@@ -174,6 +174,9 @@ comp_ds_bilinear_onethird_loop0:
     //restore   the tailer for the unasigned size
     st1     {v16.16b}, [x0]
 WELS_ASM_AARCH64_FUNC_END
+//void DyadicBilinearQuarterDownsampler_AArch64_neon(uint8_t* pDst, const int32_t kiDstStride,
+//uint8_t* pSrc, const int32_t kiSrcStride,
+//const int32_t kiSrcWidth, const int32_t kiHeight);
 
 WELS_ASM_AARCH64_FUNC_BEGIN DyadicBilinearQuarterDownsampler_AArch64_neon
     //Initialize the register
@@ -229,6 +232,9 @@ comp_ds_bilinear_quarter_loop0:
     st1     {v16.16b}, [x0]
 WELS_ASM_AARCH64_FUNC_END
 
+//void GeneralBilinearAccurateDownsampler_AArch64_neon (uint8_t* pDst, const int32_t kiDstStride,
+//    const int32_t kiDstWidth, const int32_t kiDstHeight,
+//   uint8_t* pSrc, const int32_t kiSrcStride, const uint32_t kuiScaleX, const uint32_t kuiScaleY);
 WELS_ASM_AARCH64_FUNC_BEGIN GeneralBilinearAccurateDownsampler_AArch64_neon
     mov     w10, #32767
     and     w8, w6, w10
@@ -259,6 +265,13 @@ WELS_ASM_AARCH64_FUNC_BEGIN GeneralBilinearAccurateDownsampler_AArch64_neon
 
     eor     v26.16b, v26.16b, v26.16b
     eor     v27.16b, v27.16b, v27.16b
+    SIGN_EXTENSION x1, w1
+    SIGN_EXTENSION x2, w2
+    SIGN_EXTENSION x3, w3
+    SIGN_EXTENSION x5, w5
+    SIGN_EXTENSION x6, w6
+    SIGN_EXTENSION x7, w7
+
     sub     x1, x1, x2
     sub     x3, x3, #1
 

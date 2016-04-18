@@ -33,6 +33,8 @@
 #ifdef HAVE_NEON_AARCH64
 #include "arm_arch64_common_macro.S"
 WELS_ASM_AARCH64_FUNC_BEGIN SampleVariance16x16_AArch64_neon
+    SIGN_EXTENSION x1, w1
+    SIGN_EXTENSION x3, w3
     ld1   {v1.16b}, [x0], x1 //save the ref data (16bytes)
     ld1   {v0.16b}, [x2], x3 //save the src data (16bytes)
     uabd  v2.16b, v0.16b, v1.16b

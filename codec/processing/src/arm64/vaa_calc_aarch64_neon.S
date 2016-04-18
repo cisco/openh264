@@ -61,6 +61,8 @@
  */
 WELS_ASM_AARCH64_FUNC_BEGIN VAACalcSad_AArch64_neon
     eor     v31.16b, v31.16b, v31.16b
+
+    SIGN_EXTENSION x4, w4
     lsl     x9, x4, #4
     sub     x10, x9, #16    //x10 keep the 16*pic_stride-16
     sub     x9, x9, x2      //x9 keep the 16*pic_stride-pic_width
@@ -119,6 +121,7 @@ WELS_ASM_AARCH64_FUNC_BEGIN VAACalcSadBgd_AArch64_neon
     ldr     x15, [sp, #0]
     eor     v28.16b, v28.16b, v28.16b
 
+    SIGN_EXTENSION x4, w4
     lsl     x9, x4, #4
     sub     x10, x9, #16    //x10 keep the 16*pic_stride-16
     sub     x9, x9, x2      //x9 keep the 16*pic_stride-pic_width
@@ -260,6 +263,7 @@ WELS_ASM_AARCH64_FUNC_BEGIN VAACalcSadSsdBgd_AArch64_neon
     ldr     x15, [sp, #24]  //p_mad8x8
     eor     v17.16b, v17.16b, v17.16b
 
+    SIGN_EXTENSION x4, w4
     lsl     x9, x4, #4
     sub     x10, x9, #16    //x10 keep the 16*pic_stride-16
     sub     x9, x9, x2      //x9 keep the 16*pic_stride-pic_width
@@ -400,6 +404,7 @@ WELS_ASM_AARCH64_FUNC_BEGIN VAACalcSadSsd_AArch64_neon
     ldr     x13, [sp, #8]   //psqdiff16x16
     eor     v17.16b, v17.16b, v17.16b
 
+    SIGN_EXTENSION x4, w4
     lsl     x9, x4, #4
     sub     x10, x9, #16    //x10 keep the 16*pic_stride-16
     sub     x9, x9, x2      //x9 keep the 16*pic_stride-pic_width
@@ -500,6 +505,7 @@ WELS_ASM_AARCH64_FUNC_BEGIN VAACalcSadVar_AArch64_neon
     ldr     x12, [sp, #0]   //psqsum16x16
     eor     v17.16b, v17.16b, v17.16b
 
+    SIGN_EXTENSION x4, w4
     lsl     x9, x4, #4
     sub     x10, x9, #16    //x10 keep the 16*pic_stride-16
     sub     x9, x9, x2      //x9 keep the 16*pic_stride-pic_width

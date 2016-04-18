@@ -294,6 +294,9 @@ WELS_ASM_AARCH64_FUNC_BEGIN McHorVer20WidthEq16_AArch64_neon
     sub x0, x0, #2
     movi v0.8h, #20, lsl #0
     movi v1.8h, #5, lsl #0
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
 w16_h_mc_luma_loop:
     ld1 {v2.8b, v3.8b, v4.8b}, [x0], x1 //only use 21(16+5); v2=src[-2]
     trn1 v2.2d, v2.2d, v3.2d
@@ -312,11 +315,15 @@ w16_h_mc_luma_loop:
     cbnz x4, w16_h_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
 
+//void McHorVer20WidthEq8_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer20WidthEq8_AArch64_neon
     sub x0, x0, #2
     stp d8,d9, [sp,#-16]!
     movi v8.8h, #20, lsl #0
     movi v9.8h, #5, lsl #0
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
 w8_h_mc_luma_loop:
     VEC4_LD1_8BITS_16ELEMENT x0, x1, v16, v20, v24, v28    //load src[-2] in v16,v20,v24,v28 for 4 row; only use 13(8+5);
     sub x4, x4, #4
@@ -366,10 +373,15 @@ w8_h_mc_luma_loop:
     ldp d8,d9,[sp],#16
 WELS_ASM_AARCH64_FUNC_END
 
+//void McHorVer20WidthEq4_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                      int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer20WidthEq4_AArch64_neon
     sub x0, x0, #2
     movi v0.8h, #20, lsl #0
     movi v1.8h, #5, lsl #0
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
     asr x4, x4, #1
 w4_h_mc_luma_loop:
     ld1 {v2.16b}, [x0], x1 //only use 9(4+5); 1st row src[-2:6]
@@ -401,10 +413,15 @@ w4_h_mc_luma_loop:
     cbnz x4, w4_h_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
 
+//void McHorVer10WidthEq16_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                       int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer10WidthEq16_AArch64_neon
     sub x0, x0, #2
     movi v0.8h, #20, lsl #0
     movi v1.8h, #5, lsl #0
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
 w16_xy_10_mc_luma_loop:
     ld1 {v2.8b, v3.8b, v4.8b}, [x0], x1 //only use 21(16+5); v2=src[-2]
     trn1 v2.2d, v2.2d, v3.2d
@@ -423,11 +440,16 @@ w16_xy_10_mc_luma_loop:
     cbnz x4, w16_xy_10_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
 
+//void McHorVer10WidthEq8_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                      int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer10WidthEq8_AArch64_neon
     sub x0, x0, #2
     stp d8,d9, [sp,#-16]!
     movi v8.8h, #20, lsl #0
     movi v9.8h, #5, lsl #0
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
 w8_xy_10_mc_luma_loop:
     VEC4_LD1_8BITS_16ELEMENT x0, x1, v16, v20, v24, v28    //load src[-2] in v16,v20,v24,v28 for 4 row; only use 13(8+5);
     sub x4, x4, #4
@@ -479,10 +501,15 @@ w8_xy_10_mc_luma_loop:
     ldp d8,d9,[sp],#16
 WELS_ASM_AARCH64_FUNC_END
 
+//void McHorVer10WidthEq4_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                      int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer10WidthEq4_AArch64_neon
     sub x0, x0, #2
     movi v0.8h, #20, lsl #0
     movi v1.8h, #5, lsl #0
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
     asr x4, x4, #1
 w4_xy_10_mc_luma_loop:
     ld1 {v2.16b}, [x0], x1 //only use 9(4+5); 1st row src[-2:6]
@@ -514,11 +541,15 @@ w4_xy_10_mc_luma_loop:
     cbnz x4, w4_xy_10_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
 
-
+//void McHorVer30WidthEq16_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                       int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer30WidthEq16_AArch64_neon
     sub x0, x0, #2
     movi v0.8h, #20, lsl #0
     movi v1.8h, #5, lsl #0
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
 w16_xy_30_mc_luma_loop:
     ld1 {v2.8b, v3.8b, v4.8b}, [x0], x1 //only use 21(16+5); v2=src[-2]
     trn1 v2.2d, v2.2d, v3.2d
@@ -537,11 +568,16 @@ w16_xy_30_mc_luma_loop:
     cbnz x4, w16_xy_30_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
 
+//void McHorVer30WidthEq8_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                      int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer30WidthEq8_AArch64_neon
     sub x0, x0, #2
     stp d8,d9, [sp,#-16]!
     movi v8.8h, #20, lsl #0
     movi v9.8h, #5, lsl #0
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
 w8_xy_30_mc_luma_loop:
     VEC4_LD1_8BITS_16ELEMENT x0, x1, v16, v20, v24, v28    //load src[-2] in v16,v20,v24,v28 for 4 row; only use 13(8+5);
     sub x4, x4, #4
@@ -593,10 +629,15 @@ w8_xy_30_mc_luma_loop:
     ldp d8,d9,[sp],#16
 WELS_ASM_AARCH64_FUNC_END
 
+//void McHorVer30WidthEq4_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                      int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer30WidthEq4_AArch64_neon
     sub x0, x0, #2
     movi v0.8h, #20, lsl #0
     movi v1.8h, #5, lsl #0
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
     asr x4, x4, #1
 w4_xy_30_mc_luma_loop:
     ld1 {v2.16b}, [x0], x1 //only use 9(4+5); 1st row src[-2:6]
@@ -628,8 +669,12 @@ w4_xy_30_mc_luma_loop:
     cbnz x4, w4_xy_30_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
 
-
+//void McHorVer01WidthEq16_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                       int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer01WidthEq16_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
     sub x0, x0, x1, lsl #1
     movi v0.8h, #20, lsl #0
     movi v1.8h, #5, lsl #0
@@ -711,7 +756,12 @@ w16_xy_01_mc_luma_loop:
     cbnz x4, w16_xy_01_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
 
+//void McHorVer01WidthEq8_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                      int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer01WidthEq8_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
     sub x0, x0, x1, lsl #1
     movi v30.8h, #20, lsl #0
     movi v31.8h, #5, lsl #0
@@ -750,7 +800,12 @@ w8_xy_01_mc_luma_loop:
     cbnz x4, w8_xy_01_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
 
+//void McHorVer01WidthEq4_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                      int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer01WidthEq4_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
     sub x0, x0, x1, lsl #1
     movi v0.8h, #20, lsl #0
     movi v1.8h, #5, lsl #0
@@ -805,8 +860,12 @@ w4_xy_01_mc_luma_loop:
     cbnz x4, w4_xy_01_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
 
-
+//void McHorVer03WidthEq16_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                       int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer03WidthEq16_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
     sub x0, x0, x1, lsl #1
     movi v0.8h, #20, lsl #0
     movi v1.8h, #5, lsl #0
@@ -888,7 +947,12 @@ w16_xy_03_mc_luma_loop:
     cbnz x4, w16_xy_03_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
 
+//void McHorVer03WidthEq8_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                      int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer03WidthEq8_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
     sub x0, x0, x1, lsl #1
     movi v30.8h, #20, lsl #0
     movi v31.8h, #5, lsl #0
@@ -927,7 +991,12 @@ w8_xy_03_mc_luma_loop:
     cbnz x4, w8_xy_03_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
 
+//void McHorVer03WidthEq4_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                      int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer03WidthEq4_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
     sub x0, x0, x1, lsl #1
     movi v0.8h, #20, lsl #0
     movi v1.8h, #5, lsl #0
@@ -982,8 +1051,12 @@ w4_xy_03_mc_luma_loop:
     cbnz x4, w4_xy_03_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
 
-
+//void McHorVer02WidthEq16_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                       int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer02WidthEq16_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
     sub x0, x0, x1, lsl #1
     movi v0.8h, #20, lsl #0
     movi v1.8h, #5, lsl #0
@@ -1065,7 +1138,12 @@ w16_xy_02_mc_luma_loop:
     cbnz x4, w16_xy_02_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
 
+//void McHorVer02WidthEq8_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                      int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer02WidthEq8_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
     sub x0, x0, x1, lsl #1
     movi v30.8h, #20, lsl #0
     movi v31.8h, #5, lsl #0
@@ -1100,7 +1178,12 @@ w8_xy_02_mc_luma_loop:
     cbnz x4, w8_xy_02_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
 
+//void McHorVer02WidthEq4_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                      int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer02WidthEq4_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
     sub x0, x0, x1, lsl #1
     movi v0.8h, #20, lsl #0
     movi v1.8h, #5, lsl #0
@@ -1155,8 +1238,12 @@ w4_xy_02_mc_luma_loop:
     cbnz x4, w4_xy_02_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
 
-
+//void McHorVer22WidthEq16_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                       int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer22WidthEq16_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
     stp d8, d9, [sp,#-16]!
     stp d10, d11, [sp,#-16]!
     stp d12, d13, [sp,#-16]!
@@ -1321,7 +1408,12 @@ w16_hv_mc_luma_loop:
     ldp d8, d9, [sp], #16
 WELS_ASM_AARCH64_FUNC_END
 
+//void McHorVer22WidthEq8_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                      int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer22WidthEq8_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
     sub x0, x0, #2
     sub x0, x0, x1, lsl #1
     movi v0.8h, #20, lsl #0
@@ -1391,9 +1483,13 @@ w8_hv_mc_luma_loop:
     sub x4, x4, #4
     cbnz x4, w8_hv_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
-
+//void McHorVer22WidthEq4_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                      int32_t iHeight);
 
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer22WidthEq4_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
     sub x0, x0, #2
     sub x0, x0, x1, lsl #1
     movi v0.8h, #20, lsl #0
@@ -1462,9 +1558,13 @@ w4_hv_mc_luma_loop:
     sub x4, x4, #4
     cbnz x4, w4_hv_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
-
+//void McCopyWidthEq16_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                   int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN McCopyWidthEq16_AArch64_neon
     //prfm pldl1strm, [x0]
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
 w16_copy_loop:
     //prfm pldl1strm, [x0, x1]
     ld1 {v0.16b}, [x0], x1  //read 16Byte : 0 line
@@ -1476,9 +1576,13 @@ w16_copy_loop:
     sub x4, x4, #2
     cbnz x4, w16_copy_loop
 WELS_ASM_AARCH64_FUNC_END
-
+//void McCopyWidthEq8_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                  int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN McCopyWidthEq8_AArch64_neon
     //prfm pldl1strm, [x0]
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
 w8_copy_loop:
     //prfm pldl1strm, [x0, x1]
     ld1 {v0.8b}, [x0], x1  //read 16Byte : 0 line
@@ -1493,6 +1597,9 @@ WELS_ASM_AARCH64_FUNC_END
 
 WELS_ASM_AARCH64_FUNC_BEGIN McCopyWidthEq4_AArch64_neon
     //prfm pldl1strm, [x0]
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
 w4_copy_loop:
     //prfm pldl1strm, [x0, x1]
     ld1 {v0.s}[0], [x0], x1  //read 16Byte : 0 line
@@ -1505,8 +1612,14 @@ w4_copy_loop:
     cbnz x4, w4_copy_loop
 WELS_ASM_AARCH64_FUNC_END
 
-WELS_ASM_AARCH64_FUNC_BEGIN PixStrideAvgWidthEq16_AArch64_neon
+//void PixStrideAvgWidthEq16_AArch64_neon (uint8_t* pDst, int32_t iDstStride, const uint8_t* pSrcA, int32_t iSrcStrideA,
+//const uint8_t* pSrcB, int32_t iSrcStrideB, int32_t iHeight);
 
+WELS_ASM_AARCH64_FUNC_BEGIN PixStrideAvgWidthEq16_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x5,w5
+    SIGN_EXTENSION x6,w6
 enc_w16_pix_avg_loop:
     ld1 {v0.16b}, [x2], x3  //read 16Byte : src0: 0 line
     ld1 {v1.16b}, [x4], x5  //read 16Byte : src1: 0 line
@@ -1538,9 +1651,15 @@ enc_w16_pix_avg_loop:
     cbnz x6, enc_w16_pix_avg_loop
 WELS_ASM_AARCH64_FUNC_END
 
+//void PixStrideAvgWidthEq8_AArch64_neon (uint8_t* pDst, int32_t iDstStride, const uint8_t* pSrcA, int32_t iSrcStrideA,
+//                                        const uint8_t* pSrcB, int32_t iSrcStrideB, int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN PixStrideAvgWidthEq8_AArch64_neon
     //prfm pldl1strm, [x2]
     //prfm pldl1strm, [x4]
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x5,w5
+    SIGN_EXTENSION x6,w6
 enc_w8_pix_avg_loop:
     //prfm pldl1strm, [x2, x3]
     //prfm pldl1strm, [x4, x5]
@@ -1574,10 +1693,15 @@ enc_w8_pix_avg_loop:
     sub x6, x6, #4
     cbnz x6, enc_w8_pix_avg_loop
 WELS_ASM_AARCH64_FUNC_END
-
+//void PixelAvgWidthEq16_AArch64_neon (uint8_t* pDst, int32_t iDstStride, const uint8_t* pSrcA, int32_t iSrcAStride,
+//                                     const uint8_t* pSrcB, int32_t iSrcBStride, int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN PixelAvgWidthEq16_AArch64_neon
     //prfm pldl1strm, [x2]
     //prfm pldl1strm, [x4]
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x5,w5
+    SIGN_EXTENSION x6,w6
 w16_pix_avg_loop:
     //prfm pldl1strm, [x2, x3]
     //prfm pldl1strm, [x4, x5]
@@ -1616,10 +1740,15 @@ w16_pix_avg_loop:
     sub x6, x6, #4
     cbnz x6, w16_pix_avg_loop
 WELS_ASM_AARCH64_FUNC_END
-
+//void PixelAvgWidthEq8_AArch64_neon (uint8_t* pDst, int32_t iDstStride, const uint8_t* pSrcA, int32_t iSrcAStride,
+//                                   const uint8_t* pSrcB, int32_t iSrcBStride, int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN PixelAvgWidthEq8_AArch64_neon
     //prfm pldl1strm, [x2]
     //prfm pldl1strm, [x4]
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x5,w5
+    SIGN_EXTENSION x6,w6
 w8_pix_avg_loop:
     //prfm pldl1strm, [x2, x3]
     //prfm pldl1strm, [x4, x5]
@@ -1654,10 +1783,15 @@ w8_pix_avg_loop:
     cbnz x6, w8_pix_avg_loop
 WELS_ASM_AARCH64_FUNC_END
 
-
+//void PixelAvgWidthEq4_AArch64_neon (uint8_t* pDst, int32_t iDstStride, const uint8_t* pSrcA, int32_t iSrcAStride,
+//                                    const uint8_t* pSrcB, int32_t iSrcBStride, int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN PixelAvgWidthEq4_AArch64_neon
     //prfm pldl1strm, [x2]
     //prfm pldl1strm, [x4]
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x5,w5
+    SIGN_EXTENSION x6,w6
 w4_pix_avg_loop:
     //prfm pldl1strm, [x2, x3]
     //prfm pldl1strm, [x4, x5]
@@ -1674,8 +1808,12 @@ w4_pix_avg_loop:
     sub x6, x6, #2
     cbnz x6, w4_pix_avg_loop
 WELS_ASM_AARCH64_FUNC_END
-
+//void McChromaWidthEq8_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                    int32_t* pWeights, int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN McChromaWidthEq8_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x5,w5
     ld4r {v28.8b, v29.8b, v30.8b, v31.8b}, [x4] //load A/B/C/D
     ld1 {v16.16b}, [x0], x1  // src[x]
     ext v17.16b, v16.16b, v16.16b, #1  // src[x+1]
@@ -1729,8 +1867,12 @@ w8_mc_chroma_loop:
     sub x5, x5, #4
     cbnz x5, w8_mc_chroma_loop
 WELS_ASM_AARCH64_FUNC_END
-
+//void McChromaWidthEq4_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                    int32_t* pWeights, int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN McChromaWidthEq4_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x5,w5
     ld4r {v4.8b, v5.8b, v6.8b, v7.8b}, [x4] //load A/B/C/D
     ld1 {v0.8b}, [x0], x1  // src[x]
     ext v1.8b, v0.8b, v0.8b, #1  // src[x+1]
@@ -1759,8 +1901,12 @@ w4_mc_chroma_loop:
     cbnz x5, w4_mc_chroma_loop
 WELS_ASM_AARCH64_FUNC_END
 
-
+//void McHorVer20Width17_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                    int32_t iHeight);// width+1
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer20Width17_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
     sub x0, x0, #2
     sub x3, x3, #16
     mov x5, #16
@@ -1789,7 +1935,12 @@ w17_h_mc_luma_loop:
     cbnz x4, w17_h_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
 
+//void McHorVer20Width9_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                    int32_t iHeight);// width+1
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer20Width9_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
     sub x0, x0, #2
     sub x3, x3, #8
     mov x5, #8
@@ -1817,8 +1968,12 @@ w9_h_mc_luma_loop:
     cbnz x4, w9_h_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
 
-
+//void McHorVer20Width5_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                    int32_t iHeight);// width+1
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer20Width5_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
     sub x0, x0, #2
     sub x3, x3, #4
     mov x5, #4
@@ -1841,12 +1996,16 @@ w5_h_mc_luma_loop:
     cbnz x4, w5_h_mc_luma_loop
 WELS_ASM_AARCH64_FUNC_END
 
-
+//void McHorVer22Width17_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                     int32_t iHeight);
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer22Width17_AArch64_neon
     stp d8, d9, [sp,#-16]!
     stp d10, d11, [sp,#-16]!
     stp d12, d13, [sp,#-16]!
     stp d14, d15, [sp,#-16]!
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
     sub x0, x0, #2
     sub x0, x0, x1, lsl #1
     movi v0.8h, #20, lsl #0
@@ -2044,8 +2203,12 @@ w17_hv_mc_luma_loop:
     ldp d8, d9, [sp], #16
 WELS_ASM_AARCH64_FUNC_END
 
-
+//void McHorVer22Width9_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                    int32_t iHeight);//width+1&&height+1
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer22Width9_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
     sub x0, x0, #2
     sub x0, x0, x1, lsl #1
     movi v0.8h, #20, lsl #0
@@ -2140,8 +2303,12 @@ w9_hv_mc_luma_loop:
     st1 {v26.b}[0], [x2], x3 //write 8th Byte : 0 line
 WELS_ASM_AARCH64_FUNC_END
 
-
+//void McHorVer22Width5_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                    int32_t iHeight);//width+1&&height+1
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer22Width5_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
     sub x0, x0, #2
     sub x0, x0, x1, lsl #1
     movi v0.8h, #20, lsl #0
@@ -2231,8 +2398,12 @@ w5_hv_mc_luma_loop:
     st1 {v26.b}[4], [x2], x3 //write 5th Byte : 0 line
 WELS_ASM_AARCH64_FUNC_END
 
-
+//void McHorVer02Height17_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                      int32_t iHeight);// height+1
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer02Height17_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
     sub x0, x0, x1, lsl #1
     movi v0.8h, #20, lsl #0
     movi v1.8h, #5, lsl #0
@@ -2320,8 +2491,12 @@ w17_v_mc_luma_loop:
     FILTER_6TAG_8BITS2 v2, v3, v4, v5, v6, v7, v20, v0, v1
     st1 {v20.16b}, [x2], x3 //write 16Byte : last line
 WELS_ASM_AARCH64_FUNC_END
-
+//void McHorVer02Height9_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                     int32_t iHeight);// height+1
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer02Height9_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
     sub x0, x0, x1, lsl #1
     movi v0.8h, #20, lsl #0
     movi v1.8h, #5, lsl #0
@@ -2375,8 +2550,12 @@ w9_v_mc_luma_loop:
     st1 {v20.8b}, [x2], x3 //write 8Byte : 0 line
 WELS_ASM_AARCH64_FUNC_END
 
-
+//void McHorVer02Height5_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+//                                     int32_t iHeight);// height+1
 WELS_ASM_AARCH64_FUNC_BEGIN McHorVer02Height5_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x4,w4
     sub x0, x0, x1, lsl #1
     movi v0.8h, #20, lsl #0
     movi v1.8h, #5, lsl #0
