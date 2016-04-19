@@ -75,6 +75,8 @@ int32_t  WriteBlockResidualCavlc (SWelsFuncPtrList* pFuncList, int16_t* pCoffLev
 extern "C" {
 #endif//__cplusplus
 
+int32_t CavlcParamCal_c (int16_t* pCoffLevel, uint8_t* pRun, int16_t* pLevel, int32_t* pTotalCoeffs ,
+                         int32_t iEndIdx);
 #ifdef  X86_ASM
 int32_t CavlcParamCal_sse2 (int16_t* pCoffLevel, uint8_t* pRun, int16_t* pLevel, int32_t* pTotalCoeffs ,
                             int32_t iEndIdx);
