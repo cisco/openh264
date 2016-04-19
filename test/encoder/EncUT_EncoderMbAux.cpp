@@ -301,6 +301,10 @@ TEST (EncodeMbAuxTest, WelsGetNoneZeroCount_c) {
 TEST (EncodeMbAuxTest, WelsGetNoneZeroCount_sse2) {
   TestGetNoneZeroCount (WelsGetNoneZeroCount_sse2);
 }
+TEST (EncodeMbAuxTest, WelsGetNoneZeroCount_sse42) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_SSE42)
+    TestGetNoneZeroCount (WelsGetNoneZeroCount_sse42);
+}
 #endif
 #define WELS_ABS_LC(a) ((sign ^ (int32_t)(a)) - sign)
 #define NEW_QUANT(pDct, ff, mf) (((ff)+ WELS_ABS_LC(pDct))*(mf)) >>16
