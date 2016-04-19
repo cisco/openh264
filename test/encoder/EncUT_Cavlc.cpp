@@ -81,3 +81,10 @@ TEST (CavlcTest, CavlcParamCal_sse2) {
   TestCavlcParamCal (CavlcParamCal_sse2);
 }
 #endif
+
+#ifdef X86_ASM
+TEST (CavlcTest, CavlcParamCal_sse42) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_SSE42)
+    TestCavlcParamCal (CavlcParamCal_sse42);
+}
+#endif
