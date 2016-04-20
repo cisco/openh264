@@ -122,6 +122,7 @@ WELS_ASM_AARCH64_FUNC_END
 
 WELS_ASM_AARCH64_FUNC_BEGIN WelsBlockZero8x8_AArch64_neon
     eor v0.16b, v0.16b, v0.16b
+    SIGN_EXTENSION x1, w1
     lsl x1, x1, 1
 .rept 8
     st1 {v0.16b}, [x0], x1

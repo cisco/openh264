@@ -469,7 +469,10 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsDequantIHadamard4x4_AArch64_neon
     st1    {v0.16b, v1.16b}, [x0]
 WELS_ASM_AARCH64_FUNC_END
 
+//void WelsDctT4_AArch64_neon (int16_t* pDct,  uint8_t* pPixel1, int32_t iStride1, uint8_t* pPixel2, int32_t iStride2);
 WELS_ASM_AARCH64_FUNC_BEGIN WelsDctT4_AArch64_neon
+    SIGN_EXTENSION x2, w2
+    SIGN_EXTENSION x4, w4
     LOAD_4x4_DATA_FOR_DCT   v0, v1, x1, x2, x3, x4
     usubl  v2.8h, v0.8b, v1.8b
     usubl2 v4.8h, v0.16b, v1.16b
