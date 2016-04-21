@@ -517,12 +517,13 @@ WELS_EXTERN CavlcParamCal_sse42
 %define p_run          r1
 %define p_level        r2
 %define p_total_coeffs r3
-%define i_endidxd      r4d
+%define i_endidxd      dword arg5d
 
 %ifdef X86_32
+    push            r4
     push            r5
     push            r6
-    %assign push_num 2
+    %assign push_num 3
     %define r_mask  r5
     %define r_maskd r5d
     %define p_shufb_lut wels_cavlc_param_cal_shufb_lut
@@ -544,7 +545,7 @@ WELS_EXTERN CavlcParamCal_sse42
     lea             p_shufb_lut, [wels_cavlc_param_cal_shufb_lut]
 %endif
 
-    LOAD_5_PARA
+    LOAD_4_PARA
     PUSH_XMM 2
 
     ; Free up rcx/ecx because only cl is accepted as shift amount operand.
@@ -644,10 +645,11 @@ WELS_EXTERN CavlcParamCal_sse42
 .done:
     mov             retrq, i_total_zeros
     POP_XMM
-    LOAD_5_PARA_POP
+    LOAD_4_PARA_POP
 %ifdef X86_32
     pop             r6
     pop             r5
+    pop             r4
 %elifdef WIN64
     pop             rbx
 %endif
