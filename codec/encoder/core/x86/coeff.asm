@@ -592,7 +592,6 @@ WELS_EXTERN CavlcParamCal_sse42
     pshufb          xmm0, [wels_shufb_rev]
     pmovmskb        r_maskd, xmm0
     xor             r_maskd, 0FFFFh
-    mov             r_tmpd, i_endidxd
 %undef i_endidxd
 %define r_tmp2  r4
 %define r_tmp2d r4d
