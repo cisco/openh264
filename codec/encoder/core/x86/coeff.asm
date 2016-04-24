@@ -513,65 +513,62 @@ WELS_EXTERN CavlcParamCal_sse2
 ;***********************************************************************
 
 WELS_EXTERN CavlcParamCal_sse42
-%define p_coeff_level  r0
-%define p_run          r1
-%define p_level        r2
-%define p_total_coeffs r3
 %define i_endidxd      dword arg5d
 
 %ifdef X86_32
+    push            r3
     push            r4
     push            r5
     push            r6
-    %assign push_num 3
+    %assign push_num 4
+    %define p_total_coeffs r0
+    %define r_tmp r1
+    %define r_tmpd r1d
+    %define r_tmpb r1b
+    %define p_level r2
+    %define p_coeff_level r3
     %define r_mask  r5
     %define r_maskd r5d
+    %define p_run r6
     %define p_shufb_lut wels_cavlc_param_cal_shufb_lut
     %define p_run_lut   wels_cavlc_param_cal_run_lut
+    mov             p_coeff_level, arg1
+    mov             p_run, arg2
+    mov             p_level, arg3
+    mov             p_total_coeffs, arg4
 %elifdef WIN64
     push            rbx
     %assign push_num 1
+    %define p_coeff_level r0
+    %define p_run r1
+    %define p_level r2
+    %define p_total_coeffs r3
     %define r_mask  rbx
     %define r_maskd ebx
     %define p_shufb_lut r5
     %define p_run_lut (p_shufb_lut + (wels_cavlc_param_cal_run_lut - wels_cavlc_param_cal_shufb_lut))
     lea             p_shufb_lut, [wels_cavlc_param_cal_shufb_lut]
-%else
-    %assign push_num 0
-    %define r_mask  rax
-    %define r_maskd eax
-    %define p_shufb_lut r5
-    %define p_run_lut (p_shufb_lut + (wels_cavlc_param_cal_run_lut - wels_cavlc_param_cal_shufb_lut))
-    lea             p_shufb_lut, [wels_cavlc_param_cal_shufb_lut]
-%endif
-
     LOAD_4_PARA
-    PUSH_XMM 2
-
     ; Free up rcx/ecx because only cl is accepted as shift amount operand.
-%ifidni r0b, cl
     mov             r6, r0
     %undef p_coeff_level
     %define p_coeff_level r6
     %define r_tmp r0
     %define r_tmpd r0d
     %define r_tmpb r0b
-%elifidni r1b, cl
-    mov             r6, r1
-    %undef p_run
-    %define p_run r6
-    %define r_tmp r1
-    %define r_tmpd r1d
-    %define r_tmpb r1b
-%elifidni r3b, cl
-    mov             r6, r3
-    %undef p_total_coeffs
-    %define p_total_coeffs r6
-    %define r_tmp r3
-    %define r_tmpd r3d
-    %define r_tmpb r3b
 %else
-    %error "Unknown cl register."
+    %assign push_num 0
+    %define p_coeff_level r0
+    %define p_run r1
+    %define p_level r2
+    %define p_total_coeffs r3
+    %define r_mask  rax
+    %define r_maskd eax
+    %define p_shufb_lut r5
+    %define i_total_zeros r6
+    %define p_run_lut (p_shufb_lut + (wels_cavlc_param_cal_run_lut - wels_cavlc_param_cal_shufb_lut))
+    lea             p_shufb_lut, [wels_cavlc_param_cal_shufb_lut]
+    LOAD_4_PARA
 %endif
 
     ; Acquire a bitmask indicating which words are non-zero.
@@ -598,7 +595,14 @@ WELS_EXTERN CavlcParamCal_sse42
 %define r_tmp2d r4d
     popcnt          r_tmp2d, r_maskd
     mov             [p_total_coeffs], r_tmp2d
-%xdefine i_total_zeros p_total_coeffs
+    ; Recycle p_total_coeffs.
+%ifidni p_total_coeffs, rcx
+    %define r_tmp rcx
+    %define r_tmpd ecx
+    %define r_tmpb cl
+%else
+    %xdefine i_total_zeros p_total_coeffs
+%endif
 %undef p_total_coeffs
     mov             i_total_zeros, r_tmp2
     jz              .done
@@ -643,13 +647,17 @@ WELS_EXTERN CavlcParamCal_sse42
     shr             r_maskd, 4
     jnz             .loop
 .done:
+%ifnidni retrq, i_total_zeros
     mov             retrq, i_total_zeros
-    POP_XMM
+%endif
+%ifndef X86_32
     LOAD_4_PARA_POP
+%endif
 %ifdef X86_32
     pop             r6
     pop             r5
     pop             r4
+    pop             r3
 %elifdef WIN64
     pop             rbx
 %endif
