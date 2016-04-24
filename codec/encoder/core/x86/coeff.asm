@@ -548,7 +548,6 @@ WELS_EXTERN CavlcParamCal_sse42
     %define p_shufb_lut r5
     %define p_run_lut (p_shufb_lut + (wels_cavlc_param_cal_run_lut - wels_cavlc_param_cal_shufb_lut))
     lea             p_shufb_lut, [wels_cavlc_param_cal_shufb_lut]
-    LOAD_4_PARA
     ; Free up rcx/ecx because only cl is accepted as shift amount operand.
     mov             r6, r0
     %undef p_coeff_level
@@ -568,7 +567,6 @@ WELS_EXTERN CavlcParamCal_sse42
     %define i_total_zeros r6
     %define p_run_lut (p_shufb_lut + (wels_cavlc_param_cal_run_lut - wels_cavlc_param_cal_shufb_lut))
     lea             p_shufb_lut, [wels_cavlc_param_cal_shufb_lut]
-    LOAD_4_PARA
 %endif
 
     ; Acquire a bitmask indicating which words are non-zero.
@@ -649,9 +647,6 @@ WELS_EXTERN CavlcParamCal_sse42
 .done:
 %ifnidni retrq, i_total_zeros
     mov             retrq, i_total_zeros
-%endif
-%ifndef X86_32
-    LOAD_4_PARA_POP
 %endif
 %ifdef X86_32
     pop             r6
