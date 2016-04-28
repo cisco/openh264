@@ -368,3 +368,137 @@ WELS_EXTERN WelsDequantIHadamard4x4_sse2
     punpcklqdq  xmm2,       xmm3
     MOVDQ       [r0+16],    xmm2
     ret
+
+
+; data=%1 abs_out=%2 ff=%3 mf=%4 7FFFh=%5
+%macro AVX2_Quant 5
+    vpabsw          %2, %1
+    vpor            %1, %1, %5  ; ensure non-zero before vpsignw
+    vpaddusw        %2, %2, %3
+    vpmulhuw        %2, %2, %4
+    vpsignw         %1, %2, %1
+%endmacro
+
+
+;***********************************************************************
+;   void WelsQuant4x4_avx2(int16_t *pDct, int16_t* ff, int16_t *mf);
+;***********************************************************************
+
+WELS_EXTERN WelsQuant4x4_avx2
+    %assign push_num 0
+    LOAD_3_PARA
+    PUSH_XMM 5
+    vbroadcasti128  ymm0, [r1]
+    vbroadcasti128  ymm1, [r2]
+    WELS_DW32767_VEX ymm2
+    vmovdqu         ymm3, [r0]
+    AVX2_Quant      ymm3, ymm4, ymm0, ymm1, ymm2
+    vmovdqu         [r0], ymm3
+    vzeroupper
+    POP_XMM
+    ret
+
+
+;***********************************************************************
+;void WelsQuant4x4Dc_avx2(int16_t *pDct, int16_t ff, int16_t mf);
+;***********************************************************************
+
+WELS_EXTERN WelsQuant4x4Dc_avx2
+    %assign push_num 0
+    LOAD_1_PARA
+    PUSH_XMM 5
+%ifidni r1, arg2
+    vmovd           xmm0, arg2d
+    vpbroadcastw    ymm0, xmm0
+%else
+    vpbroadcastw    ymm0, arg2
+%endif
+%ifidni r2, arg3
+    vmovd           xmm1, arg3d
+    vpbroadcastw    ymm1, xmm1
+%else
+    vpbroadcastw    ymm1, arg3
+%endif
+    WELS_DW32767_VEX ymm2
+    vmovdqu         ymm3, [r0]
+    AVX2_Quant      ymm3, ymm4, ymm0, ymm1, ymm2
+    vmovdqu         [r0], ymm3
+    vzeroupper
+    POP_XMM
+    ret
+
+
+;***********************************************************************
+;   void WelsQuantFour4x4_avx2(int16_t *pDct, int16_t* ff, int16_t *mf);
+;***********************************************************************
+
+WELS_EXTERN WelsQuantFour4x4_avx2
+    %assign push_num 0
+    LOAD_3_PARA
+    PUSH_XMM 6
+    vbroadcasti128  ymm0, [r1]
+    vbroadcasti128  ymm1, [r2]
+    WELS_DW32767_VEX ymm4
+    vmovdqu         ymm3, [r0 + 0x00]
+    vmovdqu         ymm5, [r0 + 0x20]
+    AVX2_Quant      ymm3, ymm2, ymm0, ymm1, ymm4
+    vmovdqu         [r0 + 0x00], ymm3
+    AVX2_Quant      ymm5, ymm2, ymm0, ymm1, ymm4
+    vmovdqu         [r0 + 0x20], ymm5
+    vmovdqu         ymm3, [r0 + 0x40]
+    vmovdqu         ymm5, [r0 + 0x60]
+    AVX2_Quant      ymm3, ymm2, ymm0, ymm1, ymm4
+    vmovdqu         [r0 + 0x40], ymm3
+    AVX2_Quant      ymm5, ymm2, ymm0, ymm1, ymm4
+    vmovdqu         [r0 + 0x60], ymm5
+    vzeroupper
+    POP_XMM
+    ret
+
+
+;***********************************************************************
+;   void WelsQuantFour4x4Max_avx2(int16_t *pDct, int32_t* ff, int16_t *mf, int16_t *max);
+;***********************************************************************
+
+WELS_EXTERN WelsQuantFour4x4Max_avx2
+    %assign push_num 0
+    LOAD_4_PARA
+    PUSH_XMM 7
+    vbroadcasti128  ymm0, [r1]
+    vbroadcasti128  ymm1, [r2]
+    WELS_DW32767_VEX ymm6
+    vmovdqu         ymm4, [r0 + 0x00]
+    vmovdqu         ymm5, [r0 + 0x20]
+    AVX2_Quant      ymm4, ymm2, ymm0, ymm1, ymm6
+    vmovdqu         [r0 + 0x00], ymm4
+    AVX2_Quant      ymm5, ymm3, ymm0, ymm1, ymm6
+    vmovdqu         [r0 + 0x20], ymm5
+    vperm2i128      ymm4, ymm2, ymm3, 00100000b
+    vperm2i128      ymm3, ymm2, ymm3, 00110001b
+    vpmaxsw         ymm2, ymm4, ymm3
+    vmovdqu         ymm4, [r0 + 0x40]
+    vmovdqu         ymm5, [r0 + 0x60]
+    AVX2_Quant      ymm4, ymm3, ymm0, ymm1, ymm6
+    vmovdqu         [r0 + 0x40], ymm4
+    AVX2_Quant      ymm5, ymm4, ymm0, ymm1, ymm6
+    vmovdqu         [r0 + 0x60], ymm5
+    vperm2i128      ymm5, ymm3, ymm4, 00100000b
+    vperm2i128      ymm4, ymm3, ymm4, 00110001b
+    vpmaxsw         ymm3, ymm5, ymm4
+    vpxor           ymm2, ymm2, ymm6  ; flip bits so as to enable use of vphminposuw to find max value.
+    vpxor           ymm3, ymm3, ymm6  ; flip bits so as to enable use of vphminposuw to find max value.
+    vextracti128    xmm4, ymm2, 1
+    vextracti128    xmm5, ymm3, 1
+    vphminposuw     xmm2, xmm2
+    vphminposuw     xmm3, xmm3
+    vphminposuw     xmm4, xmm4
+    vphminposuw     xmm5, xmm5
+    vpunpcklwd      xmm2, xmm2, xmm4
+    vpunpcklwd      xmm3, xmm3, xmm5
+    vpunpckldq      xmm2, xmm2, xmm3
+    vpxor           xmm2, xmm2, xmm6  ; restore non-flipped values.
+    vmovq           [r3], xmm2        ; store max values.
+    vzeroupper
+    POP_XMM
+    LOAD_4_PARA_POP
+    ret
