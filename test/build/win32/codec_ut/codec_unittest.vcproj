@@ -391,6 +391,10 @@
 			Name="encoder"
 			>
 			<File
+				RelativePath="..\..\..\encoder\EncUT_Cavlc.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\encoder\EncUT_DecodeMbAux.cpp"
 				>
 			</File>
