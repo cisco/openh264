@@ -46,6 +46,7 @@
 #include "deblocking.h"
 #include "ref_list_mgr_svc.h"
 #include "mc.h"
+#include "paraset_strategy.h"
 #include "sample.h"
 
 #include "svc_enc_golomb.h"
@@ -222,6 +223,10 @@ int32_t InitFunctionPointers (sWelsEncCtx* pEncCtx, SWelsSvcCodingParam* pParam,
   InitFillNeighborCacheInterFunc (pFuncList, pParam->bEnableBackgroundDetection);
 
   InitRefListMgrFunc (pFuncList, pParam->bEnableLongTermReference, bScreenContent);
+
+  pFuncList->pParametersetStrategy = IWelsParametersetStrategy::CreateParametersetStrategy (pParam->eSpsPpsIdStrategy,
+                                     pParam->bSimulcastAVC, pParam->iSpatialLayerNum);
+  WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, (NULL == pFuncList->pParametersetStrategy))
 
   return iReturn;
 }

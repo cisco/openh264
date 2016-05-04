@@ -45,6 +45,7 @@
 #include "param_svc.h"
 #include "nal_encap.h"
 #include "picture.h"
+#include "paraset_strategy.h"
 #include "dq_map.h"
 #include "stat.h"
 #include "macros.h"
@@ -61,7 +62,6 @@
 
 namespace WelsEnc {
 
-class IWelsTaskManage;
 /*
  *  reference list for each quality layer in SVC
  */
@@ -236,30 +236,7 @@ typedef struct TagWelsEncCtx {
   bool bRecFlag;
 #endif
   int64_t            uiLastTimestamp;
-  uint32_t GetNeededSpsNum() {
-    if (0 == sPSOVector.uiNeededSpsNum) {
-      sPSOVector.uiNeededSpsNum = ((SPS_LISTING & pSvcParam->eSpsPpsIdStrategy) ? (MAX_SPS_COUNT) : (1));
-      sPSOVector.uiNeededSpsNum *= ((pSvcParam->bSimulcastAVC) ? (pSvcParam->iSpatialLayerNum) : (1));
-    }
-    return sPSOVector.uiNeededSpsNum;
-  }
 
-  uint32_t GetNeededSubsetSpsNum() {
-    if (0 == sPSOVector.uiNeededSubsetSpsNum) {
-      sPSOVector.uiNeededSubsetSpsNum = ((pSvcParam->bSimulcastAVC) ? (0) :
-                                         ((SPS_LISTING & pSvcParam->eSpsPpsIdStrategy) ? (MAX_SPS_COUNT) : (pSvcParam->iSpatialLayerNum - 1)));
-    }
-    return sPSOVector.uiNeededSubsetSpsNum;
-  }
-
-  uint32_t GetNeededPpsNum() {
-    if (0 == sPSOVector.uiNeededPpsNum) {
-      sPSOVector.uiNeededPpsNum = ((pSvcParam->eSpsPpsIdStrategy & SPS_PPS_LISTING) ? (MAX_PPS_COUNT) :
-                                   (1 + pSvcParam->iSpatialLayerNum));
-      sPSOVector.uiNeededPpsNum *= ((pSvcParam->bSimulcastAVC) ? (pSvcParam->iSpatialLayerNum) : (1));
-    }
-    return sPSOVector.uiNeededPpsNum;
-  }
 } sWelsEncCtx/*, *PWelsEncCtx*/;
 }
 #endif//sWelsEncCtx_H__
