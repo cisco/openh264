@@ -523,6 +523,9 @@ void WelsInitEncodingFuncs (SWelsFuncPtrList* pFuncList, uint32_t  uiCpuFlag) {
   if (uiCpuFlag & WELS_CPU_SSSE3) {
     pFuncList->pfScan4x4                = WelsScan4x4DcAc_ssse3;
   }
+  if (uiCpuFlag & WELS_CPU_SSE42) {
+    pFuncList->pfGetNoneZeroCount       = WelsGetNoneZeroCount_sse42;
+  }
   if (uiCpuFlag & WELS_CPU_AVX2) {
     pFuncList->pfDctT4                  = WelsDctT4_avx2;
     pFuncList->pfDctFourT4              = WelsDctFourT4_avx2;

@@ -76,6 +76,7 @@ extern "C" {
 #ifdef X86_ASM
 
 int32_t WelsGetNoneZeroCount_sse2 (int16_t* pLevel);
+int32_t WelsGetNoneZeroCount_sse42 (int16_t* pLevel);
 
 /****************************************************************************
  * Scan and Score functions

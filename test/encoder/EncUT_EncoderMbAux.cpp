@@ -269,26 +269,43 @@ GENERATE_UT_FOR_COPY (16, 8, WelsCopy16x8NotAligned_sse2);
 GENERATE_UT_FOR_COPY (16, 16, WelsCopy16x16NotAligned_sse2);
 GENERATE_UT_FOR_COPY (16, 16, WelsCopy16x16_sse2);
 #endif
-TEST (EncodeMbAuxTest, WelsGetNoneZeroCount_c) {
+
+namespace {
+
+void TestGetNoneZeroCount (PGetNoneZeroCountFunc func) {
   ENFORCE_STACK_ALIGN_1D (int16_t, pLevel, 16, 16);
-  int32_t result = 0;
-  for (int i = 0; i < 16; i++) {
-    pLevel[i] = (rand() & 0x07) - 4;
-    if (pLevel[i]) result ++;
+  const int num_test_runs = 1000;
+  for (int run = 0; run < num_test_runs; run++) {
+    const bool all_zero = run == 0;
+    const bool all_nonzero = run == 1;
+    int result = 0;
+    for (int i = 0; i < 16; i++) {
+      const int r = rand();
+      if (all_zero)
+        pLevel[i] = 0;
+      else if (all_nonzero)
+        pLevel[i] = r % 0xFFFF - 0x8000 ? r % 0xFFFF - 0x8000 : 0x7FFF;
+      else
+        pLevel[i] = (r >> 16 & 1) * ((r & 0xFFFF) - 0x8000);
+      result += pLevel[i] != 0;
+    }
+    const int32_t nnz = func (pLevel);
+    EXPECT_EQ (nnz, result);
   }
-  int32_t nnz = WelsGetNoneZeroCount_c (pLevel);
-  EXPECT_EQ (nnz, result);
+}
+
+} // anon ns.
+
+TEST (EncodeMbAuxTest, WelsGetNoneZeroCount_c) {
+  TestGetNoneZeroCount (WelsGetNoneZeroCount_c);
 }
 #ifdef X86_ASM
 TEST (EncodeMbAuxTest, WelsGetNoneZeroCount_sse2) {
-  ENFORCE_STACK_ALIGN_1D (int16_t, pLevel, 16, 16);
-  int32_t result = 0;
-  for (int i = 0; i < 16; i++) {
-    pLevel[i] = (rand() & 0x07) - 4;
-    if (pLevel[i]) result ++;
-  }
-  int32_t nnz = WelsGetNoneZeroCount_sse2 (pLevel);
-  EXPECT_EQ (nnz, result);
+  TestGetNoneZeroCount (WelsGetNoneZeroCount_sse2);
+}
+TEST (EncodeMbAuxTest, WelsGetNoneZeroCount_sse42) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_SSE42)
+    TestGetNoneZeroCount (WelsGetNoneZeroCount_sse42);
 }
 #endif
 #define WELS_ABS_LC(a) ((sign ^ (int32_t)(a)) - sign)
