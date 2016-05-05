@@ -47,6 +47,10 @@ testbin/test_vd_rc.yuv
 testbin/test.264
 testbin/test.yuv
 
+# iOS output files
+codec/build/iOS/common/build/
+codec/build/iOS/dec/welsdec/build/
+
 # pkg-config file
 *.pc
 
