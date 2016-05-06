@@ -221,8 +221,6 @@ int32_t InitFunctionPointers (sWelsEncCtx* pEncCtx, SWelsSvcCodingParam* pParam,
 
   InitFillNeighborCacheInterFunc (pFuncList, pParam->bEnableBackgroundDetection);
 
-  InitRefListMgrFunc (pFuncList, pParam->bEnableLongTermReference, bScreenContent);
-
   return iReturn;
 }
 

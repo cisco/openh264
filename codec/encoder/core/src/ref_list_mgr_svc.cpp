@@ -426,7 +426,7 @@ bool WelsUpdateRefList (sWelsEncCtx* pCtx) {
       pCtx->pVaa->uiMarkLongTermPicIdx = 0;
     }
   }
-  pCtx->pFuncList->pEndofUpdateRefList (pCtx);
+  pCtx->pReferenceStrategy->EndofUpdateRefList();
   return true;
 }
 
@@ -793,9 +793,10 @@ bool WelsUpdateRefListScreen (sWelsEncCtx* pCtx) {
     pCtx->pVaa->uiValidLongTermPicIdx = 0;
   }
 
-  pCtx->pFuncList->pEndofUpdateRefList (pCtx);
+  pCtx->pReferenceStrategy->EndofUpdateRefList();
   return true;
 }
+
 bool WelsBuildRefListScreen (sWelsEncCtx* pCtx, const int32_t iPOC, int32_t iBestLtrRefIdx) {
   SRefList* pRefList = pCtx->ppRefPicListExt[pCtx->uiDependencyId];
   SWelsSvcCodingParam* pParam = pCtx->pSvcParam;
@@ -993,31 +994,85 @@ void WelsMarkPicScreen (sWelsEncCtx* pCtx) {
 void DoNothing (sWelsEncCtx* pointer) {
 }
 
-void InitRefListMgrFunc (SWelsFuncPtrList* pFuncList, const bool bWithLtr, const bool bScreenContent) {
-  bool bLosslessScreenRefSelectionWithLtr = bWithLtr && bScreenContent;
-  if (bLosslessScreenRefSelectionWithLtr) {
-    pFuncList->pBuildRefList =   WelsBuildRefListScreen;
-    pFuncList->pMarkPic      =   WelsMarkPicScreen;
-    pFuncList->pUpdateRefList =   WelsUpdateRefListScreen;
-    pFuncList->pEndofUpdateRefList =   UpdateSrcPicList;
-  } else {
-    pFuncList->pBuildRefList =   WelsBuildRefList;
-    pFuncList->pMarkPic      =   WelsMarkPic;
-    pFuncList->pUpdateRefList =   WelsUpdateRefList;
-    pFuncList->pEndofUpdateRefList =   PrefetchNextBuffer;
-  }
 
-  pFuncList->pAfterBuildRefList = DoNothing;
-  if (bScreenContent) {
-    if (bLosslessScreenRefSelectionWithLtr) {
-      pFuncList->pEndofUpdateRefList =   UpdateSrcPicListLosslessScreenRefSelectionWithLtr;
+IWelsReferenceStrategy*   IWelsReferenceStrategy::CreateReferenceStrategy (sWelsEncCtx* pCtx,
+    const EUsageType keUsageType,
+    const bool kbLtrEnabled) {
+
+  IWelsReferenceStrategy* pReferenceStrategy = NULL;
+  switch (keUsageType) {
+  case SCREEN_CONTENT_REAL_TIME:
+    if (kbLtrEnabled) {
+      pReferenceStrategy = WELS_NEW_OP (CWelsReference_LosslessWithLtr(),
+                                        CWelsReference_LosslessWithLtr);
     } else {
-      pFuncList->pEndofUpdateRefList =   UpdateSrcPicList;
-      pFuncList->pAfterBuildRefList = UpdateBlockStatic;
+      pReferenceStrategy = WELS_NEW_OP (CWelsReference_Screen(),
+                                        CWelsReference_Screen);
     }
-  } else {
-    pFuncList->pEndofUpdateRefList = PrefetchNextBuffer;
+    WELS_VERIFY_RETURN_IF (NULL, NULL == pReferenceStrategy)
+    break;
+  case CAMERA_VIDEO_REAL_TIME:
+  case CAMERA_VIDEO_NON_REAL_TIME:
+  default:
+    pReferenceStrategy = WELS_NEW_OP (CWelsReference_TemporalLayer(),
+                                      CWelsReference_TemporalLayer);
+    WELS_VERIFY_RETURN_IF (NULL, NULL == pReferenceStrategy)
+    break;
   }
+  pReferenceStrategy->Init (pCtx);
+  return pReferenceStrategy;
+}
+
+class  CWelsReference_TemporalLayer::CWelsReference_TemporalLayer {
+};
+
+void CWelsReference_TemporalLayer::Init (sWelsEncCtx* pCtx) {
+  m_pEncoderCtx = pCtx;
+}
+
+bool CWelsReference_TemporalLayer::BuildRefList (const int32_t iPOC, int32_t iBestLtrRefIdx) {
+  return WelsBuildRefList (m_pEncoderCtx, iPOC,  iBestLtrRefIdx);
+}
+void CWelsReference_TemporalLayer::MarkPic() {
+  WelsMarkPic (m_pEncoderCtx);
+}
+bool CWelsReference_TemporalLayer::UpdateRefList() {
+  return WelsUpdateRefList (m_pEncoderCtx);
+}
+void CWelsReference_TemporalLayer::EndofUpdateRefList() {
+  PrefetchNextBuffer (m_pEncoderCtx);
+}
+void CWelsReference_TemporalLayer::AfterBuildRefList() {
+  DoNothing (m_pEncoderCtx);
+}
+
+bool CWelsReference_Screen::BuildRefList (const int32_t iPOC, int32_t iBestLtrRefIdx) {
+  return WelsBuildRefList (m_pEncoderCtx, iPOC,  iBestLtrRefIdx);
+}
+void CWelsReference_Screen::MarkPic() {
+  WelsMarkPic (m_pEncoderCtx);
+}
+bool CWelsReference_Screen::UpdateRefList() {
+  return WelsUpdateRefList (m_pEncoderCtx);
+}
+void CWelsReference_Screen::EndofUpdateRefList() {
+  UpdateSrcPicList (m_pEncoderCtx);
+}
+void CWelsReference_Screen::AfterBuildRefList() {
+  UpdateBlockStatic (m_pEncoderCtx);
+}
+
+bool CWelsReference_LosslessWithLtr::BuildRefList (const int32_t iPOC, int32_t iBestLtrRefIdx) {
+  return WelsBuildRefListScreen (m_pEncoderCtx, iPOC,  iBestLtrRefIdx);
+}
+void CWelsReference_LosslessWithLtr::MarkPic() {
+  WelsMarkPicScreen (m_pEncoderCtx);
+}
+bool CWelsReference_LosslessWithLtr::UpdateRefList() {
+  return WelsUpdateRefListScreen (m_pEncoderCtx);
+}
+void CWelsReference_LosslessWithLtr::EndofUpdateRefList() {
+  UpdateSrcPicListLosslessScreenRefSelectionWithLtr (m_pEncoderCtx);
 }
 } // namespace WelsEnc
 
