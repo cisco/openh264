@@ -34,7 +34,8 @@
 #include "cpu.h"
 
 WELSVP_NAMESPACE_BEGIN
-
+#define MAX_SAMPLE_WIDTH 1920
+#define MAX_SAMPLE_HEIGHT 1088
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -43,11 +44,37 @@ CDownsampling::CDownsampling (int32_t iCpuFlag) {
   m_eMethod   = METHOD_DOWNSAMPLE;
   WelsMemset (&m_pfDownsample, 0, sizeof (m_pfDownsample));
   InitDownsampleFuncs (m_pfDownsample, m_iCPUFlag);
+  m_bNoSampleBuffer = AllocateSampleBuffer();
 }
 
 CDownsampling::~CDownsampling() {
+  FreeSampleBuffer();
 }
+bool CDownsampling::AllocateSampleBuffer() {
+  for (int32_t i = 0; i < 2; i++) {
+    m_pSampleBuffer[i][0] = (uint8_t*)WelsMalloc (MAX_SAMPLE_WIDTH * MAX_SAMPLE_HEIGHT);
+    if (!m_pSampleBuffer[i][0])
+      goto FREE_RET;
+    m_pSampleBuffer[i][1] = (uint8_t*)WelsMalloc (MAX_SAMPLE_WIDTH * MAX_SAMPLE_HEIGHT / 4);
+    if (!m_pSampleBuffer[i][1])
+      goto FREE_RET;
+    m_pSampleBuffer[i][2] = (uint8_t*)WelsMalloc (MAX_SAMPLE_WIDTH * MAX_SAMPLE_HEIGHT / 4);
+    if (!m_pSampleBuffer[i][2])
+      goto FREE_RET;
+  }
+  return false;
+FREE_RET:
+  FreeSampleBuffer();
+  return true;
 
+}
+void CDownsampling::FreeSampleBuffer() {
+  for (int32_t i = 0; i < 2; i++) {
+    WelsFree (m_pSampleBuffer[i][0]);
+    WelsFree (m_pSampleBuffer[i][1]);
+    WelsFree (m_pSampleBuffer[i][2]);
+  }
+}
 void CDownsampling::InitDownsampleFuncs (SDownsampleFuncs& sDownsampleFunc,  int32_t iCpuFlag) {
   sDownsampleFunc.pfHalfAverage[0] = DyadicBilinearDownsampler_c;
   sDownsampleFunc.pfHalfAverage[1] = DyadicBilinearDownsampler_c;
@@ -123,49 +150,132 @@ EResult CDownsampling::Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pDs
   if (iSrcWidthY <= iDstWidthY || iSrcHeightY <= iDstHeightY) {
     return RET_INVALIDPARAM;
   }
+  if (iSrcWidthY > MAX_SAMPLE_WIDTH || iSrcHeightY > MAX_SAMPLE_HEIGHT || m_bNoSampleBuffer) {
+    if ((iSrcWidthY >> 1) == iDstWidthY && (iSrcHeightY >> 1) == iDstHeightY) {
+      // use half average functions
+      uint8_t iAlignIndex = GetAlignedIndex (iSrcWidthY);
+      m_pfDownsample.pfHalfAverage[iAlignIndex] ((uint8_t*)pDstPixMap->pPixel[0], pDstPixMap->iStride[0],
+          (uint8_t*)pSrcPixMap->pPixel[0], pSrcPixMap->iStride[0], iSrcWidthY, iSrcHeightY);
 
-  if ((iSrcWidthY >> 1) == iDstWidthY && (iSrcHeightY >> 1) == iDstHeightY) {
-    // use half average functions
-    uint8_t iAlignIndex = GetAlignedIndex (iSrcWidthY);
-    m_pfDownsample.pfHalfAverage[iAlignIndex] ((uint8_t*)pDstPixMap->pPixel[0], pDstPixMap->iStride[0],
-        (uint8_t*)pSrcPixMap->pPixel[0], pSrcPixMap->iStride[0], iSrcWidthY, iSrcHeightY);
+      iAlignIndex = GetAlignedIndex (iSrcWidthUV);
+      m_pfDownsample.pfHalfAverage[iAlignIndex] ((uint8_t*)pDstPixMap->pPixel[1], pDstPixMap->iStride[1],
+          (uint8_t*)pSrcPixMap->pPixel[1], pSrcPixMap->iStride[1], iSrcWidthUV, iSrcHeightUV);
+      m_pfDownsample.pfHalfAverage[iAlignIndex] ((uint8_t*)pDstPixMap->pPixel[2], pDstPixMap->iStride[2],
+          (uint8_t*)pSrcPixMap->pPixel[2], pSrcPixMap->iStride[2], iSrcWidthUV, iSrcHeightUV);
+    } else if ((iSrcWidthY >> 2) == iDstWidthY && (iSrcHeightY >> 2) == iDstHeightY) {
 
-    iAlignIndex = GetAlignedIndex (iSrcWidthUV);
-    m_pfDownsample.pfHalfAverage[iAlignIndex] ((uint8_t*)pDstPixMap->pPixel[1], pDstPixMap->iStride[1],
-        (uint8_t*)pSrcPixMap->pPixel[1], pSrcPixMap->iStride[1], iSrcWidthUV, iSrcHeightUV);
-    m_pfDownsample.pfHalfAverage[iAlignIndex] ((uint8_t*)pDstPixMap->pPixel[2], pDstPixMap->iStride[2],
-        (uint8_t*)pSrcPixMap->pPixel[2], pSrcPixMap->iStride[2], iSrcWidthUV, iSrcHeightUV);
-  } else if ((iSrcWidthY >> 2) == iDstWidthY && (iSrcHeightY >> 2) == iDstHeightY) {
+      m_pfDownsample.pfQuarterDownsampler ((uint8_t*)pDstPixMap->pPixel[0], pDstPixMap->iStride[0],
+                                           (uint8_t*)pSrcPixMap->pPixel[0], pSrcPixMap->iStride[0], iSrcWidthY, iSrcHeightY);
 
-    m_pfDownsample.pfQuarterDownsampler ((uint8_t*)pDstPixMap->pPixel[0], pDstPixMap->iStride[0],
+      m_pfDownsample.pfQuarterDownsampler ((uint8_t*)pDstPixMap->pPixel[1], pDstPixMap->iStride[1],
+                                           (uint8_t*)pSrcPixMap->pPixel[1], pSrcPixMap->iStride[1], iSrcWidthUV, iSrcHeightUV);
+
+      m_pfDownsample.pfQuarterDownsampler ((uint8_t*)pDstPixMap->pPixel[2], pDstPixMap->iStride[2],
+                                           (uint8_t*)pSrcPixMap->pPixel[2], pSrcPixMap->iStride[2], iSrcWidthUV, iSrcHeightUV);
+
+    } else if ((iSrcWidthY / 3) == iDstWidthY && (iSrcHeightY / 3) == iDstHeightY) {
+
+      m_pfDownsample.pfOneThirdDownsampler ((uint8_t*)pDstPixMap->pPixel[0], pDstPixMap->iStride[0],
+                                            (uint8_t*)pSrcPixMap->pPixel[0], pSrcPixMap->iStride[0], iSrcWidthY, iDstHeightY);
+
+      m_pfDownsample.pfOneThirdDownsampler ((uint8_t*)pDstPixMap->pPixel[1], pDstPixMap->iStride[1],
+                                            (uint8_t*)pSrcPixMap->pPixel[1], pSrcPixMap->iStride[1], iSrcWidthUV, iDstHeightUV);
+
+      m_pfDownsample.pfOneThirdDownsampler ((uint8_t*)pDstPixMap->pPixel[2], pDstPixMap->iStride[2],
+                                            (uint8_t*)pSrcPixMap->pPixel[2], pSrcPixMap->iStride[2], iSrcWidthUV, iDstHeightUV);
+
+    } else {
+      m_pfDownsample.pfGeneralRatioLuma ((uint8_t*)pDstPixMap->pPixel[0], pDstPixMap->iStride[0], iDstWidthY, iDstHeightY,
                                          (uint8_t*)pSrcPixMap->pPixel[0], pSrcPixMap->iStride[0], iSrcWidthY, iSrcHeightY);
 
-    m_pfDownsample.pfQuarterDownsampler ((uint8_t*)pDstPixMap->pPixel[1], pDstPixMap->iStride[1],
-                                         (uint8_t*)pSrcPixMap->pPixel[1], pSrcPixMap->iStride[1], iSrcWidthUV, iSrcHeightUV);
+      m_pfDownsample.pfGeneralRatioChroma ((uint8_t*)pDstPixMap->pPixel[1], pDstPixMap->iStride[1], iDstWidthUV, iDstHeightUV,
+                                           (uint8_t*)pSrcPixMap->pPixel[1], pSrcPixMap->iStride[1], iSrcWidthUV, iSrcHeightUV);
 
-    m_pfDownsample.pfQuarterDownsampler ((uint8_t*)pDstPixMap->pPixel[2], pDstPixMap->iStride[2],
-                                         (uint8_t*)pSrcPixMap->pPixel[2], pSrcPixMap->iStride[2], iSrcWidthUV, iSrcHeightUV);
-
-  } else if ((iSrcWidthY / 3) == iDstWidthY && (iSrcHeightY / 3) == iDstHeightY) {
-
-    m_pfDownsample.pfOneThirdDownsampler ((uint8_t*)pDstPixMap->pPixel[0], pDstPixMap->iStride[0],
-                                          (uint8_t*)pSrcPixMap->pPixel[0], pSrcPixMap->iStride[0], iSrcWidthY, iDstHeightY);
-
-    m_pfDownsample.pfOneThirdDownsampler ((uint8_t*)pDstPixMap->pPixel[1], pDstPixMap->iStride[1],
-                                          (uint8_t*)pSrcPixMap->pPixel[1], pSrcPixMap->iStride[1], iSrcWidthUV, iDstHeightUV);
-
-    m_pfDownsample.pfOneThirdDownsampler ((uint8_t*)pDstPixMap->pPixel[2], pDstPixMap->iStride[2],
-                                          (uint8_t*)pSrcPixMap->pPixel[2], pSrcPixMap->iStride[2], iSrcWidthUV, iDstHeightUV);
-
+      m_pfDownsample.pfGeneralRatioChroma ((uint8_t*)pDstPixMap->pPixel[2], pDstPixMap->iStride[2], iDstWidthUV, iDstHeightUV,
+                                           (uint8_t*)pSrcPixMap->pPixel[2], pSrcPixMap->iStride[2], iSrcWidthUV, iSrcHeightUV);
+    }
   } else {
-    m_pfDownsample.pfGeneralRatioLuma ((uint8_t*)pDstPixMap->pPixel[0], pDstPixMap->iStride[0], iDstWidthY, iDstHeightY,
-                                       (uint8_t*)pSrcPixMap->pPixel[0], pSrcPixMap->iStride[0], iSrcWidthY, iSrcHeightY);
 
-    m_pfDownsample.pfGeneralRatioChroma ((uint8_t*)pDstPixMap->pPixel[1], pDstPixMap->iStride[1], iDstWidthUV, iDstHeightUV,
-                                         (uint8_t*)pSrcPixMap->pPixel[1], pSrcPixMap->iStride[1], iSrcWidthUV, iSrcHeightUV);
+    int32_t iIdx = 0;
+    int32_t iHalfSrcWidth = iSrcWidthY >> 1;
+    int32_t iHalfSrcHeight = iSrcHeightY >> 1;
+    uint8_t* pSrcY = (uint8_t*)pSrcPixMap->pPixel[0];
+    uint8_t* pSrcU = (uint8_t*)pSrcPixMap->pPixel[1];
+    uint8_t* pSrcV = (uint8_t*)pSrcPixMap->pPixel[2];
+    int32_t iSrcStrideY = pSrcPixMap->iStride[0];
+    int32_t iSrcStrideU = pSrcPixMap->iStride[1];
+    int32_t iSrcStrideV = pSrcPixMap->iStride[2];
 
-    m_pfDownsample.pfGeneralRatioChroma ((uint8_t*)pDstPixMap->pPixel[2], pDstPixMap->iStride[2], iDstWidthUV, iDstHeightUV,
-                                         (uint8_t*)pSrcPixMap->pPixel[2], pSrcPixMap->iStride[2], iSrcWidthUV, iSrcHeightUV);
+    int32_t iDstStrideY = pDstPixMap->iStride[0];
+    int32_t iDstStrideU = pDstPixMap->iStride[1];
+    int32_t iDstStrideV = pDstPixMap->iStride[2];
+
+    uint8_t* pDstY = (uint8_t*)m_pSampleBuffer[iIdx][0];
+    uint8_t* pDstU = (uint8_t*)m_pSampleBuffer[iIdx][1];
+    uint8_t* pDstV = (uint8_t*)m_pSampleBuffer[iIdx][2];
+    iIdx++;
+    do {
+      if ((iHalfSrcWidth == iDstWidthY) && (iHalfSrcHeight == iDstHeightY)) { //end
+        // use half average functions
+        uint8_t iAlignIndex = GetAlignedIndex (iSrcWidthY);
+        m_pfDownsample.pfHalfAverage[iAlignIndex] ((uint8_t*)pDstPixMap->pPixel[0], pDstPixMap->iStride[0],
+            (uint8_t*)pSrcY, iSrcStrideY, iSrcWidthY, iSrcHeightY);
+
+        iAlignIndex = GetAlignedIndex (iSrcWidthUV);
+        m_pfDownsample.pfHalfAverage[iAlignIndex] ((uint8_t*)pDstPixMap->pPixel[1], pDstPixMap->iStride[1],
+            (uint8_t*)pSrcU, iSrcStrideU, iSrcWidthUV, iSrcHeightUV);
+        m_pfDownsample.pfHalfAverage[iAlignIndex] ((uint8_t*)pDstPixMap->pPixel[2], pDstPixMap->iStride[2],
+            (uint8_t*)pSrcV, iSrcStrideV, iSrcWidthUV, iSrcHeightUV);
+        break;
+      } else if (((iHalfSrcWidth >> 1) >= iDstWidthY) && ((iHalfSrcHeight >> 1) >= iDstHeightY)) {
+        // use half average functions
+        iDstStrideY = iHalfSrcWidth;
+        iDstStrideU = iHalfSrcWidth >> 1;
+        iDstStrideV = iHalfSrcWidth >> 1;
+        uint8_t iAlignIndex = GetAlignedIndex (iSrcWidthY);
+        m_pfDownsample.pfHalfAverage[iAlignIndex] ((uint8_t*)pDstY, iDstStrideY,
+            (uint8_t*)pSrcY, iSrcStrideY, iSrcWidthY, iSrcHeightY);
+
+        iAlignIndex = GetAlignedIndex (iSrcWidthUV);
+        m_pfDownsample.pfHalfAverage[iAlignIndex] ((uint8_t*)pDstU, iDstStrideU,
+            (uint8_t*)pSrcU, iSrcStrideU, iSrcWidthUV, iSrcHeightUV);
+        m_pfDownsample.pfHalfAverage[iAlignIndex] ((uint8_t*)pDstV, iDstStrideV,
+            (uint8_t*)pSrcV, iSrcStrideV, iSrcWidthUV, iSrcHeightUV);
+
+        pSrcY = (uint8_t*)pDstY;
+        pSrcU = (uint8_t*)pDstU;
+        pSrcV = (uint8_t*)pDstV;
+
+
+        iSrcWidthY = iHalfSrcWidth;
+        iSrcWidthUV = iHalfSrcWidth >> 1;
+        iSrcHeightY = iHalfSrcHeight;
+        iSrcHeightUV = iHalfSrcHeight >> 1;
+
+        iSrcStrideY = iSrcWidthY;
+        iSrcStrideU = iSrcWidthUV;
+        iSrcStrideV = iSrcWidthUV;
+
+        iHalfSrcWidth >>= 1;
+        iHalfSrcHeight >>= 1;
+
+        iIdx = iIdx % 2;
+        pDstY = (uint8_t*)m_pSampleBuffer[iIdx][0];
+        pDstU = (uint8_t*)m_pSampleBuffer[iIdx][1];
+        pDstV = (uint8_t*)m_pSampleBuffer[iIdx][2];
+        iIdx++;
+      } else {
+        m_pfDownsample.pfGeneralRatioLuma ((uint8_t*)pDstPixMap->pPixel[0], pDstPixMap->iStride[0], iDstWidthY, iDstHeightY,
+                                           (uint8_t*)pSrcY, iSrcStrideY, iSrcWidthY, iSrcHeightY);
+
+        m_pfDownsample.pfGeneralRatioChroma ((uint8_t*)pDstPixMap->pPixel[1], pDstPixMap->iStride[1], iDstWidthUV, iDstHeightUV,
+                                             (uint8_t*)pSrcU, iSrcStrideU,  iSrcWidthUV, iSrcHeightUV);
+
+        m_pfDownsample.pfGeneralRatioChroma ((uint8_t*)pDstPixMap->pPixel[2], pDstPixMap->iStride[2], iDstWidthUV, iDstHeightUV,
+                                             (uint8_t*)pSrcV, iSrcStrideV, iSrcWidthUV, iSrcHeightUV);
+        break;
+      }
+    } while (true);
   }
   return RET_SUCCESS;
 }
