@@ -1023,9 +1023,6 @@ IWelsReferenceStrategy*   IWelsReferenceStrategy::CreateReferenceStrategy (sWels
   return pReferenceStrategy;
 }
 
-class  CWelsReference_TemporalLayer::CWelsReference_TemporalLayer {
-};
-
 void CWelsReference_TemporalLayer::Init (sWelsEncCtx* pCtx) {
   m_pEncoderCtx = pCtx;
 }
