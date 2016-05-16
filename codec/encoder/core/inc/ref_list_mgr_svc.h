@@ -93,10 +93,56 @@ bool CheckCurMarkFrameNumUsed (sWelsEncCtx* pCtx);
 */
 void WelsMarkPic (sWelsEncCtx* pCtx);
 
-void InitRefListMgrFunc (SWelsFuncPtrList* pFuncList, const bool bEnableLongTermReference, const bool bScreenContent);
-
 #ifdef LONG_TERM_REF_DUMP
 void DumpRef (sWelsEncCtx* ctx);
 #endif
+
+class IWelsReferenceStrategy {
+ public:
+  IWelsReferenceStrategy() {};
+  virtual ~IWelsReferenceStrategy() { };
+
+  static IWelsReferenceStrategy* CreateReferenceStrategy (sWelsEncCtx* pCtx, const EUsageType keUsageType,
+      const bool kbLtrEnabled);
+  virtual bool BuildRefList (const int32_t iPOC, int32_t iBestLtrRefIdx) = 0;
+  virtual void MarkPic() = 0;
+  virtual bool UpdateRefList() = 0;
+  virtual void EndofUpdateRefList() = 0;
+  virtual void AfterBuildRefList() = 0;
+
+ protected:
+  virtual void Init (sWelsEncCtx* pCtx) = 0;
+};
+
+class  CWelsReference_TemporalLayer : public IWelsReferenceStrategy {
+ public:
+  virtual bool BuildRefList (const int32_t iPOC, int32_t iBestLtrRefIdx);
+  virtual void MarkPic();
+  virtual bool UpdateRefList();
+  virtual void EndofUpdateRefList();
+  virtual void AfterBuildRefList();
+
+  void Init (sWelsEncCtx* pCtx);
+ protected:
+  sWelsEncCtx* m_pEncoderCtx;
+
+};
+
+class  CWelsReference_Screen : public CWelsReference_TemporalLayer {
+ public:
+  virtual bool BuildRefList (const int32_t iPOC, int32_t iBestLtrRefIdx);
+  virtual void MarkPic();
+  virtual bool UpdateRefList();
+  virtual void EndofUpdateRefList();
+  virtual void AfterBuildRefList();
+};
+
+class  CWelsReference_LosslessWithLtr : public CWelsReference_Screen {
+ public:
+  virtual bool BuildRefList (const int32_t iPOC, int32_t iBestLtrRefIdx);
+  virtual void MarkPic();
+  virtual bool UpdateRefList();
+  virtual void EndofUpdateRefList();
+};
 }
 #endif//REFERENCE_PICTURE_LIST_MANAGEMENT_SVC_H__
