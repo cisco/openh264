@@ -3917,7 +3917,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     }
   }
 
-  while (iSpatialIdx < pSvcParam->iSpatialLayerNum) {
+  while (iSpatialIdx < iSpatialNum) {
     iCurDid  = (pSpatialIndexMap + iSpatialIdx)->iDid;
     SSpatialLayerConfig* pParam = &pSvcParam->sSpatialLayers[iCurDid];
     SSpatialLayerInternal* pParamInternal = &pSvcParam->sDependencyLayers[iCurDid];
