@@ -170,10 +170,13 @@ class CDownsampling : public IStrategy {
   void InitDownsampleFuncs (SDownsampleFuncs& sDownsampleFunc, int32_t iCpuFlag);
 
   int32_t GetAlignedIndex (const int32_t kiSrcWidth);
-
+  bool AllocateSampleBuffer();
+  void FreeSampleBuffer();
  private:
   SDownsampleFuncs m_pfDownsample;
   int32_t  m_iCPUFlag;
+  uint8_t  *m_pSampleBuffer[2][3];
+  bool     m_bNoSampleBuffer;
 };
 
 WELSVP_NAMESPACE_END
