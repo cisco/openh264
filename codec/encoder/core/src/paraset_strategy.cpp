@@ -370,7 +370,7 @@ void ParasetIdAdditionIdAdjust (SParaSetOffsetVariable* sParaSetOffsetVariable,
 
 void CWelsParametersetIdIncreasing::Update (const uint32_t kuiId, const int iParasetType) {
 #if _DEBUG
-  m_sParaSetOffset.SpsPpsIdStrategy = INCREASING_ID;
+  m_sParaSetOffset.eSpsPpsIdStrategy = INCREASING_ID;
   assert (kuiId < MAX_DQ_LAYER_NUM);
 #endif
 
