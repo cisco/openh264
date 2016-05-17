@@ -385,7 +385,7 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_INCREASING_ID) {
   //prepare output if needed
   FILE* fEnc =  NULL;
 #ifdef DEBUG_FILE_SAVE_INCREASING_ID
-  fEnc = fopen ("enc_INCREASING_ID.264", "wb");
+  fEnc = fopen ("enc_i.264", "wb");
 #endif
 
   // Test part#1
@@ -440,7 +440,7 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_INCREASING_ID) {
   ASSERT_TRUE (rv == cmResultSuccess) << "SetOption Failed sParam3: rv = " << rv;
 
 #ifdef DEBUG_FILE_SAVE_INCREASING_ID
-  fEnc = fopen ("enc_INCREASING_ID2.264", "wb");
+  fEnc = fopen ("enc3.264", "wb");
 #endif
   iEncFrameNum = 0;
   EncDecOneFrame (sParam3.iPicWidth, sParam3.iPicHeight, iEncFrameNum++, fEnc);
@@ -495,7 +495,7 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_LISTING_AND_PPS_INCREASING
   //prepare output if needed
   FILE* fEnc =  NULL;
 #ifdef DEBUG_FILE_SAVE2
-  fEnc = fopen ("enc_SPS_LISTING_AND_PPS_INCREASING1.264", "wb");
+  fEnc = fopen ("enc2.264", "wb");
 #endif
 
   // Test part#1
@@ -550,7 +550,7 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_LISTING_AND_PPS_INCREASING
   ASSERT_TRUE (rv == cmResultSuccess) << "SetOption Failed sParam3: rv = " << rv;
 
 #ifdef DEBUG_FILE_SAVE2
-  fEnc = fopen ("enc_SPS_LISTING_AND_PPS_INCREASING11.264", "wb");
+  fEnc = fopen ("enc3.264", "wb");
 #endif
   iEncFrameNum = 0;
   EncDecOneFrame (sParam3.iPicWidth, sParam3.iPicHeight, iEncFrameNum++, fEnc);
@@ -598,7 +598,7 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_LISTING_AND_PPS_INCREASING
   //prepare output if needed
   FILE* fEnc =  NULL;
 #ifdef DEBUG_FILE_SAVE5
-  fEnc = fopen ("enc_SPS_LISTING_AND_PPS_INCREASING2.264", "wb");
+  fEnc = fopen ("encID2.264", "wb");
 #endif
 
   // step#1: pParam1
@@ -647,7 +647,7 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_LISTING_AND_PPS_INCREASING
   //prepare output if needed
   FILE* fEnc =  NULL;
 #ifdef DEBUG_FILE_SAVE2
-  fEnc = fopen ("enc_SPS_LISTING_AND_PPS_INCREASING3.264", "wb");
+  fEnc = fopen ("enc4.264", "wb");
 #endif
 
   // step#1: pParam1
@@ -853,7 +853,7 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_PPS_LISTING3) {
   //prepare output if needed
   FILE* fEnc =  NULL;
 #ifdef DEBUG_FILE_SAVE5
-  fEnc = fopen ("enc_LISTING3.264", "wb");
+  fEnc = fopen ("enc4.264", "wb");
 #endif
 
   // step#1: ordinary encoding

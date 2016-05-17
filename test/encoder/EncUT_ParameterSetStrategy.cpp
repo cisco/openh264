@@ -5,7 +5,6 @@
 #include "param_svc.h"
 #include "parameter_sets.h"
 #include "wels_const.h"
-#include "paraset_strategy.h"
 
 using namespace WelsEnc;
 

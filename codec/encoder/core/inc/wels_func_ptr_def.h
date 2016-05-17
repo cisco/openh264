@@ -193,8 +193,6 @@ typedef int32_t (*PWelsSpatialWriteMbSyn) (sWelsEncCtx* pCtx, SSlice* pSlice, SM
 typedef void (*PStashMBStatus) (SDynamicSlicingStack* pDss, SSlice* pSlice, int32_t iMbSkipRun);
 typedef int32_t (*PStashPopMBStatus) (SDynamicSlicingStack* pDss, SSlice* pSlice);
 
-class IWelsParametersetStrategy;
-
 struct TagWelsFuncPointerList {
   SExpandPicFunc sExpandPicFunc;
   PFillInterNeighborCacheFunc       pfFillInterNeighborCache;
@@ -296,8 +294,6 @@ struct TagWelsFuncPointerList {
   PWelsSpatialWriteMbSyn pfWelsSpatialWriteMbSyn;
   PStashMBStatus pfStashMBStatus;
   PStashPopMBStatus pfStashPopMBStatus;
-
-  IWelsParametersetStrategy* pParametersetStrategy;
 };
 
 }  //end of namespace WelsEnc {
