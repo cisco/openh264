@@ -406,10 +406,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\src\paraset_strategy.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\encoder\core\src\picture_handle.cpp"
 				>
 			</File>
@@ -620,10 +616,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\encoder\core\inc\parameter_sets.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\encoder\core\inc\paraset_strategy.h"
 				>
 			</File>
 			<File

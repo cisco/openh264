@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0D6970BE1CA5BCFB001D88F8 /* paraset_strategy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D6970BC1CA5BCFB001D88F8 /* paraset_strategy.cpp */; };
 		0DD32A961B4A478B009181A1 /* wels_task_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0DD32A951B4A478B009181A1 /* wels_task_base.cpp */; };
 		0DD32A991B4A4997009181A1 /* wels_task_management.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0DD32A981B4A4997009181A1 /* wels_task_management.cpp */; };
 		0DD32A9C1B4A4E8F009181A1 /* wels_task_encoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0DD32A9B1B4A4E8F009181A1 /* wels_task_encoder.cpp */; };
@@ -70,8 +69,6 @@
 
 /* Begin PBXFileReference section */
 		04FE0684196FD9370004D7CE /* version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = version.h; path = ../../../common/inc/version.h; sourceTree = "<group>"; };
-		0D6970BC1CA5BCFB001D88F8 /* paraset_strategy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = paraset_strategy.cpp; sourceTree = "<group>"; };
-		0D6970BF1CA5BD26001D88F8 /* paraset_strategy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = paraset_strategy.h; sourceTree = "<group>"; };
 		0DD32A951B4A478B009181A1 /* wels_task_base.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wels_task_base.cpp; sourceTree = "<group>"; };
 		0DD32A971B4A47D0009181A1 /* wels_task_base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wels_task_base.h; sourceTree = "<group>"; };
 		0DD32A981B4A4997009181A1 /* wels_task_management.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wels_task_management.cpp; sourceTree = "<group>"; };
@@ -284,7 +281,6 @@
 				4CE446BD18BC605C0017DF25 /* nal_encap.h */,
 				4CE446BF18BC605C0017DF25 /* param_svc.h */,
 				4CE446C018BC605C0017DF25 /* parameter_sets.h */,
-				0D6970BF1CA5BD26001D88F8 /* paraset_strategy.h */,
 				4CE446C118BC605C0017DF25 /* picture.h */,
 				4CE446C218BC605C0017DF25 /* picture_handle.h */,
 				4CE446C418BC605C0017DF25 /* rc.h */,
@@ -333,7 +329,6 @@
 				4CE446E718BC605C0017DF25 /* md.cpp */,
 				4CE446E918BC605C0017DF25 /* mv_pred.cpp */,
 				4CE446EA18BC605C0017DF25 /* nal_encap.cpp */,
-				0D6970BC1CA5BCFB001D88F8 /* paraset_strategy.cpp */,
 				4CE446EB18BC605C0017DF25 /* picture_handle.cpp */,
 				4CE446ED18BC605C0017DF25 /* ratectl.cpp */,
 				4CE446EE18BC605C0017DF25 /* ref_list_mgr_svc.cpp */,
@@ -480,7 +475,6 @@
 				4C34067218C57D0400DFA14A /* reconstruct_neon.S in Sources */,
 				0DD32A961B4A478B009181A1 /* wels_task_base.cpp in Sources */,
 				F7E9994919EBD1F8009B1021 /* set_mb_syn_cabac.cpp in Sources */,
-				0D6970BE1CA5BCFB001D88F8 /* paraset_strategy.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
