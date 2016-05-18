@@ -62,6 +62,9 @@
 
 namespace WelsEnc {
 
+class IWelsTaskManage;
+class IWelsReferenceStrategy;
+
 /*
  *  reference list for each quality layer in SVC
  */
@@ -135,6 +138,7 @@ typedef struct TagWelsEncCtx {
 
   SSliceThreading*  pSliceThreading;
   IWelsTaskManage*  pTaskManage; //was planning to put it under CWelsH264SVCEncoder but it may be updated (lock/no lock) when param is changed
+  IWelsReferenceStrategy* pReferenceStrategy;
 
   // pointers
   SPicture*         pEncPic;                // pointer to current picture to be encoded

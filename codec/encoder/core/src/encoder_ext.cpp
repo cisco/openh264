@@ -1754,6 +1754,9 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx, SExistingParasetList* pExistingPa
     return 1;
   }
 
+  (*ppCtx)->pReferenceStrategy = IWelsReferenceStrategy::CreateReferenceStrategy((*ppCtx), pParam->iUsageType, pParam->bEnableLongTermReference);
+  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pReferenceStrategy), FreeMemorySvc (ppCtx))
+
   (*ppCtx)->pIntra4x4PredModeBlocks = static_cast<int8_t*>
                                       (pMa->WelsMallocz (iCountMaxMbNum * INTRA_4x4_MODE_NUM, "pIntra4x4PredModeBlocks"));
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pIntra4x4PredModeBlocks), FreeMemorySvc (ppCtx))
@@ -1941,6 +1944,10 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
 
     if (pParam != NULL && pParam->iMultipleThreadIdc > 1)
       ReleaseMtResource (ppCtx);
+
+    if (NULL != pCtx->pReferenceStrategy) {
+      WELS_DELETE_OP(pCtx->pReferenceStrategy);
+    }
 
     // frame bitstream pBuffer
     if (NULL != pCtx->pFrameBs) {
@@ -3700,8 +3707,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
     WelsInitCurrentLayer (pCtx, iCurWidth, iCurHeight);
 
-    pCtx->pFuncList->pMarkPic (pCtx);
-    if (!pCtx->pFuncList->pBuildRefList (pCtx, pParamInternal->iPOC, 0)) {
+    pCtx->pReferenceStrategy->MarkPic ();
+    if (!pCtx->pReferenceStrategy->BuildRefList (pParamInternal->iPOC, 0)) {
       WelsLog (pLogCtx, WELS_LOG_WARNING,
                "WelsEncoderEncodeExt(), WelsBuildRefList failed for P frames, pCtx->iNumRef0= %d. ForceCodingIDR!",
                pCtx->iNumRef0);
@@ -3710,7 +3717,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       break;
     }
     if (pCtx->eSliceType != I_SLICE) {
-      pCtx->pFuncList->pAfterBuildRefList (pCtx);
+      pCtx->pReferenceStrategy->AfterBuildRefList ();
     }
 #ifdef LONG_TERM_REF_DUMP
     DumpRef (pCtx);
@@ -3964,7 +3971,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
     // reference picture list update
     if (eNalRefIdc != NRI_PRI_LOWEST) {
-      if (!pCtx->pFuncList->pUpdateRefList (pCtx)) {
+      if (!pCtx->pReferenceStrategy->UpdateRefList ()) {
         WelsLog (pLogCtx, WELS_LOG_WARNING, "WelsEncoderEncodeExt(), WelsUpdateRefList failed. ForceCodingIDR!");
         //the above is to set the next frame to be IDR
         pCtx->iEncoderError = ENC_RETURN_CORRECTED;
