@@ -934,14 +934,16 @@ int32_t ParseResidualBlockCabac (PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroC
   } else if (iResProperty == CHROMA_DC_U || iResProperty == CHROMA_DC_V) {
     do {
       if (pSignificantMap[j] != 0)
-        sTCoeff[pScanTable[j]] = pCtx->bUseScalingList ? (pSignificantMap[j] * pDeQuantMul[0]) >> 4 :
+        sTCoeff[pScanTable[j]] = pCtx->bUseScalingList ? (int16_t) ((int64_t)pSignificantMap[j] *
+                                 (int64_t)pDeQuantMul[0] >> 4) :
                                  (pSignificantMap[j] * pDeQuantMul[0]);
       ++j;
     } while (j < 16);
   } else { //luma ac, chroma ac
     do {
       if (pSignificantMap[j] != 0)
-        sTCoeff[pScanTable[j]] = pCtx->bUseScalingList ? (pSignificantMap[j] * pDeQuantMul[pScanTable[j]] >> 4) :
+        sTCoeff[pScanTable[j]] = pCtx->bUseScalingList ? (int16_t) ((int64_t)pSignificantMap[j] *
+                                 (int64_t)pDeQuantMul[pScanTable[j]] >> 4) :
                                  pSignificantMap[j] * pDeQuantMul[pScanTable[j] & 0x07];
       ++j;
     } while (j < 16);

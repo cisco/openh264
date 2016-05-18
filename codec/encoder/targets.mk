@@ -11,6 +11,7 @@ ENCODER_CPP_SRCS=\
 	$(ENCODER_SRCDIR)/core/src/md.cpp\
 	$(ENCODER_SRCDIR)/core/src/mv_pred.cpp\
 	$(ENCODER_SRCDIR)/core/src/nal_encap.cpp\
+	$(ENCODER_SRCDIR)/core/src/paraset_strategy.cpp\
 	$(ENCODER_SRCDIR)/core/src/picture_handle.cpp\
 	$(ENCODER_SRCDIR)/core/src/ratectl.cpp\
 	$(ENCODER_SRCDIR)/core/src/ref_list_mgr_svc.cpp\
