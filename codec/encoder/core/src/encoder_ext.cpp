@@ -3489,22 +3489,29 @@ EVideoFrameType PrepareEncodeFrame (sWelsEncCtx* pCtx, SLayerBSInfo*& pLayerBsIn
     pCtx->iContinualSkipFrames = 0;
     iCurTid = GetTemporalLevel (&pSvcParam->sDependencyLayers[iCurDid], pParamInternal->iCodingIndex,
                                 pSvcParam->uiGopSize);
-    pCtx->uiTemporalId = iCurTid;
-    if (eFrameType == videoFrameTypeIDR) {
-      // write parameter sets bitstream or SEI/SSEI (if any) here
-      // TODO: use function pointer instead
-      if (! (SPS_LISTING & pCtx->pSvcParam->eSpsPpsIdStrategy)) {
-        if (pSvcParam->bSimulcastAVC) {
-          pCtx->iEncoderError = WriteSavcParaset (pCtx, iCurDid, pLayerBsInfo, iLayerNum, iFrameSize);
-          ++ pCtx->uiIdrPicId;
+    //skip this spatial layer
+    if (iCurTid == INVALID_TEMPORAL_ID) {
+      pParamInternal->iCodingIndex ++;
+      eFrameType = videoFrameTypeSkip;
+      pLayerBsInfo->eFrameType = videoFrameTypeSkip;
+    } else {
+      pCtx->uiTemporalId = iCurTid;
+      if (eFrameType == videoFrameTypeIDR) {
+        // write parameter sets bitstream or SEI/SSEI (if any) here
+        // TODO: use function pointer instead
+        if (! (SPS_LISTING & pCtx->pSvcParam->eSpsPpsIdStrategy)) {
+          if (pSvcParam->bSimulcastAVC) {
+            pCtx->iEncoderError = WriteSavcParaset (pCtx, iCurDid, pLayerBsInfo, iLayerNum, iFrameSize);
+            ++ pCtx->uiIdrPicId;
+          } else {
+            pCtx->iEncoderError = WriteSsvcParaset (pCtx, iSpatialNum, pLayerBsInfo, iLayerNum, iFrameSize);
+            ++ pCtx->uiIdrPicId;
+          }
         } else {
-          pCtx->iEncoderError = WriteSsvcParaset (pCtx, iSpatialNum, pLayerBsInfo, iLayerNum, iFrameSize);
+          pCtx->iEncoderError = WriteSavcParaset_Listing (pCtx, iSpatialNum, pLayerBsInfo, iLayerNum, iFrameSize);
+
           ++ pCtx->uiIdrPicId;
         }
-      } else {
-        pCtx->iEncoderError = WriteSavcParaset_Listing (pCtx, iSpatialNum, pLayerBsInfo, iLayerNum, iFrameSize);
-
-        ++ pCtx->uiIdrPicId;
       }
     }
 
@@ -3609,12 +3616,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     int32_t  iDecompositionStages = pSvcParam->sDependencyLayers[iCurDid].iDecompositionStages;
     pCtx->pCurDqLayer           = pCtx->ppDqLayerList[iCurDid];
     pCtx->uiDependencyId        =  iCurDid;
-    //skip this spatial layer
-    if (GetTemporalLevel (pParamInternal, pParamInternal->iCodingIndex, pSvcParam->uiGopSize) == INVALID_TEMPORAL_ID) {
-      ++iSpatialIdx;
-      pParamInternal->iCodingIndex ++;
-      continue;
-    }
+
     if (pSvcParam->bSimulcastAVC) {
       eFrameType = PrepareEncodeFrame (pCtx, pLayerBsInfo, iSpatialNum , iCurDid, iCurTid, iLayerNum, iFrameSize,
                                        pFbi->uiTimeStamp);
