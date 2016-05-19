@@ -214,6 +214,20 @@ int32_t CWelsPreProcess::BuildSpatialPicList (sWelsEncCtx* pCtx, const SSourcePi
   return iSpatialNum;
 }
 
+SPicture* CWelsPreProcess::GetBestRefPic (EUsageType iUsageType, bool bSceneLtr, EWelsSliceType eSliceType,
+    int32_t kiDidx, int32_t iRefTemporalIdx) {
+  assert (iUsageType == SCREEN_CONTENT_REAL_TIME);
+  SVAAFrameInfoExt* pVaaExt = static_cast<SVAAFrameInfoExt*> (m_pEncCtx->pVaa);
+  SRefInfoParam* BestRefCandidateParam = (bSceneLtr) ? (& (pVaaExt->sVaaLtrBestRefCandidate[0])) :
+                                         (& (pVaaExt->sVaaStrBestRefCandidate[0]));
+  return m_pSpatialPic[0][BestRefCandidateParam->iSrcListIdx];
+
+}
+SPicture* CWelsPreProcess::GetBestRefPic (const int32_t kiDidx, const int32_t iRefTemporalIdx) {
+
+  return m_pSpatialPic[kiDidx][iRefTemporalIdx];
+}
+
 int32_t CWelsPreProcess::AnalyzeSpatialPic (sWelsEncCtx* pCtx, const int32_t kiDidx) {
   SWelsSvcCodingParam* pSvcParam = pCtx->pSvcParam;
   bool bNeededMbAq = (pSvcParam->bEnableAdaptiveQuant && (pCtx->eSliceType == P_SLICE));
@@ -230,10 +244,8 @@ int32_t CWelsPreProcess::AnalyzeSpatialPic (sWelsEncCtx* pCtx, const int32_t kiD
   bool bCalculateVar = (pSvcParam->iRCMode >= RC_BITRATE_MODE && pCtx->eSliceType == I_SLICE);
 
   if (pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME) {
-    SVAAFrameInfoExt* pVaaExt = static_cast<SVAAFrameInfoExt*> (m_pEncCtx->pVaa);
-    SRefInfoParam* BestRefCandidateParam = (pCtx->bCurFrameMarkedAsSceneLtr) ? (& (pVaaExt->sVaaLtrBestRefCandidate[0])) :
-                                           (& (pVaaExt->sVaaStrBestRefCandidate[0]));
-    SPicture* pRefPic = m_pSpatialPic[0][BestRefCandidateParam->iSrcListIdx];
+    SPicture* pRefPic = GetBestRefPic (pSvcParam->iUsageType, pCtx->bCurFrameMarkedAsSceneLtr, pCtx->eSliceType, kiDidx,
+                                       iRefTemporalIdx);
 
     VaaCalculation (pCtx->pVaa, pCurPic, pRefPic, false, bCalculateVar, bCalculateBGD);
 
@@ -244,10 +256,9 @@ int32_t CWelsPreProcess::AnalyzeSpatialPic (sWelsEncCtx* pCtx, const int32_t kiD
       AdaptiveQuantCalculation (pCtx->pVaa, pCurPic, pRefPic);
     }
   } else {
-    SPicture* pRefPic = m_pSpatialPic[kiDidx][iRefTemporalIdx];
+    SPicture* pRefPic = GetBestRefPic (kiDidx, iRefTemporalIdx);
     SPicture* pLastPic = m_pLastSpatialPicture[kiDidx][0];
     bool bCalculateSQDiff = ((pLastPic->pData[0] == pRefPic->pData[0]) && bNeededMbAq);
-    bool bCalculateVar = (pSvcParam->iRCMode >= RC_BITRATE_MODE && pCtx->eSliceType == I_SLICE);
 
     VaaCalculation (pCtx->pVaa, pCurPic, pRefPic, bCalculateSQDiff, bCalculateVar, bCalculateBGD);
 
@@ -256,9 +267,7 @@ int32_t CWelsPreProcess::AnalyzeSpatialPic (sWelsEncCtx* pCtx, const int32_t kiD
     }
 
     if (bNeededMbAq) {
-      SPicture* pCurPic = m_pLastSpatialPicture[kiDidx][1];
-      SPicture* pRefPic = m_pLastSpatialPicture[kiDidx][0];
-      AdaptiveQuantCalculation (pCtx->pVaa, pCurPic, pRefPic);
+      AdaptiveQuantCalculation (pCtx->pVaa, m_pLastSpatialPicture[kiDidx][1], m_pLastSpatialPicture[kiDidx][0]);
     }
   }
   return 0;
