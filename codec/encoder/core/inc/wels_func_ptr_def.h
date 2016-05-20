@@ -192,7 +192,7 @@ typedef  int32_t (*PCavlcParamCalFunc) (int16_t* pCoff, uint8_t* pRun, int16_t* 
 typedef int32_t (*PWelsSpatialWriteMbSyn) (sWelsEncCtx* pCtx, SSlice* pSlice, SMB* pCurMb);
 typedef void (*PStashMBStatus) (SDynamicSlicingStack* pDss, SSlice* pSlice, int32_t iMbSkipRun);
 typedef int32_t (*PStashPopMBStatus) (SDynamicSlicingStack* pDss, SSlice* pSlice);
-
+typedef int32_t (*PGetBsPosition)(SSlice *pSlice);
 class IWelsParametersetStrategy;
 
 struct TagWelsFuncPointerList {
@@ -288,6 +288,7 @@ struct TagWelsFuncPointerList {
 
   PCavlcParamCalFunc    pfCavlcParamCal;
   PWelsSpatialWriteMbSyn pfWelsSpatialWriteMbSyn;
+  PGetBsPosition pfGetBsPosition;
   PStashMBStatus pfStashMBStatus;
   PStashPopMBStatus pfStashPopMBStatus;
 

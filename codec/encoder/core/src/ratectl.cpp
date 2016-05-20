@@ -1076,11 +1076,10 @@ void WelsRcMbInitGom (sWelsEncCtx* pEncCtx, SMB* pCurMb, SSlice* pSlice) {
   SWelsSvcRc* pWelsSvcRc        = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
   const int32_t kiSliceId       = pSlice->uiSliceIdx;
   SRCSlicing* pSOverRc          = &pSliceInLayer[kiSliceId].sSlicingOverRc;
-  SBitStringAux* bs             = pSlice->pSliceBsa;
   SDqLayer* pCurLayer           = pEncCtx->pCurDqLayer;
   const uint8_t kuiChromaQpIndexOffset = pCurLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset;
 
-  pSOverRc->iBsPosSlice = BsGetBitsPos (bs);
+  pSOverRc->iBsPosSlice = pEncCtx->pFuncList->pfGetBsPosition (pSlice);
   if ((pEncCtx->pSvcParam->iRCMode == RC_BITRATE_MODE) && (pEncCtx->eSliceType == I_SLICE)) {
     pCurMb->uiLumaQp   = pEncCtx->iGlobalQp;
     pCurMb->uiChromaQp = g_kuiChromaQpTable[CLIP3_QP_0_51 (pCurMb->uiLumaQp + kuiChromaQpIndexOffset)];
@@ -1101,13 +1100,12 @@ void WelsRcMbInitGom (sWelsEncCtx* pEncCtx, SMB* pCurMb, SSlice* pSlice) {
 void WelsRcMbInfoUpdateGom (sWelsEncCtx* pEncCtx, SMB* pCurMb, int32_t iCostLuma, SSlice* pSlice) {
   SSlice* pSliceInLayer             = pEncCtx->pCurDqLayer->sLayerInfo.pSliceInLayer;
   SWelsSvcRc* pWelsSvcRc            = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
-  SBitStringAux* bs                 = pSlice->pSliceBsa;
   int32_t iSliceId                  = pSlice->uiSliceIdx;
   SRCSlicing* pSOverRc              = &pSliceInLayer[iSliceId].sSlicingOverRc;
 
   const int32_t kiComplexityIndex   = pSOverRc->iComplexityIndexSlice;
 
-  int32_t iCurMbBits = BsGetBitsPos (bs) - pSOverRc->iBsPosSlice;
+  int32_t iCurMbBits = pEncCtx->pFuncList->pfGetBsPosition (pSlice) - pSOverRc->iBsPosSlice;
   pSOverRc->iFrameBitsSlice += iCurMbBits;
   pSOverRc->iGomBitsSlice += iCurMbBits;
 
