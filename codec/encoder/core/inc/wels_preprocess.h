@@ -191,6 +191,10 @@ class CWelsPreProcess {
   */
   void WelsExchangeSpatialPictures (SPicture** ppPic1, SPicture** ppPic2);
 
+  SPicture* GetBestRefPic (EUsageType iUsageType, bool bSceneLtr, EWelsSliceType eSliceType, int32_t kiDidx,
+                           int32_t iRefTemporalIdx);
+  SPicture* GetBestRefPic (const int32_t kiDidx, const int32_t iRefTemporalIdx);
+
  private:
   Scaled_Picture   m_sScaledPicture;
   SPicture*        m_pLastSpatialPicture[MAX_DEPENDENCY_LAYER][2];
