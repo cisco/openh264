@@ -101,6 +101,7 @@ HalveDownsampleFunc     DyadicBilinearDownsamplerWidthx32_sse4;
 
 GeneralDownsampleFunc GeneralBilinearFastDownsamplerWrap_sse2;
 GeneralDownsampleFunc GeneralBilinearAccurateDownsamplerWrap_sse2;
+GeneralDownsampleFunc GeneralBilinearFastDownsamplerWrap_ssse3;
 
 SpecificDownsampleFunc  DyadicBilinearOneThirdDownsampler_ssse3;
 SpecificDownsampleFunc  DyadicBilinearOneThirdDownsampler_sse4;
@@ -114,6 +115,9 @@ void GeneralBilinearFastDownsampler_sse2 (uint8_t* pDst, const int32_t kiDstStri
 void GeneralBilinearAccurateDownsampler_sse2 (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth,
     const int32_t kiDstHeight, uint8_t* pSrc, const int32_t kiSrcStride, const uint32_t kuiScaleX,
     const uint32_t kuiScaleY);
+void GeneralBilinearFastDownsampler_ssse3 (uint8_t* pDst, int32_t iDstStride, int32_t iDstWidth,
+    int32_t iDstHeight, uint8_t* pSrc, int32_t iSrcStride, uint32_t uiScaleX,
+    uint32_t uiScaleY);
 
 WELSVP_EXTERN_C_END
 #endif

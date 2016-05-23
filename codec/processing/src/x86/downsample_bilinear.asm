@@ -60,6 +60,16 @@ SECTION .rodata align=16
 ;***********************************************************************
 
 ALIGN 16
+db80h_128:
+    times 16 db 80h
+shufb_0000000088888888:
+    times 8 db 0
+    times 8 db 8
+shufb_000044448888CCCC:
+    times 4 db 0
+    times 4 db 4
+    times 4 db 8
+    times 4 db 12
 shufb_mask_low:
     db 00h, 80h, 02h, 80h, 04h, 80h, 06h, 80h, 08h, 80h, 0ah, 80h, 0ch, 80h, 0eh, 80h
 shufb_mask_high:
@@ -2595,3 +2605,514 @@ WELS_EXTERN DyadicBilinearQuarterDownsampler_sse4
 %endif
     ret
 
+; xpos_int=%1 xpos_frac=%2 inc_int+1=%3 inc_frac=%4 tmp=%5
+%macro SSE2_BilinearIncXposuw 5
+    movdqa          %5, %2
+    paddw           %2, %4
+    paddusw         %5, %4
+    pcmpeqw         %5, %2
+    paddb           %1, %3
+    paddb           %1, %5  ; subtract 1 if no carry
+%endmacro
+
+; outl=%1 outh=%2 in=%3
+%macro SSE2_UnpckXFracuw 3
+    pcmpeqw         %1, %1
+    pxor            %1, %3
+    movdqa          %2, %1
+    punpcklwd       %1, %3
+    punpckhwd       %2, %3
+%endmacro
+
+; [in:xfrac out:xyfrac0]=%1 [out:xyfrac1]=%2 yfrac0=%3 yfrac1=%4
+%macro SSE2_BilinearFastCalcXYFrac 4
+    movdqa          %2, %1
+    pmulhuw         %1, %3
+    pmulhuw         %2, %4
+%endmacro
+
+; [in:dwordsl out:bytes] dwordsh=%2 zero=%3
+%macro SSE2_BilinearFastPackDwordsToBytes 3
+    psrld           %1, 14
+    psrld           %2, 14
+    packssdw        %1, %2
+    pavgw           %1, %3
+    packuswb        %1, %1
+%endmacro
+
+%macro SSSE3_BilinearFastDownsample2xOrLess_8px 0
+    movdqa          xmm_tmp0, xmm_xpos_int
+    pshufb          xmm_tmp0, xmm_0
+    psubb           xmm_xpos_int, xmm_tmp0
+    SSE2_UnpckXFracuw xmm_tmp0, xmm_tmp1, xmm_xpos_frac
+    mov             r_tmp0, i_xpos
+    lea             i_xpos, [i_xpos + 8 * i_scalex]
+    shr             r_tmp0, 16
+    movdqu          xmm_tmp4, [p_src_row0 + r_tmp0]
+    pshufb          xmm_tmp4, xmm_xpos_int
+    movdqa          xmm_tmp5, xmm_tmp4
+    punpcklbw       xmm_tmp4, xmm_0
+    punpckhbw       xmm_tmp5, xmm_0
+    SSE2_BilinearFastCalcXYFrac xmm_tmp0, xmm_tmp2, xmm_yfrac0, xmm_yfrac1
+    SSE2_BilinearFastCalcXYFrac xmm_tmp1, xmm_tmp3, xmm_yfrac0, xmm_yfrac1
+    pmaddwd         xmm_tmp0, xmm_tmp4
+    pmaddwd         xmm_tmp1, xmm_tmp5
+    movdqu          xmm_tmp4, [p_src_row1 + r_tmp0]
+    pshufb          xmm_tmp4, xmm_xpos_int
+    movdqa          xmm_tmp5, xmm_tmp4
+    punpcklbw       xmm_tmp4, xmm_0
+    punpckhbw       xmm_tmp5, xmm_0
+    pmaddwd         xmm_tmp2, xmm_tmp4
+    pmaddwd         xmm_tmp3, xmm_tmp5
+    paddd           xmm_tmp0, xmm_tmp2
+    paddd           xmm_tmp1, xmm_tmp3
+    SSE2_BilinearFastPackDwordsToBytes xmm_tmp0, xmm_tmp1, xmm_0
+    movlps          [p_dst], xmm_tmp0
+    add             p_dst, 8
+    SSE2_BilinearIncXposuw xmm_xpos_int, xmm_xpos_frac, xmm_xpos_int_inc, xmm_xpos_frac_inc, xmm_tmp0
+%endmacro
+
+%macro SSSE3_BilinearFastDownsample4xOrLess_8px 0
+    movdqa          xmm_tmp0, xmm_xpos_int
+    pshufb          xmm_tmp0, [shufb_0000000088888888]
+    psubb           xmm_xpos_int, xmm_tmp0
+    SSE2_UnpckXFracuw xmm_tmp0, xmm_tmp1, xmm_xpos_frac
+    mov             r_tmp0, i_xpos
+    shr             r_tmp0, 16
+    movdqu          xmm_tmp3, [p_src_row0 + r_tmp0]
+    movdqu          xmm_tmp4, [p_src_row1 + r_tmp0]
+    movdqa          xmm_tmp2, xmm_xpos_int
+    punpcklbw       xmm_tmp2, [db80h_128]
+    pshufb          xmm_tmp3, xmm_tmp2
+    pshufb          xmm_tmp4, xmm_tmp2
+    SSE2_BilinearFastCalcXYFrac xmm_tmp0, xmm_tmp2, xmm_yfrac0, xmm_yfrac1
+    pmaddwd         xmm_tmp0, xmm_tmp3
+    pmaddwd         xmm_tmp2, xmm_tmp4
+    paddd           xmm_tmp0, xmm_tmp2
+    lea             r_tmp0, [i_xpos + 4 * i_scalex]
+    lea             i_xpos, [i_xpos + 8 * i_scalex]
+    shr             r_tmp0, 16
+    movdqu          xmm_tmp3, [p_src_row0 + r_tmp0]
+    movdqu          xmm_tmp4, [p_src_row1 + r_tmp0]
+    movdqa          xmm_tmp2, xmm_xpos_int
+    punpckhbw       xmm_tmp2, [db80h_128]
+    pshufb          xmm_tmp3, xmm_tmp2
+    pshufb          xmm_tmp4, xmm_tmp2
+    SSE2_BilinearFastCalcXYFrac xmm_tmp1, xmm_tmp2, xmm_yfrac0, xmm_yfrac1
+    pmaddwd         xmm_tmp1, xmm_tmp3
+    pmaddwd         xmm_tmp2, xmm_tmp4
+    paddd           xmm_tmp1, xmm_tmp2
+    SSE2_BilinearFastPackDwordsToBytes xmm_tmp0, xmm_tmp1, xmm_0
+    movlps          [p_dst], xmm_tmp0
+    add             p_dst, 8
+    SSE2_BilinearIncXposuw xmm_xpos_int, xmm_xpos_frac, xmm_xpos_int_inc, xmm_xpos_frac_inc, xmm_tmp0
+%endmacro
+
+%macro SSE2_GeneralBilinearFastDownsample_8px 0
+    mov             r_tmp0, i_xpos
+    shr             r_tmp0, 16
+    movd            xmm_tmp3, [p_src_row0 + r_tmp0]
+    movd            xmm_tmp4, [p_src_row1 + r_tmp0]
+    lea             r_tmp0, [i_xpos + i_scalex]
+    shr             r_tmp0, 16
+    pinsrw          xmm_tmp3, [p_src_row0 + r_tmp0], 1
+    pinsrw          xmm_tmp4, [p_src_row1 + r_tmp0], 1
+    lea             r_tmp0, [i_xpos + 2 * i_scalex]
+    lea             i_xpos, [i_xpos + 4 * i_scalex]
+    shr             r_tmp0, 16
+    pinsrw          xmm_tmp3, [p_src_row0 + r_tmp0], 2
+    pinsrw          xmm_tmp4, [p_src_row1 + r_tmp0], 2
+    mov             r_tmp0, i_xpos
+    sub             r_tmp0, i_scalex
+    shr             r_tmp0, 16
+    pinsrw          xmm_tmp3, [p_src_row0 + r_tmp0], 3
+    pinsrw          xmm_tmp4, [p_src_row1 + r_tmp0], 3
+    punpcklbw       xmm_tmp3, xmm_0
+    punpcklbw       xmm_tmp4, xmm_0
+    movdqa          xmm_tmp0, xmm_xfrac0
+    SSE2_BilinearFastCalcXYFrac xmm_tmp0, xmm_tmp2, xmm_yfrac0, xmm_yfrac1
+    pmaddwd         xmm_tmp0, xmm_tmp3
+    pmaddwd         xmm_tmp2, xmm_tmp4
+    paddd           xmm_tmp0, xmm_tmp2
+    mov             r_tmp0, i_xpos
+    shr             r_tmp0, 16
+    movd            xmm_tmp3, [p_src_row0 + r_tmp0]
+    movd            xmm_tmp4, [p_src_row1 + r_tmp0]
+    lea             r_tmp0, [i_xpos + i_scalex]
+    shr             r_tmp0, 16
+    pinsrw          xmm_tmp3, [p_src_row0 + r_tmp0], 1
+    pinsrw          xmm_tmp4, [p_src_row1 + r_tmp0], 1
+    lea             r_tmp0, [i_xpos + 2 * i_scalex]
+    lea             i_xpos, [i_xpos + 4 * i_scalex]
+    shr             r_tmp0, 16
+    pinsrw          xmm_tmp3, [p_src_row0 + r_tmp0], 2
+    pinsrw          xmm_tmp4, [p_src_row1 + r_tmp0], 2
+    mov             r_tmp0, i_xpos
+    sub             r_tmp0, i_scalex
+    shr             r_tmp0, 16
+    pinsrw          xmm_tmp3, [p_src_row0 + r_tmp0], 3
+    pinsrw          xmm_tmp4, [p_src_row1 + r_tmp0], 3
+    punpcklbw       xmm_tmp3, xmm_0
+    punpcklbw       xmm_tmp4, xmm_0
+    movdqa          xmm_tmp1, xmm_xfrac1
+    SSE2_BilinearFastCalcXYFrac xmm_tmp1, xmm_tmp2, xmm_yfrac0, xmm_yfrac1
+    pmaddwd         xmm_tmp1, xmm_tmp3
+    pmaddwd         xmm_tmp2, xmm_tmp4
+    paddd           xmm_tmp1, xmm_tmp2
+    SSE2_BilinearFastPackDwordsToBytes xmm_tmp0, xmm_tmp1, xmm_0
+    movlps          [p_dst], xmm_tmp0
+    add             p_dst, 8
+    paddw           xmm_xfrac0, xmm_xfrac_inc
+    paddw           xmm_xfrac1, xmm_xfrac_inc
+%endmacro
+
+; downsample_8px_macro=%1 b_fast=%2
+%macro SSE2_GeneralBilinearDownsampler_loop 2
+%%height:
+    mov             p_src_row0, i_ypos
+    shr             p_src_row0, 15
+    imul            p_src_row0, i_src_stride
+    add             p_src_row0, p_src
+    mov             p_src_row1, p_src_row0
+    add             p_src_row1, i_src_stride
+    movd            xmm_tmp1, i_yposd
+%if %2
+    pshuflw         xmm_tmp1, xmm_tmp1, 0
+    psllw           xmm_tmp1, 1
+    psrlw           xmm_tmp1, 1
+%else
+    pslld           xmm_tmp1, 17
+    psrld           xmm_tmp1, 17
+%endif
+%ifdef X86_32
+    pshufd          xmm_tmp1, xmm_tmp1, 0
+    pcmpeqw         xmm_tmp0, xmm_tmp0
+%if %2
+    psrlw           xmm_tmp0, 1
+%else
+    psrld           xmm_tmp0, 17
+%endif
+    pxor            xmm_tmp0, xmm_tmp1
+    movdqa          xmm_yfrac0, xmm_tmp0
+    movdqa          xmm_yfrac1, xmm_tmp1
+%else
+    pshufd          xmm_yfrac1, xmm_tmp1, 0
+    pcmpeqw         xmm_yfrac0, xmm_yfrac0
+%if %2
+    psrlw           xmm_yfrac0, 1
+%else
+    psrld           xmm_yfrac0, 17
+%endif
+    pxor            xmm_yfrac0, xmm_yfrac1
+%endif
+
+    mov             i_xpos, 1 << 15
+    mov             i_width_cnt, i_dst_width
+    sub             i_width_cnt, 1
+
+%ifdef xmm_xpos_int
+    movdqa          xmm_xpos_int, xmm_xpos_int_begin
+    movdqa          xmm_xpos_frac, xmm_xpos_frac_begin
+%else
+    movdqa          xmm_xfrac0, xmm_xfrac0_begin
+    movdqa          xmm_xfrac1, xmm_xfrac1_begin
+%endif
+
+%%width:
+    %1
+    sub             i_width_cnt, 8
+    jg              %%width
+
+    lea             p_dst, [p_dst + i_width_cnt + 1]
+    imul            i_width_cnt, i_scalex
+    add             i_xpos, i_width_cnt
+    shr             i_xpos, 16
+    movzx           r_tmp0, byte [p_src_row0 + i_xpos]
+    mov             [p_dst - 1], r_tmp0b
+%ifdef X86_32
+    mov             r_tmp0, i_scaleyd
+    add             i_yposd, r_tmp0
+%else
+    add             i_yposd, i_scaleyd
+%endif
+    add             p_dst, i_dst_stride_less_width
+    sub             i_dst_height, 1
+    jg              %%height
+%endmacro
+
+;**************************************************************************************************************
+;void GeneralBilinearFastDownsampler_ssse3 (uint8_t* pDst, int32_t iDstStride, int32_t iDstWidth,
+;    int32_t iDstHeight, uint8_t* pSrc, int32_t iSrcStride, uint32_t uiScaleX,
+;    uint32_t uiScaleY);
+;
+;**************************************************************************************************************
+
+WELS_EXTERN GeneralBilinearFastDownsampler_ssse3
+    %assign push_num 0
+%ifndef X86_32
+    push            r12
+    push            r13
+    push            rbx
+    push            rbp
+    %assign push_num 4
+%ifdef WIN64
+    push            rdi
+    push            rsi
+    %assign push_num push_num + 2
+%endif
+%endif
+    LOAD_7_PARA
+    PUSH_XMM 16
+    SIGN_EXTENSION  r1, r1d
+    SIGN_EXTENSION  r2, r2d
+    SIGN_EXTENSION  r3, r3d
+    SIGN_EXTENSION  r5, r5d
+    ZERO_EXTENSION  r6d
+    sub             r1, r2                                            ; dst_stride - dst_width
+%ifdef X86_32
+    movd            xmm0, arg8
+    movd            xmm1, esp
+    and             esp, -16
+    sub             esp, 8 * 4 + 7 * 16
+    movd            [esp], xmm1
+    %define p_dst                   r0
+    %define i_dst_stride_less_width [esp + 1 * 4]
+    %define i_dst_width             [esp + 2 * 4]
+    %define i_dst_height            dword [esp + 3 * 4]
+    %define p_src                   [esp + 4 * 4]
+    %define i_src_stride            [esp + 5 * 4]
+    %define i_scalex                r6
+    %define i_scalexd               r6d
+    %define i_scaleyd               [esp + 6 * 4]
+    %define i_xpos                  r2
+    %define i_ypos                  dword [esp + 7 * 4]
+    %define i_yposd                 dword [esp + 7 * 4]
+    %define p_src_row0              r3
+    %define p_src_row1              r4
+    %define i_width_cnt             r5
+    %define r_tmp0                  r1
+    %define r_tmp0b                 r1b
+    %define xmm_xpos_frac           xmm1
+    %define xmm_xpos_frac_inc       [esp + 8 * 4]
+    %define xmm_xpos_int            xmm3
+    %define xmm_xpos_int_inc        [esp + 8 * 4 + 1 * 16]
+    %define xmm_yfrac0              [esp + 8 * 4 + 2 * 16]
+    %define xmm_yfrac1              [esp + 8 * 4 + 3 * 16]
+    %define xmm_tmp0                xmm7
+    %define xmm_tmp1                xmm0
+    %define xmm_tmp2                xmm2
+    %define xmm_tmp3                xmm4
+    %define xmm_tmp4                xmm5
+    %define xmm_tmp5                xmm6
+    %define xmm_0                   [esp + 8 * 4 + 4 * 16]
+    %define xmm_xpos_int_begin      [esp + 8 * 4 + 5 * 16]
+    %define xmm_xpos_frac_begin     [esp + 8 * 4 + 6 * 16]
+    mov             i_dst_stride_less_width, r1
+    mov             i_dst_width, r2
+    mov             i_dst_height, r3
+    mov             p_src, r4
+    mov             i_src_stride, r5
+    movd            i_scaleyd, xmm0
+    pxor            xmm_tmp0, xmm_tmp0
+    movdqa          xmm_0, xmm_tmp0
+%else
+    %define p_dst                   r0
+    %define i_dst_stride_less_width r1
+    %define i_dst_width             r2
+    %define i_dst_height            r3
+    %define p_src                   r4
+    %define i_src_stride            r5
+    %define i_scalex                r6
+    %define i_scalexd               r6d
+    %define i_scaleyd               dword arg8d
+    %define i_xpos                  r12
+    %define i_ypos                  r13
+    %define i_yposd                 r13d
+    %define p_src_row0              rbp
+%ifdef WIN64
+    %define p_src_row1              rsi
+    %define i_width_cnt             rdi
+%else
+    %define p_src_row1              r11
+    %define i_width_cnt             rax
+%endif
+    %define r_tmp0                  rbx
+    %define r_tmp0b                 bl
+    %define xmm_0                   xmm0
+    %define xmm_xpos_frac           xmm1
+    %define xmm_xpos_frac_inc       xmm8
+    %define xmm_xpos_int            xmm3
+    %define xmm_xpos_int_inc        xmm10
+    %define xmm_yfrac0              xmm11
+    %define xmm_yfrac1              xmm12
+    %define xmm_tmp0                xmm7
+    %define xmm_tmp1                xmm2
+    %define xmm_tmp2                xmm9
+    %define xmm_tmp3                xmm4
+    %define xmm_tmp4                xmm5
+    %define xmm_tmp5                xmm6
+    %define xmm_xpos_int_begin      xmm14
+    %define xmm_xpos_frac_begin     xmm15
+    pxor            xmm_0, xmm_0
+%endif
+
+    sub             i_dst_height, 1
+    je              .final_row
+    jl              .done
+
+    mov             i_ypos, 1 << 14
+    movd            xmm_xpos_frac, i_scalexd
+    pshufd          xmm_xpos_frac, xmm_xpos_frac, 0
+    movdqa          xmm_tmp0, xmm_xpos_frac
+    pslld           xmm_tmp0, 2
+    pslldq          xmm_xpos_frac, 4
+    paddd           xmm_tmp0, xmm_xpos_frac
+    movdqa          xmm_tmp1, xmm_xpos_frac
+    pslldq          xmm_tmp1, 4
+    paddd           xmm_xpos_frac, xmm_tmp1
+    paddd           xmm_tmp0, xmm_tmp1
+    pslldq          xmm_tmp1, 4
+    paddd           xmm_xpos_frac, xmm_tmp1
+    paddd           xmm_tmp0, xmm_tmp1
+    pcmpeqw         xmm_tmp1, xmm_tmp1
+    psrld           xmm_tmp1, 31
+    pslld           xmm_tmp1, 15
+    paddd           xmm_xpos_frac, xmm_tmp1
+    paddd           xmm_tmp0, xmm_tmp1
+    movdqa          xmm_xpos_int, xmm_xpos_frac
+    movdqa          xmm_tmp1, xmm_tmp0
+    psrld           xmm_xpos_int, 16
+    psrld           xmm_tmp1, 16
+    packssdw        xmm_xpos_int, xmm_tmp1
+    packuswb        xmm_xpos_int, xmm_xpos_int
+    movdqa          xmm_tmp1, xmm_xpos_int
+    pcmpeqw         xmm_tmp2, xmm_tmp2
+    psubb           xmm_tmp1, xmm_tmp2
+    punpcklbw       xmm_xpos_int, xmm_tmp1
+    pslld           xmm_xpos_frac, 16
+    pslld           xmm_tmp0, 16
+    psrad           xmm_xpos_frac, 16
+    psrad           xmm_tmp0, 16
+    packssdw        xmm_xpos_frac, xmm_tmp0
+    movd            xmm_tmp0, i_scalexd
+    pslld           xmm_tmp0, 3
+    movdqa          xmm_tmp1, xmm_tmp0
+    punpcklwd       xmm_tmp0, xmm_tmp0
+    pshufd          xmm_tmp0, xmm_tmp0, 0
+    movdqa          xmm_xpos_frac_inc, xmm_tmp0
+    psrld           xmm_tmp1, 16
+    psubw           xmm_tmp1, xmm_tmp2
+    pxor            xmm_tmp2, xmm_tmp2
+    pshufb          xmm_tmp1, xmm_tmp2
+    movdqa          xmm_xpos_int_inc, xmm_tmp1
+    movdqa          xmm_xpos_int_begin, xmm_xpos_int
+    movdqa          xmm_xpos_frac_begin, xmm_xpos_frac
+
+    cmp             i_scalex, 4 << 16
+    ja              .scalex_above4
+    cmp             i_scalex, 2 << 16
+    ja              .scalex_above2_beloweq4
+    SSE2_GeneralBilinearDownsampler_loop SSSE3_BilinearFastDownsample2xOrLess_8px, 1
+    jmp             .final_row
+%ifdef X86_32
+    %undef xmm_yfrac0
+    %xdefine xmm_yfrac0 xmm_tmp5
+    %undef xmm_tmp5
+%endif
+.scalex_above2_beloweq4:
+    SSE2_GeneralBilinearDownsampler_loop SSSE3_BilinearFastDownsample4xOrLess_8px, 1
+    jmp             .final_row
+.scalex_above4:
+%xdefine xmm_xfrac0 xmm_xpos_frac
+%xdefine xmm_xfrac1 xmm_xpos_int
+%xdefine xmm_xfrac0_begin xmm_xpos_int_begin
+%xdefine xmm_xfrac1_begin xmm_xpos_frac_begin
+%xdefine xmm_xfrac_inc xmm_xpos_frac_inc
+%undef xmm_xpos_int
+%undef xmm_xpos_frac
+%undef xmm_xpos_int_begin
+%undef xmm_xpos_frac_begin
+%undef xmm_xpos_int_inc
+%undef xmm_xpos_frac_inc
+    SSE2_UnpckXFracuw xmm_tmp0, xmm_xfrac1, xmm_xfrac0
+    movdqa          xmm_xfrac0, xmm_tmp0
+    movdqa          xmm_xfrac0_begin, xmm_xfrac0
+    movdqa          xmm_xfrac1_begin, xmm_xfrac1
+    pcmpeqw         xmm_tmp0, xmm_tmp0
+    pmullw          xmm_tmp0, xmm_xfrac_inc
+    punpcklwd       xmm_tmp0, xmm_xfrac_inc
+    movdqa          xmm_xfrac_inc, xmm_tmp0
+    SSE2_GeneralBilinearDownsampler_loop SSE2_GeneralBilinearFastDownsample_8px, 1
+
+.final_row:
+    mov             p_src_row0, i_ypos
+    shr             p_src_row0, 15
+    imul            p_src_row0, i_src_stride
+    add             p_src_row0, p_src
+    mov             i_xpos, 1 << 15
+    mov             i_width_cnt, i_dst_width
+
+.final_row_width:
+    mov             r_tmp0, i_xpos
+    shr             r_tmp0, 16
+    movzx           r_tmp0, byte [p_src_row0 + r_tmp0]
+    mov             [p_dst], r_tmp0b
+    add             p_dst, 1
+    add             i_xpos, i_scalex
+    sub             i_width_cnt, 1
+    jg              .final_row_width
+
+.done:
+%ifdef X86_32
+    mov             esp, [esp]
+%endif
+    POP_XMM
+    LOAD_7_PARA_POP
+%ifndef X86_32
+%ifdef WIN64
+    pop             rsi
+    pop             rdi
+%endif
+    pop             rbp
+    pop             rbx
+    pop             r13
+    pop             r12
+%endif
+    ret
+%undef p_dst
+%undef i_dst_stride_less_width
+%undef i_dst_width
+%undef i_dst_height
+%undef p_src
+%undef i_src_stride
+%undef i_scalex
+%undef i_scalexd
+%undef i_scaleyd
+%undef i_xpos
+%undef i_ypos
+%undef i_yposd
+%undef p_src_row0
+%undef p_src_row1
+%undef i_width_cnt
+%undef r_tmp0
+%undef r_tmp0b
+%undef xmm_0
+%undef xmm_xpos_frac
+%undef xmm_xpos_frac_inc
+%undef xmm_xpos_int
+%undef xmm_xpos_int_inc
+%undef xmm_yfrac0
+%undef xmm_yfrac1
+%undef xmm_tmp0
+%undef xmm_tmp1
+%undef xmm_tmp2
+%undef xmm_tmp3
+%undef xmm_tmp4
+%undef xmm_tmp5
+%undef xmm_xpos_int_begin
+%undef xmm_xpos_frac_begin
+%undef xmm_xfrac0
+%undef xmm_xfrac1
+%undef xmm_xfrac0_begin
+%undef xmm_xfrac1_begin
+%undef xmm_xfrac_inc
