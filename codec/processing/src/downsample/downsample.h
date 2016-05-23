@@ -102,6 +102,7 @@ HalveDownsampleFunc     DyadicBilinearDownsamplerWidthx32_sse4;
 GeneralDownsampleFunc GeneralBilinearFastDownsamplerWrap_sse2;
 GeneralDownsampleFunc GeneralBilinearAccurateDownsamplerWrap_sse2;
 GeneralDownsampleFunc GeneralBilinearFastDownsamplerWrap_ssse3;
+GeneralDownsampleFunc GeneralBilinearAccurateDownsamplerWrap_sse41;
 
 SpecificDownsampleFunc  DyadicBilinearOneThirdDownsampler_ssse3;
 SpecificDownsampleFunc  DyadicBilinearOneThirdDownsampler_sse4;
@@ -116,6 +117,9 @@ void GeneralBilinearAccurateDownsampler_sse2 (uint8_t* pDst, const int32_t kiDst
     const int32_t kiDstHeight, uint8_t* pSrc, const int32_t kiSrcStride, const uint32_t kuiScaleX,
     const uint32_t kuiScaleY);
 void GeneralBilinearFastDownsampler_ssse3 (uint8_t* pDst, int32_t iDstStride, int32_t iDstWidth,
+    int32_t iDstHeight, uint8_t* pSrc, int32_t iSrcStride, uint32_t uiScaleX,
+    uint32_t uiScaleY);
+void GeneralBilinearAccurateDownsampler_sse41 (uint8_t* pDst, int32_t iDstStride, int32_t iDstWidth,
     int32_t iDstHeight, uint8_t* pSrc, int32_t iSrcStride, uint32_t uiScaleX,
     uint32_t uiScaleY);
 

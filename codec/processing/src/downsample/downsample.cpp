@@ -107,6 +107,7 @@ void CDownsampling::InitDownsampleFuncs (SDownsampleFuncs& sDownsampleFunc,  int
     sDownsampleFunc.pfHalfAverage[1]    = DyadicBilinearDownsamplerWidthx16_sse4;
     sDownsampleFunc.pfOneThirdDownsampler = DyadicBilinearOneThirdDownsampler_sse4;
     sDownsampleFunc.pfQuarterDownsampler  = DyadicBilinearQuarterDownsampler_sse4;
+    sDownsampleFunc.pfGeneralRatioChroma  = GeneralBilinearAccurateDownsamplerWrap_sse41;
   }
 #endif//X86_ASM
 
