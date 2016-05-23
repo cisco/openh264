@@ -631,7 +631,7 @@ TRY_REENCODING:
     if (ENC_RETURN_SUCCESS != iEncReturn)
       return iEncReturn;
 
-    sDss.iCurrentPos = BsGetBitsPos (pBs);
+    sDss.iCurrentPos = pEncCtx->pFuncList->pfGetBsPosition (pSlice);
 
     if (DynSlcJudgeSliceBoundaryStepBack (pEncCtx, pSlice, pSliceCtx, pCurMb, &sDss)) { //islice
       pEncCtx->pFuncList->pfStashPopMBStatus (&sDss, pSlice);
@@ -1254,7 +1254,7 @@ TRY_REENCODING:
 
 
     //DYNAMIC_SLICING_ONE_THREAD - MultiD
-    sDss.iCurrentPos = BsGetBitsPos (pBs);
+    sDss.iCurrentPos = pEncCtx->pFuncList->pfGetBsPosition (pSlice);
     if (DynSlcJudgeSliceBoundaryStepBack (pEncCtx, pSlice, pSliceCtx, pCurMb, &sDss)) {
       pSlice->iMbSkipRun = pEncCtx->pFuncList->pfStashPopMBStatus (&sDss, pSlice);
       pCurLayer->pLastCodedMbIdxOfPartition[kiPartitionId] = iCurMbIdx -

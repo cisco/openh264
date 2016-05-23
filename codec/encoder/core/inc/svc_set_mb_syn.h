@@ -64,5 +64,7 @@ void WelsWriteSliceEndSyn(SSlice *pSlice,bool bEntropyCodingModeFlag);
 //for Base Layer CAVLC writing
 int32_t WelsSpatialWriteMbSyn (sWelsEncCtx* Ctx, SSlice* pSlice, SMB* pCurMb);
 int32_t WelsSpatialWriteMbSynCabac (sWelsEncCtx* pCtx, SSlice* pSlice, SMB* pCurMb);
+int32_t GetBsPosCavlc(SSlice *pSlice);
+int32_t GetBsPosCabac(SSlice *pSlice);
 }
 #endif
