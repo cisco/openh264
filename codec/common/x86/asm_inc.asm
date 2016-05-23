@@ -478,6 +478,12 @@ SECTION .note.GNU-stack noalloc noexec nowrite progbits ; Mark the stack as non-
     %endif
 %endmacro
 
+%macro ZERO_EXTENSION 1
+    %ifndef X86_32
+        mov dword %1, %1
+    %endif
+%endmacro
+
 %macro WELS_EXTERN 1
     ALIGN 16
     %ifdef PREFIX
