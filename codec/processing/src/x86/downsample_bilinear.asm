@@ -3856,6 +3856,291 @@ WELS_EXTERN GeneralBilinearAccurateDownsampler_sse41
     vpaddw          ymm_xfrac1, ymm_xfrac1, ymm_xfrac_inc
 %endmacro
 
+; xpos_int=%1 xpos_frac=%2 inc_int=%3 inc_frac=%4 7FFFh=%5 tmp=%6,%7
+%macro AVX2_BilinearIncXposw 7
+    vpaddb          %1, %1, %3
+    vpaddw          %6, %2, %4
+    vpcmpgtw        %7, %2, %6
+    vpsubb          %1, %1, %7  ; add carry
+    vpand           %2, %6, %5
+%endmacro
+
+; res>>29=%1 data0=%2 data1=%3 frac0=%4 frac1=%5 tmp=%6
+%macro AVX2_LinearAccurateInterpolateVerticalDwords 6
+    vpshufd         %1, %2, 10110001b
+    vpshufd         %6, %3, 10110001b
+    vpmuludq        %1, %1, %4
+    vpmuludq        %6, %6, %5
+    vpaddq          %1, %1, %6
+    vpmuludq        %2, %2, %4
+    vpmuludq        %3, %3, %5
+    vpaddq          %2, %2, %3
+    vpsllq          %1, %1,  3
+    vpsrlq          %2, %2, 29
+    vpblendd        %1, %1, %2, 01010101b
+%endmacro
+
+%macro AVX2_BilinearAccurateDownsample2xOrLess_16px 0
+    vpshufb         ymm_tmp0, ymm_xpos_int, ymm_0
+    vpsubb          ymm_xpos_int, ymm_xpos_int, ymm_tmp0
+    AVX2_UnpckXFrac ymm_tmp0, ymm_tmp1, ymm_xpos_frac, ymm_7fff
+    mov             r_tmp0, i_xpos
+    shr             r_tmp0, 16
+    vmovdqu         xmm_tmp4, [p_src_row0 + r_tmp0]
+    vmovdqu         xmm_tmp5, [p_src_row1 + r_tmp0]
+    lea             r_tmp0, [i_xpos + 4 * i_scalex2]
+    lea             i_xpos, [i_xpos + 8 * i_scalex2]
+    shr             r_tmp0, 16
+    vinserti128     ymm_tmp4, ymm_tmp4, [p_src_row0 + r_tmp0], 1
+    vinserti128     ymm_tmp5, ymm_tmp5, [p_src_row1 + r_tmp0], 1
+    vpshufb         ymm_tmp4, ymm_tmp4, ymm_xpos_int
+    vpshufb         ymm_tmp5, ymm_tmp5, ymm_xpos_int
+    vpunpcklbw      ymm_tmp2, ymm_tmp4, ymm_0
+    vpunpcklbw      ymm_tmp3, ymm_tmp5, ymm_0
+    vpunpckhbw      ymm_tmp4, ymm_tmp4, ymm_0
+    vpunpckhbw      ymm_tmp5, ymm_tmp5, ymm_0
+    vpmaddwd        ymm_tmp2, ymm_tmp2, ymm_tmp0
+    vpmaddwd        ymm_tmp3, ymm_tmp3, ymm_tmp0
+    vpmaddwd        ymm_tmp4, ymm_tmp4, ymm_tmp1
+    vpmaddwd        ymm_tmp5, ymm_tmp5, ymm_tmp1
+    AVX2_LinearAccurateInterpolateVerticalDwords ymm_tmp0, ymm_tmp2, ymm_tmp3, ymm_yfrac0, ymm_yfrac1, ymm_tmp1
+    AVX2_LinearAccurateInterpolateVerticalDwords ymm_tmp1, ymm_tmp4, ymm_tmp5, ymm_yfrac0, ymm_yfrac1, ymm_tmp2
+    vpackssdw       ymm_tmp0, ymm_tmp0, ymm_tmp1
+    vpavgw          ymm_tmp0, ymm_tmp0, ymm_0
+    vpackuswb       ymm_tmp0, ymm_tmp0, ymm_tmp0
+    vmovlps         [p_dst], xmm_tmp0
+    vextracti128    [p_dst + 8], ymm_tmp0, 1
+    add             p_dst, 16
+    AVX2_BilinearIncXposw ymm_xpos_int, ymm_xpos_frac, ymm_xpos_int_inc, ymm_xpos_frac_inc, ymm_7fff, ymm_tmp0, ymm_tmp1
+%endmacro
+
+%macro AVX2_BilinearAccurateDownsample4xOrLess_16px 0
+    vbroadcasti128  ymm_tmp0, [shufb_0000000088888888]
+    vpshufb         ymm_tmp0, ymm_xpos_int, ymm_tmp0
+    vpsubb          ymm_xpos_int, ymm_xpos_int, ymm_tmp0
+    AVX2_UnpckXFrac ymm_tmp0, ymm_tmp1, ymm_xpos_frac, ymm_7fff
+    mov             r_tmp0, i_xpos
+    shr             r_tmp0, 16
+    vmovdqu         xmm_tmp4, [p_src_row0 + r_tmp0]
+    vmovdqu         xmm_tmp2, [p_src_row1 + r_tmp0]
+    lea             r_tmp0, [i_xpos + 4 * i_scalex2]
+    shr             r_tmp0, 16
+    vinserti128     ymm_tmp4, ymm_tmp4, [p_src_row0 + r_tmp0], 1
+    vinserti128     ymm_tmp2, ymm_tmp2, [p_src_row1 + r_tmp0], 1
+    lea             r_tmp0, [i_xpos + 2 * i_scalex2]
+    lea             i_xpos, [r_tmp0 + 4 * i_scalex2]
+    shr             r_tmp0, 16
+    vpunpcklbw      ymm_tmp3, ymm_xpos_int, [db80h_256]
+    vpshufb         ymm_tmp4, ymm_tmp4, ymm_tmp3
+    vpshufb         ymm_tmp2, ymm_tmp2, ymm_tmp3
+    vpmaddwd        ymm_tmp4, ymm_tmp4, ymm_tmp0
+    vpmaddwd        ymm_tmp2, ymm_tmp2, ymm_tmp0
+    AVX2_LinearAccurateInterpolateVerticalDwords ymm_tmp0, ymm_tmp4, ymm_tmp2, ymm_yfrac0, ymm_yfrac1, ymm_tmp3
+    vmovdqu         xmm_tmp4, [p_src_row0 + r_tmp0]
+    vmovdqu         xmm_tmp2, [p_src_row1 + r_tmp0]
+    mov             r_tmp0, i_xpos
+    lea             i_xpos, [i_xpos + 2 * i_scalex2]
+    shr             r_tmp0, 16
+    vinserti128     ymm_tmp4, ymm_tmp4, [p_src_row0 + r_tmp0], 1
+    vinserti128     ymm_tmp2, ymm_tmp2, [p_src_row1 + r_tmp0], 1
+    vpunpckhbw      ymm_tmp3, ymm_xpos_int, [db80h_256]
+    vpshufb         ymm_tmp4, ymm_tmp4, ymm_tmp3
+    vpshufb         ymm_tmp2, ymm_tmp2, ymm_tmp3
+    vpmaddwd        ymm_tmp4, ymm_tmp4, ymm_tmp1
+    vpmaddwd        ymm_tmp2, ymm_tmp2, ymm_tmp1
+    AVX2_LinearAccurateInterpolateVerticalDwords ymm_tmp1, ymm_tmp4, ymm_tmp2, ymm_yfrac0, ymm_yfrac1, ymm_tmp3
+    vpackssdw       ymm_tmp0, ymm_tmp0, ymm_tmp1
+    vpavgw          ymm_tmp0, ymm_tmp0, ymm_0
+    vpackuswb       ymm_tmp0, ymm_tmp0, ymm_tmp0
+    vmovlps         [p_dst], xmm_tmp0
+    vextracti128    [p_dst + 8], ymm_tmp0, 1
+    add             p_dst, 16
+    AVX2_BilinearIncXposw ymm_xpos_int, ymm_xpos_frac, ymm_xpos_int_inc, ymm_xpos_frac_inc, ymm_7fff, ymm_tmp0, ymm_tmp1
+%endmacro
+
+%macro AVX2_BilinearAccurateDownsample8xOrLess_16px 0
+    vbroadcasti128  ymm_tmp0, [shufb_000044448888CCCC]
+    vpshufb         ymm_tmp0, ymm_xpos_int, ymm_tmp0
+    vpsubb          ymm_xpos_int, ymm_xpos_int, ymm_tmp0
+    mov             r_tmp0, i_xpos
+    shr             r_tmp0, 16
+    vmovdqu         xmm_tmp4, [p_src_row0 + r_tmp0]
+    vmovdqu         xmm_tmp5, [p_src_row1 + r_tmp0]
+    lea             r_tmp0, [i_xpos + 4 * i_scalex2]
+    add             i_xpos, i_scalex2
+    shr             r_tmp0, 16
+    vinserti128     ymm_tmp4, ymm_tmp4, [p_src_row0 + r_tmp0], 1
+    vinserti128     ymm_tmp5, ymm_tmp5, [p_src_row1 + r_tmp0], 1
+    mov             r_tmp0, i_xpos
+    shr             r_tmp0, 16
+    vmovdqu         xmm_tmp0, [p_src_row0 + r_tmp0]
+    vmovdqu         xmm_tmp1, [p_src_row1 + r_tmp0]
+    lea             r_tmp0, [i_xpos + 4 * i_scalex2]
+    add             i_xpos, i_scalex2
+    shr             r_tmp0, 16
+    vinserti128     ymm_tmp0, ymm_tmp0, [p_src_row0 + r_tmp0], 1
+    vinserti128     ymm_tmp1, ymm_tmp1, [p_src_row1 + r_tmp0], 1
+    vpunpcklbw      ymm_tmp3, ymm_xpos_int, [db80h_256]
+    vpshufb         ymm_tmp4, ymm_tmp4, ymm_tmp3
+    vpshufb         ymm_tmp5, ymm_tmp5, ymm_tmp3
+    vpshufb         ymm_tmp0, ymm_tmp0, ymm_tmp3
+    vpshufb         ymm_tmp1, ymm_tmp1, ymm_tmp3
+    vpblendd        ymm_tmp4, ymm_tmp4, ymm_tmp0, 11001100b
+    vpblendd        ymm_tmp5, ymm_tmp5, ymm_tmp1, 11001100b
+    AVX2_UnpckXFrac ymm_tmp0, ymm_tmp1, ymm_xpos_frac, ymm_7fff
+    vpmaddwd        ymm_tmp4, ymm_tmp4, ymm_tmp0
+    vpmaddwd        ymm_tmp5, ymm_tmp5, ymm_tmp0
+    AVX2_LinearAccurateInterpolateVerticalDwords ymm_tmp0, ymm_tmp4, ymm_tmp5, ymm_yfrac0, ymm_yfrac1, ymm_tmp3
+    mov             r_tmp0, i_xpos
+    shr             r_tmp0, 16
+    vmovdqu         xmm_tmp4, [p_src_row0 + r_tmp0]
+    vmovdqu         xmm_tmp5, [p_src_row1 + r_tmp0]
+    lea             r_tmp0, [i_xpos + 4 * i_scalex2]
+    add             i_xpos, i_scalex2
+    shr             r_tmp0, 16
+    vinserti128     ymm_tmp4, ymm_tmp4, [p_src_row0 + r_tmp0], 1
+    vinserti128     ymm_tmp5, ymm_tmp5, [p_src_row1 + r_tmp0], 1
+    mov             r_tmp0, i_xpos
+    lea             i_xpos, [i_xpos + 4 * i_scalex2]
+    shr             r_tmp0, 16
+    vmovdqu         xmm_tmp2, [p_src_row0 + r_tmp0]
+    vmovdqu         xmm_tmp3, [p_src_row1 + r_tmp0]
+    mov             r_tmp0, i_xpos
+    add             i_xpos, i_scalex2
+    shr             r_tmp0, 16
+    vinserti128     ymm_tmp2, ymm_tmp2, [p_src_row0 + r_tmp0], 1
+    vinserti128     ymm_tmp3, ymm_tmp3, [p_src_row1 + r_tmp0], 1
+    vpshufb         ymm_tmp4, ymm_tmp4, ymm_xpos_int
+    vpshufb         ymm_tmp5, ymm_tmp5, ymm_xpos_int
+    vpshufb         ymm_tmp2, ymm_tmp2, ymm_xpos_int
+    vpshufb         ymm_tmp3, ymm_tmp3, ymm_xpos_int
+    vpblendd        ymm_tmp4, ymm_tmp4, ymm_tmp2, 10001000b
+    vpblendd        ymm_tmp5, ymm_tmp5, ymm_tmp3, 10001000b
+    vpunpckhbw      ymm_tmp4, ymm_tmp4, ymm_0
+    vpunpckhbw      ymm_tmp5, ymm_tmp5, ymm_0
+    vpmaddwd        ymm_tmp4, ymm_tmp4, ymm_tmp1
+    vpmaddwd        ymm_tmp5, ymm_tmp5, ymm_tmp1
+    AVX2_LinearAccurateInterpolateVerticalDwords ymm_tmp1, ymm_tmp4, ymm_tmp5, ymm_yfrac0, ymm_yfrac1, ymm_tmp3
+    vpackssdw       ymm_tmp0, ymm_tmp0, ymm_tmp1
+    vpavgw          ymm_tmp0, ymm_tmp0, ymm_0
+    vpackuswb       ymm_tmp0, ymm_tmp0, ymm_tmp0
+    vmovlps         [p_dst], xmm_tmp0
+    vextracti128    [p_dst + 8], ymm_tmp0, 1
+    add             p_dst, 16
+    AVX2_BilinearIncXposw ymm_xpos_int, ymm_xpos_frac, ymm_xpos_int_inc, ymm_xpos_frac_inc, ymm_7fff, ymm_tmp0, ymm_tmp1
+%endmacro
+
+%macro AVX2_GeneralBilinearAccurateDownsample_16px 0
+    mov             r_tmp0, i_xpos
+    shr             r_tmp0, 16
+    vpbroadcastd    ymm_tmp4, [p_src_row0 + r_tmp0]
+    vpbroadcastd    ymm_tmp5, [p_src_row1 + r_tmp0]
+    lea             r_tmp0, [i_xpos + 1 * i_scalex]
+    shr             r_tmp0, 16
+    vpbroadcastd    ymm_tmp0, [p_src_row0 + r_tmp0]
+    vpunpcklwd      ymm_tmp4, ymm_tmp4, ymm_tmp0
+    vpbroadcastd    ymm_tmp0, [p_src_row1 + r_tmp0]
+    vpunpcklwd      ymm_tmp5, ymm_tmp5, ymm_tmp0
+    lea             r_tmp0, [i_xpos + 2 * i_scalex]
+    lea             i_xpos, [i_xpos + 4 * i_scalex]
+    shr             r_tmp0, 16
+    vpbroadcastd    ymm_tmp0, [p_src_row0 + r_tmp0]
+    vpblendd        ymm_tmp4, ymm_tmp4, ymm_tmp0, 00100010b
+    vpbroadcastd    ymm_tmp0, [p_src_row1 + r_tmp0]
+    vpblendd        ymm_tmp5, ymm_tmp5, ymm_tmp0, 00100010b
+    mov             r_tmp0, i_xpos
+    sub             r_tmp0, i_scalex
+    shr             r_tmp0, 16
+    vpbroadcastd    ymm_tmp0, [p_src_row0 + r_tmp0 - 2]
+    vpblendw        ymm_tmp4, ymm_tmp4, ymm_tmp0, 1000b
+    vpbroadcastd    ymm_tmp0, [p_src_row1 + r_tmp0 - 2]
+    vpblendw        ymm_tmp5, ymm_tmp5, ymm_tmp0, 1000b
+    mov             r_tmp0, i_xpos
+    shr             r_tmp0, 16
+    vpbroadcastd    ymm_tmp2, [p_src_row0 + r_tmp0]
+    vpbroadcastd    ymm_tmp3, [p_src_row1 + r_tmp0]
+    lea             r_tmp0, [i_xpos + 1 * i_scalex]
+    shr             r_tmp0, 16
+    vpbroadcastd    ymm_tmp0, [p_src_row0 + r_tmp0]
+    vpunpcklwd      ymm_tmp2, ymm_tmp2, ymm_tmp0
+    vpbroadcastd    ymm_tmp0, [p_src_row1 + r_tmp0]
+    vpunpcklwd      ymm_tmp3, ymm_tmp3, ymm_tmp0
+    lea             r_tmp0, [i_xpos + 2 * i_scalex]
+    lea             i_xpos, [i_xpos + 4 * i_scalex]
+    shr             r_tmp0, 16
+    vpbroadcastd    ymm_tmp0, [p_src_row0 + r_tmp0]
+    vpblendd        ymm_tmp2, ymm_tmp2, ymm_tmp0, 00100010b
+    vpbroadcastd    ymm_tmp0, [p_src_row1 + r_tmp0]
+    vpblendd        ymm_tmp3, ymm_tmp3, ymm_tmp0, 00100010b
+    mov             r_tmp0, i_xpos
+    sub             r_tmp0, i_scalex
+    shr             r_tmp0, 16
+    vpbroadcastd    ymm_tmp0, [p_src_row0 + r_tmp0 - 2]
+    vpblendw        ymm_tmp2, ymm_tmp2, ymm_tmp0, 1000b
+    vpbroadcastd    ymm_tmp0, [p_src_row1 + r_tmp0 - 2]
+    vpblendw        ymm_tmp3, ymm_tmp3, ymm_tmp0, 1000b
+    mov             r_tmp0, i_xpos
+    shr             r_tmp0, 16
+    vmovd           xmm_tmp0, [p_src_row0 + r_tmp0]
+    vmovd           xmm_tmp1, [p_src_row1 + r_tmp0]
+    lea             r_tmp0, [i_xpos + i_scalex]
+    shr             r_tmp0, 16
+    vpinsrw         xmm_tmp0, [p_src_row0 + r_tmp0], 1
+    vpinsrw         xmm_tmp1, [p_src_row1 + r_tmp0], 1
+    lea             r_tmp0, [i_xpos + 2 * i_scalex]
+    lea             i_xpos, [i_xpos + 4 * i_scalex]
+    shr             r_tmp0, 16
+    vpinsrw         xmm_tmp0, [p_src_row0 + r_tmp0], 2
+    vpinsrw         xmm_tmp1, [p_src_row1 + r_tmp0], 2
+    mov             r_tmp0, i_xpos
+    sub             r_tmp0, i_scalex
+    shr             r_tmp0, 16
+    vpinsrw         xmm_tmp0, [p_src_row0 + r_tmp0], 3
+    vpinsrw         xmm_tmp1, [p_src_row1 + r_tmp0], 3
+    vpblendd        ymm_tmp4, ymm_tmp4, ymm_tmp0, 00001111b
+    vpblendd        ymm_tmp5, ymm_tmp5, ymm_tmp1, 00001111b
+    mov             r_tmp0, i_xpos
+    shr             r_tmp0, 16
+    vmovd           xmm_tmp0, [p_src_row0 + r_tmp0]
+    vmovd           xmm_tmp1, [p_src_row1 + r_tmp0]
+    lea             r_tmp0, [i_xpos + i_scalex]
+    shr             r_tmp0, 16
+    vpinsrw         xmm_tmp0, [p_src_row0 + r_tmp0], 1
+    vpinsrw         xmm_tmp1, [p_src_row1 + r_tmp0], 1
+    lea             r_tmp0, [i_xpos + 2 * i_scalex]
+    lea             i_xpos, [i_xpos + 4 * i_scalex]
+    shr             r_tmp0, 16
+    vpinsrw         xmm_tmp0, [p_src_row0 + r_tmp0], 2
+    vpinsrw         xmm_tmp1, [p_src_row1 + r_tmp0], 2
+    mov             r_tmp0, i_xpos
+    sub             r_tmp0, i_scalex
+    shr             r_tmp0, 16
+    vpinsrw         xmm_tmp0, [p_src_row0 + r_tmp0], 3
+    vpinsrw         xmm_tmp1, [p_src_row1 + r_tmp0], 3
+    vpblendd        ymm_tmp2, ymm_tmp2, ymm_tmp0, 00001111b
+    vpblendd        ymm_tmp3, ymm_tmp3, ymm_tmp1, 00001111b
+    vpunpcklbw      ymm_tmp4, ymm_tmp4, ymm_0
+    vpunpcklbw      ymm_tmp5, ymm_tmp5, ymm_0
+    vpmaddwd        ymm_tmp4, ymm_tmp4, ymm_xfrac0
+    vpmaddwd        ymm_tmp5, ymm_tmp5, ymm_xfrac0
+    AVX2_LinearAccurateInterpolateVerticalDwords ymm_tmp0, ymm_tmp4, ymm_tmp5, ymm_yfrac0, ymm_yfrac1, ymm_tmp1
+    vpunpcklbw      ymm_tmp4, ymm_tmp2, ymm_0
+    vpunpcklbw      ymm_tmp5, ymm_tmp3, ymm_0
+    vpmaddwd        ymm_tmp4, ymm_tmp4, ymm_xfrac1
+    vpmaddwd        ymm_tmp5, ymm_tmp5, ymm_xfrac1
+    AVX2_LinearAccurateInterpolateVerticalDwords ymm_tmp1, ymm_tmp4, ymm_tmp5, ymm_yfrac0, ymm_yfrac1, ymm_tmp2
+    vpackssdw       ymm_tmp0, ymm_tmp0, ymm_tmp1
+    vpavgw          ymm_tmp0, ymm_tmp0, ymm_0
+    vpackuswb       ymm_tmp0, ymm_tmp0, ymm_tmp0
+    vextracti128    [p_dst], ymm_tmp0, 1
+    vmovlps         [p_dst + 8], xmm_tmp0
+    add             p_dst, 16
+    vpaddw          ymm_xfrac0, ymm_xfrac0, ymm_xfrac_inc
+    vpaddw          ymm_xfrac1, ymm_xfrac1, ymm_xfrac_inc
+    vpand           ymm_xfrac0, ymm_xfrac0, ymm_7fff
+    vpand           ymm_xfrac1, ymm_xfrac1, ymm_7fff
+%endmacro
+
 ; downsample_16px_macro=%1 b_fast=%2
 %macro AVX2_GeneralBilinearDownsampler_loop 2
 %%height:
@@ -4249,6 +4534,329 @@ WELS_EXTERN GeneralBilinearFastDownsampler_avx2
 %undef ymm_tmp5
 %undef ymm_ffff
 %undef ymm_0
+%undef ymm_xpos_int_begin
+%undef ymm_xpos_frac_begin
+%undef ymm_xfrac0
+%undef ymm_xfrac1
+%undef ymm_xfrac0_begin
+%undef ymm_xfrac1_begin
+%undef ymm_xfrac_inc
+
+;**************************************************************************************************************
+;void GeneralBilinearAccurateDownsampler_avx2 (uint8_t* pDst, int32_t iDstStride, int32_t iDstWidth,
+;    int32_t iDstHeight, uint8_t* pSrc, int32_t iSrcStride, uint32_t uiScaleX,
+;    uint32_t uiScaleY);
+;
+;**************************************************************************************************************
+
+WELS_EXTERN GeneralBilinearAccurateDownsampler_avx2
+    %assign push_num 0
+%ifndef X86_32
+    push            r12
+    push            r13
+    push            rbx
+    push            rbp
+    %assign push_num 4
+%ifdef WIN64
+    push            rdi
+    push            rsi
+    %assign push_num push_num + 2
+%endif
+%endif
+    LOAD_7_PARA
+    PUSH_XMM 16
+    SIGN_EXTENSION  r1, r1d
+    SIGN_EXTENSION  r2, r2d
+    SIGN_EXTENSION  r3, r3d
+    SIGN_EXTENSION  r5, r5d
+    ZERO_EXTENSION  r6d
+    sub             r1, r2                                            ; dst_stride - dst_width
+    add             r6, r6                                            ; 2 * scalex
+%ifdef X86_32
+    vmovd           xmm0, arg8
+    vmovd           xmm1, esp
+    and             esp, -32
+    sub             esp, 8 * 4 + 8 * 32
+    vmovd           [esp], xmm1
+    %define p_dst                   r0
+    %define i_dst_stride_less_width [esp + 1 * 4]
+    %define i_dst_width             [esp + 2 * 4]
+    %define i_dst_height            dword [esp + 3 * 4]
+    %define p_src                   [esp + 4 * 4]
+    %define i_src_stride            [esp + 5 * 4]
+    %define i_scalex                r6
+    %define i_scalexd               r6d
+    %define i_scaleyd               [esp + 6 * 4]
+    %define i_xpos                  r2
+    %define i_ypos                  [esp + 7 * 4]
+    %define i_yposd                 dword [esp + 7 * 4]
+    %define p_src_row0              r3
+    %define p_src_row1              r4
+    %define i_width_cnt             r5
+    %define r_tmp0                  r1
+    %define r_tmp0b                 r1b
+    %define ymm_xpos_frac           ymm1
+    %define ymm_xpos_frac_inc       [esp + 8 * 4]
+    %define ymm_xpos_int            ymm3
+    %define ymm_xpos_int_inc        [esp + 8 * 4 + 1 * 32]
+    %define ymm_yfrac0              [esp + 8 * 4 + 2 * 32]
+    %define ymm_yfrac1              [esp + 8 * 4 + 3 * 32]
+    %define xmm_tmp0                xmm7
+    %define ymm_tmp0                ymm7
+    %define xmm_tmp1                xmm0
+    %define ymm_tmp1                ymm0
+    %define xmm_tmp2                xmm2
+    %define ymm_tmp2                ymm2
+    %define xmm_tmp3                xmm4
+    %define ymm_tmp3                ymm4
+    %define xmm_tmp4                xmm5
+    %define ymm_tmp4                ymm5
+    %define xmm_tmp5                xmm6
+    %define ymm_tmp5                ymm6
+    %define ymm_0                   [esp + 8 * 4 + 4 * 32]
+    %define ymm_7fff                [esp + 8 * 4 + 5 * 32]
+    %define ymm_xpos_int_begin      [esp + 8 * 4 + 6 * 32]
+    %define ymm_xpos_frac_begin     [esp + 8 * 4 + 7 * 32]
+    mov             i_dst_stride_less_width, r1
+    mov             i_dst_width, r2
+    mov             i_dst_height, r3
+    mov             p_src, r4
+    mov             i_src_stride, r5
+    vmovd           i_scaleyd, xmm0
+    vpxor           xmm0, xmm0, xmm0
+    vmovdqa         ymm_0, ymm0
+    vpcmpeqw        ymm0, ymm0, ymm0
+    vpsrlw          ymm0, ymm0, 1
+    vmovdqa         ymm_7fff, ymm0
+%else
+    %define p_dst                   r0
+    %define i_dst_stride_less_width r1
+    %define i_dst_width             r2
+    %define i_dst_height            r3
+    %define p_src                   r4
+    %define i_src_stride            r5
+    %define i_scalex                r6
+    %define i_scalexd               r6d
+    %define i_scaleyd               dword arg8d
+    %define i_xpos                  r12
+    %define i_ypos                  r13
+    %define i_yposd                 r13d
+    %define p_src_row0              rbp
+%ifdef WIN64
+    %define p_src_row1              rsi
+    %define i_width_cnt             rdi
+%else
+    %define p_src_row1              r11
+    %define i_width_cnt             rax
+%endif
+    %define r_tmp0                  rbx
+    %define r_tmp0b                 bl
+    %define ymm_0                   ymm0
+    %define ymm_xpos_frac           ymm1
+    %define ymm_xpos_int            ymm3
+    %define ymm_xpos_frac_inc       ymm2
+    %define ymm_xpos_int_inc        ymm4
+    %define ymm_yfrac0              ymm5
+    %define ymm_yfrac1              ymm6
+    %define xmm_tmp0                xmm7
+    %define ymm_tmp0                ymm7
+    %define xmm_tmp1                xmm8
+    %define ymm_tmp1                ymm8
+    %define xmm_tmp2                xmm9
+    %define ymm_tmp2                ymm9
+    %define xmm_tmp3                xmm10
+    %define ymm_tmp3                ymm10
+    %define xmm_tmp4                xmm11
+    %define ymm_tmp4                ymm11
+    %define xmm_tmp5                xmm12
+    %define ymm_tmp5                ymm12
+    %define ymm_7fff                ymm13
+    %define ymm_xpos_int_begin      ymm14
+    %define ymm_xpos_frac_begin     ymm15
+    vpxor           ymm_0, ymm_0, ymm_0
+    vpcmpeqw        ymm_7fff, ymm_7fff, ymm_7fff
+    vpsrlw          ymm_7fff, ymm_7fff, 1
+%endif
+
+    sub             i_dst_height, 1
+    je              .final_row
+    jl              .done
+
+    mov             i_yposd, 1 << 14
+    vmovd           xmm_tmp0, i_scalexd
+    vpbroadcastd    ymm_tmp0, xmm_tmp0
+    vpslld          ymm_tmp1, ymm_tmp0, 2
+    vpslld          ymm_tmp2, ymm_tmp0, 3
+    vpaddd          ymm_tmp3, ymm_tmp1, ymm_tmp2
+    vpxor           ymm_tmp4, ymm_tmp4, ymm_tmp4
+    vpblendd        ymm_tmp1, ymm_tmp4, ymm_tmp1, 11110000b
+    vpblendd        ymm_tmp2, ymm_tmp2, ymm_tmp3, 11110000b
+    vpaddd          ymm_tmp3, ymm_tmp0, ymm_tmp0
+    vpblendd        ymm_tmp3, ymm_tmp4, ymm_tmp3, 11001100b
+    vpblendd        ymm_tmp0, ymm_tmp4, ymm_tmp0, 10101010b
+    vpaddd          ymm_tmp0, ymm_tmp3, ymm_tmp0
+    vpaddd          ymm_tmp1, ymm_tmp1, ymm_tmp0
+    vpaddd          ymm_tmp2, ymm_tmp2, ymm_tmp0
+    vpcmpeqw        ymm_tmp3, ymm_tmp3, ymm_tmp3
+    vpsrld          ymm_tmp3, ymm_tmp3, 31
+    vpslld          ymm_tmp3, ymm_tmp3, 15
+    vpaddd          ymm_tmp1, ymm_tmp1, ymm_tmp3
+    vpaddd          ymm_tmp2, ymm_tmp2, ymm_tmp3
+    vpsrld          ymm_xpos_int, ymm_tmp1, 16
+    vpsrld          ymm_tmp0, ymm_tmp2, 16
+    vpackssdw       ymm_xpos_int, ymm_xpos_int, ymm_tmp0
+    vpermq          ymm_xpos_int, ymm_xpos_int, 11011000b
+    vpackuswb       ymm_xpos_int, ymm_xpos_int, ymm_xpos_int
+    vpcmpeqw        ymm_tmp3, ymm_tmp3, ymm_tmp3
+    vpsubb          ymm_tmp0, ymm_xpos_int, ymm_tmp3
+    vpunpcklbw      ymm_xpos_int, ymm_xpos_int, ymm_tmp0
+    vpslld          ymm_tmp1, ymm_tmp1, 16
+    vpsrld          ymm_tmp1, ymm_tmp1, 16
+    vpslld          ymm_tmp2, ymm_tmp2, 16
+    vpsrld          ymm_tmp2, ymm_tmp2, 16
+    vpackusdw       ymm_xpos_frac, ymm_tmp1, ymm_tmp2
+    vpermq          ymm_xpos_frac, ymm_xpos_frac, 11011000b
+    vpsrlw          ymm_xpos_frac, ymm_xpos_frac, 1
+    vmovd           xmm_tmp0, i_scalexd
+    vpslld          xmm_tmp0, xmm_tmp0, 4
+    vpbroadcastw    ymm_tmp1, xmm_tmp0
+    vpsrlw          ymm_tmp1, ymm_tmp1, 1
+    vmovdqa         ymm_xpos_frac_inc, ymm_tmp1
+    vpsrld          xmm_tmp0, xmm_tmp0, 16
+    vpsubw          ymm_tmp0, ymm_tmp0, ymm_tmp3
+    vpbroadcastb    ymm_tmp0, xmm_tmp0
+    vmovdqa         ymm_xpos_int_inc, ymm_tmp0
+    vmovdqa         ymm_xpos_int_begin, ymm_xpos_int
+    vmovdqa         ymm_xpos_frac_begin, ymm_xpos_frac
+
+    cmp             i_scalex, 4 << 16
+    ja              .scalex_above4
+    cmp             i_scalex, 2 << 16
+    ja              .scalex_above2_beloweq4
+    add             i_scalex, i_scalex
+%xdefine i_scalex2 i_scalex
+%undef i_scalex
+    AVX2_GeneralBilinearDownsampler_loop AVX2_BilinearAccurateDownsample2xOrLess_16px, 0
+    shr             i_scalex2, 1
+%xdefine i_scalex i_scalex2
+%undef i_scalex2
+    jmp             .final_row
+.scalex_above2_beloweq4:
+    add             i_scalex, i_scalex
+%xdefine i_scalex2 i_scalex
+%undef i_scalex
+    AVX2_GeneralBilinearDownsampler_loop AVX2_BilinearAccurateDownsample4xOrLess_16px, 0
+    shr             i_scalex2, 1
+%xdefine i_scalex i_scalex2
+%undef i_scalex2
+    jmp             .final_row
+.scalex_above4:
+    cmp             i_scalex, 8 << 16
+    ja              .scalex_above8
+    add             i_scalex, i_scalex
+%xdefine i_scalex2 i_scalex
+%undef i_scalex
+    AVX2_GeneralBilinearDownsampler_loop AVX2_BilinearAccurateDownsample8xOrLess_16px, 0
+    shr             i_scalex2, 1
+%xdefine i_scalex i_scalex2
+%undef i_scalex2
+    jmp             .final_row
+.scalex_above8:
+%xdefine ymm_xfrac0 ymm_xpos_frac
+%xdefine ymm_xfrac1 ymm_xpos_int
+%xdefine ymm_xfrac0_begin ymm_xpos_int_begin
+%xdefine ymm_xfrac1_begin ymm_xpos_frac_begin
+%xdefine ymm_xfrac_inc ymm_xpos_frac_inc
+%undef ymm_xpos_int
+%undef ymm_xpos_frac
+%undef ymm_xpos_int_begin
+%undef ymm_xpos_frac_begin
+%undef ymm_xpos_int_inc
+%undef ymm_xpos_frac_inc
+    AVX2_UnpckXFrac ymm_tmp0, ymm_xfrac1, ymm_xfrac0, ymm_7fff
+    vpermq          ymm_xfrac0, ymm_tmp0,   01001110b
+    vpermq          ymm_xfrac1, ymm_xfrac1, 01001110b
+    vmovdqa         ymm_xfrac0_begin, ymm_xfrac0
+    vmovdqa         ymm_xfrac1_begin, ymm_xfrac1
+    vpcmpeqw        ymm_tmp0, ymm_tmp0, ymm_tmp0
+    vpmullw         ymm_tmp0, ymm_tmp0, ymm_xfrac_inc
+    vpunpcklwd      ymm_tmp0, ymm_tmp0, ymm_xfrac_inc
+    vmovdqa         ymm_xfrac_inc, ymm_tmp0
+    AVX2_GeneralBilinearDownsampler_loop AVX2_GeneralBilinearAccurateDownsample_16px, 0
+
+.final_row:
+    mov             p_src_row0, i_ypos
+    shr             p_src_row0, 15
+    imul            p_src_row0, i_src_stride
+    add             p_src_row0, p_src
+    mov             i_xpos, 1 << 15
+    mov             i_width_cnt, i_dst_width
+
+.final_row_width:
+    mov             r_tmp0, i_xpos
+    shr             r_tmp0, 16
+    movzx           r_tmp0, byte [p_src_row0 + r_tmp0]
+    mov             [p_dst], r_tmp0b
+    add             p_dst, 1
+    add             i_xpos, i_scalex
+    sub             i_width_cnt, 1
+    jg              .final_row_width
+
+.done:
+    vzeroupper
+%ifdef X86_32
+    mov             esp, [esp]
+%endif
+    POP_XMM
+    LOAD_7_PARA_POP
+%ifndef X86_32
+%ifdef WIN64
+    pop             rsi
+    pop             rdi
+%endif
+    pop             rbp
+    pop             rbx
+    pop             r13
+    pop             r12
+%endif
+    ret
+%undef p_dst
+%undef i_dst_stride_less_width
+%undef i_dst_width
+%undef i_dst_height
+%undef p_src
+%undef i_src_stride
+%undef i_scalex
+%undef i_scalexd
+%undef i_scaleyd
+%undef i_xpos
+%undef i_ypos
+%undef i_yposd
+%undef p_src_row0
+%undef p_src_row1
+%undef i_width_cnt
+%undef r_tmp0
+%undef r_tmp0b
+%undef ymm_xpos_frac
+%undef ymm_xpos_frac_inc
+%undef ymm_xpos_int
+%undef ymm_xpos_int_inc
+%undef ymm_yfrac0
+%undef ymm_yfrac1
+%undef xmm_tmp0
+%undef ymm_tmp0
+%undef xmm_tmp1
+%undef ymm_tmp1
+%undef xmm_tmp2
+%undef ymm_tmp2
+%undef xmm_tmp3
+%undef ymm_tmp3
+%undef xmm_tmp4
+%undef ymm_tmp4
+%undef xmm_tmp5
+%undef ymm_tmp5
+%undef ymm_0
+%undef ymm_7fff
 %undef ymm_xpos_int_begin
 %undef ymm_xpos_frac_begin
 %undef ymm_xfrac0
