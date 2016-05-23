@@ -100,6 +100,7 @@ void CDownsampling::InitDownsampleFuncs (SDownsampleFuncs& sDownsampleFunc,  int
     sDownsampleFunc.pfHalfAverage[1]    = DyadicBilinearDownsamplerWidthx16_ssse3;
     sDownsampleFunc.pfOneThirdDownsampler = DyadicBilinearOneThirdDownsampler_ssse3;
     sDownsampleFunc.pfQuarterDownsampler  = DyadicBilinearQuarterDownsampler_ssse3;
+    sDownsampleFunc.pfGeneralRatioLuma    = GeneralBilinearFastDownsamplerWrap_ssse3;
   }
   if (iCpuFlag & WELS_CPU_SSE41) {
     sDownsampleFunc.pfHalfAverage[0]    = DyadicBilinearDownsamplerWidthx32_sse4;
