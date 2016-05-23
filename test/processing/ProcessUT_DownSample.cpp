@@ -296,21 +296,23 @@ TEST (DownSampleTest, func) { \
   int src_stride_a; \
   int src_width_a; \
   int src_height_a; \
-  dst_stride_c = dst_stride_a = 320; \
-  src_stride_c = src_stride_a = 320; \
-  src_width_c = src_width_a = 320; \
-  src_height_c = src_height_a = 180; \
-  dst_width_c = dst_width_a = 300; \
-  dst_height_c = dst_height_a = 160; \
-  for (int j = 0; j < 70000; j++) { \
-    dst_c[j] = dst_a[j] = rand() % 256; \
-    src_c[j] = src_a[j] = rand() % 256; \
-  } \
-  ref (dst_c, dst_stride_c, dst_width_c, dst_height_c, src_c, src_stride_c, src_width_c, src_height_c); \
-  func (dst_a, dst_stride_a, dst_width_a, dst_height_a, src_a, src_stride_a, src_width_a, src_height_a); \
-  for (int j = 0; j < dst_height_c; j++) { \
-    for (int m = 0; m < dst_width_c ; m++) { \
-      ASSERT_EQ (dst_c[m + j * dst_stride_c], dst_a[m + j * dst_stride_a]); \
+  for (int i = 0; i < 5; i++) { \
+    dst_stride_c = dst_stride_a = 320; \
+    src_stride_c = src_stride_a = 320; \
+    src_width_c = src_width_a = 320; \
+    src_height_c = src_height_a = 180; \
+    dst_width_c = dst_width_a = (src_width_c >> (i + 1)) + rand() % (src_width_c >> (i + 1)); \
+    dst_height_c = dst_height_a = 160; \
+    for (int j = 0; j < 70000; j++) { \
+      dst_c[j] = dst_a[j] = rand() % 256; \
+      src_c[j] = src_a[j] = rand() % 256; \
+    } \
+    ref (dst_c, dst_stride_c, dst_width_c, dst_height_c, src_c, src_stride_c, src_width_c, src_height_c); \
+    func (dst_a, dst_stride_a, dst_width_a, dst_height_a, src_a, src_stride_a, src_width_a, src_height_a); \
+    for (int j = 0; j < dst_height_c; j++) { \
+      for (int m = 0; m < dst_width_c ; m++) { \
+        ASSERT_EQ (dst_c[m + j * dst_stride_c], dst_a[m + j * dst_stride_a]); \
+      } \
     } \
   } \
 }
