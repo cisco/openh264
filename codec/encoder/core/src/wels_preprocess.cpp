@@ -893,9 +893,14 @@ void CWelsPreProcess::InitPixMap (const SPicture* pPicture, SPixMap* pPixMap) {
 
   pPixMap->eFormat = VIDEO_FORMAT_I420;
 }
-void CWelsPreProcess::GetAvailableRefListLosslessScreenRefSelection (SPicture** pSrcPicList, uint8_t iCurTid,
+
+SPicture** CWelsPreProcess::GetReferenceSrcPicList(int32_t iTargetDid) {
+  return (&m_pSpatialPic[iTargetDid][1]);
+}
+
+void CWelsPreProcess::GetAvailableRefListLosslessScreenRefSelection (SPicture** pRefPicList, uint8_t iCurTid,
     const int32_t iClosestLtrFrameNum,
-    SRefInfoParam* pAvailableRefList, int32_t& iAvailableRefNum, int32_t& iAvailableSceneRefNum) {
+    SRefInfoParam* pAvailableRefParam, int32_t& iAvailableRefNum, int32_t& iAvailableSceneRefNum) {
   const int32_t iSourcePicNum = m_iAvaliableRefInSpatialPicList;
   if (0 >= iSourcePicNum) {
     iAvailableRefNum = 0;
@@ -913,7 +918,7 @@ void CWelsPreProcess::GetAvailableRefListLosslessScreenRefSelection (SPicture** 
   //the saving order will be depend on pSrcPicList
   //TODO: use a frame_idx to find the closer ref in time distance, and correctly sort the ref list
   for (int32_t i = iSourcePicNum - 1; i >= 0; --i) {
-    pRefPic = pSrcPicList[i];
+    pRefPic = pRefPicList[i];
     if (NULL == pRefPic || !pRefPic->bUsedAsRef || !pRefPic->bIsLongRef || (bCurFrameMarkedAsSceneLtr
         && (!pRefPic->bIsSceneLTR))) {
       continue;
@@ -923,20 +928,20 @@ void CWelsPreProcess::GetAvailableRefListLosslessScreenRefSelection (SPicture** 
 
     if (bRefRealLtr || (0 == iCurTid && 0 == uiRefTid) || (uiRefTid < iCurTid)) {
       int32_t idx = (pRefPic->iLongTermPicNum == iClosestLtrFrameNum) ? (0) : (iAvailableRefNum++);
-      pAvailableRefList[idx].pRefPicture = pRefPic;
-      pAvailableRefList[idx].iSrcListIdx = i + 1; //in SrcList, the idx 0 is reserved for CurPic
+      pAvailableRefParam[idx].pRefPicture = pRefPic;
+      pAvailableRefParam[idx].iSrcListIdx = i + 1; //in SrcList, the idx 0 is reserved for CurPic
       iAvailableSceneRefNum += bRefRealLtr;
     }
   }
 
-  if (pAvailableRefList[0].pRefPicture == NULL) {
+  if (pAvailableRefParam[0].pRefPicture == NULL) {
     for (int32_t i = 1; i < iAvailableRefNum ; ++i) {
-      pAvailableRefList[i - 1].pRefPicture = pAvailableRefList[i].pRefPicture;
-      pAvailableRefList[i - 1].iSrcListIdx = pAvailableRefList[i].iSrcListIdx;
+      pAvailableRefParam[i - 1].pRefPicture = pAvailableRefParam[i].pRefPicture;
+      pAvailableRefParam[i - 1].iSrcListIdx = pAvailableRefParam[i].iSrcListIdx;
     }
 
-    pAvailableRefList[iAvailableRefNum - 1].pRefPicture = NULL;
-    pAvailableRefList[iAvailableRefNum - 1].iSrcListIdx = 0;
+    pAvailableRefParam[iAvailableRefNum - 1].pRefPicture = NULL;
+    pAvailableRefParam[iAvailableRefNum - 1].iSrcListIdx = 0;
     --iAvailableRefNum;
   }
 }
@@ -944,7 +949,7 @@ void CWelsPreProcess::GetAvailableRefListLosslessScreenRefSelection (SPicture** 
 
 
 void CWelsPreProcess::GetAvailableRefList (SPicture** pSrcPicList, uint8_t iCurTid, const int32_t iClosestLtrFrameNum,
-    SRefInfoParam* pAvailableRefList, int32_t& iAvailableRefNum, int32_t& iAvailableSceneRefNum) {
+    SRefInfoParam* pAvailableRefParam, int32_t& iAvailableRefNum, int32_t& iAvailableSceneRefNum) {
   const int32_t iSourcePicNum = m_iAvaliableRefInSpatialPicList;
   if (0 >= iSourcePicNum) {
     iAvailableRefNum = 0;
@@ -966,8 +971,8 @@ void CWelsPreProcess::GetAvailableRefList (SPicture** pSrcPicList, uint8_t iCurT
     uiRefTid = pRefPic->uiTemporalId;
 
     if (uiRefTid <= iCurTid) {
-      pAvailableRefList[iAvailableRefNum].pRefPicture = pRefPic;
-      pAvailableRefList[iAvailableRefNum].iSrcListIdx = i + 1; //in SrcList, the idx 0 is reserved for CurPic
+      pAvailableRefParam[iAvailableRefNum].pRefPicture = pRefPic;
+      pAvailableRefParam[iAvailableRefNum].iSrcListIdx = i + 1; //in SrcList, the idx 0 is reserved for CurPic
       iAvailableRefNum ++;
     }
   }
@@ -1021,12 +1026,12 @@ ESceneChangeIdc CWelsPreProcess::DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPi
   }
 
   ESceneChangeIdc iVaaFrameSceneChangeIdc = LARGE_CHANGED_SCENE;
-  SPicture** pSrcPicList = &m_pSpatialPic[iTargetDid][1];
-  if (NULL == pSrcPicList) {
+  SPicture** pRefPicList = GetReferenceSrcPicList(iTargetDid);
+  if (NULL == pRefPicList) {
     return LARGE_CHANGED_SCENE;
   }
 
-  SRefInfoParam sAvailableRefList[MAX_REF_PIC_COUNT] = { { 0 } };
+  SRefInfoParam sAvailableRefParam[MAX_REF_PIC_COUNT] = { { 0 } };
   int32_t iAvailableRefNum = 0;
   int32_t iAvailableSceneRefNum = 0;
 
@@ -1058,11 +1063,11 @@ ESceneChangeIdc CWelsPreProcess::DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPi
   }
   const int32_t iClosestLtrFrameNum = pCtx->pLtr[iTargetDid].iLastLtrIdx[iCurTid];
   if (pSvcParam->bEnableLongTermReference) {
-    GetAvailableRefListLosslessScreenRefSelection (pSrcPicList, iCurTid, iClosestLtrFrameNum, &sAvailableRefList[0],
+    GetAvailableRefListLosslessScreenRefSelection (pRefPicList, iCurTid, iClosestLtrFrameNum, &sAvailableRefParam[0],
         iAvailableRefNum,
         iAvailableSceneRefNum);
   } else {
-    GetAvailableRefList (pSrcPicList, iCurTid, iClosestLtrFrameNum, &sAvailableRefList[0], iAvailableRefNum,
+    GetAvailableRefList (pRefPicList, iCurTid, iClosestLtrFrameNum, &sAvailableRefParam[0], iAvailableRefNum,
                          iAvailableSceneRefNum);
   }
   //after this build, pAvailableRefList[idx].iSrcListIdx is the idx of the ref in h->spatial_pic
@@ -1081,7 +1086,7 @@ ESceneChangeIdc CWelsPreProcess::DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPi
     sSceneChangeResult.pStaticBlockIdc = pCurBlockStaticPointer;
     sSceneChangeResult.sScrollResult.bScrollDetectFlag = false;
 
-    pRefPicInfo = & (sAvailableRefList[iScdIdx]);
+    pRefPicInfo = & (sAvailableRefParam[iScdIdx]);
     assert (NULL != pRefPicInfo);
     pRefPic = pRefPicInfo->pRefPicture;
     InitPixMap (pRefPic, &sRefMap);
