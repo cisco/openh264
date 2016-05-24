@@ -982,7 +982,7 @@ void RcUpdateFrameComplexity (sWelsEncCtx* pEncCtx) {
     pTOverRc->iLinearCmplx = ((int64_t)pWelsSvcRc->iFrameDqBits) * iQStep;
   } else {
     pTOverRc->iLinearCmplx = WELS_DIV_ROUND64 ((LINEAR_MODEL_DECAY_FACTOR * (int64_t)pTOverRc->iLinearCmplx
-                             + (INT_MULTIPLY - LINEAR_MODEL_DECAY_FACTOR) * (int64_t) (pWelsSvcRc->iFrameDqBits * iQStep)),
+                             + (INT_MULTIPLY - LINEAR_MODEL_DECAY_FACTOR) *((int64_t)pWelsSvcRc->iFrameDqBits * iQStep)),
                              INT_MULTIPLY);
   }
   int32_t iAlpha = WELS_DIV_ROUND (INT_MULTIPLY, (1 + pTOverRc->iPFrameNum));
