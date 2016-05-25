@@ -3181,6 +3181,7 @@ int32_t WelsEncoderEncodeParameterSets (sWelsEncCtx* pCtx, void* pDst) {
   pLayerBsInfo->uiLayerType   = NON_VIDEO_CODING_LAYER;
   pLayerBsInfo->iNalCount     = iCountNal;
   pLayerBsInfo->eFrameType    = videoFrameTypeInvalid;
+  pLayerBsInfo->iSubSeqId     = 0;
   //pCtx->eLastNalPriority      = NRI_PRI_HIGHEST;
   pFbi->iLayerNum             = 1;
   pFbi->eFrameType            = videoFrameTypeInvalid;
@@ -3218,6 +3219,7 @@ int32_t WriteSsvcParaset (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
   pLayerBsInfo->uiLayerType     = NON_VIDEO_CODING_LAYER;
   pLayerBsInfo->iNalCount       = iCountNal;
   pLayerBsInfo->eFrameType      = videoFrameTypeIDR;
+  pLayerBsInfo->iSubSeqId = GetSubSequenceId (pCtx, videoFrameTypeIDR);
   //point to next pLayerBsInfo
   ++ pLayerBsInfo;
   ++ pCtx->pOut->iLayerBsIndex;
@@ -3262,6 +3264,7 @@ int32_t WriteSavcParaset (sWelsEncCtx* pCtx, const int32_t iIdx,
   pLayerBsInfo->uiLayerType   = NON_VIDEO_CODING_LAYER;
   pLayerBsInfo->iNalCount     = iCountNal;
   pLayerBsInfo->eFrameType    = videoFrameTypeIDR;
+  pLayerBsInfo->iSubSeqId     = GetSubSequenceId (pCtx, videoFrameTypeIDR);
   //point to next pLayerBsInfo
   ++ pLayerBsInfo;
   ++ pCtx->pOut->iLayerBsIndex;
@@ -3296,6 +3299,7 @@ int32_t WriteSavcParaset (sWelsEncCtx* pCtx, const int32_t iIdx,
   pLayerBsInfo->uiLayerType   = NON_VIDEO_CODING_LAYER;
   pLayerBsInfo->iNalCount     = iCountNal;
   pLayerBsInfo->eFrameType    = videoFrameTypeIDR;
+  pLayerBsInfo->iSubSeqId     = GetSubSequenceId (pCtx, videoFrameTypeIDR);
   //point to next pLayerBsInfo
   ++ pLayerBsInfo;
   ++ pCtx->pOut->iLayerBsIndex;
@@ -3343,6 +3347,7 @@ int32_t WriteSavcParaset_Listing (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
     pLayerBsInfo->uiLayerType   = NON_VIDEO_CODING_LAYER;
     pLayerBsInfo->iNalCount     = iCountNal;
     pLayerBsInfo->eFrameType    = videoFrameTypeIDR;
+    pLayerBsInfo->iSubSeqId     = GetSubSequenceId (pCtx, videoFrameTypeIDR);
     //point to next pLayerBsInfo
     ++ pLayerBsInfo;
     ++ pCtx->pOut->iLayerBsIndex;
@@ -3376,6 +3381,7 @@ int32_t WriteSavcParaset_Listing (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
     pLayerBsInfo->uiLayerType   = NON_VIDEO_CODING_LAYER;
     pLayerBsInfo->iNalCount     = iCountNal;
     pLayerBsInfo->eFrameType    = videoFrameTypeIDR;
+    pLayerBsInfo->iSubSeqId     = GetSubSequenceId (pCtx, videoFrameTypeIDR);
     //point to next pLayerBsInfo
     ++ pLayerBsInfo;
     ++ pCtx->pOut->iLayerBsIndex;
@@ -3772,6 +3778,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       pLayerBsInfo->uiQualityId         = 0;
       pLayerBsInfo->iNalCount           = ++ iNalIdxInLayer;
       pLayerBsInfo->eFrameType          = eFrameType;
+      pLayerBsInfo->iSubSeqId = GetSubSequenceId (pCtx, eFrameType);
     }
     // for dynamic slicing single threading..
     else if ((SM_SIZELIMITED_SLICE == pParam->sSliceArgument.uiSliceMode) && (pSvcParam->iMultipleThreadIdc <= 1)) {
@@ -3779,6 +3786,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       pCtx->iEncoderError = WelsCodeOnePicPartition (pCtx, pFbi, pLayerBsInfo, &iNalIdxInLayer, &iLayerSize, 0,
                             kiLastMbInFrame, 0);
       pLayerBsInfo->eFrameType = eFrameType;
+      pLayerBsInfo->iSubSeqId = GetSubSequenceId (pCtx, eFrameType);
       WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
     } else {
       //other multi-slice uiSliceMode
@@ -3805,6 +3813,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         pLayerBsInfo->uiQualityId   = 0;
         pLayerBsInfo->iNalCount     = 0;
         pLayerBsInfo->eFrameType    = eFrameType;
+        pLayerBsInfo->iSubSeqId = GetSubSequenceId (pCtx, eFrameType);
         pCtx->pTaskManage->ExecuteTasks();
         if (pCtx->iEncoderError) {
           WelsLog (pLogCtx, WELS_LOG_ERROR,
@@ -3856,7 +3865,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         pLbi->uiQualityId   = 0;
         pLbi->iNalCount     = 0;
         pLbi->eFrameType = eFrameType;
-
+        pLbi->iSubSeqId = GetSubSequenceId (pCtx, eFrameType);
         int32_t iIdx = 0;
         while (iIdx < kiPartitionCnt) {
           pCtx->pSliceThreading->pThreadPEncCtx[iIdx].pFrameBsInfo = pFbi;
@@ -3925,6 +3934,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         pLayerBsInfo->uiQualityId       = 0;
         pLayerBsInfo->iNalCount         = iNalIdxInLayer;
         pLayerBsInfo->eFrameType        = eFrameType;
+        pLayerBsInfo->iSubSeqId         = GetSubSequenceId (pCtx, eFrameType);
       }
     }
 
@@ -4103,6 +4113,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       pLayerBsInfo->iNalCount           = 1;
       pLayerBsInfo->pNalLengthInByte[0] = iPaddingNalSize;
       pLayerBsInfo->eFrameType          = eFrameType;
+      pLayerBsInfo->iSubSeqId = GetSubSequenceId (pCtx, eFrameType);
       ++ pLayerBsInfo;
       ++ pCtx->pOut->iLayerBsIndex;
       pLayerBsInfo->pBsBuf           = pCtx->pFrameBs + pCtx->iPosBsBuffer;
@@ -4187,17 +4198,14 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
 
   pFbi->iLayerNum = iLayerNum;
-  pFbi->iSubSeqId = GetSubSequenceId (pCtx, eFrameType);
 
-  WelsLog (pLogCtx, WELS_LOG_DEBUG, "WelsEncoderEncodeExt() OutputInfo iLayerNum = %d,iSubSeqId = %d,iFrameSize = %d",
-           iLayerNum,
-           pFbi->iSubSeqId, iFrameSize);
+  WelsLog (pLogCtx, WELS_LOG_DEBUG, "WelsEncoderEncodeExt() OutputInfo iLayerNum = %d,iFrameSize = %d",
+           iLayerNum,iFrameSize);
   for (int32_t i = 0; i < iLayerNum; i++)
     WelsLog (pLogCtx, WELS_LOG_DEBUG,
-             "WelsEncoderEncodeExt() OutputInfo iLayerId = %d,iNalType = %d,iNalCount = %d, first Nal Length=%d,uiSpatialId = %d,uiTemporalId = %d",
-             i,
+             "WelsEncoderEncodeExt() OutputInfo iLayerId = %d,iNalType = %d,iNalCount = %d, first Nal Length=%d,uiSpatialId = %d,uiTemporalId = %d,iSubSeqId = %d",i,
              pFbi->sLayerInfo[i].uiLayerType, pFbi->sLayerInfo[i].iNalCount, pFbi->sLayerInfo[i].pNalLengthInByte[0],
-             pFbi->sLayerInfo[i].uiSpatialId, pFbi->sLayerInfo[i].uiTemporalId);
+             pFbi->sLayerInfo[i].uiSpatialId, pFbi->sLayerInfo[i].uiTemporalId,pFbi->sLayerInfo[i].iSubSeqId);
   WelsEmms();
 
   pLayerBsInfo->eFrameType = eFrameType;

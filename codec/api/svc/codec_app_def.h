@@ -578,6 +578,11 @@ typedef struct {
   EVideoFrameType eFrameType;
   unsigned char uiLayerType;
 
+  /**
+   * The sub sequence layers are ordered hierarchically based on their dependency on each other so that any picture in a layer shall not be
+   * predicted from any picture on any higher layer.
+  */
+  int   iSubSeqId;                ///< refer to D.2.11 Sub-sequence information SEI message semantics
   int   iNalCount;              ///< count number of NAL coded already
   int*  pNalLengthInByte;       ///< length of NAL size in byte from 0 to iNalCount-1
   unsigned char*  pBsBuf;       ///< buffer of bitstream contained
@@ -587,14 +592,6 @@ typedef struct {
 * @brief Frame bit stream info
 */
 typedef struct {
-  int iTemporalId;              ///< temporal ID
-
-  /**
-  * The sub sequence layers are ordered hierarchically based on their dependency on each other so that any picture in a layer shall not be
-  * predicted from any picture on any higher layer.
-  */
-  int iSubSeqId;                ///< refer to D.2.11 Sub-sequence information SEI message semantics
-
   int           iLayerNum;
   SLayerBSInfo  sLayerInfo[MAX_LAYER_NUM_OF_FRAME];
 
