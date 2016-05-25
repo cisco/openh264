@@ -302,7 +302,7 @@ TEST (DownSampleTest, func) { \
     src_width_c = src_width_a = 320; \
     src_height_c = src_height_a = 180; \
     dst_width_c = dst_width_a = (src_width_c >> (i + 1)) + rand() % (src_width_c >> (i + 1)); \
-    dst_height_c = dst_height_a = 160; \
+    dst_height_c = dst_height_a = (src_height_c >> (i + 1)) + rand() % (src_height_c >> (i + 1)); \
     for (int j = 0; j < 70000; j++) { \
       dst_c[j] = dst_a[j] = rand() % 256; \
       src_c[j] = src_a[j] = rand() % 256; \
