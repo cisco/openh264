@@ -785,18 +785,20 @@ bool CheckFrameSkipBasedMaxbr (sWelsEncCtx* pEncCtx, int32_t iSpatialNum, EVideo
     if (true == pEncCtx->pWelsSvcRc[iDidIdx].bSkipFlag) {
        bSkipMustFlag = true;
        pEncCtx->pWelsSvcRc[iDidIdx].uiLastTimeStamp = uiTimeStamp;
+       pEncCtx->pWelsSvcRc[iDidIdx].bSkipFlag = false;
        pEncCtx->iContinualSkipFrames++;
     }
   }else{
     for(int32_t i = 0;i<iSpatialNum;i++){
-      if (UNSPECIFIED_BIT_RATE == pEncCtx->pSvcParam->sSpatialLayers[i].iMaxSpatialBitrate)
+      iDidIdx = (pSpatialIndexMap + i)->iDid;
+      if (UNSPECIFIED_BIT_RATE == pEncCtx->pSvcParam->sSpatialLayers[iDidIdx].iMaxSpatialBitrate)
         break;
-       iDidIdx = (pSpatialIndexMap + i)->iDid;
        pEncCtx->pFuncList->pfRc.pfWelsRcPicDelayJudge (pEncCtx, eFrameType, uiTimeStamp,iDidIdx);
-       if (true == pEncCtx->pWelsSvcRc[i].bSkipFlag) {
+       if (true == pEncCtx->pWelsSvcRc[iDidIdx].bSkipFlag) {
          bSkipMustFlag = true;
-         pEncCtx->pWelsSvcRc[i].uiLastTimeStamp = uiTimeStamp;
+         pEncCtx->pWelsSvcRc[iDidIdx].uiLastTimeStamp = uiTimeStamp;
          pEncCtx->iContinualSkipFrames++;
+         pEncCtx->pWelsSvcRc[iDidIdx].bSkipFlag = false;
          break;
       }
     }
@@ -1285,7 +1287,7 @@ void InitRcModuleTimeStamp (sWelsEncCtx* pEncCtx) {
   pWelsSvcRc->iSkipBufferRatio  = SKIP_RATIO;
 }
 void WelsRcFrameDelayJudgeTimeStamp (sWelsEncCtx* pEncCtx, EVideoFrameType eFrameType, long long uiTimeStamp,int32_t iDidIdx) {
-  SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
+  SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[iDidIdx];
   SSpatialLayerConfig* pDLayerConfig   = &pEncCtx->pSvcParam->sSpatialLayers[iDidIdx];
 
   if (pDLayerConfig->iSpatialBitrate > pDLayerConfig->iMaxSpatialBitrate)
@@ -1300,6 +1302,11 @@ void WelsRcFrameDelayJudgeTimeStamp (sWelsEncCtx* pEncCtx, EVideoFrameType eFram
   int32_t iSentBits  = (int32_t) ((double)iBitRate * iEncTimeInv * (1.0E-3) + 0.5);
   iSentBits = WELS_MAX (iSentBits, 0);
 
+    WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG,
+             "WelsRcFrameDelayJudgeTimeStamp AiDidIdx = %d,iSkipFrameNum = %d,buffer = %" PRId64
+             ",threadhold = %d,bitrate = %d,iSentBits = %d,lasttimestamp = %lld,timestamp=%lld\n",iDidIdx,
+             pWelsSvcRc->iSkipFrameNum, pWelsSvcRc->iBufferFullnessSkip, pWelsSvcRc->iBufferSizeSkip, iBitRate, iSentBits,
+             pWelsSvcRc->uiLastTimeStamp, uiTimeStamp);
   //When bitrate is changed, pBuffer size should be updated
   pWelsSvcRc->iBufferSizeSkip = WELS_DIV_ROUND (pDLayerConfig->iSpatialBitrate * pWelsSvcRc->iSkipBufferRatio,
                                 INT_MULTIPLY);
@@ -1319,8 +1326,8 @@ void WelsRcFrameDelayJudgeTimeStamp (sWelsEncCtx* pEncCtx, EVideoFrameType eFram
     }
   }
   WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG,
-           "WelsRcFrameDelayJudgeTimeStamp iSkipFrameNum = %d,buffer = %" PRId64
-           ",threadhold = %d,bitrate = %d,iSentBits = %d,lasttimestamp = %lld,timestamp=%lld\n",
+           "WelsRcFrameDelayJudgeTimeStamp iDidIdx = %d,iSkipFrameNum = %d,buffer = %" PRId64
+           ",threadhold = %d,bitrate = %d,iSentBits = %d,lasttimestamp = %lld,timestamp=%lld\n",iDidIdx,
            pWelsSvcRc->iSkipFrameNum, pWelsSvcRc->iBufferFullnessSkip, pWelsSvcRc->iBufferSizeSkip, iBitRate, iSentBits,
            pWelsSvcRc->uiLastTimeStamp, uiTimeStamp);
 }
@@ -1450,7 +1457,6 @@ void  WelsRcPictureInfoUpdateGomTimeStamp (sWelsEncCtx* pEncCtx, int32_t iLayerS
   pWelsSvcRc->iRemainingBits -= pWelsSvcRc->iFrameDqBits;
   //condition 1: whole pBuffer fullness
   pWelsSvcRc->iBufferFullnessSkip += pWelsSvcRc->iFrameDqBits;
-
 
   if (pEncCtx->pSvcParam->iPaddingFlag)
     RcVBufferCalculationPadding (pEncCtx);

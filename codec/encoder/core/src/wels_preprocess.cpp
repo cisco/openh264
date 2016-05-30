@@ -109,7 +109,7 @@ int32_t CWelsPreProcess::WelsPreprocessDestroy() {
   return 0;
 }
 
-int32_t CWelsPreProcess::WelsPreprocessReset (sWelsEncCtx* pCtx,int32_t iWidth,int32_t iHeight) {
+int32_t CWelsPreProcess::WelsPreprocessReset (sWelsEncCtx* pCtx, int32_t iWidth, int32_t iHeight) {
   int32_t iRet = -1;
   SWelsSvcCodingParam* pSvcParam = pCtx->pSvcParam;
   //init source width and height
@@ -118,7 +118,8 @@ int32_t CWelsPreProcess::WelsPreprocessReset (sWelsEncCtx* pCtx,int32_t iWidth,i
   pSvcParam->SUsedPicRect.iWidth =  iWidth;
   pSvcParam->SUsedPicRect.iHeight = iHeight;
   if ((iWidth < 16) || ((iHeight < 16))) {
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "Don't support width(%d) or height(%d) which is less than 16 ",iWidth, iHeight);
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "Don't support width(%d) or height(%d) which is less than 16 ", iWidth,
+             iHeight);
     return iRet;
   }
   if (pCtx) {
@@ -191,7 +192,7 @@ int32_t CWelsPreProcess::BuildSpatialPicList (sWelsEncCtx* pCtx, const SSourcePi
     if (WelsPreprocessCreate() != 0)
       return -1;
 
-    if (WelsPreprocessReset (pCtx,iWidth,iHeight) != 0)
+    if (WelsPreprocessReset (pCtx, iWidth, iHeight) != 0)
       return -1;
 
     m_iAvaliableRefInSpatialPicList = pSvcParam->iNumRefFrame;
@@ -199,7 +200,7 @@ int32_t CWelsPreProcess::BuildSpatialPicList (sWelsEncCtx* pCtx, const SSourcePi
     m_bInitDone = true;
   } else {
     if ((iWidth != pSvcParam->SUsedPicRect.iWidth) || (iHeight != pSvcParam->SUsedPicRect.iHeight)) {
-      if (WelsPreprocessReset (pCtx,iWidth,iHeight) != 0)
+      if (WelsPreprocessReset (pCtx, iWidth, iHeight) != 0)
         return -1;
     }
   }
@@ -331,8 +332,7 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
   pDlayerParam = &pSvcParam->sSpatialLayers[iDependencyId];
   iTargetWidth   = pDlayerParam->iVideoWidth;
   iTargetHeight  = pDlayerParam->iVideoHeight;
-  iTemporalId    = pDlayerParamInternal->uiCodingIdx2TemporalId[pDlayerParamInternal->iCodingIndex &
-                   (pSvcParam->uiGopSize - 1)];
+
   iSrcWidth   = pSvcParam->SUsedPicRect.iWidth;
   iSrcHeight  = pSvcParam->SUsedPicRect.iHeight;
   if (pSvcParam->uiIntraPeriod)
@@ -376,13 +376,27 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
       }
     }
   }
+
+  for (int32_t i = 0; i < pSvcParam->iSpatialLayerNum; i++) {
+    pDlayerParamInternal = &pSvcParam->sDependencyLayers[i];
+    iTemporalId    = pDlayerParamInternal->uiCodingIdx2TemporalId[pDlayerParamInternal->iCodingIndex &
+                     (pSvcParam->uiGopSize - 1)];
+    if (iTemporalId != INVALID_TEMPORAL_ID) {
+      ++ iSpatialNum;
+    }
+  }
+  pDlayerParamInternal = &pSvcParam->sDependencyLayers[iDependencyId];
+  iTemporalId    = pDlayerParamInternal->uiCodingIdx2TemporalId[pDlayerParamInternal->iCodingIndex &
+                   (pSvcParam->uiGopSize - 1)];
+  int iActualSpatialNum = iSpatialNum - 1;
   if (iTemporalId != INVALID_TEMPORAL_ID) {
-    ++ iSpatialNum;
+    WelsUpdateSpatialIdxMap (pCtx, iActualSpatialNum, pDstPic, iDependencyId);
+    -- iActualSpatialNum;
   }
 
-  WelsUpdateSpatialIdxMap (pCtx, iDependencyId, pDstPic, iDependencyId);
   m_pLastSpatialPicture[iDependencyId][1] = m_pSpatialPic[iDependencyId][iPicturePos];
   -- iDependencyId;
+
 
   // generate other spacial layer
   // pSrc is
@@ -409,9 +423,10 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
       DownsamplePadding (pSrcPic, pDstPic, iSrcWidth, iSrcHeight, iShrinkWidth, iShrinkHeight, iTargetWidth, iTargetHeight,
                          true);
 
-      WelsUpdateSpatialIdxMap (pCtx, iDependencyId, pDstPic, iDependencyId);
-      if ((iTemporalId != INVALID_TEMPORAL_ID))
-        ++ iSpatialNum;
+      if ((iTemporalId != INVALID_TEMPORAL_ID)) {
+        WelsUpdateSpatialIdxMap (pCtx, iActualSpatialNum, pDstPic, iDependencyId);
+        iActualSpatialNum--;
+      }
       m_pLastSpatialPicture[iDependencyId][1] = m_pSpatialPic[iDependencyId][iPicturePos];
 
       iClosestDid = iDependencyId;
