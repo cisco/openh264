@@ -87,7 +87,6 @@ typedef struct TagDLayerParam {
   float         fInputFrameRate;                // input frame rate
   float         fOutputFrameRate;               // output frame rate
  // uint16_t          uiIdrPicId;           // IDR picture id: [0, 65535], this one is used for LTR
-  int32_t           iSkipFrameFlag; //_GOM_RC_
   int32_t           iCodingIndex;
   int32_t           iFrameIndex;            // count how many frames elapsed during coding context currently
   bool              bEncCurFrmAsIdrFlag;

@@ -330,12 +330,11 @@ void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType, c
 #endif//FRAME_INFO_OUTPUT
 }
 
-EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum, const int32_t kiDidx) {
+EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum, const int32_t kiDidx, bool bSkipFrameFlag) {
   SWelsSvcCodingParam* pSvcParam = pEncCtx->pSvcParam;
   SSpatialLayerInternal* pParamInternal = &pEncCtx->pSvcParam->sDependencyLayers[kiDidx];
   EVideoFrameType iFrameType = videoFrameTypeInvalid;
   bool bSceneChangeFlag = false;
-  int32_t iSkipFrameFlag = pSvcParam->bSimulcastAVC?pParamInternal->iSkipFrameFlag:pEncCtx->iSkipFrameFlag;
   if (pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME) {
     if ((!pSvcParam->bEnableSceneChangeDetect) || pEncCtx->pVaa->bIdrPeriodFlag ||
         (kiSpatialNum < pSvcParam->iSpatialLayerNum)) {
@@ -365,8 +364,7 @@ EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum
     } else {
       iFrameType = videoFrameTypeP;
     }
-    if (videoFrameTypeP == iFrameType && iSkipFrameFlag > 0) {
-      pParamInternal->iSkipFrameFlag = 0;
+    if (videoFrameTypeP == iFrameType && bSkipFrameFlag) {
       iFrameType = videoFrameTypeSkip;
     } else if (videoFrameTypeIDR == iFrameType) {
       pParamInternal->iCodingIndex = 0;
@@ -389,8 +387,7 @@ EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum
     iFrameType = (pEncCtx->pVaa->bIdrPeriodFlag || bSceneChangeFlag
                   || pParamInternal->bEncCurFrmAsIdrFlag) ? videoFrameTypeIDR : videoFrameTypeP;
 
-    if (videoFrameTypeP == iFrameType && iSkipFrameFlag > 0) {  // for frame skip, 1/5/2010
-      pParamInternal->iSkipFrameFlag = 0;
+    if (videoFrameTypeP == iFrameType && bSkipFrameFlag) {  // for frame skip, 1/5/2010
       iFrameType = videoFrameTypeSkip;
     } else if (videoFrameTypeIDR == iFrameType) {
       pParamInternal->iCodingIndex = 0;

@@ -172,7 +172,6 @@ typedef struct TagWelsEncCtx {
   int32_t           iCheckWindowInterval;
   int32_t           iCheckWindowIntervalShift;
   bool              bCheckWindowShiftResetFlag;
-  int32_t           iSkipFrameFlag; //_GOM_RC_
   int32_t           iContinualSkipFrames;
   int32_t           iGlobalQp;      // global qp
 

@@ -1163,7 +1163,6 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx, SExistingParasetList* p
     const int32_t kiMbW             = (pDlayer->iVideoWidth + 0x0f) >> 4;
     const int32_t kiMbH             = (pDlayer->iVideoHeight + 0x0f) >> 4;
 
-    pParamInternal->iSkipFrameFlag = 0;
     pParamInternal->iCodingIndex = 0;
     pParamInternal->iFrameIndex = 0;
     pParamInternal->iFrameNum = 0;
@@ -3144,7 +3143,6 @@ int32_t ForceCodingIDR (sWelsEncCtx* pCtx) {
   for (int32_t iDid = 0; iDid < pCtx->pSvcParam->iSpatialLayerNum; iDid++) {
     SSpatialLayerInternal* pParamInternal = &pCtx->pSvcParam->sDependencyLayers[iDid];
     pParamInternal->iCodingIndex = 0;
-    pParamInternal->iSkipFrameFlag = 0;
     pParamInternal->iFrameIndex = 0;
     pParamInternal->iFrameNum = 0;
     pParamInternal->iPOC = 0;
@@ -3454,14 +3452,9 @@ EVideoFrameType PrepareEncodeFrame (sWelsEncCtx* pCtx, SLayerBSInfo*& pLayerBsIn
                                     int32_t& iLayerNum, int32_t& iFrameSize, long long uiTimeStamp) {
   SWelsSvcCodingParam* pSvcParam        = pCtx->pSvcParam;
   SSpatialPicIndex* pSpatialIndexMap = &pCtx->sSpatialIndexMap[0];
-  if (!pSvcParam->bSimulcastAVC) {
-    pCtx->iSkipFrameFlag = false;
-    for (int32_t iDid = 0; iDid < iSpatialNum; iDid++) {
-      if (pCtx->pSvcParam->sDependencyLayers[ (pSpatialIndexMap + iDid)->iDid].iSkipFrameFlag)
-        pCtx->iSkipFrameFlag = 1;
-    }
-  }
-  EVideoFrameType eFrameType = DecideFrameType (pCtx, iSpatialNum, iCurDid);
+
+  bool bSkipFrameFlag =  WelsRcCheckFrameStatus (pCtx,uiTimeStamp,iSpatialNum);
+  EVideoFrameType eFrameType = DecideFrameType (pCtx, iSpatialNum, iCurDid, bSkipFrameFlag);
 
   if (eFrameType == videoFrameTypeSkip) {
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG,
@@ -3475,27 +3468,12 @@ EVideoFrameType PrepareEncodeFrame (sWelsEncCtx* pCtx, SLayerBSInfo*& pLayerBsIn
     else {
       if (pCtx->pFuncList->pfRc.pfWelsUpdateBufferWhenSkip) {
         for (int32_t i = 0; i < iSpatialNum; i++) {
-          pCtx->pSvcParam->sDependencyLayers[i].iSkipFrameFlag = false;
           pCtx->pFuncList->pfRc.pfWelsUpdateBufferWhenSkip (pCtx, (pSpatialIndexMap + i)->iDid);
         }
       }
     }
 
   } else {
-    if (pCtx->pFuncList->pfRc.pfWelsCheckSkipBasedMaxbr) {
-      bool bSkip = pCtx->pFuncList->pfRc.pfWelsCheckSkipBasedMaxbr (pCtx, iSpatialNum, eFrameType,
-                   (uint32_t)uiTimeStamp);
-      if (bSkip) {
-        eFrameType = videoFrameTypeSkip;
-        pLayerBsInfo->eFrameType = videoFrameTypeSkip;
-        WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG,
-                 "[Rc] Frame timestamp = %lld, skip one frame due to max_br, continual skipped %d frames",
-                 uiTimeStamp, pCtx->iContinualSkipFrames);
-      }
-    }
-  }
-
-  if (eFrameType != videoFrameTypeSkip) {
     SSpatialLayerInternal* pParamInternal = &pSvcParam->sDependencyLayers[iCurDid];
     pCtx->iContinualSkipFrames = 0;
     iCurTid = GetTemporalLevel (&pSvcParam->sDependencyLayers[iCurDid], pParamInternal->iCodingIndex,
