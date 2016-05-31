@@ -3453,7 +3453,7 @@ EVideoFrameType PrepareEncodeFrame (sWelsEncCtx* pCtx, SLayerBSInfo*& pLayerBsIn
   SWelsSvcCodingParam* pSvcParam        = pCtx->pSvcParam;
   SSpatialPicIndex* pSpatialIndexMap = &pCtx->sSpatialIndexMap[0];
 
-  bool bSkipFrameFlag =  WelsRcCheckFrameStatus (pCtx,uiTimeStamp,iSpatialNum);
+  bool bSkipFrameFlag =  WelsRcCheckFrameStatus (pCtx,uiTimeStamp,iSpatialNum,iCurDid);
   EVideoFrameType eFrameType = DecideFrameType (pCtx, iSpatialNum, iCurDid, bSkipFrameFlag);
 
   if (eFrameType == videoFrameTypeSkip) {
