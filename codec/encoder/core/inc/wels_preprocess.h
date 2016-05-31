@@ -122,8 +122,9 @@ class CWelsPreProcess {
 
   static CWelsPreProcess* CreatePreProcess (sWelsEncCtx* pEncCtx);
 
+  virtual SPicture* GetCurrentOrigFrame (int32_t iDIdx) = 0;
  public:
-  int32_t WelsPreprocessReset (sWelsEncCtx* pEncCtx,int32_t iWidth,int32_t iHeight);
+  int32_t WelsPreprocessReset (sWelsEncCtx* pEncCtx, int32_t iWidth, int32_t iHeight);
   int32_t AllocSpatialPictures (sWelsEncCtx* pCtx, SWelsSvcCodingParam* pParam);
   void    FreeSpatialPictures (sWelsEncCtx* pCtx);
   int32_t BuildSpatialPicList (sWelsEncCtx* pEncCtx, const SSourcePicture* kpSrcPic);
@@ -135,9 +136,7 @@ class CWelsPreProcess {
                                     const int32_t kiDependencyId, const bool kbCalculateBGD);
   int32_t UpdateBlockIdcForScreen (uint8_t*  pCurBlockStaticPointer, const SPicture* kpRefPic, const SPicture* kpSrcPic);
 
-  SPicture* GetCurrentFrameFromOrigList (int32_t iDIdx) {
-    return m_pSpatialPic[iDIdx][0];
-  }
+
   void UpdateSrcList (SPicture* pCurPicture, const int32_t kiCurDid, SPicture** pShortRefList,
                       const uint32_t kuiShortRefCount);
   void UpdateSrcListLosslessScreenRefSelectionWithLtr (SPicture* pCurPicture, const int32_t kiCurDid,
@@ -150,11 +149,12 @@ class CWelsPreProcess {
 
   void InitPixMap (const SPicture* pPicture, SPixMap* pPixMap);
 
+  int32_t GetCurPicPosition (const int32_t kiDidx);
+
  private:
   int32_t WelsPreprocessCreate();
   int32_t WelsPreprocessDestroy();
   int32_t InitLastSpatialPictures (sWelsEncCtx* pEncCtx);
-  int32_t GetCurPicPosition(const int32_t kiDidx);
 
  private:
   int32_t SingleLayerPreprocess (sWelsEncCtx* pEncCtx, const SSourcePicture* kpSrc, Scaled_Picture* m_sScaledPicture);
@@ -193,14 +193,14 @@ class CWelsPreProcess {
  protected:
   IWelsVP*         m_pInterfaceVp;
   sWelsEncCtx*     m_pEncCtx;
+  uint8_t          m_uiSpatialLayersInTemporal[MAX_DEPENDENCY_LAYER];
 
  private:
   Scaled_Picture   m_sScaledPicture;
   SPicture*        m_pLastSpatialPicture[MAX_DEPENDENCY_LAYER][2];
   bool             m_bInitDone;
-  uint8_t          m_uiSpatialLayersInTemporal[MAX_DEPENDENCY_LAYER];
   uint8_t          m_uiSpatialPicNum[MAX_DEPENDENCY_LAYER];
- public:
+ protected:
   /* For Downsampling & VAA I420 based source pictures */
   SPicture*        m_pSpatialPic[MAX_DEPENDENCY_LAYER][MAX_REF_PIC_COUNT + 1];
   // need memory requirement with total number of num_of_ref + 1, "+1" is for current frame
@@ -212,7 +212,9 @@ class CWelsPreProcessVideo : public CWelsPreProcess {
  public:
   CWelsPreProcessVideo (sWelsEncCtx* pEncCtx) : CWelsPreProcess (pEncCtx) {};
 
-  virtual  ESceneChangeIdc  DetectSceneChange (SPicture* pCurPicture, SPicture* pRefPicture = NULL);
+  virtual SPicture* GetCurrentOrigFrame (int32_t iDIdx);
+
+  virtual ESceneChangeIdc  DetectSceneChange (SPicture* pCurPicture, SPicture* pRefPicture = NULL);
 };
 
 
@@ -221,7 +223,9 @@ class CWelsPreProcessScreen : public CWelsPreProcess {
  public:
   CWelsPreProcessScreen (sWelsEncCtx* pEncCtx) : CWelsPreProcess (pEncCtx) {};
 
-  virtual  ESceneChangeIdc  DetectSceneChange (SPicture* pCurPicture, SPicture* pRefPicture = NULL);
+  virtual SPicture* GetCurrentOrigFrame (int32_t iDIdx);
+
+  virtual ESceneChangeIdc  DetectSceneChange (SPicture* pCurPicture, SPicture* pRefPicture = NULL);
 
  private:
   void GetAvailableRefListLosslessScreenRefSelection (SPicture** pSrcPicList, uint8_t iCurTid,
