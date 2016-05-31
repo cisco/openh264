@@ -559,7 +559,6 @@ void CWelsPreProcess::BilateralDenoising (SPicture* pSrc, const int32_t kiWidth,
 }
 
 ESceneChangeIdc CWelsPreProcessVideo::DetectSceneChange (SPicture* pCurPicture, SPicture* pRefPicture) {
-  bool bSceneChangeFlag = false;
   int32_t iMethodIdx = METHOD_SCENE_CHANGE_DETECTION_VIDEO;
   SSceneChangeResult sSceneChangeDetectResult = { SIMILAR_SCENE };
   SPixMap sSrcPixMap;
@@ -573,7 +572,6 @@ ESceneChangeIdc CWelsPreProcessVideo::DetectSceneChange (SPicture* pCurPicture, 
   sSrcPixMap.sRect.iRectHeight = pCurPicture->iHeightInPixel;
   sSrcPixMap.eFormat = VIDEO_FORMAT_I420;
 
-
   sRefPixMap.pPixel[0] = pRefPicture->pData[0];
   sRefPixMap.iSizeInBits = g_kiPixMapSizeInBits;
   sRefPixMap.iStride[0] = pRefPicture->iLineSize[0];
@@ -583,6 +581,7 @@ ESceneChangeIdc CWelsPreProcessVideo::DetectSceneChange (SPicture* pCurPicture, 
 
   int32_t iRet = m_pInterfaceVp->Process (iMethodIdx, &sSrcPixMap, &sRefPixMap);
   if (iRet == 0) {
+    bool bSceneChangeFlag = false;
     m_pInterfaceVp->Get (iMethodIdx, (void*)&sSceneChangeDetectResult);
     bSceneChangeFlag = (sSceneChangeDetectResult.eSceneChangeIdc == LARGE_CHANGED_SCENE) ? true : false;
   }
