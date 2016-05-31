@@ -170,6 +170,8 @@ class CWelsPreProcess {
 
   ESceneChangeIdc DetectSceneChangeScreen (sWelsEncCtx* pCtx, SPicture* pCurPicture);
   void InitPixMap (const SPicture* pPicture, SPixMap* pPixMap);
+
+  SPicture** GetReferenceSrcPicList(int32_t iTargetDid);
   void GetAvailableRefListLosslessScreenRefSelection (SPicture** pSrcPicList, uint8_t iCurTid,
       const int32_t iClosestLtrFrameNum,
       SRefInfoParam* pAvailableRefList, int32_t& iAvailableRefNum, int32_t& iAvailableSceneRefNum);
