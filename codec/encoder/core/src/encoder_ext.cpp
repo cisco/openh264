@@ -1754,7 +1754,8 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx, SExistingParasetList* pExistingPa
     return 1;
   }
 
-  (*ppCtx)->pReferenceStrategy = IWelsReferenceStrategy::CreateReferenceStrategy((*ppCtx), pParam->iUsageType, pParam->bEnableLongTermReference);
+  (*ppCtx)->pReferenceStrategy = IWelsReferenceStrategy::CreateReferenceStrategy ((*ppCtx), pParam->iUsageType,
+                                 pParam->bEnableLongTermReference);
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pReferenceStrategy), FreeMemorySvc (ppCtx))
 
   (*ppCtx)->pIntra4x4PredModeBlocks = static_cast<int8_t*>
@@ -1946,7 +1947,7 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
       ReleaseMtResource (ppCtx);
 
     if (NULL != pCtx->pReferenceStrategy) {
-      WELS_DELETE_OP(pCtx->pReferenceStrategy);
+      WELS_DELETE_OP (pCtx->pReferenceStrategy);
     }
 
     // frame bitstream pBuffer
@@ -3453,7 +3454,6 @@ EVideoFrameType PrepareEncodeFrame (sWelsEncCtx* pCtx, SLayerBSInfo*& pLayerBsIn
                                     int32_t& iLayerNum, int32_t& iFrameSize, long long uiTimeStamp) {
   SWelsSvcCodingParam* pSvcParam        = pCtx->pSvcParam;
   SSpatialPicIndex* pSpatialIndexMap = &pCtx->sSpatialIndexMap[0];
-
   if (!pSvcParam->bSimulcastAVC) {
     pCtx->iSkipFrameFlag = false;
     for (int32_t iDid = 0; iDid < iSpatialNum; iDid++) {
@@ -3461,8 +3461,6 @@ EVideoFrameType PrepareEncodeFrame (sWelsEncCtx* pCtx, SLayerBSInfo*& pLayerBsIn
         pCtx->iSkipFrameFlag = 1;
     }
   }
-
-
   EVideoFrameType eFrameType = DecideFrameType (pCtx, iSpatialNum, iCurDid);
 
   if (eFrameType == videoFrameTypeSkip) {
@@ -3502,35 +3500,34 @@ EVideoFrameType PrepareEncodeFrame (sWelsEncCtx* pCtx, SLayerBSInfo*& pLayerBsIn
     pCtx->iContinualSkipFrames = 0;
     iCurTid = GetTemporalLevel (&pSvcParam->sDependencyLayers[iCurDid], pParamInternal->iCodingIndex,
                                 pSvcParam->uiGopSize);
-    //skip this spatial layer
-    if (iCurTid == INVALID_TEMPORAL_ID) {
-      pParamInternal->iCodingIndex ++;
-      eFrameType = videoFrameTypeSkip;
-      pLayerBsInfo->eFrameType = videoFrameTypeSkip;
-    } else {
-      pCtx->uiTemporalId = iCurTid;
-      if (eFrameType == videoFrameTypeIDR) {
-        // write parameter sets bitstream or SEI/SSEI (if any) here
-        // TODO: use function pointer instead
-        if (! (SPS_LISTING & pCtx->pSvcParam->eSpsPpsIdStrategy)) {
-          if (pSvcParam->bSimulcastAVC) {
-            pCtx->iEncoderError = WriteSavcParaset (pCtx, iCurDid, pLayerBsInfo, iLayerNum, iFrameSize);
-            ++ pCtx->uiIdrPicId;
-          } else {
-            pCtx->iEncoderError = WriteSsvcParaset (pCtx, iSpatialNum, pLayerBsInfo, iLayerNum, iFrameSize);
-            ++ pCtx->uiIdrPicId;
-          }
+    pCtx->uiTemporalId = iCurTid;
+    if (eFrameType == videoFrameTypeIDR) {
+      // write parameter sets bitstream or SEI/SSEI (if any) here
+      // TODO: use function pointer instead
+      if (! (SPS_LISTING & pCtx->pSvcParam->eSpsPpsIdStrategy)) {
+        if (pSvcParam->bSimulcastAVC) {
+          pCtx->iEncoderError = WriteSavcParaset (pCtx, iCurDid, pLayerBsInfo, iLayerNum, iFrameSize);
+          ++ pCtx->uiIdrPicId;
         } else {
-          pCtx->iEncoderError = WriteSavcParaset_Listing (pCtx, iSpatialNum, pLayerBsInfo, iLayerNum, iFrameSize);
-
+          pCtx->iEncoderError = WriteSsvcParaset (pCtx, iSpatialNum, pLayerBsInfo, iLayerNum, iFrameSize);
           ++ pCtx->uiIdrPicId;
         }
+      } else {
+        pCtx->iEncoderError = WriteSavcParaset_Listing (pCtx, iSpatialNum, pLayerBsInfo, iLayerNum, iFrameSize);
+
+        ++ pCtx->uiIdrPicId;
       }
     }
-
+    if (!pSvcParam->bSimulcastAVC) {
+      for (int32_t i = 0; i < pSvcParam->iSpatialLayerNum; i++) {
+        SSpatialLayerInternal* pParamInternal = &pSvcParam->sDependencyLayers[i];
+        pParamInternal->iCodingIndex ++;
+      }
+    } else {
+      SSpatialLayerInternal* pParamInternal = &pSvcParam->sDependencyLayers[iCurDid];
+      pParamInternal->iCodingIndex++;
+    }
   }
-
-
   return eFrameType;
 }
 /*!
@@ -3608,8 +3605,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   InitBitStream (pCtx);
   pLayerBsInfo->pBsBuf = pCtx->pFrameBs ;
   pLayerBsInfo->pNalLengthInByte = pCtx->pOut->pNalLen;
-
-  pCtx->pCurDqLayer             = pCtx->ppDqLayerList[pSpatialIndexMap->iDid];
+  iCurDid = pSpatialIndexMap->iDid;
+  pCtx->pCurDqLayer             = pCtx->ppDqLayerList[iCurDid];
   pCtx->pCurDqLayer->pRefLayer  = NULL;
   if (!pSvcParam->bSimulcastAVC) {
     eFrameType = PrepareEncodeFrame (pCtx, pLayerBsInfo, iSpatialNum , iCurDid, iCurTid, iLayerNum, iFrameSize,
@@ -3617,8 +3614,15 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     if (eFrameType == videoFrameTypeSkip) {
       pFbi->eFrameType = videoFrameTypeSkip;
       pLayerBsInfo->eFrameType = videoFrameTypeSkip;
-
       return ENC_RETURN_SUCCESS;
+    }
+  } else {
+    for (int32_t iDidIdx = 0; iDidIdx < pSvcParam->iSpatialLayerNum; iDidIdx++) {
+      SSpatialLayerInternal* pParamInternal = &pSvcParam->sDependencyLayers[iDidIdx];
+      int32_t iTemporalId =  GetTemporalLevel (pParamInternal, pParamInternal->iCodingIndex,
+                             pSvcParam->uiGopSize);
+      if (iTemporalId == INVALID_TEMPORAL_ID)
+        pParamInternal->iCodingIndex ++;
     }
   }
 
@@ -3713,7 +3717,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
     WelsInitCurrentLayer (pCtx, iCurWidth, iCurHeight);
 
-    pCtx->pReferenceStrategy->MarkPic ();
+    pCtx->pReferenceStrategy->MarkPic();
     if (!pCtx->pReferenceStrategy->BuildRefList (pParamInternal->iPOC, 0)) {
       WelsLog (pLogCtx, WELS_LOG_WARNING,
                "WelsEncoderEncodeExt(), WelsBuildRefList failed for P frames, pCtx->iNumRef0= %d. ForceCodingIDR!",
@@ -3723,7 +3727,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       break;
     }
     if (pCtx->eSliceType != I_SLICE) {
-      pCtx->pReferenceStrategy->AfterBuildRefList ();
+      pCtx->pReferenceStrategy->AfterBuildRefList();
     }
 #ifdef LONG_TERM_REF_DUMP
     DumpRef (pCtx);
@@ -3981,7 +3985,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
     // reference picture list update
     if (eNalRefIdc != NRI_PRI_LOWEST) {
-      if (!pCtx->pReferenceStrategy->UpdateRefList ()) {
+      if (!pCtx->pReferenceStrategy->UpdateRefList()) {
         WelsLog (pLogCtx, WELS_LOG_WARNING, "WelsEncoderEncodeExt(), WelsUpdateRefList failed. ForceCodingIDR!");
         //the above is to set the next frame to be IDR
         pCtx->iEncoderError = ENC_RETURN_CORRECTED;
@@ -4155,7 +4159,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         && (pCtx->pLtr[pCtx->uiDependencyId].iLTRMarkMode == LTR_DIRECT_MARK)) || eFrameType == videoFrameTypeIDR)) {
       pCtx->bRefOfCurTidIsLtr[iCurDid][iCurTid] = true;
     }
-    ++ pParamInternal->iCodingIndex;
+    // ++ pParamInternal->iCodingIndex;
   }//end of (iSpatialIdx/iSpatialNum)
 
   if (ENC_RETURN_CORRECTED == pCtx->iEncoderError) {

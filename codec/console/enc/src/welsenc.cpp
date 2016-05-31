@@ -810,7 +810,7 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
   sSvcParam.iPicHeight = (!sSvcParam.iPicHeight) ? iSourceHeight : sSvcParam.iPicHeight;
 
   iTotalFrameMax = (int32_t)fs.uiFrameToBeCoded;
-
+  //  sSvcParam.bSimulcastAVC = true;
   if (cmResultSuccess != pPtrEnc->InitializeExt (&sSvcParam)) { // SVC encoder initialization
     fprintf (stderr, "SVC encoder Initialize failed\n");
     iRet = 1;
