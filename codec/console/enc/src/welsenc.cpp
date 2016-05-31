@@ -223,9 +223,9 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
 
       if (strTag[0].compare ("UsageType") == 0) {
         pSvcParam.iUsageType = (EUsageType)atoi (strTag[1].c_str());
-      } else if (strTag[0].compare ("SourceWidth") == 0) {
-        pSrcPic->iPicWidth = atoi (strTag[1].c_str());
-      } else if (strTag[0].compare ("SourceHeight") == 0) {
+      }else if (strTag[0].compare ("SimulcastAVC") == 0) {
+        pSvcParam.bSimulcastAVC = atoi (strTag[1].c_str()) ? true : false;
+      }else if (strTag[0].compare ("SourceHeight") == 0) {
         pSrcPic->iPicHeight = atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("InputFile") == 0) {
         if (strTag[1].length() > 0)
@@ -387,6 +387,8 @@ void PrintHelp() {
   printf ("  -org         Original file, example: -org src.yuv\n");
   printf ("  -sw          the source width\n");
   printf ("  -sh          the source height\n");
+  printf ("  -utype       usage type\n");
+  printf ("  -savc        simulcast avc\n");
   printf ("  -frms        Number of total frames to be encoded\n");
   printf ("  -frin        input frame rate\n");
   printf ("  -numtl       Temporal layer number (default: 1)\n");
@@ -438,6 +440,9 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
       sFileSet.strBsFile.assign (argv[n++]);
     else if (!strcmp (pCommand, "-utype") && (n < argc))
       pSvcParam.iUsageType = (EUsageType)atoi (argv[n++]);
+
+    else if (!strcmp (pCommand, "-savc") && (n < argc))
+        pSvcParam.bSimulcastAVC =  atoi (argv[n++]) ? true : false;
 
     else if (!strcmp (pCommand, "-org") && (n < argc))
       sFileSet.strSeqFile.assign (argv[n++]);
@@ -661,6 +666,7 @@ int FillSpecificParameters (SEncParamExt& sParam) {
   sParam.eSpsPpsIdStrategy = INCREASING_ID;
   sParam.bPrefixNalAddingCtrl = 0;
   sParam.iComplexityMode = MEDIUM_COMPLEXITY;
+  sParam.bSimulcastAVC         = false;
   int iIndexLayer = 0;
   sParam.sSpatialLayers[iIndexLayer].uiProfileIdc       = PRO_BASELINE;
   sParam.sSpatialLayers[iIndexLayer].iVideoWidth        = 160;
