@@ -581,9 +581,8 @@ ESceneChangeIdc CWelsPreProcessVideo::DetectSceneChange (SPicture* pCurPicture, 
 
   int32_t iRet = m_pInterfaceVp->Process (iMethodIdx, &sSrcPixMap, &sRefPixMap);
   if (iRet == 0) {
-    bool bSceneChangeFlag = false;
     m_pInterfaceVp->Get (iMethodIdx, (void*)&sSceneChangeDetectResult);
-    bSceneChangeFlag = (sSceneChangeDetectResult.eSceneChangeIdc == LARGE_CHANGED_SCENE) ? true : false;
+    //bSceneChangeFlag = (sSceneChangeDetectResult.eSceneChangeIdc == LARGE_CHANGED_SCENE) ? true : false;
   }
 
   return sSceneChangeDetectResult.eSceneChangeIdc;
