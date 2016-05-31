@@ -104,7 +104,7 @@ void CWelsThreadPool::RemoveInstance (IWelsTaskSink* pSink) {
   -- m_iRefCount;
 
   if (0 == m_iRefCount) {
-    //StopAllRunning();
+    StopAllRunning();
     Uninit();
     //fprintf(stdout, "m_iRefCount=%d, IdleThreadNum=%d, BusyThreadNum=%d, WaitedTask=%d\n", m_iRefCount, GetIdleThreadNum(), GetBusyThreadNum(), GetWaitedTaskNum());
   }
