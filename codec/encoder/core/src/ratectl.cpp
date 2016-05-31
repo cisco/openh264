@@ -768,7 +768,7 @@ void CheckFrameSkipBasedMaxbr (sWelsEncCtx* pEncCtx, const long long uiTimeStamp
   }
 }
 
-bool WelsRcCheckFrameStatus (sWelsEncCtx* pEncCtx, long long uiTimeStamp, int32_t iSpatialNum) {
+bool WelsRcCheckFrameStatus (sWelsEncCtx* pEncCtx, long long uiTimeStamp, int32_t iSpatialNum,int32_t iCurDid) {
 
   bool bSkipMustFlag = false;
 
@@ -777,7 +777,7 @@ bool WelsRcCheckFrameStatus (sWelsEncCtx* pEncCtx, long long uiTimeStamp, int32_
   //simul_cast AVC control
   if (pEncCtx->pSvcParam->bSimulcastAVC) {
     //check target_br skip and update info
-    int32_t iDidIdx = pSpatialIndexMap->iDid;
+    int32_t iDidIdx = iCurDid;
     if (pEncCtx->pFuncList->pfRc.pfWelsRcPicDelayJudge) {
       pEncCtx->pFuncList->pfRc.pfWelsRcPicDelayJudge (pEncCtx, uiTimeStamp, iDidIdx);
     }
