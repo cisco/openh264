@@ -225,7 +225,9 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
         pSvcParam.iUsageType = (EUsageType)atoi (strTag[1].c_str());
       }else if (strTag[0].compare ("SimulcastAVC") == 0) {
         pSvcParam.bSimulcastAVC = atoi (strTag[1].c_str()) ? true : false;
-      }else if (strTag[0].compare ("SourceHeight") == 0) {
+      }else if (strTag[0].compare ("SourceWidth") == 0) {
+        pSrcPic->iPicWidth = atoi (strTag[1].c_str());
+      } else if (strTag[0].compare ("SourceHeight") == 0) {
         pSrcPic->iPicHeight = atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("InputFile") == 0) {
         if (strTag[1].length() > 0)
