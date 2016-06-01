@@ -118,6 +118,10 @@ void RcInitSequenceParameter (sWelsEncCtx* pEncCtx) {
     pWelsSvcRc->iRcVaryPercentage = pEncCtx->pSvcParam->iBitsVaryPercentage; // % -- for temp
     pWelsSvcRc->iRcVaryRatio = pWelsSvcRc->iRcVaryPercentage;
 
+    pWelsSvcRc->iBufferFullnessSkip = 0;
+    pWelsSvcRc->uiLastTimeStamp = 0;
+    pWelsSvcRc->iCost2BitsIntra = 1;
+    pWelsSvcRc->iAvgCost2Bits = 1;
     pWelsSvcRc->iSkipBufferRatio  = SKIP_RATIO;
 
     pWelsSvcRc->iQpRangeUpperInFrame = (QP_RANGE_UPPER_MODE1 * MAX_BITS_VARY_PERCENTAGE - ((
@@ -1305,17 +1309,6 @@ void WelsRcMbInitScc (sWelsEncCtx* pEncCtx, SMB* pCurMb, SSlice* pSlice) {
   pCurMb->uiChromaQp = g_kuiChromaQpTable[WELS_CLIP3 (pCurMb->uiLumaQp + pEncCtx->pPps->uiChromaQpIndexOffset, 0, 51)];
 }
 
-void InitRcModuleTimeStamp (sWelsEncCtx* pEncCtx) {
-  SWelsSvcRc* pWelsSvcRc =  &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
-  pWelsSvcRc->iBaseQp = 30;
-
-  pWelsSvcRc->iBufferFullnessSkip = 0;
-  pWelsSvcRc->uiLastTimeStamp = 0;
-
-  pWelsSvcRc->iCost2BitsIntra = 1;
-  pWelsSvcRc->iAvgCost2Bits = 1;
-  pWelsSvcRc->iSkipBufferRatio  = SKIP_RATIO;
-}
 void WelsRcFrameDelayJudgeTimeStamp (sWelsEncCtx* pEncCtx, long long uiTimeStamp, int32_t iDidIdx) {
   SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[iDidIdx];
   SSpatialLayerConfig* pDLayerConfig   = &pEncCtx->pSvcParam->sSpatialLayers[iDidIdx];
@@ -1550,7 +1543,6 @@ void  WelsRcInitFuncPointers (sWelsEncCtx* pEncCtx, RC_MODES iRcMode) {
     pRcf->pfWelsUpdateBufferWhenSkip = NULL;
     pRcf->pfWelsUpdateMaxBrWindowStatus = NULL;
     pRcf->pfWelsRcPostFrameSkipping = NULL;
-    InitRcModuleTimeStamp (pEncCtx);
     break;
   case RC_QUALITY_MODE:
   default:
