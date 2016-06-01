@@ -3472,7 +3472,7 @@ EVideoFrameType PrepareEncodeFrame (sWelsEncCtx* pCtx, SLayerBSInfo*& pLayerBsIn
       }
       WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG,
                  "[Rc] Frame timestamp = %lld, iDid = %d,skip one frame due to target_br, continual skipped %d frames",
-                 uiTimeStamp, pSpatialIndexMap->iDid, pCtx->pWelsSvcRc[pSpatialIndexMap->iDid].iContinualSkipFrames);
+                 uiTimeStamp, iCurDid, pCtx->pWelsSvcRc[iCurDid].iContinualSkipFrames);
     }
 
   } else {
