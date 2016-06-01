@@ -485,7 +485,7 @@ SECTION .note.GNU-stack noalloc noexec nowrite progbits ; Mark the stack as non-
 %endmacro
 
 %macro WELS_EXTERN 1
-    ALIGN 16
+    ALIGN 16, nop
     %ifdef PREFIX
         global _%1
         %define %1 _%1

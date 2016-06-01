@@ -102,8 +102,6 @@ void CDownsampling::InitDownsampleFuncs (SDownsampleFuncs& sDownsampleFunc,  int
     sDownsampleFunc.pfGeneralRatioLuma    = GeneralBilinearFastDownsamplerWrap_ssse3;
   }
   if (iCpuFlag & WELS_CPU_SSE41) {
-    sDownsampleFunc.pfHalfAverageWidthx32 = DyadicBilinearDownsamplerWidthx32_sse4;
-    sDownsampleFunc.pfHalfAverageWidthx16 = DyadicBilinearDownsamplerWidthx16_sse4;
     sDownsampleFunc.pfOneThirdDownsampler = DyadicBilinearOneThirdDownsampler_sse4;
     sDownsampleFunc.pfQuarterDownsampler  = DyadicBilinearQuarterDownsampler_sse4;
     sDownsampleFunc.pfGeneralRatioChroma  = GeneralBilinearAccurateDownsamplerWrap_sse41;

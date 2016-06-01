@@ -94,10 +94,6 @@ HalveDownsampleFunc     DyadicBilinearDownsamplerWidthx32_sse;
 HalveDownsampleFunc     DyadicBilinearDownsamplerWidthx16_ssse3;
 // iSrcWidth= x32 pixels
 HalveDownsampleFunc     DyadicBilinearDownsamplerWidthx32_ssse3;
-// iSrcWidth= x16 pixels
-HalveDownsampleFunc     DyadicBilinearDownsamplerWidthx16_sse4;
-// iSrcWidth= x32 pixels
-HalveDownsampleFunc     DyadicBilinearDownsamplerWidthx32_sse4;
 
 GeneralDownsampleFunc GeneralBilinearFastDownsamplerWrap_sse2;
 GeneralDownsampleFunc GeneralBilinearAccurateDownsamplerWrap_sse2;
