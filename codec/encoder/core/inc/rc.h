@@ -222,7 +222,7 @@ int32_t   iBufferFullnessPadding;
 int32_t   iPaddingSize;
 int32_t   iPaddingBitrateStat;
 bool      bSkipFlag;
-
+int32_t   iContinualSkipFrames;
 SRCTemporal* pTemporalOverRc;
 
 //for scc

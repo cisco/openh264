@@ -736,9 +736,9 @@ void CheckFrameSkipBasedMaxbr (sWelsEncCtx* pEncCtx, const long long uiTimeStamp
   3:if in last ODD_TIME_WINDOW the MAX Br is overflowed, make more strict skipping conditions
   4:such as case 3 in the other window
   */
-  bool bJudgeBufferFullSkip = (pEncCtx->iContinualSkipFrames <= iPredSkipFramesTarBr)
+  bool bJudgeBufferFullSkip = (pWelsSvcRc->iContinualSkipFrames <= iPredSkipFramesTarBr)
                               && (pWelsSvcRc->iBufferFullnessSkip > pWelsSvcRc->iBufferSizeSkip);
-  bool bJudgeMaxBRbufferFullSkip = (pEncCtx->iContinualSkipFrames <= iPredSkipFramesMaxBr)
+  bool bJudgeMaxBRbufferFullSkip = (pWelsSvcRc->iContinualSkipFrames <= iPredSkipFramesMaxBr)
                                    && (pEncCtx->iCheckWindowInterval > TIME_CHECK_WINDOW / 2)
                                    && (pWelsSvcRc->iBufferMaxBRFullness[EVEN_TIME_WINDOW] + pWelsSvcRc->iPredFrameBit - iAvailableBitsInTimeWindow > 0);
   bJudgeMaxBRbSkip[EVEN_TIME_WINDOW] = (pEncCtx->iCheckWindowInterval > TIME_CHECK_WINDOW / 2)
@@ -797,7 +797,7 @@ bool WelsRcCheckFrameStatus (sWelsEncCtx* pEncCtx, long long uiTimeStamp, int32_
     if (bSkipMustFlag) {
       pEncCtx->pWelsSvcRc[iDidIdx].uiLastTimeStamp = uiTimeStamp;
       pEncCtx->pWelsSvcRc[iDidIdx].bSkipFlag = false;
-      pEncCtx->iContinualSkipFrames++;
+      pEncCtx->pWelsSvcRc[iDidIdx].iContinualSkipFrames++;
       return true;
     }
   } else { //SVC control
@@ -821,7 +821,6 @@ bool WelsRcCheckFrameStatus (sWelsEncCtx* pEncCtx, long long uiTimeStamp, int32_
         }
       }
       if (bSkipMustFlag) {
-        pEncCtx->iContinualSkipFrames++;
         break;
       }
     }
@@ -831,6 +830,7 @@ bool WelsRcCheckFrameStatus (sWelsEncCtx* pEncCtx, long long uiTimeStamp, int32_
         int32_t iDidIdx = (pSpatialIndexMap + i)->iDid;
         pEncCtx->pWelsSvcRc[iDidIdx].uiLastTimeStamp = uiTimeStamp;
         pEncCtx->pWelsSvcRc[iDidIdx].bSkipFlag = false;
+        pEncCtx->pWelsSvcRc[iDidIdx].iContinualSkipFrames++;
       }
       return true;
     }
@@ -845,8 +845,8 @@ void UpdateBufferWhenFrameSkipped (sWelsEncCtx* pEncCtx, int32_t iCurDid) {
   pWelsSvcRc->iBufferMaxBRFullness[EVEN_TIME_WINDOW] -= kiOutputMaxBits;
   pWelsSvcRc->iBufferMaxBRFullness[ODD_TIME_WINDOW] -= kiOutputMaxBits;
   WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG,
-           "[Rc] bits in buffer = %" PRId64 ", bits in Max bitrate buffer = %" PRId64,
-           pWelsSvcRc->iBufferFullnessSkip, pWelsSvcRc->iBufferMaxBRFullness[EVEN_TIME_WINDOW]);
+           "[Rc] iDid = %d,bits in buffer = %" PRId64 ", bits in Max bitrate buffer = %" PRId64,
+           iCurDid,pWelsSvcRc->iBufferFullnessSkip, pWelsSvcRc->iBufferMaxBRFullness[EVEN_TIME_WINDOW]);
 
   pWelsSvcRc->iBufferFullnessSkip = WELS_MAX (pWelsSvcRc->iBufferFullnessSkip, 0);
 
@@ -854,12 +854,11 @@ void UpdateBufferWhenFrameSkipped (sWelsEncCtx* pEncCtx, int32_t iCurDid) {
   pWelsSvcRc->iSkipFrameNum++;
   pWelsSvcRc->iSkipFrameInVGop++;
 
-  pEncCtx->iContinualSkipFrames++;
-  if ((pEncCtx->iContinualSkipFrames % 3) == 0) {
+  if ((pWelsSvcRc->iContinualSkipFrames % 3) == 0) {
     //output a warning when iContinualSkipFrames is large enough, which may indicate subjective quality problem
     //note that here iContinualSkipFrames must be >0, so the log output will be 3/6/....
-    WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_WARNING, "[Rc] iContinualSkipFrames(%d) is large",
-             pEncCtx->iContinualSkipFrames);
+    WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_WARNING, "[Rc] iDid = %d,iContinualSkipFrames(%d) is large",
+             iCurDid,pWelsSvcRc->iContinualSkipFrames);
   }
 }
 void UpdateMaxBrCheckWindowStatus (sWelsEncCtx* pEncCtx, int32_t iSpatialNum, const long long uiTimeStamp) {
