@@ -2454,7 +2454,7 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
     WelsCabacInit (pCtx);
   WelsRcInitModule (pCtx,  pCtx->pSvcParam->iRCMode);
 
-  pCtx->pVpp = new CWelsPreProcess (pCtx);
+  pCtx->pVpp = CWelsPreProcess::CreatePreProcess(pCtx);
   if (pCtx->pVpp == NULL) {
     iRet = 1;
     WelsLog (pLogCtx, WELS_LOG_ERROR, "WelsInitEncoderExt(), pOut of memory in case new CWelsPreProcess().");
