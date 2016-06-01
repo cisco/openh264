@@ -73,8 +73,8 @@ SpecificDownsampleFunc  DyadicBilinearOneThirdDownsampler_c;
 SpecificDownsampleFunc  DyadicBilinearQuarterDownsampler_c;
 
 typedef struct {
-  // align_index: 0 = x32; 1 = x16; 2 = x8; 3 = common case left;
-  PHalveDownsampleFunc          pfHalfAverage[4];
+  PHalveDownsampleFunc          pfHalfAverageWidthx32;
+  PHalveDownsampleFunc          pfHalfAverageWidthx16;
   PSpecificDownsampleFunc       pfOneThirdDownsampler;
   PSpecificDownsampleFunc       pfQuarterDownsampler;
   PGeneralDownsampleFunc        pfGeneralRatioLuma;
@@ -185,7 +185,8 @@ class CDownsampling : public IStrategy {
  private:
   void InitDownsampleFuncs (SDownsampleFuncs& sDownsampleFunc, int32_t iCpuFlag);
 
-  int32_t GetAlignedIndex (const int32_t kiSrcWidth);
+  void DownsampleHalfAverage (uint8_t* pDst, int32_t iDstStride,
+      uint8_t* pSrc, int32_t iSrcStride, int32_t iSrcWidth, int32_t iSrcHeight);
   bool AllocateSampleBuffer();
   void FreeSampleBuffer();
  private:
