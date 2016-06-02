@@ -178,7 +178,6 @@ class CWelsPreProcess {
   void WelsMoveMemoryWrapper (SWelsSvcCodingParam* pSvcParam, SPicture* pDstPic, const SSourcePicture* kpSrc,
                               const int32_t kiWidth, const int32_t kiHeight);
 
-
   /*!
   * \brief  exchange two picture pData planes
   * \param  ppPic1      picture pointer to picture 1
