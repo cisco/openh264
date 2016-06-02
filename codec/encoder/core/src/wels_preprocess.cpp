@@ -588,7 +588,7 @@ ESceneChangeIdc CWelsPreProcessVideo::DetectSceneChange (SPicture* pCurPicture, 
 }
 
 SPicture* CWelsPreProcessVideo::GetCurrentOrigFrame (int32_t iDIdx) {
-  return m_pSpatialPic[iDIdx][GetCurPicPosition(iDIdx)];
+  return m_pSpatialPic[iDIdx][GetCurPicPosition (iDIdx)];
 }
 
 int32_t CWelsPreProcess::DownsamplePadding (SPicture* pSrc, SPicture* pDstPic,  int32_t iSrcWidth, int32_t iSrcHeight,
@@ -930,6 +930,10 @@ void CWelsPreProcess::InitPixMap (const SPicture* pPicture, SPixMap* pPixMap) {
   pPixMap->eFormat = VIDEO_FORMAT_I420;
 }
 
+SPicture** CWelsPreProcessScreen::GetReferenceSrcPicList (int32_t iTargetDid) {
+  return (&m_pSpatialPic[iTargetDid][1]);
+}
+
 void CWelsPreProcessScreen::GetAvailableRefListLosslessScreenRefSelection (SPicture** pRefPicList, uint8_t iCurTid,
     const int32_t iClosestLtrFrameNum,
     SRefInfoParam* pAvailableRefParam, int32_t& iAvailableRefNum, int32_t& iAvailableSceneRefNum) {
@@ -1064,7 +1068,7 @@ ESceneChangeIdc CWelsPreProcessScreen::DetectSceneChange (SPicture* pCurPicture,
   }
 
   ESceneChangeIdc iVaaFrameSceneChangeIdc = LARGE_CHANGED_SCENE;
-  SPicture** pRefPicList = &m_pSpatialPic[iTargetDid][1];
+  SPicture** pRefPicList = GetReferenceSrcPicList (iTargetDid);
   if (NULL == pRefPicList) {
     return LARGE_CHANGED_SCENE;
   }

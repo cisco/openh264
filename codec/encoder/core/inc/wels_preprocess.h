@@ -227,6 +227,8 @@ class CWelsPreProcessScreen : public CWelsPreProcess {
   virtual ESceneChangeIdc  DetectSceneChange (SPicture* pCurPicture, SPicture* pRefPicture = NULL);
 
  private:
+  SPicture** GetReferenceSrcPicList(int32_t iTargetDid);
+
   void GetAvailableRefListLosslessScreenRefSelection (SPicture** pSrcPicList, uint8_t iCurTid,
       const int32_t iClosestLtrFrameNum,
       SRefInfoParam* pAvailableRefList, int32_t& iAvailableRefNum, int32_t& iAvailableSceneRefNum);
