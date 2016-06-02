@@ -123,7 +123,7 @@ void RcInitSequenceParameter (sWelsEncCtx* pEncCtx) {
     pWelsSvcRc->iCost2BitsIntra = 1;
     pWelsSvcRc->iAvgCost2Bits = 1;
     pWelsSvcRc->iSkipBufferRatio  = SKIP_RATIO;
-
+    pWelsSvcRc->iContinualSkipFrames = 0;
     pWelsSvcRc->iQpRangeUpperInFrame = (QP_RANGE_UPPER_MODE1 * MAX_BITS_VARY_PERCENTAGE - ((
                                           QP_RANGE_UPPER_MODE1 - QP_RANGE_MODE0) *
                                         pWelsSvcRc->iRcVaryRatio)) / MAX_BITS_VARY_PERCENTAGE;
@@ -1056,6 +1056,7 @@ int32_t RcCalculateCascadingQp (struct TagWelsEncCtx* pEncCtx, int32_t iQp) {
 
 void  WelsRcPictureInitGom (sWelsEncCtx* pEncCtx, long long uiTimeStamp) {
   SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
+  pWelsSvcRc->iContinualSkipFrames = 0;
 
   if (pEncCtx->eSliceType == I_SLICE) {
     if (0 == pWelsSvcRc->iIdrNum) { //iIdrNum == 0 means encoder has been initialed
