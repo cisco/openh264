@@ -2648,7 +2648,7 @@ WELS_EXTERN DyadicBilinearQuarterDownsampler_sse4
     mov             r_tmp0, i_xpos
     lea             i_xpos, [i_xpos + 8 * i_scalex]
     shr             r_tmp0, 16
-    movdqu          xmm_tmp4, [p_src_row0 + r_tmp0]
+    lddqu           xmm_tmp4, [p_src_row0 + r_tmp0]
     pshufb          xmm_tmp4, xmm_xpos_int
     movdqa          xmm_tmp5, xmm_tmp4
     punpcklbw       xmm_tmp4, xmm_0
@@ -2657,7 +2657,7 @@ WELS_EXTERN DyadicBilinearQuarterDownsampler_sse4
     SSE2_BilinearFastCalcXYFrac xmm_tmp1, xmm_tmp3, xmm_yfrac0, xmm_yfrac1
     pmaddwd         xmm_tmp0, xmm_tmp4
     pmaddwd         xmm_tmp1, xmm_tmp5
-    movdqu          xmm_tmp4, [p_src_row1 + r_tmp0]
+    lddqu           xmm_tmp4, [p_src_row1 + r_tmp0]
     pshufb          xmm_tmp4, xmm_xpos_int
     movdqa          xmm_tmp5, xmm_tmp4
     punpcklbw       xmm_tmp4, xmm_0
@@ -2679,8 +2679,8 @@ WELS_EXTERN DyadicBilinearQuarterDownsampler_sse4
     SSE2_UnpckXFracuw xmm_tmp0, xmm_tmp1, xmm_xpos_frac
     mov             r_tmp0, i_xpos
     shr             r_tmp0, 16
-    movdqu          xmm_tmp3, [p_src_row0 + r_tmp0]
-    movdqu          xmm_tmp4, [p_src_row1 + r_tmp0]
+    lddqu           xmm_tmp3, [p_src_row0 + r_tmp0]
+    lddqu           xmm_tmp4, [p_src_row1 + r_tmp0]
     movdqa          xmm_tmp2, xmm_xpos_int
     punpcklbw       xmm_tmp2, [db80h_256]
     pshufb          xmm_tmp3, xmm_tmp2
@@ -2692,8 +2692,8 @@ WELS_EXTERN DyadicBilinearQuarterDownsampler_sse4
     lea             r_tmp0, [i_xpos + 4 * i_scalex]
     lea             i_xpos, [i_xpos + 8 * i_scalex]
     shr             r_tmp0, 16
-    movdqu          xmm_tmp3, [p_src_row0 + r_tmp0]
-    movdqu          xmm_tmp4, [p_src_row1 + r_tmp0]
+    lddqu           xmm_tmp3, [p_src_row0 + r_tmp0]
+    lddqu           xmm_tmp4, [p_src_row1 + r_tmp0]
     movdqa          xmm_tmp2, xmm_xpos_int
     punpckhbw       xmm_tmp2, [db80h_256]
     pshufb          xmm_tmp3, xmm_tmp2
@@ -2808,14 +2808,14 @@ WELS_EXTERN DyadicBilinearQuarterDownsampler_sse4
     mov             r_tmp0, i_xpos
     lea             i_xpos, [i_xpos + 8 * i_scalex]
     shr             r_tmp0, 16
-    movdqu          xmm_tmp4, [p_src_row0 + r_tmp0]
+    lddqu           xmm_tmp4, [p_src_row0 + r_tmp0]
     pshufb          xmm_tmp4, xmm_xpos_int
     movdqa          xmm_tmp5, xmm_tmp4
     punpcklbw       xmm_tmp4, xmm_0
     punpckhbw       xmm_tmp5, xmm_0
     pmaddwd         xmm_tmp4, xmm_tmp0
     pmaddwd         xmm_tmp5, xmm_tmp1
-    movdqu          xmm_tmp2, [p_src_row1 + r_tmp0]
+    lddqu           xmm_tmp2, [p_src_row1 + r_tmp0]
     pshufb          xmm_tmp2, xmm_xpos_int
     movdqa          xmm_tmp3, xmm_tmp2
     punpcklbw       xmm_tmp2, xmm_0
@@ -2841,8 +2841,8 @@ WELS_EXTERN DyadicBilinearQuarterDownsampler_sse4
     shr             r_tmp0, 16
     movdqa          xmm_tmp3, xmm_xpos_int
     punpcklbw       xmm_tmp3, [db80h_256]
-    movdqu          xmm_tmp4, [p_src_row0 + r_tmp0]
-    movdqu          xmm_tmp2, [p_src_row1 + r_tmp0]
+    lddqu           xmm_tmp4, [p_src_row0 + r_tmp0]
+    lddqu           xmm_tmp2, [p_src_row1 + r_tmp0]
     lea             r_tmp0, [i_xpos + 4 * i_scalex]
     lea             i_xpos, [i_xpos + 8 * i_scalex]
     shr             r_tmp0, 16
@@ -2853,8 +2853,8 @@ WELS_EXTERN DyadicBilinearQuarterDownsampler_sse4
     SSE41_LinearAccurateInterpolateVerticalDwords xmm_tmp0, xmm_tmp4, xmm_tmp2, xmm_yfrac0, xmm_yfrac1, xmm_tmp3
     movdqa          xmm_tmp2, xmm_xpos_int
     punpckhbw       xmm_tmp2, [db80h_256]
-    movdqu          xmm_tmp4, [p_src_row0 + r_tmp0]
-    movdqu          xmm_tmp3, [p_src_row1 + r_tmp0]
+    lddqu           xmm_tmp4, [p_src_row0 + r_tmp0]
+    lddqu           xmm_tmp3, [p_src_row1 + r_tmp0]
     pshufb          xmm_tmp4, xmm_tmp2
     pshufb          xmm_tmp3, xmm_tmp2
     pmaddwd         xmm_tmp4, xmm_tmp1
