@@ -275,12 +275,12 @@ void CDownsampling::DownsampleHalfAverage (uint8_t* pDst, int32_t iDstStride,
   if ((iSrcStride & 31) == 0) {
     assert ((iDstStride & 15) == 0);
     m_pfDownsample.pfHalfAverageWidthx32 (pDst, iDstStride,
-        pSrc, iSrcStride, WELS_ALIGN (iSrcWidth, 32), iSrcHeight);
+        pSrc, iSrcStride, WELS_ALIGN (iSrcWidth & ~1, 32), iSrcHeight);
   } else {
     assert ((iSrcStride & 15) == 0);
     assert ((iDstStride &  7) == 0);
     m_pfDownsample.pfHalfAverageWidthx16 (pDst, iDstStride,
-        pSrc, iSrcStride, WELS_ALIGN (iSrcWidth, 16), iSrcHeight);
+        pSrc, iSrcStride, WELS_ALIGN (iSrcWidth & ~1, 16), iSrcHeight);
   }
 }
 
