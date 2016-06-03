@@ -600,10 +600,11 @@ int32_t WelsISliceMdEncDynamic (sWelsEncCtx* pEncCtx, SSlice* pSlice) { //pMd + 
 
   SWelsMD sMd;
   SDynamicSlicingStack sDss;
-  sDss.iStartPos = BsGetBitsPos (pBs);
   if (pEncCtx->pSvcParam->iEntropyCodingModeFlag) {
     WelsInitSliceCabac (pEncCtx, pSlice);
-  }
+    sDss.iStartPos = 0;
+  }else
+    sDss.iStartPos = BsGetBitsPos (pBs);
   for (; ;) {
     iCurMbIdx = iNextMbIdx;
     pCurMb = &pMbList[ iCurMbIdx ];
@@ -1196,10 +1197,12 @@ int32_t WelsMdInterMbLoopOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice,
   int32_t iEncReturn = ENC_RETURN_SUCCESS;
 
   SDynamicSlicingStack sDss;
-  sDss.iStartPos = BsGetBitsPos (pBs);
   if (pEncCtx->pSvcParam->iEntropyCodingModeFlag) {
     WelsInitSliceCabac (pEncCtx, pSlice);
-  }
+    sDss.iStartPos = 0;
+  }else
+    sDss.iStartPos = BsGetBitsPos (pBs);
+
   pSlice->iMbSkipRun = 0;
   for (;;) {
     //DYNAMIC_SLICING_ONE_THREAD - MultiD
