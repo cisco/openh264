@@ -178,7 +178,6 @@ class CWelsPreProcess {
   void WelsMoveMemoryWrapper (SWelsSvcCodingParam* pSvcParam, SPicture* pDstPic, const SSourcePicture* kpSrc,
                               const int32_t kiWidth, const int32_t kiHeight);
 
-
   /*!
   * \brief  exchange two picture pData planes
   * \param  ppPic1      picture pointer to picture 1
@@ -228,6 +227,8 @@ class CWelsPreProcessScreen : public CWelsPreProcess {
   virtual ESceneChangeIdc  DetectSceneChange (SPicture* pCurPicture, SPicture* pRefPicture = NULL);
 
  private:
+  SPicture** GetReferenceSrcPicList(int32_t iTargetDid);
+
   void GetAvailableRefListLosslessScreenRefSelection (SPicture** pSrcPicList, uint8_t iCurTid,
       const int32_t iClosestLtrFrameNum,
       SRefInfoParam* pAvailableRefList, int32_t& iAvailableRefNum, int32_t& iAvailableSceneRefNum);
