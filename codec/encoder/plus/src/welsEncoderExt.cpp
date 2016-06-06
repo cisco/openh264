@@ -574,21 +574,16 @@ void CWelsH264SVCEncoder::UpdateStatistics (SFrameBSInfo* pBsInfo,
   int32_t iMaxDid = m_pEncContext->pSvcParam->iSpatialLayerNum - 1;
   SLayerBSInfo*  pLayerInfo = &pBsInfo->sLayerInfo[0];
   for (int32_t iDid = 0; iDid <= iMaxDid; iDid++) {
-    EVideoFrameType eFrameType = pBsInfo->eFrameType;
+    EVideoFrameType eFrameType = videoFrameTypeSkip;
     int32_t kiCurrentFrameSize = 0;
-    if (pBsInfo->eFrameType == videoFrameTypeSkip) {
-      eFrameType = videoFrameTypeSkip;
-    } else {
-      for (int32_t iLayerNum = 0; iLayerNum < pBsInfo->iLayerNum; iLayerNum++) {
-        pLayerInfo = &pBsInfo->sLayerInfo[iLayerNum];
-        if ((pLayerInfo->uiLayerType == VIDEO_CODING_LAYER) && (pLayerInfo->uiSpatialId == iDid)) {
-          eFrameType = pLayerInfo->eFrameType;
-          for (int32_t iNalIdx = 0; iNalIdx < pLayerInfo->iNalCount; iNalIdx++) {
-            kiCurrentFrameSize += pLayerInfo->pNalLengthInByte[iNalIdx];
-          }
+    for (int32_t iLayerNum = 0; iLayerNum < pBsInfo->iLayerNum; iLayerNum++) {
+      pLayerInfo = &pBsInfo->sLayerInfo[iLayerNum];
+      if ((pLayerInfo->uiLayerType == VIDEO_CODING_LAYER) && (pLayerInfo->uiSpatialId == iDid)) {
+        eFrameType = pLayerInfo->eFrameType;
+        for (int32_t iNalIdx = 0; iNalIdx < pLayerInfo->iNalCount; iNalIdx++) {
+          kiCurrentFrameSize += pLayerInfo->pNalLengthInByte[iNalIdx];
         }
       }
-
     }
     SEncoderStatistics* pStatistics = & (m_pEncContext->sEncoderStatistics[iDid]);
 
@@ -1065,7 +1060,8 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     if (m_pWelsTrace) {
       WelsTraceCallback callback = * ((WelsTraceCallback*)pOption);
       m_pWelsTrace->SetTraceCallback (callback);
-      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_TRACE_CALLBACK callback = %p.",
+      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+               "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_TRACE_CALLBACK callback = %p.",
                callback);
     }
   }
