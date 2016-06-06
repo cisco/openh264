@@ -614,7 +614,7 @@ void CWelsH264SVCEncoder::UpdateStatistics (SFrameBSInfo* pBsInfo,
     }
     //pStatistics->fLatestFrameRate = m_pEncContext->pWelsSvcRc->fLatestFrameRate; //TODO: finish the calculation in RC
     //pStatistics->uiBitRate = m_pEncContext->pWelsSvcRc->iActualBitRate; //TODO: finish the calculation in RC
-    pStatistics->uiAverageFrameQP = m_pEncContext->pWelsSvcRc->iAverageFrameQp;
+    pStatistics->uiAverageFrameQP = m_pEncContext->pWelsSvcRc[iDid].iAverageFrameQp;
 
     if (videoFrameTypeIDR == eFrameType || videoFrameTypeI == eFrameType) {
       pStatistics->uiIDRSentNum ++;
