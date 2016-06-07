@@ -1091,18 +1091,16 @@ TEST_F (EncoderInterfaceTest, NalSizeChecking) {
     m_iWidth = pParamExt->iPicWidth;
     m_iHeight = pParamExt->iPicHeight;
     m_iPicResSize =  m_iWidth * m_iHeight * 3 >> 1;
-    delete []pYUV;
+    if(pYUV)
+       delete []pYUV;
     pYUV = new unsigned char [m_iPicResSize];
+    ASSERT_TRUE (pYUV != NULL);
     FileInputStream fileStream;
     ASSERT_TRUE (fileStream.Open ("res/Cisco_Absolute_Power_1280x720_30fps.yuv"));
     PrepareOneSrcFrame();
     for (int i = 0; i < kiFrameNumber; i ++) {
         if(fileStream.read (pYUV, m_iPicResSize) != m_iPicResSize){
-            int iStartX = rand() % (m_iPicResSize >> 1);
-            int iEndX = (iStartX + (rand() % MEM_VARY_SIZE)) % m_iPicResSize;
-            for (int j = iStartX; j < iEndX; j++)
-                pYUV[j] = rand() % 256;
-
+            break;
         }
         iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
         EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
@@ -1125,7 +1123,7 @@ TEST_F (EncoderInterfaceTest, NalSizeChecking) {
     m_iPicResSize =  m_iWidth * m_iHeight * 3 >> 1;
     delete []pYUV;
     pYUV = new unsigned char [m_iPicResSize];
-
+    ASSERT_TRUE (pYUV != NULL);
     iResult = pPtrEnc->InitializeExt (pParamExt);
     PrepareOneSrcFrame();
 
@@ -1137,11 +1135,7 @@ TEST_F (EncoderInterfaceTest, NalSizeChecking) {
     EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
 
     for (int i = 0; i < kiFrameNumber; i ++) {
-        int iStartX = rand() % (m_iPicResSize >> 1);
-        int iEndX = (iStartX + (rand() % MEM_VARY_SIZE)) % m_iPicResSize;
-        for (int j = iStartX; j < iEndX; j++)
-            pYUV[j] = rand() % 256;
-
+        PrepareOneSrcFrame();
         iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
         EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
         pSrcPic->uiTimeStamp += 30;
