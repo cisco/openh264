@@ -123,6 +123,8 @@ static const EncodeFileParam kFileParamArray[] = {
   },
   {
     "res/CiscoVT2people_320x192_12fps.yuv",
+// X86_ASM downsampling routines average vertically first, as opposed to
+// horizontally first, which results in different output.
 #ifdef X86_ASM
     "a5341d588b769809c1f1d983e5a0fcef7362f3ad",
 #else
@@ -136,6 +138,8 @@ static const EncodeFileParam kFileParamArray[] = {
   },
   {
     "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
+// X86_ASM downsampling routines average vertically first, as opposed to
+// horizontally first, which results in different output.
 #ifdef X86_ASM
     "ec9d776a7d92cf0f6640065aee8af2450af0e993",
 #else

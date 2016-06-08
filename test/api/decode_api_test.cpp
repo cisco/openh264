@@ -759,6 +759,8 @@ const uint32_t kiHeight = 96; //DO NOT CHANGE!
 const uint32_t kiFrameRate = 12; //DO NOT CHANGE!
 const uint32_t kiFrameNum = 100; //DO NOT CHANGE!
 const char* pHashStr[] = { //DO NOT CHANGE!
+// X86_ASM downsampling routines average vertically first, as opposed to
+// horizontally first, which results in different output.
 #ifdef X86_ASM
   "244eebcb51f4c2a56e83fc5da3373cad9ec0e1e5",
   "bbad99ef99e37b34bcb4f09a7ec4d144375f6be7",
