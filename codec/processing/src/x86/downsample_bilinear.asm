@@ -40,6 +40,10 @@
 ;*************************************************************************/
 %include "asm_inc.asm"
 
+%ifdef __NASM_VER__
+    %use smartalign
+%endif
+
 ;***********************************************************************
 ; Macros and other preprocessor constants
 ;***********************************************************************
@@ -471,24 +475,12 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx8_sse
 
 
 
-; got about 50% improvement over DyadicBilinearDownsamplerWidthx32_sse
 ;***********************************************************************
 ;   void DyadicBilinearDownsamplerWidthx32_ssse3(   unsigned char* pDst, const int iDstStride,
 ;                   unsigned char* pSrc, const int iSrcStride,
 ;                   const int iSrcWidth, const int iSrcHeight );
 ;***********************************************************************
 WELS_EXTERN DyadicBilinearDownsamplerWidthx32_ssse3
-    ;push ebx
-    ;push edx
-    ;push esi
-    ;push edi
-    ;push ebp
-
-    ;mov edi, [esp+24]   ; pDst
-    ;mov edx, [esp+28]   ; iDstStride
-    ;mov esi, [esp+32]   ; pSrc
-    ;mov ecx, [esp+36]   ; iSrcStride
-    ;mov ebp, [esp+44]   ; iSrcHeight
 %ifdef X86_32
     push r6
     %assign push_num 1
@@ -496,7 +488,7 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx32_ssse3
     %assign push_num 0
 %endif
     LOAD_6_PARA
-    PUSH_XMM 8
+    PUSH_XMM 4
     SIGN_EXTENSION r1, r1d
     SIGN_EXTENSION r3, r3d
     SIGN_EXTENSION r4, r4d
@@ -508,96 +500,44 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx32_ssse3
 %endif
     sar r5, $01            ; iSrcHeight >> 1
 
-    movdqa xmm7, [shufb_mask_low]   ; mask low
-    movdqa xmm6, [shufb_mask_high]  ; mask high
+    WELS_DB1 xmm3
+    WELS_Zero xmm2
+    sar r4, $01            ; iSrcWidth >> 1
+    add r0, r4             ; pDst += iSrcWidth >> 1
 
 .yloops4:
-    ;mov eax, [esp+40]   ; iSrcWidth
-    ;sar eax, $01            ; iSrcWidth >> 1
-    ;mov ebx, eax        ; iDstWidth restored at ebx
-    ;sar eax, $04            ; (iSrcWidth >> 1) / 16     ; loop count = num_of_mb
-    ;neg ebx             ; - (iSrcWidth >> 1)
 %ifdef X86_32
     mov r4, arg5
 %else
     mov r4, r12
 %endif
     sar r4, $01            ; iSrcWidth >> 1
-    mov r6, r4        ; iDstWidth restored at ebx
-    sar r4, $04            ; (iSrcWidth >> 1) / 16     ; loop count = num_of_mb
-    neg r6             ; - (iSrcWidth >> 1)
+    neg r4                 ; -(iSrcWidth >> 1)
+    mov r6, r4
+    align 16
     ; each loop = source bandwidth: 32 bytes
 .xloops4:
-    ; 1st part horizonal loop: x16 bytes
-    ;               mem  hi<-       ->lo
-    ;1st Line Src:  xmm0: h H g G f F e E d D c C b B a A
-    ;               xmm1: p P o O n N m M l L k K j J i I
-    ;2nd Line Src:  xmm2: h H g G f F e E d D c C b B a A
-    ;               xmm3: p P o O n N m M l L k K j J i I
-    ;=> target:
-    ;: P O N M L K J I H G F E D C B A
-    ;: p o n m l k j i h g f e d c b a
-    ;: P ..                          A
-    ;: p ..                          a
-
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    movdqa xmm0, [r2]          ; 1st_src_line
-    movdqa xmm1, [r2+16]       ; 1st_src_line + 16
-    movdqa xmm2, [r2+r3]      ; 2nd_src_line
-    movdqa xmm3, [r2+r3+16]   ; 2nd_src_line + 16
-
-    ; packing & avg
-    movdqa xmm4, xmm0           ; h H g G f F e E d D c C b B a A
-    pshufb xmm0, xmm7           ; 0 H 0 G 0 F 0 E 0 D 0 C 0 B 0 A
-    pshufb xmm4, xmm6           ; 0 h 0 g 0 f 0 e 0 d 0 c 0 b 0 a
-    ; another implementation for xmm4 high bits
-;   psubb xmm4, xmm0            ; h 0 g 0 f 0 e 0 d 0 c 0 b 0 a 0
-;   psrlw xmm4, 8               ; 0 h 0 g 0 f 0 e 0 d 0 c 0 b 0 a
-    pavgb xmm0, xmm4
-
-    movdqa xmm5, xmm1
-    pshufb xmm1, xmm7
-    pshufb xmm5, xmm6
-;   psubb xmm5, xmm1
-;   psrlw xmm5, 8
-    pavgb xmm1, xmm5
-
-    movdqa xmm4, xmm2
-    pshufb xmm2, xmm7
-    pshufb xmm4, xmm6
-;   psubb xmm4, xmm2
-;   psrlw xmm4, 8
-    pavgb xmm2, xmm4
-
-    movdqa xmm5, xmm3
-    pshufb xmm3, xmm7
-    pshufb xmm5, xmm6
-;   psubb xmm5, xmm3
-;   psrlw xmm5, 8
-    pavgb xmm3, xmm5
-
-    packuswb xmm0, xmm1
-    packuswb xmm2, xmm3
-    pavgb xmm0, xmm2
-
-    ; write pDst
-    movdqa [r0], xmm0
-
-    ; next SMB
-    lea r2, [r2+32]
-    lea r0, [r0+16]
-
-    dec r4
-    jg near .xloops4
+    movdqa xmm0, [r2+r3]
+    movdqa xmm1, [r2+r3+16]
+    pavgb  xmm0, [r2]          ; avg vertical pixels 0-15
+    pavgb  xmm1, [r2+16]       ; avg vertical pixels 16-31
+    add r2, 32                 ; pSrc += 32
+    pmaddubsw xmm0, xmm3       ; pairwise horizontal sum neighboring pixels 0-15
+    pmaddubsw xmm1, xmm3       ; pairwise horizontal sum neighboring pixels 16-31
+    pavgw xmm0, xmm2           ; (sum + 1) >> 1
+    pavgw xmm1, xmm2           ; (sum + 1) >> 1
+    packuswb xmm0, xmm1        ; pack words to bytes
+    movdqa [r0+r4], xmm0       ; store results
+    add r4, 16
+    jl .xloops4
 
     ; next line
     lea r2, [r2+2*r3]    ; next end of lines
     lea r2, [r2+2*r6]    ; reset to base 0 [- 2 * iDstWidth]
     lea r0, [r0+r1]
-    lea r0, [r0+r6]      ; reset to base 0 [- iDstWidth]
 
-    dec r5
-    jg near .yloops4
+    sub r5, 1
+    jg .yloops4
 
 %ifndef X86_32
     pop r12
@@ -623,7 +563,7 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx16_ssse3
     %assign push_num 0
 %endif
     LOAD_6_PARA
-    PUSH_XMM 6
+    PUSH_XMM 4
     SIGN_EXTENSION r1, r1d
     SIGN_EXTENSION r3, r3d
     SIGN_EXTENSION r4, r4d
@@ -634,8 +574,11 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx16_ssse3
     mov r12, r4
 %endif
     sar r5, $01            ; iSrcHeight >> 1
-    movdqa xmm5, [shufb_mask_low]   ; mask low
-    movdqa xmm4, [shufb_mask_high]  ; mask high
+    WELS_DB1 xmm3
+    WELS_Zero xmm2
+    add r2, r4             ; pSrc += iSrcWidth
+    sar r4, $01            ; iSrcWidth >> 1
+    add r0, r4             ; pDst += iSrcWidth >> 1
 
 .yloops5:
 %ifdef X86_32
@@ -644,279 +587,26 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx16_ssse3
     mov r4, r12
 %endif
     sar r4, $01            ; iSrcWidth >> 1
-    mov r6, r4        ; iDstWidth restored at ebx
-    sar r4, $03            ; (iSrcWidth >> 1) / 8     ; loop count = num_of_mb
-    neg r6             ; - (iSrcWidth >> 1)
+    neg r4                 ; -(iSrcWidth >> 1)
+    lea r6, [r2+r3]        ; pSrc + iSrcStride
+    align 16
     ; each loop = source bandwidth: 16 bytes
 .xloops5:
-    ; horizonal loop: x16 bytes by source
-    ;               mem  hi<-       ->lo
-    ;1st line pSrc: xmm0: h H g G f F e E d D c C b B a A
-    ;2nd line pSrc:  xmm1: p P o O n N m M l L k K j J i I
-    ;=> target:
-    ;: H G F E D C B A, P O N M L K J I
-    ;: h g f e d c b a, p o n m l k j i
-
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    movdqa xmm0, [r2]          ; 1st_src_line
-    movdqa xmm1, [r2+r3]      ; 2nd_src_line
-
-    ; packing & avg
-    movdqa xmm2, xmm0           ; h H g G f F e E d D c C b B a A
-    pshufb xmm0, xmm5           ; 0 H 0 G 0 F 0 E 0 D 0 C 0 B 0 A
-    pshufb xmm2, xmm4           ; 0 h 0 g 0 f 0 e 0 d 0 c 0 b 0 a
-    ; another implementation for xmm2 high bits
-;   psubb xmm2, xmm0            ; h 0 g 0 f 0 e 0 d 0 c 0 b 0 a 0
-;   psrlw xmm2, 8               ; 0 h 0 g 0 f 0 e 0 d 0 c 0 b 0 a
-    pavgb xmm0, xmm2
-
-    movdqa xmm3, xmm1
-    pshufb xmm1, xmm5
-    pshufb xmm3, xmm4
-;   psubb xmm3, xmm1
-;   psrlw xmm3, 8
-    pavgb xmm1, xmm3
-
-    pavgb xmm0, xmm1
-    packuswb xmm0, xmm1
-
-    ; write pDst
-    movq [r0], xmm0
-
-    ; next SMB
-    lea r2, [r2+16]
-    lea r0, [r0+8]
-
-    dec r4
-    jg near .xloops5
-
-    lea r2, [r2+2*r3]    ; next end of lines
-    lea r2, [r2+2*r6]    ; reset to base 0 [- 2 * iDstWidth]
-    lea r0, [r0+r1]
-    lea r0, [r0+r6]      ; reset to base 0 [- iDstWidth]
-
-    dec r5
-    jg near .yloops5
-
-%ifndef X86_32
-    pop r12
-%endif
-
-    POP_XMM
-    LOAD_6_PARA_POP
-%ifdef X86_32
-    pop r6
-%endif
-    ret
-
-; got about 65% improvement over DyadicBilinearDownsamplerWidthx32_sse
-;***********************************************************************
-;   void DyadicBilinearDownsamplerWidthx32_sse4(    unsigned char* pDst, const int iDstStride,
-;                   unsigned char* pSrc, const int iSrcStride,
-;                   const int iSrcWidth, const int iSrcHeight );
-;***********************************************************************
-WELS_EXTERN DyadicBilinearDownsamplerWidthx32_sse4
-%ifdef X86_32
-    push r6
-    %assign push_num 1
-%else
-    %assign push_num 0
-%endif
-    LOAD_6_PARA
-    PUSH_XMM 8
-    SIGN_EXTENSION r1, r1d
-    SIGN_EXTENSION r3, r3d
-    SIGN_EXTENSION r4, r4d
-    SIGN_EXTENSION r5, r5d
-
-%ifndef X86_32
-    push r12
-    mov r12, r4
-%endif
-    sar r5, $01            ; iSrcHeight >> 1
-
-    movdqa xmm7, [shufb_mask_low]   ; mask low
-    movdqa xmm6, [shufb_mask_high]  ; mask high
-
-.yloops6:
-%ifdef X86_32
-    mov r4, arg5
-%else
-    mov r4, r12
-%endif
-    sar r4, $01            ; iSrcWidth >> 1
-    mov r6, r4        ; iDstWidth restored at ebx
-    sar r4, $04            ; (iSrcWidth >> 1) / 16     ; loop count = num_of_mb
-    neg r6             ; - (iSrcWidth >> 1)
-    ; each loop = source bandwidth: 32 bytes
-.xloops6:
-    ; 1st part horizonal loop: x16 bytes
-    ;               mem  hi<-       ->lo
-    ;1st Line Src:  xmm0: h H g G f F e E d D c C b B a A
-    ;               xmm1: p P o O n N m M l L k K j J i I
-    ;2nd Line Src:  xmm2: h H g G f F e E d D c C b B a A
-    ;               xmm3: p P o O n N m M l L k K j J i I
-    ;=> target:
-    ;: P O N M L K J I H G F E D C B A
-    ;: p o n m l k j i h g f e d c b a
-    ;: P ..                          A
-    ;: p ..                          a
-
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    movntdqa xmm0, [r2]            ; 1st_src_line
-    movntdqa xmm1, [r2+16]     ; 1st_src_line + 16
-    movntdqa xmm2, [r2+r3]        ; 2nd_src_line
-    movntdqa xmm3, [r2+r3+16] ; 2nd_src_line + 16
-
-    ; packing & avg
-    movdqa xmm4, xmm0           ; h H g G f F e E d D c C b B a A
-    pshufb xmm0, xmm7           ; 0 H 0 G 0 F 0 E 0 D 0 C 0 B 0 A
-    pshufb xmm4, xmm6           ; 0 h 0 g 0 f 0 e 0 d 0 c 0 b 0 a
-;   psubb xmm4, xmm0            ; h 0 g 0 f 0 e 0 d 0 c 0 b 0 a 0
-;   psrlw xmm4, 8               ; 0 h 0 g 0 f 0 e 0 d 0 c 0 b 0 a
-    pavgb xmm0, xmm4
-
-    movdqa xmm5, xmm1
-    pshufb xmm1, xmm7
-    pshufb xmm5, xmm6
-;   psubb xmm5, xmm1
-;   psrlw xmm5, 8
-    pavgb xmm1, xmm5
-
-    movdqa xmm4, xmm2
-    pshufb xmm2, xmm7
-    pshufb xmm4, xmm6
-;   psubb xmm4, xmm2
-;   psrlw xmm4, 8
-    pavgb xmm2, xmm4
-
-    movdqa xmm5, xmm3
-    pshufb xmm3, xmm7
-    pshufb xmm5, xmm6
-;   psubb xmm5, xmm3
-;   psrlw xmm5, 8
-    pavgb xmm3, xmm5
-
-    packuswb xmm0, xmm1
-    packuswb xmm2, xmm3
-    pavgb xmm0, xmm2
-
-    ; write pDst
-    movdqa [r0], xmm0
-
-    ; next SMB
-    lea r2, [r2+32]
-    lea r0, [r0+16]
-
-    dec r4
-    jg near .xloops6
-
-    lea r2, [r2+2*r3]    ; next end of lines
-    lea r2, [r2+2*r6]    ; reset to base 0 [- 2 * iDstWidth]
-    lea r0, [r0+r1]
-    lea r0, [r0+r6]      ; reset to base 0 [- iDstWidth]
-
-    dec r5
-    jg near .yloops6
-
-%ifndef X86_32
-    pop r12
-%endif
-
-    POP_XMM
-    LOAD_6_PARA_POP
-%ifdef X86_32
-    pop r6
-%endif
-    ret
-
-;***********************************************************************
-;   void DyadicBilinearDownsamplerWidthx16_sse4( unsigned char* pDst, const int iDstStride,
-;                     unsigned char* pSrc, const int iSrcStride,
-;                     const int iSrcWidth, const int iSrcHeight );
-;***********************************************************************
-WELS_EXTERN DyadicBilinearDownsamplerWidthx16_sse4
-%ifdef X86_32
-    push r6
-    %assign push_num 1
-%else
-    %assign push_num 0
-%endif
-    LOAD_6_PARA
-    PUSH_XMM 6
-    SIGN_EXTENSION r1, r1d
-    SIGN_EXTENSION r3, r3d
-    SIGN_EXTENSION r4, r4d
-    SIGN_EXTENSION r5, r5d
-
-%ifndef X86_32
-    push r12
-    mov r12, r4
-%endif
-    sar r5, $01            ; iSrcHeight >> 1
-    movdqa xmm5, [shufb_mask_low]   ; mask low
-    movdqa xmm4, [shufb_mask_high]  ; mask high
-
-.yloops7:
-%ifdef X86_32
-    mov r4, arg5
-%else
-    mov r4, r12
-%endif
-    sar r4, $01            ; iSrcWidth >> 1
-    mov r6, r4        ; iDstWidth restored at ebx
-    sar r4, $03            ; (iSrcWidth >> 1) / 8     ; loop count = num_of_mb
-    neg r6             ; - (iSrcWidth >> 1)
-    ; each loop = source bandwidth: 16 bytes
-.xloops7:
-    ; horizonal loop: x16 bytes by source
-    ;               mem  hi<-       ->lo
-    ;1st line pSrc: xmm0: h H g G f F e E d D c C b B a A
-    ;2nd line pSrc:  xmm1: p P o O n N m M l L k K j J i I
-    ;=> target:
-    ;: H G F E D C B A, P O N M L K J I
-    ;: h g f e d c b a, p o n m l k j i
-
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    movntdqa xmm0, [r2]            ; 1st_src_line
-    movntdqa xmm1, [r2+r3]        ; 2nd_src_line
-
-    ; packing & avg
-    movdqa xmm2, xmm0           ; h H g G f F e E d D c C b B a A
-    pshufb xmm0, xmm5           ; 0 H 0 G 0 F 0 E 0 D 0 C 0 B 0 A
-    pshufb xmm2, xmm4           ; 0 h 0 g 0 f 0 e 0 d 0 c 0 b 0 a
-;   psubb xmm2, xmm0            ; h 0 g 0 f 0 e 0 d 0 c 0 b 0 a 0
-;   psrlw xmm2, 8               ; 0 h 0 g 0 f 0 e 0 d 0 c 0 b 0 a
-    pavgb xmm0, xmm2
-
-    movdqa xmm3, xmm1
-    pshufb xmm1, xmm5
-    pshufb xmm3, xmm4
-;   psubb xmm3, xmm1
-;   psrlw xmm3, 8
-    pavgb xmm1, xmm3
-
-    pavgb xmm0, xmm1
-    packuswb xmm0, xmm1
-
-    ; write pDst
-    movq [r0], xmm0
-
-    ; next SMB
-    lea r2, [r2+16]
-    lea r0, [r0+8]
-
-    dec r4
-    jg near .xloops7
+    movdqa xmm0, [r2+2*r4]
+    pavgb  xmm0, [r6+2*r4]     ; avg vertical pixels
+    pmaddubsw xmm0, xmm3       ; pairwise horizontal sum neighboring pixels
+    pavgw xmm0, xmm2           ; (sum + 1) >> 1
+    packuswb xmm0, xmm0        ; pack words to bytes
+    movlps [r0+r4], xmm0       ; store results
+    add r4, 8
+    jl .xloops5
 
     ; next line
     lea r2, [r2+2*r3]    ; next end of lines
-    lea r2, [r2+2*r6]    ; reset to base 0 [- 2 * iDstWidth]
     lea r0, [r0+r1]
-    lea r0, [r0+r6]      ; reset to base 0 [- iDstWidth]
 
-    dec r5
-    jg near .yloops7
+    sub r5, 1
+    jg .yloops5
 
 %ifndef X86_32
     pop r12

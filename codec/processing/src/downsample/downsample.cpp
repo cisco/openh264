@@ -32,6 +32,7 @@
 
 #include "downsample.h"
 #include "cpu.h"
+#include <cassert>
 
 WELSVP_NAMESPACE_BEGIN
 #define MAX_SAMPLE_WIDTH 1920
@@ -75,20 +76,18 @@ void CDownsampling::FreeSampleBuffer() {
     WelsFree (m_pSampleBuffer[i][2]);
   }
 }
+
 void CDownsampling::InitDownsampleFuncs (SDownsampleFuncs& sDownsampleFunc,  int32_t iCpuFlag) {
-  sDownsampleFunc.pfHalfAverage[0] = DyadicBilinearDownsampler_c;
-  sDownsampleFunc.pfHalfAverage[1] = DyadicBilinearDownsampler_c;
-  sDownsampleFunc.pfHalfAverage[2] = DyadicBilinearDownsampler_c;
-  sDownsampleFunc.pfHalfAverage[3] = DyadicBilinearDownsampler_c;
+  sDownsampleFunc.pfHalfAverageWidthx32 = DyadicBilinearDownsampler_c;
+  sDownsampleFunc.pfHalfAverageWidthx16 = DyadicBilinearDownsampler_c;
   sDownsampleFunc.pfOneThirdDownsampler = DyadicBilinearOneThirdDownsampler_c;
   sDownsampleFunc.pfQuarterDownsampler  = DyadicBilinearQuarterDownsampler_c;
   sDownsampleFunc.pfGeneralRatioChroma  = GeneralBilinearAccurateDownsampler_c;
   sDownsampleFunc.pfGeneralRatioLuma    = GeneralBilinearFastDownsampler_c;
 #if defined(X86_ASM)
   if (iCpuFlag & WELS_CPU_SSE) {
-    sDownsampleFunc.pfHalfAverage[0]    = DyadicBilinearDownsamplerWidthx32_sse;
-    sDownsampleFunc.pfHalfAverage[1]    = DyadicBilinearDownsamplerWidthx16_sse;
-    sDownsampleFunc.pfHalfAverage[2]    = DyadicBilinearDownsamplerWidthx8_sse;
+    sDownsampleFunc.pfHalfAverageWidthx32 = DyadicBilinearDownsamplerWidthx32_sse;
+    sDownsampleFunc.pfHalfAverageWidthx16 = DyadicBilinearDownsamplerWidthx16_sse;
     sDownsampleFunc.pfQuarterDownsampler = DyadicBilinearQuarterDownsampler_sse;
   }
   if (iCpuFlag & WELS_CPU_SSE2) {
@@ -96,15 +95,13 @@ void CDownsampling::InitDownsampleFuncs (SDownsampleFuncs& sDownsampleFunc,  int
     sDownsampleFunc.pfGeneralRatioLuma   = GeneralBilinearFastDownsamplerWrap_sse2;
   }
   if (iCpuFlag & WELS_CPU_SSSE3) {
-    sDownsampleFunc.pfHalfAverage[0]    = DyadicBilinearDownsamplerWidthx32_ssse3;
-    sDownsampleFunc.pfHalfAverage[1]    = DyadicBilinearDownsamplerWidthx16_ssse3;
+    sDownsampleFunc.pfHalfAverageWidthx32 = DyadicBilinearDownsamplerWidthx32_ssse3;
+    sDownsampleFunc.pfHalfAverageWidthx16 = DyadicBilinearDownsamplerWidthx16_ssse3;
     sDownsampleFunc.pfOneThirdDownsampler = DyadicBilinearOneThirdDownsampler_ssse3;
     sDownsampleFunc.pfQuarterDownsampler  = DyadicBilinearQuarterDownsampler_ssse3;
     sDownsampleFunc.pfGeneralRatioLuma    = GeneralBilinearFastDownsamplerWrap_ssse3;
   }
   if (iCpuFlag & WELS_CPU_SSE41) {
-    sDownsampleFunc.pfHalfAverage[0]    = DyadicBilinearDownsamplerWidthx32_sse4;
-    sDownsampleFunc.pfHalfAverage[1]    = DyadicBilinearDownsamplerWidthx16_sse4;
     sDownsampleFunc.pfOneThirdDownsampler = DyadicBilinearOneThirdDownsampler_sse4;
     sDownsampleFunc.pfQuarterDownsampler  = DyadicBilinearQuarterDownsampler_sse4;
     sDownsampleFunc.pfGeneralRatioChroma  = GeneralBilinearAccurateDownsamplerWrap_sse41;
@@ -117,10 +114,8 @@ void CDownsampling::InitDownsampleFuncs (SDownsampleFuncs& sDownsampleFunc,  int
 
 #if defined(HAVE_NEON)
   if (iCpuFlag & WELS_CPU_NEON) {
-    sDownsampleFunc.pfHalfAverage[0] = DyadicBilinearDownsamplerWidthx32_neon;
-    sDownsampleFunc.pfHalfAverage[1] = DyadicBilinearDownsampler_neon;
-    sDownsampleFunc.pfHalfAverage[2] = DyadicBilinearDownsampler_neon;
-    sDownsampleFunc.pfHalfAverage[3] = DyadicBilinearDownsampler_neon;
+    sDownsampleFunc.pfHalfAverageWidthx32 = DyadicBilinearDownsamplerWidthx32_neon;
+    sDownsampleFunc.pfHalfAverageWidthx16 = DyadicBilinearDownsampler_neon;
     sDownsampleFunc.pfOneThirdDownsampler = DyadicBilinearOneThirdDownsampler_neon;
     sDownsampleFunc.pfQuarterDownsampler  = DyadicBilinearQuarterDownsampler_neon;
     sDownsampleFunc.pfGeneralRatioChroma = GeneralBilinearAccurateDownsamplerWrap_neon;
@@ -130,10 +125,8 @@ void CDownsampling::InitDownsampleFuncs (SDownsampleFuncs& sDownsampleFunc,  int
 
 #if defined(HAVE_NEON_AARCH64)
   if (iCpuFlag & WELS_CPU_NEON) {
-    sDownsampleFunc.pfHalfAverage[0] = DyadicBilinearDownsamplerWidthx32_AArch64_neon;
-    sDownsampleFunc.pfHalfAverage[1] = DyadicBilinearDownsampler_AArch64_neon;
-    sDownsampleFunc.pfHalfAverage[2] = DyadicBilinearDownsampler_AArch64_neon;
-    sDownsampleFunc.pfHalfAverage[3] = DyadicBilinearDownsampler_AArch64_neon;
+    sDownsampleFunc.pfHalfAverageWidthx32 = DyadicBilinearDownsamplerWidthx32_AArch64_neon;
+    sDownsampleFunc.pfHalfAverageWidthx16 = DyadicBilinearDownsampler_AArch64_neon;
     sDownsampleFunc.pfOneThirdDownsampler = DyadicBilinearOneThirdDownsampler_AArch64_neon;
     sDownsampleFunc.pfQuarterDownsampler  = DyadicBilinearQuarterDownsampler_AArch64_neon;
     sDownsampleFunc.pfGeneralRatioChroma = GeneralBilinearAccurateDownsamplerWrap_AArch64_neon;
@@ -159,14 +152,11 @@ EResult CDownsampling::Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pDs
   if (iSrcWidthY > MAX_SAMPLE_WIDTH || iSrcHeightY > MAX_SAMPLE_HEIGHT || m_bNoSampleBuffer) {
     if ((iSrcWidthY >> 1) == iDstWidthY && (iSrcHeightY >> 1) == iDstHeightY) {
       // use half average functions
-      uint8_t iAlignIndex = GetAlignedIndex (iSrcWidthY);
-      m_pfDownsample.pfHalfAverage[iAlignIndex] ((uint8_t*)pDstPixMap->pPixel[0], pDstPixMap->iStride[0],
+      DownsampleHalfAverage ((uint8_t*)pDstPixMap->pPixel[0], pDstPixMap->iStride[0],
           (uint8_t*)pSrcPixMap->pPixel[0], pSrcPixMap->iStride[0], iSrcWidthY, iSrcHeightY);
-
-      iAlignIndex = GetAlignedIndex (iSrcWidthUV);
-      m_pfDownsample.pfHalfAverage[iAlignIndex] ((uint8_t*)pDstPixMap->pPixel[1], pDstPixMap->iStride[1],
+      DownsampleHalfAverage ((uint8_t*)pDstPixMap->pPixel[1], pDstPixMap->iStride[1],
           (uint8_t*)pSrcPixMap->pPixel[1], pSrcPixMap->iStride[1], iSrcWidthUV, iSrcHeightUV);
-      m_pfDownsample.pfHalfAverage[iAlignIndex] ((uint8_t*)pDstPixMap->pPixel[2], pDstPixMap->iStride[2],
+      DownsampleHalfAverage ((uint8_t*)pDstPixMap->pPixel[2], pDstPixMap->iStride[2],
           (uint8_t*)pSrcPixMap->pPixel[2], pSrcPixMap->iStride[2], iSrcWidthUV, iSrcHeightUV);
     } else if ((iSrcWidthY >> 2) == iDstWidthY && (iSrcHeightY >> 2) == iDstHeightY) {
 
@@ -223,29 +213,23 @@ EResult CDownsampling::Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pDs
     do {
       if ((iHalfSrcWidth == iDstWidthY) && (iHalfSrcHeight == iDstHeightY)) { //end
         // use half average functions
-        uint8_t iAlignIndex = GetAlignedIndex (iSrcWidthY);
-        m_pfDownsample.pfHalfAverage[iAlignIndex] ((uint8_t*)pDstPixMap->pPixel[0], pDstPixMap->iStride[0],
+        DownsampleHalfAverage ((uint8_t*)pDstPixMap->pPixel[0], pDstPixMap->iStride[0],
             (uint8_t*)pSrcY, iSrcStrideY, iSrcWidthY, iSrcHeightY);
-
-        iAlignIndex = GetAlignedIndex (iSrcWidthUV);
-        m_pfDownsample.pfHalfAverage[iAlignIndex] ((uint8_t*)pDstPixMap->pPixel[1], pDstPixMap->iStride[1],
+        DownsampleHalfAverage ((uint8_t*)pDstPixMap->pPixel[1], pDstPixMap->iStride[1],
             (uint8_t*)pSrcU, iSrcStrideU, iSrcWidthUV, iSrcHeightUV);
-        m_pfDownsample.pfHalfAverage[iAlignIndex] ((uint8_t*)pDstPixMap->pPixel[2], pDstPixMap->iStride[2],
+        DownsampleHalfAverage ((uint8_t*)pDstPixMap->pPixel[2], pDstPixMap->iStride[2],
             (uint8_t*)pSrcV, iSrcStrideV, iSrcWidthUV, iSrcHeightUV);
         break;
       } else if (((iHalfSrcWidth >> 1) >= iDstWidthY) && ((iHalfSrcHeight >> 1) >= iDstHeightY)) {
         // use half average functions
-        iDstStrideY = iHalfSrcWidth;
-        iDstStrideU = iHalfSrcWidth >> 1;
-        iDstStrideV = iHalfSrcWidth >> 1;
-        uint8_t iAlignIndex = GetAlignedIndex (iSrcWidthY);
-        m_pfDownsample.pfHalfAverage[iAlignIndex] ((uint8_t*)pDstY, iDstStrideY,
+        iDstStrideY = WELS_ALIGN (iHalfSrcWidth, 32);
+        iDstStrideU = WELS_ALIGN (iHalfSrcWidth >> 1, 32);
+        iDstStrideV = WELS_ALIGN (iHalfSrcWidth >> 1, 32);
+        DownsampleHalfAverage ((uint8_t*)pDstY, iDstStrideY,
             (uint8_t*)pSrcY, iSrcStrideY, iSrcWidthY, iSrcHeightY);
-
-        iAlignIndex = GetAlignedIndex (iSrcWidthUV);
-        m_pfDownsample.pfHalfAverage[iAlignIndex] ((uint8_t*)pDstU, iDstStrideU,
+        DownsampleHalfAverage ((uint8_t*)pDstU, iDstStrideU,
             (uint8_t*)pSrcU, iSrcStrideU, iSrcWidthUV, iSrcHeightUV);
-        m_pfDownsample.pfHalfAverage[iAlignIndex] ((uint8_t*)pDstV, iDstStrideV,
+        DownsampleHalfAverage ((uint8_t*)pDstV, iDstStrideV,
             (uint8_t*)pSrcV, iSrcStrideV, iSrcWidthUV, iSrcHeightUV);
 
         pSrcY = (uint8_t*)pDstY;
@@ -258,9 +242,9 @@ EResult CDownsampling::Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pDs
         iSrcHeightY = iHalfSrcHeight;
         iSrcHeightUV = iHalfSrcHeight >> 1;
 
-        iSrcStrideY = iSrcWidthY;
-        iSrcStrideU = iSrcWidthUV;
-        iSrcStrideV = iSrcWidthUV;
+        iSrcStrideY = iDstStrideY;
+        iSrcStrideU = iDstStrideU;
+        iSrcStrideV = iDstStrideV;
 
         iHalfSrcWidth >>= 1;
         iHalfSrcHeight >>= 1;
@@ -286,17 +270,18 @@ EResult CDownsampling::Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pDs
   return RET_SUCCESS;
 }
 
-int32_t CDownsampling::GetAlignedIndex (const int32_t kiSrcWidth) {
-  int32_t iAlignIndex;
-  if ((kiSrcWidth & 0x1f) == 0)         // x32
-    iAlignIndex = 0;
-  else if ((kiSrcWidth & 0x0f) == 0)    // x16
-    iAlignIndex = 1;
-  else if ((kiSrcWidth & 0x07) == 0)    // x8
-    iAlignIndex = 2;
-  else
-    iAlignIndex = 3;
-  return iAlignIndex;
+void CDownsampling::DownsampleHalfAverage (uint8_t* pDst, int32_t iDstStride,
+        uint8_t* pSrc, int32_t iSrcStride, int32_t iSrcWidth, int32_t iSrcHeight) {
+  if ((iSrcStride & 31) == 0) {
+    assert ((iDstStride & 15) == 0);
+    m_pfDownsample.pfHalfAverageWidthx32 (pDst, iDstStride,
+        pSrc, iSrcStride, WELS_ALIGN (iSrcWidth & ~1, 32), iSrcHeight);
+  } else {
+    assert ((iSrcStride & 15) == 0);
+    assert ((iDstStride &  7) == 0);
+    m_pfDownsample.pfHalfAverageWidthx16 (pDst, iDstStride,
+        pSrc, iSrcStride, WELS_ALIGN (iSrcWidth & ~1, 16), iSrcHeight);
+  }
 }
 
 

@@ -123,7 +123,14 @@ static const EncodeFileParam kFileParamArray[] = {
   },
   {
     "res/CiscoVT2people_320x192_12fps.yuv",
-    "73156dfc1dc45924349b5b79f8debcac13d7231d", CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 2, false, false, false
+// X86_ASM downsampling routines average vertically first, as opposed to
+// horizontally first, which results in different output.
+#ifdef X86_ASM
+    "a5341d588b769809c1f1d983e5a0fcef7362f3ad",
+#else
+    "73156dfc1dc45924349b5b79f8debcac13d7231d",
+#endif
+    CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 2, false, false, false
   },
   {
     "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
@@ -131,7 +138,14 @@ static const EncodeFileParam kFileParamArray[] = {
   },
   {
     "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
-    "3943145545a2bd27a642b2045d4e3dbae55c6870", CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_SINGLE_SLICE, false, 4, false, false, false
+// X86_ASM downsampling routines average vertically first, as opposed to
+// horizontally first, which results in different output.
+#ifdef X86_ASM
+    "ec9d776a7d92cf0f6640065aee8af2450af0e993",
+#else
+    "3943145545a2bd27a642b2045d4e3dbae55c6870",
+#endif
+    CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_SINGLE_SLICE, false, 4, false, false, false
   },
   // the following values may be adjusted for times since we start tuning the strategy
   {

@@ -83,10 +83,6 @@ WELSVP_NAMESPACE_BEGIN
 #define WELS_CLAMP(x, minv, maxv)  WELS_MIN(WELS_MAX(x, minv), maxv)
 
 #define ALIGNBYTES         (16)       /* Worst case is requiring alignment to an 16 byte boundary */
-#define WELS_ALIGN(iInput)   ((iInput+(ALIGNMENT-1)) & ~(ALIGNMENT-1))
-#define WELS_ALIGN2(iInput)  ((iInput+1) & ~1)
-#define WELS_ALIGN4(iInput)  ((iInput+3) & ~3)
-#define WELS_ALIGN8(iInput)  ((iInput+7) & ~7)
 
 #define WelsCastFromPointer(p)      (reinterpret_cast<intptr_t>(p))
 #define WelsStaticCast(type, p)  (static_cast<type>(p))
