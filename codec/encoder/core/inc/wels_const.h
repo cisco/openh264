@@ -132,7 +132,7 @@
 
 #define INVALID_ID                      (-1)
 
-#define NAL_HEADER_ADD_0X30BYTES        50
+#define NAL_HEADER_ADD_0X30BYTES        20
 
 #define SLICE_NUM_EXPAND_COEF           2
 

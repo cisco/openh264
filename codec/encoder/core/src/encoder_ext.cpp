@@ -588,9 +588,9 @@ int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPa
     case SM_SIZELIMITED_SLICE: {
       iMbWidth  = (kiPicWidth + 15) >> 4;
       iMbHeight = (kiPicHeight + 15) >> 4;
-      if (pSpatialLayer->sSliceArgument.uiSliceSizeConstraint <= 0) {
-        WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid iSliceSize (%d) settings!",
-                 pSpatialLayer->sSliceArgument.uiSliceSizeConstraint);
+      if (pSpatialLayer->sSliceArgument.uiSliceSizeConstraint <= MAX_MACROBLOCK_SIZE_IN_BYTE) {
+        WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid iSliceSize (%d) settings!should be larger than  MAX_MACROBLOCK_SIZE_IN_BYTE(%d)",
+                 pSpatialLayer->sSliceArgument.uiSliceSizeConstraint,MAX_MACROBLOCK_SIZE_IN_BYTE);
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
 
@@ -610,6 +610,7 @@ int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPa
           pSpatialLayer->sSliceArgument.uiSliceSizeConstraint =  pCodingParam->uiMaxNalSize - NAL_HEADER_ADD_0X30BYTES;
         }
       }
+      pSpatialLayer->sSliceArgument.uiSliceSizeConstraint -= NAL_HEADER_ADD_0X30BYTES;
     }
     break;
     default: {

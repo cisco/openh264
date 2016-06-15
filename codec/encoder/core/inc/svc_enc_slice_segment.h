@@ -71,7 +71,6 @@ namespace WelsEnc {
 #define JUMPPACKETSIZE_CONSTRAINT(max_byte)             ( max_byte - AVER_MARGIN_BYTES ) //in bytes
 #define JUMPPACKETSIZE_JUDGE(len,mb_idx,max_byte)       ( (len) > JUMPPACKETSIZE_CONSTRAINT(max_byte) ) //( (mb_idx+1)%40/*16slice for compare*/ == 0 )        //
 //cur_mb_idx is for early tests, can be omit in optimization
-
 typedef struct TagSlice      SSlice;
 typedef struct TagDqLayer    SDqLayer;
 typedef struct TagWelsEncCtx sWelsEncCtx;

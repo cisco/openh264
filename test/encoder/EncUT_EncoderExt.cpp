@@ -4,6 +4,7 @@
 #include "codec_app_def.h"
 #include "svc_enc_slice_segment.h"
 #include "test_stdint.h"
+#include "utils/FileInputStream.h"
 //TODO: consider using BaseEncoderTest class from #include "../BaseEncoderTest.h"
 
 class EncoderInterfaceTest : public ::testing::Test {
@@ -1053,4 +1054,99 @@ TEST_F (EncoderInterfaceTest, DiffResolutionCheck) {
 
   // finish
   pPtrEnc->Uninitialize();
+}
+
+TEST_F (EncoderInterfaceTest, NalSizeChecking) {
+   // int uiTraceLevel = WELS_LOG_DETAIL;
+   // pPtrEnc->SetOption (ENCODER_OPTION_TRACE_LEVEL, &uiTraceLevel);
+
+    pParamExt->iPicWidth = 1280;
+    pParamExt->iPicHeight = 720;
+    pParamExt->iPicWidth += (rand() << 1) % IMAGE_VARY_SIZE;
+    pParamExt->iPicHeight += (rand() << 1) % IMAGE_VARY_SIZE;
+    pParamExt->fMaxFrameRate = 30;
+    pParamExt->iTemporalLayerNum = rand()%3;
+    pParamExt->iSpatialLayerNum = rand()%4;
+    pParamExt->iNumRefFrame = AUTO_REF_PIC_COUNT;
+    pParamExt->iSpatialLayerNum = WELS_CLIP3(pParamExt->iSpatialLayerNum,1,4);
+
+    pParamExt->iMultipleThreadIdc = 1;//multi-thread can't control size. will be fixed.
+    pParamExt->iEntropyCodingModeFlag = rand()%2;
+    int iMaxNalSize =rand()%5000;
+    iMaxNalSize =  WELS_CLIP3(iMaxNalSize,1000,5000);
+    pParamExt->uiMaxNalSize = iMaxNalSize;
+    for(int i = 0;i<pParamExt->iSpatialLayerNum;i++){
+      pParamExt->sSpatialLayers[i].sSliceArgument.uiSliceMode = SM_SIZELIMITED_SLICE;
+      pParamExt->sSpatialLayers[i].sSliceArgument.uiSliceSizeConstraint = iMaxNalSize;
+      pParamExt->sSpatialLayers[i].iVideoHeight = pParamExt->iPicHeight;
+      pParamExt->sSpatialLayers[i].iVideoWidth = pParamExt->iPicWidth;
+      int bitrate = rand()%3000000;
+      pParamExt->sSpatialLayers[i].iSpatialBitrate = WELS_CLIP3(bitrate,500000,3000000) ;
+      pParamExt->iTargetBitrate+= pParamExt->sSpatialLayers[i].iSpatialBitrate;
+      pParamExt->sSpatialLayers[i].fFrameRate = 30;
+    }
+    int iResult = pPtrEnc->InitializeExt (pParamExt);
+    const int kiFrameNumber = TEST_FRAMES;
+
+    m_iWidth = pParamExt->iPicWidth;
+    m_iHeight = pParamExt->iPicHeight;
+    m_iPicResSize =  m_iWidth * m_iHeight * 3 >> 1;
+    if(pYUV)
+       delete []pYUV;
+    pYUV = new unsigned char [m_iPicResSize];
+    ASSERT_TRUE (pYUV != NULL);
+    FileInputStream fileStream;
+    ASSERT_TRUE (fileStream.Open ("res/Cisco_Absolute_Power_1280x720_30fps.yuv"));
+    PrepareOneSrcFrame();
+    for (int i = 0; i < kiFrameNumber; i ++) {
+        if(fileStream.read (pYUV, m_iPicResSize) != m_iPicResSize){
+            break;
+        }
+        iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+        EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+        pSrcPic->uiTimeStamp += 30;
+
+        for (int i = 0; i < sFbi.iLayerNum; ++i) {
+            for (int j = 0; j < sFbi.sLayerInfo[i].iNalCount; ++j) {
+                int length = sFbi.sLayerInfo[i].pNalLengthInByte[j];
+                EXPECT_LE (length, iMaxNalSize);
+            }
+        }
+
+    }
+    pParamExt->iPicWidth = 1280;
+    pParamExt->iPicHeight = 720;
+    pParamExt->iPicWidth += (rand() << 1) % IMAGE_VARY_SIZE;
+    pParamExt->iPicHeight += (rand() << 1) % IMAGE_VARY_SIZE;
+    m_iWidth = pParamExt->iPicWidth;
+    m_iHeight = pParamExt->iPicHeight;
+    m_iPicResSize =  m_iWidth * m_iHeight * 3 >> 1;
+    delete []pYUV;
+    pYUV = new unsigned char [m_iPicResSize];
+    ASSERT_TRUE (pYUV != NULL);
+    iResult = pPtrEnc->InitializeExt (pParamExt);
+    PrepareOneSrcFrame();
+
+    ENCODER_OPTION eOptionId = ENCODER_OPTION_SVC_ENCODE_PARAM_EXT;
+    memcpy (pOption, pParamExt, sizeof (SEncParamExt));
+    pOption ->iPicWidth = m_iWidth;
+    pOption ->iPicHeight = m_iHeight;
+    iResult = pPtrEnc->SetOption (eOptionId, pOption);
+    EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+
+    for (int i = 0; i < kiFrameNumber; i ++) {
+        PrepareOneSrcFrame();
+        iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+        EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+        pSrcPic->uiTimeStamp += 30;
+
+        for (int i = 0; i < sFbi.iLayerNum; ++i) {
+            for (int j = 0; j < sFbi.sLayerInfo[i].iNalCount; ++j) {
+                int length = sFbi.sLayerInfo[i].pNalLengthInByte[j];
+                EXPECT_LE (length, iMaxNalSize);
+            }
+        }
+    }
+    iResult = pPtrEnc->Uninitialize();
+    EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
 }
