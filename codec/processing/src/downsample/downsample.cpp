@@ -149,7 +149,7 @@ EResult CDownsampling::Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pDs
   if (iSrcWidthY <= iDstWidthY || iSrcHeightY <= iDstHeightY) {
     return RET_INVALIDPARAM;
   }
-  if (iSrcWidthY > MAX_SAMPLE_WIDTH || iSrcHeightY > MAX_SAMPLE_HEIGHT || m_bNoSampleBuffer) {
+  if ((iSrcWidthY >> 1) > MAX_SAMPLE_WIDTH || (iSrcHeightY >> 1) > MAX_SAMPLE_HEIGHT || m_bNoSampleBuffer) {
     if ((iSrcWidthY >> 1) == iDstWidthY && (iSrcHeightY >> 1) == iDstHeightY) {
       // use half average functions
       DownsampleHalfAverage ((uint8_t*)pDstPixMap->pPixel[0], pDstPixMap->iStride[0],
