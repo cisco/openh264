@@ -663,9 +663,12 @@ void WelsUpdateSliceHeaderSyntax (sWelsEncCtx* pCtx,  const int32_t iAbsDiffPicN
         pRefReorder->SReorderingSyntax[0].uiAbsDiffPicNumMinus1 = iAbsDiffPicNumMinus1;
         pRefReorder->SReorderingSyntax[1].uiReorderingOfPicNumsIdc = 3;
       } else {
-        pRefReorder->SReorderingSyntax[0].uiReorderingOfPicNumsIdc = 2;
-        pRefReorder->SReorderingSyntax[0].iLongTermPicNum = pCtx->pRefList0[0]->iLongTermPicNum;
-        pRefReorder->SReorderingSyntax[1].uiReorderingOfPicNumsIdc = 3;
+        int32_t iRefIdx = 0;
+        for (iRefIdx = 0; iRefIdx < pCtx->iNumRef0; iRefIdx++) {
+          pRefReorder->SReorderingSyntax[iRefIdx].uiReorderingOfPicNumsIdc = 2;
+          pRefReorder->SReorderingSyntax[iRefIdx].iLongTermPicNum = pCtx->pRefList0[iRefIdx]->iLongTermPicNum;
+        }
+        pRefReorder->SReorderingSyntax[iRefIdx].uiReorderingOfPicNumsIdc = 3;
       }
     }
 
