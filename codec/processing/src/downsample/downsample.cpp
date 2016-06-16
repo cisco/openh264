@@ -32,7 +32,7 @@
 
 #include "downsample.h"
 #include "cpu.h"
-#include <cassert>
+#include <assert.h>
 
 WELSVP_NAMESPACE_BEGIN
 #define MAX_SAMPLE_WIDTH 1920
