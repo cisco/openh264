@@ -36,6 +36,17 @@
 #include "utils.h"
 #include "encoder.h"
 
+namespace {
+
+void ClearEndOfLinePadding (uint8_t* pData, int32_t iStride, int32_t iWidth, int32_t iHeight) {
+  if (iWidth < iStride) {
+    for (int32_t i = 0; i < iHeight; ++i)
+      memset (pData + i * iStride + iWidth, 0, iStride - iWidth);
+  }
+}
+
+} // anon ns.
+
 namespace WelsEnc {
 
 
@@ -501,6 +512,20 @@ int32_t  WelsInitScaledPic (SWelsSvcCodingParam* pParam,  Scaled_Picture*  pScal
                                           pParam->SUsedPicRect.iHeight, false, 0);
     if (pScaledPicture->pScaledInputPicture == NULL)
       return -1;
+
+    // Avoid valgrind false positives.
+    //
+    // X86 SIMD downsampling routines may, for convenience, read slightly beyond
+    // the input data and into the alignment padding area beyond each line. This
+    // causes valgrind to warn about uninitialized values even if these values
+    // only affect lanes of a SIMD vector that are effectively never used.
+    //
+    // Avoid these false positives by zero-initializing the padding area beyond
+    // each line of the source buffer used for downsampling.
+    SPicture* pPic = pScaledPicture->pScaledInputPicture;
+    ClearEndOfLinePadding (pPic->pData[0], pPic->iLineSize[0], pPic->iWidthInPixel, pPic->iHeightInPixel);
+    ClearEndOfLinePadding (pPic->pData[1], pPic->iLineSize[1], pPic->iWidthInPixel >> 1, pPic->iHeightInPixel >> 1);
+    ClearEndOfLinePadding (pPic->pData[2], pPic->iLineSize[2], pPic->iWidthInPixel >> 1, pPic->iHeightInPixel >> 1);
   }
   return 0;
 }
