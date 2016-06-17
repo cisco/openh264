@@ -220,7 +220,7 @@ EResult CDownsampling::Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pDs
         DownsampleHalfAverage ((uint8_t*)pDstPixMap->pPixel[2], pDstPixMap->iStride[2],
             (uint8_t*)pSrcV, iSrcStrideV, iSrcWidthUV, iSrcHeightUV);
         break;
-      } else if (((iHalfSrcWidth >> 1) >= iDstWidthY) && ((iHalfSrcHeight >> 1) >= iDstHeightY)) {
+      } else if ((iHalfSrcWidth > iDstWidthY) && (iHalfSrcHeight > iDstHeightY)){
         // use half average functions
         iDstStrideY = WELS_ALIGN (iHalfSrcWidth, 32);
         iDstStrideU = WELS_ALIGN (iHalfSrcWidth >> 1, 32);
