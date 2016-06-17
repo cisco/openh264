@@ -758,18 +758,12 @@ const uint32_t kiWidth = 160; //DO NOT CHANGE!
 const uint32_t kiHeight = 96; //DO NOT CHANGE!
 const uint32_t kiFrameRate = 12; //DO NOT CHANGE!
 const uint32_t kiFrameNum = 100; //DO NOT CHANGE!
-const char* pHashStr[] = { //DO NOT CHANGE!
-// X86_ASM downsampling routines average vertically first, as opposed to
-// horizontally first, which results in different output.
-#ifdef X86_ASM
-  "244eebcb51f4c2a56e83fc5da3373cad9ec0e1e5",
-  "bbad99ef99e37b34bcb4f09a7ec4d144375f6be7",
-  "809f97e836650624d92f0b8e200a6ab25f810d6f"
-#else
-  "9c4e6146b29bac5d5d4be3c5bbab9c072dcb3f3f",
-  "f350001c333902029800bd291fbed915a4bdf19a",
-  "eb9d853b7daec03052c4850027ac94adc84c3a7e"
-#endif
+const char* const pHashStr[][2] = { //DO NOT CHANGE!
+  // Allow for different output depending on whether averaging is done
+  // vertically or horizontally first when downsampling.
+  { "244eebcb51f4c2a56e83fc5da3373cad9ec0e1e5", "9c4e6146b29bac5d5d4be3c5bbab9c072dcb3f3f" },
+  { "bbad99ef99e37b34bcb4f09a7ec4d144375f6be7", "f350001c333902029800bd291fbed915a4bdf19a" },
+  { "809f97e836650624d92f0b8e200a6ab25f810d6f", "eb9d853b7daec03052c4850027ac94adc84c3a7e" }
 };
 
 class DecodeParseAPI : public ::testing::TestWithParam<EncodeDecodeFileParamBase>, public EncodeDecodeTestBase {
@@ -905,7 +899,7 @@ TEST_F (DecodeParseAPI, ParseOnly_General) {
     unsigned char digest[SHA_DIGEST_LENGTH];
     SHA1Result (&ctx_, digest);
     if (!HasFatalFailure()) {
-      CompareHash (digest, pHashStr[uiTargetLayerId]);
+      CompareHashAnyOf (digest, pHashStr[uiTargetLayerId], sizeof *pHashStr / sizeof **pHashStr);
     }
   } //while
 #ifdef DEBUG_FILE_SAVE
