@@ -464,14 +464,12 @@ void RcCalculatePictureQp (sWelsEncCtx* pEncCtx) {
                           pWelsSvcRc->iLastCalculatedQScale + pWelsSvcRc->iFrameDeltaQpUpper + iDeltaQpTemporal);
     iLumaQp = WELS_CLIP3 (iLumaQp,  pTOverRc->iMinQp, pTOverRc->iMaxQp);
 
-    pWelsSvcRc->iQStep = RcConvertQp2QStep (iLumaQp);
-    pWelsSvcRc->iLastCalculatedQScale = iLumaQp;
-
     if (pEncCtx->pSvcParam->bEnableAdaptiveQuant) {
       iLumaQp = WELS_CLIP3 ((iLumaQp * INT_MULTIPLY - pEncCtx->pVaa->sAdaptiveQuantParam.iAverMotionTextureIndexToDeltaQp) /
                             INT_MULTIPLY, pTOverRc->iMinQp, pTOverRc->iMaxQp);
     }
-
+    pWelsSvcRc->iQStep = RcConvertQp2QStep (iLumaQp);
+    pWelsSvcRc->iLastCalculatedQScale = iLumaQp;
     pEncCtx->iGlobalQp = iLumaQp;
 
     return;
@@ -500,15 +498,14 @@ void RcCalculatePictureQp (sWelsEncCtx* pEncCtx) {
   }
 
   iLumaQp = WELS_CLIP3 (iLumaQp,  pTOverRc->iMinQp, pTOverRc->iMaxQp);
-
-  pWelsSvcRc->iQStep = RcConvertQp2QStep (iLumaQp);
-  pWelsSvcRc->iLastCalculatedQScale = iLumaQp;
   if (pEncCtx->pSvcParam->bEnableAdaptiveQuant) {
 
     iLumaQp =  WELS_DIV_ROUND (iLumaQp * INT_MULTIPLY - pEncCtx->pVaa->sAdaptiveQuantParam.iAverMotionTextureIndexToDeltaQp,
                                INT_MULTIPLY);
     iLumaQp = WELS_CLIP3 (iLumaQp, pTOverRc->iMinQp, pTOverRc->iMaxQp);
   }
+  pWelsSvcRc->iQStep = RcConvertQp2QStep (iLumaQp);
+  pWelsSvcRc->iLastCalculatedQScale = iLumaQp;
   pEncCtx->iGlobalQp = iLumaQp;
 }
 
