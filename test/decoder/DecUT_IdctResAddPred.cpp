@@ -4,6 +4,9 @@
 #include "deblocking.h"
 #include "cpu.h"
 using namespace WelsDec;
+
+namespace {
+
 void IdctResAddPred_ref (uint8_t* pPred, const int32_t kiStride, int16_t* pRs) {
   int16_t iSrc[16];
 
@@ -49,14 +52,25 @@ void SetNonZeroCount_ref (int8_t* pNonZeroCount) {
   }
 }
 
+#if defined(X86_ASM)
+void IdctFourResAddPred_ref (uint8_t* pPred, int32_t iStride, int16_t* pRs) {
+  IdctResAddPred_ref (pPred + 0 * iStride + 0, iStride, pRs + 0 * 16);
+  IdctResAddPred_ref (pPred + 0 * iStride + 4, iStride, pRs + 1 * 16);
+  IdctResAddPred_ref (pPred + 4 * iStride + 0, iStride, pRs + 2 * 16);
+  IdctResAddPred_ref (pPred + 4 * iStride + 4, iStride, pRs + 3 * 16);
+}
+#endif
+
+} // anon ns
+
 #define GENERATE_IDCTRESADDPRED(pred, flag) \
 TEST(DecoderDecodeMbAux, pred) {\
   const int32_t kiStride = 32;\
   const int iBits = 12;\
   const int iMask = (1 << iBits) - 1;\
   const int iOffset = 1 << (iBits - 1);\
-  int16_t iRS[16];\
-  uint8_t uiPred[16*kiStride];\
+  ENFORCE_STACK_ALIGN_1D (int16_t, iRS, 16, 16);\
+  ENFORCE_STACK_ALIGN_1D (uint8_t, uiPred, 16 * kiStride, 16);\
   int16_t iRefRS[16];\
   uint8_t uiRefPred[16*kiStride];\
   int32_t iRunTimes = 1000;\
@@ -84,9 +98,48 @@ TEST(DecoderDecodeMbAux, pred) {\
   }\
 }
 
+#define GENERATE_IDCTFOURRESADDPRED(pred, flag) \
+TEST(DecoderDecodeMbAux, pred) {\
+  const int32_t kiStride = 32;\
+  const int iBits = 12;\
+  const int iMask = (1 << iBits) - 1;\
+  const int iOffset = 1 << (iBits - 1);\
+  ENFORCE_STACK_ALIGN_1D (int16_t, iRS, 4 * 16, 16);\
+  ENFORCE_STACK_ALIGN_1D (uint8_t, uiPred, 4 * 16 * kiStride, 16);\
+  int16_t iRefRS[4 * 16];\
+  uint8_t uiRefPred[4 * 16 * kiStride];\
+  int8_t iNzc[6] = { 0 };\
+  int32_t iRunTimes = 1000;\
+  uint32_t uiCPUFlags = WelsCPUFeatureDetect(0); \
+  if ((uiCPUFlags & flag) == 0 && flag != 0) \
+    return; \
+  while (iRunTimes--) {\
+    for (int i = 0; i < 4; i++)\
+      for (int j = 0; j < 16; j++)\
+        iNzc[i / 2 * 4 + i % 2] += !!(iRefRS[16 * i + j] = iRS[16 * i + j] = (rand() & iMask) - iOffset);\
+    for (int i = 0; i < 8; i++)\
+      for (int j = 0; j < 8; j++)\
+        uiRefPred[i * kiStride + j] = uiPred[i * kiStride + j] = rand() & 255;\
+    pred (uiPred, kiStride, iRS, iNzc);\
+    IdctFourResAddPred_ref (uiRefPred, kiStride, iRefRS);\
+    bool ok = true;\
+    for (int i = 0; i < 8; i++)\
+      for (int j = 0; j < 8; j++)\
+        if (uiRefPred[i * kiStride + j] != uiPred[i * kiStride + j]) {\
+          ok = false;\
+          goto next;\
+        }\
+    next:\
+    EXPECT_EQ(ok, true);\
+  }\
+}
+
 GENERATE_IDCTRESADDPRED (IdctResAddPred_c, 0)
 #if defined(X86_ASM)
 GENERATE_IDCTRESADDPRED (IdctResAddPred_mmx, WELS_CPU_MMXEXT)
+GENERATE_IDCTRESADDPRED (IdctResAddPred_sse2, WELS_CPU_SSE2)
+GENERATE_IDCTRESADDPRED (IdctResAddPred_avx2, WELS_CPU_AVX2)
+GENERATE_IDCTFOURRESADDPRED (IdctFourResAddPred_avx2, WELS_CPU_AVX2)
 #endif
 
 #if defined(HAVE_NEON)

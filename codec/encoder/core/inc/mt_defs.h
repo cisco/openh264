@@ -44,7 +44,9 @@
 #include "codec_app_def.h"
 #include "wels_const.h"
 #include "WelsThreadLib.h"
+#include "slice.h"
 
+using namespace WelsEnc;
 /*
  *  MT_DEBUG: output trace MT related into log file
  */
@@ -57,7 +59,7 @@
 
 typedef struct TagSliceThreadPrivateData {
 void*           pWelsPEncCtx;
-SLayerBSInfo*   pLayerBs;
+SFrameBSInfo*   pFrameBsInfo;
 int32_t         iSliceIndex;    // slice index, zero based
 int32_t         iThreadIndex;   // thread index, zero based
 
@@ -80,12 +82,13 @@ WELS_EVENT                      pThreadMasterEvent[MAX_THREADS_NUM];    // event
 
 WELS_MUTEX                      mutexSliceNumUpdate;    // for dynamic slicing mode MT
 
-uint32_t*                       pSliceConsumeTime[MAX_DEPENDENCY_LAYER];        // consuming time for each slice, [iSpatialIdx][uiSliceIdx]
-int32_t*                        pSliceComplexRatio[MAX_DEPENDENCY_LAYER]; // *INT_MULTIPLY
-
 #ifdef MT_DEBUG
 FILE*                           pFSliceDiff;    // file handle for debug
 #endif//MT_DEBUG
+
+uint8_t*                        pThreadBsBuffer[MAX_THREADS_NUM]; //actual memory for slice buffer
+bool                            bThreadBsBufferUsage[MAX_THREADS_NUM];
+WELS_MUTEX                      mutexThreadBsBufferUsage;
 
 } SSliceThreading;
 

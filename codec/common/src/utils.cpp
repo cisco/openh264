@@ -50,7 +50,7 @@ float WelsCalcPsnr (const void* kpTarPic,
 
 void WelsLog (SLogContext* logCtx, int32_t iLevel, const char* kpFmt, ...) {
   va_list vl;
-  char pTraceTag[MAX_LOG_SIZE];
+  char pTraceTag[MAX_LOG_SIZE] = {0};
   switch (iLevel) {
   case WELS_LOG_ERROR:
     WelsSnprintf (pTraceTag, MAX_LOG_SIZE, "[OpenH264] this = 0x%p, Error:", logCtx->pCodecInstance);

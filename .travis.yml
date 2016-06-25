@@ -1,4 +1,5 @@
 language: cpp
+dist: trusty
 
 compiler:
   - g++
@@ -6,7 +7,7 @@ compiler:
 
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq nasm g++-4.6-multilib gcc-multilib libc6-dev-i386
+  - sudo apt-get install -qq nasm g++-multilib gcc-multilib libc6-dev-i386
 
 install:
   - make gmp-bootstrap
@@ -21,15 +22,12 @@ before_script:
 env:
   - TASK=UnitTest;      TestParameter=""
   - TASK=BinaryCompare; TestParameter=BA_MW_D.264
-  - TASK=BinaryCompare; TestParameter=LS_SVA_D.264
   - TASK=BinaryCompare; TestParameter=CVPCMNL1_SVA_C.264
 
 matrix:
   exclude:
     - compiler: clang
       env: TASK=BinaryCompare; TestParameter=BA_MW_D.264
-    - compiler: clang
-      env: TASK=BinaryCompare; TestParameter=LS_SVA_D.264
     - compiler: clang
       env: TASK=BinaryCompare; TestParameter=CVPCMNL1_SVA_C.264
 script:

@@ -80,7 +80,7 @@ typedef enum {
 typedef enum {
   cmResultSuccess,          ///< successful
   cmInitParaError,          ///< parameters are invalid
-  cmUnkonwReason,
+  cmUnknownReason,
   cmMallocMemeError,        ///< malloc a memory error
   cmInitExpected,           ///< initial action is expected
   cmUnsupportedData

@@ -469,7 +469,10 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsDequantIHadamard4x4_AArch64_neon
     st1    {v0.16b, v1.16b}, [x0]
 WELS_ASM_AARCH64_FUNC_END
 
+//void WelsDctT4_AArch64_neon (int16_t* pDct,  uint8_t* pPixel1, int32_t iStride1, uint8_t* pPixel2, int32_t iStride2);
 WELS_ASM_AARCH64_FUNC_BEGIN WelsDctT4_AArch64_neon
+    SIGN_EXTENSION x2, w2
+    SIGN_EXTENSION x4, w4
     LOAD_4x4_DATA_FOR_DCT   v0, v1, x1, x2, x3, x4
     usubl  v2.8h, v0.8b, v1.8b
     usubl2 v4.8h, v0.16b, v1.16b
@@ -490,8 +493,10 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsDctT4_AArch64_neon
     st4       {v0.d, v1.d, v2.d, v3.d}[0], [x0]
 WELS_ASM_AARCH64_FUNC_END
 
-
+//void WelsDctFourT4_AArch64_neon (int16_t* pDct,  uint8_t* pPixel1, int32_t iStride1, uint8_t* pPixel2, int32_t iStride2);
 WELS_ASM_AARCH64_FUNC_BEGIN WelsDctFourT4_AArch64_neon
+    SIGN_EXTENSION x2,w2
+    SIGN_EXTENSION x4,w4
 .rept 2
     LOAD_8x4_DATA_FOR_DCT   v0, v1, v2, v3, v4, v5, v6, v7, x1, x3
     usubl    v0.8h, v0.8b, v4.8b
@@ -518,8 +523,10 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsDctFourT4_AArch64_neon
     st1     {v6.16b, v7.16b}, [x0], #32
 .endr
 WELS_ASM_AARCH64_FUNC_END
-
+//void WelsIDctT4Rec_AArch64_neon (uint8_t* pRec, int32_t iStride, uint8_t* pPrediction, int32_t iPredStride, int16_t* pDct)
 WELS_ASM_AARCH64_FUNC_BEGIN WelsIDctT4Rec_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
     ld1     {v16.s}[0], [x2], x3
     ld1     {v16.s}[1], [x2], x3
     ld1     {v16.s}[2], [x2], x3
@@ -552,8 +559,10 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsIDctT4Rec_AArch64_neon
     st1     {v1.s}[0],[x0],x1
     st1     {v1.s}[1],[x0],x1
 WELS_ASM_AARCH64_FUNC_END
-
+//void WelsIDctFourT4Rec_AArch64_neon (uint8_t* pRec, int32_t iStride, uint8_t* pPrediction, int32_t iPredStride, int16_t* pDct);
 WELS_ASM_AARCH64_FUNC_BEGIN WelsIDctFourT4Rec_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
 .rept 2
     ld1     {v16.d}[0], [x2], x3
     ld1     {v16.d}[1], [x2], x3
@@ -644,7 +653,11 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsHadamardT4Dc_AArch64_neon
     st1       {v4.16b, v5.16b}, [x0]  //store
 WELS_ASM_AARCH64_FUNC_END
 
+//void WelsIDctRecI16x16Dc_AArch64_neon (uint8_t* pRec, int32_t iStride, uint8_t* pPrediction, int32_t iPredStride,
+//                int16_t* pDctDc);
 WELS_ASM_AARCH64_FUNC_BEGIN WelsIDctRecI16x16Dc_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
     ld1       {v16.16b,v17.16b}, [x4]
     srshr     v16.8h, v16.8h, #6
     srshr     v17.8h, v17.8h, #6

@@ -54,8 +54,7 @@
 
 WELSVP_NAMESPACE_BEGIN
 
-#define MAX_WIDTH      (4096)
-#define MAX_HEIGHT     (2304)//MAX_FS_LEVEL51 (36864); MAX_FS_LEVEL51*256/4096 = 2304
+#define MAX_MBS_PER_FRAME 36864 //in accordance with max level support in Rec
 
 #define MB_WIDTH_LUMA  (16)
 #define PESN               (1e-6)       // desired float precision
@@ -84,10 +83,6 @@ WELSVP_NAMESPACE_BEGIN
 #define WELS_CLAMP(x, minv, maxv)  WELS_MIN(WELS_MAX(x, minv), maxv)
 
 #define ALIGNBYTES         (16)       /* Worst case is requiring alignment to an 16 byte boundary */
-#define WELS_ALIGN(iInput)   ((iInput+(ALIGNMENT-1)) & ~(ALIGNMENT-1))
-#define WELS_ALIGN2(iInput)  ((iInput+1) & ~1)
-#define WELS_ALIGN4(iInput)  ((iInput+3) & ~3)
-#define WELS_ALIGN8(iInput)  ((iInput+7) & ~7)
 
 #define WelsCastFromPointer(p)      (reinterpret_cast<intptr_t>(p))
 #define WelsStaticCast(type, p)  (static_cast<type>(p))

@@ -150,6 +150,26 @@ WELS_EXTERN McHorVer20WidthEq4_mmx
     movq    %9, %1
 %endmacro
 
+
+%macro FILTER_HV_W4 9
+paddw   %1, %6
+movdqa  %8, %3
+movdqa  %7, %2
+paddw   %1, [h264_w0x10_1]
+paddw   %8, %4
+paddw   %7, %5
+psllw   %8, 2
+psubw   %8, %7
+paddw   %1, %8
+psllw   %8, 2
+paddw   %1, %8
+psraw   %1, 5
+WELS_Zero %8
+packuswb %1, %8
+movd    %9, %1
+%endmacro
+
+
 ;*******************************************************************************
 ; Code
 ;*******************************************************************************
@@ -574,6 +594,140 @@ WELS_EXTERN McHorVer02Height9Or17_sse2
 
 
 ;***********************************************************************
+; void McHorVer02Height5_sse2(  const uint8_t *pSrc,
+;                       int32_t iSrcStride,
+;                       uint8_t *pDst,
+;                       int32_t iDstStride,
+;                       int32_t iWidth,
+;                       int32_t iHeight )
+;***********************************************************************
+WELS_EXTERN McHorVer02Height5_sse2
+%assign  push_num 0
+LOAD_6_PARA
+PUSH_XMM 8
+SIGN_EXTENSION  r1, r1d
+SIGN_EXTENSION  r3, r3d
+SIGN_EXTENSION  r4, r4d
+SIGN_EXTENSION  r5, r5d
+
+%ifndef X86_32
+push r12
+push r13
+push r14
+mov  r12, r0
+mov  r13, r2
+mov  r14, r5
+%endif
+
+shr r4, 2
+sub r0, r1
+sub r0, r1
+
+.xloop:
+WELS_Zero xmm7
+SSE_LOAD_8P xmm0, xmm7, [r0]
+SSE_LOAD_8P xmm1, xmm7, [r0+r1]
+lea r0, [r0+2*r1]
+SSE_LOAD_8P xmm2, xmm7, [r0]
+SSE_LOAD_8P xmm3, xmm7, [r0+r1]
+lea r0, [r0+2*r1]
+SSE_LOAD_8P xmm4, xmm7, [r0]
+SSE_LOAD_8P xmm5, xmm7, [r0+r1]
+
+FILTER_HV_W4 xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, [r2]
+dec r5
+lea r0, [r0+2*r1]
+SSE_LOAD_8P xmm6, xmm7, [r0]
+movdqa xmm0,xmm1
+movdqa xmm1,xmm2
+movdqa xmm2,xmm3
+movdqa xmm3,xmm4
+movdqa xmm4,xmm5
+movdqa xmm5,xmm6
+add r2, r3
+sub r0, r1
+
+.start:
+FILTER_HV_W4 xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, [r2]
+dec r5
+jz near .x_loop_dec
+
+lea r0, [r0+2*r1]
+SSE_LOAD_8P xmm6, xmm7, [r0]
+FILTER_HV_W4 xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0, [r2+r3]
+dec r5
+jz near .x_loop_dec
+
+lea r2, [r2+2*r3]
+SSE_LOAD_8P xmm7, xmm0, [r0+r1]
+FILTER_HV_W4 xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0, xmm1, [r2]
+dec r5
+jz near .x_loop_dec
+
+lea r0, [r0+2*r1]
+SSE_LOAD_8P xmm0, xmm1, [r0]
+FILTER_HV_W4 xmm3, xmm4, xmm5, xmm6, xmm7, xmm0, xmm1, xmm2, [r2+r3]
+dec r5
+jz near .x_loop_dec
+
+lea r2, [r2+2*r3]
+SSE_LOAD_8P xmm1, xmm2, [r0+r1]
+FILTER_HV_W4 xmm4, xmm5, xmm6, xmm7, xmm0, xmm1, xmm2, xmm3, [r2]
+dec r5
+jz near .x_loop_dec
+
+lea r0, [r0+2*r1]
+SSE_LOAD_8P xmm2, xmm3, [r0]
+FILTER_HV_W4 xmm5, xmm6, xmm7, xmm0, xmm1, xmm2, xmm3, xmm4, [r2+r3]
+dec r5
+jz near .x_loop_dec
+
+lea r2, [r2+2*r3]
+SSE_LOAD_8P xmm3, xmm4, [r0+r1]
+FILTER_HV_W4 xmm6, xmm7, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, [r2]
+dec r5
+jz near .x_loop_dec
+
+lea r0, [r0+2*r1]
+SSE_LOAD_8P xmm4, xmm5, [r0]
+FILTER_HV_W4 xmm7, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, [r2+r3]
+dec r5
+jz near .x_loop_dec
+
+lea r2, [r2+2*r3]
+SSE_LOAD_8P xmm5, xmm6, [r0+r1]
+jmp near .start
+
+.x_loop_dec:
+dec r4
+jz  near .xx_exit
+%ifdef X86_32
+mov r0, arg1
+mov r2, arg3
+mov r5, arg6
+%else
+mov r0, r12
+mov r2, r13
+mov r5, r14
+%endif
+sub r0, r1
+sub r0, r1
+add r0, 4
+add r2, 4
+jmp near .xloop
+
+.xx_exit:
+%ifndef X86_32
+pop r14
+pop r13
+pop r12
+%endif
+POP_XMM
+LOAD_6_PARA_POP
+ret
+
+
+;***********************************************************************
 ; void McHorVer20Width9Or17_sse2(       const uint8_t *pSrc,
 ;                       int32_t iSrcStride,
 ;                       uint8_t *pDst,
@@ -732,6 +886,80 @@ WELS_EXTERN McHorVer20Width9Or17_sse2
     LOAD_6_PARA_POP
     ret
 
+
+;***********************************************************************
+; void McHorVer20Width5_sse2(       const uint8_t *pSrc,
+;                       int32_t iSrcStride,
+;                       uint8_t *pDst,
+;                       int32_t iDstStride,
+;                       int32_t iWidth,
+;                       int32_t iHeight
+;                      );
+;***********************************************************************
+WELS_EXTERN McHorVer20Width5_sse2
+%assign  push_num 0
+LOAD_6_PARA
+PUSH_XMM 8
+SIGN_EXTENSION  r1, r1d
+SIGN_EXTENSION  r3, r3d
+SIGN_EXTENSION  r4, r4d
+SIGN_EXTENSION  r5, r5d
+sub r0, 2
+pxor xmm7, xmm7
+
+.yloop_width_5:
+movq xmm0, [r0]
+punpcklbw xmm0, xmm7
+movq xmm1, [r0+5]
+punpcklbw xmm1, xmm7
+movq xmm2, [r0+1]
+punpcklbw xmm2, xmm7
+movq xmm3, [r0+4]
+punpcklbw xmm3, xmm7
+movq xmm4, [r0+2]
+punpcklbw xmm4, xmm7
+movq xmm5, [r0+3]
+punpcklbw xmm5, xmm7
+
+movdqa xmm7, xmm2
+paddw   xmm7, xmm3
+movdqa xmm6, xmm4
+paddw   xmm6, xmm5
+psllw xmm6, 2
+psubw xmm6, xmm7
+paddw xmm0, xmm1
+paddw xmm0, xmm6
+psllw xmm6, 2
+paddw xmm0, xmm6
+paddw xmm0, [h264_w0x10_1]
+psraw  xmm0, 5
+packuswb xmm0, xmm0
+movd [r2], xmm0
+
+pxor  xmm7, xmm7
+movq xmm0, [r0+6]
+punpcklbw xmm0, xmm7
+
+paddw xmm4, xmm1
+paddw xmm5, xmm3
+psllw xmm5, 2
+psubw xmm5, xmm4
+paddw xmm2, xmm0
+paddw xmm2, xmm5
+psllw xmm5, 2
+paddw xmm2, xmm5
+paddw xmm2, [h264_w0x10_1]
+psraw  xmm2, 5
+packuswb xmm2, xmm2
+movd [r2+1], xmm2
+
+add r0, r1
+add r2, r3
+dec r5
+jnz .yloop_width_5
+POP_XMM
+LOAD_6_PARA_POP
+ret
 
 
 ;***********************************************************************
@@ -1162,3 +1390,359 @@ WELS_EXTERN McHorVer22Width8VerLastUnAlign_sse2
     POP_XMM
     LOAD_6_PARA_POP
     ret
+
+
+;***********************************************************************
+;void McHorVer22Width5HorFirst_sse2
+;                           (const uint8_t *pSrc,
+;                           int32_t iSrcStride,
+;                           uint8_t * pTap,
+;                           int32_t iTapStride,
+;                           int32_t iWidth,int32_t iHeight);
+;***********************************************************************
+WELS_EXTERN McHorVer22Width5HorFirst_sse2
+%assign  push_num 0
+LOAD_6_PARA
+PUSH_XMM 8
+SIGN_EXTENSION  r1, r1d
+SIGN_EXTENSION  r3, r3d
+SIGN_EXTENSION  r4, r4d
+SIGN_EXTENSION  r5, r5d
+pxor xmm7, xmm7
+sub r0, r1              ;;;;;;;;need more 5 lines.
+sub r0, r1
+
+.yloop_width_5:
+movq xmm0, [r0]
+punpcklbw xmm0, xmm7
+movq xmm1, [r0+5]
+punpcklbw xmm1, xmm7
+movq xmm2, [r0+1]
+punpcklbw xmm2, xmm7
+movq xmm3, [r0+4]
+punpcklbw xmm3, xmm7
+movq xmm4, [r0+2]
+punpcklbw xmm4, xmm7
+movq xmm5, [r0+3]
+punpcklbw xmm5, xmm7
+
+movdqa xmm7, xmm2
+paddw   xmm7, xmm3
+movdqa xmm6, xmm4
+paddw   xmm6, xmm5
+psllw xmm6, 2
+psubw xmm6, xmm7
+paddw xmm0, xmm1
+paddw xmm0, xmm6
+psllw xmm6, 2
+paddw xmm0, xmm6
+movd [r2], xmm0
+
+pxor  xmm7, xmm7
+movq xmm0, [r0+6]
+punpcklbw xmm0, xmm7
+
+paddw xmm4, xmm1
+paddw xmm5, xmm3
+psllw xmm5, 2
+psubw xmm5, xmm4
+paddw xmm2, xmm0
+paddw xmm2, xmm5
+psllw xmm5, 2
+paddw xmm2, xmm5
+movq [r2+2], xmm2
+movhps [r2+2+8], xmm2
+
+add r0, r1
+add r2, r3
+dec r5
+jnz .yloop_width_5
+POP_XMM
+LOAD_6_PARA_POP
+ret
+
+
+%macro FILTER_VER_4 9
+paddw  %1, %6
+movdqa %7, %2
+movdqa %8, %3
+
+
+paddw %7, %5
+paddw %8, %4
+
+psubw  %1, %7
+psraw   %1, 2
+paddw  %1, %8
+psubw  %1, %7
+psraw   %1, 2
+paddw  %8, %1
+paddw  %8, [h264_mc_hc_32]
+psraw   %8, 6
+packuswb %8, %8
+movd %9, %8
+%endmacro
+
+
+;***********************************************************************
+;void McHorVer22Width4VerLastAlign_sse2(
+;                                           const uint8_t *pTap,
+;                                           int32_t iTapStride,
+;                                           uint8_t * pDst,
+;                                           int32_t iDstStride,
+;                                           int32_t iWidth,
+;                                           int32_t iHeight);
+;***********************************************************************
+
+WELS_EXTERN McHorVer22Width4VerLastAlign_sse2
+%assign  push_num 0
+LOAD_6_PARA
+PUSH_XMM 8
+SIGN_EXTENSION  r1, r1d
+SIGN_EXTENSION  r3, r3d
+SIGN_EXTENSION  r4, r4d
+SIGN_EXTENSION  r5, r5d
+%ifndef X86_32
+push r12
+push r13
+push r14
+mov  r12, r0
+mov  r13, r2
+mov  r14, r5
+%endif
+
+shr r4, 2
+
+.width_loop:
+movdqa xmm0, [r0]
+movdqa xmm1, [r0+r1]
+lea r0, [r0+2*r1]
+movdqa xmm2, [r0]
+movdqa xmm3, [r0+r1]
+lea r0, [r0+2*r1]
+movdqa xmm4, [r0]
+movdqa xmm5, [r0+r1]
+
+FILTER_VER_4 xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, [r2]
+dec r5
+lea r0, [r0+2*r1]
+movdqa xmm6, [r0]
+
+movdqa xmm0, xmm1
+movdqa xmm1, xmm2
+movdqa xmm2, xmm3
+movdqa xmm3, xmm4
+movdqa xmm4, xmm5
+movdqa xmm5, xmm6
+
+add r2, r3
+sub r0, r1
+
+.start:
+FILTER_VER_4 xmm0,xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, [r2]
+dec r5
+jz near .x_loop_dec
+
+lea r0, [r0+2*r1]
+movdqa xmm6, [r0]
+FILTER_VER_4 xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,[r2+r3]
+dec r5
+jz near .x_loop_dec
+
+lea r2, [r2+2*r3]
+movdqa xmm7, [r0+r1]
+FILTER_VER_4  xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0, xmm1, [r2]
+dec r5
+jz near .x_loop_dec
+
+lea r0, [r0+2*r1]
+movdqa xmm0, [r0]
+FILTER_VER_4  xmm3, xmm4, xmm5, xmm6, xmm7, xmm0, xmm1, xmm2,[r2+r3]
+dec r5
+jz near .x_loop_dec
+
+lea r2, [r2+2*r3]
+movdqa xmm1, [r0+r1]
+FILTER_VER_4  xmm4, xmm5, xmm6, xmm7, xmm0, xmm1, xmm2, xmm3,[r2]
+dec r5
+jz near .x_loop_dec
+
+lea r0, [r0+2*r1]
+movdqa xmm2, [r0]
+FILTER_VER_4  xmm5, xmm6, xmm7, xmm0, xmm1, xmm2, xmm3,xmm4,[r2+r3]
+dec r5
+jz near .x_loop_dec
+
+lea r2, [r2+2*r3]
+movdqa xmm3, [r0+r1]
+FILTER_VER_4  xmm6, xmm7, xmm0, xmm1, xmm2, xmm3,xmm4,xmm5,[r2]
+dec r5
+jz near .x_loop_dec
+
+lea r0, [r0+2*r1]
+movdqa xmm4, [r0]
+FILTER_VER_4  xmm7, xmm0, xmm1, xmm2, xmm3,xmm4,xmm5,xmm6, [r2+r3]
+dec r5
+jz near .x_loop_dec
+
+lea r2, [r2+2*r3]
+movdqa xmm5, [r0+r1]
+jmp near .start
+
+.x_loop_dec:
+dec r4
+jz near .exit
+%ifdef X86_32
+mov r0, arg1
+mov r2, arg3
+mov r5, arg6
+%else
+mov r0, r12
+mov r2, r13
+mov r5, r14
+%endif
+add r0, 8
+add r2, 4
+jmp .width_loop
+
+.exit:
+%ifndef X86_32
+pop r14
+pop r13
+pop r12
+%endif
+POP_XMM
+LOAD_6_PARA_POP
+ret
+
+
+;***********************************************************************
+;void McHorVer22Width4VerLastUnAlign_sse2(
+;                                           const uint8_t *pTap,
+;                                           int32_t iTapStride,
+;                                           uint8_t * pDst,
+;                                           int32_t iDstStride,
+;                                           int32_t iWidth,
+;                                           int32_t iHeight);
+;***********************************************************************
+
+WELS_EXTERN McHorVer22Width4VerLastUnAlign_sse2
+%assign  push_num 0
+LOAD_6_PARA
+PUSH_XMM 8
+SIGN_EXTENSION  r1, r1d
+SIGN_EXTENSION  r3, r3d
+SIGN_EXTENSION  r4, r4d
+SIGN_EXTENSION  r5, r5d
+%ifndef X86_32
+push r12
+push r13
+push r14
+mov  r12, r0
+mov  r13, r2
+mov  r14, r5
+%endif
+shr r4, 2
+
+.width_loop:
+movdqu xmm0, [r0]
+movdqu xmm1, [r0+r1]
+lea r0, [r0+2*r1]
+movdqu xmm2, [r0]
+movdqu xmm3, [r0+r1]
+lea r0, [r0+2*r1]
+movdqu xmm4, [r0]
+movdqu xmm5, [r0+r1]
+
+FILTER_VER_4 xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, [r2]
+dec r5
+lea r0, [r0+2*r1]
+movdqu xmm6, [r0]
+
+movdqa xmm0, xmm1
+movdqa xmm1, xmm2
+movdqa xmm2, xmm3
+movdqa xmm3, xmm4
+movdqa xmm4, xmm5
+movdqa xmm5, xmm6
+
+add r2, r3
+sub r0, r1
+
+.start:
+FILTER_VER_4 xmm0,xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, [r2]
+dec r5
+jz near .x_loop_dec
+
+lea r0, [r0+2*r1]
+movdqu xmm6, [r0]
+FILTER_VER_4 xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0,[r2+r3]
+dec r5
+jz near .x_loop_dec
+
+lea r2, [r2+2*r3]
+movdqu xmm7, [r0+r1]
+FILTER_VER_4  xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm0, xmm1, [r2]
+dec r5
+jz near .x_loop_dec
+
+lea r0, [r0+2*r1]
+movdqu xmm0, [r0]
+FILTER_VER_4  xmm3, xmm4, xmm5, xmm6, xmm7, xmm0, xmm1, xmm2,[r2+r3]
+dec r5
+jz near .x_loop_dec
+
+lea r2, [r2+2*r3]
+movdqu xmm1, [r0+r1]
+FILTER_VER_4  xmm4, xmm5, xmm6, xmm7, xmm0, xmm1, xmm2, xmm3,[r2]
+dec r5
+jz near .x_loop_dec
+
+lea r0, [r0+2*r1]
+movdqu xmm2, [r0]
+FILTER_VER_4  xmm5, xmm6, xmm7, xmm0, xmm1, xmm2, xmm3,xmm4,[r2+r3]
+dec r5
+jz near .x_loop_dec
+
+lea r2, [r2+2*r3]
+movdqu xmm3, [r0+r1]
+FILTER_VER_4  xmm6, xmm7, xmm0, xmm1, xmm2, xmm3,xmm4,xmm5,[r2]
+dec r5
+jz near .x_loop_dec
+
+lea r0, [r0+2*r1]
+movdqu xmm4, [r0]
+FILTER_VER_4  xmm7, xmm0, xmm1, xmm2, xmm3,xmm4,xmm5,xmm6, [r2+r3]
+dec r5
+jz near .x_loop_dec
+
+lea r2, [r2+2*r3]
+movdqu xmm5, [r0+r1]
+jmp near .start
+
+.x_loop_dec:
+dec r4
+jz near .exit
+%ifdef X86_32
+mov r0, arg1
+mov r2, arg3
+mov r5, arg6
+%else
+mov r0, r12
+mov r2, r13
+mov r5, r14
+%endif
+add r0, 8
+add r2, 4
+jmp .width_loop
+
+.exit:
+%ifndef X86_32
+pop r14
+pop r13
+pop r12
+%endif
+POP_XMM
+LOAD_6_PARA_POP
+ret
+

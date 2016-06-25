@@ -68,10 +68,17 @@ uint8_t uiFMEGoodFrameCount;
 int32_t iHighFreMbCount;
 } SFeatureSearchPreparation; //maintain only one
 
+typedef struct TagSliceThreadInfo {
+SSlice*                 pSliceInThread[MAX_THREADS_NUM];// slice buffer for multi thread,
+                                                        // will not alloated when multi thread is off
+int32_t                 iMaxSliceNumInThread[MAX_THREADS_NUM];
+int32_t                 iEncodedSliceNumInThread[MAX_THREADS_NUM];
+}SSliceThreadInfo;
+
 typedef struct TagLayerInfo {
 SNalUnitHeaderExt       sNalHeaderExt;
-SSlice*
-pSliceInLayer;// Here SSlice identify to Frame on concept, [iSliceIndex], need memory block external side       for MT
+SSlice*                 pSliceInLayer;  // Here SSlice identify to Frame on concept, [iSliceIndex],
+                                        // may need extend list size for sliceMode=SM_SIZELIMITED_SLICE
 SSubsetSps*             pSubsetSpsP;    // current pSubsetSps used, memory alloc in external
 SWelsSPS*               pSpsP;          // current pSps based avc used, memory alloc in external
 SWelsPPS*               pPpsP;          // current pPps used
@@ -79,7 +86,9 @@ SWelsPPS*               pPpsP;          // current pPps used
 /* Layer Representation */
 struct TagDqLayer {
 SLayerInfo              sLayerInfo;
-
+SSliceThreadInfo        sSliceThreadInfo;
+SSlice**                ppSliceInLayer;
+SSliceCtx               sSliceEncCtx;   // current slice context
 uint8_t*                pCsData[3];     // pointer to reconstructed picture pData
 int32_t                 iCsStride[3];   // Cs stride
 
@@ -105,11 +114,11 @@ SPicture*               pRefPic;        // reference picture pointer
 SPicture*               pDecPic;        // reconstruction picture pointer for layer
 SPicture*               pRefOri[MAX_REF_PIC_COUNT];
 
-SSliceCtx*              pSliceEncCtx;   // current slice context
-
+int32_t                 iMaxSliceNum;
 int32_t*                pNumSliceCodedOfPartition;      // for dynamic slicing mode
 int32_t*                pLastCodedMbIdxOfPartition;     // for dynamic slicing mode
 int32_t*                pLastMbIdxOfPartition;          // for dynamic slicing mode
+bool                    bNeedAdjustingSlicing;
 
 SFeatureSearchPreparation* pFeatureSearchPreparation;
 

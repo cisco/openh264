@@ -50,6 +50,7 @@ namespace WelsEnc {
 void WelsCountMbType (int32_t (*iMbCount)[18], const EWelsSliceType eSt, const SMB* pMb);
 #endif
 
+void UpdateMbNeighbor(SDqLayer* pCurDq, SMB* pMb, const int32_t kiMbWidth, uint16_t uiSliceIdc);
 
 void UpdateNonZeroCountCache (SMB* pMb, SMbCache* pMbCache);
 
@@ -79,6 +80,30 @@ int32_t WelsPSliceMdEncDynamic (sWelsEncCtx* pEncCtx, SSlice* pSlice,  const boo
 int32_t WelsISliceMdEnc (sWelsEncCtx* pEncCtx, SSlice* pSlice);         // for intra non-dynamic slice
 int32_t WelsISliceMdEncDynamic (sWelsEncCtx* pEncCtx, SSlice* pSlice);  // for intra dynamic slice
 
+//slice buffer init, allocate and free process
+int32_t AllocMbCacheAligned (SMbCache* pMbCache, CMemoryAlign* pMa);
+void FreeMbCache (SMbCache* pMbCache, CMemoryAlign* pMa);
+
+int32_t InitSliceMBInfo (SSliceArgument* pSliceArgument,
+                         SSlice* pSlice,
+                         const int32_t kiMBWidth,
+                         const int32_t kiMBHeight,
+                         CMemoryAlign* pMa);
+
+int32_t AllocateSliceMBBuffer (SSlice* pSlice, CMemoryAlign* pMa);
+
+int32_t InitSliceBsBuffer (SSlice* pSlice,
+                           SBitStringAux* pBsWrite,
+                           bool bIndependenceBsBuffer,
+                           const int32_t iMaxSliceBufferSize,
+                           CMemoryAlign* pMa);
+
+void FreeSliceBuffer(SSlice*& pSliceList,
+                     const int32_t kiMaxSliceNum,
+                     CMemoryAlign* pMa,
+                     const char* kpTag);
+
+//slice encoding process
 int32_t WelsCodePSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice);
 int32_t WelsCodePOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice);
 
@@ -87,7 +112,7 @@ int32_t WelsCodeOneSlice (sWelsEncCtx* pEncCtx, const int32_t kiSliceIdx,
 
 void WelsInitSliceEncodingFuncs (uint32_t uiCpuFlag);
 
-void UpdateMbNeighbourInfoForNextSlice (SSliceCtx* pSliceCtx,
+void UpdateMbNeighbourInfoForNextSlice (SDqLayer* pCurDq,
                                         SMB* pMbList,
                                         const int32_t kiNextSliceFirstMbIdx,
                                         const int32_t kiLastMbIdxInPartition);

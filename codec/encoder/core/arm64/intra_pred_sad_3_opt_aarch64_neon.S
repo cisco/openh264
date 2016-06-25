@@ -179,9 +179,12 @@
     add     \arg7, \arg7, v4.4s
 .endm
 
+//int32_t WelsIntra8x8Combined3Sad_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*, uint8_t*,uint8_t*);
 WELS_ASM_AARCH64_FUNC_BEGIN WelsIntra8x8Combined3Sad_AArch64_neon
     ldr     x11, [sp, #0]
-
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x5,w5
     LOAD_CHROMA_DATA x0, v0.8b, v0.b
 
     uaddlp  v1.8h, v0.16b
@@ -279,8 +282,11 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsIntra8x8Combined3Sad_AArch64_neon
     str     w7, [x4]
 WELS_ASM_AARCH64_FUNC_END
 
+//int32_t WelsIntra16x16Combined3Sad_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*);
 WELS_ASM_AARCH64_FUNC_BEGIN WelsIntra16x16Combined3Sad_AArch64_neon
-
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x5,w5
     LOAD_LUMA_DATA
 
     uaddlv    h2, v0.16b
@@ -331,7 +337,13 @@ sad_intra_16x16_x3_opt_loop0:
     str     w7, [x4]
 WELS_ASM_AARCH64_FUNC_END
 
+//int32_t WelsIntra4x4Combined3Satd_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t, uint8_t*, int32_t*, int32_t, int32_t,int32_t);
 WELS_ASM_AARCH64_FUNC_BEGIN WelsIntra4x4Combined3Satd_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x6,w6
+    SIGN_EXTENSION x7,w7
+
     sub     x9, x0, x1
     ld1     {v16.s}[0], [x9]      //top
     sub     x9, x0, #1
@@ -421,9 +433,13 @@ satd_intra_4x4_x3_opt_end:
 
 WELS_ASM_AARCH64_FUNC_END
 
+//int32_t WelsIntra8x8Combined3Satd_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*, uint8_t*,uint8_t*);
 WELS_ASM_AARCH64_FUNC_BEGIN WelsIntra8x8Combined3Satd_AArch64_neon
     ldr     x11, [sp, #0]
 
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x5,w5
     LOAD_CHROMA_DATA x0, v0.8b, v0.b
 
     LOAD_CHROMA_DATA x7, v1.8b, v1.b
@@ -511,8 +527,11 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsIntra8x8Combined3Satd_AArch64_neon
     str     w7, [x4]
 WELS_ASM_AARCH64_FUNC_END
 
-
+//int32_t WelsIntra16x16Combined3Satd_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*);
 WELS_ASM_AARCH64_FUNC_BEGIN WelsIntra16x16Combined3Satd_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
+    SIGN_EXTENSION x5,w5
     LOAD_LUMA_DATA
 
     uaddlv  h2, v0.16b

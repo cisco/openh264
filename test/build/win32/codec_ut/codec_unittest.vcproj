@@ -347,7 +347,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\api\decode_api_test.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\api\decode_encode_test.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\api\decoder_ec_test.cpp"
 				>
 			</File>
 			<File
@@ -359,7 +367,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\api\encode_options_test.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\api\encoder_test.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\api\ltr_test.cpp"
 				>
 			</File>
 			<File
@@ -374,6 +390,10 @@
 		<Filter
 			Name="encoder"
 			>
+			<File
+				RelativePath="..\..\..\encoder\EncUT_Cavlc.cpp"
+				>
+			</File>
 			<File
 				RelativePath="..\..\..\encoder\EncUT_DecodeMbAux.cpp"
 				>
@@ -831,6 +851,14 @@
 			Name="common"
 			>
 			<File
+				RelativePath="..\..\..\common\CWelsCircleQueue.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\CWelsListTest.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\common\ExpandPicture.cpp"
 				>
 				<FileConfiguration
@@ -857,6 +885,10 @@
 						AdditionalIncludeDirectories="..\..\..\codec\processing\src\common;..\..\..\..\codec\decoder\core\inc"
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\common\WelsThreadPoolTest.cpp"
+				>
 			</File>
 		</Filter>
 	</Files>

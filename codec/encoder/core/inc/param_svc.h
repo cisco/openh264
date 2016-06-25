@@ -86,7 +86,12 @@ typedef struct TagDLayerParam {
   int8_t        iHighestTemporalId;
   float         fInputFrameRate;                // input frame rate
   float         fOutputFrameRate;               // output frame rate
-
+ // uint16_t          uiIdrPicId;           // IDR picture id: [0, 65535], this one is used for LTR
+  int32_t           iCodingIndex;
+  int32_t           iFrameIndex;            // count how many frames elapsed during coding context currently
+  bool              bEncCurFrmAsIdrFlag;
+  int32_t           iFrameNum;              // current frame number coding
+  int32_t           iPOC;                   // frame iPOC
 #ifdef ENABLE_FRAME_DUMP
   char          sRecFileName[MAX_FNAME_LEN];    // file to be constructed
 #endif//ENABLE_FRAME_DUMP
@@ -111,8 +116,6 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
 
   bool      bDeblockingParallelFlag;        // deblocking filter parallelization control flag
   int32_t   iBitsVaryPercentage;
-  short
-  iCountThreadsNum;                       //              # derived from disable_multiple_slice_idc (=0 or >1) means;
 
   int8_t   iDecompStages;          // GOP size dependency
   int32_t  iMaxNumRefFrame;
@@ -137,6 +140,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     param.iTargetBitrate        = UNSPECIFIED_BIT_RATE; // overall target bitrate introduced in RC module
     param.iMaxBitrate           = UNSPECIFIED_BIT_RATE;
     param.iMultipleThreadIdc    = 1;
+    param.bUseLoadBalancing = true;
 
     param.iLTRRefNum            = 0;
     param.iLtrMarkPeriod        = 30;   //the min distance of two int32_t references
@@ -176,13 +180,25 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
       param.sSpatialLayers[iLayer].uiLevelIdc = LEVEL_UNKNOWN;
       param.sSpatialLayers[iLayer].iDLayerQp = SVC_QUALITY_BASE_QP;
       param.sSpatialLayers[iLayer].fFrameRate = param.fMaxFrameRate;
-      param.sSpatialLayers[iLayer].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
-      param.sSpatialLayers[iLayer].sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 1500;
-      param.sSpatialLayers[iLayer].sSliceCfg.sSliceArgument.uiSliceNum = 1;
+
       param.sSpatialLayers[iLayer].iMaxSpatialBitrate = UNSPECIFIED_BIT_RATE;
+
+      param.sSpatialLayers[iLayer].sSliceArgument.uiSliceMode = SM_SINGLE_SLICE;
+      param.sSpatialLayers[iLayer].sSliceArgument.uiSliceNum = 0; //AUTO, using number of CPU cores
+      param.sSpatialLayers[iLayer].sSliceArgument.uiSliceSizeConstraint = 1500;
       const int32_t kiLesserSliceNum = ((MAX_SLICES_NUM < MAX_SLICES_NUM_TMP) ? MAX_SLICES_NUM : MAX_SLICES_NUM_TMP);
       for (int32_t idx = 0; idx < kiLesserSliceNum; idx++)
-        param.sSpatialLayers[iLayer].sSliceCfg.sSliceArgument.uiSliceMbNum[idx] = 960;
+        param.sSpatialLayers[iLayer].sSliceArgument.uiSliceMbNum[idx] = 0; //default, using one row a slice if uiSliceMode is SM_RASTER_MODE
+
+      // See codec_app_def.h for more info about members bVideoSignalTypePresent through uiColorMatrix.  The default values
+      // used below preserve the previous behavior; i.e., no additional information will be written to the output file.
+      param.sSpatialLayers[iLayer].bVideoSignalTypePresent = false;			// do not write any of the following information to the header
+      param.sSpatialLayers[iLayer].uiVideoFormat = VF_UNDEF;				// undefined
+      param.sSpatialLayers[iLayer].bFullRange = false;						// analog video data range [16, 235]
+      param.sSpatialLayers[iLayer].bColorDescriptionPresent = false;		// do not write any of the following three items to the header
+      param.sSpatialLayers[iLayer].uiColorPrimaries = CP_UNDEF;				// undefined
+      param.sSpatialLayers[iLayer].uiTransferCharacteristics = TRC_UNDEF;	// undefined
+      param.sSpatialLayers[iLayer].uiColorMatrix = CM_UNDEF;				// undefined
     }
   }
 
@@ -199,8 +215,6 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
 
     bDeblockingParallelFlag     = false;// deblocking filter parallelization control flag
 
-    iCountThreadsNum            = 1;    // # derived from disable_multiple_slice_idc (=0 or >1) means;
-
     iDecompStages               = 0;    // GOP size dependency, unknown here and be revised later
     iBitsVaryPercentage = 0;
   }
@@ -215,8 +229,8 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
 
     SUsedPicRect.iLeft = 0;
     SUsedPicRect.iTop  = 0;
-    SUsedPicRect.iWidth = ((iPicWidth >> 1) << 1);
-    SUsedPicRect.iHeight = ((iPicHeight >> 1) << 1);
+    SUsedPicRect.iWidth = ((iPicWidth >> 1) * (1 << 1));
+    SUsedPicRect.iHeight = ((iPicHeight >> 1) * (1 << 1));
 
     iRCMode = pCodingParam.iRCMode;    // rc mode
 
@@ -278,6 +292,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     SUsedPicRect.iHeight = ((iPicHeight >> 1) << 1);
 
     iMultipleThreadIdc = pCodingParam.iMultipleThreadIdc;
+    bUseLoadBalancing = pCodingParam.bUseLoadBalancing;
 
     /* Deblocking loop filter */
     iLoopFilterDisableIdc       = pCodingParam.iLoopFilterDisableIdc;      // 0: on, 1: off, 2: on except for slice boundaries,
@@ -296,7 +311,8 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     if (iMaxBitrate < iTargetBitrate) {
       iMaxBitrate  = iTargetBitrate;
     }
-
+    iMaxQp = pCodingParam.iMaxQp;
+    iMinQp = pCodingParam.iMinQp;
     uiMaxNalSize          = pCodingParam.uiMaxNalSize;
     /* Denoise Control */
     bEnableDenoise = pCodingParam.bEnableDenoise ? true : false;    // Denoise Control  // only support 0 or 1 now
@@ -393,17 +409,22 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
         pCodingParam.sSpatialLayers[iIdxSpatial].iMaxSpatialBitrate;
 
       //multi slice
-      pSpatialLayer->sSliceCfg.uiSliceMode = pCodingParam.sSpatialLayers[iIdxSpatial].sSliceCfg.uiSliceMode;
-      pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceSizeConstraint
-        = (uint32_t) (pCodingParam.sSpatialLayers[iIdxSpatial].sSliceCfg.sSliceArgument.uiSliceSizeConstraint);
-      pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceNum
-        = pCodingParam.sSpatialLayers[iIdxSpatial].sSliceCfg.sSliceArgument.uiSliceNum;
-      const int32_t kiLesserSliceNum = ((MAX_SLICES_NUM < MAX_SLICES_NUM_TMP) ? MAX_SLICES_NUM : MAX_SLICES_NUM_TMP);
-      memcpy (pSpatialLayer->sSliceCfg.sSliceArgument.uiSliceMbNum,
-              pCodingParam.sSpatialLayers[iIdxSpatial].sSliceCfg.sSliceArgument.uiSliceMbNum, // confirmed_safe_unsafe_usage
-              kiLesserSliceNum * sizeof (uint32_t)) ;
+      pSpatialLayer->sSliceArgument = pCodingParam.sSpatialLayers[iIdxSpatial].sSliceArgument;
+
+      memcpy (&(pSpatialLayer->sSliceArgument),
+              &(pCodingParam.sSpatialLayers[iIdxSpatial].sSliceArgument), // confirmed_safe_unsafe_usage
+              sizeof (SSliceArgument)) ;
 
       pSpatialLayer->iDLayerQp = pCodingParam.sSpatialLayers[iIdxSpatial].iDLayerQp;
+
+      // See codec_app_def.h and parameter_sets.h for more info about members bVideoSignalTypePresent through uiColorMatrix.
+      pSpatialLayer->bVideoSignalTypePresent =   pCodingParam.sSpatialLayers[iIdxSpatial].bVideoSignalTypePresent;
+      pSpatialLayer->uiVideoFormat =             pCodingParam.sSpatialLayers[iIdxSpatial].uiVideoFormat;
+      pSpatialLayer->bFullRange =                pCodingParam.sSpatialLayers[iIdxSpatial].bFullRange;
+      pSpatialLayer->bColorDescriptionPresent =  pCodingParam.sSpatialLayers[iIdxSpatial].bColorDescriptionPresent;
+      pSpatialLayer->uiColorPrimaries =          pCodingParam.sSpatialLayers[iIdxSpatial].uiColorPrimaries;
+      pSpatialLayer->uiTransferCharacteristics = pCodingParam.sSpatialLayers[iIdxSpatial].uiTransferCharacteristics;
+      pSpatialLayer->uiColorMatrix =             pCodingParam.sSpatialLayers[iIdxSpatial].uiColorMatrix;
 
       uiProfileIdc = (!bSimulcastAVC) ? PRO_SCALABLE_BASELINE : PRO_BASELINE;
       ++ pDlp;

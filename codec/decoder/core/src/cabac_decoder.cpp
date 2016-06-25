@@ -107,7 +107,7 @@ int32_t Read32BitsCabac (PWelsCabacDecEngine pDecEngine, uint32_t& uiValue, int3
   iNumBitsRead = 0;
   uiValue = 0;
   if (iLeftBytes <= 0) {
-    return ERR_CABAC_NO_BS_TO_READ;
+    return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_CABAC_NO_BS_TO_READ);
   }
   switch (iLeftBytes) {
   case 3:
@@ -273,7 +273,10 @@ int32_t DecodeExpBypassCabac (PWelsCabacDecEngine pDecEngine, int32_t iCount, ui
       iSymTmp += (1 << iCount);
       ++iCount;
     }
-  } while (uiCode != 0);
+  } while (uiCode != 0 && iCount != 16);
+  if (iCount == 16) {
+    return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_CABAC_UNEXPECTED_VALUE);
+  }
 
   while (iCount--) {
     WELS_READ_VERIFY (DecodeBypassCabac (pDecEngine, uiCode));

@@ -104,6 +104,12 @@ void WelsFree (void* pPtr, const char* kpTag);
 
 #define WELS_SAFE_FREE(pPtr, pTag)              if (pPtr) { WelsFree(pPtr, pTag); pPtr = NULL; }
 
+#define  WELS_NEW_OP(object, type)   \
+  (type*)(new object);
+
+#define  WELS_DELETE_OP(p) \
+  delete p;            \
+  p = NULL;
 
 }
 

@@ -190,7 +190,22 @@ void WelsSpatialWriteSubMbPred (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurM
 
   //step 1: sub_mb_type
   for (i = 0; i < 4; i++) {
-    BsWriteUE (pBs, 0);
+    switch (pCurMb->uiSubMbType[i]) {
+    case SUB_MB_TYPE_8x8:
+      BsWriteUE (pBs, 0);
+      break;
+    case SUB_MB_TYPE_8x4:
+      BsWriteUE (pBs, 1);
+      break;
+    case SUB_MB_TYPE_4x8:
+      BsWriteUE (pBs, 2);
+      break;
+    case SUB_MB_TYPE_4x4:
+      BsWriteUE (pBs, 3);
+      break;
+    default: //should not enter
+      break;
+    }
   }
 
   //step 2: get and write uiRefIndex and sMvd
@@ -202,8 +217,30 @@ void WelsSpatialWriteSubMbPred (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurM
   }
   //write sMvd
   for (i = 0; i < 4; i++) {
-    BsWriteSE (pBs, pCurMb->sMv[*kpScan4].iMvX - pMbCache->sMbMvp[i].iMvX);
-    BsWriteSE (pBs, pCurMb->sMv[*kpScan4].iMvY - pMbCache->sMbMvp[i].iMvY);
+    uint32_t uiSubMbType = pCurMb->uiSubMbType[i];
+    if (SUB_MB_TYPE_8x8 == uiSubMbType) {
+      BsWriteSE (pBs, pCurMb->sMv[*kpScan4].iMvX - pMbCache->sMbMvp[*kpScan4].iMvX);
+      BsWriteSE (pBs, pCurMb->sMv[*kpScan4].iMvY - pMbCache->sMbMvp[*kpScan4].iMvY);
+    } else if (SUB_MB_TYPE_4x4 == uiSubMbType) {
+      BsWriteSE (pBs, pCurMb->sMv[*kpScan4].iMvX - pMbCache->sMbMvp[*kpScan4].iMvX);
+      BsWriteSE (pBs, pCurMb->sMv[*kpScan4].iMvY - pMbCache->sMbMvp[*kpScan4].iMvY);
+      BsWriteSE (pBs, pCurMb->sMv[* (kpScan4 + 1)].iMvX - pMbCache->sMbMvp[* (kpScan4 + 1)].iMvX);
+      BsWriteSE (pBs, pCurMb->sMv[* (kpScan4 + 1)].iMvY - pMbCache->sMbMvp[* (kpScan4 + 1)].iMvY);
+      BsWriteSE (pBs, pCurMb->sMv[* (kpScan4 + 2)].iMvX - pMbCache->sMbMvp[* (kpScan4 + 2)].iMvX);
+      BsWriteSE (pBs, pCurMb->sMv[* (kpScan4 + 2)].iMvY - pMbCache->sMbMvp[* (kpScan4 + 2)].iMvY);
+      BsWriteSE (pBs, pCurMb->sMv[* (kpScan4 + 3)].iMvX - pMbCache->sMbMvp[* (kpScan4 + 3)].iMvX);
+      BsWriteSE (pBs, pCurMb->sMv[* (kpScan4 + 3)].iMvY - pMbCache->sMbMvp[* (kpScan4 + 3)].iMvY);
+    } else if (SUB_MB_TYPE_8x4 == uiSubMbType) {
+      BsWriteSE (pBs, pCurMb->sMv[*kpScan4].iMvX - pMbCache->sMbMvp[*kpScan4].iMvX);
+      BsWriteSE (pBs, pCurMb->sMv[*kpScan4].iMvY - pMbCache->sMbMvp[*kpScan4].iMvY);
+      BsWriteSE (pBs, pCurMb->sMv[* (kpScan4 + 2)].iMvX - pMbCache->sMbMvp[* (kpScan4 + 2)].iMvX);
+      BsWriteSE (pBs, pCurMb->sMv[* (kpScan4 + 2)].iMvY - pMbCache->sMbMvp[* (kpScan4 + 2)].iMvY);
+    } else if (SUB_MB_TYPE_4x8 == uiSubMbType) {
+      BsWriteSE (pBs, pCurMb->sMv[*kpScan4].iMvX - pMbCache->sMbMvp[*kpScan4].iMvX);
+      BsWriteSE (pBs, pCurMb->sMv[*kpScan4].iMvY - pMbCache->sMbMvp[*kpScan4].iMvY);
+      BsWriteSE (pBs, pCurMb->sMv[* (kpScan4 + 1)].iMvX - pMbCache->sMbMvp[* (kpScan4 + 1)].iMvX);
+      BsWriteSE (pBs, pCurMb->sMv[* (kpScan4 + 1)].iMvY - pMbCache->sMbMvp[* (kpScan4 + 1)].iMvY);
+    }
     kpScan4 += 4;
   }
 }
@@ -213,7 +250,7 @@ int32_t CheckBitstreamBuffer (const uint32_t kuiSliceIdx, sWelsEncCtx* pEncCtx, 
   assert (iLeftLength > 0);
 
   if (iLeftLength < MAX_MACROBLOCK_SIZE_IN_BYTE_x2) {
-    return ENC_RETURN_MEMALLOCERR;
+    return ENC_RETURN_VLCOVERFLOWFOUND;//ENC_RETURN_MEMALLOCERR;
     //TODO: call the realloc&copy instead
   }
   return ENC_RETURN_SUCCESS;

@@ -691,7 +691,6 @@ void  DeblockingFilterFrameAvcbase (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc) {
 }
 
 void DeblockingFilterSliceAvcbase (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc, const int32_t kiSliceIdx) {
-  SSliceCtx* pSliceCtx                  = pCurDq->pSliceEncCtx;
   SMB* pMbList                          = pCurDq->sMbDataP;
   SSliceHeaderExt* sSliceHeaderExt      = &pCurDq->sLayerInfo.pSliceInLayer[kiSliceIdx].sSliceHeaderExt;
   SMB* pCurrentMbBlock;
@@ -731,12 +730,15 @@ void DeblockingFilterSliceAvcbase (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc, co
     DeblockingMbAvcbase (pFunc, pCurrentMbBlock, &pFilter);
 
     ++iNumMbFiltered;
-    iNextMbIdx = WelsGetNextMbOfSlice (pSliceCtx, iCurMbIdx);
+    iNextMbIdx = WelsGetNextMbOfSlice (pCurDq, iCurMbIdx);
     //whether all of MB in current slice filtered or not
     if (iNextMbIdx == -1 || iNextMbIdx >= kiTotalNumMb || iNumMbFiltered >= kiTotalNumMb) {
       break;
     }
   }
+}
+
+void DeblockingFilterSliceAvcbaseNull (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc, const int32_t kiSliceIdx) {
 }
 
 void PerformDeblockingFilter (sWelsEncCtx* pEnc) {
@@ -751,14 +753,14 @@ void PerformDeblockingFilter (sWelsEncCtx* pEnc) {
     int32_t iSliceCount = 0;
     int32_t iSliceIdx   = 0;
 
-    if (SM_DYN_SLICE != pSpatialLayer->sSliceCfg.uiSliceMode) {
-      iSliceCount = GetCurrentSliceNum (pCurLayer->pSliceEncCtx);
+    if (SM_SIZELIMITED_SLICE != pSpatialLayer->sSliceArgument.uiSliceMode) {
+      iSliceCount = GetCurrentSliceNum (pCurLayer);
       do {
         DeblockingFilterSliceAvcbase (pCurLayer, pEnc->pFuncList, iSliceIdx);
         ++ iSliceIdx;
       } while (iSliceIdx < iSliceCount);
     } else { // for dynamic slicing mode
-      const int32_t kiNumPicPartition = pEnc->iActiveThreadsNum; //pSvcParam->iCountThreadsNum;
+      const int32_t kiNumPicPartition = pEnc->iActiveThreadsNum;
       int32_t iPartitionIdx = 0;
 
       while (iPartitionIdx < kiNumPicPartition) {

@@ -40,6 +40,7 @@
  *****************************************************************************/
 #include "memmgr_nal_unit.h"
 #include "memory_align.h"
+#include "error_code.h"
 
 namespace WelsDec {
 
@@ -52,7 +53,7 @@ int32_t MemInitNalList (PAccessUnit* ppAu, const uint32_t kuiSize, CMemoryAlign*
   const uint32_t kuiCountSize = (kuiSizeAu + kuiSizeNalUnitPtr + kuiSize * kuiSizeNalUnit) * sizeof (uint8_t);
 
   if (kuiSize == 0)
-    return 1;
+    return ERR_INFO_INVALID_PARAM;
 
   if (*ppAu != NULL) {
     MemFreeNalList (ppAu, pMa);
@@ -60,7 +61,7 @@ int32_t MemInitNalList (PAccessUnit* ppAu, const uint32_t kuiSize, CMemoryAlign*
 
   pBase = (uint8_t*)pMa->WelsMallocz (kuiCountSize, "Access Unit");
   if (pBase == NULL)
-    return 1;
+    return ERR_INFO_OUT_OF_MEMORY;
   pPtr = pBase;
   *ppAu = (PAccessUnit)pPtr;
   pPtr += kuiSizeAu;
@@ -79,7 +80,7 @@ int32_t MemInitNalList (PAccessUnit* ppAu, const uint32_t kuiSize, CMemoryAlign*
   (*ppAu)->uiEndPos             = 0;
   (*ppAu)->bCompletedAuFlag     = false;
 
-  return 0;
+  return ERR_NONE;
 }
 
 int32_t MemFreeNalList (PAccessUnit* ppAu, CMemoryAlign* pMa) {
@@ -90,19 +91,19 @@ int32_t MemFreeNalList (PAccessUnit* ppAu, CMemoryAlign* pMa) {
       *ppAu = NULL;
     }
   }
-  return 0;
+  return ERR_NONE;
 }
 
 
 int32_t ExpandNalUnitList (PAccessUnit* ppAu, const int32_t kiOrgSize, const int32_t kiExpSize, CMemoryAlign* pMa) {
   if (kiExpSize <= kiOrgSize)
-    return 1;
+    return ERR_INFO_INVALID_PARAM;
   else {
     PAccessUnit pTmp = NULL;
     int32_t iIdx = 0;
-
-    if (MemInitNalList (&pTmp, kiExpSize, pMa)) // request new list with expanding
-      return 1;
+    int32_t iRet = ERR_NONE;
+    if ((iRet = MemInitNalList (&pTmp, kiExpSize, pMa)) != ERR_NONE) // request new list with expanding
+      return iRet;
 
     do {
       memcpy (pTmp->pNalUnitsList[iIdx], (*ppAu)->pNalUnitsList[iIdx], sizeof (SNalUnit)); //confirmed_safe_unsafe_usage
@@ -117,7 +118,7 @@ int32_t ExpandNalUnitList (PAccessUnit* ppAu, const int32_t kiOrgSize, const int
 
     MemFreeNalList (ppAu, pMa); // free old list
     *ppAu = pTmp;
-    return 0;
+    return ERR_NONE;
   }
 }
 

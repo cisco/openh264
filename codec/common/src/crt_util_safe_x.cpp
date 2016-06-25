@@ -242,9 +242,11 @@ int32_t WelsStrftime (char* pBuffer, int32_t iSize, const char* kpFormat, const 
 #endif
 
 
-char* WelsStrcat (char* pDest, int32_t iSizeInBytes, const char* kpSrc) {
-  int32_t iCurLen = (int32_t)strlen (pDest);
-  return WelsStrncpy (pDest + iCurLen, iSizeInBytes - iCurLen, kpSrc);
+char* WelsStrcat (char* pDest, uint32_t uiSizeInBytes, const char* kpSrc) {
+  uint32_t uiCurLen = (uint32_t) strlen (pDest);
+  if (uiSizeInBytes > uiCurLen)
+    return WelsStrncpy (pDest + uiCurLen, uiSizeInBytes - uiCurLen, kpSrc);
+  return pDest;
 }
 
 int32_t WelsFwrite (const void* kpBuffer, int32_t iSize, int32_t iCount, WelsFileHandle* pFp) {

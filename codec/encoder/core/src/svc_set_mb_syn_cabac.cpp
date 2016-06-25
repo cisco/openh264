@@ -41,7 +41,9 @@
 #include "set_mb_syn_cabac.h"
 #include "svc_enc_golomb.h"
 
-namespace WelsEnc {
+using namespace WelsEnc;
+
+namespace {
 
 static const uint16_t uiSignificantCoeffFlagOffset[5] = {0, 15, 29, 44, 47};
 static const uint16_t uiLastCoeffFlagOffset[5] = {0, 15, 29, 44, 47};
@@ -271,8 +273,7 @@ void WelsMbSkipCabac (SCabacCtx* pCabacCtx, SMB* pCurMb, int32_t iMbWidth, EWels
   WelsCabacEncodeDecision (pCabacCtx, iCtx, bSkipFlag);
 
   if (bSkipFlag) {
-    for (int  i = 0; i < 4; i++) {
-
+    for (int  i = 0; i < 16; i++) {
       pCurMb->sMvd[i].iMvX = 0;
       pCurMb->sMvd[i].iMvY = 0;
     }
@@ -338,7 +339,7 @@ inline void WelsCabacMbMvdLx (SCabacCtx* pCabacCtx, int32_t sMvd, int32_t iCtx, 
   }
 }
 SMVUnitXY WelsCabacMbMvd (SCabacCtx* pCabacCtx, SMB* pCurMb, uint32_t iMbWidth,
-                          SMVUnitXY sCurMv, SMVUnitXY sPredMv, int16_t iBlockIdx) {
+                          SMVUnitXY sCurMv, SMVUnitXY sPredMv, int16_t i4x4ScanIdx) {
   uint32_t iAbsMvd0, iAbsMvd1;
   uint8_t uiNeighborAvail = pCurMb->uiNeighborAvail;
   SMVUnitXY sMvd;
@@ -347,18 +348,15 @@ SMVUnitXY WelsCabacMbMvd (SCabacCtx* pCabacCtx, SMB* pCurMb, uint32_t iMbWidth,
 
   sMvdLeft.iMvX = sMvdLeft.iMvY = sMvdTop.iMvX = sMvdTop.iMvY = 0;
   sMvd.sDeltaMv (sCurMv, sPredMv);
-
-  if (((iBlockIdx == 0) || (iBlockIdx == 1)) && (uiNeighborAvail & TOP_MB_POS)) {
-    sMvdTop.sAssginMv ((pCurMb - iMbWidth)->sMvd[iBlockIdx + 2]);
+  if ((i4x4ScanIdx < 4) && (uiNeighborAvail & TOP_MB_POS)) { //top row blocks
+    sMvdTop.sAssignMv ((pCurMb - iMbWidth)->sMvd[i4x4ScanIdx + 12]);
+  } else if (i4x4ScanIdx >= 4) {
+    sMvdTop.sAssignMv (pCurMb->sMvd[i4x4ScanIdx - 4]);
   }
-  if ((iBlockIdx == 2) || (iBlockIdx == 3)) {
-    sMvdTop.sAssginMv (pCurMb->sMvd[iBlockIdx - 2]);
-  }
-  if (((iBlockIdx == 0) || (iBlockIdx == 2)) && (uiNeighborAvail & LEFT_MB_POS)) {
-    sMvdLeft.sAssginMv ((pCurMb - 1)->sMvd[iBlockIdx + 1]);
-  }
-  if ((iBlockIdx == 1) || (iBlockIdx == 3)) {
-    sMvdLeft.sAssginMv (pCurMb->sMvd[iBlockIdx - 1]);
+  if ((! (i4x4ScanIdx & 0x03)) && (uiNeighborAvail & LEFT_MB_POS)) { //left column blocks
+    sMvdLeft.sAssignMv ((pCurMb - 1)->sMvd[i4x4ScanIdx + 3]);
+  } else if (i4x4ScanIdx & 0x03) {
+    sMvdLeft.sAssignMv (pCurMb->sMvd[i4x4ScanIdx - 1]);
   }
 
   iAbsMvd0 = WELS_ABS (sMvdLeft.iMvX) + WELS_ABS (sMvdTop.iMvX);
@@ -367,6 +365,62 @@ SMVUnitXY WelsCabacMbMvd (SCabacCtx* pCabacCtx, SMB* pCurMb, uint32_t iMbWidth,
   WelsCabacMbMvdLx (pCabacCtx, sMvd.iMvX, 40, iAbsMvd0);
   WelsCabacMbMvdLx (pCabacCtx, sMvd.iMvY, 47, iAbsMvd1);
   return sMvd;
+}
+static void WelsCabacSubMbType (SCabacCtx* pCabacCtx, SMB* pCurMb) {
+  for (int32_t i8x8Idx = 0; i8x8Idx < 4; ++i8x8Idx) {
+    uint32_t uiSubMbType = pCurMb->uiSubMbType[i8x8Idx];
+    if (SUB_MB_TYPE_8x8 == uiSubMbType) {
+      WelsCabacEncodeDecision (pCabacCtx, 21, 1);
+      continue;
+    }
+    WelsCabacEncodeDecision (pCabacCtx, 21, 0);
+    if (SUB_MB_TYPE_8x4 == uiSubMbType) {
+      WelsCabacEncodeDecision (pCabacCtx, 22, 0);
+    } else {
+      WelsCabacEncodeDecision (pCabacCtx, 22, 1);
+      WelsCabacEncodeDecision (pCabacCtx, 23, SUB_MB_TYPE_4x8 == uiSubMbType);
+    }
+  } //for
+}
+
+static void WelsCabacSubMbMvd (SCabacCtx* pCabacCtx, SMB* pCurMb, SMbCache* pMbCache, const int kiMbWidth) {
+  SMVUnitXY sMvd;
+  int32_t i8x8Idx, i4x4ScanIdx;
+  for (i8x8Idx = 0; i8x8Idx < 4; ++i8x8Idx) {
+    uint32_t uiSubMbType = pCurMb->uiSubMbType[i8x8Idx];
+    if (SUB_MB_TYPE_8x8 == uiSubMbType) {
+      i4x4ScanIdx = g_kuiMbCountScan4Idx[i8x8Idx << 2];
+      sMvd = WelsCabacMbMvd (pCabacCtx, pCurMb, kiMbWidth, pCurMb->sMv[i4x4ScanIdx], pMbCache->sMbMvp[i4x4ScanIdx],
+                             i4x4ScanIdx);
+      pCurMb->sMvd[    i4x4ScanIdx].sAssignMv (sMvd);
+      pCurMb->sMvd[1 + i4x4ScanIdx].sAssignMv (sMvd);
+      pCurMb->sMvd[4 + i4x4ScanIdx].sAssignMv (sMvd);
+      pCurMb->sMvd[5 + i4x4ScanIdx].sAssignMv (sMvd);
+    } else if (SUB_MB_TYPE_4x4 == uiSubMbType) {
+      for (int32_t i4x4Idx = 0; i4x4Idx < 4; ++i4x4Idx) {
+        i4x4ScanIdx = g_kuiMbCountScan4Idx[ (i8x8Idx << 2) + i4x4Idx];
+        sMvd = WelsCabacMbMvd (pCabacCtx, pCurMb, kiMbWidth, pCurMb->sMv[i4x4ScanIdx], pMbCache->sMbMvp[i4x4ScanIdx],
+                               i4x4ScanIdx);
+        pCurMb->sMvd[i4x4ScanIdx].sAssignMv (sMvd);
+      }
+    } else if (SUB_MB_TYPE_8x4 == uiSubMbType) {
+      for (int32_t i8x4Idx = 0; i8x4Idx < 2; ++i8x4Idx) {
+        i4x4ScanIdx = g_kuiMbCountScan4Idx[ (i8x8Idx << 2) + (i8x4Idx << 1)];
+        sMvd = WelsCabacMbMvd (pCabacCtx, pCurMb, kiMbWidth, pCurMb->sMv[i4x4ScanIdx], pMbCache->sMbMvp[i4x4ScanIdx],
+                               i4x4ScanIdx);
+        pCurMb->sMvd[    i4x4ScanIdx].sAssignMv (sMvd);
+        pCurMb->sMvd[1 + i4x4ScanIdx].sAssignMv (sMvd);
+      }
+    } else if (SUB_MB_TYPE_4x8 == uiSubMbType) {
+      for (int32_t i4x8Idx = 0; i4x8Idx < 2; ++i4x8Idx) {
+        i4x4ScanIdx = g_kuiMbCountScan4Idx[ (i8x8Idx << 2) + i4x8Idx];
+        sMvd = WelsCabacMbMvd (pCabacCtx, pCurMb, kiMbWidth, pCurMb->sMv[i4x4ScanIdx], pMbCache->sMbMvp[i4x4ScanIdx],
+                               i4x4ScanIdx);
+        pCurMb->sMvd[    i4x4ScanIdx].sAssignMv (sMvd);
+        pCurMb->sMvd[4 + i4x4ScanIdx].sAssignMv (sMvd);
+      }
+    }
+  }
 }
 
 int16_t WelsGetMbCtxCabac (SMbCache* pMbCache, SMB* pCurMb, uint32_t iMbWidth, ECtxBlockCat eCtxBlockCat,
@@ -403,21 +457,17 @@ void  WelsWriteBlockResidualCabac (SMbCache* pMbCache, SMB* pCurMb, uint32_t iMb
                                    ECtxBlockCat eCtxBlockCat, int16_t  iIdx, int16_t iNonZeroCount, int16_t* pBlock, int16_t iEndIdx) {
   int32_t iCtx = WelsGetMbCtxCabac (pMbCache, pCurMb, iMbWidth, eCtxBlockCat, iIdx);
   if (iNonZeroCount) {
-    ENFORCE_STACK_ALIGN_1D (int16_t, iAbsLevel, 16, 16);
-    ENFORCE_STACK_ALIGN_1D (int16_t, iSignLevel, 16, 16);
+    int16_t iLevel[16];
     const int32_t iCtxSig = 105 + uiSignificantCoeffFlagOffset[eCtxBlockCat];
     const int32_t iCtxLast = 166 + uiLastCoeffFlagOffset[eCtxBlockCat];
     const int32_t iCtxLevel = 227 + uiCoeffAbsLevelMinus1Offset[eCtxBlockCat];
     int32_t iNonZeroIdx = 0;
     int32_t i = 0;
-    int32_t iNumAbsLevelEq1 = 0;
-    int32_t iNumAbsLevelGt1 = 0;
 
     WelsCabacEncodeDecision (pCabacCtx, iCtx, 1);
     while (1) {
       if (pBlock[i]) {
-        iSignLevel[iNonZeroIdx] = pBlock[i] < 0;
-        iAbsLevel[iNonZeroIdx] = WELS_ABS (pBlock[i]) - 1;
+        iLevel[iNonZeroIdx] = pBlock[i];
 
         iNonZeroIdx++;
         WelsCabacEncodeDecision (pCabacCtx, iCtxSig + i, 1);
@@ -431,33 +481,38 @@ void  WelsWriteBlockResidualCabac (SMbCache* pMbCache, SMB* pCurMb, uint32_t iMb
         WelsCabacEncodeDecision (pCabacCtx, iCtxSig + i, 0);
       i++;
       if (i == iEndIdx) {
-        iSignLevel[iNonZeroIdx]   = pBlock[i] < 0;
-        iAbsLevel[iNonZeroIdx] = WELS_ABS (pBlock[i]) - 1;
+        iLevel[iNonZeroIdx] = pBlock[i];
         iNonZeroIdx++;
         break;
       }
     }
+
+    int32_t iNumAbsLevelGt1 = 0;
+    int32_t iCtx1 = iCtxLevel + 1;
+
     do {
       int32_t iPrefix = 0;
       iNonZeroIdx--;
-      iPrefix = WELS_MIN (iAbsLevel[iNonZeroIdx], 14);
+      iPrefix = WELS_ABS (iLevel[iNonZeroIdx]) - 1;
       if (iPrefix) {
-        iCtx = iCtxLevel + ((iNumAbsLevelGt1 != 0) ? 0 : WELS_MIN (4, 1 + iNumAbsLevelEq1));
+        iPrefix = WELS_MIN (iPrefix, 14);
+        iCtx = WELS_MIN (iCtxLevel + 4, iCtx1);
         WelsCabacEncodeDecision (pCabacCtx, iCtx, 1);
-        iCtx = iCtxLevel + 5 + WELS_MIN (4 - (eCtxBlockCat == CHROMA_DC), iNumAbsLevelGt1);
-        for (i = 0; i < iPrefix - 1; i++)
+        iNumAbsLevelGt1++;
+        iCtx = iCtxLevel + 4 + WELS_MIN (5 - (eCtxBlockCat == CHROMA_DC), iNumAbsLevelGt1);
+        for (i = 1; i < iPrefix; i++)
           WelsCabacEncodeDecision (pCabacCtx, iCtx, 1);
-        if (iPrefix < 14)
+        if (WELS_ABS (iLevel[iNonZeroIdx]) < 15)
           WelsCabacEncodeDecision (pCabacCtx, iCtx, 0);
         else
-          WelsCabacEncodeUeBypass (pCabacCtx, 0, iAbsLevel[iNonZeroIdx] - 14);
-        iNumAbsLevelGt1++;
+          WelsCabacEncodeUeBypass (pCabacCtx, 0, WELS_ABS (iLevel[iNonZeroIdx]) - 15);
+        iCtx1 = iCtxLevel;
       } else {
-        iCtx = iCtxLevel + ((iNumAbsLevelGt1 != 0) ? 0 : WELS_MIN (4, 1 + iNumAbsLevelEq1));
+        iCtx = WELS_MIN (iCtxLevel + 4, iCtx1);
         WelsCabacEncodeDecision (pCabacCtx, iCtx, 0);
-        iNumAbsLevelEq1++;
+        iCtx1 += iNumAbsLevelGt1 == 0;
       }
-      WelsCabacEncodeBypassOne (pCabacCtx, iSignLevel[iNonZeroIdx]);
+      WelsCabacEncodeBypassOne (pCabacCtx, iLevel[iNonZeroIdx] < 0);
     } while (iNonZeroIdx > 0);
 
   } else {
@@ -467,12 +522,10 @@ void  WelsWriteBlockResidualCabac (SMbCache* pMbCache, SMB* pCurMb, uint32_t iMb
 
 }
 int32_t WelsCalNonZeroCount2x2Block (int16_t* pBlock) {
-  int32_t iCount = 0;
-  for (int16_t i = 0; i < 4; i++) {
-    if (pBlock[i])
-      iCount++;
-  }
-  return iCount;
+  return (pBlock[0] != 0)
+       + (pBlock[1] != 0)
+       + (pBlock[2] != 0)
+       + (pBlock[3] != 0);
 }
 int32_t WelsWriteMbResidualCabac (SWelsFuncPtrList* pFuncList, SSlice* pSlice, SMbCache* sMbCacheInfo, SMB* pCurMb,
                                   SCabacCtx* pCabacCtx,
@@ -566,6 +619,10 @@ int32_t WelsWriteMbResidualCabac (SWelsFuncPtrList* pFuncList, SSlice* pSlice, S
   return 0;
 }
 
+} // anon ns.
+
+namespace WelsEnc {
+
 void WelsInitSliceCabac (sWelsEncCtx* pEncCtx, SSlice* pSlice) {
   /* alignment needed */
   SBitStringAux* pBs = pSlice->pSliceBsa;
@@ -610,10 +667,9 @@ int32_t WelsSpatialWriteMbSynCabac (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* p
       }
       WelsCabacMbIntraChromaPredMode (pCabacCtx, pCurMb, pMbCache, iMbWidth);
       sMvd.iMvX = sMvd.iMvY = 0;
-      pCurMb->sMvd[0].sAssginMv (sMvd);
-      pCurMb->sMvd[1].sAssginMv (sMvd);
-      pCurMb->sMvd[2].sAssginMv (sMvd);
-      pCurMb->sMvd[3].sAssginMv (sMvd);
+      for (i = 0; i < 16; ++i) {
+        pCurMb->sMvd[i].sAssignMv (sMvd);
+      }
 
     } else if (uiMbType == MB_TYPE_16x16) {
 
@@ -622,10 +678,9 @@ int32_t WelsSpatialWriteMbSynCabac (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* p
       }
       sMvd = WelsCabacMbMvd (pCabacCtx, pCurMb, iMbWidth, pCurMb->sMv[0], pMbCache->sMbMvp[0], 0);
 
-      pCurMb->sMvd[0].sAssginMv (sMvd);
-      pCurMb->sMvd[1].sAssginMv (sMvd);
-      pCurMb->sMvd[2].sAssginMv (sMvd);
-      pCurMb->sMvd[3].sAssginMv (sMvd);
+      for (i = 0; i < 16; ++i) {
+        pCurMb->sMvd[i].sAssignMv (sMvd);
+      }
 
     } else if (uiMbType == MB_TYPE_16x8) {
       if (uiNumRefIdxL0Active > 0) {
@@ -633,30 +688,31 @@ int32_t WelsSpatialWriteMbSynCabac (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* p
         WelsCabacMbRef (pCabacCtx, pCurMb, pMbCache, 12);
       }
       sMvd = WelsCabacMbMvd (pCabacCtx, pCurMb, iMbWidth , pCurMb->sMv[0], pMbCache->sMbMvp[0], 0);
-      pCurMb->sMvd[0].sAssginMv (sMvd);
-      pCurMb->sMvd[1].sAssginMv (sMvd);
-
-
-      sMvd = WelsCabacMbMvd (pCabacCtx, pCurMb, iMbWidth, pCurMb->sMv[8], pMbCache->sMbMvp[1], 2);
-      pCurMb->sMvd[2].sAssginMv (sMvd);
-      pCurMb->sMvd[3].sAssginMv (sMvd);
-
+      for (i = 0; i < 8; ++i) {
+        pCurMb->sMvd[i].sAssignMv (sMvd);
+      }
+      sMvd = WelsCabacMbMvd (pCabacCtx, pCurMb, iMbWidth, pCurMb->sMv[8], pMbCache->sMbMvp[1], 8);
+      for (i = 8; i < 16; ++i) {
+        pCurMb->sMvd[i].sAssignMv (sMvd);
+      }
     } else  if (uiMbType == MB_TYPE_8x16) {
       if (uiNumRefIdxL0Active > 0) {
         WelsCabacMbRef (pCabacCtx, pCurMb, pMbCache, 0);
         WelsCabacMbRef (pCabacCtx, pCurMb, pMbCache, 2);
       }
       sMvd = WelsCabacMbMvd (pCabacCtx, pCurMb, iMbWidth, pCurMb->sMv[0], pMbCache->sMbMvp[0], 0);
-      pCurMb->sMvd[0].sAssginMv (sMvd);
-      pCurMb->sMvd[2].sAssginMv (sMvd);
-
-      sMvd = WelsCabacMbMvd (pCabacCtx, pCurMb, iMbWidth,  pCurMb->sMv[2], pMbCache->sMbMvp[1], 1);
-      pCurMb->sMvd[1].sAssginMv (sMvd);
-      pCurMb->sMvd[3].sAssginMv (sMvd);
-
+      for (i = 0; i < 16; i += 4) {
+        pCurMb->sMvd[i    ].sAssignMv (sMvd);
+        pCurMb->sMvd[i + 1].sAssignMv (sMvd);
+      }
+      sMvd = WelsCabacMbMvd (pCabacCtx, pCurMb, iMbWidth,  pCurMb->sMv[2], pMbCache->sMbMvp[1], 2);
+      for (i = 0; i < 16; i += 4) {
+        pCurMb->sMvd[i + 2].sAssignMv (sMvd);
+        pCurMb->sMvd[i + 3].sAssignMv (sMvd);
+      }
     } else if ((uiMbType == MB_TYPE_8x8) || (uiMbType == MB_TYPE_8x8_REF0)) {
-      for (i = 0; i < 4; i++)
-        WelsCabacEncodeDecision (pCabacCtx, 21, 1);
+      //write sub_mb_type
+      WelsCabacSubMbType (pCabacCtx, pCurMb);
 
       if (uiNumRefIdxL0Active > 0) {
         WelsCabacMbRef (pCabacCtx, pCurMb, pMbCache, 0);
@@ -664,19 +720,8 @@ int32_t WelsSpatialWriteMbSynCabac (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* p
         WelsCabacMbRef (pCabacCtx, pCurMb, pMbCache, 12);
         WelsCabacMbRef (pCabacCtx, pCurMb, pMbCache, 14);
       }
-
-
-      sMvd = WelsCabacMbMvd (pCabacCtx, pCurMb, iMbWidth, pCurMb->sMv[0], pMbCache->sMbMvp[0], 0);
-      pCurMb->sMvd[0].sAssginMv (sMvd);
-
-      sMvd = WelsCabacMbMvd (pCabacCtx, pCurMb, iMbWidth, pCurMb->sMv[2], pMbCache->sMbMvp[1], 1);
-      pCurMb->sMvd[1].sAssginMv (sMvd);
-
-      sMvd = WelsCabacMbMvd (pCabacCtx, pCurMb, iMbWidth, pCurMb->sMv[8], pMbCache->sMbMvp[2], 2);
-      pCurMb->sMvd[2].sAssginMv (sMvd);
-
-      sMvd = WelsCabacMbMvd (pCabacCtx, pCurMb, iMbWidth, pCurMb->sMv[10], pMbCache->sMbMvp[3], 3);
-      pCurMb->sMvd[3].sAssginMv (sMvd);
+      //write sub8x8 mvd
+      WelsCabacSubMbMvd (pCabacCtx, pCurMb, pMbCache, iMbWidth);
     }
     if (uiMbType != MB_TYPE_INTRA16x16) {
       WelsCabacMbCbp (pCurMb, iMbWidth, pCabacCtx);

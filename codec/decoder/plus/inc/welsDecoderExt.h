@@ -109,8 +109,9 @@ virtual long EXTAPI GetOption (DECODER_OPTION eOptID, void* pOption);
 PWelsDecoderContext     m_pDecContext;
 welsCodecTrace*         m_pWelsTrace;
 
-int32_t InitDecoder (const bool);
+int32_t InitDecoder (const SDecodingParam* pParam);
 void UninitDecoder (void);
+int32_t ResetDecoder();
 
 #ifdef OUTPUT_BIT_STREAM
 WelsFileHandle* m_pFBS;

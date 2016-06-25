@@ -46,6 +46,7 @@
 #define MIN_REF_PIC_COUNT               1               // minimal count number of reference pictures, 1 short + 2 key reference based?
 #define MAX_SHORT_REF_COUNT             16              // maximal count number of short reference pictures
 #define MAX_LONG_REF_COUNT              16              // maximal count number of long reference pictures
+#define MAX_DPB_COUNT                   (MAX_REF_PIC_COUNT + 1) // 1 additional position for re-order and other process
 
 #define MAX_MMCO_COUNT                  66
 

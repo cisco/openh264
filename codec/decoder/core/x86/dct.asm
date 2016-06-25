@@ -42,77 +42,7 @@
 
 %include "asm_inc.asm"
 
-;*******************************************************************************
-; Macros and other preprocessor constants
-;*******************************************************************************
-%macro MMX_SumSubDiv2 3
-    movq    %3, %2
-    psraw   %3, $01
-    paddw   %3, %1
-    psraw   %1, $01
-    psubw   %1, %2
-%endmacro
-
-%macro MMX_SumSub 3
-    movq    %3, %2
-    psubw   %2, %1
-    paddw   %1, %3
-%endmacro
-
-%macro MMX_IDCT 6
-    MMX_SumSub      %4, %5, %6
-    MMX_SumSubDiv2  %3, %2, %1
-    MMX_SumSub      %1, %4, %6
-    MMX_SumSub      %3, %5, %6
-%endmacro
-
-
-%macro MMX_StoreDiff4P 5
-    movd       %2, %5
-    punpcklbw  %2, %4
-    paddw      %1, %3
-    psraw      %1, $06
-    paddsw     %1, %2
-    packuswb   %1, %2
-    movd       %5, %1
-%endmacro
-
-;*******************************************************************************
-; Code
-;*******************************************************************************
-
 SECTION .text
-
-;*******************************************************************************
-;   void IdctResAddPred_mmx( uint8_t *pPred, const int32_t kiStride, int16_t *pRs )
-;*******************************************************************************
-
-WELS_EXTERN IdctResAddPred_mmx
-    %assign push_num 0
-    LOAD_3_PARA
-    SIGN_EXTENSION r1, r1d
-    movq    mm0, [r2+ 0]
-    movq    mm1, [r2+ 8]
-    movq    mm2, [r2+16]
-    movq    mm3, [r2+24]
-
-    MMX_Trans4x4W        mm0, mm1, mm2, mm3, mm4
-    MMX_IDCT            mm1, mm2, mm3, mm4, mm0, mm6
-    MMX_Trans4x4W        mm1, mm3, mm0, mm4, mm2
-    MMX_IDCT            mm3, mm0, mm4, mm2, mm1, mm6
-
-    WELS_Zero           mm7
-    WELS_DW32           mm6
-
-    MMX_StoreDiff4P    mm3, mm0, mm6, mm7, [r0]
-    MMX_StoreDiff4P    mm4, mm0, mm6, mm7, [r0+r1]
-    lea     r0, [r0+2*r1]
-    MMX_StoreDiff4P    mm1, mm0, mm6, mm7, [r0]
-    MMX_StoreDiff4P    mm2, mm0, mm6, mm7, [r0+r1]
-
-
-    emms
-    ret
 
 ;void WelsBlockZero16x16_sse2(int16_t * block, int32_t stride);
 WELS_EXTERN WelsBlockZero16x16_sse2

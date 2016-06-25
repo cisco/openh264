@@ -333,8 +333,8 @@ void WelsDctT4_c (int16_t* pDct, uint8_t* pPixel1, int32_t iStride1, uint8_t* pP
 
     pDct[i ]   = s[0] + s[1];
     pDct[kiI2] = s[0] - s[1];
-    pDct[kiI1] = (s[3] << 1) + s[2];
-    pDct[kiI3] = s[3] - (s[2] << 1);
+    pDct[kiI1] = (s[3] * (1 << 1)) + s[2];
+    pDct[kiI3] = s[3] - (s[2] * (1 << 1));
   }
 
   /* vertical transform */
@@ -350,8 +350,8 @@ void WelsDctT4_c (int16_t* pDct, uint8_t* pPixel1, int32_t iStride1, uint8_t* pP
 
     pDct[i  ]   = s[0] + s[1];
     pDct[kiI8 ] = s[0] - s[1];
-    pDct[kiI4 ] = (s[3] << 1) + s[2];
-    pDct[kiI12] = s[3] - (s[2] << 1);
+    pDct[kiI4 ] = (s[3] * (1 << 1)) + s[2];
+    pDct[kiI12] = s[3] - (s[2] * (1 << 1));
   }
 }
 
@@ -516,11 +516,24 @@ void WelsInitEncodingFuncs (SWelsFuncPtrList* pFuncList, uint32_t  uiCpuFlag) {
     pFuncList->pfScan4x4Ac              = WelsScan4x4Ac_sse2;
     pFuncList->pfCalculateSingleCtr4x4  = WelsCalculateSingleCtr4x4_sse2;
 
+    pFuncList->pfDctT4                  = WelsDctT4_sse2;
     pFuncList->pfDctFourT4              = WelsDctFourT4_sse2;
   }
 //#ifndef MACOS
   if (uiCpuFlag & WELS_CPU_SSSE3) {
     pFuncList->pfScan4x4                = WelsScan4x4DcAc_ssse3;
+  }
+  if (uiCpuFlag & WELS_CPU_SSE42) {
+    pFuncList->pfGetNoneZeroCount       = WelsGetNoneZeroCount_sse42;
+  }
+  if (uiCpuFlag & WELS_CPU_AVX2) {
+    pFuncList->pfDctT4                  = WelsDctT4_avx2;
+    pFuncList->pfDctFourT4              = WelsDctFourT4_avx2;
+
+    pFuncList->pfQuantization4x4        = WelsQuant4x4_avx2;
+    pFuncList->pfQuantizationDc4x4      = WelsQuant4x4Dc_avx2;
+    pFuncList->pfQuantizationFour4x4    = WelsQuantFour4x4_avx2;
+    pFuncList->pfQuantizationFour4x4Max = WelsQuantFour4x4Max_avx2;
   }
 
 //#endif//MACOS

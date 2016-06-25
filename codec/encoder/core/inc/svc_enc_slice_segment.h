@@ -71,7 +71,9 @@ namespace WelsEnc {
 #define JUMPPACKETSIZE_CONSTRAINT(max_byte)             ( max_byte - AVER_MARGIN_BYTES ) //in bytes
 #define JUMPPACKETSIZE_JUDGE(len,mb_idx,max_byte)       ( (len) > JUMPPACKETSIZE_CONSTRAINT(max_byte) ) //( (mb_idx+1)%40/*16slice for compare*/ == 0 )        //
 //cur_mb_idx is for early tests, can be omit in optimization
-
+typedef struct TagSlice      SSlice;
+typedef struct TagDqLayer    SDqLayer;
+typedef struct TagWelsEncCtx sWelsEncCtx;
 /*!
  * \brief   SSlice context
  */
@@ -83,10 +85,9 @@ int16_t                 iMbHeight;              /* height of picture size in mb 
 int32_t                 iSliceNumInFrame;       /* count number of slices in frame; */
 int32_t                 iMbNumInFrame;          /* count number of MBs in frame */
 uint16_t*               pOverallMbMap;          /* overall MB map in frame, store virtual slice idc; */
-int32_t*                pFirstMbInSlice;        /* first MB address top-left based in every slice respectively; */
-int32_t*                pCountMbNumInSlice;     /* count number of MBs in every slice respectively; */
 uint32_t                uiSliceSizeConstraint;  /* in byte */
 int32_t                 iMaxSliceNumConstraint; /* maximal number of slices constraint */
+
 } SSliceCtx;
 
 
@@ -106,7 +107,7 @@ uint8_t         uiLastMbQp;
 /*!
  * \brief   Initialize Wels SSlice context (Single/multiple slices and FMO)
  *
- * \param   pSliceCtx       SSlice context to be initialized
+ * \param   pCurDq          current layer which its SSlice context will be initialized
  * \param   bFmoUseFlag     flag of using fmo
  * \param   iMbWidth        MB width
  * \param   iMbHeight       MB height
@@ -116,80 +117,81 @@ uint8_t         uiLastMbQp;
  *
  * \return  0 - successful; none 0 - failed;
  */
-int32_t InitSlicePEncCtx (SSliceCtx* pSliceCtx,
+int32_t InitSlicePEncCtx (SDqLayer* pCurDq,
                           CMemoryAlign* pMa,
                           bool bFmoUseFlag,
                           int32_t iMbWidth,
                           int32_t iMbHeight,
-                          SSliceConfig* pMulSliceOption,
+                          SSliceArgument* pSliceArgument,
                           void* pPpsArg);
 
 
 /*!
  * \brief   Uninitialize Wels SSlice context (Single/multiple slices and FMO)
  *
- * \param   pSliceCtx       SSlice context to be initialized
+ * \param   pCurDq       curent layer which its SSlice context will be initialized
  *
  * \return  NONE;
  */
-void UninitSlicePEncCtx (SSliceCtx* pSliceCtx, CMemoryAlign* pMa);
+void UninitSlicePEncCtx (SDqLayer* pCurDq, CMemoryAlign* pMa);
 
 /*!
  * \brief   Get slice idc for given iMbXY (apply in Single/multiple slices and FMO)
  *
- * \param   pSliceCtx       SSlice context
- * \param   kiMbXY          MB xy index
+ * \param   pCurDq    current layer info
+ * \param   kiMbXY    MB xy index
  *
  * \return  uiSliceIdc - successful; (uint8_t)(-1) - failed;
  */
-uint16_t WelsMbToSliceIdc (SSliceCtx* pSliceCtx, const int32_t kiMbXY);
+uint16_t WelsMbToSliceIdc (SDqLayer* pCurDq, const int32_t kiMbXY);
 
 /*!
  * \brief   Get first mb in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
  *
- * \param   pSliceCtx       SSlice context
+ * \param   pSliceInLayer   slice list in current layer
  * \param   kiSliceIdc      slice idc
  *
  * \return  first_mb - successful; -1 - failed;
  */
-int32_t WelsGetFirstMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kiSliceIdc);
+int32_t WelsGetFirstMbOfSlice (SSlice* pSliceInLayer, const int32_t kiSliceIdc);
 
 /*!
  * \brief   Get successive mb to be processed in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
  *
- * \param   pSliceCtx       SSlice context
- * \param   kiMbXY          MB xy index
+ * \param   pCurDq       current layer info
+ * \param   kiMbXY       MB xy index
  *
  * \return  next_mb - successful; -1 - failed;
  */
-int32_t WelsGetNextMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kiMbXY);
+int32_t WelsGetNextMbOfSlice (SDqLayer* pCurDq, const int32_t kiMbXY);
 
 /*!
  * \brief   Get previous mb to be processed in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
  *
- * \param   pSliceCtx       SSlice context
+ * \param   pCurDq          current layer info
  * \param   kiMbXY          MB xy index
  *
  * \return  prev_mb - successful; -1 - failed;
  */
-int32_t WelsGetPrevMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kiMbXY);
+int32_t WelsGetPrevMbOfSlice (SDqLayer* pCurDq, const int32_t kiMbXY);
 
 /*!
  * \brief   Get number of mb in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
  *
- * \param   pSliceCtx       SSlice context
+ * \param   pCurDq          current layer info
  * \param   kiSliceIdc      slice/slice_group idc
  *
  * \return  count_num_of_mb - successful; -1 - failed;
  */
-int32_t WelsGetNumMbInSlice (SSliceCtx* pSliceCtx, const int32_t kiSliceIdc);
+int32_t WelsGetNumMbInSlice (SDqLayer* pCurDq, const int32_t kiSliceIdc);
 
 /*!
  *  Get slice count for multiple slice segment
  *
  */
-int32_t GetInitialSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, SSliceConfig* pMso);
-int32_t GetCurrentSliceNum (const SSliceCtx* kpSliceCtx);
+int32_t GetInitialSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, SSliceArgument* pSliceArgument);
+int32_t GetCurrentSliceNum (const SDqLayer* pCurDq);
+SSlice* GetSliceByIndex(sWelsEncCtx* pCtx, const int32_t kiSliceIdc);
 
 //checking valid para
 int32_t DynamicMaxSliceNumConstraint (uint32_t uiMaximumNum, int32_t uiConsumedNum, uint32_t uiDulplicateTimes);
@@ -202,7 +204,7 @@ bool GomValidCheckSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, u
 bool GomValidCheckSliceMbNum (const int32_t kiMbWidth, const int32_t kiMbHeight,  SSliceArgument* pSliceArg);
 //end of checking valid para
 
-int32_t DynamicAdjustSlicePEncCtxAll (SSliceCtx* pSliceCtx,
+int32_t DynamicAdjustSlicePEncCtxAll (SDqLayer* pCurDq,
                                       int32_t* pRunLength);
 }
 #endif//WELS_SLICE_SEGMENT_H__

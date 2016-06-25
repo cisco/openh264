@@ -43,6 +43,7 @@
 #define WELS_ACCESS_UNIT_WRITER_H__
 
 #include "parameter_sets.h"
+#include "paraset_strategy.h"
 #include "param_svc.h"
 #include "utils.h"
 namespace WelsEnc {
@@ -92,7 +93,7 @@ int32_t WelsWriteSubsetSpsSyntax (SSubsetSps* pSubsetSps, SBitStringAux* pBitStr
  * \note    Call it in case EWelsNalUnitType is PPS.
  *************************************************************************************
  */
-int32_t WelsWritePpsSyntax (SWelsPPS* pPps, SBitStringAux* pBitStringAux, SParaSetOffset* sPSOVector);
+int32_t WelsWritePpsSyntax (SWelsPPS* pPps, SBitStringAux* pBitStringAux, IWelsParametersetStrategy* pParametersetStrategy);
 
 /*!
  * \brief   initialize pSps based on configurable parameters in svc
@@ -147,21 +148,5 @@ int32_t WelsCheckRefFrameLimitationLevelIdcFirst (SLogContext* pLogCtx, SWelsSvc
 
 int32_t WelsAdjustLevel (SSpatialLayerConfig* pSpatialLayer);
 
-/*!
- * \brief   check if the current parameter can found a presenting sps
- * \param   pParam          the current encoding paramter in SWelsSvcCodingParam
- * \param   kbUseSubsetSps  bool
- * \param   iDlayerIndex    int, the index of current D layer
- * \param   iDlayerCount    int, the number of total D layer
- * \param pSpsArray         array of all the stored SPSs
- * \param   pSubsetArray    array of all the stored Subset-SPSs
- * \return  0 - successful
- *         -1 - cannot find existing SPS for current encoder parameter
- */
-int32_t FindExistingSps (SWelsSvcCodingParam* pParam, const bool kbUseSubsetSps, const int32_t iDlayerIndex,
-                         const int32_t iDlayerCount,  const int32_t iSpsNumInUse,
-                         SWelsSPS* pSpsArray,
-                         SSubsetSps* pSubsetArray,
-                         bool bSVCBaselayer);
 }
 #endif//WELS_ACCESS_UNIT_PARSER_H__

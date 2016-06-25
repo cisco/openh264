@@ -148,15 +148,14 @@ typedef enum {
 * @brief Option types introduced in decoder application
 */
 typedef enum {
-  DECODER_OPTION_DATAFORMAT = 0,        ///< color format, now supports 23 only (I420)
-  DECODER_OPTION_END_OF_STREAM,         ///< end of stream flag
+  DECODER_OPTION_END_OF_STREAM = 1,     ///< end of stream flag
   DECODER_OPTION_VCL_NAL,               ///< feedback whether or not have VCL NAL in current AU for application layer
   DECODER_OPTION_TEMPORAL_ID,           ///< feedback temporal id for application layer
   DECODER_OPTION_FRAME_NUM,             ///< feedback current decoded frame number
   DECODER_OPTION_IDR_PIC_ID,            ///< feedback current frame belong to which IDR period
   DECODER_OPTION_LTR_MARKING_FLAG,      ///< feedback wether current frame mark a LTR
   DECODER_OPTION_LTR_MARKED_FRAME_NUM,  ///< feedback frame num marked by current Frame
-  DECODER_OPTION_ERROR_CON_IDC,         ///< not finished yet, indicate decoder error concealment status, in progress
+  DECODER_OPTION_ERROR_CON_IDC,         ///< indicate decoder error concealment method
   DECODER_OPTION_TRACE_LEVEL,
   DECODER_OPTION_TRACE_CALLBACK,        ///< a void (*)(void* context, int level, const char* message) function which receives log messages
   DECODER_OPTION_TRACE_CALLBACK_CONTEXT,///< context info of trace callbac
@@ -255,29 +254,6 @@ typedef struct {
 } SLTRConfig;
 
 /**
-* @brief Structure for slice argument
-*/
-typedef struct {
-  unsigned int
-  uiSliceMbNum[MAX_SLICES_NUM_TMP];        ///< only used when uiSliceMode=2;here we use a tmp fixed value since MAX_SLICES_NUM is not defined here and its definition may be changed;
-  unsigned int      uiSliceNum;            ///< only used when uiSliceMode=1
-  unsigned int      uiSliceSizeConstraint; ///< only used when uiSliceMode=4
-} SSliceArgument;                          ///< not all the elements in this argument will be used, how it will be used depends on uiSliceMode; please refer to SliceModeEnum
-
-/**
-* @brief Enumerate the type of slice mode
-*/
-typedef enum {
-  SM_SINGLE_SLICE         = 0, ///< | SliceNum==1
-  SM_FIXEDSLCNUM_SLICE    = 1, ///< | according to SliceNum        | enabled dynamic slicing for multi-thread
-  SM_RASTER_SLICE         = 2, ///< | according to SlicesAssign    | need input of MB numbers each slice. In addition, if other constraint in SSliceArgument is presented, need to follow the constraints. Typically if MB num and slice size are both constrained, re-encoding may be involved.
-  SM_ROWMB_SLICE          = 3, ///< | according to PictureMBHeight | typical of single row of mbs each slice + slice size constraint which including re-encoding
-  SM_DYN_SLICE            = 4, ///< | according to SliceSize       | dynamic slicing (have no idea about slice_nums until encoding current frame)
-  SM_AUTO_SLICE           = 5, ///< | according to thread number
-  SM_RESERVED             = 6
-} SliceModeEnum;
-
-/**
 * @brief Enumerate the type of rate control mode
 */
 typedef enum {
@@ -285,7 +261,8 @@ typedef enum {
   RC_BITRATE_MODE = 1,     ///< bitrate mode
   RC_BUFFERBASED_MODE = 2, ///< no bitrate control,only using buffer status,adjust the video quality
   RC_TIMESTAMP_MODE = 3, //rate control based timestamp
-  RC_OFF_MODE = -1         ///< rate control off mode
+  RC_BITRATE_MODE_POST_SKIP = 4, ///< this is in-building RC MODE, WILL BE DELETED after algorithm tuning!
+  RC_OFF_MODE = -1,         ///< rate control off mode
 } RC_MODES;
 
 /**
@@ -346,12 +323,97 @@ enum {
 };
 
 /**
-* @brief Structure for slice configuration
-*/
+ * @brief Enumerate the type of slice mode
+ */
+typedef enum {
+  SM_SINGLE_SLICE         = 0, ///< | SliceNum==1
+  SM_FIXEDSLCNUM_SLICE    = 1, ///< | according to SliceNum        | enabled dynamic slicing for multi-thread
+  SM_RASTER_SLICE         = 2, ///< | according to SlicesAssign    | need input of MB numbers each slice. In addition, if other constraint in SSliceArgument is presented, need to follow the constraints. Typically if MB num and slice size are both constrained, re-encoding may be involved.
+  SM_SIZELIMITED_SLICE           = 3, ///< | according to SliceSize       | slicing according to size, the slicing will be dynamic(have no idea about slice_nums until encoding current frame)
+  SM_RESERVED             = 4
+} SliceModeEnum;
+
+/**
+ * @brief Structure for slice argument
+ */
 typedef struct {
   SliceModeEnum uiSliceMode;    ///< by default, uiSliceMode will be SM_SINGLE_SLICE
-  SSliceArgument sSliceArgument;
-} SSliceConfig;
+  unsigned int  uiSliceNum;     ///< only used when uiSliceMode=1, when uiSliceNum=0 means auto design it with cpu core number
+  unsigned int  uiSliceMbNum[MAX_SLICES_NUM_TMP]; ///< only used when uiSliceMode=2; when =0 means setting one MB row a slice
+  unsigned int  uiSliceSizeConstraint; ///< now only used when uiSliceMode=4
+} SSliceArgument;
+
+/**
+* @brief Enumerate the type of video format
+*/
+typedef enum {
+  VF_COMPONENT,
+  VF_PAL,
+  VF_NTSC,
+  VF_SECAM,
+  VF_MAC,
+  VF_UNDEF,
+  VF_NUM_ENUM
+} EVideoFormatSPS;	// EVideoFormat is already defined/used elsewhere!
+
+/**
+* @brief Enumerate the type of color primaries
+*/
+typedef enum {
+  CP_RESERVED0,
+  CP_BT709,
+  CP_UNDEF,
+  CP_RESERVED3,
+  CP_BT470M,
+  CP_BT470BG,
+  CP_SMPTE170M,
+  CP_SMPTE240M,
+  CP_FILM,
+  CP_BT2020,
+  CP_NUM_ENUM
+} EColorPrimaries;
+
+/**
+* @brief Enumerate the type of transfer characteristics
+*/
+typedef enum {
+  TRC_RESERVED0,
+  TRC_BT709,
+  TRC_UNDEF,
+  TRC_RESERVED3,
+  TRC_BT470M,
+  TRC_BT470BG,
+  TRC_SMPTE170M,
+  TRC_SMPTE240M,
+  TRC_LINEAR,
+  TRC_LOG100,
+  TRC_LOG316,
+  TRC_IEC61966_2_4,
+  TRC_BT1361E,
+  TRC_IEC61966_2_1,
+  TRC_BT2020_10,
+  TRC_BT2020_12,
+  TRC_NUM_ENUM
+} ETransferCharacteristics;
+
+/**
+* @brief Enumerate the type of color matrix
+*/
+typedef enum {
+  CM_GBR,
+  CM_BT709,
+  CM_UNDEF,
+  CM_RESERVED3,
+  CM_FCC,
+  CM_BT470BG,
+  CM_SMPTE170M,
+  CM_SMPTE240M,
+  CM_YCGCO,
+  CM_BT2020NC,
+  CM_BT2020C,
+  CM_NUM_ENUM
+} EColorMatrix;
+
 /**
 * @brief  Structure for spatial layer configuration
 */
@@ -365,7 +427,19 @@ typedef struct {
   ELevelIdc    uiLevelIdc;     ///< value of profile IDC (0 for auto-detection)
   int          iDLayerQp;      ///< value of level IDC (0 for auto-detection)
 
-  SSliceConfig sSliceCfg;      ///< slice configuration for a layer
+  SSliceArgument sSliceArgument;
+
+  // Note: members bVideoSignalTypePresent through uiColorMatrix below are also defined in SWelsSPS in parameter_sets.h.
+  bool			bVideoSignalTypePresent;	// false => do not write any of the following information to the header
+  unsigned char	uiVideoFormat;				// EVideoFormatSPS; 3 bits in header; 0-5 => component, kpal, ntsc, secam, mac, undef
+  bool			bFullRange;					// false => analog video data range [16, 235]; true => full data range [0,255]
+  bool			bColorDescriptionPresent;	// false => do not write any of the following three items to the header
+  unsigned char	uiColorPrimaries;			// EColorPrimaries; 8 bits in header; 0 - 9 => ???, bt709, undef, ???, bt470m, bt470bg,
+                                            //    smpte170m, smpte240m, film, bt2020
+  unsigned char	uiTransferCharacteristics;	// ETransferCharacteristics; 8 bits in header; 0 - 15 => ???, bt709, undef, ???, bt470m, bt470bg, smpte170m,
+										    //   smpte240m, linear, log100, log316, iec61966-2-4, bt1361e, iec61966-2-1, bt2020-10, bt2020-12
+  unsigned char	uiColorMatrix;				// EColorMatrix; 8 bits in header (corresponds to FFmpeg "colorspace"); 0 - 10 => GBR, bt709,
+										    //   undef, ???, fcc, bt470bg, smpte170m, smpte240m, YCgCo, bt2020nc, bt2020c
 } SSpatialLayerConfig;
 
 /**
@@ -437,7 +511,7 @@ typedef struct TagEncParamExt {
   eSpsPpsIdStrategy;       ///< different stategy in adjust ID in SPS/PPS: 0- constant ID, 1-additional ID, 6-mapping and additional
   bool    bPrefixNalAddingCtrl;        ///< false:not use Prefix NAL; true: use Prefix NAL
   bool    bEnableSSEI;                 ///< false:not use SSEI; true: use SSEI -- TODO: planning to remove the interface of SSEI
-  bool    bSimulcastAVC;               ///< (when encoding more than 1 spatial layer) false: use SVC syntax for higher layers; true: use Simulcast AVC -- coming soon
+  bool    bSimulcastAVC;               ///< (when encoding more than 1 spatial layer) false: use SVC syntax for higher layers; true: use Simulcast AVC
   int     iPaddingFlag;                ///< 0:disable padding;1:padding
   int     iEntropyCodingModeFlag;      ///< 0:CAVLC  1:CABAC.
 
@@ -455,6 +529,7 @@ typedef struct TagEncParamExt {
   /* multi-thread settings*/
   unsigned short
   iMultipleThreadIdc;                  ///< 1 # 0: auto(dynamic imp. internal encoder); 1: multiple threads imp. disabled; lager than 1: count number of threads;
+  bool  bUseLoadBalancing; ///< only used when uiSliceMode=1 or 3, will change slicing of a picture during the run-time of multi-thread encoding, so the result of each run may be different
 
   /* Deblocking loop filter */
   int       iLoopFilterDisableIdc;     ///< 0: on, 1: off, 2: on except for slice boundaries
@@ -484,7 +559,6 @@ typedef struct {
 typedef struct TagSVCDecodingParam {
   char*     pFileNameRestructed;       ///< file name of reconstructed frame used for PSNR calculation based debug
 
-  EVideoFormatType eOutputColorFormat; ///< color space format to be outputed, EVideoFormatType specified in codec_def.h
   unsigned int  uiCpuLoad;             ///< CPU load
   unsigned char uiTargetDqLayer;       ///< setting target dq layer id
 
@@ -501,9 +575,14 @@ typedef struct {
   unsigned char uiTemporalId;
   unsigned char uiSpatialId;
   unsigned char uiQualityId;
-
+  EVideoFrameType eFrameType;
   unsigned char uiLayerType;
 
+  /**
+   * The sub sequence layers are ordered hierarchically based on their dependency on each other so that any picture in a layer shall not be
+   * predicted from any picture on any higher layer.
+  */
+  int   iSubSeqId;                ///< refer to D.2.11 Sub-sequence information SEI message semantics
   int   iNalCount;              ///< count number of NAL coded already
   int*  pNalLengthInByte;       ///< length of NAL size in byte from 0 to iNalCount-1
   unsigned char*  pBsBuf;       ///< buffer of bitstream contained
@@ -513,14 +592,6 @@ typedef struct {
 * @brief Frame bit stream info
 */
 typedef struct {
-  int iTemporalId;              ///< temporal ID
-
-  /**
-  * The sub sequence layers are ordered hierarchically based on their dependency on each other so that any picture in a layer shall not be
-  * predicted from any picture on any higher layer.
-  */
-  int iSubSeqId;                ///< refer to D.2.11 Sub-sequence information SEI message semantics
-
   int           iLayerNum;
   SLayerBSInfo  sLayerInfo[MAX_LAYER_NUM_OF_FRAME];
 

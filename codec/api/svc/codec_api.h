@@ -36,7 +36,7 @@
 #define WELS_VIDEO_CODEC_SVC_API_H__
 
 #ifndef __cplusplus
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && (_MSC_VER < 1800)
 typedef unsigned char bool;
 #else
 #include <stdbool.h>

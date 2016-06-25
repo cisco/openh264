@@ -104,6 +104,11 @@ VAACalcSadSsdBgdFunc    VAACalcSadSsdBgd_sse2;
 VAACalcSadFunc          VAACalcSad_sse2;
 VAACalcSadVarFunc       VAACalcSadVar_sse2;
 VAACalcSadSsdFunc       VAACalcSadSsd_sse2;
+VAACalcSadBgdFunc       VAACalcSadBgd_avx2;
+VAACalcSadSsdBgdFunc    VAACalcSadSsdBgd_avx2;
+VAACalcSadFunc          VAACalcSad_avx2;
+VAACalcSadVarFunc       VAACalcSadVar_avx2;
+VAACalcSadSsdFunc       VAACalcSadSsd_avx2;
 WELSVP_EXTERN_C_END
 #endif
 

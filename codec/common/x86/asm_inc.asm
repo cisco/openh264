@@ -79,6 +79,19 @@ BITS 64
 %define arg11 [rsp + push_num*8 + 88]
 %define arg12 [rsp + push_num*8 + 96]
 
+%define arg1d ecx
+%define arg2d edx
+%define arg3d r8d
+%define arg4d r9d
+%define arg5d arg5
+%define arg6d arg6
+%define arg7d arg7
+%define arg8d arg8
+%define arg9d arg9
+%define arg10d arg10
+%define arg11d arg11
+%define arg12d arg12
+
 %define r0 rcx
 %define r1 rdx
 %define r2 r8
@@ -100,6 +113,7 @@ BITS 64
 %define r1w  dx
 %define r2w  r8w
 %define r3w  r9w
+%define r4w  ax
 %define r6w  r11w
 
 %define r0b  cl
@@ -135,6 +149,19 @@ SECTION .note.GNU-stack noalloc noexec nowrite progbits ; Mark the stack as non-
 %define arg11 [rsp + push_num*8 + 40]
 %define arg12 [rsp + push_num*8 + 48]
 
+%define arg1d edi
+%define arg2d esi
+%define arg3d edx
+%define arg4d ecx
+%define arg5d r8d
+%define arg6d r9d
+%define arg7d arg7
+%define arg8d arg8
+%define arg9d arg9
+%define arg10d arg10
+%define arg11d arg11
+%define arg12d arg12
+
 %define r0 rdi
 %define r1 rsi
 %define r2 rdx
@@ -156,6 +183,7 @@ SECTION .note.GNU-stack noalloc noexec nowrite progbits ; Mark the stack as non-
 %define r1w  si
 %define r2w  dx
 %define r3w  cx
+%define r4w  r8w
 %define r6w  r10w
 
 %define r0b  dil
@@ -189,6 +217,19 @@ SECTION .note.GNU-stack noalloc noexec nowrite progbits ; Mark the stack as non-
 %define arg11 [esp + push_num*4 + 44]
 %define arg12 [esp + push_num*4 + 48]
 
+%define arg1d arg1
+%define arg2d arg2
+%define arg3d arg3
+%define arg4d arg4
+%define arg5d arg5
+%define arg6d arg6
+%define arg7d arg7
+%define arg8d arg8
+%define arg9d arg9
+%define arg10d arg10
+%define arg11d arg11
+%define arg12d arg12
+
 %define r0 eax
 %define r1 ecx
 %define r2 edx
@@ -210,6 +251,7 @@ SECTION .note.GNU-stack noalloc noexec nowrite progbits ; Mark the stack as non-
 %define r1w cx
 %define r2w dx
 %define r3w bx
+%define r4w si
 %define r6w bp
 
 %define r0b al
@@ -436,8 +478,14 @@ SECTION .note.GNU-stack noalloc noexec nowrite progbits ; Mark the stack as non-
     %endif
 %endmacro
 
+%macro ZERO_EXTENSION 1
+    %ifndef X86_32
+        mov dword %1, %1
+    %endif
+%endmacro
+
 %macro WELS_EXTERN 1
-    ALIGN 16
+    ALIGN 16, nop
     %ifdef PREFIX
         global _%1
         %define %1 _%1
@@ -605,8 +653,18 @@ SECTION .note.GNU-stack noalloc noexec nowrite progbits ; Mark the stack as non-
     packuswb %1,%1
 %endmacro
 
+%macro WELS_DW1_VEX 1
+    vpcmpeqw %1, %1, %1
+    vpsrlw   %1, %1, 15
+%endmacro
 
+%macro WELS_DW32_VEX 1
+    vpcmpeqw %1, %1, %1
+    vpsrlw   %1, %1, 15
+    vpsllw   %1, %1,  5
+%endmacro
 
-
-
-
+%macro WELS_DW32767_VEX 1
+    vpcmpeqw %1, %1, %1
+    vpsrlw   %1, %1,  1
+%endmacro

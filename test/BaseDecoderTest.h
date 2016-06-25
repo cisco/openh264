@@ -28,7 +28,7 @@ class BaseDecoderTest {
   };
 
   BaseDecoderTest();
-  void SetUp();
+  int32_t SetUp();
   void TearDown();
   void DecodeFile (const char* fileName, Callback* cbk);
 

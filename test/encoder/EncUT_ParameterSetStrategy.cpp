@@ -5,6 +5,7 @@
 #include "param_svc.h"
 #include "parameter_sets.h"
 #include "wels_const.h"
+#include "paraset_strategy.h"
 
 using namespace WelsEnc;
 
@@ -117,6 +118,102 @@ TEST_F (ParameterSetStrategyTest, FindExistingSps) {
   iFoundId = FindExistingSps (&sParam2, bUseSubsetSps, iDlayerIndex, iDlayerCount, iCurSpsInUse,
                               m_pSpsArray, m_pSubsetArray, false);
   EXPECT_EQ (iFoundId, INVALID_ID);
+  (void) iRet; // Not using iRet at the moment
+}
+
+TEST_F (ParameterSetStrategyTest, TestVSTPParameters) {
+  int32_t iRet = 0;
+  bool FalseLocal = false;	// EXPECT_EQ does not like "true" or "false" as its first arg
+
+  // this test verifies that the client's "video signal type present" parameter values end up in SWelsSPS 
+
+  //init client parameters
+  SEncParamExt sParamExt;
+  SWelsSvcCodingParam::FillDefault(sParamExt);
+  sParamExt.iUsageType = CAMERA_VIDEO_REAL_TIME;
+  sParamExt.iPicWidth = 1280;
+  sParamExt.iPicHeight = 720;
+  sParamExt.iTargetBitrate = 1000000;
+  sParamExt.iRCMode = RC_BITRATE_MODE;
+  sParamExt.fMaxFrameRate = 30.0f;
+
+  // VSTP parameters should be their default values (see SWelsSvcCodingParam::FillDefault())
+  for  ( int i = 0; i < MAX_SPATIAL_LAYER_NUM; i++ )
+  {
+    //         expected    actual
+    EXPECT_EQ( FalseLocal, sParamExt.sSpatialLayers[i].bVideoSignalTypePresent);
+    EXPECT_EQ( VF_UNDEF,   sParamExt.sSpatialLayers[i].uiVideoFormat);//5
+    EXPECT_EQ( FalseLocal, sParamExt.sSpatialLayers[i].bFullRange);
+    EXPECT_EQ( FalseLocal, sParamExt.sSpatialLayers[i].bColorDescriptionPresent);
+    EXPECT_EQ( CP_UNDEF,   sParamExt.sSpatialLayers[i].uiColorPrimaries);//2
+    EXPECT_EQ( TRC_UNDEF,  sParamExt.sSpatialLayers[i].uiTransferCharacteristics);//2
+    EXPECT_EQ( CM_UNDEF,   sParamExt.sSpatialLayers[i].uiColorMatrix);//2
+  }
+
+  // set non-default VSTP values
+  sParamExt.iSpatialLayerNum = 2;
+
+  sParamExt.sSpatialLayers[0].bVideoSignalTypePresent   = true;
+  sParamExt.sSpatialLayers[0].uiVideoFormat             = VF_NTSC;//2
+  sParamExt.sSpatialLayers[0].bFullRange                = true;
+  sParamExt.sSpatialLayers[0].bColorDescriptionPresent  = true;
+  sParamExt.sSpatialLayers[0].uiColorPrimaries          = CP_BT709;//1
+  sParamExt.sSpatialLayers[0].uiTransferCharacteristics = TRC_BT709;//1
+  sParamExt.sSpatialLayers[0].uiColorMatrix             = CM_BT709;//1
+
+  sParamExt.sSpatialLayers[1].bVideoSignalTypePresent   = true;
+  sParamExt.sSpatialLayers[1].uiVideoFormat             = VF_PAL;//1
+  sParamExt.sSpatialLayers[1].bFullRange                = true;
+  sParamExt.sSpatialLayers[1].bColorDescriptionPresent  = true;
+  sParamExt.sSpatialLayers[1].uiColorPrimaries          = CP_SMPTE170M;//6
+  sParamExt.sSpatialLayers[1].uiTransferCharacteristics = TRC_SMPTE170M;//6
+  sParamExt.sSpatialLayers[1].uiColorMatrix             = CM_SMPTE170M;//6
+
+  // transcode parameters from client
+  SWelsSvcCodingParam sSvcCodingParam;
+  iRet = sSvcCodingParam.ParamTranscode(sParamExt);
+  EXPECT_EQ (iRet, 0);
+
+  // transcoded VSTP parameters should match the client values
+  for  ( int i = 0; i < sParamExt.iSpatialLayerNum; i++ )
+  {
+    EXPECT_EQ( sParamExt.sSpatialLayers[i].bVideoSignalTypePresent,   sSvcCodingParam.sSpatialLayers[i].bVideoSignalTypePresent);
+    EXPECT_EQ( sParamExt.sSpatialLayers[i].uiVideoFormat,             sSvcCodingParam.sSpatialLayers[i].uiVideoFormat);
+    EXPECT_EQ( sParamExt.sSpatialLayers[i].bFullRange,                sSvcCodingParam.sSpatialLayers[i].bFullRange);
+    EXPECT_EQ( sParamExt.sSpatialLayers[i].bColorDescriptionPresent,  sSvcCodingParam.sSpatialLayers[i].bColorDescriptionPresent);
+    EXPECT_EQ( sParamExt.sSpatialLayers[i].uiColorPrimaries,          sSvcCodingParam.sSpatialLayers[i].uiColorPrimaries);
+    EXPECT_EQ( sParamExt.sSpatialLayers[i].uiTransferCharacteristics, sSvcCodingParam.sSpatialLayers[i].uiTransferCharacteristics);
+    EXPECT_EQ( sParamExt.sSpatialLayers[i].uiColorMatrix,             sSvcCodingParam.sSpatialLayers[i].uiColorMatrix);
+  }
+
+  // use transcoded parameters to initialize an SWelsSPS
+  m_pSpsArrayPointer = &m_pSpsArray[0];
+  SSpatialLayerConfig* pDlayerParam = &(sSvcCodingParam.sSpatialLayers[0]);
+  iRet = WelsInitSps (
+    m_pSpsArrayPointer,
+    pDlayerParam,
+    &sSvcCodingParam.sDependencyLayers[0],
+    sSvcCodingParam.uiIntraPeriod,
+    sSvcCodingParam.iMaxNumRefFrame,
+    0, //SpsId
+    sSvcCodingParam.bEnableFrameCroppingFlag,
+    sSvcCodingParam.iRCMode != RC_OFF_MODE,
+    0, //DlayerCount
+    false
+    );
+  EXPECT_EQ (iRet, 0);
+
+  // SPS VSTP parameters should match the transcoded values
+  EXPECT_EQ( sSvcCodingParam.sSpatialLayers[0].bVideoSignalTypePresent,   m_pSpsArrayPointer->bVideoSignalTypePresent);
+  EXPECT_EQ( sSvcCodingParam.sSpatialLayers[0].uiVideoFormat,             m_pSpsArrayPointer->uiVideoFormat);
+  EXPECT_EQ( sSvcCodingParam.sSpatialLayers[0].bFullRange,                m_pSpsArrayPointer->bFullRange);
+  EXPECT_EQ( sSvcCodingParam.sSpatialLayers[0].bColorDescriptionPresent,  m_pSpsArrayPointer->bColorDescriptionPresent);
+  EXPECT_EQ( sSvcCodingParam.sSpatialLayers[0].uiColorPrimaries,          m_pSpsArrayPointer->uiColorPrimaries);
+  EXPECT_EQ( sSvcCodingParam.sSpatialLayers[0].uiTransferCharacteristics, m_pSpsArrayPointer->uiTransferCharacteristics);
+  EXPECT_EQ( sSvcCodingParam.sSpatialLayers[0].uiColorMatrix,             m_pSpsArrayPointer->uiColorMatrix);
+
+  // TODO: verify that WriteVUI (au_set.cpp) writes the SPS VSTP values to the output file (verified using FFmpeg)
+
   (void) iRet; // Not using iRet at the moment
 }
 

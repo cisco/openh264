@@ -45,6 +45,7 @@ using namespace WelsCommon;
 
 namespace WelsEnc {
 
+typedef int32_t WelsErrorType;
 
 struct SMVUnitXY { // each 4 Bytes
   int16_t iMvX;
@@ -55,7 +56,7 @@ struct SMVUnitXY { // each 4 Bytes
     iMvY = _v0.iMvY - _v1.iMvY;
     return (*this);
   };
-  SMVUnitXY& sAssginMv (const SMVUnitXY& _v0) {
+  SMVUnitXY& sAssignMv (const SMVUnitXY& _v0) {
     iMvX = _v0.iMvX;
     iMvY = _v0.iMvY;
     return (*this);

@@ -42,6 +42,7 @@
 #include "parameter_sets.h"
 #include "svc_enc_slice_segment.h"
 #include "set_mb_syn_cabac.h"
+#include "nal_encap.h"
 
 namespace WelsEnc {
 
@@ -79,6 +80,21 @@ bool            bLongTermRefFlag;
 bool            bAdaptiveRefPicMarkingModeFlag;
 } SRefPicMarking;
 
+// slice level rc statistic info
+typedef struct TagRCSlicing {
+  int32_t   iComplexityIndexSlice;
+  int32_t   iCalculatedQpSlice;
+  int32_t   iStartMbSlice;
+  int32_t   iEndMbSlice;
+  int32_t   iTotalQpSlice;
+  int32_t   iTotalMbSlice;
+  int32_t   iTargetBitsSlice;
+  int32_t   iBsPosSlice;
+  int32_t   iFrameBitsSlice;
+  int32_t   iGomBitsSlice;
+  int32_t   iGomTargetBits;
+  //int32_t   gom_coded_mb;
+} SRCSlicing;
 
 /* Header of slice syntax elements, refer to Page 63 in JVT X201wcm */
 typedef struct TagSliceHeader {
@@ -157,6 +173,7 @@ typedef struct TagSlice {
 // mainly for multiple threads imp.
 SMbCache        sMbCacheInfo;   // MBCache is introduced within slice dependency
 SBitStringAux*  pSliceBsa;
+SWelsSliceBs    sSliceBs;
 
 /*******************************sSliceHeader****************************/
 SSliceHeaderExt sSliceHeaderExt;
@@ -181,6 +198,12 @@ uint8_t         uiReservedFillByte;     // reserved to meet 4 bytes alignment
 SCabacCtx       sCabacCtx;
 int32_t         iCabacInitIdc;
 int32_t         iMbSkipRun;
+
+int32_t         iCountMbNumInSlice;
+uint32_t        uiSliceConsumeTime;
+int32_t         iSliceComplexRatio;
+
+SRCSlicing      sSlicingOverRc;   //slice level rc statistic info
 } SSlice, *PSlice;
 
 }

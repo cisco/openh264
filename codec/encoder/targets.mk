@@ -11,8 +11,8 @@ ENCODER_CPP_SRCS=\
 	$(ENCODER_SRCDIR)/core/src/md.cpp\
 	$(ENCODER_SRCDIR)/core/src/mv_pred.cpp\
 	$(ENCODER_SRCDIR)/core/src/nal_encap.cpp\
+	$(ENCODER_SRCDIR)/core/src/paraset_strategy.cpp\
 	$(ENCODER_SRCDIR)/core/src/picture_handle.cpp\
-	$(ENCODER_SRCDIR)/core/src/property.cpp\
 	$(ENCODER_SRCDIR)/core/src/ratectl.cpp\
 	$(ENCODER_SRCDIR)/core/src/ref_list_mgr_svc.cpp\
 	$(ENCODER_SRCDIR)/core/src/sample.cpp\
@@ -28,6 +28,9 @@ ENCODER_CPP_SRCS=\
 	$(ENCODER_SRCDIR)/core/src/svc_set_mb_syn_cabac.cpp\
 	$(ENCODER_SRCDIR)/core/src/svc_set_mb_syn_cavlc.cpp\
 	$(ENCODER_SRCDIR)/core/src/wels_preprocess.cpp\
+	$(ENCODER_SRCDIR)/core/src/wels_task_base.cpp\
+	$(ENCODER_SRCDIR)/core/src/wels_task_encoder.cpp\
+	$(ENCODER_SRCDIR)/core/src/wels_task_management.cpp\
 	$(ENCODER_SRCDIR)/plus/src/welsEncoderExt.cpp\
 
 ENCODER_OBJS += $(ENCODER_CPP_SRCS:.cpp=.$(OBJ))

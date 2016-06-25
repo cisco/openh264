@@ -1,6 +1,42 @@
 
 Releases
 -----------
+v1.5.2
+------
+- Fix GMP Plugin causing the Browser crash on Android
+
+v1.5.1
+------
+- Bug fixes for GMP Plugin
+
+v1.5.0
+------
+- Correct a typo in codec return value (github issue#2046, cmUnkonwReason -> cmUnknownReason)
+- Added Codec demo and auto build script for WP8
+- Decoder support of 'Constrained High Profile' of H.264
+- Encoder support of CABAC of H.264
+- Encoder support of input frame rate 60
+- Improved syntax of gaps_in_frame_num_value_allowed_flag in encoder
+- Improved memory usage for multi-threading in encoder
+- Added VUI info for base layer in encoder
+- Added encoder interface to get external setting of iMaxQp and iMinQp for rate control
+- Bug fixes for Rate Control, multi-threading and simulcasting in encoder
+- Bug fixes for NoDelay API, ParseOnly functions, error-concealment off functiond and error-detection in decoder
+- Bug fixes for UT
+- Fixes to avoid valgrind warnings, potential crash and calculation overflow
+- Merged files for decoder/encoder and remove unused files
+- Improvements on build scripts, UT, error-protection in decoder, input param checking in encoder, assembly for 64bit support, downsampling, logging and documentation
+
+Note:
+'Constrained High Profile' = 'Constrained Baseline Profile' plus:
+- CABAC
+- Intra 8x8 mode support
+- 8x8 transform
+- QP scaling matrices
+- QP per chroma component
+- Mono 4:0:0 (experimental)
+- Weighted prediction
+
 v1.4.0
 ------
 - Decoder new interface of DecodeFrameNoDelay
@@ -66,6 +102,17 @@ Binaries
 -----------
 These binary releases are distributed under this license:
 http://www.openh264.org/BINARY_LICENSE.txt
+
+v1.5.0
+------
+http://ciscobinary.openh264.org/libopenh264-1.5.0-android19.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.5.0-ios.a.bz2
+http://ciscobinary.openh264.org/libopenh264-1.5.0-linux32.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.5.0-linux64.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.5.0-osx32.dylib.bz2
+http://ciscobinary.openh264.org/libopenh264-1.5.0-osx64.dylib.bz2
+http://ciscobinary.openh264.org/openh264-1.5.0-win32msvc.dll.bz2
+http://ciscobinary.openh264.org/openh264-1.5.0-win64msvc.dll.bz2
 
 v1.4.0
 ------

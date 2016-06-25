@@ -301,7 +301,51 @@ void UpdateP8x8MotionInfo (SMbCache* pMbCache, SMB* pCurMb, const int32_t kiPart
       pMvComp->sMotionVectorCache[kiCacheIdx6] =
         pMvComp->sMotionVectorCache[kiCacheIdx7] = *pMv;
 }
+//update uiRefIndex and pMv of both SMB and Mb_cache, only for P4x4
+void UpdateP4x4MotionInfo (SMbCache* pMbCache, SMB* pCurMb, const int32_t kiPartIdx, const int8_t kiRef,
+                           SMVUnitXY* pMv) {
+  SMVComponentUnit* pMvComp = &pMbCache->sMvComponents;
+  const int16_t kiScan4Idx  = g_kuiMbCountScan4Idx[kiPartIdx];
+  const int16_t kiCacheIdx  = g_kuiCache30ScanIdx[kiPartIdx];
 
+  //mb
+  pCurMb->sMv[kiScan4Idx] = *pMv;
+  //cache
+  pMvComp->iRefIndexCache[kiCacheIdx] = kiRef;
+  pMvComp->sMotionVectorCache[kiCacheIdx] = *pMv;
+}
+//update uiRefIndex and pMv of both SMB and Mb_cache, only for P8x4
+void UpdateP8x4MotionInfo (SMbCache* pMbCache, SMB* pCurMb, const int32_t kiPartIdx, const int8_t kiRef,
+                           SMVUnitXY* pMv) {
+  SMVComponentUnit* pMvComp = &pMbCache->sMvComponents;
+  const int16_t kiScan4Idx  = g_kuiMbCountScan4Idx[kiPartIdx];
+  const int16_t kiCacheIdx  = g_kuiCache30ScanIdx[kiPartIdx];
+
+  //mb
+  pCurMb->sMv[    kiScan4Idx] = *pMv;
+  pCurMb->sMv[1 + kiScan4Idx] = *pMv;
+  //cache
+  pMvComp->iRefIndexCache[    kiCacheIdx] = kiRef;
+  pMvComp->iRefIndexCache[1 + kiCacheIdx] = kiRef;
+  pMvComp->sMotionVectorCache[    kiCacheIdx] = *pMv;
+  pMvComp->sMotionVectorCache[1 + kiCacheIdx] = *pMv;
+}
+//update uiRefIndex and pMv of both SMB and Mb_cache, only for P4x8
+void UpdateP4x8MotionInfo (SMbCache* pMbCache, SMB* pCurMb, const int32_t kiPartIdx, const int8_t kiRef,
+                           SMVUnitXY* pMv) {
+  SMVComponentUnit* pMvComp = &pMbCache->sMvComponents;
+  const int16_t kiScan4Idx  = g_kuiMbCountScan4Idx[kiPartIdx];
+  const int16_t kiCacheIdx  = g_kuiCache30ScanIdx[kiPartIdx];
+
+  //mb
+  pCurMb->sMv[    kiScan4Idx] = *pMv;
+  pCurMb->sMv[4 + kiScan4Idx] = *pMv;
+  //cache
+  pMvComp->iRefIndexCache[    kiCacheIdx] = kiRef;
+  pMvComp->iRefIndexCache[6 + kiCacheIdx] = kiRef;
+  pMvComp->sMotionVectorCache[    kiCacheIdx] = *pMv;
+  pMvComp->sMotionVectorCache[6 + kiCacheIdx] = *pMv;
+}
 //=========================update motion info(MV and ref_idx) into Mb_cache==========================
 //update pMv and uiRefIndex cache only for Mb_cache, only for P_16*16 (SKIP inclusive)
 
@@ -359,4 +403,34 @@ void UpdateP8x8Motion2Cache (SMbCache* pMbCache, int32_t iPartIdx, int8_t pRef, 
         pMvComp->sMotionVectorCache[7 + kuiCacheIdx] = *pMv;
 }
 
+//update uiRefIndex and pMv of only Mb_cache, for P4x4
+void UpdateP4x4Motion2Cache (SMbCache* pMbCache, int32_t iPartIdx, int8_t pRef, SMVUnitXY* pMv) {
+  SMVComponentUnit* pMvComp = &pMbCache->sMvComponents;
+  const uint8_t kuiCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
+
+  pMvComp->iRefIndexCache    [kuiCacheIdx] = pRef;
+  pMvComp->sMotionVectorCache[kuiCacheIdx] = *pMv;
+}
+
+//update uiRefIndex and pMv of only Mb_cache, for P8x4
+void UpdateP8x4Motion2Cache (SMbCache* pMbCache, int32_t iPartIdx, int8_t pRef, SMVUnitXY* pMv) {
+  SMVComponentUnit* pMvComp = &pMbCache->sMvComponents;
+  const uint8_t kuiCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
+
+  pMvComp->iRefIndexCache      [    kuiCacheIdx] =
+    pMvComp->iRefIndexCache    [1 + kuiCacheIdx] = pRef;
+  pMvComp->sMotionVectorCache  [    kuiCacheIdx] =
+    pMvComp->sMotionVectorCache[1 + kuiCacheIdx] = *pMv;
+}
+
+//update uiRefIndex and pMv of only Mb_cache, for P4x8
+void UpdateP4x8Motion2Cache (SMbCache* pMbCache, int32_t iPartIdx, int8_t pRef, SMVUnitXY* pMv) {
+  SMVComponentUnit* pMvComp = &pMbCache->sMvComponents;
+  const uint8_t kuiCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
+
+  pMvComp->iRefIndexCache      [    kuiCacheIdx] =
+    pMvComp->iRefIndexCache    [6 + kuiCacheIdx] = pRef;
+  pMvComp->sMotionVectorCache  [    kuiCacheIdx] =
+    pMvComp->sMotionVectorCache[6 + kuiCacheIdx] = *pMv;
+}
 } // namespace WelsEnc

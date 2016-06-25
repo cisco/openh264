@@ -107,7 +107,7 @@ void DecEncFileParamToParamExt (DecodeEncodeFileParam* pDecEncFileParam, SEncPar
   pEnxParamExt->iEntropyCodingModeFlag    = 0;
 
   for (int i = 0; i < pEnxParamExt->iSpatialLayerNum; i++) {
-    pEnxParamExt->sSpatialLayers[i].sSliceCfg.uiSliceMode = SM_SINGLE_SLICE;
+    pEnxParamExt->sSpatialLayers[i].sSliceArgument.uiSliceMode = SM_SINGLE_SLICE;
   }
 
 }
@@ -130,8 +130,8 @@ TEST_P (DecodeEncodeTest, CompareOutput) {
   }
 }
 static const DecodeEncodeFileParam kFileParamArray[] = {
-  {"res/test_vd_1d.264", "0d38e143df069d13a5e74cfd03f7ba92964a13d6", 320, 192, 12.0f},
-  {"res/test_vd_rc.264", "ea1e6c3bacd59312c18f9da0be105ba1fb8e57bb", 320, 192, 12.0f},
+  {"res/test_vd_1d.264", "cb3ec7a1bf37d0c08118f00009befb6f11dace3c", 320, 192, 12.0f},
+  {"res/test_vd_rc.264", "f231547ee7a3e6e4f1a05425280c41f285df390c", 320, 192, 12.0f},
 };
 
 

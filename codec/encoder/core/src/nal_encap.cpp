@@ -77,9 +77,8 @@ void WelsUnloadNal (SWelsEncoderOutput* pEncoderOuput) {
 /*!
  * \brief   load an initialize NAL pRawNal pData
  */
-void WelsLoadNalForSlice (SWelsSliceBs* pSliceBsIn, const int32_t/*EWelsNalUnitType*/ kiType,
+void WelsLoadNalForSlice (SWelsSliceBs* pSliceBs, const int32_t/*EWelsNalUnitType*/ kiType,
                           const int32_t/*EWelsNalRefIdc*/ kiNalRefIdc) {
-  SWelsSliceBs* pSliceBs                = pSliceBsIn;
   SWelsNalRaw* pRawNal                  = &pSliceBs->sNalList[ pSliceBs->iNalIndex ];
   SNalUnitHeader* sNalUnitHeader        = &pRawNal->sNalExt.sNalUnitHeader;
   SBitStringAux* pBitStringAux          = &pSliceBs->sBsWrite;
@@ -97,8 +96,7 @@ void WelsLoadNalForSlice (SWelsSliceBs* pSliceBsIn, const int32_t/*EWelsNalUnitT
 /*!
  * \brief   unload pRawNal NAL
  */
-void WelsUnloadNalForSlice (SWelsSliceBs* pSliceBsIn) {
-  SWelsSliceBs* pSliceBs        = pSliceBsIn;
+void WelsUnloadNalForSlice (SWelsSliceBs* pSliceBs) {
   int32_t*      pIdx            = &pSliceBs->iNalIndex;
   SWelsNalRaw* pRawNal          = &pSliceBs->sNalList[ *pIdx ];
   SBitStringAux* pBitStringAux  = &pSliceBs->sBsWrite;

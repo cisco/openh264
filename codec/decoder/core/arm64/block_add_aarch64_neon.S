@@ -68,7 +68,7 @@
 
 //  uint8_t *pred, const int32_t stride, int16_t *rs
 WELS_ASM_AARCH64_FUNC_BEGIN IdctResAddPred_AArch64_neon
-
+    SIGN_EXTENSION x1,w1
     ld4        {v0.4h, v1.4h, v2.4h, v3.4h}, [x2]      // cost 3 cycles!
     ROW_TRANSFORM_1_STEP        v0, v1, v2, v3, v16, v17, v18, v19, v4, v5
     TRANSFORM_4BYTES        v0, v1, v2, v3, v16, v17, v18, v19
@@ -113,6 +113,7 @@ WELS_ASM_AARCH64_FUNC_END
 WELS_ASM_AARCH64_FUNC_BEGIN WelsBlockZero16x16_AArch64_neon
     eor v0.16b, v0.16b, v0.16b
     eor v1.16b, v1.16b, v1.16b
+    SIGN_EXTENSION x1,w1
     lsl x1, x1, 1
 .rept 16
     st1 {v0.16b, v1.16b}, [x0], x1
@@ -121,6 +122,7 @@ WELS_ASM_AARCH64_FUNC_END
 
 WELS_ASM_AARCH64_FUNC_BEGIN WelsBlockZero8x8_AArch64_neon
     eor v0.16b, v0.16b, v0.16b
+    SIGN_EXTENSION x1, w1
     lsl x1, x1, 1
 .rept 8
     st1 {v0.16b}, [x0], x1

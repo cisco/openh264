@@ -39,6 +39,7 @@
  */
 #include <string.h>
 #include "rc.h"
+#include "svc_enc_frame.h"
 
 namespace WelsEnc {
 /*!
@@ -61,44 +62,41 @@ int32_t AssignMbMapSingleSlice (void* pMbMap, const int32_t kiCountMbNum, const 
 /*!
  * \brief   Assign MB map for multiple slice(s) segment
  *
- * \param   pMbMap          overall MB map
- * \param   iCountMbNum     count number of MB
+ * \param   pCurDq              current layer which its MB map will be assigned
+ * \param   kpSliceArgument     slice argument for current layer
  *
  * \return  0 - successful; none 0 - failed
  */
-int32_t AssignMbMapMultipleSlices (SSliceCtx* pSliceSeg, const SSliceConfig* kpMso) {
+int32_t AssignMbMapMultipleSlices (SDqLayer* pCurDq,const SSliceArgument* kpSliceArgument) {
+  SSliceCtx* pSliceSeg   = &pCurDq->sSliceEncCtx;
+  int32_t iSliceIdx      = 0;
   if (NULL == pSliceSeg || SM_SINGLE_SLICE == pSliceSeg->uiSliceMode)
     return 1;
 
-  if (SM_ROWMB_SLICE == pSliceSeg->uiSliceMode) {
+  if ((SM_RASTER_SLICE == pSliceSeg->uiSliceMode) && (0 == kpSliceArgument->uiSliceMbNum[0])) {
     const int32_t kiMbWidth = pSliceSeg->iMbWidth;
-    int32_t iSliceNum = pSliceSeg->iSliceNumInFrame, uiSliceIdx = 0;
+    int32_t iSliceNum = pSliceSeg->iSliceNumInFrame;
 
-    while (uiSliceIdx < iSliceNum) {
-      const int32_t kiFirstMb = uiSliceIdx * kiMbWidth;
-      pSliceSeg->pCountMbNumInSlice[uiSliceIdx] = kiMbWidth;
-      pSliceSeg->pFirstMbInSlice[uiSliceIdx]    = kiFirstMb;
-      WelsSetMemMultiplebytes_c(pSliceSeg->pOverallMbMap + kiFirstMb, uiSliceIdx,
+    iSliceIdx = 0;
+    while (iSliceIdx < iSliceNum) {
+      const int32_t kiFirstMb                       = iSliceIdx * kiMbWidth;
+      WelsSetMemMultiplebytes_c(pSliceSeg->pOverallMbMap + kiFirstMb, iSliceIdx,
                                 kiMbWidth, sizeof(uint16_t));
-      ++ uiSliceIdx;
+      ++ iSliceIdx;
     }
 
     return 0;
   } else if (SM_RASTER_SLICE  == pSliceSeg->uiSliceMode ||
-             SM_FIXEDSLCNUM_SLICE == pSliceSeg->uiSliceMode ||
-             SM_AUTO_SLICE == pSliceSeg->uiSliceMode) {
-    const int32_t* kpSlicesAssignList           = (int32_t*) & (kpMso->sSliceArgument.uiSliceMbNum[0]);
+             SM_FIXEDSLCNUM_SLICE == pSliceSeg->uiSliceMode) {
+    const int32_t* kpSlicesAssignList           = (int32_t*) & (kpSliceArgument->uiSliceMbNum[0]);
     const int32_t kiCountNumMbInFrame           = pSliceSeg->iMbNumInFrame;
     const int32_t kiCountSliceNumInFrame        = pSliceSeg->iSliceNumInFrame;
-    uint16_t iSliceIdx                          = 0;
     int32_t iMbIdx                              = 0;
 
+    iSliceIdx = 0;
     do {
-      const int32_t kiCurRunLength      = kpSlicesAssignList[iSliceIdx];
-      int32_t iRunIdx                   = 0;
-
-      pSliceSeg->pFirstMbInSlice[iSliceIdx]     = iMbIdx;
-      pSliceSeg->pCountMbNumInSlice[iSliceIdx]  = kiCurRunLength;
+      const int32_t kiCurRunLength                  = kpSlicesAssignList[iSliceIdx];
+      int32_t iRunIdx                               = 0;
 
       // due here need check validate mb_assign_map for input pData, can not use memset
       do {
@@ -109,15 +107,8 @@ int32_t AssignMbMapMultipleSlices (SSliceCtx* pSliceSeg, const SSliceConfig* kpM
       iMbIdx += kiCurRunLength;
       ++ iSliceIdx;
     } while (iSliceIdx < kiCountSliceNumInFrame && iMbIdx < kiCountNumMbInFrame);
-  } else if (SM_DYN_SLICE == pSliceSeg->uiSliceMode) {
-    int32_t iSliceIdx = 0;
-    const int32_t kiMaxSliceNum = pSliceSeg->iMaxSliceNumConstraint;
-    const int32_t kiCountNumMbInFrame = pSliceSeg->iMbNumInFrame;
-    do {
-      pSliceSeg->pFirstMbInSlice[iSliceIdx] = 0;
-      pSliceSeg->pCountMbNumInSlice[iSliceIdx] = kiCountNumMbInFrame;
-      iSliceIdx++;
-    } while (iSliceIdx < kiMaxSliceNum);
+  } else if (SM_SIZELIMITED_SLICE == pSliceSeg->uiSliceMode) {
+     // do nothing,pSliceSeg->pOverallMbMap will be initial later
   } else { // any else uiSliceMode?
     assert (0);
   }
@@ -145,7 +136,12 @@ bool CheckFixedSliceNumMultiSliceSetting (const int32_t kiMbNumInFrame, SSliceAr
     pSlicesAssignList[uiSliceIdx] = kiMbNumPerSlice;
     iNumMbLeft -= kiMbNumPerSlice;
   }
+
   pSlicesAssignList[uiSliceIdx] = iNumMbLeft;
+
+  if (iNumMbLeft <= 0 || kiMbNumPerSlice <= 0 ) {
+    return false;
+  }
 
   return true;
 }
@@ -287,7 +283,6 @@ bool GomValidCheckSliceMbNum (const int32_t kiMbWidth, const int32_t kiMbHeight,
   iMinimalMbNum = iGomSize;
   while (uiSliceIdx + 1 < kuiSliceNum) {
     iMaximalMbNum = iNumMbLeft - (kuiSliceNum - uiSliceIdx - 1) * iMinimalMbNum; // get maximal num_mb in left parts
-
     // make sure one GOM at least in each slice for safe
     if (iNumMbAssigning < iMinimalMbNum)
       iCurNumMbAssigning = iMinimalMbNum;
@@ -309,6 +304,9 @@ bool GomValidCheckSliceMbNum (const int32_t kiMbWidth, const int32_t kiMbHeight,
     ++ uiSliceIdx;
   }
   pSlicesAssignList[uiSliceIdx] = iNumMbLeft;
+  if ( iNumMbLeft < iMinimalMbNum ) {
+    return false;
+  }
 
   return true;
 }
@@ -318,19 +316,18 @@ bool GomValidCheckSliceMbNum (const int32_t kiMbWidth, const int32_t kiMbHeight,
  *  Get slice count for multiple slice segment
  *
  */
-int32_t GetInitialSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, SSliceConfig* pMso) {
-  if (NULL == pMso)
+int32_t GetInitialSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, SSliceArgument* pSliceArgument) {
+  if (NULL == pSliceArgument)
     return -1;
 
-  switch (pMso->uiSliceMode) {
+  switch (pSliceArgument->uiSliceMode) {
   case SM_SINGLE_SLICE:
   case SM_FIXEDSLCNUM_SLICE:
   case SM_RASTER_SLICE:
-  case SM_ROWMB_SLICE:
-  case SM_AUTO_SLICE: {
-    return pMso->sSliceArgument.uiSliceNum;
+    {
+    return pSliceArgument->uiSliceNum;
   }
-  case SM_DYN_SLICE: {
+  case SM_SIZELIMITED_SLICE: {
     return AVERSLICENUM_CONSTRAINT;//at the beginning of dynamic slicing, set the uiSliceNum to be 1
   }
   case SM_RESERVED:
@@ -345,7 +342,7 @@ int32_t GetInitialSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, S
 /*!
  * \brief   Initialize slice segment (Single/multiple slices)
  *
- * \param   pSliceSeg           SSlice segment to be initialized
+ * \param   pCurDq              current layer which its SSlice segment will be initialized
  * \param   uiSliceMode         SSlice mode
  * \param   multi_slice_argv    Multiple slices argument
  * \param   iMbWidth            MB width
@@ -353,18 +350,20 @@ int32_t GetInitialSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, S
  *
  * \return  0 - successful; none 0 - failed;
  */
-int32_t InitSliceSegment (SSliceCtx* pSliceSeg,
+int32_t InitSliceSegment (SDqLayer* pCurDq,
                           CMemoryAlign* pMa,
-                          SSliceConfig* pMso,
+                          SSliceArgument* pSliceArgument,
                           const int32_t kiMbWidth,
                           const int32_t kiMbHeight) {
-  const int32_t kiCountMbNum = kiMbWidth * kiMbHeight;
-  SliceModeEnum uiSliceMode = SM_SINGLE_SLICE;
+  SSliceCtx* pSliceSeg        = &pCurDq->sSliceEncCtx;
+  SSlice* pSliceInLayer     = pCurDq->sLayerInfo.pSliceInLayer;
+  const int32_t kiCountMbNum  = kiMbWidth * kiMbHeight;
+  SliceModeEnum uiSliceMode   = SM_SINGLE_SLICE;
 
-  if (NULL == pSliceSeg || NULL == pMso || kiMbWidth == 0 || kiMbHeight == 0)
+  if (NULL == pSliceSeg || NULL == pSliceArgument || kiMbWidth == 0 || kiMbHeight == 0)
     return 1;
 
-  uiSliceMode = pMso->uiSliceMode;
+  uiSliceMode = pSliceArgument->uiSliceMode;
   if (pSliceSeg->iMbNumInFrame == kiCountMbNum && pSliceSeg->iMbWidth == kiMbWidth
       && pSliceSeg->iMbHeight == kiMbHeight && pSliceSeg->uiSliceMode == uiSliceMode && pSliceSeg->pOverallMbMap != NULL)
     return 0;
@@ -374,16 +373,7 @@ int32_t InitSliceSegment (SSliceCtx* pSliceSeg,
 
       pSliceSeg->pOverallMbMap = NULL;
     }
-    if (NULL != pSliceSeg->pFirstMbInSlice) {
-      pMa->WelsFree (pSliceSeg->pFirstMbInSlice, "pSliceSeg->pFirstMbInSlice");
 
-      pSliceSeg->pFirstMbInSlice = NULL;
-    }
-    if (NULL != pSliceSeg->pCountMbNumInSlice) {
-      pMa->WelsFree (pSliceSeg->pCountMbNumInSlice, "pSliceSeg->pCountMbNumInSlice");
-
-      pSliceSeg->pCountMbNumInSlice = NULL;
-    }
     // just for safe
     pSliceSeg->iSliceNumInFrame = 0;
     pSliceSeg->iMbNumInFrame    = 0;
@@ -398,56 +388,36 @@ int32_t InitSliceSegment (SSliceCtx* pSliceSeg,
     WELS_VERIFY_RETURN_IF (1, NULL == pSliceSeg->pOverallMbMap)
     pSliceSeg->iSliceNumInFrame = 1;
 
-    pSliceSeg->pFirstMbInSlice = (int32_t*)pMa->WelsMalloc (pSliceSeg->iSliceNumInFrame * sizeof (int32_t),
-                                  "pSliceSeg->pFirstMbInSlice");
-
-    WELS_VERIFY_RETURN_IF (1, NULL == pSliceSeg->pFirstMbInSlice)
-
-    pSliceSeg->pCountMbNumInSlice = (int32_t*)pMa->WelsMalloc (pSliceSeg->iSliceNumInFrame * sizeof (int32_t),
-                                    "pSliceSeg->pCountMbNumInSlice");
-
-    WELS_VERIFY_RETURN_IF (1, NULL == pSliceSeg->pCountMbNumInSlice)
     pSliceSeg->uiSliceMode              = uiSliceMode;
     pSliceSeg->iMbWidth                 = kiMbWidth;
     pSliceSeg->iMbHeight                = kiMbHeight;
     pSliceSeg->iMbNumInFrame            = kiCountMbNum;
-    pSliceSeg->pCountMbNumInSlice[0]    = kiCountMbNum;
-    pSliceSeg->pFirstMbInSlice[0]       = 0;
+    pSliceInLayer[0].iCountMbNumInSlice = kiCountMbNum;
 
     return AssignMbMapSingleSlice (pSliceSeg->pOverallMbMap, kiCountMbNum, sizeof (pSliceSeg->pOverallMbMap[0]));
   } else { //if ( SM_MULTIPLE_SLICE == uiSliceMode )
-    if (uiSliceMode != SM_FIXEDSLCNUM_SLICE && uiSliceMode != SM_ROWMB_SLICE && uiSliceMode != SM_RASTER_SLICE
-        && uiSliceMode != SM_DYN_SLICE && uiSliceMode != SM_AUTO_SLICE)
+    if (uiSliceMode != SM_FIXEDSLCNUM_SLICE && uiSliceMode != SM_RASTER_SLICE
+        && uiSliceMode != SM_SIZELIMITED_SLICE )
       return 1;
 
     pSliceSeg->pOverallMbMap = (uint16_t*)pMa->WelsMalloc (kiCountMbNum * sizeof (uint16_t), "pSliceSeg->pOverallMbMap");
-
     WELS_VERIFY_RETURN_IF (1, NULL == pSliceSeg->pOverallMbMap)
 
     WelsSetMemMultiplebytes_c(pSliceSeg->pOverallMbMap, 0, kiCountMbNum, sizeof(uint16_t));
 
-    //SM_DYN_SLICE: init, set pSliceSeg->iSliceNumInFrame = 1;
-    pSliceSeg->iSliceNumInFrame = GetInitialSliceNum (kiMbWidth, kiMbHeight, pMso);
-
+    //SM_SIZELIMITED_SLICE: init, set pSliceSeg->iSliceNumInFrame = 1;
+    pSliceSeg->iSliceNumInFrame = GetInitialSliceNum (kiMbWidth, kiMbHeight, pSliceArgument);
     if (-1 == pSliceSeg->iSliceNumInFrame)
       return 1;
 
-    pSliceSeg->pCountMbNumInSlice = (int32_t*)pMa->WelsMalloc (pSliceSeg->iSliceNumInFrame * sizeof (int32_t),
-                                    "pSliceSeg->pCountMbNumInSlice");
+    pSliceSeg->uiSliceMode      = pSliceArgument->uiSliceMode;
 
-    WELS_VERIFY_RETURN_IF (1, NULL == pSliceSeg->pCountMbNumInSlice)
-
-    pSliceSeg->pFirstMbInSlice = (int32_t*)pMa->WelsMalloc (pSliceSeg->iSliceNumInFrame * sizeof (int32_t),
-                                    "pSliceSeg->pFirstMbInSlice");
-
-    WELS_VERIFY_RETURN_IF (1, NULL == pSliceSeg->pFirstMbInSlice)
-    pSliceSeg->uiSliceMode      = pMso->uiSliceMode;
     pSliceSeg->iMbWidth         = kiMbWidth;
     pSliceSeg->iMbHeight        = kiMbHeight;
     pSliceSeg->iMbNumInFrame    = kiCountMbNum;
-    if (SM_DYN_SLICE == pMso->uiSliceMode) {
-      if (0 < pMso->sSliceArgument.uiSliceSizeConstraint) {
-        pSliceSeg->uiSliceSizeConstraint = pMso->sSliceArgument.uiSliceSizeConstraint;
+    if (SM_SIZELIMITED_SLICE == pSliceArgument->uiSliceMode) {
+      if (0 < pSliceArgument->uiSliceSizeConstraint) {
+        pSliceSeg->uiSliceSizeConstraint = pSliceArgument->uiSliceSizeConstraint;
       } else {
         return 1;
       }
@@ -455,13 +425,13 @@ int32_t InitSliceSegment (SSliceCtx* pSliceSeg,
       pSliceSeg->uiSliceSizeConstraint = DEFAULT_MAXPACKETSIZE_CONSTRAINT;
     }
     // about "iMaxSliceNumConstraint"
-    //only used in SM_DYN_SLICE mode so far,
+    //only used in SM_SIZELIMITED_SLICE mode so far,
     //now follows NAL_UNIT_CONSTRAINT, (see definition)
     //will be adjusted under MT if there is limitation on iLayerNum
     pSliceSeg->iMaxSliceNumConstraint = MAX_SLICES_NUM;
 
 
-    return AssignMbMapMultipleSlices (pSliceSeg, pMso);
+    return AssignMbMapMultipleSlices (pCurDq, pSliceArgument);
   }
   return 0;
 }
@@ -469,33 +439,26 @@ int32_t InitSliceSegment (SSliceCtx* pSliceSeg,
 /*!
  * \brief   Uninitialize slice segment (Single/multiple slices)
  *
- * \param   pSliceSeg           SSlice segment to be uninitialized
+ * \param   pCurDq           current layer which its SSlice segment will be uninitialized
  *
  * \return  none;
  */
-void UninitSliceSegment (SSliceCtx* pSliceSeg, CMemoryAlign* pMa) {
+void UninitSliceSegment (SDqLayer* pCurDq, CMemoryAlign* pMa) {
+  SSliceCtx* pSliceSeg = &pCurDq->sSliceEncCtx;
   if (NULL != pSliceSeg) {
     if (NULL != pSliceSeg->pOverallMbMap) {
       pMa->WelsFree (pSliceSeg->pOverallMbMap, "pSliceSeg->pOverallMbMap");
 
       pSliceSeg->pOverallMbMap = NULL;
     }
-    if (NULL != pSliceSeg->pFirstMbInSlice) {
-      pMa->WelsFree (pSliceSeg->pFirstMbInSlice, "pSliceSeg->pFirstMbInSlice");
 
-      pSliceSeg->pFirstMbInSlice = NULL;
-    }
-    if (NULL != pSliceSeg->pCountMbNumInSlice) {
-      pMa->WelsFree (pSliceSeg->pCountMbNumInSlice, "pSliceSeg->pCountMbNumInSlice");
-
-      pSliceSeg->pCountMbNumInSlice = NULL;
-    }
-
-    pSliceSeg->iMbNumInFrame    = 0;
+    pSliceSeg->uiSliceMode      = SM_SINGLE_SLICE;      // single in default
     pSliceSeg->iMbWidth         = 0;
     pSliceSeg->iMbHeight        = 0;
-    pSliceSeg->uiSliceMode      = SM_SINGLE_SLICE;      // single in default
     pSliceSeg->iSliceNumInFrame = 0;
+    pSliceSeg->iMbNumInFrame    = 0;
+    pSliceSeg->uiSliceSizeConstraint = 0;
+    pSliceSeg->iMaxSliceNumConstraint    = 0;
   }
 }
 
@@ -503,7 +466,7 @@ void UninitSliceSegment (SSliceCtx* pSliceSeg, CMemoryAlign* pMa) {
 /*!
  * \brief   Initialize Wels SSlice context (Single/multiple slices and FMO)
  *
- * \param   pSliceCtx       SSlice context to be initialized
+ * \param   pCurDq          current layer which its SSlice context will be initialized
  * \param   bFmoUseFlag     flag of using fmo
  * \param   iMbWidth        MB width
  * \param   iMbHeight       MB height
@@ -513,19 +476,19 @@ void UninitSliceSegment (SSliceCtx* pSliceSeg, CMemoryAlign* pMa) {
  *
  * \return  0 - successful; none 0 - failed;
  */
-int32_t InitSlicePEncCtx (SSliceCtx* pSliceCtx,
+int32_t InitSlicePEncCtx (SDqLayer* pCurDq,
                           CMemoryAlign* pMa,
                           bool bFmoUseFlag,
                           int32_t iMbWidth,
                           int32_t iMbHeight,
-                          SSliceConfig* pMso,
+                          SSliceArgument* pSliceArgument,
                           void* pPpsArg) {
-  if (NULL == pSliceCtx)
+  if (NULL == pCurDq)
     return 1;
 
-  InitSliceSegment (pSliceCtx,
+  InitSliceSegment (pCurDq,
                     pMa,
-                    pMso,
+                    pSliceArgument,
                     iMbWidth,
                     iMbHeight);
   return 0;
@@ -534,25 +497,29 @@ int32_t InitSlicePEncCtx (SSliceCtx* pSliceCtx,
 /*!
  * \brief   Uninitialize Wels SSlice context (Single/multiple slices and FMO)
  *
- * \param   pSliceCtx       SSlice context to be initialized
+ * \param   pCurDq       current layer which its SSlice context will be initialized
  *
  * \return  NONE;
  */
-void UninitSlicePEncCtx (SSliceCtx* pSliceCtx, CMemoryAlign* pMa) {
-  if (NULL != pSliceCtx) {
-    UninitSliceSegment (pSliceCtx, pMa);
+void UninitSlicePEncCtx (SDqLayer* pCurDq, CMemoryAlign* pMa) {
+  if (NULL != pCurDq) {
+    UninitSliceSegment (pCurDq, pMa);
   }
 }
 
 /*!
  * \brief   Get slice idc for given iMbXY (apply in Single/multiple slices and FMO)
  *
- * \param   pSliceCtx       SSlice context
- * \param   kiMbXY          MB xy index
+ * \param   pCurDq    current layer info
+ * \param   kiMbXY    MB xy index
  *
  * \return  uiSliceIdc - successful; -1 - failed;
  */
-uint16_t WelsMbToSliceIdc (SSliceCtx* pSliceCtx, const int32_t kiMbXY) {
+uint16_t WelsMbToSliceIdc (SDqLayer* pCurDq, const int32_t kiMbXY) {
+  if (NULL == pCurDq)
+    return (uint16_t) (-1);
+
+  SSliceCtx* pSliceCtx = &pCurDq->sSliceEncCtx;
   if (NULL != pSliceCtx && kiMbXY < pSliceCtx->iMbNumInFrame && kiMbXY >= 0)
     return pSliceCtx->pOverallMbMap[ kiMbXY ];
   return (uint16_t) (-1);
@@ -561,26 +528,29 @@ uint16_t WelsMbToSliceIdc (SSliceCtx* pSliceCtx, const int32_t kiMbXY) {
 /*!
  * \brief   Get first mb in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
  *
- * \param   pSliceCtx       SSlice context
+ * \param   pSliceInLayer   slice list in current layer
  * \param   kuiSliceIdc     slice idc
  *
  * \return  iFirstMb - successful; -1 - failed;
  */
-int32_t WelsGetFirstMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kuiSliceIdc) {
-  return pSliceCtx->pFirstMbInSlice[ kuiSliceIdc ];
+int32_t WelsGetFirstMbOfSlice (SSlice* pSliceInLayer, const int32_t kuiSliceIdc) {
+  if ( NULL == pSliceInLayer || NULL == &pSliceInLayer[kuiSliceIdc] )
+    return -1;
+
+  return pSliceInLayer[kuiSliceIdc].sSliceHeaderExt.sSliceHeader.iFirstMbInSlice;
 }
 
 /*!
  * \brief   Get successive mb to be processed in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
  *
- * \param   pSliceCtx       SSlice context
- * \param   kiMbXY          MB xy index
+ * \param   pCurDq     current layer info
+ * \param   kiMbXY     MB xy index
  *
  * \return  next_mb - successful; -1 - failed;
  */
-int32_t WelsGetNextMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kiMbXY) {
-  if (NULL != pSliceCtx) {
-    SSliceCtx* pSliceSeg = pSliceCtx;
+int32_t WelsGetNextMbOfSlice (SDqLayer* pCurDq, const int32_t kiMbXY) {
+  if (NULL != pCurDq) {
+    SSliceCtx* pSliceSeg = &pCurDq->sSliceEncCtx;
     if (NULL == pSliceSeg || kiMbXY < 0 || kiMbXY >= pSliceSeg->iMbNumInFrame)
       return -1;
     if (SM_SINGLE_SLICE == pSliceSeg->uiSliceMode) {
@@ -607,14 +577,14 @@ int32_t WelsGetNextMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kiMbXY) {
 /*!
  * \brief   Get previous mb to be processed in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
  *
- * \param   pSliceCtx       SSlice context
- * \param   kiMbXY          MB xy index
+ * \param   pCurDq     current layer info
+ * \param   kiMbXY     MB xy index
  *
  * \return  prev_mb - successful; -1 - failed;
  */
-int32_t WelsGetPrevMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kiMbXY) {
-  if (NULL != pSliceCtx) {
-    SSliceCtx* pSliceSeg = pSliceCtx;
+int32_t WelsGetPrevMbOfSlice (SDqLayer* pCurDq, const int32_t kiMbXY) {
+  if (NULL != pCurDq) {
+    SSliceCtx* pSliceSeg = &pCurDq->sSliceEncCtx;
     if (NULL == pSliceSeg || kiMbXY < 0 || kiMbXY >= pSliceSeg->iMbNumInFrame)
       return -1;
     if (pSliceSeg->uiSliceMode == SM_SINGLE_SLICE)
@@ -642,28 +612,34 @@ int32_t WelsGetPrevMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kiMbXY) {
  *
  * \return  count_num_of_mb - successful; -1 - failed;
  */
-int32_t WelsGetNumMbInSlice (SSliceCtx* pSliceCtx, const int32_t kuiSliceIdc) {
+int32_t WelsGetNumMbInSlice (SDqLayer* pCurDq, const int32_t kuiSliceIdc) {
+  SSliceCtx* pSliceCtx = &pCurDq->sSliceEncCtx;
+  SSlice* pSlice       = &pCurDq->sLayerInfo.pSliceInLayer[kuiSliceIdc];
+
   if (NULL == pSliceCtx || kuiSliceIdc < 0)
     return -1;
   {
     SSliceCtx* pSliceSeg = pSliceCtx;
     if (SM_SINGLE_SLICE != pSliceSeg->uiSliceMode) {
-      if (NULL == pSliceSeg->pCountMbNumInSlice || kuiSliceIdc >= pSliceSeg->iSliceNumInFrame)
+      if (kuiSliceIdc >= pSliceSeg->iSliceNumInFrame)
         return -1;
-      return pSliceSeg->pCountMbNumInSlice[ kuiSliceIdc ];
+      return pSlice->iCountMbNumInSlice;
     } else { /*if ( pSliceSeg->uiSliceMode == SM_SINGLE_SLICE )*/
-      if (kuiSliceIdc > 0 || NULL == pSliceSeg->pCountMbNumInSlice)
+      if (kuiSliceIdc > 0)
         return -1;
-      return pSliceSeg->pCountMbNumInSlice[ kuiSliceIdc ];
+      return pSlice->iCountMbNumInSlice;
     }
   }
 }
 
-int32_t GetCurrentSliceNum (const SSliceCtx* kpSliceCtx) {
+int32_t GetCurrentSliceNum (const SDqLayer* pCurDq) {
+  const SSliceCtx* kpSliceCtx = &pCurDq->sSliceEncCtx;
   return (kpSliceCtx != NULL) ? (kpSliceCtx->iSliceNumInFrame) : (-1);
 }
-int32_t DynamicAdjustSlicePEncCtxAll (SSliceCtx* pSliceCtx,
+int32_t DynamicAdjustSlicePEncCtxAll (SDqLayer* pCurDq,
                                       int32_t* pRunLength) {
+  SSliceCtx* pSliceCtx                  = &pCurDq->sSliceEncCtx;
+  SSlice* pSliceInLayer                 = pCurDq->sLayerInfo.pSliceInLayer;
   const int32_t iCountNumMbInFrame      = pSliceCtx->iMbNumInFrame;
   const int32_t iCountSliceNumInFrame   = pSliceCtx->iSliceNumInFrame;
   int32_t iSameRunLenFlag               = 1;
@@ -673,7 +649,7 @@ int32_t DynamicAdjustSlicePEncCtxAll (SSliceCtx* pSliceCtx,
   assert (iCountSliceNumInFrame <= MAX_THREADS_NUM);
 
   while (iSliceIdx < iCountSliceNumInFrame) {
-    if (pRunLength[iSliceIdx] != pSliceCtx->pCountMbNumInSlice[iSliceIdx]) {
+    if (pRunLength[iSliceIdx] != pSliceInLayer[iSliceIdx].iCountMbNumInSlice) {
       iSameRunLenFlag = 0;
       break;
     }
@@ -686,9 +662,9 @@ int32_t DynamicAdjustSlicePEncCtxAll (SSliceCtx* pSliceCtx,
   iSliceIdx = 0;
   do {
     const int32_t kiSliceRun = pRunLength[iSliceIdx];
-
-    pSliceCtx->pFirstMbInSlice[iSliceIdx]    = iFirstMbIdx;
-    pSliceCtx->pCountMbNumInSlice[iSliceIdx] = kiSliceRun;
+    SSliceHeaderExt* pSliceHeaderExt              = &pSliceInLayer[iSliceIdx].sSliceHeaderExt;
+    pSliceHeaderExt->sSliceHeader.iFirstMbInSlice = iFirstMbIdx;
+    pSliceInLayer[iSliceIdx].iCountMbNumInSlice   = kiSliceRun;
 
     WelsSetMemMultiplebytes_c(pSliceCtx->pOverallMbMap + iFirstMbIdx, iSliceIdx,
                               kiSliceRun, sizeof(uint16_t));

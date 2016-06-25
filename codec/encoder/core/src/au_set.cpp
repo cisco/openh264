@@ -202,7 +202,27 @@ int32_t WelsWriteVUI (SWelsSPS* pSps, SBitStringAux* pBitStringAux) {
 
   BsWriteOneBit (pLocalBitStringAux, false); //aspect_ratio_info_present_flag
   BsWriteOneBit (pLocalBitStringAux, false); //overscan_info_present_flag
-  BsWriteOneBit (pLocalBitStringAux, false); //video_signal_type_present_flag
+
+  // See codec_app_def.h and parameter_sets.h for more info about members bVideoSignalTypePresent through uiColorMatrix.
+  BsWriteOneBit (pLocalBitStringAux, pSps->bVideoSignalTypePresent); //video_signal_type_present_flag
+  if  ( pSps->bVideoSignalTypePresent )
+  {//write video signal type info to header
+
+    BsWriteBits (pLocalBitStringAux, 3, pSps->uiVideoFormat);
+    BsWriteOneBit (pLocalBitStringAux, pSps->bFullRange);
+    BsWriteOneBit (pLocalBitStringAux, pSps->bColorDescriptionPresent);
+
+    if  ( pSps->bColorDescriptionPresent )
+    {//write color description info to header
+
+      BsWriteBits (pLocalBitStringAux, 8, pSps->uiColorPrimaries);
+      BsWriteBits (pLocalBitStringAux, 8, pSps->uiTransferCharacteristics);
+      BsWriteBits (pLocalBitStringAux, 8, pSps->uiColorMatrix);
+
+    }//write color description info to header
+
+  }//write video signal type info to header
+
   BsWriteOneBit (pLocalBitStringAux, false); //chroma_loc_info_present_flag
   BsWriteOneBit (pLocalBitStringAux, false); //timing_info_present_flag
   BsWriteOneBit (pLocalBitStringAux, false); //nal_hrd_parameters_present_flag
@@ -360,29 +380,12 @@ int32_t WelsWriteSubsetSpsSyntax (SSubsetSps* pSubsetSps, SBitStringAux* pBitStr
  * \note    Call it in case EWelsNalUnitType is PPS.
  *************************************************************************************
  */
-int32_t WelsWritePpsSyntax (SWelsPPS* pPps, SBitStringAux* pBitStringAux, SParaSetOffset* pPSOVector) {
+int32_t WelsWritePpsSyntax (SWelsPPS* pPps, SBitStringAux* pBitStringAux,
+                            IWelsParametersetStrategy* pParametersetStrategy) {
   SBitStringAux* pLocalBitStringAux = pBitStringAux;
 
-  const int32_t kiParameterSetType = (pPSOVector != NULL) ? (pPSOVector->bPpsIdMappingIntoSubsetsps[pPps->iPpsId] ?
-                                     PARA_SET_TYPE_SUBSETSPS : PARA_SET_TYPE_AVCSPS) : 0;
-
-  BsWriteUE (pLocalBitStringAux, pPps->iPpsId
-             + ((pPSOVector != NULL) ? (pPSOVector->sParaSetOffsetVariable[PARA_SET_TYPE_PPS].iParaSetIdDelta[pPps->iPpsId]) : 0));
-  BsWriteUE (pLocalBitStringAux, pPps->iSpsId
-             + ((pPSOVector != NULL) ? (pPSOVector->sParaSetOffsetVariable[kiParameterSetType].iParaSetIdDelta[pPps->iSpsId]) : 0));
-
-#if _DEBUG
-  //SParaSetOffset use, 110421
-  if ((pPSOVector != NULL) && (INCREASING_ID & pPSOVector->eSpsPpsIdStrategy)) {
-    const int32_t kiTmpSpsIdInBs = pPps->iSpsId +
-                                   pPSOVector->sParaSetOffsetVariable[kiParameterSetType].iParaSetIdDelta[pPps->iSpsId];
-    const int32_t tmp_pps_id_in_bs = pPps->iPpsId +
-                                     pPSOVector->sParaSetOffsetVariable[PARA_SET_TYPE_PPS].iParaSetIdDelta[pPps->iPpsId];
-    assert (MAX_SPS_COUNT > kiTmpSpsIdInBs);
-    assert (MAX_PPS_COUNT > tmp_pps_id_in_bs);
-    assert (pPSOVector->sParaSetOffsetVariable[kiParameterSetType].bUsedParaSetIdInBs[kiTmpSpsIdInBs]);
-  }
-#endif
+  BsWriteUE (pLocalBitStringAux, pPps->iPpsId + pParametersetStrategy->GetPpsIdOffset (pPps->iPpsId));
+  BsWriteUE (pLocalBitStringAux, pPps->iSpsId + pParametersetStrategy->GetSpsIdOffset (pPps->iPpsId, pPps->iSpsId));
 
   BsWriteOneBit (pLocalBitStringAux, pPps->bEntropyCodingModeFlag);
   BsWriteOneBit (pLocalBitStringAux, false/*pPps->bPicOrderPresentFlag*/);
@@ -517,6 +520,16 @@ int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialL
     pSps->bGapsInFrameNumValueAllowedFlag = true;
 
   pSps->bVuiParamPresentFlag = true;
+
+  // See codec_app_def.h and parameter_sets.h for more info about members bVideoSignalTypePresent through uiColorMatrix.
+  pSps->bVideoSignalTypePresent =   pLayerParam->bVideoSignalTypePresent;
+  pSps->uiVideoFormat =             pLayerParam->uiVideoFormat;
+  pSps->bFullRange =                pLayerParam->bFullRange;
+  pSps->bColorDescriptionPresent =  pLayerParam->bColorDescriptionPresent;
+  pSps->uiColorPrimaries =          pLayerParam->uiColorPrimaries;
+  pSps->uiTransferCharacteristics = pLayerParam->uiTransferCharacteristics;
+  pSps->uiColorMatrix =             pLayerParam->uiColorMatrix;
+
   return 0;
 }
 

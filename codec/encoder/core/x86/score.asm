@@ -337,3 +337,17 @@ WELS_EXTERN WelsGetNoneZeroCount_sse2
     ;add       al,  [nozero_count_table+r1]
     ret
 
+;***********************************************************************
+; int32_t WelsGetNoneZeroCount_sse42(int16_t* level);
+;***********************************************************************
+WELS_EXTERN WelsGetNoneZeroCount_sse42
+    %assign push_num 0
+    LOAD_1_PARA
+    movdqa          xmm0, [r0]
+    packsswb        xmm0, [r0 + 16]
+    pxor            xmm1, xmm1
+    pcmpeqb         xmm0, xmm1
+    pmovmskb        retrd, xmm0
+    xor             retrd, 0FFFFh
+    popcnt          retrd, retrd
+    ret

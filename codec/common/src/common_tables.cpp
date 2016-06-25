@@ -165,12 +165,12 @@ const EVclType g_keTypeMap[32][2] = {
   { NON_VCL,    NON_VCL },      // 13: NAL_UNIT_SPS_EXT
   { NON_VCL,    NON_VCL },      // 14: NAL_UNIT_PREFIX, NEED associate succeeded NAL to make a VCL
   { NON_VCL,    NON_VCL },      // 15: NAL_UNIT_SUBSET_SPS
-  { NON_VCL,    NON_VCL },      // 16: NAL_UNIT_RESV_16
+  { NON_VCL,    NON_VCL },      // 16: NAL_UNIT_DEPTH_PARAM
   { NON_VCL,    NON_VCL },      // 17: NAL_UNIT_RESV_17
   { NON_VCL,    NON_VCL },      // 18: NAL_UNIT_RESV_18
   { NON_VCL,    NON_VCL },      // 19: NAL_UNIT_AUX_CODED_SLICE
   { NON_VCL,    VCL     },      // 20: NAL_UNIT_CODED_SLICE_EXT
-  { NON_VCL,    NON_VCL },      // 21: NAL_UNIT_RESV_21
+  { NON_VCL,    NON_VCL },      // 21: NAL_UNIT_MVC_SLICE_EXT
   { NON_VCL,    NON_VCL },      // 22: NAL_UNIT_RESV_22
   { NON_VCL,    NON_VCL },      // 23: NAL_UNIT_RESV_23
   { NON_VCL,    NON_VCL },      // 24: NAL_UNIT_UNSPEC_24

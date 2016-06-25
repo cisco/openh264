@@ -83,6 +83,7 @@ typedef void (*PChromaDeblockingEQ4Func) (uint8_t* iSampleCb, uint8_t* iSampleCr
     int32_t iBeta);
 typedef void (*PDeblockingBSCalc) (SWelsFuncPtrList* pFunc, SMB* pCurMb, uint8_t uiBS[2][4][4], Mb_Type uiCurMbType,
                                    int32_t iMbStride, int32_t iLeftFlag, int32_t iTopFlag);
+typedef void (*PDeblockingFilterSlice) (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc, const int32_t kiSliceIdx);
 
 typedef struct tagDeblockingFunc {
   PLumaDeblockingLT4Func    pfLumaDeblockingLT4Ver;
@@ -96,6 +97,8 @@ typedef struct tagDeblockingFunc {
   PChromaDeblockingEQ4Func  pfChromaDeblockingEQ4Hor;
 
   PDeblockingBSCalc         pfDeblockingBSCalc;
+
+  PDeblockingFilterSlice    pfDeblockingFilterSlice;
 } DeblockingFunc;
 
 typedef  void (*PSetNoneZeroCountZeroFunc) (int8_t* pNonZeroCount);
@@ -189,6 +192,8 @@ typedef  int32_t (*PCavlcParamCalFunc) (int16_t* pCoff, uint8_t* pRun, int16_t* 
 typedef int32_t (*PWelsSpatialWriteMbSyn) (sWelsEncCtx* pCtx, SSlice* pSlice, SMB* pCurMb);
 typedef void (*PStashMBStatus) (SDynamicSlicingStack* pDss, SSlice* pSlice, int32_t iMbSkipRun);
 typedef int32_t (*PStashPopMBStatus) (SDynamicSlicingStack* pDss, SSlice* pSlice);
+typedef int32_t (*PGetBsPosition)(SSlice *pSlice);
+class IWelsParametersetStrategy;
 
 struct TagWelsFuncPointerList {
   SExpandPicFunc sExpandPicFunc;
@@ -281,16 +286,13 @@ struct TagWelsFuncPointerList {
   PSetMemoryZero        pfSetMemZeroSize64Aligned16;      // for size is times of 64, and address is align to 16
   PSetMemoryZero        pfSetMemZeroSize64;      // for size is times of 64, and don't know address is align to 16 or not
 
-  PBuildRefListFunc     pBuildRefList;
-  PMarkPicFunc          pMarkPic;
-  PUpdateRefListFunc    pUpdateRefList;
-  PEndofUpdateRefListFunc    pEndofUpdateRefList;
-  PAfterBuildRefListFunc    pAfterBuildRefList;
-
   PCavlcParamCalFunc    pfCavlcParamCal;
   PWelsSpatialWriteMbSyn pfWelsSpatialWriteMbSyn;
+  PGetBsPosition pfGetBsPosition;
   PStashMBStatus pfStashMBStatus;
   PStashPopMBStatus pfStashPopMBStatus;
+
+  IWelsParametersetStrategy* pParametersetStrategy;
 };
 
 }  //end of namespace WelsEnc {

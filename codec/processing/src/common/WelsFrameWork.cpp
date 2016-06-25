@@ -233,16 +233,16 @@ bool  CVpFrameWork::CheckValid (EMethods eMethod, SPixMap& pSrcPixMap, SPixMap& 
   }
 
   if (pSrcPixMap.pPixel[0]) {
-    if (pSrcPixMap.sRect.iRectWidth <= 0 || pSrcPixMap.sRect.iRectWidth > MAX_WIDTH || pSrcPixMap.sRect.iRectHeight <= 0
-        || pSrcPixMap.sRect.iRectHeight > MAX_HEIGHT)
+    if (pSrcPixMap.sRect.iRectWidth <= 0 || pSrcPixMap.sRect.iRectHeight <= 0
+        || pSrcPixMap.sRect.iRectWidth * pSrcPixMap.sRect.iRectHeight > (MAX_MBS_PER_FRAME << 8))
       goto exit;
     if (pSrcPixMap.sRect.iRectTop >= pSrcPixMap.sRect.iRectHeight
         || pSrcPixMap.sRect.iRectLeft >= pSrcPixMap.sRect.iRectWidth || pSrcPixMap.sRect.iRectWidth > pSrcPixMap.iStride[0])
       goto exit;
   }
   if (pDstPixMap.pPixel[0]) {
-    if (pDstPixMap.sRect.iRectWidth <= 0 || pDstPixMap.sRect.iRectWidth > MAX_WIDTH || pDstPixMap.sRect.iRectHeight <= 0
-        || pDstPixMap.sRect.iRectHeight > MAX_HEIGHT)
+    if (pDstPixMap.sRect.iRectWidth <= 0 || pDstPixMap.sRect.iRectHeight <= 0
+        || pDstPixMap.sRect.iRectWidth * pDstPixMap.sRect.iRectHeight > (MAX_MBS_PER_FRAME << 8))
       goto exit;
     if (pDstPixMap.sRect.iRectTop >= pDstPixMap.sRect.iRectHeight
         || pDstPixMap.sRect.iRectLeft >= pDstPixMap.sRect.iRectWidth || pDstPixMap.sRect.iRectWidth > pDstPixMap.iStride[0])

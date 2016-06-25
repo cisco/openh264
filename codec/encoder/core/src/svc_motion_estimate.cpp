@@ -65,8 +65,8 @@ static inline void UpdateMeResults (const SMVUnitXY ksBestMv, const uint32_t kiB
 }
 static inline void MeEndIntepelSearch (SWelsME* pMe) {
   /* -> qpel mv */
-  pMe->sMv.iMvX <<= 2;
-  pMe->sMv.iMvY <<= 2;
+  pMe->sMv.iMvX *= (1 << 2);
+  pMe->sMv.iMvY *= (1 << 2);
   pMe->uiSatdCost = pMe->uiSadCost;
 }
 
@@ -194,7 +194,7 @@ void WelsMotionEstimateSearchScrolled (SWelsFuncPtrList* pFuncList, SDqLayer* pC
   pMe->pRefMb = pMe->pColoRefMb + pMe->sMv.iMvY * kiStrideRef + pMe->sMv.iMvX;
   pMe->uiSadCost =
     pFuncList->sSampleDealingFuncs.pfSampleSad[pMe->uiBlockSize] (pMe->pEncMb, kiStrideEnc, pMe->pRefMb, kiStrideRef)
-    + COST_MVD (pMe->pMvdCost, (pMe->sMv.iMvX << 2) - pMe->sMvp.iMvX, (pMe->sMv.iMvY << 2) - pMe->sMvp.iMvY);
+    + COST_MVD (pMe->pMvdCost, (pMe->sMv.iMvX * (1 << 2)) - pMe->sMvp.iMvX, (pMe->sMv.iMvY * (1 << 2)) - pMe->sMvp.iMvY);
   MeEndIntepelSearch (pMe);
   pFuncList->pfCalculateSatd (pFuncList->sSampleDealingFuncs.pfSampleSatd[pMe->uiBlockSize], pMe, kiStrideEnc,
                               kiStrideRef);
@@ -235,7 +235,7 @@ bool WelsMotionEstimateInitialPoint (SWelsFuncPtrList* pFuncList, SWelsME* pMe, 
   pRefMb = &pMe->pRefMb[sMv.iMvY * iStrideRef + sMv.iMvX];
 
   iBestSadCost = pSad (kpEncMb, iStrideEnc, pRefMb, iStrideRef);
-  iBestSadCost += COST_MVD (kpMvdCost, ((sMv.iMvX) << 2) - ksMvp.iMvX, ((sMv.iMvY) << 2) - ksMvp.iMvY);
+  iBestSadCost += COST_MVD (kpMvdCost, ((sMv.iMvX) * (1 << 2)) - ksMvp.iMvX, ((sMv.iMvY) * (1 << 2)) - ksMvp.iMvY);
 
   for (i = 0; i < kuiMvcNum; i++) {
     //clipping here is essential since some pOut-of-range MVC may happen here (i.e., refer to baseMV)
@@ -246,7 +246,7 @@ bool WelsMotionEstimateInitialPoint (SWelsFuncPtrList* pFuncList, SWelsME* pMe, 
       pFref2 = &pMe->pRefMb[iMvc1 * iStrideRef + iMvc0];
 
       iSadCost = pSad (kpEncMb, iStrideEnc, pFref2, iStrideRef) +
-                 COST_MVD (kpMvdCost, (iMvc0 << 2) - ksMvp.iMvX, (iMvc1 << 2) - ksMvp.iMvY);
+                 COST_MVD (kpMvdCost, (iMvc0 * (1 << 2)) - ksMvp.iMvX, (iMvc1 * (1 << 2)) - ksMvp.iMvY);
 
       if (iSadCost < iBestSadCost) {
         sMv.iMvX = iMvc0;
@@ -333,8 +333,8 @@ void WelsDiamondSearch (SWelsFuncPtrList* pFuncList, SWelsME* pMe, SSlice* pSlic
   const SMVUnitXY ksMvStartMin    = pSlice->sMvStartMin;
   const SMVUnitXY ksMvStartMax    = pSlice->sMvStartMax;
 
-  int32_t iMvDx = ((pMe->sMv.iMvX) << 2) - pMe->sMvp.iMvX;
-  int32_t iMvDy = ((pMe->sMv.iMvY) << 2) - pMe->sMvp.iMvY;
+  int32_t iMvDx = ((pMe->sMv.iMvX) * (1 << 2)) - pMe->sMvp.iMvX;
+  int32_t iMvDy = ((pMe->sMv.iMvY) * (1 << 2)) - pMe->sMvp.iMvY;
 
   uint8_t* pRefMb = pFref;
   int32_t iBestCost = (pMe->uiSadCost);
@@ -355,8 +355,8 @@ void WelsDiamondSearch (SWelsFuncPtrList* pFuncList, SWelsME* pMe, SSlice* pSlic
     if (kbIsBestCostWorse)
       break;
 
-    iMvDx -= iX << 2 ;
-    iMvDy -= iY << 2 ;
+    iMvDx -= (iX * (1 << 2)) ;
+    iMvDy -= (iY * (1 << 2)) ;
 
     pRefMb -= (iX + iY * kiStrideRef);
 
@@ -384,7 +384,7 @@ bool CheckDirectionalMv (PSampleSadSatdCostFunc pSad, SWelsME* pMe,
       && CheckMvInRange (pMe->sDirectionalMv, ksMinMv, ksMaxMv)) {
     uint8_t* pRef = &pMe->pColoRefMb[kiMvY * kiRefStride + kiMvX];
     uint32_t uiCurrentSadCost = pSad (pMe->pEncMb, kiEncStride,  pRef, kiRefStride) +
-                                COST_MVD (pMe->pMvdCost, (kiMvX << 2) - pMe->sMvp.iMvX, (kiMvY << 2) - pMe->sMvp.iMvY);
+                                COST_MVD (pMe->pMvdCost, (kiMvX * (1 << 2)) - pMe->sMvp.iMvX, (kiMvY * (1 << 2)) - pMe->sMvp.iMvY);
     if (uiCurrentSadCost < pMe->uiSadCost) {
       iBestSadCost = uiCurrentSadCost;
       return true;
@@ -405,7 +405,7 @@ bool CheckDirectionalMvFalse (PSampleSadSatdCostFunc pSad, SWelsME* vpMe,
 #if defined (X86_ASM)
 void CalcMvdCostx8_c (uint16_t* pMvdCost, const int32_t kiStartMv, uint16_t* pMvdTable, const uint16_t kiFixedCost) {
   uint16_t* pBaseCost  = pMvdCost;
-  const int32_t kiOffset = (kiStartMv << 2);
+  const int32_t kiOffset = (kiStartMv * (1 << 2));
   uint16_t* pMvd  = pMvdTable + kiOffset;
   for (int32_t i = 0; i < 8; ++ i) {
     pBaseCost[i] = ((*pMvd) + kiFixedCost);
@@ -426,7 +426,7 @@ void VerticalFullSearchUsingSSE41 (SWelsFuncPtrList* pFuncList, SWelsME* pMe,
   int32_t iMinPos = kiCurMeBlockPixY + kiMinMv;
   int32_t iMaxPos = kiCurMeBlockPixY + kiMaxMv;
   int32_t iFixedMvd = * (pMvdTable - pMe->sMvp.iMvX);
-  uint16_t* pMvdCost  = & (pMvdTable[ (kiMinMv << 2) - pMe->sMvp.iMvY]);
+  uint16_t* pMvdCost  = & (pMvdTable[ (kiMinMv * (1 << 2)) - pMe->sMvp.iMvY]);
   int16_t iStartMv = 0;
 
 
@@ -476,7 +476,7 @@ void VerticalFullSearchUsingSSE41 (SWelsFuncPtrList* pFuncList, SWelsME* pMe,
     kpEncMb = pMe->pEncMb;
     pRef = &pMe->pColoRefMb[ (iTargetPos - kiCurMeBlockPix) * kiRefStride];
     while (iTargetPos < iMaxPos) {
-      const uint16_t uiMvdCost = pMvdCost[iStartMv << 2];
+      const uint16_t uiMvdCost = pMvdCost[iStartMv * (1 << 2)];
       uint32_t uiSadCost = pSad (kpEncMb, kiEncStride, pRef, kiRefStride) + (iFixedMvd + uiMvdCost);
       if (uiSadCost < uiBestCost) {
         uiBestCost = uiSadCost;
@@ -506,7 +506,7 @@ void HorizontalFullSearchUsingSSE41 (SWelsFuncPtrList* pFuncList, SWelsME* pMe,
   int32_t iMinPos = iCurMeBlockPixX + kiMinMv;
   int32_t iMaxPos = iCurMeBlockPixX + kiMaxMv;
   int32_t iFixedMvd = * (pMvdTable - pMe->sMvp.iMvY);
-  uint16_t* pMvdCost  = & (pMvdTable[ (kiMinMv << 2) - pMe->sMvp.iMvX]);
+  uint16_t* pMvdCost  = & (pMvdTable[ (kiMinMv * (1 << 2)) - pMe->sMvp.iMvX]);
   int16_t iStartMv = 0;
   uint8_t* pRef         = &pMe->pColoRefMb[kiMinMv];
   const int32_t kIsBlock16x16 = pMe->uiBlockSize == BLOCK_16x16;
@@ -536,7 +536,7 @@ void HorizontalFullSearchUsingSSE41 (SWelsFuncPtrList* pFuncList, SWelsME* pMe,
   }
   if (kiRemainingLoop8 > 0) {
     while (iTargetPos < iMaxPos) {
-      const uint16_t uiMvdCost = pMvdCost[iStartMv << 2];
+      const uint16_t uiMvdCost = pMvdCost[iStartMv * (1 << 2)];
       uint32_t uiSadCost = pSad (kpEncMb, kiEncStride, pRef, kiRefStride) + (iFixedMvd + uiMvdCost);
       if (uiSadCost < uiBestCost) {
         uiBestCost = uiSadCost;
@@ -575,14 +575,14 @@ void LineFullSearch_c (SWelsFuncPtrList* pFuncList, SWelsME* pMe,
     iFixedMvd = * (pMvdTable - pMe->sMvp.iMvX);
     iCurMeBlockPix = pMe->iCurMeBlockPixY;
     iStride = kiRefStride;
-    pMvdCost  = & (pMvdTable[ (iMinMv << 2) - pMe->sMvp.iMvY]);
+    pMvdCost  = & (pMvdTable[ (iMinMv * (1 << 2)) - pMe->sMvp.iMvY]);
   } else {
     iMinPos = kiCurMeBlockPixX + iMinMv;
     iMaxPos = kiCurMeBlockPixX + iMaxMv;
     iFixedMvd = * (pMvdTable - pMe->sMvp.iMvY);
     iCurMeBlockPix = pMe->iCurMeBlockPixX;
     iStride = 1;
-    pMvdCost  = & (pMvdTable[ (iMinMv << 2) - pMe->sMvp.iMvX]);
+    pMvdCost  = & (pMvdTable[ (iMinMv * (1 << 2)) - pMe->sMvp.iMvX]);
   }
   uint8_t* pRef            = &pMe->pColoRefMb[ iMinMv * iStride];
   uint32_t uiBestCost    = 0xFFFFFFFF;
@@ -906,10 +906,10 @@ bool SetFeatureSearchIn (SWelsFuncPtrList* pFunc,  const SWelsME& sMe,
   pFeatureSearchIn->pMvdCostX = sMe.pMvdCost - pFeatureSearchIn->iCurPixXQpel - sMe.sMvp.iMvX;
   pFeatureSearchIn->pMvdCostY = sMe.pMvdCost - pFeatureSearchIn->iCurPixYQpel - sMe.sMvp.iMvY;
 
-  pFeatureSearchIn->iMinQpelX = pFeatureSearchIn->iCurPixXQpel + ((pSlice->sMvStartMin.iMvX) << 2);
-  pFeatureSearchIn->iMinQpelY = pFeatureSearchIn->iCurPixYQpel + ((pSlice->sMvStartMin.iMvY) << 2);
-  pFeatureSearchIn->iMaxQpelX = pFeatureSearchIn->iCurPixXQpel + ((pSlice->sMvStartMax.iMvX) << 2);
-  pFeatureSearchIn->iMaxQpelY = pFeatureSearchIn->iCurPixYQpel + ((pSlice->sMvStartMax.iMvY) << 2);
+  pFeatureSearchIn->iMinQpelX = pFeatureSearchIn->iCurPixXQpel + ((pSlice->sMvStartMin.iMvX) * (1 << 2));
+  pFeatureSearchIn->iMinQpelY = pFeatureSearchIn->iCurPixYQpel + ((pSlice->sMvStartMin.iMvY) * (1 << 2));
+  pFeatureSearchIn->iMaxQpelX = pFeatureSearchIn->iCurPixXQpel + ((pSlice->sMvStartMax.iMvX) * (1 << 2));
+  pFeatureSearchIn->iMaxQpelY = pFeatureSearchIn->iCurPixYQpel + ((pSlice->sMvStartMax.iMvY) * (1 << 2));
 
   if (NULL == pFeatureSearchIn->pSad || NULL == pFeatureSearchIn->pTimesOfFeature
       || NULL == pFeatureSearchIn->pQpelLocationOfFeature) {
@@ -1016,7 +1016,7 @@ void MotionEstimateFeatureFullSearch (SFeatureSearchIn& sFeatureSearchIn,
 //switch related
 static uint32_t CountFMECostDown (const SDqLayer* pCurLayer) {
   uint32_t uiCostDownSum      = 0;
-  const int32_t kiSliceCount  = GetCurrentSliceNum (pCurLayer->pSliceEncCtx);
+  const int32_t kiSliceCount  = GetCurrentSliceNum (pCurLayer);
   if (kiSliceCount >= 1) {
     int32_t iSliceIndex  = 0;
     SSlice* pSlice    = &pCurLayer->sLayerInfo.pSliceInLayer[iSliceIndex];

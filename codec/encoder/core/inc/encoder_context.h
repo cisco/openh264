@@ -45,6 +45,7 @@
 #include "param_svc.h"
 #include "nal_encap.h"
 #include "picture.h"
+#include "paraset_strategy.h"
 #include "dq_map.h"
 #include "stat.h"
 #include "macros.h"
@@ -57,8 +58,12 @@
 
 #include "mt_defs.h" // for multiple threadin,
 #include "WelsThreadLib.h"
+#include "wels_task_management.h"
 
 namespace WelsEnc {
+
+class IWelsTaskManage;
+class IWelsReferenceStrategy;
 
 /*
  *  reference list for each quality layer in SVC
@@ -112,7 +117,6 @@ typedef struct TagWelsEncCtx {
   SLogContext sLogCtx;
 // Input
   SWelsSvcCodingParam* pSvcParam;   // SVC parameter, WelsSVCParamConfig in svc_param_settings.h
-  SWelsSliceBs*     pSliceBs;       // bitstream buffering for various slices, [uiSliceIdx]
 
   int32_t*          pSadCostMb;
   /* MVD cost tables for Inter MB */
@@ -133,10 +137,10 @@ typedef struct TagWelsEncCtx {
   SWelsFuncPtrList* pFuncList;
 
   SSliceThreading*  pSliceThreading;
+  IWelsTaskManage*  pTaskManage; //was planning to put it under CWelsH264SVCEncoder but it may be updated (lock/no lock) when param is changed
+  IWelsReferenceStrategy* pReferenceStrategy;
 
-// SSlice context
-  SSliceCtx*        pSliceCtxList;// slice context table for each dependency quality layer
-// pointers
+  // pointers
   SPicture*         pEncPic;                // pointer to current picture to be encoded
   SPicture*         pDecPic;                // pointer to current picture being reconstructed
   SPicture*         pRefPic;                // pointer to current reference picture
@@ -149,20 +153,16 @@ typedef struct TagWelsEncCtx {
   SLTRState*        pLtr;//[MAX_DEPENDENCY_LAYER];
   bool              bCurFrameMarkedAsSceneLtr;
 // Derived
-  int32_t           iCodingIndex;
-  int32_t           iFrameIndex;            // count how many frames elapsed during coding context currently
-  int32_t           iFrameNum;              // current frame number coding
-  int32_t           iPOC;                   // frame iPOC
+
   EWelsSliceType    eSliceType;             // currently coding slice type
   EWelsNalUnitType  eNalType;               // NAL type
   EWelsNalRefIdc    eNalPriority;           // NAL_Reference_Idc currently
-  EWelsNalRefIdc    eLastNalPriority;       // NAL_Reference_Idc in last frame
+  EWelsNalRefIdc    eLastNalPriority[MAX_DEPENDENCY_LAYER];       // NAL_Reference_Idc in last frame
   uint8_t           iNumRef0;
 
   uint8_t           uiDependencyId;         // Idc of dependecy layer to be coded
   uint8_t           uiTemporalId;           // Idc of temporal layer to be coded
   bool              bNeedPrefixNalFlag;     // whether add prefix nal
-  bool              bEncCurFrmAsIdrFlag;
 
 // Rate control routine
   SWelsSvcRc*       pWelsSvcRc;
@@ -172,8 +172,6 @@ typedef struct TagWelsEncCtx {
   int32_t           iCheckWindowInterval;
   int32_t           iCheckWindowIntervalShift;
   bool              bCheckWindowShiftResetFlag;
-  int32_t           iSkipFrameFlag; //_GOM_RC_
-  int32_t           iContinualSkipFrames;
   int32_t           iGlobalQp;      // global qp
 
 // VAA
@@ -198,10 +196,10 @@ typedef struct TagWelsEncCtx {
   int32_t           iPosBsBuffer;   // current writing position of frame bs pBuffer
 
   SSpatialPicIndex  sSpatialIndexMap[MAX_DEPENDENCY_LAYER];
+  int32_t           iSliceBufferSize[MAX_DEPENDENCY_LAYER];
 
   bool              bRefOfCurTidIsLtr[MAX_DEPENDENCY_LAYER][MAX_TEMPORAL_LEVEL];
   uint16_t          uiIdrPicId;           // IDR picture id: [0, 65535], this one is used for LTR
-
   int32_t           iMaxSliceCount;// maximal count number of slices for all layers observation
   int16_t           iActiveThreadsNum;      // number of threads active so far
 
@@ -224,12 +222,12 @@ typedef struct TagWelsEncCtx {
 
   //related to Statistics
   int64_t            uiStartTimestamp;
-  SEncoderStatistics sEncoderStatistics;
+  SEncoderStatistics sEncoderStatistics[MAX_DEPENDENCY_LAYER];
   int32_t            iStatisticsLogInterval;
   int64_t            iLastStatisticsLogTs;
-  int64_t            iTotalEncodedBytes;
-  int64_t            iLastStatisticsBytes;
-  int64_t            iLastStatisticsFrameCount;
+  int64_t            iTotalEncodedBytes[MAX_DEPENDENCY_LAYER];
+  int64_t            iLastStatisticsBytes[MAX_DEPENDENCY_LAYER];
+  int64_t            iLastStatisticsFrameCount[MAX_DEPENDENCY_LAYER];
 
   int32_t iEncoderError;
   WELS_MUTEX mutexEncoderError;
@@ -239,31 +237,8 @@ typedef struct TagWelsEncCtx {
   bool bDependencyRecFlag[MAX_DEPENDENCY_LAYER];
   bool bRecFlag;
 #endif
+  int64_t            uiLastTimestamp;
 
-  uint32_t GetNeededSpsNum() {
-    if (0 == sPSOVector.uiNeededSpsNum) {
-      sPSOVector.uiNeededSpsNum = ((SPS_LISTING & pSvcParam->eSpsPpsIdStrategy) ? (MAX_SPS_COUNT) : (1));
-      sPSOVector.uiNeededSpsNum *= ((pSvcParam->bSimulcastAVC) ? (pSvcParam->iSpatialLayerNum) : (1));
-    }
-    return sPSOVector.uiNeededSpsNum;
-  }
-
-  uint32_t GetNeededSubsetSpsNum() {
-    if (0 == sPSOVector.uiNeededSubsetSpsNum) {
-      sPSOVector.uiNeededSubsetSpsNum = ((pSvcParam->bSimulcastAVC) ? (0) :
-                                         ((SPS_LISTING & pSvcParam->eSpsPpsIdStrategy) ? (MAX_SPS_COUNT) : (pSvcParam->iSpatialLayerNum - 1)));
-    }
-    return sPSOVector.uiNeededSubsetSpsNum;
-  }
-
-  uint32_t GetNeededPpsNum() {
-    if (0 == sPSOVector.uiNeededPpsNum) {
-      sPSOVector.uiNeededPpsNum = ((pSvcParam->eSpsPpsIdStrategy & SPS_PPS_LISTING) ? (MAX_PPS_COUNT) :
-                                   (1 + pSvcParam->iSpatialLayerNum));
-      sPSOVector.uiNeededPpsNum *= ((pSvcParam->bSimulcastAVC) ? (pSvcParam->iSpatialLayerNum) : (1));
-    }
-    return sPSOVector.uiNeededPpsNum;
-  }
 } sWelsEncCtx/*, *PWelsEncCtx*/;
 }
 #endif//sWelsEncCtx_H__

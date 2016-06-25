@@ -58,40 +58,6 @@ DECODING_STATE DecodeFrame (const unsigned char* kpSrc,
   return dsErrorFree;
 }
 
-
-int32_t InitDecoder (const bool bParseOnly, PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
-
-
-  if (NULL == pCtx)
-    return cmMallocMemeError;
-
-  if (NULL == pCtx->pMemAlign) {
-    pCtx->pMemAlign = new CMemoryAlign (16);
-    if (NULL == pCtx->pMemAlign)
-      return cmMallocMemeError;
-  }
-
-  return WelsInitDecoder (pCtx, bParseOnly, pLogCtx);
-}
-
-long Initialize (const SDecodingParam* pParam, PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
-  int iRet = ERR_NONE;
-  if (pParam == NULL) {
-    return cmInitParaError;
-  }
-
-  // H.264 decoder initialization,including memory allocation,then open it ready to decode
-  iRet = InitDecoder (pParam->bParseOnly, pCtx, pLogCtx);
-  if (iRet)
-    return iRet;
-
-  iRet = DecoderConfigParam (pCtx, pParam);
-  if (iRet)
-    return iRet;
-
-  return cmResultSuccess;
-}
-
 void UninitDecoder (PWelsDecoderContext pCtx) {
   if (NULL == pCtx)
     return;
@@ -107,6 +73,46 @@ void UninitDecoder (PWelsDecoderContext pCtx) {
   }
 
 }
+
+int32_t InitDecoder (const SDecodingParam* pParam, PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
+
+
+  if (NULL == pCtx)
+    return cmMallocMemeError;
+
+  if (NULL == pCtx->pMemAlign) {
+    pCtx->pMemAlign = new CMemoryAlign (16);
+    if (NULL == pCtx->pMemAlign)
+      return cmMallocMemeError;
+  }
+
+  pCtx->sLogCtx = *pLogCtx;
+
+  //check param and update decoder context
+  pCtx->pParam = (SDecodingParam*) pCtx->pMemAlign->WelsMallocz (sizeof (SDecodingParam), "SDecodingParam");
+  WELS_VERIFY_RETURN_PROC_IF (cmMallocMemeError, (NULL == pCtx->pParam), UninitDecoder (pCtx));
+  int32_t iRet = DecoderConfigParam (pCtx, pParam);
+  WELS_VERIFY_RETURN_IFNEQ (iRet, cmResultSuccess);
+
+  WELS_VERIFY_RETURN_PROC_IF (cmInitParaError, WelsInitDecoder (pCtx, pLogCtx), UninitDecoder (pCtx));
+
+  return cmResultSuccess;
+}
+
+long Initialize (const SDecodingParam* pParam, PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
+  int iRet = ERR_NONE;
+  if (pParam == NULL) {
+    return cmInitParaError;
+  }
+
+  // H.264 decoder initialization,including memory allocation,then open it ready to decode
+  iRet = InitDecoder (pParam, pCtx, pLogCtx);
+  if (iRet)
+    return iRet;
+
+  return cmResultSuccess;
+}
+
 class DecoderParseSyntaxTest : public ::testing::Test {
  public:
   virtual void SetUp() {
@@ -122,7 +128,7 @@ class DecoderParseSyntaxTest : public ::testing::Test {
     }
   }
   //Init members
-  void Init();
+  int32_t Init();
   //Uninit members
   void Uninit();
   //Decoder real bitstream
@@ -149,12 +155,11 @@ class DecoderParseSyntaxTest : public ::testing::Test {
 };
 
 //Init members
-void DecoderParseSyntaxTest::Init() {
+int32_t DecoderParseSyntaxTest::Init() {
   memset (&m_sBufferInfo, 0, sizeof (SBufferInfo));
   memset (&m_sDecParam, 0, sizeof (SDecodingParam));
   memset (&m_sParserBsInfo, 0, sizeof (SParserBsInfo));
   m_sDecParam.pFileNameRestructed = NULL;
-  m_sDecParam.eOutputColorFormat = videoFormatI420;
   m_sDecParam.uiCpuLoad = rand() % 100;
   m_sDecParam.uiTargetDqLayer = rand() % 100;
   m_sDecParam.eEcActiveIdc = (ERROR_CON_IDC)7;
@@ -175,7 +180,7 @@ void DecoderParseSyntaxTest::Init() {
     m_pWelsTrace->SetTraceLevel (WELS_LOG_ERROR);
   }
   CM_RETURN eRet = (CM_RETURN)Initialize (&m_sDecParam, m_pCtx, &m_pWelsTrace->m_sLogCtx);
-  (void) eRet;
+  return (int32_t)eRet;
 }
 
 void DecoderParseSyntaxTest::Uninit() {
@@ -257,7 +262,9 @@ void DecoderParseSyntaxTest::TestScalingList() {
   uint8_t iScalingListPPS[6][16];
   memset (iScalingListPPS, 0, 6 * 16 * sizeof (uint8_t));
   //Scalinglist matrix not written into sps or pps
-  Init();
+  int32_t iRet = ERR_NONE;
+  iRet = Init();
+  ASSERT_EQ (iRet, ERR_NONE);
   DecodeBs ("res/BA_MW_D.264");
   ASSERT_TRUE (m_pCtx->sSpsBuffer[0].bSeqScalingMatrixPresentFlag == false);
   EXPECT_EQ (0, memcmp (iScalingListPPS, m_pCtx->sSpsBuffer[0].iScalingList4x4, 6 * 16 * sizeof (uint8_t)));
@@ -265,7 +272,8 @@ void DecoderParseSyntaxTest::TestScalingList() {
   EXPECT_EQ (0, memcmp (iScalingListPPS, m_pCtx->sPpsBuffer[0].iScalingList4x4, 6 * 16 * sizeof (uint8_t)));
   Uninit();
   //Scalinglist value just written into sps and pps
-  Init();
+  iRet = Init();
+  ASSERT_EQ (iRet, ERR_NONE);
   DecodeBs ("res/test_scalinglist_jm.264");
   ASSERT_TRUE (m_pCtx->sSpsBuffer[0].bSeqScalingMatrixPresentFlag);
   for (int i = 0; i < 6; i++) {
@@ -275,8 +283,6 @@ void DecoderParseSyntaxTest::TestScalingList() {
   ASSERT_TRUE (m_pCtx->sPpsBuffer[0].bPicScalingMatrixPresentFlag == false);
   EXPECT_EQ (0, memcmp (iScalingListPPS, m_pCtx->sPpsBuffer[0].iScalingList4x4, 6 * 16 * sizeof (uint8_t)));
   Uninit();
-
-
 }
 
 //TEST here for whole tests

@@ -165,7 +165,7 @@ int32_t  WriteBlockResidualCavlc (SWelsFuncPtrList* pFuncList, int16_t* pCoffLev
   for (i = iTrailingOnes; i < iTotalCoeffs; i++) {
     int32_t iVal = iLevel[i];
 
-    iLevelCode = (iVal - 1) << 1;
+    iLevelCode = (iVal - 1) * (1 << 1);
     uiSign = (iLevelCode >> 31);
     iLevelCode = (iLevelCode ^ uiSign) + (uiSign << 1);
     iLevelCode -= ((i == iTrailingOnes) && (iTrailingOnes < 3)) << 1;
@@ -259,7 +259,12 @@ int32_t StashPopMBStatusCabac (SDynamicSlicingStack* pDss, SSlice* pSlice) {
   pSlice->uiLastMbQp = pDss->uiLastMbQp;
   return pDss->iMbSkipRunStack;
 }
-
+int32_t GetBsPosCavlc(SSlice *pSlice){
+  return BsGetBitsPos (pSlice->pSliceBsa);
+}
+int32_t GetBsPosCabac(SSlice *pSlice){
+  return (int32_t) ((pSlice->sCabacCtx.m_pBufCur - pSlice->sCabacCtx.m_pBufStart) << 3) + (pSlice->sCabacCtx.m_iLowBitCnt - 9);
+}
 void WelsWriteSliceEndSyn (SSlice* pSlice, bool bEntropyCodingModeFlag) {
   SBitStringAux* pBs = pSlice->pSliceBsa;
   if (bEntropyCodingModeFlag) {
@@ -279,15 +284,21 @@ void InitCoeffFunc (SWelsFuncPtrList* pFuncList, const uint32_t uiCpuFlag, int32
     pFuncList->pfCavlcParamCal = CavlcParamCal_sse2;
   }
 #endif
+#ifdef X86_ASM
+  if (uiCpuFlag & WELS_CPU_SSE42) {
+    pFuncList->pfCavlcParamCal = CavlcParamCal_sse42;
+  }
+#endif
   if (iEntropyCodingModeFlag) {
     pFuncList->pfStashMBStatus = StashMBStatusCabac;
     pFuncList->pfStashPopMBStatus = StashPopMBStatusCabac;
     pFuncList->pfWelsSpatialWriteMbSyn = WelsSpatialWriteMbSynCabac;
+    pFuncList->pfGetBsPosition = GetBsPosCabac;
   } else {
     pFuncList->pfStashMBStatus = StashMBStatusCavlc;
     pFuncList->pfStashPopMBStatus = StashPopMBStatusCavlc;
     pFuncList->pfWelsSpatialWriteMbSyn = WelsSpatialWriteMbSyn;
-
+    pFuncList->pfGetBsPosition = GetBsPosCavlc;
   }
 }
 
