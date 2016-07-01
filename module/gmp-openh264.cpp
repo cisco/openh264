@@ -34,6 +34,7 @@
 
 #include <stdint.h>
 #include <time.h>
+#include <cmath>
 #include <cstdio>
 #include <cstring>
 #include <iostream>
@@ -115,6 +116,7 @@ const char* kLogStrings[] = {
   "Debug"
 };
 
+#define OPENH264_MAX_MB 36864
 
 GMPPlatformAPI* g_platform_api = nullptr;
 
@@ -249,8 +251,27 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
     // Set up layers. Currently we have one layer.
     SSpatialLayerConfig* layer = &param.sSpatialLayers[0];
 
-    layer->iVideoWidth = codecSettings.mWidth;
-    layer->iVideoHeight = codecSettings.mHeight;
+    // Make sure the output resolution doesn't exceed the Openh264 capability
+    double width_mb = std::ceil(codecSettings.mWidth/16.0);
+    double height_mb = std::ceil(codecSettings.mHeight/16.0);
+    double input_mb = width_mb * height_mb;
+    if (static_cast<uint32_t>(input_mb) > OPENH264_MAX_MB) {
+      double scale = std::sqrt(OPENH264_MAX_MB / input_mb);
+      layer->iVideoWidth = static_cast<uint32_t>(width_mb * 16 * scale);
+      layer->iVideoHeight = static_cast<uint32_t>(height_mb * 16 * scale);
+      GMPLOG (GL_INFO, "InitEncode: the output resolution overflows, w x h = " << codecSettings.mWidth << " x " << codecSettings.mHeight
+              << ", turned to be " << layer->iVideoWidth << " x " << layer->iVideoHeight);
+    } else {
+      layer->iVideoWidth = codecSettings.mWidth;
+      layer->iVideoHeight = codecSettings.mHeight;
+    }
+    if (layer->iVideoWidth < 16) {
+      layer->iVideoWidth = 16;
+    }
+    if (layer->iVideoHeight < 16) {
+      layer->iVideoHeight = 16;
+    }
+
     layer->fFrameRate = param.fMaxFrameRate;
     layer->iSpatialBitrate = param.iTargetBitrate;
     layer->iMaxSpatialBitrate = param.iMaxBitrate;
