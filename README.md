@@ -4,12 +4,13 @@ OpenH264 is a codec library which supports H.264 encoding and decoding. It is su
 
 Encoder Features
 ----------------
-- Constrained Baseline Profile up to Level 5.2 (4096x2304)
+- Constrained Baseline Profile up to Level 5.2 (Max frame size is 36864 macro-blocks)
 - Arbitrary resolution, not constrained to multiples of 16x16
 - Rate control with adaptive quantization, or constant quantization
 - Slice options: 1 slice per frame, N slices per frame, N macroblocks per slice, or N bytes per slice
 - Multiple threads automatically used for multiple slices
 - Temporal scalability up to 4 layers in a dyadic hierarchy
+- Simulcast AVC up to 4 resolutions from a single input
 - Spatial simulcast up to 4 resolutions from a single input
 - Long Term Reference (LTR) frames
 - Memory Management Control Operation (MMCO)
