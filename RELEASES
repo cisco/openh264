@@ -1,6 +1,27 @@
 
 Releases
 -----------
+v1.6.0
+------
+- Adjusted the encoder API structures
+- Removed the unused data format in decoder API
+- Encoder support of simulcast AVC
+- Added support of video signal type present information
+- Added support of encoder load-balancing
+- Improved encoder multi-threads, rate control and down-sampling
+- Fixed the frame size constraint in encoder
+- Bug fixes for rate control, multi-threading, simulcasting in encoder
+- Bug fixes for interface call, return value check, memory leak in decoder
+- Bug fixes for UT and statistic information
+- Bug fixes for assembly code
+- Remove the unused and redundant code
+- Improvements on UT, memory allocation failed protection, error-protection in decoder, input parameters checking in encoder, assembly for AVX2 support, assembly code performance, logging and documentation
+- Correct some typos in source code and documents
+
+v1.5.3
+------
+- Bug fixes for GMP Plugin
+
 v1.5.2
 ------
 - Fix GMP Plugin causing the Browser crash on Android
