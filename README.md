@@ -24,7 +24,7 @@ Encoder Features
 
 Decoder Features
 ----------------
-- Constrained Baseline Profile up to Level 5.2 (4096x2304)
+- Constrained Baseline Profile up to Level 5.2 (Max frame size is 36864 macro-blocks)
 - Arbitrary resolution, not constrained to multiples of 16x16
 - Single thread for all slices
 - Long Term Reference (LTR) frames
