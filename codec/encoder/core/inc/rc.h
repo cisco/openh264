@@ -119,7 +119,7 @@ enum {
 #define FRAME_iTargetBits_VARY_RANGE 50 // *INT_MULTIPLY
 //R-Q Model
 #define LINEAR_MODEL_DECAY_FACTOR 80 // *INT_MULTIPLY
-#define FRAME_CMPLX_RATIO_RANGE 10 // *INT_MULTIPLY
+#define FRAME_CMPLX_RATIO_RANGE 20 // *INT_MULTIPLY
 #define SMOOTH_FACTOR_MIN_VALUE 2 // *INT_MULTIPLY
 //#define VGOP_BITS_MIN_RATIO 0.8
 //skip and padding
@@ -174,6 +174,7 @@ int32_t   iCurrentBitsLevel;//0:normal; 1:limited; 2:exceeded.
 int32_t   iIdrNum;
 int64_t   iIntraComplexity; //255*255(MaxMbSAD)*36864(MaxFS) make the highest bit of 32-bit integer 1
 int32_t   iIntraMbCount;
+int64_t   iIntraComplxMean;
 
 int8_t    iTlOfFrames[VGOP_SIZE];
 int32_t   iRemainingWeights;
@@ -184,6 +185,7 @@ int32_t*   pGomForegroundBlockNum;
 int32_t*   pCurrentFrameGomSad;
 int32_t*   pGomCost;
 
+int32_t   bEnableGomQp;
 int32_t   iAverageFrameQp;
 int32_t   iMinFrameQp;
 int32_t   iMaxFrameQp;
