@@ -535,6 +535,10 @@ int32_t ParseIntra8x8Mode (PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail
   pCurDqLayer->pIntraPredMode[iMbXy][4] = pIntraPredMode[4 + 8 * 1];
   pCurDqLayer->pIntraPredMode[iMbXy][5] = pIntraPredMode[4 + 8 * 2];
   pCurDqLayer->pIntraPredMode[iMbXy][6] = pIntraPredMode[4 + 8 * 3];
+
+  if (pCtx->pSps->uiChromaFormatIdc == 0)
+    return ERR_NONE;
+
   if (pCurDqLayer->sLayerInfo.pPps->bEntropyCodingModeFlag) {
     WELS_READ_VERIFY (ParseIntraPredModeChromaCabac (pCtx, uiNeighAvail, iCode));
     if (iCode > MAX_PRED_MODE_ID_CHROMA) {

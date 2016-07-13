@@ -1377,12 +1377,7 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
   pPps->bWeightedPredFlag  = !!uiCode;
   WELS_READ_VERIFY (BsGetBits (pBsAux, 2, &uiCode)); //weighted_bipred_idc
   pPps->uiWeightedBipredIdc = uiCode;
-  if (pPps->uiWeightedBipredIdc != 0) {
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
-             "ParsePps(): weighted_bipred_idc (%d) not supported.\n",
-             pPps->uiWeightedBipredIdc);
-    return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_WP);
-  }
+  // weighted_bipred_idc > 0 NOT supported now, but no impact when we ignore it
 
   WELS_READ_VERIFY (BsGetSe (pBsAux, &iCode)); //pic_init_qp_minus26
   pPps->iPicInitQp = PIC_INIT_QP_OFFSET + iCode;
