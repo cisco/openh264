@@ -45,6 +45,7 @@ CDownsampling::CDownsampling (int32_t iCpuFlag) {
   m_eMethod   = METHOD_DOWNSAMPLE;
   WelsMemset (&m_pfDownsample, 0, sizeof (m_pfDownsample));
   InitDownsampleFuncs (m_pfDownsample, m_iCPUFlag);
+  WelsMemset(m_pSampleBuffer,0,sizeof(m_pSampleBuffer));
   m_bNoSampleBuffer = AllocateSampleBuffer();
 }
 
