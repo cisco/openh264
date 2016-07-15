@@ -107,10 +107,12 @@ void CDownsampling::InitDownsampleFuncs (SDownsampleFuncs& sDownsampleFunc,  int
     sDownsampleFunc.pfQuarterDownsampler  = DyadicBilinearQuarterDownsampler_sse4;
     sDownsampleFunc.pfGeneralRatioChroma  = GeneralBilinearAccurateDownsamplerWrap_sse41;
   }
+#ifdef HAVE_AVX2
   if (iCpuFlag & WELS_CPU_AVX2) {
     sDownsampleFunc.pfGeneralRatioChroma = GeneralBilinearAccurateDownsamplerWrap_avx2;
     sDownsampleFunc.pfGeneralRatioLuma   = GeneralBilinearFastDownsamplerWrap_avx2;
   }
+#endif
 #endif//X86_ASM
 
 #if defined(HAVE_NEON)
