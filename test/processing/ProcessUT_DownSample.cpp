@@ -372,10 +372,13 @@ GENERATE_GeneralBilinearDownsampler_UT (GeneralBilinearFastDownsamplerWrap_ssse3
                                         WELS_CPU_SSSE3)
 GENERATE_GeneralBilinearDownsampler_UT (GeneralBilinearAccurateDownsamplerWrap_sse41,
                                         GeneralBilinearAccurateDownsampler_ref, 1, WELS_CPU_SSE41)
+#ifdef HAVE_AVX2
 GENERATE_GeneralBilinearDownsampler_UT (GeneralBilinearFastDownsamplerWrap_avx2, GeneralBilinearFastDownsampler_ref, 1,
                                         WELS_CPU_AVX2)
 GENERATE_GeneralBilinearDownsampler_UT (GeneralBilinearAccurateDownsamplerWrap_avx2,
                                         GeneralBilinearAccurateDownsampler_ref, 1, WELS_CPU_AVX2)
+#endif
+
 #endif
 
 #if defined(HAVE_NEON)
