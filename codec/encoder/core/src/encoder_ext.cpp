@@ -2759,12 +2759,13 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
   //const bool kbBaseAvail      = pCurLayer->bBaseLayerAvailableFlag;
   const bool kbHighestSpatialLayer =
     (pCtx->pSvcParam->iSpatialLayerNum == (pCurLayer->sLayerInfo.sNalHeaderExt.uiDependencyId + 1));
+  bool bFastMode = kbHighestSpatialLayer && (pCtx->pSvcParam->iComplexityMode == LOW_COMPLEXITY);
   SWelsFuncPtrList* pFuncList = pCtx->pFuncList;
   SLogContext* pLogCtx = & (pCtx->sLogCtx);
   /* function pointers conditional assignment under sWelsEncCtx, layer_mb_enc_rec (in stack) is exclusive */
-  if ((pCtx->pSvcParam->iUsageType == CAMERA_VIDEO_REAL_TIME && kbHighestSpatialLayer) ||
+  if ((pCtx->pSvcParam->iUsageType == CAMERA_VIDEO_REAL_TIME && bFastMode) ||
       (pCtx->pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME && P_SLICE == pCtx->eSliceType
-       && kbHighestSpatialLayer) //TODO: here is for sync with the origin code, consider the design again with more tests
+       && bFastMode) //TODO: here is for sync with the origin code, consider the design again with more tests
      ) {
     SetFastCodingFunc (pFuncList);
   } else {
@@ -2786,7 +2787,7 @@ void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
     pFuncList->sSampleDealingFuncs.pfMeCost = pCtx->pFuncList->sSampleDealingFuncs.pfSampleSatd;
     pFuncList->pfSetScrollingMv = SetScrollingMvToMdNull;
 
-    if (kbHighestSpatialLayer) {
+    if (bFastMode) {
       pFuncList->pfCalculateSatd = NotCalculateSatdCost;
       pFuncList->pfInterFineMd = WelsMdInterFinePartitionVaa;
     } else {

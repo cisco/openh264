@@ -136,7 +136,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
 
     param.fMaxFrameRate         = MAX_FRAME_RATE;       // maximal frame rate [Hz / fps]
 
-    param.iComplexityMode       = MEDIUM_COMPLEXITY;
+    param.iComplexityMode       = LOW_COMPLEXITY;
     param.iTargetBitrate        = UNSPECIFIED_BIT_RATE; // overall target bitrate introduced in RC module
     param.iMaxBitrate           = UNSPECIFIED_BIT_RATE;
     param.iMultipleThreadIdc    = 1;
