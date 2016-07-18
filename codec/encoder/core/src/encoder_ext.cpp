@@ -3704,7 +3704,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 #ifdef LONG_TERM_REF_DUMP
     DumpRef (pCtx);
 #endif
-
     if (pSvcParam->iRCMode != RC_OFF_MODE)
       pCtx->pVpp->AnalyzePictureComplexity (pCtx, pCtx->pEncPic, ((pCtx->eSliceType == P_SLICE)
                                             && (pCtx->iNumRef0 > 0)) ? pCtx->pRefList0[0] : NULL,
@@ -3712,7 +3711,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     WelsUpdateRefSyntax (pCtx,  pParamInternal->iPOC,
                          eFrameType); //get reordering syntax used for writing slice header and transmit to encoder.
     PrefetchReferencePicture (pCtx, eFrameType); // update reference picture for current pDq layer
-
     pCtx->pFuncList->pfRc.pfWelsRcPictureInit (pCtx, pFbi->uiTimeStamp);
     PreprocessSliceCoding (pCtx); // MUST be called after pfWelsRcPictureInit() and WelsInitCurrentLayer()
 

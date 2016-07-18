@@ -216,7 +216,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     bDeblockingParallelFlag     = false;// deblocking filter parallelization control flag
 
     iDecompStages               = 0;    // GOP size dependency, unknown here and be revised later
-    iBitsVaryPercentage = 0;
+    iBitsVaryPercentage = 10;
   }
 
   int32_t ParamBaseTranscode (const SEncParamBase& pCodingParam) {
