@@ -305,11 +305,32 @@ void McHorVer22Width4VerLastUnAlign_sse2 (const uint8_t* pTap, int32_t iTapStrid
         int32_t iWidth, int32_t iHeight);
 
 //***************************************************************************//
+//                       SSE3 definition                                     //
+//***************************************************************************//
+void McCopyWidthEq16_sse3 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                           int32_t iHeight);
+
+//***************************************************************************//
 //                       SSSE3 definition                                    //
 //***************************************************************************//
-
 void McChromaWidthEq8_ssse3 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                              const uint8_t* kpABCD, int32_t iHeight);
+void McHorVer02_ssse3 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                       int32_t iWidth, int32_t iHeight);
+void McHorVer02Width4S16ToU8_ssse3 (const int16_t* pSrc, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
+void McHorVer02Width5S16ToU8_ssse3 (const int16_t* pSrc, int32_t iSrcStride,
+                                    uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
+void McHorVer02WidthGe8S16ToU8_ssse3 (const int16_t* pSrc, int32_t iSrcStride,
+                                      uint8_t* pDst, int32_t iDstStride, int32_t iWidth, int32_t iHeight);
+void McHorVer20_ssse3 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                       int32_t iWidth, int32_t iHeight);
+void McHorVer20Width4U8ToS16_ssse3 (const uint8_t* pSrc, int32_t iSrcStride, int16_t* pDst, int32_t iHeight);
+void McHorVer20Width5Or9Or17_ssse3 (const uint8_t* pSrc, int32_t iSrcStride,
+                                    uint8_t* pDst, int32_t iDstStride, int32_t iWidth, int32_t iHeight);
+void McHorVer20Width8U8ToS16_ssse3 (const uint8_t* pSrc, int32_t iSrcStride,
+                                    int16_t* pDst, int32_t iDstStride, int32_t iHeight);
+void McHorVer20Width9Or17U8ToS16_ssse3 (const uint8_t* pSrc, int32_t iSrcStride,
+                                        int16_t* pDst, int32_t iDstStride, int32_t iWidth, int32_t iHeight);
 
 #endif //X86_ASM
 

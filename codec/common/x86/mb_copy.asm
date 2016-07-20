@@ -587,3 +587,28 @@ ALIGN 4
 
     LOAD_5_PARA_POP
     ret
+
+
+;*******************************************************************************
+;   void McCopyWidthEq16_sse3( uint8_t *pSrc, int iSrcStride, uint8_t *pDst, int iDstStride, int iHeight )
+;*******************************************************************************
+WELS_EXTERN McCopyWidthEq16_sse3
+    %assign push_num 0
+%ifdef X86_32
+    push            r5
+    push            r6
+    %assign push_num 2
+%endif
+    LOAD_5_PARA
+    SIGN_EXTENSION  r1, r1d
+    SIGN_EXTENSION  r3, r3d
+    SIGN_EXTENSION  r4, r4d
+
+    CopyStrided4N   lddqu, MOVDQ, r2, r3, r0, r1, r4, r5, r6, xmm0, xmm1
+
+    LOAD_5_PARA_POP
+%ifdef X86_32
+    pop             r6
+    pop             r5
+%endif
+    ret
