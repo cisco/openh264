@@ -278,7 +278,7 @@ inline void CBackgroundDetection::ForegroundDilation (SBackgroundOU* pBackground
 
       // chroma component check
       if (pBackgroundOU->iBackgroundFlag == 1) {
-        int8_t iNeighbourForegroundFlags = !pOUNeighbours[0]->iBackgroundFlag | ((!pOUNeighbours[1]->iBackgroundFlag) << 1)
+        int8_t iNeighbourForegroundFlags = (!pOUNeighbours[0]->iBackgroundFlag) | ((!pOUNeighbours[1]->iBackgroundFlag) << 1)
                                             | ((!pOUNeighbours[2]->iBackgroundFlag) << 2) | ((!pOUNeighbours[3]->iBackgroundFlag) << 3);
         pBackgroundOU->iBackgroundFlag = !ForegroundDilation23Chroma (iNeighbourForegroundFlags, iChromaSampleStartPos,
                                          iPicStrideUV, pBgdParam);
