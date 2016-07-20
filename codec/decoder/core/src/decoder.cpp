@@ -1005,10 +1005,13 @@ void InitPredFunc (PWelsDecoderContext pCtx, uint32_t uiCpuFlag) {
     pCtx->pGetIChromaPredFunc[C_PRED_DC_T]    = WelsDecoderIChromaPredDcTop_sse2;
     pCtx->pGetI4x4LumaPredFunc[I4_PRED_H]     = WelsDecoderI4x4LumaPredH_sse2;
   }
+#if defined(HAVE_AVX2)
   if (uiCpuFlag & WELS_CPU_AVX2) {
     pCtx->pIdctResAddPredFunc     = IdctResAddPred_avx2;
     pCtx->pIdctFourResAddPredFunc = IdctFourResAddPred_avx2;
   }
+#endif
+
 #endif
 }
 

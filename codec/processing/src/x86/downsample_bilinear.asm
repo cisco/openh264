@@ -3254,6 +3254,7 @@ WELS_EXTERN GeneralBilinearAccurateDownsampler_sse41
 %undef xmm_xfrac1_begin
 %undef xmm_xfrac_inc
 
+%ifdef HAVE_AVX2
 ; xpos_int=%1 xpos_frac=%2 inc_int+1=%3 inc_frac=%4 tmp=%5
 %macro AVX2_BilinearIncXposuw 5
     vpaddusw        %5, %2, %4
@@ -4552,3 +4553,5 @@ WELS_EXTERN GeneralBilinearAccurateDownsampler_avx2
 %undef ymm_xfrac0_begin
 %undef ymm_xfrac1_begin
 %undef ymm_xfrac_inc
+%endif
+
