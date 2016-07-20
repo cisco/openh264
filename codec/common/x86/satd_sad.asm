@@ -1504,6 +1504,7 @@ loop_get_satd_16x16_right:
 ;
 ;***********************************************************************
 
+%ifdef HAVE_AVX2
 ; out=%1 pSrcA=%2 pSrcB=%3 HSumSubDB1_256=%4 ymm_clobber=%5
 %macro AVX2_LoadDiffSatd16x1 5
     vbroadcasti128   %1, [%2]
@@ -1722,6 +1723,8 @@ WelsSampleSatd16x4N_avx2:
     pop r4
 %endif
     ret
+
+%endif
 
 ;***********************************************************************
 ;

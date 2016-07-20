@@ -56,7 +56,6 @@
 #define WELS_CPU_SSE42      0x00000400    /* sse 4.2 */
 
 /* CPU features application extensive */
-#define WELS_CPU_AVX        0x00000800  /* Advanced Vector eXtentions */
 #define WELS_CPU_FPU        0x00001000  /* x87-FPU on chip */
 #define WELS_CPU_HTT        0x00002000  /* Hyper-Threading Technology (HTT), Multi-threading enabled feature:
                                            physical processor package is capable of supporting more than one logic processor
@@ -67,7 +66,13 @@
 #define WELS_CPU_MOVBE      0x00008000  /* MOVBE instruction */
 #define WELS_CPU_AES        0x00010000  /* AES instruction extensions */
 #define WELS_CPU_FMA        0x00020000  /* AVX VEX FMA instruction sets */
+#define WELS_CPU_AVX        0x00000800  /* Advanced Vector eXtentions */
+
+#ifdef HAVE_AVX2
 #define WELS_CPU_AVX2       0x00040000  /* AVX2 */
+#else
+#define WELS_CPU_AVX2       0x00000000  /* !AVX2 */
+#endif
 
 #define WELS_CPU_CACHELINE_16    0x10000000    /* CacheLine Size 16 */
 #define WELS_CPU_CACHELINE_32    0x20000000    /* CacheLine Size 32 */

@@ -370,6 +370,7 @@ WELS_EXTERN WelsDequantIHadamard4x4_sse2
     ret
 
 
+%ifdef HAVE_AVX2
 ; data=%1 abs_out=%2 ff=%3 mf=%4 7FFFh=%5
 %macro AVX2_Quant 5
     vpabsw          %2, %1
@@ -502,3 +503,5 @@ WELS_EXTERN WelsQuantFour4x4Max_avx2
     POP_XMM
     LOAD_4_PARA_POP
     ret
+%endif
+
