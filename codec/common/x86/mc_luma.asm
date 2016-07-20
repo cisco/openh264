@@ -44,11 +44,37 @@
 ;*******************************************************************************
 ; Local Data (Read Only)
 ;*******************************************************************************
-SECTION .rodata align=16
+SECTION .rodata align=32
 
 ;*******************************************************************************
 ; Various memory constants (trigonometric values or rounding values)
 ;*******************************************************************************
+
+%ifdef HAVE_AVX2
+ALIGN 32
+dwm32768_256:
+    times 16 dw -32768
+maddubsw_m2p10_m40m40_p10m2_p0p0_256:
+    times 4 db -2, 10, -40, -40, 10, -2, 0, 0
+dwm1024_256:
+    times 16 dw -1024
+dd32768_256:
+    times 8 dd 32768
+maddubsw_p1m5_256:
+    times 16 db 1, -5
+maddubsw_m5p1_256:
+    times 16 db -5, 1
+db20_256:
+    times 32 db 20
+maddubsw_m5p20_256:
+    times 16 db -5, 20
+maddubsw_p20m5_256:
+    times 16 db 20, -5
+h264_w0x10_256:
+    times 16 dw 16
+dw32_256:
+    times 16 dw 32
+%endif ; HAVE_AVX2
 
 ALIGN 16
 shufb_32435465768798A9:
@@ -2874,3 +2900,1450 @@ WELS_EXTERN McHorVer02WidthGe8S16ToU8_ssse3
 %undef i_width
 %undef i_height
 %undef i_srcstride3
+
+
+%ifdef HAVE_AVX2
+
+; pixels=%1 shufb_32435465768798A9=%2 shufb_011267784556ABBC=%3 maddubsw_p1m5_p1m5_m5p1_m5p1=%4 tmp=%5,%6
+%macro AVX2_FilterHorizontalbw_16px 6
+    vpshufb         %5, %1, %3
+    vpshufb         %1, %1, %2
+    vpshufd         %6, %1, 10110001b
+    vpmaddubsw      %1, %1, [db20_256]
+    vpmaddubsw      %5, %5, %4
+    vpmaddubsw      %6, %6, %4
+    vpaddw          %1, %1, %5
+    vpaddw          %1, %1, %6
+%endmacro
+
+; pixels=%1 shufb_32435465768798A9=%2 shufb_011267784556ABBC=%3 db20=%4 tmp=%5,%6
+%macro AVX2_FilterHorizontal_16px 6
+    AVX2_FilterHorizontalbw_16px %1, %2, %3, %4, %5, %6
+    vpaddw          %1, %1, [h264_w0x10_256]
+    vpsraw          %1, %1, 5
+%endmacro
+
+; px0=%1 px1=%2 shufb_32435465768798A9=%3 shufb_011267784556ABBC=%4 maddubsw_p1m5_p1m5_m5p1_m5p1=%5 tmp=%6,%7
+%macro AVX2_FilterHorizontalbw_4x4px 7
+    vpshufb         %6, %1, %4
+    vpshufb         %7, %2, %4
+    vpshufb         %1, %1, %3
+    vpshufb         %2, %2, %3
+    vpunpcklqdq     %1, %1, %2
+    vpunpcklqdq     %6, %6, %7
+    vpshufd         %7, %1, 10110001b
+    vpmaddubsw      %1, %1, [db20_256]
+    vpmaddubsw      %6, %6, %5
+    vpmaddubsw      %7, %7, %5
+    vpaddw          %1, %1, %6
+    vpaddw          %1, %1, %7
+%endmacro
+
+; px0=%1 px1=%2 shufb_32435465768798A9=%3 shufb_011267784556ABBC=%4 db20=%5 tmp=%6,%7
+%macro AVX2_FilterHorizontal_4x4px 7
+    AVX2_FilterHorizontalbw_4x4px %1, %2, %3, %4, %5, %6, %7
+    vpaddw          %1, %1, [h264_w0x10_256]
+    vpsraw          %1, %1, 5
+%endmacro
+
+; pixels=%1 -32768>>scale=%2 tmp=%3
+%macro AVX2_FilterHorizontalbw_4px 3
+    vpmaddubsw      %1, %1, [maddubsw_m2p10_m40m40_p10m2_p0p0_256]
+    vpmaddwd        %1, %1, %2
+    vpshufd         %3, %1, 10110001b
+    vpaddd          %1, %1, %3
+%endmacro
+
+; pixels=%1 tmp=%2
+%macro AVX2_FilterHorizontal_4px 2
+    AVX2_FilterHorizontalbw_4px %1, [dwm1024_256], %2
+    vpaddd          %1, %1, [dd32768_256]
+%endmacro
+
+; px_ab=%1 px_cd=%2 px_ef=%3 maddubsw_ab=%4 maddubsw_cd=%5 maddubsw_ef=%6 tmp=%7
+%macro AVX2_FilterVertical_16px 7
+    vpmaddubsw      %1, %1, %4
+    vpmaddubsw      %7, %2, %5
+    vpaddw          %1, %1, %7
+    vpmaddubsw      %7, %3, %6
+    vpaddw          %1, %1, %7
+    vpaddw          %1, %1, [h264_w0x10_256]
+    vpsraw          %1, %1, 5
+%endmacro
+
+; px_a=%1 px_f=%2 px_bc=%3 px_de=%4 maddubsw_bc=%5 maddubsw_de=%6 tmp=%7,%8
+%macro AVX2_FilterVertical2_16px 8
+    vpxor           %7, %7, %7
+    vpunpcklbw      %1, %1, %7
+    vpunpcklbw      %8, %2, %7
+    vpaddw          %1, %1, %8
+    vpmaddubsw      %7, %3, %5
+    vpaddw          %1, %1, %7
+    vpmaddubsw      %7, %4, %6
+    vpaddw          %1, %1, %7
+    vpaddw          %1, %1, [h264_w0x10_256]
+    vpsraw          %1, %1, 5
+%endmacro
+
+; px0=%1 px1=%2 px2=%3 px3=%4 px4=%5 px5=%6 tmp=%7
+%macro AVX2_FilterVerticalw_16px 7
+    vpaddw          %1, %1, %6
+    vpaddw          %7, %2, %5
+    vpsubw          %1, %1, %7
+    vpsraw          %1, %1, 2
+    vpsubw          %1, %1, %7
+    vpaddw          %7, %3, %4
+    vpaddw          %1, %1, %7
+    vpsraw          %1, %1, 2
+    vpaddw          %7, %7, [dw32_256]
+    vpaddw          %1, %1, %7
+    vpsraw          %1, %1, 6
+%endmacro
+
+;***********************************************************************
+; void McHorVer02_avx2(const uint8_t *pSrc,
+;                      int32_t iSrcStride,
+;                      uint8_t *pDst,
+;                      int32_t iDstStride,
+;                      int32_t iWidth,
+;                      int32_t iHeight)
+;***********************************************************************
+
+WELS_EXTERN McHorVer02_avx2
+%define p_src         r0
+%define i_srcstride   r1
+%define p_dst         r2
+%define i_dststride   r3
+%define i_width       r4
+%define i_height      r5
+%define i_srcstride3  r6
+    %assign push_num 0
+%ifdef X86_32
+    push            r6
+    %assign push_num 1
+%endif
+    LOAD_6_PARA
+    PUSH_XMM 8
+    SIGN_EXTENSION  r1, r1d
+    SIGN_EXTENSION  r3, r3d
+    SIGN_EXTENSION  r4, r4d
+    SIGN_EXTENSION  r5, r5d
+    sub             p_src, i_srcstride
+    sub             p_src, i_srcstride
+    lea             i_srcstride3, [3 * i_srcstride]
+    cmp             i_width, 8
+    je              .width8
+    jg              .width16
+; .width4:
+    vmovd           xmm0, [p_src]
+    vpbroadcastd    xmm5, [p_src + i_srcstride]
+    vpunpcklbw      xmm0, xmm0, xmm5
+    vpbroadcastd    ymm1, [p_src + 2 * i_srcstride]
+    vpunpcklbw      xmm5, xmm5, xmm1
+    vpblendd        xmm0, xmm0, xmm5, 1100b
+    vpbroadcastd    ymm5, [p_src + i_srcstride3]
+    lea             p_src, [p_src + 4 * i_srcstride]
+    vpunpcklbw      ymm1, ymm1, ymm5
+    vpbroadcastd    ymm2, [p_src]
+    vpunpcklbw      ymm5, ymm5, ymm2
+    vpblendd        ymm1, ymm1, ymm5, 11001100b
+    vpblendd        ymm0, ymm0, ymm1, 11110000b
+    vpbroadcastd    ymm5, [p_src + i_srcstride]
+    lea             p_src, [p_src + 2 * i_srcstride]
+    vpunpcklbw      ymm2, ymm2, ymm5
+    vpbroadcastd    ymm3, [p_src]
+    vpunpcklbw      ymm5, ymm5, ymm3
+    vpblendd        ymm2, ymm2, ymm5, 11001100b
+    vpblendd        ymm1, ymm1, ymm2, 11110000b
+    vpbroadcastd    ymm5, [p_src + i_srcstride]
+    vpunpcklbw      ymm3, ymm3, ymm5
+    vpbroadcastd    ymm4, [p_src + 2 * i_srcstride]
+    vpunpcklbw      ymm5, ymm5, ymm4
+    vpblendd        ymm3, ymm3, ymm5, 11001100b
+    vpblendd        ymm2, ymm2, ymm3, 11110000b
+    vbroadcasti128  ymm6, [db20_128]
+    AVX2_FilterVertical_16px ymm0, ymm1, ymm2, [maddubsw_p1m5_256], ymm6, [maddubsw_m5p1_256], ymm5
+    vpackuswb       ymm0, ymm0, ymm0
+    vmovd           [p_dst], xmm0
+    vpsrlq          xmm5, xmm0, 32
+    vmovd           [p_dst + i_dststride], xmm5
+    lea             p_dst, [p_dst + 2 * i_dststride]
+    vextracti128    xmm0, ymm0, 1
+    vmovd           [p_dst], xmm0
+    vpsrlq          xmm5, xmm0, 32
+    vmovd           [p_dst + i_dststride], xmm5
+    cmp             i_height, 5
+    jl              .width4_done
+    lea             p_dst, [p_dst + 2 * i_dststride]
+    vpbroadcastd    ymm5, [p_src + i_srcstride3]
+    vpunpcklbw      ymm4, ymm4, ymm5
+    jg              .width4_height_ge8
+    AVX2_FilterVertical_16px xmm2, xmm3, xmm4, [maddubsw_p1m5_256], xmm6, [maddubsw_m5p1_256], xmm5
+    vpackuswb       xmm2, xmm2, xmm2
+    vmovd           [p_dst], xmm2
+    jmp             .width4_done
+.width4_height_ge8:
+    lea             p_src, [p_src + 4 * i_srcstride]
+    vpbroadcastd    ymm1, [p_src]
+    vpunpcklbw      ymm5, ymm5, ymm1
+    vpblendd        ymm4, ymm4, ymm5, 11001100b
+    vpblendd        ymm3, ymm3, ymm4, 11110000b
+    vpbroadcastd    ymm5, [p_src + i_srcstride]
+    vpunpcklbw      ymm1, ymm5
+    vpbroadcastd    ymm0, [p_src + 2 * i_srcstride]
+    vpunpcklbw      ymm5, ymm5, ymm0
+    vpblendd        ymm1, ymm1, ymm5, 11001100b
+    vpblendd        ymm4, ymm4, ymm1, 11110000b
+    AVX2_FilterVertical_16px ymm2, ymm3, ymm4, [maddubsw_p1m5_256], ymm6, [maddubsw_m5p1_256], ymm5
+    vpackuswb       ymm2, ymm2, ymm2
+    vmovd           [p_dst], xmm2
+    vpsrlq          xmm5, xmm2, 32
+    vmovd           [p_dst + i_dststride], xmm5
+    lea             p_dst, [p_dst + 2 * i_dststride]
+    vextracti128    xmm2, ymm2, 1
+    vmovd           [p_dst], xmm2
+    vpsrlq          xmm5, xmm2, 32
+    vmovd           [p_dst + i_dststride], xmm5
+    cmp             i_height, 9
+    jl              .width4_done
+    lea             p_dst, [p_dst + 2 * i_dststride]
+    vmovd           xmm5, [p_src + i_srcstride3]
+    vpunpcklbw      xmm0, xmm0, xmm5
+    AVX2_FilterVertical_16px xmm4, xmm1, xmm0, [maddubsw_p1m5_256], xmm6, [maddubsw_m5p1_256], xmm5
+    vpackuswb       xmm4, xmm4, xmm4
+    vmovd           [p_dst], xmm4
+.width4_done:
+    vzeroupper
+    POP_XMM
+    LOAD_6_PARA_POP
+%ifdef X86_32
+    pop             r6
+%endif
+    ret
+
+.width8:
+    sub             i_height, 1
+    vmovq           xmm0, [p_src]
+    vmovq           xmm4, [p_src + i_srcstride]
+    vpunpcklbw      xmm0, xmm0, xmm4
+    vmovq           xmm1, [p_src + 2 * i_srcstride]
+    vpunpcklbw      xmm4, xmm4, xmm1
+    vinserti128     ymm0, ymm0, xmm4, 1
+    vmovq           xmm4, [p_src + i_srcstride3]
+    lea             p_src, [p_src + 4 * i_srcstride]
+    vpunpcklbw      xmm1, xmm1, xmm4
+    vmovq           xmm6, [p_src]
+    vpunpcklbw      xmm4, xmm4, xmm6
+    vinserti128     ymm1, ymm1, xmm4, 1
+.width8_yloop:
+    vmovq           xmm4, [p_src + i_srcstride]
+    vpunpcklbw      xmm2, xmm6, xmm4
+    vmovq           xmm3, [p_src + 2 * i_srcstride]
+    vpunpcklbw      xmm4, xmm4, xmm3
+    vinserti128     ymm2, ymm2, xmm4, 1
+    vbroadcasti128  ymm5, [db20_128]
+    AVX2_FilterVertical_16px ymm0, ymm1, ymm2, [maddubsw_p1m5_256], ymm5, [maddubsw_m5p1_256], ymm4
+    vmovq           xmm4, [p_src + i_srcstride3]
+    lea             p_src, [p_src + 4 * i_srcstride]
+    vpunpcklbw      xmm3, xmm3, xmm4
+    vmovq           xmm6, [p_src]
+    vpunpcklbw      xmm4, xmm4, xmm6
+    vinserti128     ymm3, ymm3, xmm4, 1
+    AVX2_FilterVertical_16px ymm1, ymm2, ymm3, [maddubsw_p1m5_256], ymm5, [maddubsw_m5p1_256], ymm4
+    vpackuswb       ymm0, ymm0, ymm1
+    vmovlps         [p_dst], xmm0
+    vextracti128    xmm1, ymm0, 1
+    vmovlps         [p_dst + i_dststride], xmm1
+    lea             p_dst, [p_dst + 2 * i_dststride]
+    vmovhps         [p_dst], xmm0
+    vmovhps         [p_dst + i_dststride], xmm1
+    cmp             i_height, 4
+    jl              .width8_done
+    lea             p_dst, [p_dst + 2 * i_dststride]
+    vmovq           xmm4, [p_src + i_srcstride]
+    vpunpcklbw      xmm0, xmm6, xmm4
+    jg              .width8_height_ge8
+    AVX2_FilterVertical_16px xmm2, xmm3, xmm0, [maddubsw_p1m5_256], xmm5, [maddubsw_m5p1_256], xmm4
+    vpackuswb       xmm2, xmm2, xmm2
+    vmovlps         [p_dst], xmm2
+    jmp             .width8_done
+.width8_height_ge8:
+    vmovq           xmm1, [p_src + 2 * i_srcstride]
+    vpunpcklbw      xmm4, xmm4, xmm1
+    vinserti128     ymm0, ymm0, xmm4, 1
+    AVX2_FilterVertical_16px ymm2, ymm3, ymm0, [maddubsw_p1m5_256], ymm5, [maddubsw_m5p1_256], ymm4
+    vmovq           xmm4, [p_src + i_srcstride3]
+    lea             p_src, [p_src + 4 * i_srcstride]
+    vpunpcklbw      xmm1, xmm1, xmm4
+    vmovq           xmm6, [p_src]
+    vpunpcklbw      xmm4, xmm4, xmm6
+    vinserti128     ymm1, ymm1, xmm4, 1
+    AVX2_FilterVertical_16px ymm3, ymm0, ymm1, [maddubsw_p1m5_256], ymm5, [maddubsw_m5p1_256], ymm4
+    vpackuswb       ymm2, ymm2, ymm3
+    vmovlps         [p_dst], xmm2
+    vextracti128    xmm3, ymm2, 1
+    vmovlps         [p_dst + i_dststride], xmm3
+    lea             p_dst, [p_dst + 2 * i_dststride]
+    vmovhps         [p_dst], xmm2
+    vmovhps         [p_dst + i_dststride], xmm3
+    lea             p_dst, [p_dst + 2 * i_dststride]
+    sub             i_height, 8
+    jg              .width8_yloop
+    jl              .width8_done
+    vmovq           xmm4, [p_src + i_srcstride]
+    vpunpcklbw      xmm2, xmm6, xmm4
+    AVX2_FilterVertical_16px xmm0, xmm1, xmm2, [maddubsw_p1m5_256], xmm5, [maddubsw_m5p1_256], xmm4
+    vpackuswb       xmm0, xmm0, xmm0
+    vmovlps         [p_dst], xmm0
+.width8_done:
+    vzeroupper
+    POP_XMM
+    LOAD_6_PARA_POP
+%ifdef X86_32
+    pop             r6
+%endif
+    ret
+
+.width16:
+    sub             i_height, 1
+    test            i_height, 1
+    jnz             .width16_yloop_begin_even
+    vmovq           xmm0, [p_src]
+    vpbroadcastq    ymm1, [p_src + 8]
+    vpblendd        ymm0, ymm0, ymm1, 11110000b
+    vmovq           xmm1, [p_src + i_srcstride]
+    vpbroadcastq    ymm2, [p_src + i_srcstride + 8]
+    vpblendd        ymm1, ymm1, ymm2, 11110000b
+    vpunpcklbw      ymm0, ymm0, ymm1
+    vmovq           xmm2, [p_src + 2 * i_srcstride]
+    vpbroadcastq    ymm3, [p_src + 2 * i_srcstride + 8]
+    vpblendd        ymm2, ymm2, ymm3, 11110000b
+    vmovq           xmm3, [p_src + i_srcstride3]
+    vpbroadcastq    ymm4, [p_src + i_srcstride3 + 8]
+    lea             p_src, [p_src + 4 * i_srcstride]
+    vpblendd        ymm3, ymm3, ymm4, 11110000b
+    vpunpcklbw      ymm2, ymm2, ymm3
+    vmovq           xmm4, [p_src]
+    vpbroadcastq    ymm5, [p_src + 8]
+    vpblendd        ymm4, ymm4, ymm5, 11110000b
+    vmovq           xmm5, [p_src + i_srcstride]
+    vpbroadcastq    ymm6, [p_src + i_srcstride + 8]
+    lea             p_src, [p_src + 2 * i_srcstride]
+    vpblendd        ymm5, ymm5, ymm6, 11110000b
+    vpunpcklbw      ymm4, ymm4, ymm5
+    AVX2_FilterVertical_16px ymm0, ymm2, ymm4, [maddubsw_p1m5_256], [db20_256], [maddubsw_m5p1_256], ymm7
+    vpackuswb       ymm0, ymm0, ymm0
+    vpermq          ymm0, ymm0, 1000b
+    vmovdqa         [p_dst], xmm0
+    add             p_dst, i_dststride
+    jmp             .width16_yloop
+.width16_yloop_begin_even:
+    vmovq           xmm1, [p_src]
+    vpbroadcastq    ymm2, [p_src + 8]
+    vpblendd        ymm1, ymm1, ymm2, 11110000b
+    vmovq           xmm2, [p_src + i_srcstride]
+    vpbroadcastq    ymm3, [p_src + i_srcstride + 8]
+    vpblendd        ymm2, ymm2, ymm3, 11110000b
+    vmovq           xmm3, [p_src + 2 * i_srcstride]
+    vpbroadcastq    ymm4, [p_src + 2 * i_srcstride + 8]
+    add             p_src, i_srcstride3
+    vpblendd        ymm3, ymm3, ymm4, 11110000b
+    vpunpcklbw      ymm2, ymm2, ymm3
+    vmovq           xmm4, [p_src]
+    vpbroadcastq    ymm5, [p_src + 8]
+    vpblendd        ymm4, ymm4, ymm5, 11110000b
+    vmovq           xmm5, [p_src + i_srcstride]
+    vpbroadcastq    ymm6, [p_src + i_srcstride + 8]
+    lea             p_src, [p_src + 2 * i_srcstride]
+    vpblendd        ymm5, ymm5, ymm6, 11110000b
+    vpunpcklbw      ymm4, ymm4, ymm5
+.width16_yloop:
+    vmovq           xmm6, [p_src]
+    vpbroadcastq    ymm7, [p_src + 8]
+    vpblendd        ymm6, ymm6, ymm7, 11110000b
+    AVX2_FilterVertical2_16px ymm1, ymm6, ymm2, ymm4, [maddubsw_m5p20_256], [maddubsw_p20m5_256], ymm0, ymm7
+    vmovq           xmm7, [p_src + i_srcstride]
+    vpbroadcastq    ymm0, [p_src + i_srcstride + 8]
+    vpblendd        ymm7, ymm7, ymm0, 11110000b
+    vpunpcklbw      ymm6, ymm6, ymm7
+    AVX2_FilterVertical_16px ymm2, ymm4, ymm6, [maddubsw_p1m5_256], [db20_256], [maddubsw_m5p1_256], ymm0
+    vpackuswb       ymm1, ymm1, ymm2
+    vpermq          ymm1, ymm1, 11011000b
+    vmovdqa         [p_dst], xmm1
+    vextracti128    [p_dst + i_dststride], ymm1, 1
+    lea             p_dst, [p_dst + 2 * i_dststride]
+    vmovq           xmm0, [p_src + 2 * i_srcstride]
+    vpbroadcastq    ymm1, [p_src + 2 * i_srcstride + 8]
+    vpblendd        ymm0, ymm0, ymm1, 11110000b
+    AVX2_FilterVertical2_16px ymm3, ymm0, ymm4, ymm6, [maddubsw_m5p20_256], [maddubsw_p20m5_256], ymm2, ymm1
+    vmovq           xmm1, [p_src + i_srcstride3]
+    vpbroadcastq    ymm2, [p_src + i_srcstride3 + 8]
+    lea             p_src, [p_src + 4 * i_srcstride]
+    vpblendd        ymm1, ymm1, ymm2, 11110000b
+    vpunpcklbw      ymm0, ymm0, ymm1
+    AVX2_FilterVertical_16px ymm4, ymm6, ymm0, [maddubsw_p1m5_256], [db20_256], [maddubsw_m5p1_256], ymm2
+    vpackuswb       ymm3, ymm3, ymm4
+    vpermq          ymm3, ymm3, 11011000b
+    vmovdqa         [p_dst], xmm3
+    vextracti128    [p_dst + i_dststride], ymm3, 1
+    lea             p_dst, [p_dst + 2 * i_dststride]
+    vmovq           xmm2, [p_src]
+    vpbroadcastq    ymm3, [p_src + 8]
+    vpblendd        ymm2, ymm2, ymm3, 11110000b
+    AVX2_FilterVertical2_16px ymm5, ymm2, ymm6, ymm0, [maddubsw_m5p20_256], [maddubsw_p20m5_256], ymm4, ymm3
+    vmovq           xmm3, [p_src + i_srcstride]
+    vpbroadcastq    ymm4, [p_src + i_srcstride + 8]
+    vpblendd        ymm3, ymm3, ymm4, 11110000b
+    vpunpcklbw      ymm2, ymm2, ymm3
+    AVX2_FilterVertical_16px ymm6, ymm0, ymm2, [maddubsw_p1m5_256], [db20_256], [maddubsw_m5p1_256], ymm4
+    vpackuswb       ymm5, ymm5, ymm6
+    vpermq          ymm5, ymm5, 11011000b
+    vmovdqa         [p_dst], xmm5
+    vextracti128    [p_dst + i_dststride], ymm5, 1
+    lea             p_dst, [p_dst + 2 * i_dststride]
+    vmovq           xmm4, [p_src + 2 * i_srcstride]
+    vpbroadcastq    ymm5, [p_src + 2 * i_srcstride + 8]
+    vpblendd        ymm4, ymm4, ymm5, 11110000b
+    AVX2_FilterVertical2_16px ymm7, ymm4, ymm0, ymm2, [maddubsw_m5p20_256], [maddubsw_p20m5_256], ymm6, ymm5
+    vmovq           xmm5, [p_src + i_srcstride3]
+    vpbroadcastq    ymm6, [p_src + i_srcstride3 + 8]
+    lea             p_src, [p_src + 4 * i_srcstride]
+    vpblendd        ymm5, ymm5, ymm6, 11110000b
+    vpunpcklbw      ymm4, ymm4, ymm5
+    AVX2_FilterVertical_16px ymm0, ymm2, ymm4, [maddubsw_p1m5_256], [db20_256], [maddubsw_m5p1_256], ymm6
+    vpackuswb       ymm7, ymm7, ymm0
+    vpermq          ymm7, ymm7, 11011000b
+    vmovdqa         [p_dst], xmm7
+    vextracti128    [p_dst + i_dststride], ymm7, 1
+    lea             p_dst, [p_dst + 2 * i_dststride]
+    sub             i_height, 8
+    jg              .width16_yloop
+    vzeroupper
+    POP_XMM
+    LOAD_6_PARA_POP
+%ifdef X86_32
+    pop             r6
+%endif
+    ret
+%undef p_src
+%undef i_srcstride
+%undef i_srcstride3
+%undef p_dst
+%undef i_dststride
+%undef i_width
+%undef i_height
+%undef i_ycnt
+
+
+;*******************************************************************************
+; void McHorVer20_avx2(const uint8_t *pSrc,
+;                      int iSrcStride,
+;                      uint8_t *pDst,
+;                      int iDstStride,
+;                      int iWidth,
+;                      int iHeight);
+;*******************************************************************************
+
+WELS_EXTERN McHorVer20_avx2
+%define p_src        r0
+%define i_srcstride  r1
+%define p_dst        r2
+%define i_dststride  r3
+%define i_width      r4
+%define i_height     r5
+    %assign  push_num 0
+    LOAD_6_PARA
+    PUSH_XMM 7
+    SIGN_EXTENSION  r1, r1d
+    SIGN_EXTENSION  r3, r3d
+    SIGN_EXTENSION  r4, r4d
+    SIGN_EXTENSION  r5, r5d
+    vbroadcasti128  ymm4, [shufb_32435465768798A9]
+    vbroadcasti128  ymm5, [shufb_011267784556ABBC]
+    vbroadcasti128  ymm6, [maddubsw_p1m5_p1m5_m5p1_m5p1_128]
+    cmp             i_width, 8
+    je              .width8
+    jg              .width16_yloop
+%xdefine i_srcstride3 i_width
+%undef i_width
+    lea             i_srcstride3, [3 * i_srcstride]
+.width4_yloop:
+    vmovdqu         xmm0, [p_src - 2]
+    vmovdqu         xmm1, [p_src + i_srcstride - 2]
+    vinserti128     ymm0, ymm0, [p_src + 2 * i_srcstride - 2], 1
+    vinserti128     ymm1, ymm1, [p_src + i_srcstride3 - 2], 1
+    lea             p_src, [p_src + 4 * i_srcstride]
+    AVX2_FilterHorizontal_4x4px ymm0, ymm1, ymm4, ymm5, ymm6, ymm2, ymm3
+    vpackuswb       ymm0, ymm0, ymm0
+    vmovd           [p_dst], xmm0
+    vpsrlq          xmm1, xmm0, 32
+    vmovd           [p_dst + i_dststride], xmm1
+    lea             p_dst, [p_dst + 2 * i_dststride]
+    vextracti128    xmm0, ymm0, 1
+    vmovd           [p_dst], xmm0
+    vpsrlq          xmm1, xmm0, 32
+    vmovd           [p_dst + i_dststride], xmm1
+    lea             p_dst, [p_dst + 2 * i_dststride]
+    sub             i_height, 4
+    jg              .width4_yloop
+    vzeroupper
+    POP_XMM
+    LOAD_6_PARA_POP
+    ret
+.width8:
+    lea             i_srcstride3, [3 * i_srcstride]
+.width8_yloop:
+    vmovdqu         xmm0, [p_src - 2]
+    vmovdqu         xmm1, [p_src + i_srcstride - 2]
+    vinserti128     ymm0, ymm0, [p_src + 2 * i_srcstride - 2], 1
+    vinserti128     ymm1, ymm1, [p_src + i_srcstride3 - 2], 1
+    lea             p_src, [p_src + 4 * i_srcstride]
+    AVX2_FilterHorizontal_16px ymm0, ymm4, ymm5, ymm6, ymm2, ymm3
+    AVX2_FilterHorizontal_16px ymm1, ymm4, ymm5, ymm6, ymm2, ymm3
+    vpackuswb       ymm0, ymm0, ymm1
+    vmovlps         [p_dst], xmm0
+    vmovhps         [p_dst + i_dststride], xmm0
+    lea             p_dst, [p_dst + 2 * i_dststride]
+    vextracti128    xmm0, ymm0, 1
+    vmovlps         [p_dst], xmm0
+    vmovhps         [p_dst + i_dststride], xmm0
+    lea             p_dst, [p_dst + 2 * i_dststride]
+    sub             i_height, 4
+    jg              .width8_yloop
+    vzeroupper
+    POP_XMM
+    LOAD_6_PARA_POP
+    ret
+%undef i_srcstride3
+.width16_yloop:
+    vmovdqu         xmm0, [p_src - 2]
+    vmovdqu         xmm1, [p_src + 6]
+    vinserti128     ymm0, ymm0, [p_src + i_srcstride - 2], 1
+    vinserti128     ymm1, ymm1, [p_src + i_srcstride + 6], 1
+    lea             p_src, [p_src + 2 * i_srcstride]
+    AVX2_FilterHorizontal_16px ymm0, ymm4, ymm5, ymm6, ymm2, ymm3
+    AVX2_FilterHorizontal_16px ymm1, ymm4, ymm5, ymm6, ymm2, ymm3
+    vpackuswb       ymm0, ymm0, ymm1
+    vmovdqa         [p_dst], xmm0
+    vextracti128    [p_dst + i_dststride], ymm0, 1
+    lea             p_dst, [p_dst + 2 * i_dststride]
+    sub             i_height, 2
+    jg              .width16_yloop
+    vzeroupper
+    POP_XMM
+    LOAD_6_PARA_POP
+    ret
+%undef p_src
+%undef i_srcstride
+%undef p_dst
+%undef i_dststride
+%undef i_width
+%undef i_height
+
+
+;***********************************************************************
+; void McHorVer20Width5Or9Or17_avx2(const uint8_t *pSrc,
+;                                   int32_t iSrcStride,
+;                                   uint8_t *pDst,
+;                                   int32_t iDstStride,
+;                                   int32_t iWidth,
+;                                   int32_t iHeight);
+;***********************************************************************
+
+WELS_EXTERN McHorVer20Width5Or9Or17_avx2
+%define p_src        r0
+%define i_srcstride  r1
+%define p_dst        r2
+%define i_dststride  r3
+%define i_width      r4
+%define i_height     r5
+    %assign  push_num 0
+    LOAD_6_PARA
+    PUSH_XMM 8
+    SIGN_EXTENSION  r1, r1d
+    SIGN_EXTENSION  r3, r3d
+    SIGN_EXTENSION  r4, r4d
+    SIGN_EXTENSION  r5, r5d
+    vbroadcasti128  ymm5, [shufb_32435465768798A9]
+    vbroadcasti128  ymm6, [shufb_011267784556ABBC]
+    vbroadcasti128  ymm7, [maddubsw_p1m5_p1m5_m5p1_m5p1_128]
+    cmp             i_width, 9
+    je              .width9
+    jg              .width17
+.width5_yloop:
+    vmovdqu         xmm0, [p_src - 2]
+    vinserti128     ymm0, ymm0, [p_src + i_srcstride - 2], 1
+    lea             p_src, [p_src + 2 * i_srcstride]
+    AVX2_FilterHorizontal_16px ymm0, ymm5, ymm6, ymm7, ymm1, ymm2
+    vpackuswb       ymm0, ymm0, ymm0
+    vpsrlq          xmm1, xmm0, 8
+    vmovd           [p_dst + 1], xmm1
+    vmovd           [p_dst], xmm0
+    add             p_dst, i_dststride
+    vextracti128    xmm0, ymm0, 1
+    vpsrlq          xmm1, xmm0, 8
+    vmovd           [p_dst + 1], xmm1
+    vmovd           [p_dst], xmm0
+    add             p_dst, i_dststride
+    sub             i_height, 2
+    jg              .width5_yloop
+    vzeroupper
+    POP_XMM
+    LOAD_6_PARA_POP
+    ret
+.width9:
+%xdefine i_srcstride3 i_width
+%undef i_width
+    lea             i_srcstride3, [3 * i_srcstride]
+.width9_yloop:
+    vmovdqu         xmm0, [p_src - 2]
+    vmovdqu         xmm4, [p_src + i_srcstride - 2]
+    vinserti128     ymm0, ymm0, [p_src + 2 * i_srcstride - 2], 1
+    vinserti128     ymm4, ymm4, [p_src + i_srcstride3 - 2], 1
+    lea             p_src, [p_src + 4 * i_srcstride]
+    vpunpckhqdq     ymm3, ymm0, ymm4
+    AVX2_FilterHorizontal_4px ymm3, ymm2
+    AVX2_FilterHorizontal_16px ymm0, ymm5, ymm6, ymm7, ymm1, ymm2
+    vpackuswb       ymm3, ymm3, ymm0
+    vmovd           [p_dst + 5], xmm3
+    vmovhps         [p_dst], xmm3
+    add             p_dst, i_dststride
+    AVX2_FilterHorizontal_16px ymm4, ymm5, ymm6, ymm7, ymm1, ymm2
+    vpackuswb       ymm4, ymm4, ymm4
+    vpsrlq          xmm2, xmm3, 32
+    vmovd           [p_dst + 5], xmm2
+    vmovlps         [p_dst], xmm4
+    add             p_dst, i_dststride
+    vextracti128    xmm3, ymm3, 1
+    vextracti128    xmm4, ymm4, 1
+    vmovd           [p_dst + 5], xmm3
+    vmovhps         [p_dst], xmm3
+    add             p_dst, i_dststride
+    vpsrlq          xmm2, xmm3, 32
+    vmovd           [p_dst + 5], xmm2
+    vmovlps         [p_dst], xmm4
+    add             p_dst, i_dststride
+    sub             i_height, 4
+    jg              .width9_yloop
+    vzeroupper
+    POP_XMM
+    LOAD_6_PARA_POP
+    ret
+.width17:
+    lea             i_srcstride3, [3 * i_srcstride]
+.width17_yloop:
+    vmovdqu         xmm0, [p_src - 2]
+    vmovdqu         xmm3, [p_src + 6]
+    vinserti128     ymm0, ymm0, [p_src + i_srcstride - 2], 1
+    vinserti128     ymm3, ymm3, [p_src + i_srcstride + 6], 1
+    vmovdqa         ymm4, ymm3
+    AVX2_FilterHorizontal_16px ymm0, ymm5, ymm6, ymm7, ymm1, ymm2
+    AVX2_FilterHorizontal_16px ymm3, ymm5, ymm6, ymm7, ymm1, ymm2
+    vpackuswb       ymm0, ymm0, ymm3
+    vmovdqu         xmm1, [p_src + 2 * i_srcstride - 2]
+    vmovdqu         xmm3, [p_src + 2 * i_srcstride + 6]
+    vinserti128     ymm1, ymm1, [p_src + i_srcstride3 - 2], 1
+    vinserti128     ymm3, ymm3, [p_src + i_srcstride3 + 6], 1
+    lea             p_src, [p_src + 4 * i_srcstride]
+    vpunpckhqdq     ymm4, ymm4, ymm3
+    AVX2_FilterHorizontal_4px ymm4, ymm2
+    vpackuswb       ymm4, ymm4, ymm4
+    vmovd           [p_dst + 13], xmm4
+    vmovdqa         [p_dst], xmm0
+    add             p_dst, i_dststride
+    vextracti128    xmm2, ymm4, 1
+    vmovd           [p_dst + 13], xmm2
+    vextracti128    [p_dst], ymm0, 1
+    add             p_dst, i_dststride
+    vpsrlq          xmm4, xmm4, 32
+    vmovd           [p_dst + 13], xmm4
+    AVX2_FilterHorizontal_16px ymm1, ymm5, ymm6, ymm7, ymm0, ymm4
+    AVX2_FilterHorizontal_16px ymm3, ymm5, ymm6, ymm7, ymm0, ymm4
+    vpackuswb       ymm1, ymm1, ymm3
+    vmovdqa         [p_dst], xmm1
+    add             p_dst, i_dststride
+    vpsrlq          xmm2, xmm2, 32
+    vmovd           [p_dst + 13], xmm2
+    vextracti128    [p_dst], ymm1, 1
+    add             p_dst, i_dststride
+    sub             i_height, 4
+    jg              .width17_yloop
+    vzeroupper
+    POP_XMM
+    LOAD_6_PARA_POP
+    ret
+%undef i_srcstride3
+%undef p_src
+%undef i_srcstride
+%undef p_dst
+%undef i_dststride
+%undef i_width
+%undef i_height
+
+
+;*******************************************************************************
+; void McHorVer20Width4U8ToS16_avx2(const uint8_t *pSrc,
+;                                   int iSrcStride,
+;                                   int16_t *pDst,
+;                                   int iHeight);
+;*******************************************************************************
+
+WELS_EXTERN McHorVer20Width4U8ToS16_avx2
+%define p_src        r0
+%define i_srcstride  r1
+%define p_dst        r2
+%define i_height     r3
+%define i_srcstride3 r4
+%define i_dststride   8
+    %assign  push_num 0
+%ifdef X86_32
+    push            r4
+    %assign  push_num 1
+%endif
+    LOAD_4_PARA
+    PUSH_XMM 7
+    SIGN_EXTENSION  r1, r1d
+    SIGN_EXTENSION  r3, r3d
+    sub             p_src, i_srcstride
+    sub             p_src, i_srcstride
+    lea             i_srcstride3, [3 * i_srcstride]
+    vbroadcasti128  ymm4, [shufb_32435465768798A9]
+    vbroadcasti128  ymm5, [shufb_011267784556ABBC]
+    vbroadcasti128  ymm6, [maddubsw_p1m5_p1m5_m5p1_m5p1_128]
+    sub             i_height, 3
+.yloop:
+    vmovdqu         xmm0, [p_src - 2]
+    vmovdqu         xmm1, [p_src + i_srcstride - 2]
+    vinserti128     ymm0, ymm0, [p_src + 2 * i_srcstride - 2], 1
+    vinserti128     ymm1, ymm1, [p_src + i_srcstride3 - 2], 1
+    lea             p_src, [p_src + 4 * i_srcstride]
+    AVX2_FilterHorizontalbw_4x4px ymm0, ymm1, ymm4, ymm5, ymm6, ymm2, ymm3
+    vmovdqa         [p_dst], ymm0
+    add             p_dst, 4 * i_dststride
+    sub             i_height, 4
+    jg              .yloop
+    ; Height % 4 remaining single.
+    vmovdqu         xmm0, [p_src - 2]
+    AVX2_FilterHorizontalbw_16px xmm0, xmm4, xmm5, xmm6, xmm2, xmm3
+    vmovlps         [p_dst], xmm0
+    vzeroupper
+    POP_XMM
+    LOAD_4_PARA_POP
+%ifdef X86_32
+    pop             r4
+%endif
+    ret
+%undef p_src
+%undef i_srcstride
+%undef p_dst
+%undef i_height
+%undef i_srcstride3
+%undef i_dststride
+
+
+;***********************************************************************
+; void McHorVer02Width4S16ToU8_avx2(const int16_t *pSrc,
+;                                   uint8_t *pDst,
+;                                   int32_t iDstStride,
+;                                   int32_t iHeight);
+;***********************************************************************
+
+WELS_EXTERN McHorVer02Width4S16ToU8_avx2
+%define p_src        r0
+%define p_dst        r1
+%define i_dststride  r2
+%define i_height     r3
+%define i_dststride3 r4
+%define i_srcstride  8
+    %assign  push_num 0
+%ifdef X86_32
+    push            r4
+    %assign  push_num 1
+%endif
+    LOAD_4_PARA
+    PUSH_XMM 8
+    SIGN_EXTENSION  r2, r2d
+    SIGN_EXTENSION  r3, r3d
+    lea             i_dststride3, [3 * i_dststride]
+    vmovdqu         ymm0, [p_src +  0 * i_srcstride]
+    vmovdqu         ymm1, [p_src +  1 * i_srcstride]
+    vmovdqu         ymm2, [p_src +  2 * i_srcstride]
+    vmovdqu         ymm3, [p_src +  3 * i_srcstride]
+    vmovdqu         ymm4, [p_src +  4 * i_srcstride]
+    vmovdqu         ymm5, [p_src +  5 * i_srcstride]
+    vmovdqu         ymm6, [p_src +  6 * i_srcstride]
+    AVX2_FilterVerticalw_16px ymm0, ymm1, ymm2, ymm3, ymm4, ymm5, ymm7
+    vpackuswb       ymm0, ymm0, ymm0
+    vmovd           [p_dst], xmm0
+    vpsrlq          xmm7, xmm0, 32
+    vmovd           [p_dst + i_dststride], xmm7
+    vextracti128    xmm0, ymm0, 1
+    vmovd           [p_dst + 2 * i_dststride], xmm0
+    vpsrlq          xmm7, xmm0, 32
+    vmovd           [p_dst + i_dststride3], xmm7
+    cmp             i_height, 4
+    jle             .done
+    lea             p_dst, [p_dst + 4 * i_dststride]
+    vmovdqu         ymm7, [p_src +  7 * i_srcstride]
+    vmovdqu         ymm0, [p_src +  8 * i_srcstride]
+    vmovdqu         ymm1, [p_src +  9 * i_srcstride]
+    AVX2_FilterVerticalw_16px ymm4, ymm5, ymm6, ymm7, ymm0, ymm1, ymm3
+    vpackuswb       ymm4, ymm4, ymm4
+    vmovd           [p_dst], xmm4
+    vpsrlq          xmm3, xmm4, 32
+    vmovd           [p_dst + i_dststride], xmm3
+    vextracti128    xmm4, ymm4, 1
+    vmovd           [p_dst + 2 * i_dststride], xmm4
+    vpsrlq          xmm3, xmm4, 32
+    vmovd           [p_dst + i_dststride3], xmm3
+.done:
+    vzeroupper
+    POP_XMM
+    LOAD_4_PARA_POP
+%ifdef X86_32
+    pop             r4
+%endif
+    ret
+%undef p_src
+%undef p_dst
+%undef i_dststride
+%undef i_height
+%undef i_srcstride
+%undef i_dststride3
+
+
+;*******************************************************************************
+; void McHorVer20Width8U8ToS16_avx2(const uint8_t *pSrc,
+;                                   int iSrcStride,
+;                                   int16_t *pDst,
+;                                   int iHeight);
+;*******************************************************************************
+
+WELS_EXTERN McHorVer20Width8U8ToS16_avx2
+%define p_src        r0
+%define i_srcstride  r1
+%define p_dst        r2
+%define i_height     r3
+%define i_dststride  16
+    %assign  push_num 0
+    LOAD_4_PARA
+    PUSH_XMM 6
+    SIGN_EXTENSION  r1, r1d
+    SIGN_EXTENSION  r3, r3d
+    sub             p_src, i_srcstride
+    sub             p_src, i_srcstride
+    vbroadcasti128  ymm3, [shufb_32435465768798A9]
+    vbroadcasti128  ymm4, [shufb_011267784556ABBC]
+    vbroadcasti128  ymm5, [maddubsw_p1m5_p1m5_m5p1_m5p1_128]
+    sub             i_height, 1
+.yloop:
+    vmovdqu         xmm0, [p_src - 2]
+    vinserti128     ymm0, ymm0, [p_src + i_srcstride - 2], 1
+    lea             p_src, [p_src + 2 * i_srcstride]
+    AVX2_FilterHorizontalbw_16px ymm0, ymm3, ymm4, ymm5, ymm1, ymm2
+    vmovdqu         [p_dst], ymm0
+    add             p_dst, 2 * i_dststride
+    sub             i_height, 2
+    jg              .yloop
+    jl              .done
+    vmovdqu         xmm0, [p_src - 2]
+    AVX2_FilterHorizontalbw_16px xmm0, xmm3, xmm4, xmm5, xmm1, xmm2
+    vmovdqa         [p_dst], xmm0
+.done:
+    vzeroupper
+    POP_XMM
+    LOAD_4_PARA_POP
+    ret
+%undef p_src
+%undef i_srcstride
+%undef p_dst
+%undef i_height
+%undef i_dststride
+
+
+;***********************************************************************
+; void McHorVer02Width5S16ToU8_avx2(const int16_t *pSrc,
+;                                   uint8_t *pDst,
+;                                   int32_t iDstStride,
+;                                   int32_t iHeight);
+;***********************************************************************
+
+WELS_EXTERN McHorVer02Width5S16ToU8_avx2
+%define p_src        r0
+%define p_dst        r1
+%define i_dststride  r2
+%define i_height     r3
+%define i_srcstride  16
+    %assign  push_num 0
+    LOAD_4_PARA
+    PUSH_XMM 8
+    SIGN_EXTENSION  r2, r2d
+    SIGN_EXTENSION  r3, r3d
+    vmovdqu         ymm0, [p_src +  0 * i_srcstride]
+    vmovdqu         ymm2, [p_src +  2 * i_srcstride]
+    vmovdqu         ymm4, [p_src +  4 * i_srcstride]
+    vmovdqu         ymm6, [p_src +  6 * i_srcstride]
+    vperm2i128      ymm1, ymm0, ymm2, 00100001b
+    vperm2i128      ymm3, ymm2, ymm4, 00100001b
+    vperm2i128      ymm5, ymm4, ymm6, 00100001b
+    AVX2_FilterVerticalw_16px ymm0, ymm1, ymm2, ymm3, ymm4, ymm5, ymm7
+    vpackuswb       ymm0, ymm0, ymm0
+    vpsrlq          xmm7, xmm0, 8
+    vmovd           [p_dst + 1], xmm7
+    vmovd           [p_dst], xmm0
+    add             p_dst, i_dststride
+    vextracti128    xmm0, ymm0, 1
+    vpsrlq          xmm7, xmm0, 8
+    vmovd           [p_dst + 1], xmm7
+    vmovd           [p_dst], xmm0
+    add             p_dst, i_dststride
+    vmovdqu         ymm7, [p_src +  7 * i_srcstride]
+    vmovdqu         ymm0, [p_src +  8 * i_srcstride]
+    AVX2_FilterVerticalw_16px ymm2, ymm3, ymm4, ymm5, ymm6, ymm7, ymm1
+    vpackuswb       ymm2, ymm2, ymm2
+    vpsrlq          xmm1, xmm2, 8
+    vmovd           [p_dst + 1], xmm1
+    vmovd           [p_dst], xmm2
+    add             p_dst, i_dststride
+    vextracti128    xmm2, ymm2, 1
+    vpsrlq          xmm1, xmm2, 8
+    vmovd           [p_dst + 1], xmm1
+    vmovd           [p_dst], xmm2
+    add             p_dst, i_dststride
+    vmovdqu         ymm1, [p_src +  9 * i_srcstride]
+    vmovdqu         ymm2, [p_src + 10 * i_srcstride]
+    AVX2_FilterVerticalw_16px ymm4, ymm5, ymm6, ymm7, ymm0, ymm1, ymm3
+    vpackuswb       ymm4, ymm4, ymm4
+    vpsrlq          xmm3, xmm4, 8
+    vmovd           [p_dst + 1], xmm3
+    vmovd           [p_dst], xmm4
+    cmp             i_height, 5
+    jle             .done
+    add             p_dst, i_dststride
+    vextracti128    xmm4, ymm4, 1
+    vpsrlq          xmm3, xmm4, 8
+    vmovd           [p_dst + 1], xmm3
+    vmovd           [p_dst], xmm4
+    add             p_dst, i_dststride
+    vmovdqu         ymm3, [p_src + 11 * i_srcstride]
+    vmovdqu         xmm4, [p_src + 12 * i_srcstride]
+    AVX2_FilterVerticalw_16px ymm6, ymm7, ymm0, ymm1, ymm2, ymm3, ymm5
+    vpackuswb       ymm6, ymm6, ymm6
+    vpsrlq          xmm5, xmm6, 8
+    vmovd           [p_dst + 1], xmm5
+    vmovd           [p_dst], xmm6
+    add             p_dst, i_dststride
+    vextracti128    xmm6, ymm6, 1
+    vpsrlq          xmm5, xmm6, 8
+    vmovd           [p_dst + 1], xmm5
+    vmovd           [p_dst], xmm6
+    add             p_dst, i_dststride
+    vmovdqu         xmm5, [p_src + 13 * i_srcstride]
+    AVX2_FilterVerticalw_16px xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm7
+    vpackuswb       xmm0, xmm0, xmm0
+    vpsrlq          xmm7, xmm0, 8
+    vmovd           [p_dst + 1], xmm7
+    vmovd           [p_dst], xmm0
+.done:
+    vzeroupper
+    POP_XMM
+    LOAD_4_PARA_POP
+    ret
+%undef p_src
+%undef p_dst
+%undef i_dststride
+%undef i_height
+%undef i_srcstride
+
+
+;***********************************************************************
+; void McHorVer02Width8S16ToU8_avx2(const int16_t *pSrc,
+;                                   uint8_t *pDst,
+;                                   int32_t iDstStride,
+;                                   int32_t iHeight);
+;***********************************************************************
+
+WELS_EXTERN McHorVer02Width8S16ToU8_avx2
+%define p_src        r0
+%define p_dst        r1
+%define i_dststride  r2
+%define i_height     r3
+%define i_dststride3 r4
+%define i_srcstride  16
+    %assign  push_num 0
+%ifdef X86_32
+    push            r4
+    %assign  push_num 1
+%endif
+    LOAD_4_PARA
+    PUSH_XMM 8
+    SIGN_EXTENSION  r2, r2d
+    SIGN_EXTENSION  r3, r3d
+    lea             i_dststride3, [3 * i_dststride]
+    vmovdqa         ymm0, [p_src +  0 * i_srcstride]
+    vmovdqa         ymm2, [p_src +  2 * i_srcstride]
+    vmovdqa         ymm4, [p_src +  4 * i_srcstride]
+    vperm2i128      ymm1, ymm0, ymm2, 00100001b
+    vperm2i128      ymm3, ymm2, ymm4, 00100001b
+.yloop:
+    vmovdqa         ymm6, [p_src +  6 * i_srcstride]
+    vperm2i128      ymm5, ymm4, ymm6, 00100001b
+    AVX2_FilterVerticalw_16px ymm0, ymm1, ymm2, ymm3, ymm4, ymm5, ymm7
+    vmovdqu         ymm7, [p_src +  7 * i_srcstride]
+    AVX2_FilterVerticalw_16px ymm2, ymm3, ymm4, ymm5, ymm6, ymm7, ymm1
+    vpackuswb       ymm1, ymm0, ymm2
+    vmovdqa         ymm0, [p_src +  8 * i_srcstride]
+    vextracti128    xmm2, ymm1, 1
+    vmovlps         [p_dst], xmm1
+    vmovlps         [p_dst + i_dststride], xmm2
+    vmovhps         [p_dst + 2 * i_dststride], xmm1
+    vmovhps         [p_dst + i_dststride3], xmm2
+    cmp             i_height, 4
+    jle             .done
+    lea             p_dst, [p_dst + 4 * i_dststride]
+    vmovdqu         ymm1, [p_src +  9 * i_srcstride]
+    vmovdqa         ymm2, [p_src + 10 * i_srcstride]
+    AVX2_FilterVerticalw_16px ymm4, ymm5, ymm6, ymm7, ymm0, ymm1, ymm3
+    vmovdqu         ymm3, [p_src + 11 * i_srcstride]
+    AVX2_FilterVerticalw_16px ymm6, ymm7, ymm0, ymm1, ymm2, ymm3, ymm5
+    vpackuswb       ymm5, ymm4, ymm6
+    vmovdqa         ymm4, [p_src + 12 * i_srcstride]
+    add             p_src, 8 * i_srcstride
+    vextracti128    xmm6, ymm5, 1
+    vmovlps         [p_dst], xmm5
+    vmovlps         [p_dst + i_dststride], xmm6
+    vmovhps         [p_dst + 2 * i_dststride], xmm5
+    vmovhps         [p_dst + i_dststride3], xmm6
+    lea             p_dst, [p_dst + 4 * i_dststride]
+    sub             i_height, 8
+    jg              .yloop
+.done:
+    vzeroupper
+    POP_XMM
+    LOAD_4_PARA_POP
+%ifdef X86_32
+    pop             r4
+%endif
+    ret
+%undef p_src
+%undef p_dst
+%undef i_dststride
+%undef i_height
+%undef i_dststride3
+%undef i_srcstride
+
+
+;*******************************************************************************
+; void McHorVer20Width16U8ToS16_avx2(const uint8_t *pSrc,
+;                                    int32_t iSrcStride,
+;                                    int16_t *pDst,
+;                                    int32_t iHeight);
+;*******************************************************************************
+
+WELS_EXTERN McHorVer20Width16U8ToS16_avx2
+%define p_src        r0
+%define i_srcstride  r1
+%define p_dst        r2
+%define i_height     r3
+%define i_dststride  32
+    %assign  push_num 0
+    LOAD_4_PARA
+    PUSH_XMM 7
+    SIGN_EXTENSION  r1, r1d
+    SIGN_EXTENSION  r3, r3d
+    sub             p_src, i_srcstride
+    sub             p_src, i_srcstride
+    vbroadcasti128  ymm4, [shufb_32435465768798A9]
+    vbroadcasti128  ymm5, [shufb_011267784556ABBC]
+    vbroadcasti128  ymm6, [maddubsw_p1m5_p1m5_m5p1_m5p1_128]
+    sub             i_height, 1
+.yloop:
+    vmovdqu         xmm0, [p_src - 2]
+    vinserti128     ymm0, ymm0, [p_src + 6], 1
+    vmovdqu         xmm1, [p_src + i_srcstride - 2]
+    vinserti128     ymm1, ymm1, [p_src + i_srcstride + 6], 1
+    lea             p_src, [p_src + 2 * i_srcstride]
+    AVX2_FilterHorizontalbw_16px ymm0, ymm4, ymm5, ymm6, ymm2, ymm3
+    vmovdqa         [p_dst], ymm0
+    AVX2_FilterHorizontalbw_16px ymm1, ymm4, ymm5, ymm6, ymm2, ymm3
+    vmovdqa         [p_dst + i_dststride], ymm1
+    add             p_dst, 2 * i_dststride
+    sub             i_height, 2
+    jg              .yloop
+    jl              .done
+    vmovdqu         xmm0, [p_src - 2]
+    vinserti128     ymm0, ymm0, [p_src + 6], 1
+    AVX2_FilterHorizontalbw_16px ymm0, ymm4, ymm5, ymm6, ymm1, ymm2
+    vmovdqa         [p_dst], ymm0
+.done:
+    vzeroupper
+    POP_XMM
+    LOAD_4_PARA_POP
+    ret
+%undef p_src
+%undef i_srcstride
+%undef p_dst
+%undef i_height
+%undef i_dststride
+
+
+;***********************************************************************
+; void McHorVer02Width9S16ToU8_avx2(const int16_t *pSrc,
+;                                   uint8_t *pDst,
+;                                   int32_t iDstStride,
+;                                   int32_t iHeight);
+;***********************************************************************
+
+WELS_EXTERN McHorVer02Width9S16ToU8_avx2
+%define p_src        r0
+%define p_dst        r1
+%define i_dststride  r2
+%define i_height     r3
+%define i_srcstride  32
+    %assign  push_num 0
+    LOAD_4_PARA
+    PUSH_XMM 8
+    SIGN_EXTENSION  r2, r2d
+    SIGN_EXTENSION  r3, r3d
+    vmovdqa         ymm0, [p_src + 0 * i_srcstride]
+    vmovdqa         ymm1, [p_src + 1 * i_srcstride]
+    vmovdqa         ymm2, [p_src + 2 * i_srcstride]
+    vmovdqa         ymm3, [p_src + 3 * i_srcstride]
+    vmovdqa         ymm4, [p_src + 4 * i_srcstride]
+    sub             i_height, 1
+.height_loop:
+    vmovdqa         ymm5, [p_src + 5 * i_srcstride]
+    AVX2_FilterVerticalw_16px ymm0, ymm1, ymm2, ymm3, ymm4, ymm5, ymm6
+    vmovdqa         ymm6, [p_src + 6 * i_srcstride]
+    AVX2_FilterVerticalw_16px ymm1, ymm2, ymm3, ymm4, ymm5, ymm6, ymm7
+    vmovdqa         ymm7, [p_src + 7 * i_srcstride]
+    vpackuswb       ymm0, ymm0, ymm1
+    vextracti128    xmm1, ymm0, 1
+    vpsllq          xmm1, xmm1, 56
+    vmovlps         [p_dst + 1], xmm1
+    vmovlps         [p_dst], xmm0
+    add             p_dst, i_dststride
+    vmovhps         [p_dst + 1], xmm1
+    vmovhps         [p_dst], xmm0
+    add             p_dst, i_dststride
+    AVX2_FilterVerticalw_16px ymm2, ymm3, ymm4, ymm5, ymm6, ymm7, ymm0
+    vmovdqa         ymm0, [p_src + 8 * i_srcstride]
+    AVX2_FilterVerticalw_16px ymm3, ymm4, ymm5, ymm6, ymm7, ymm0, ymm1
+    vpackuswb       ymm2, ymm2, ymm3
+    vextracti128    xmm3, ymm2, 1
+    vpsllq          xmm3, xmm3, 56
+    vmovlps         [p_dst + 1], xmm3
+    vmovlps         [p_dst], xmm2
+    add             p_dst, i_dststride
+    vmovhps         [p_dst + 1], xmm3
+    vmovhps         [p_dst], xmm2
+    add             p_dst, i_dststride
+    vmovdqa         ymm1, [p_src + 9 * i_srcstride]
+    AVX2_FilterVerticalw_16px ymm4, ymm5, ymm6, ymm7, ymm0, ymm1, ymm2
+    vmovdqa         ymm2, [p_src + 10 * i_srcstride]
+    AVX2_FilterVerticalw_16px ymm5, ymm6, ymm7, ymm0, ymm1, ymm2, ymm3
+    vmovdqa         ymm3, [p_src + 11 * i_srcstride]
+    vpackuswb       ymm4, ymm4, ymm5
+    vextracti128    xmm5, ymm4, 1
+    vpsllq          xmm5, xmm5, 56
+    vmovlps         [p_dst + 1], xmm5
+    vmovlps         [p_dst], xmm4
+    cmp             i_height, 4
+    jle             .done
+    add             p_dst, i_dststride
+    vmovhps         [p_dst + 1], xmm5
+    vmovhps         [p_dst], xmm4
+    add             p_dst, i_dststride
+    AVX2_FilterVerticalw_16px ymm6, ymm7, ymm0, ymm1, ymm2, ymm3, ymm4
+    vmovdqa         ymm4, [p_src + 12 * i_srcstride]
+    add             p_src, 8 * i_srcstride
+    AVX2_FilterVerticalw_16px ymm7, ymm0, ymm1, ymm2, ymm3, ymm4, ymm5
+    vpackuswb       ymm6, ymm6, ymm7
+    vextracti128    xmm7, ymm6, 1
+    vpsllq          xmm7, xmm7, 56
+    vmovlps         [p_dst + 1], xmm7
+    vmovlps         [p_dst], xmm6
+    add             p_dst, i_dststride
+    vmovhps         [p_dst + 1], xmm7
+    vmovhps         [p_dst], xmm6
+    add             p_dst, i_dststride
+    sub             i_height, 8
+    jg              .height_loop
+    vmovdqa         ymm5, [p_src + 5 * i_srcstride]
+    AVX2_FilterVerticalw_16px ymm0, ymm1, ymm2, ymm3, ymm4, ymm5, ymm6
+    vpackuswb       ymm0, ymm0, ymm0
+    vextracti128    xmm1, ymm0, 1
+    vpsllq          xmm1, xmm1, 56
+    vmovlps         [p_dst + 1], xmm1
+    vmovlps         [p_dst], xmm0
+.done:
+    vzeroupper
+    POP_XMM
+    LOAD_4_PARA_POP
+    ret
+%undef p_src
+%undef i_srcstride
+%undef p_dst
+%undef i_dststride
+%undef i_height
+
+
+;*******************************************************************************
+; void McHorVer20Width17U8ToS16_avx2(const uint8_t *pSrc,
+;                                    int32_t iSrcStride,
+;                                    int16_t *pDst,
+;                                    int32_t iHeight);
+;*******************************************************************************
+
+WELS_EXTERN McHorVer20Width17U8ToS16_avx2
+%define p_src        r0
+%define i_srcstride  r1
+%define p_dst        r2
+%define i_height     r3
+%define i_srcstride3 r4
+%define i_dststride  64
+    %assign  push_num 0
+%ifdef X86_32
+    push            r4
+    %assign  push_num 1
+%endif
+    LOAD_4_PARA
+    PUSH_XMM 8
+    SIGN_EXTENSION  r1, r1d
+    SIGN_EXTENSION  r3, r3d
+    sub             p_src, i_srcstride
+    sub             p_src, i_srcstride
+    lea             i_srcstride3, [3 * i_srcstride]
+    vbroadcasti128  ymm5, [shufb_32435465768798A9]
+    vbroadcasti128  ymm6, [shufb_011267784556ABBC]
+    vbroadcasti128  ymm7, [maddubsw_p1m5_p1m5_m5p1_m5p1_128]
+    sub             i_height, 3
+.yloop:
+    vmovdqu         xmm0, [p_src - 2]
+    vmovdqu         xmm3, [p_src + 6]
+    vinserti128     ymm0, ymm0, [p_src + i_srcstride - 2], 1
+    vinserti128     ymm3, ymm3, [p_src + i_srcstride + 6], 1
+    vmovdqa         ymm4, ymm3
+    AVX2_FilterHorizontalbw_16px ymm0, ymm5, ymm6, ymm7, ymm1, ymm2
+    vmovdqa         [p_dst], xmm0
+    vextracti128    [p_dst + i_dststride], ymm0, 1
+    AVX2_FilterHorizontalbw_16px ymm3, ymm5, ymm6, ymm7, ymm1, ymm2
+    vmovdqu         xmm1, [p_src + 2 * i_srcstride - 2]
+    vmovdqu         xmm0, [p_src + 2 * i_srcstride + 6]
+    vinserti128     ymm1, ymm1, [p_src + i_srcstride3 - 2], 1
+    vinserti128     ymm0, ymm0, [p_src + i_srcstride3 + 6], 1
+    lea             p_src, [p_src + 4 * i_srcstride]
+    vpunpckhqdq     ymm4, ymm4, ymm0
+    AVX2_FilterHorizontalbw_4px ymm4, [dwm32768_256], ymm2
+    vmovlps         [p_dst + 26], xmm4
+    vmovdqa         [p_dst + 16], xmm3
+    vextracti128    xmm2, ymm4, 1
+    vmovlps         [p_dst + i_dststride + 26], xmm2
+    vextracti128    [p_dst + i_dststride + 16], ymm3, 1
+    vmovhps         [p_dst + 2 * i_dststride + 26], xmm4
+    AVX2_FilterHorizontalbw_16px ymm1, ymm5, ymm6, ymm7, ymm3, ymm4
+    vmovdqa         [p_dst + 2 * i_dststride], xmm1
+    AVX2_FilterHorizontalbw_16px ymm0, ymm5, ymm6, ymm7, ymm3, ymm4
+    vmovdqa         [p_dst + 2 * i_dststride + 16], xmm0
+    vextracti128    [p_dst + 3 * i_dststride], ymm1, 1
+    vmovhps         [p_dst + 3 * i_dststride + 26], xmm2
+    vextracti128    [p_dst + 3 * i_dststride + 16], ymm0, 1
+    add             p_dst, 4 * i_dststride
+    sub             i_height, 4
+    jg              .yloop
+    ; Handle remaining 2 lines after 4x unrolled loop.
+    vmovdqu         xmm0, [p_src - 2]
+    vinserti128     ymm0, ymm0, [p_src + 6], 1
+    vmovdqu         xmm3, [p_src + i_srcstride - 2]
+    vinserti128     ymm3, ymm3, [p_src + i_srcstride + 6], 1
+    vpunpckhqdq     ymm4, ymm0, ymm3
+    AVX2_FilterHorizontalbw_4px ymm4, [dwm32768_256], ymm2
+    AVX2_FilterHorizontalbw_16px ymm0, ymm5, ymm6, ymm7, ymm1, ymm2
+    AVX2_FilterHorizontalbw_16px ymm3, ymm5, ymm6, ymm7, ymm1, ymm2
+    vextracti128    xmm4, ymm4, 1
+    vmovlps         [p_dst + 26], xmm4
+    vmovdqa         [p_dst], ymm0
+    vmovhps         [p_dst + i_dststride + 26], xmm4
+    vmovdqa         [p_dst + i_dststride], ymm3
+    vzeroupper
+    POP_XMM
+    LOAD_4_PARA_POP
+%ifdef X86_32
+    pop             r4
+%endif
+    ret
+%undef p_src
+%undef i_srcstride
+%undef p_dst
+%undef i_dststride
+%undef i_height
+%undef i_srcstride3
+
+
+;***********************************************************************
+; void McHorVer02Width16Or17S16ToU8_avx2(const int16_t *pSrc,
+;                                        int32_t iSrcStride,
+;                                        uint8_t *pDst,
+;                                        int32_t iDstStride,
+;                                        int32_t iWidth,
+;                                        int32_t iHeight);
+;***********************************************************************
+
+WELS_EXTERN McHorVer02Width16Or17S16ToU8_avx2
+%define p_src        r0
+%define i_srcstride  r1
+%define p_dst        r2
+%define i_dststride  r3
+%define i_width      r4
+%define i_height     r5
+%define i_srcstride3 r6
+    %assign  push_num 0
+%ifdef X86_32
+    push            r6
+    %assign  push_num 1
+%endif
+    LOAD_6_PARA
+    PUSH_XMM 8
+    SIGN_EXTENSION  r1, r1d
+    SIGN_EXTENSION  r3, r3d
+    SIGN_EXTENSION  r4, r4d
+    SIGN_EXTENSION  r5, r5d
+    sub             i_height, 1
+    lea             i_srcstride3, [3 * i_srcstride]
+    test            i_width, 1
+    jz              .align_begin
+    push            i_height
+    push            p_src
+    push            p_dst
+    lea             p_src, [p_src + 2 * i_width - 2]
+    add             p_dst, i_width
+    vmovd           xmm0, [p_src]
+    vpunpcklwd      xmm0, xmm0, [p_src + i_srcstride]
+    vmovd           xmm1, [p_src + 2 * i_srcstride]
+    add             p_src, i_srcstride3
+    vpunpcklwd      xmm1, xmm1, [p_src]
+    vpunpckldq      xmm0, xmm0, xmm1
+    vmovd           xmm1, [p_src + i_srcstride]
+    vpunpcklwd      xmm1, xmm1, [p_src + 2 * i_srcstride]
+    vmovd           xmm2, [p_src + i_srcstride3]
+    lea             p_src, [p_src + 4 * i_srcstride]
+    vpunpcklwd      xmm2, xmm2, [p_src]
+    vpunpckldq      xmm1, xmm1, xmm2
+    vpunpcklqdq     xmm0, xmm0, xmm1
+.height_loop_unalign:
+    vmovd           xmm1, [p_src + i_srcstride]
+    vpalignr        xmm1, xmm1, xmm0, 2
+    vmovd           xmm2, [p_src + 2 * i_srcstride]
+    vpalignr        xmm2, xmm2, xmm1, 2
+    vmovd           xmm3, [p_src + i_srcstride3]
+    vpalignr        xmm3, xmm3, xmm2, 2
+    lea             p_src, [p_src + 4 * i_srcstride]
+    vmovd           xmm4, [p_src]
+    vpalignr        xmm4, xmm4, xmm3, 2
+    vmovd           xmm5, [p_src + i_srcstride]
+    vpalignr        xmm5, xmm5, xmm4, 2
+    AVX2_FilterVerticalw_16px xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm7
+    vpackuswb       xmm0, xmm0, xmm0
+    vpslld          xmm6, xmm0, 24
+    vmovd           [p_dst - 4], xmm6
+    vmovlps         [p_dst + 4 * i_dststride - 8], xmm6
+    add             p_dst, i_dststride
+    vpslld          xmm6, xmm0, 16
+    vmovd           [p_dst - 4], xmm6
+    vmovlps         [p_dst + 4 * i_dststride - 8], xmm6
+    add             p_dst, i_dststride
+    vpslld          xmm6, xmm0, 8
+    vmovd           [p_dst - 4], xmm6
+    vmovd           [p_dst + i_dststride - 4], xmm0
+    lea             p_dst, [p_dst + 4 * i_dststride]
+    vmovlps         [p_dst - 8], xmm6
+    vmovlps         [p_dst + i_dststride - 8], xmm0
+    lea             p_dst, [p_dst + 2 * i_dststride]
+    sub             i_height, 8
+    jle             .height_loop_unalign_exit
+    vmovd           xmm1, [p_src + 2 * i_srcstride]
+    vpalignr        xmm1, xmm1, xmm5, 2
+    vmovd           xmm0, [p_src + i_srcstride3]
+    lea             p_src, [p_src + 4 * i_srcstride]
+    vpunpcklwd      xmm0, xmm0, [p_src]
+    vpalignr        xmm0, xmm0, xmm1, 4
+    jmp             .height_loop_unalign
+.height_loop_unalign_exit:
+    vpbroadcastq    xmm6, [p_src + 2 * i_srcstride - 6]
+    AVX2_FilterVerticalw_16px xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7
+    vpackuswb       xmm1, xmm1, xmm1
+    vmovlps         [p_dst - 8], xmm1
+    pop             p_dst
+    pop             p_src
+    pop             i_height
+.align_begin:
+    vmovdqa         ymm0, [p_src]
+    vmovdqa         ymm1, [p_src + i_srcstride]
+    vmovdqa         ymm2, [p_src + 2 * i_srcstride]
+    vmovdqa         ymm3, [p_src + i_srcstride3]
+    lea             p_src, [p_src + 4 * i_srcstride]
+    vmovdqa         ymm4, [p_src]
+.height_loop:
+    vmovdqa         ymm5, [p_src + i_srcstride]
+    AVX2_FilterVerticalw_16px ymm0, ymm1, ymm2, ymm3, ymm4, ymm5, ymm6
+    vmovdqa         ymm6, [p_src + 2 * i_srcstride]
+    AVX2_FilterVerticalw_16px ymm1, ymm2, ymm3, ymm4, ymm5, ymm6, ymm7
+    vmovdqa         ymm7, [p_src + i_srcstride3]
+    lea             p_src, [p_src + 4 * i_srcstride]
+    vpackuswb       ymm0, ymm0, ymm1
+    vpermq          ymm0, ymm0, 11011000b
+    vmovdqa         [p_dst], xmm0
+    vextracti128    [p_dst + i_dststride], ymm0, 1
+    lea             p_dst, [p_dst + 2 * i_dststride]
+    AVX2_FilterVerticalw_16px ymm2, ymm3, ymm4, ymm5, ymm6, ymm7, ymm0
+    vmovdqa         ymm0, [p_src]
+    AVX2_FilterVerticalw_16px ymm3, ymm4, ymm5, ymm6, ymm7, ymm0, ymm1
+    vpackuswb       ymm2, ymm2, ymm3
+    vpermq          ymm2, ymm2, 11011000b
+    vmovdqa         [p_dst], xmm2
+    vextracti128    [p_dst + i_dststride], ymm2, 1
+    lea             p_dst, [p_dst + 2 * i_dststride]
+    vmovdqa         ymm1, [p_src + i_srcstride]
+    AVX2_FilterVerticalw_16px ymm4, ymm5, ymm6, ymm7, ymm0, ymm1, ymm2
+    vmovdqa         ymm2, [p_src + 2 * i_srcstride]
+    AVX2_FilterVerticalw_16px ymm5, ymm6, ymm7, ymm0, ymm1, ymm2, ymm3
+    vmovdqa         ymm3, [p_src + i_srcstride3]
+    lea             p_src, [p_src + 4 * i_srcstride]
+    vpackuswb       ymm4, ymm4, ymm5
+    vpermq          ymm4, ymm4, 11011000b
+    vmovdqa        [p_dst], xmm4
+    vextracti128   [p_dst + i_dststride], ymm4, 1
+    lea             p_dst, [p_dst + 2 * i_dststride]
+    AVX2_FilterVerticalw_16px ymm6, ymm7, ymm0, ymm1, ymm2, ymm3, ymm4
+    vmovdqa         ymm4, [p_src]
+    AVX2_FilterVerticalw_16px ymm7, ymm0, ymm1, ymm2, ymm3, ymm4, ymm5
+    vpackuswb       ymm6, ymm6, ymm7
+    vpermq          ymm6, ymm6, 11011000b
+    vmovdqa         [p_dst], xmm6
+    vextracti128    [p_dst + i_dststride], ymm6, 1
+    lea             p_dst, [p_dst + 2 * i_dststride]
+    sub             i_height, 8
+    jg              .height_loop
+    jl              .done
+    vmovdqa         ymm5, [p_src + i_srcstride]
+    AVX2_FilterVerticalw_16px ymm0, ymm1, ymm2, ymm3, ymm4, ymm5, ymm6
+    vpackuswb       ymm0, ymm0, ymm0
+    vpermq          ymm0, ymm0, 11011000b
+    vmovdqa         [p_dst], xmm0
+.done:
+    vzeroupper
+    POP_XMM
+    LOAD_6_PARA_POP
+%ifdef X86_32
+    pop             r6
+%endif
+    ret
+%undef p_src
+%undef i_srcstride
+%undef p_dst
+%undef i_dststride
+%undef i_width
+%undef i_height
+%undef i_srcstride3
+
+%endif ; HAVE_AVX2

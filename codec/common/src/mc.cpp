@@ -905,6 +905,169 @@ void McChroma_ssse3 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int
     McChromaWithFragMv_c (pSrc, iSrcStride, pDst, iDstStride, iMvX, iMvY, iWidth, iHeight);
 }
 
+//***************************************************************************//
+//                          AVX2 implementation                              //
+//***************************************************************************//
+
+#ifdef HAVE_AVX2
+
+void McHorVer22_avx2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                      int32_t iWidth, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_2D (int16_t, pTmp, 16 + 5, 16, 32);
+  if (iWidth < 8) {
+    McHorVer20Width4U8ToS16_avx2 (pSrc, iSrcStride, &pTmp[0][0], iHeight + 5);
+    McHorVer02Width4S16ToU8_avx2 (&pTmp[0][0], pDst, iDstStride, iHeight);
+  } else if (iWidth == 8) {
+    McHorVer20Width8U8ToS16_avx2 (pSrc, iSrcStride, &pTmp[0][0], iHeight + 5);
+    McHorVer02Width8S16ToU8_avx2 (&pTmp[0][0], pDst, iDstStride, iHeight);
+  } else {
+    McHorVer20Width16U8ToS16_avx2 (pSrc, iSrcStride, &pTmp[0][0], iHeight + 5);
+    McHorVer02Width16Or17S16ToU8_avx2 (&pTmp[0][0], sizeof *pTmp, pDst, iDstStride, iWidth, iHeight);
+  }
+}
+
+void McHorVer01_avx2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                      int32_t iWidth, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_2D (uint8_t, pTmp, 16, 16, 16);
+  McHorVer02_avx2 (pSrc, iSrcStride, &pTmp[0][0], sizeof *pTmp, iWidth, iHeight);
+  PixelAvgWidth4Or8Or16_sse2 (pDst, iDstStride, pSrc, iSrcStride,
+                              &pTmp[0][0], sizeof *pTmp, iWidth, iHeight);
+}
+
+void McHorVer03_avx2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                      int32_t iWidth, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_2D (uint8_t, pTmp, 16, 16, 16);
+  McHorVer02_avx2 (pSrc, iSrcStride, &pTmp[0][0], sizeof *pTmp, iWidth, iHeight);
+  PixelAvgWidth4Or8Or16_sse2 (pDst, iDstStride, pSrc + iSrcStride, iSrcStride,
+                              &pTmp[0][0], sizeof *pTmp, iWidth, iHeight);
+}
+
+void McHorVer10_avx2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                      int32_t iWidth, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_2D (uint8_t, pTmp, 16, 16, 16);
+  McHorVer20_avx2 (pSrc, iSrcStride, &pTmp[0][0], sizeof *pTmp, iWidth, iHeight);
+  PixelAvgWidth4Or8Or16_sse2 (pDst, iDstStride, pSrc, iSrcStride,
+                              &pTmp[0][0], sizeof *pTmp, iWidth, iHeight);
+}
+
+void McHorVer11_avx2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                      int32_t iWidth, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_2D (uint8_t, pHorTmp, 16, 16, 16);
+  ENFORCE_STACK_ALIGN_2D (uint8_t, pVerTmp, 16, 16, 16);
+  McHorVer20_avx2 (pSrc, iSrcStride, &pHorTmp[0][0], sizeof *pHorTmp, iWidth, iHeight);
+  McHorVer02_avx2 (pSrc, iSrcStride, &pVerTmp[0][0], sizeof *pVerTmp, iWidth, iHeight);
+  PixelAvgWidth4Or8Or16_sse2 (pDst, iDstStride, &pHorTmp[0][0], sizeof *pHorTmp,
+                              &pVerTmp[0][0], sizeof *pVerTmp, iWidth, iHeight);
+}
+
+void McHorVer12_avx2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                      int32_t iWidth, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_2D (uint8_t, pVerTmp, 16, 16, 16);
+  ENFORCE_STACK_ALIGN_2D (uint8_t, pCtrTmp, 16, 16, 16);
+  McHorVer02_avx2 (pSrc, iSrcStride, &pVerTmp[0][0], sizeof *pVerTmp, iWidth, iHeight);
+  McHorVer22_avx2 (pSrc, iSrcStride, &pCtrTmp[0][0], sizeof *pCtrTmp, iWidth, iHeight);
+  PixelAvgWidth4Or8Or16_sse2 (pDst, iDstStride, &pVerTmp[0][0], sizeof *pVerTmp,
+                              &pCtrTmp[0][0], sizeof *pCtrTmp, iWidth, iHeight);
+}
+
+void McHorVer13_avx2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                      int32_t iWidth, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_2D (uint8_t, pHorTmp, 16, 16, 16);
+  ENFORCE_STACK_ALIGN_2D (uint8_t, pVerTmp, 16, 16, 16);
+  McHorVer20_avx2 (pSrc + iSrcStride, iSrcStride, &pHorTmp[0][0], sizeof *pHorTmp, iWidth, iHeight);
+  McHorVer02_avx2 (pSrc,              iSrcStride, &pVerTmp[0][0], sizeof *pVerTmp, iWidth, iHeight);
+  PixelAvgWidth4Or8Or16_sse2 (pDst, iDstStride, &pHorTmp[0][0], sizeof *pHorTmp,
+                              &pVerTmp[0][0], sizeof *pVerTmp, iWidth, iHeight);
+}
+
+void McHorVer21_avx2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                      int32_t iWidth, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_2D (uint8_t, pHorTmp, 16, 16, 16);
+  ENFORCE_STACK_ALIGN_2D (uint8_t, pCtrTmp, 16, 16, 16);
+  McHorVer20_avx2 (pSrc, iSrcStride, &pHorTmp[0][0], sizeof *pHorTmp, iWidth, iHeight);
+  McHorVer22_avx2 (pSrc, iSrcStride, &pCtrTmp[0][0], sizeof *pCtrTmp, iWidth, iHeight);
+  PixelAvgWidth4Or8Or16_sse2 (pDst, iDstStride, &pHorTmp[0][0], sizeof *pHorTmp,
+                              &pCtrTmp[0][0], sizeof *pCtrTmp, iWidth, iHeight);
+}
+
+void McHorVer23_avx2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                      int32_t iWidth, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_2D (uint8_t, pHorTmp, 16, 16, 16);
+  ENFORCE_STACK_ALIGN_2D (uint8_t, pCtrTmp, 16, 16, 16);
+  McHorVer20_avx2 (pSrc + iSrcStride, iSrcStride, &pHorTmp[0][0], sizeof *pHorTmp, iWidth, iHeight);
+  McHorVer22_avx2 (pSrc,              iSrcStride, &pCtrTmp[0][0], sizeof *pCtrTmp, iWidth, iHeight);
+  PixelAvgWidth4Or8Or16_sse2 (pDst, iDstStride, &pHorTmp[0][0], sizeof *pHorTmp,
+                              &pCtrTmp[0][0], sizeof *pCtrTmp, iWidth, iHeight);
+}
+
+void McHorVer30_avx2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                      int32_t iWidth, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_2D (uint8_t, pTmp, 16, 16, 16);
+  McHorVer20_avx2 (pSrc, iSrcStride, &pTmp[0][0], sizeof *pTmp, iWidth, iHeight);
+  PixelAvgWidth4Or8Or16_sse2 (pDst, iDstStride, pSrc + 1, iSrcStride, &pTmp[0][0], sizeof *pTmp, iWidth, iHeight);
+}
+
+void McHorVer31_avx2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                      int32_t iWidth, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_2D (uint8_t, pHorTmp, 16, 16, 16);
+  ENFORCE_STACK_ALIGN_2D (uint8_t, pVerTmp, 16, 16, 16);
+  McHorVer20_avx2 (pSrc,     iSrcStride, &pHorTmp[0][0], sizeof *pHorTmp, iWidth, iHeight);
+  McHorVer02_avx2 (pSrc + 1, iSrcStride, &pVerTmp[0][0], sizeof *pVerTmp, iWidth, iHeight);
+  PixelAvgWidth4Or8Or16_sse2 (pDst, iDstStride, &pHorTmp[0][0], sizeof *pHorTmp,
+                              &pVerTmp[0][0], sizeof *pVerTmp, iWidth, iHeight);
+}
+
+void McHorVer32_avx2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                      int32_t iWidth, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_2D (uint8_t, pVerTmp, 16, 16, 16);
+  ENFORCE_STACK_ALIGN_2D (uint8_t, pCtrTmp, 16, 16, 16);
+  McHorVer02_avx2 (pSrc + 1, iSrcStride, &pVerTmp[0][0], sizeof *pVerTmp, iWidth, iHeight);
+  McHorVer22_avx2 (pSrc,     iSrcStride, &pCtrTmp[0][0], sizeof *pCtrTmp, iWidth, iHeight);
+  PixelAvgWidth4Or8Or16_sse2 (pDst, iDstStride, &pVerTmp[0][0], sizeof *pVerTmp,
+                              &pCtrTmp[0][0], sizeof *pCtrTmp, iWidth, iHeight);
+}
+
+void McHorVer33_avx2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                      int32_t iWidth, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_2D (uint8_t, pHorTmp, 16, 16, 16);
+  ENFORCE_STACK_ALIGN_2D (uint8_t, pVerTmp, 16, 16, 16);
+  McHorVer20_avx2 (pSrc + iSrcStride, iSrcStride, &pHorTmp[0][0], sizeof *pHorTmp, iWidth, iHeight);
+  McHorVer02_avx2 (pSrc + 1,          iSrcStride, &pVerTmp[0][0], sizeof *pVerTmp, iWidth, iHeight);
+  PixelAvgWidth4Or8Or16_sse2 (pDst, iDstStride, &pHorTmp[0][0], sizeof *pHorTmp,
+                              &pVerTmp[0][0], sizeof *pVerTmp, iWidth, iHeight);
+}
+
+void McHorVer22Width5Or9Or17_avx2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                                   int32_t iWidth, int32_t iHeight) {
+  if (iWidth < 9) {
+    ENFORCE_STACK_ALIGN_2D (int16_t, pTmp, 9 + 5, WELS_ALIGN(5, 16 / sizeof (int16_t)), 16)
+    McHorVer20Width8U8ToS16_avx2 (pSrc, iSrcStride, &pTmp[0][0], iHeight + 5);
+    McHorVer02Width5S16ToU8_avx2 (&pTmp[0][0], pDst, iDstStride, iHeight);
+  } else if (iWidth == 9) {
+    ENFORCE_STACK_ALIGN_2D (int16_t, pTmp, 17 + 5, 16, 32)
+    McHorVer20Width16U8ToS16_avx2 (pSrc, iSrcStride, &pTmp[0][0], iHeight + 5);
+    McHorVer02Width9S16ToU8_avx2 (&pTmp[0][0], pDst, iDstStride, iHeight);
+  } else {
+    ENFORCE_STACK_ALIGN_2D (int16_t, pTmp, 17 + 5, WELS_ALIGN(17, 32 / sizeof (int16_t)), 32)
+    McHorVer20Width17U8ToS16_avx2 (pSrc, iSrcStride, &pTmp[0][0], iHeight + 5);
+    McHorVer02Width16Or17S16ToU8_avx2 (&pTmp[0][0], sizeof *pTmp, pDst, iDstStride, iWidth, iHeight);
+  }
+}
+
+void McLuma_avx2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                  int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight) {
+  static const PWelsMcWidthHeightFunc pWelsMcFunc[4][4] = {
+    {McCopy_sse3,     McHorVer01_avx2, McHorVer02_avx2, McHorVer03_avx2},
+    {McHorVer10_avx2, McHorVer11_avx2, McHorVer12_avx2, McHorVer13_avx2},
+    {McHorVer20_avx2, McHorVer21_avx2, McHorVer22_avx2, McHorVer23_avx2},
+    {McHorVer30_avx2, McHorVer31_avx2, McHorVer32_avx2, McHorVer33_avx2},
+  };
+
+  pWelsMcFunc[iMvX & 0x03][iMvY & 0x03] (pSrc, iSrcStride, pDst, iDstStride, iWidth, iHeight);
+}
+
+#endif //HAVE_AVX2
+
 void PixelAvg_sse2 (uint8_t* pDst, int32_t iDstStride, const uint8_t* pSrcA, int32_t iSrcAStride,
                     const uint8_t* pSrcB, int32_t iSrcBStride, int32_t iWidth, int32_t iHeight) {
   static const PWelsSampleWidthAveragingFunc kpfFuncs[2] = {
@@ -1523,6 +1686,14 @@ void WelsCommon::InitMcFunc (SMcFunc* pMcFuncs, uint32_t uiCpuFlag) {
     pMcFuncs->pMcChromaFunc = McChroma_ssse3;
     pMcFuncs->pMcLumaFunc   = McLuma_ssse3;
   }
+#ifdef HAVE_AVX2
+  if (uiCpuFlag & WELS_CPU_AVX2) {
+    pMcFuncs->pfLumaHalfpelHor  = McHorVer20Width5Or9Or17_avx2;
+    pMcFuncs->pfLumaHalfpelVer  = McHorVer02_avx2;
+    pMcFuncs->pfLumaHalfpelCen  = McHorVer22Width5Or9Or17_avx2;
+    pMcFuncs->pMcLumaFunc       = McLuma_avx2;
+  }
+#endif
 #endif //(X86_ASM)
 
 #if defined(HAVE_NEON)
