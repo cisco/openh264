@@ -2088,6 +2088,7 @@ sqdiff_bgd_width_loop:
     %assign push_num push_num - stack_alloc_num
 %endmacro
 
+%ifdef HAVE_AVX2
 ; Max unsigned byte per quadword
 ; out=%1 in=%2 tmp=%3
 %macro AVX2_Maxubq 3
@@ -3557,3 +3558,6 @@ WELS_EXTERN VAACalcSadSsdBgd_avx2
 %undef           p_sd8x8
 %undef           p_mad8x8
     ret
+
+%endif
+

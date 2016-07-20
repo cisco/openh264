@@ -678,6 +678,7 @@ WELS_EXTERN WelsIDctRecI16x16Dc_sse2
 ; AVX2 functions
 ;***********************************************************************
 
+%ifdef HAVE_AVX2
 ; out=%1 pPixel1=%2 iStride1=%3 pPixel2=%4 iStride2=%5 wels_shufb0312_movzxw=%6 clobber=%7,%8
 %macro AVX2_LoadDiff16P 8
     vmovq         x%1, [%2         ]
@@ -1011,3 +1012,5 @@ WELS_EXTERN WelsIDctT4Rec_avx2
     POP_XMM
     LOAD_5_PARA_POP
     ret
+%endif
+
