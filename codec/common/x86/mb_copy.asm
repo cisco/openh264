@@ -503,33 +503,6 @@ ALIGN 4
     ret
 
 ;*******************************************************************************
-;  void McCopyWidthEq4_mmx( uint8_t *pSrc, int iSrcStride,
-;                          uint8_t *pDst, int iDstStride, int iHeight )
-;*******************************************************************************
-WELS_EXTERN McCopyWidthEq4_mmx
-    push    r5
-    %assign  push_num 1
-    LOAD_5_PARA
-
-    SIGN_EXTENSION  r1, r1d
-    SIGN_EXTENSION  r3, r3d
-    SIGN_EXTENSION  r4, r4d
-
-ALIGN 4
-.height_loop:
-    mov r5d, [r0]
-    mov [r2], r5d
-
-    add r0, r1
-    add r2, r3
-    dec r4
-    jnz .height_loop
-    WELSEMMS
-    LOAD_5_PARA_POP
-    pop    r5
-    ret
-
-;*******************************************************************************
 ;   void McCopyWidthEq8_mmx( uint8_t *pSrc, int iSrcStride,
 ;                           uint8_t *pDst, int iDstStride, int iHeight )
 ;*******************************************************************************

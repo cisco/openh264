@@ -252,8 +252,6 @@ void McHorVer20WidthEq4_mmx (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* p
                              int32_t iHeight);
 void McChromaWidthEq4_mmx (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                            const uint8_t* kpABCD, int32_t iHeight);
-void McCopyWidthEq4_mmx (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                         int32_t iHeight);
 void McCopyWidthEq8_mmx (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                          int32_t iHeight);
 void PixelAvgWidthEq4_mmx (uint8_t* pDst, int32_t iDstStride, const uint8_t* pSrcA, int32_t iSrcAStride,

@@ -442,7 +442,7 @@ static inline void McCopy_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t
   else if (iWidth == 8)
     McCopyWidthEq8_mmx (pSrc, iSrcStride, pDst, iDstStride, iHeight);
   else if (iWidth == 4)
-    McCopyWidthEq4_mmx (pSrc, iSrcStride, pDst, iDstStride, iHeight);
+    McCopyWidthEq4_c (pSrc, iSrcStride, pDst, iDstStride, iHeight);
   else
     McCopyWidthEq2_c (pSrc, iSrcStride, pDst, iDstStride, iHeight);
 }
