@@ -324,6 +324,7 @@ TEST (EncMcHalfpel, iW##x##iH) { \
             int32_t height = iH; \
             uint8_t uAnchor[4][MC_BUFF_HEIGHT][MC_BUFF_SRC_STRIDE]; \
             uint8_t uSrcTest[MC_BUFF_HEIGHT][MC_BUFF_SRC_STRIDE]; \
+            uint8_t uRand[MC_BUFF_HEIGHT][MC_BUFF_DST_STRIDE]; \
             ENFORCE_STACK_ALIGN_2D (uint8_t, uDstTest, MC_BUFF_HEIGHT, MC_BUFF_DST_STRIDE, 16); \
             uint8_t* uAnchors[4]; \
             int16_t pBuf[MC_BUFF_DST_STRIDE]; \
@@ -337,6 +338,7 @@ TEST (EncMcHalfpel, iW##x##iH) { \
             for (int32_t j = 0; j < MC_BUFF_HEIGHT; j++) { \
                 for (int32_t i = 0; i < MC_BUFF_SRC_STRIDE; i++) { \
                     uAnchor[0][j][i] = uSrcTest[j][i] = rand() % 256; \
+                    uRand[j][i] = rand() % 256; \
                 } \
             } \
              \
@@ -344,22 +346,40 @@ TEST (EncMcHalfpel, iW##x##iH) { \
             InitMcFunc (&sMcFunc, uiCpuFlag); \
              \
             MCHalfPelFilterAnchor (uAnchors[1], uAnchors[2], uAnchors[3], uAnchors[0], MC_BUFF_SRC_STRIDE, width + 1, height + 1, pBuf + 4); \
+            memcpy (&uDstTest[0][0], &uRand[0][0], sizeof uRand); \
             sMcFunc.pfLumaHalfpelHor (&uSrcTest[4][4], MC_BUFF_SRC_STRIDE, uDstTest[0], MC_BUFF_DST_STRIDE, width + 1, height); \
             for (int32_t j = 0; j < height; j++) { \
                 for (int32_t i = 0; i < width + 1; i++) { \
                     ASSERT_EQ (uAnchor[1][4 + j][4 + i], uDstTest[j][i]); \
                 } \
             } \
+            for (int32_t j = 0; j < MC_BUFF_HEIGHT; j++) { \
+                for (int32_t i = j < height ? width + 1 : 0; i < MC_BUFF_DST_STRIDE; i++) { \
+                    ASSERT_EQ (uRand[j][i], uDstTest[j][i]); \
+                } \
+            } \
+            memcpy (&uDstTest[0][0], &uRand[0][0], sizeof uRand); \
             sMcFunc.pfLumaHalfpelVer (&uSrcTest[4][4], MC_BUFF_SRC_STRIDE, uDstTest[0], MC_BUFF_DST_STRIDE, width, height + 1); \
             for (int32_t j = 0; j < height + 1; j++) { \
                 for (int32_t i = 0; i < width; i++) { \
                     ASSERT_EQ (uAnchor[2][4 + j][4 + i], uDstTest[j][i]); \
                 } \
             } \
+            for (int32_t j = 0; j < MC_BUFF_HEIGHT; j++) { \
+                for (int32_t i = j < height + 1 ? width : 0; i < MC_BUFF_DST_STRIDE; i++) { \
+                    ASSERT_EQ (uRand[j][i], uDstTest[j][i]); \
+                } \
+            } \
+            memcpy (&uDstTest[0][0], &uRand[0][0], sizeof uRand); \
             sMcFunc.pfLumaHalfpelCen (&uSrcTest[4][4], MC_BUFF_SRC_STRIDE, uDstTest[0], MC_BUFF_DST_STRIDE, width + 1, height + 1); \
             for (int32_t j = 0; j < height + 1; j++) { \
                 for (int32_t i = 0; i < width + 1; i++) { \
                     ASSERT_EQ (uAnchor[3][4 + j][4 + i], uDstTest[j][i]); \
+                } \
+            } \
+            for (int32_t j = 0; j < MC_BUFF_HEIGHT; j++) { \
+                for (int32_t i = j < height + 1 ? width + 1 : 0; i < MC_BUFF_DST_STRIDE; i++) { \
+                    ASSERT_EQ (uRand[j][i], uDstTest[j][i]); \
                 } \
             } \
         } \
