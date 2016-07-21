@@ -128,10 +128,10 @@ v1.6.0
 ------
 http://ciscobinary.openh264.org/libopenh264-1.6.0-android19.so.bz2
 http://ciscobinary.openh264.org/libopenh264-1.6.0-ios.a.bz2
-http://ciscobinary.openh264.org/libopenh264-1.6.0-linux32.so.bz2
-http://ciscobinary.openh264.org/libopenh264-1.6.0-linux64.so.bz2
-http://ciscobinary.openh264.org/libopenh264-1.6.0-osx32.dylib.bz2
-http://ciscobinary.openh264.org/libopenh264-1.6.0-osx64.dylib.bz2
+http://ciscobinary.openh264.org/libopenh264-1.6.0-linux32.3.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.6.0-linux64.3.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.6.0-osx32.3.dylib.bz2
+http://ciscobinary.openh264.org/libopenh264-1.6.0-osx64.3.dylib.bz2
 http://ciscobinary.openh264.org/openh264-1.6.0-win32msvc.dll.bz2
 http://ciscobinary.openh264.org/openh264-1.6.0-win64msvc.dll.bz2
 
