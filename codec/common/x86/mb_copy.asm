@@ -527,10 +527,10 @@ ALIGN 32
 %endmacro
 
 ;*******************************************************************************
-;   void McCopyWidthEq8_sse2( uint8_t *pSrc, int iSrcStride,
-;                             uint8_t *pDst, int iDstStride, int iHeight )
+;   void McCopyWidthEq8_mmx( uint8_t *pSrc, int iSrcStride,
+;                            uint8_t *pDst, int iDstStride, int iHeight )
 ;*******************************************************************************
-WELS_EXTERN McCopyWidthEq8_sse2
+WELS_EXTERN McCopyWidthEq8_mmx
     %assign  push_num 0
 %ifdef X86_32
     push            r5
@@ -543,8 +543,9 @@ WELS_EXTERN McCopyWidthEq8_sse2
     SIGN_EXTENSION  r3, r3d
     SIGN_EXTENSION  r4, r4d
 
-    CopyStrided4N   movsd, movsd, r2, r3, r0, r1, r4, r5, r6, xmm0, xmm1
+    CopyStrided4N   movq, movq, r2, r3, r0, r1, r4, r5, r6, mm0, mm1
 
+    WELSEMMS
     LOAD_5_PARA_POP
 %ifdef X86_32
     pop             r6

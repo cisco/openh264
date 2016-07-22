@@ -440,7 +440,7 @@ static inline void McCopy_sse2 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t
   if (iWidth == 16)
     McCopyWidthEq16_sse2 (pSrc, iSrcStride, pDst, iDstStride, iHeight);
   else if (iWidth == 8)
-    McCopyWidthEq8_sse2 (pSrc, iSrcStride, pDst, iDstStride, iHeight);
+    McCopyWidthEq8_mmx (pSrc, iSrcStride, pDst, iDstStride, iHeight);
   else if (iWidth == 4)
     McCopyWidthEq4_c (pSrc, iSrcStride, pDst, iDstStride, iHeight);
   else
@@ -729,7 +729,7 @@ void McCopy_sse3 (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_
                   int32_t iWidth, int32_t iHeight) {
   switch (iWidth) {
   case 16: return McCopyWidthEq16_sse3 (pSrc, iSrcStride, pDst, iDstStride, iHeight);
-  case 8:  return McCopyWidthEq8_sse2 (pSrc, iSrcStride, pDst, iDstStride, iHeight);
+  case 8:  return McCopyWidthEq8_mmx (pSrc, iSrcStride, pDst, iDstStride, iHeight);
   case 4:  return McCopyWidthEq4_c (pSrc, iSrcStride, pDst, iDstStride, iHeight);
   }
   return McCopyWidthEq2_c (pSrc, iSrcStride, pDst, iDstStride, iHeight);
