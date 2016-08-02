@@ -3970,9 +3970,9 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
                  "WelsEncoderEncodeExt()MinCr Checking,codec bitstream size is larger than Level limitation");
     }
 #ifdef ENABLE_FRAME_DUMP
-    if (iCurDid + 1 < pSvcParam->iSpatialLayerNum) {
+    {
       DumpDependencyRec (fsnr, &pSvcParam->sDependencyLayers[iCurDid].sRecFileName[0], iCurDid,
-                         pCtx->bDependencyRecFlag[iCurDid], pCtx->pCurDqLayer);
+                         pCtx->bDependencyRecFlag[iCurDid], pCtx->pCurDqLayer,pSvcParam->bSimulcastAVC);
       pCtx->bDependencyRecFlag[iCurDid] = true;
     }
 #endif//ENABLE_FRAME_DUMP
@@ -4160,13 +4160,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
           1]].sSliceArgument.uiSliceNum) {
     AdjustBaseLayer (pCtx);
   }
-
-#ifdef ENABLE_FRAME_DUMP
-  DumpRecFrame (fsnr, &pSvcParam->sDependencyLayers[pSvcParam->iSpatialLayerNum - 1].sRecFileName[0],
-                pSvcParam->iSpatialLayerNum - 1, pCtx->bRecFlag, pCtx->pCurDqLayer); // pDecPic: final reconstruction output
-  pCtx->bRecFlag = true;
-
-#endif//ENABLE_FRAME_DUMP
 
   // to check number of layers / nals / slices dependencies
   if (iLayerNum > MAX_LAYER_NUM_OF_FRAME) {
