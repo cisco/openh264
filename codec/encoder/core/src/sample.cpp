@@ -404,14 +404,14 @@ void WelsInitSampleSadFunc (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag) {
     pFuncList->sSampleDealingFuncs.pfIntra16x16Combined3Satd = WelsIntra16x16Combined3Satd_sse41;
     pFuncList->sSampleDealingFuncs.pfIntra8x8Combined3Satd = WelsIntraChroma8x8Combined3Satd_sse41;
   }
-
+#if defined(HAVE_AVX2)
   if (uiCpuFlag & WELS_CPU_AVX2) {
     pFuncList->sSampleDealingFuncs.pfSampleSatd[BLOCK_16x16] = WelsSampleSatd16x16_avx2;
     pFuncList->sSampleDealingFuncs.pfSampleSatd[BLOCK_16x8]  = WelsSampleSatd16x8_avx2;
     pFuncList->sSampleDealingFuncs.pfSampleSatd[BLOCK_8x16]  = WelsSampleSatd8x16_avx2;
     pFuncList->sSampleDealingFuncs.pfSampleSatd[BLOCK_8x8]   = WelsSampleSatd8x8_avx2;
   }
-
+#endif
 #endif //(X86_ASM)
 
 #if defined (HAVE_NEON)
