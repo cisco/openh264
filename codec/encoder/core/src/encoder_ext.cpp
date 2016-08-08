@@ -589,8 +589,9 @@ int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPa
       iMbWidth  = (kiPicWidth + 15) >> 4;
       iMbHeight = (kiPicHeight + 15) >> 4;
       if (pSpatialLayer->sSliceArgument.uiSliceSizeConstraint <= MAX_MACROBLOCK_SIZE_IN_BYTE) {
-        WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidationExt(), invalid iSliceSize (%d) settings!should be larger than  MAX_MACROBLOCK_SIZE_IN_BYTE(%d)",
-                 pSpatialLayer->sSliceArgument.uiSliceSizeConstraint,MAX_MACROBLOCK_SIZE_IN_BYTE);
+        WelsLog (pLogCtx, WELS_LOG_ERROR,
+                 "ParamValidationExt(), invalid iSliceSize (%d) settings!should be larger than  MAX_MACROBLOCK_SIZE_IN_BYTE(%d)",
+                 pSpatialLayer->sSliceArgument.uiSliceSizeConstraint, MAX_MACROBLOCK_SIZE_IN_BYTE);
         return ENC_RETURN_UNSUPPORTED_PARA;
       }
 
@@ -3593,7 +3594,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     for (int32_t iDidIdx = 0; iDidIdx < pSvcParam->iSpatialLayerNum; iDidIdx++) {
       SSpatialLayerInternal* pParamInternal = &pSvcParam->sDependencyLayers[iDidIdx];
       int32_t iTemporalId =  GetTemporalLevel (pParamInternal, pParamInternal->iCodingIndex,
-                                               pSvcParam->uiGopSize);
+                             pSvcParam->uiGopSize);
       if (iTemporalId == INVALID_TEMPORAL_ID)
         pParamInternal->iCodingIndex ++;
     }
@@ -3971,9 +3972,9 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
                  "WelsEncoderEncodeExt()MinCr Checking,codec bitstream size is larger than Level limitation");
     }
 #ifdef ENABLE_FRAME_DUMP
-    if (iCurDid + 1 < pSvcParam->iSpatialLayerNum) {
+    {
       DumpDependencyRec (fsnr, &pSvcParam->sDependencyLayers[iCurDid].sRecFileName[0], iCurDid,
-                         pCtx->bDependencyRecFlag[iCurDid], pCtx->pCurDqLayer);
+                         pCtx->bDependencyRecFlag[iCurDid], pCtx->pCurDqLayer, pSvcParam->bSimulcastAVC);
       pCtx->bDependencyRecFlag[iCurDid] = true;
     }
 #endif//ENABLE_FRAME_DUMP
@@ -4161,13 +4162,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
           1]].sSliceArgument.uiSliceNum) {
     AdjustBaseLayer (pCtx);
   }
-
-#ifdef ENABLE_FRAME_DUMP
-  DumpRecFrame (fsnr, &pSvcParam->sDependencyLayers[pSvcParam->iSpatialLayerNum - 1].sRecFileName[0],
-                pSvcParam->iSpatialLayerNum - 1, pCtx->bRecFlag, pCtx->pCurDqLayer); // pDecPic: final reconstruction output
-  pCtx->bRecFlag = true;
-
-#endif//ENABLE_FRAME_DUMP
 
   // to check number of layers / nals / slices dependencies
   if (iLayerNum > MAX_LAYER_NUM_OF_FRAME) {

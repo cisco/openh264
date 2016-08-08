@@ -82,17 +82,19 @@ int32_t InitFunctionPointers (sWelsEncCtx* pEncCtx, SWelsSvcCodingParam* _param,
 /*!
  * \brief   initialize frame coding
  */
-void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType,const int32_t kiDidx);
-void LoadBackFrameNum(sWelsEncCtx* pEncCtx,const int32_t kiDidx);
+void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType, const int32_t kiDidx);
+void LoadBackFrameNum (sWelsEncCtx* pEncCtx, const int32_t kiDidx);
 
-EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum,const int32_t kiDidx, bool bSkipFrameFlag);
-void InitBitStream(sWelsEncCtx* pEncCtx);
+EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum, const int32_t kiDidx,
+                                 bool bSkipFrameFlag);
+void InitBitStream (sWelsEncCtx* pEncCtx);
 int32_t GetTemporalLevel (SSpatialLayerInternal* fDlp, const int32_t kiFrameNum, const int32_t kiGopSize);
 /*!
  * \brief   Dump reconstruction for dependency layer
  */
 
-extern "C" void DumpDependencyRec (SPicture* pSrcPic, const char* kpFileName, const int8_t kiDid, bool bAppend, SDqLayer* pDqLayer);
+extern "C" void DumpDependencyRec (SPicture* pSrcPic, const char* kpFileName, const int8_t kiDid, bool bAppend,
+                                   SDqLayer* pDqLayer, bool bSimulCastAVC);
 
 /*!
  * \brief   Dump the reconstruction pictures

@@ -235,7 +235,6 @@ typedef struct TagWelsEncCtx {
   SStateCtx sWelsCabacContexts[4][WELS_QP_MAX + 1][WELS_CONTEXT_COUNT];
 #ifdef ENABLE_FRAME_DUMP
   bool bDependencyRecFlag[MAX_DEPENDENCY_LAYER];
-  bool bRecFlag;
 #endif
   int64_t            uiLastTimestamp;
 
