@@ -64,6 +64,7 @@ void CVAACalculation::InitVaaFuncs (SVaaFuncs& sVaaFuncs, int32_t iCpuFlag) {
     sVaaFuncs.pfVAACalcSadSsdBgd = VAACalcSadSsdBgd_sse2;
     sVaaFuncs.pfVAACalcSadVar    = VAACalcSadVar_sse2;
   }
+#ifdef HAVE_AVX2
   if (iCpuFlag & WELS_CPU_AVX2) {
     sVaaFuncs.pfVAACalcSad       = VAACalcSad_avx2;
     sVaaFuncs.pfVAACalcSadBgd    = VAACalcSadBgd_avx2;
@@ -71,6 +72,7 @@ void CVAACalculation::InitVaaFuncs (SVaaFuncs& sVaaFuncs, int32_t iCpuFlag) {
     sVaaFuncs.pfVAACalcSadSsdBgd = VAACalcSadSsdBgd_avx2;
     sVaaFuncs.pfVAACalcSadVar    = VAACalcSadVar_avx2;
   }
+#endif
 #endif//X86_ASM
 #ifdef HAVE_NEON
   if ((iCpuFlag & WELS_CPU_NEON) == WELS_CPU_NEON) {

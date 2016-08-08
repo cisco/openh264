@@ -526,6 +526,7 @@ void WelsInitEncodingFuncs (SWelsFuncPtrList* pFuncList, uint32_t  uiCpuFlag) {
   if (uiCpuFlag & WELS_CPU_SSE42) {
     pFuncList->pfGetNoneZeroCount       = WelsGetNoneZeroCount_sse42;
   }
+#if defined(HAVE_AVX2)
   if (uiCpuFlag & WELS_CPU_AVX2) {
     pFuncList->pfDctT4                  = WelsDctT4_avx2;
     pFuncList->pfDctFourT4              = WelsDctFourT4_avx2;
@@ -535,7 +536,7 @@ void WelsInitEncodingFuncs (SWelsFuncPtrList* pFuncList, uint32_t  uiCpuFlag) {
     pFuncList->pfQuantizationFour4x4    = WelsQuantFour4x4_avx2;
     pFuncList->pfQuantizationFour4x4Max = WelsQuantFour4x4Max_avx2;
   }
-
+#endif
 //#endif//MACOS
 
 #endif//X86_ASM
