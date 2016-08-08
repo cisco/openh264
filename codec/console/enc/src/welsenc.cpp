@@ -667,7 +667,7 @@ int FillSpecificParameters (SEncParamExt& sParam) {
   sParam.uiIntraPeriod  = 320;           // period of Intra frame
   sParam.eSpsPpsIdStrategy = INCREASING_ID;
   sParam.bPrefixNalAddingCtrl = 0;
-  sParam.iComplexityMode = MEDIUM_COMPLEXITY;
+  sParam.iComplexityMode = LOW_COMPLEXITY;
   sParam.bSimulcastAVC         = false;
   int iIndexLayer = 0;
   sParam.sSpatialLayers[iIndexLayer].uiProfileIdc       = PRO_BASELINE;
