@@ -168,8 +168,8 @@ DEF_MCCOPYTEST (16, 8)
 DEF_MCCOPYTEST (8, 16)
 DEF_MCCOPYTEST (16, 16)
 
-#define DEF_LUMA_MCTEST(iW,iH) \
-TEST(McHorVer,iW##x##iH)  \
+#define DEF_LUMA_MCTEST(iW, iH, cpu_flags, name_suffix) \
+TEST(McHorVer, iW##x##iH##_##name_suffix) \
 {                       \
     for (int32_t a = 0; a < 4; a++) { \
     for (int32_t b = 0; b < 4; b++) { \
@@ -191,43 +191,41 @@ TEST(McHorVer,iW##x##iH)  \
         uSrcAnchor[0][j][i] = uSrcTest[j][i] = rand()%256;  \
       }\
     }\
-    int32_t iCpuCores = 1; \
-    uint32_t uiCpuFlag;\
-    for(int32_t k =0; k<2; k++)\
-    {\
-      if(k==0)\
-      {\
-        uiCpuFlag = 0;\
-      }else \
-      {\
-        uiCpuFlag = WelsCPUFeatureDetect (&iCpuCores); \
-      }\
-      InitMcFunc(&sMcFunc,uiCpuFlag);\
-      memset(uDstAnchor,0,sizeof(uint8_t)*MC_BUFF_HEIGHT*MC_BUFF_DST_STRIDE); \
-      memset(uDstTest,0,sizeof(uint8_t)*MC_BUFF_HEIGHT*MC_BUFF_DST_STRIDE); \
-      MCHalfPelFilterAnchor(uSrcInputAnchor[1],uSrcInputAnchor[2],uSrcInputAnchor[3],uSrcInputAnchor[0],MC_BUFF_SRC_STRIDE,iW+1,iH+1,pBuf+4); \
-      MCLumaAnchor(uDstAnchor[0],MC_BUFF_DST_STRIDE,uSrcInputAnchor,MC_BUFF_SRC_STRIDE,a,b,iW,iH); \
-      sMcFunc.pMcLumaFunc(&uSrcTest[4][4],MC_BUFF_SRC_STRIDE,uDstTest[0],MC_BUFF_DST_STRIDE,a,b,iW,iH);\
-      for(int32_t j=0;j<MC_BUFF_HEIGHT;j++)   \
-      {                                                                             \
-          for(int32_t i=0;i<MC_BUFF_DST_STRIDE;i++)                                  \
-          {                                                                           \
-              ASSERT_EQ(uDstAnchor[j][i],uDstTest[j][i]);                              \
-          }                                                                             \
-      }                                                                                \
-    }\
+    InitMcFunc(&sMcFunc, WelsCPUFeatureDetect (0) & (cpu_flags)); \
+    memset(uDstAnchor,0,sizeof(uint8_t)*MC_BUFF_HEIGHT*MC_BUFF_DST_STRIDE); \
+    memset(uDstTest,0,sizeof(uint8_t)*MC_BUFF_HEIGHT*MC_BUFF_DST_STRIDE); \
+    MCHalfPelFilterAnchor(uSrcInputAnchor[1],uSrcInputAnchor[2],uSrcInputAnchor[3],uSrcInputAnchor[0],MC_BUFF_SRC_STRIDE,iW+1,iH+1,pBuf+4); \
+    MCLumaAnchor(uDstAnchor[0],MC_BUFF_DST_STRIDE,uSrcInputAnchor,MC_BUFF_SRC_STRIDE,a,b,iW,iH); \
+    sMcFunc.pMcLumaFunc(&uSrcTest[4][4],MC_BUFF_SRC_STRIDE,uDstTest[0],MC_BUFF_DST_STRIDE,a,b,iW,iH);\
+    for(int32_t j=0;j<MC_BUFF_HEIGHT;j++)   \
+    {                                                                             \
+        for(int32_t i=0;i<MC_BUFF_DST_STRIDE;i++)                                  \
+        {                                                                           \
+            ASSERT_EQ(uDstAnchor[j][i],uDstTest[j][i]);                              \
+        }                                                                             \
+    }                                                                                \
     }\
     }\
 }
 
+#define DEF_LUMA_MCTESTS(cpu_flags, name_suffix) \
+    DEF_LUMA_MCTEST ( 4,  4, cpu_flags, name_suffix) \
+    DEF_LUMA_MCTEST ( 4,  8, cpu_flags, name_suffix) \
+    DEF_LUMA_MCTEST ( 8,  4, cpu_flags, name_suffix) \
+    DEF_LUMA_MCTEST ( 8,  8, cpu_flags, name_suffix) \
+    DEF_LUMA_MCTEST (16,  8, cpu_flags, name_suffix) \
+    DEF_LUMA_MCTEST ( 8, 16, cpu_flags, name_suffix) \
+    DEF_LUMA_MCTEST (16, 16, cpu_flags, name_suffix)
 
-DEF_LUMA_MCTEST (4, 4)
-DEF_LUMA_MCTEST (4, 8)
-DEF_LUMA_MCTEST (8, 4)
-DEF_LUMA_MCTEST (8, 8)
-DEF_LUMA_MCTEST (16, 8)
-DEF_LUMA_MCTEST (8, 16)
-DEF_LUMA_MCTEST (16, 16)
+DEF_LUMA_MCTESTS(0, c)
+DEF_LUMA_MCTESTS(~0, native)
+#ifdef X86_ASM
+DEF_LUMA_MCTESTS(WELS_CPU_SSE2, sse2)
+DEF_LUMA_MCTESTS(WELS_CPU_SSE2 | WELS_CPU_SSSE3, ssse3)
+#ifdef HAVE_AVX2
+DEF_LUMA_MCTESTS(WELS_CPU_SSE2 | WELS_CPU_SSSE3 | WELS_CPU_AVX2, avx2)
+#endif
+#endif
 
 #define DEF_CHROMA_MCTEST(iW,iH) \
 TEST(McChroma,iW##x##iH)  \
@@ -315,61 +313,89 @@ TEST (EncMcAvg, PixelAvg) {
   }
 }
 
-#define DEF_HALFPEL_MCTEST(iW,iH) \
-TEST (EncMcHalfpel, iW##x##iH) { \
+#define DEF_HALFPEL_MCTEST(iW, iH, cpu_flags, name_suffix) \
+TEST (EncMcHalfpel, iW##x##iH##_##name_suffix) { \
     SMcFunc sMcFunc; \
-    for (int32_t k = 0; k < 2; k++) { \
-        for (int32_t w = 0; w < 2; w++) { \
-            int32_t width = iW ; \
-            int32_t height = iH; \
-            uint8_t uAnchor[4][MC_BUFF_HEIGHT][MC_BUFF_SRC_STRIDE]; \
-            uint8_t uSrcTest[MC_BUFF_HEIGHT][MC_BUFF_SRC_STRIDE]; \
-            ENFORCE_STACK_ALIGN_2D (uint8_t, uDstTest, MC_BUFF_HEIGHT, MC_BUFF_DST_STRIDE, 16); \
-            uint8_t* uAnchors[4]; \
-            int16_t pBuf[MC_BUFF_DST_STRIDE]; \
-            uAnchors[0] = &uAnchor[0][4][4]; \
-            uAnchors[1] = &uAnchor[1][4][4]; \
-            uAnchors[2] = &uAnchor[2][4][4]; \
-            uAnchors[3] = &uAnchor[3][4][4]; \
-             \
-            memset (uAnchor, 0, 4 * sizeof (uint8_t)*MC_BUFF_HEIGHT * MC_BUFF_SRC_STRIDE); \
-            memset (uDstTest, 0, sizeof (uint8_t)*MC_BUFF_HEIGHT * MC_BUFF_DST_STRIDE); \
-            for (int32_t j = 0; j < MC_BUFF_HEIGHT; j++) { \
-                for (int32_t i = 0; i < MC_BUFF_SRC_STRIDE; i++) { \
-                    uAnchor[0][j][i] = uSrcTest[j][i] = rand() % 256; \
-                } \
+    for (int32_t w = 0; w < 2; w++) { \
+        int32_t width = iW ; \
+        int32_t height = iH; \
+        uint8_t uAnchor[4][MC_BUFF_HEIGHT][MC_BUFF_SRC_STRIDE]; \
+        uint8_t uSrcTest[MC_BUFF_HEIGHT][MC_BUFF_SRC_STRIDE]; \
+        uint8_t uRand[MC_BUFF_HEIGHT][MC_BUFF_DST_STRIDE]; \
+        ENFORCE_STACK_ALIGN_2D (uint8_t, uDstTest, MC_BUFF_HEIGHT, MC_BUFF_DST_STRIDE, 16); \
+        uint8_t* uAnchors[4]; \
+        int16_t pBuf[MC_BUFF_DST_STRIDE]; \
+        uAnchors[0] = &uAnchor[0][4][4]; \
+        uAnchors[1] = &uAnchor[1][4][4]; \
+        uAnchors[2] = &uAnchor[2][4][4]; \
+        uAnchors[3] = &uAnchor[3][4][4]; \
+         \
+        memset (uAnchor, 0, 4 * sizeof (uint8_t)*MC_BUFF_HEIGHT * MC_BUFF_SRC_STRIDE); \
+        memset (uDstTest, 0, sizeof (uint8_t)*MC_BUFF_HEIGHT * MC_BUFF_DST_STRIDE); \
+        for (int32_t j = 0; j < MC_BUFF_HEIGHT; j++) { \
+            for (int32_t i = 0; i < MC_BUFF_SRC_STRIDE; i++) { \
+                uAnchor[0][j][i] = uSrcTest[j][i] = rand() % 256; \
+                uRand[j][i] = rand() % 256; \
             } \
-             \
-            uint32_t uiCpuFlag = k == 0 ? 0 : WelsCPUFeatureDetect (NULL); \
-            InitMcFunc (&sMcFunc, uiCpuFlag); \
-             \
-            MCHalfPelFilterAnchor (uAnchors[1], uAnchors[2], uAnchors[3], uAnchors[0], MC_BUFF_SRC_STRIDE, width + 1, height + 1, pBuf + 4); \
-            sMcFunc.pfLumaHalfpelHor (&uSrcTest[4][4], MC_BUFF_SRC_STRIDE, uDstTest[0], MC_BUFF_DST_STRIDE, width + 1, height); \
-            for (int32_t j = 0; j < height; j++) { \
-                for (int32_t i = 0; i < width + 1; i++) { \
-                    ASSERT_EQ (uAnchor[1][4 + j][4 + i], uDstTest[j][i]); \
-                } \
+        } \
+         \
+        InitMcFunc (&sMcFunc, WelsCPUFeatureDetect (0) & (cpu_flags)); \
+         \
+        MCHalfPelFilterAnchor (uAnchors[1], uAnchors[2], uAnchors[3], uAnchors[0], MC_BUFF_SRC_STRIDE, width + 1, height + 1, pBuf + 4); \
+        memcpy (&uDstTest[0][0], &uRand[0][0], sizeof uRand); \
+        sMcFunc.pfLumaHalfpelHor (&uSrcTest[4][4], MC_BUFF_SRC_STRIDE, uDstTest[0], MC_BUFF_DST_STRIDE, width + 1, height); \
+        for (int32_t j = 0; j < height; j++) { \
+            for (int32_t i = 0; i < width + 1; i++) { \
+                ASSERT_EQ (uAnchor[1][4 + j][4 + i], uDstTest[j][i]); \
             } \
-            sMcFunc.pfLumaHalfpelVer (&uSrcTest[4][4], MC_BUFF_SRC_STRIDE, uDstTest[0], MC_BUFF_DST_STRIDE, width, height + 1); \
-            for (int32_t j = 0; j < height + 1; j++) { \
-                for (int32_t i = 0; i < width; i++) { \
-                    ASSERT_EQ (uAnchor[2][4 + j][4 + i], uDstTest[j][i]); \
-                } \
+        } \
+        for (int32_t j = 0; j < MC_BUFF_HEIGHT; j++) { \
+            for (int32_t i = j < height ? width + 1 : 0; i < MC_BUFF_DST_STRIDE; i++) { \
+                ASSERT_EQ (uRand[j][i], uDstTest[j][i]); \
             } \
-            sMcFunc.pfLumaHalfpelCen (&uSrcTest[4][4], MC_BUFF_SRC_STRIDE, uDstTest[0], MC_BUFF_DST_STRIDE, width + 1, height + 1); \
-            for (int32_t j = 0; j < height + 1; j++) { \
-                for (int32_t i = 0; i < width + 1; i++) { \
-                    ASSERT_EQ (uAnchor[3][4 + j][4 + i], uDstTest[j][i]); \
-                } \
+        } \
+        memcpy (&uDstTest[0][0], &uRand[0][0], sizeof uRand); \
+        sMcFunc.pfLumaHalfpelVer (&uSrcTest[4][4], MC_BUFF_SRC_STRIDE, uDstTest[0], MC_BUFF_DST_STRIDE, width, height + 1); \
+        for (int32_t j = 0; j < height + 1; j++) { \
+            for (int32_t i = 0; i < width; i++) { \
+                ASSERT_EQ (uAnchor[2][4 + j][4 + i], uDstTest[j][i]); \
+            } \
+        } \
+        for (int32_t j = 0; j < MC_BUFF_HEIGHT; j++) { \
+            for (int32_t i = j < height + 1 ? width : 0; i < MC_BUFF_DST_STRIDE; i++) { \
+                ASSERT_EQ (uRand[j][i], uDstTest[j][i]); \
+            } \
+        } \
+        memcpy (&uDstTest[0][0], &uRand[0][0], sizeof uRand); \
+        sMcFunc.pfLumaHalfpelCen (&uSrcTest[4][4], MC_BUFF_SRC_STRIDE, uDstTest[0], MC_BUFF_DST_STRIDE, width + 1, height + 1); \
+        for (int32_t j = 0; j < height + 1; j++) { \
+            for (int32_t i = 0; i < width + 1; i++) { \
+                ASSERT_EQ (uAnchor[3][4 + j][4 + i], uDstTest[j][i]); \
+            } \
+        } \
+        for (int32_t j = 0; j < MC_BUFF_HEIGHT; j++) { \
+            for (int32_t i = j < height + 1 ? width + 1 : 0; i < MC_BUFF_DST_STRIDE; i++) { \
+                ASSERT_EQ (uRand[j][i], uDstTest[j][i]); \
             } \
         } \
     } \
 }
 
-DEF_HALFPEL_MCTEST(4,4)
-DEF_HALFPEL_MCTEST(4,8)
-DEF_HALFPEL_MCTEST(8,4)
-DEF_HALFPEL_MCTEST(8,8)
-DEF_HALFPEL_MCTEST(8,16)
-DEF_HALFPEL_MCTEST(16,8)
-DEF_HALFPEL_MCTEST(16,16)
+#define DEF_HALFPEL_MCTESTS(cpu_flags, name_suffix) \
+    DEF_HALFPEL_MCTEST( 4 , 4, cpu_flags, name_suffix) \
+    DEF_HALFPEL_MCTEST( 4,  8, cpu_flags, name_suffix) \
+    DEF_HALFPEL_MCTEST( 8,  4, cpu_flags, name_suffix) \
+    DEF_HALFPEL_MCTEST( 8,  8, cpu_flags, name_suffix) \
+    DEF_HALFPEL_MCTEST( 8, 16, cpu_flags, name_suffix) \
+    DEF_HALFPEL_MCTEST(16,  8, cpu_flags, name_suffix) \
+    DEF_HALFPEL_MCTEST(16, 16, cpu_flags, name_suffix)
+
+DEF_HALFPEL_MCTESTS(0, c)
+DEF_HALFPEL_MCTESTS(~0, native)
+#ifdef X86_ASM
+DEF_HALFPEL_MCTESTS(WELS_CPU_SSE2, sse2)
+DEF_HALFPEL_MCTESTS(WELS_CPU_SSE2 | WELS_CPU_SSSE3, ssse3)
+#ifdef HAVE_AVX2
+DEF_HALFPEL_MCTESTS(WELS_CPU_SSE2 | WELS_CPU_SSSE3 | WELS_CPU_AVX2, avx2)
+#endif
+#endif
