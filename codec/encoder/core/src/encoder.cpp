@@ -330,7 +330,8 @@ void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType, c
 #endif//FRAME_INFO_OUTPUT
 }
 
-EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum, const int32_t kiDidx, bool bSkipFrameFlag) {
+EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum, const int32_t kiDidx,
+                                 bool bSkipFrameFlag) {
   SWelsSvcCodingParam* pSvcParam = pEncCtx->pSvcParam;
   SSpatialLayerInternal* pParamInternal = &pEncCtx->pSvcParam->sDependencyLayers[kiDidx];
   EVideoFrameType iFrameType = videoFrameTypeInvalid;
@@ -401,15 +402,15 @@ EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum
  */
 
 extern "C" void DumpDependencyRec (SPicture* pCurPicture, const char* kpFileName, const int8_t kiDid, bool bAppend,
-                                   SDqLayer* pDqLayer,bool bSimulCastAVC) {
+                                   SDqLayer* pDqLayer, bool bSimulCastAVC) {
   WelsFileHandle* pDumpRecFile = NULL;
   int32_t iWrittenSize = 0;
   const char* openMode = bAppend ? "ab" : "wb";
   SWelsSPS* pSpsTmp = NULL;
-  if(bSimulCastAVC ||(kiDid == BASE_DEPENDENCY_ID)) {
+  if (bSimulCastAVC || (kiDid == BASE_DEPENDENCY_ID)) {
     pSpsTmp = pDqLayer->sLayerInfo.pSpsP;
   } else {
-    pSpsTmp = &(pDqLayer->sLayerInfo.pSubsetSpsP->pSps);
+    pSpsTmp = & (pDqLayer->sLayerInfo.pSubsetSpsP->pSps);
   }
   bool bFrameCroppingFlag = pSpsTmp->bFrameCroppingFlag;
   SCropOffset* pFrameCrop = &pSpsTmp->sFrameCrop;
