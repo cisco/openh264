@@ -1,10 +1,10 @@
 #for x86
-HAVE_AVX2 := true
+HAVE_AVX2 := Yes
 
 ifneq ($(filter %86 x86_64, $(ARCH)),)
 include $(SRC_PATH)build/x86-common.mk
 ifeq ($(USE_ASM), Yes)
-ifeq ($(HAVE_AVX2), true)
+ifeq ($(HAVE_AVX2), Yes)
 CFLAGS += -DHAVE_AVX2
 CXXFLAGS += -DHAVE_AVX2
 ASMFLAGS += -DHAVE_AVX2
