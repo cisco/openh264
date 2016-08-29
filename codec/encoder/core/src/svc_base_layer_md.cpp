@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	svc_base_layer_md.c
+ * \file    svc_base_layer_md.c
  *
- * \brief	mode decision
+ * \brief   mode decision
  *
- * \date	2009.08.10 Created
+ * \date    2009.08.10 Created
  *
  *************************************************************************************
  */
@@ -48,12 +48,12 @@ namespace WelsEnc {
 static const ALIGNED_DECLARE (int8_t, g_kiIntra16AvaliMode[8][5], 16) = {
   { I16_PRED_DC_128, I16_PRED_INVALID, I16_PRED_INVALID, I16_PRED_INVALID, 1 },
   { I16_PRED_DC_L,   I16_PRED_H,       I16_PRED_INVALID, I16_PRED_INVALID, 2 },
-  { I16_PRED_DC_T,   I16_PRED_V,		 I16_PRED_INVALID, I16_PRED_INVALID, 2 },
-  { I16_PRED_V,      I16_PRED_H,		 I16_PRED_DC,	   I16_PRED_INVALID, 3 },
+  { I16_PRED_DC_T,   I16_PRED_V,       I16_PRED_INVALID, I16_PRED_INVALID, 2 },
+  { I16_PRED_V,      I16_PRED_H,       I16_PRED_DC,      I16_PRED_INVALID, 3 },
   { I16_PRED_DC_128, I16_PRED_INVALID, I16_PRED_INVALID, I16_PRED_INVALID, 1 },
-  { I16_PRED_DC_L,   I16_PRED_H,		 I16_PRED_INVALID, I16_PRED_INVALID, 2 },
-  { I16_PRED_DC_T,   I16_PRED_V,		 I16_PRED_INVALID, I16_PRED_INVALID, 2 },
-  { I16_PRED_V,      I16_PRED_H,		 I16_PRED_DC,	   I16_PRED_P,       4 }
+  { I16_PRED_DC_L,   I16_PRED_H,       I16_PRED_INVALID, I16_PRED_INVALID, 2 },
+  { I16_PRED_DC_T,   I16_PRED_V,       I16_PRED_INVALID, I16_PRED_INVALID, 2 },
+  { I16_PRED_V,      I16_PRED_H,       I16_PRED_DC,      I16_PRED_P,       4 }
 };
 
 static const ALIGNED_DECLARE (uint8_t, g_kiIntra4AvailCount[16], 16) = {
@@ -221,22 +221,22 @@ const int8_t g_kiCoordinateIdx4x4Y[16] = { 0, 0, 4, 4,
                                            8, 8, 12, 12
                                          };
 static const ALIGNED_DECLARE (int8_t, g_kiNeighborIntraToI4x4[16][16], 16) = {
-  {	0,	1,	10,	7,	1,	1,	15,	7,	10,	15,	10,	7,	15,	7,	15,	7},
-  {	1,	1,	15,	7,	1,	1,	15,	7,	15,	15,	15,	7,	15,	7,	15,	7},
-  {	10,	15,	10,	7,	15,	7,	15,	7,	10,	15,	10,	7,	15,	7,	15,	7},
-  {	11,	15,	15,	7,	15,	7,	15,	7,	15,	15,	15,	7,	15,	7,	15,	7},
-  {	4,	1,	10,	7,	1,	1,	15,	7,	10,	15,	10,	7,	15,	7,	15,	7},
-  {	5,	1,	15,	7,	1,	1,	15,	7,	15,	15,	15,	7,	15,	7,	15,	7},
-  {	14,	15,	10,	7,	15,	7,	15,	7,	10,	15,	10,	7,	15,	7,	15,	7},
-  {	15,	15,	15,	7,	15,	7,	15,	7,	15,	15,	15,	7,	15,	7,	15,	7},
-  {	0,	1,	10,	7,	1,	9,	15,	7,	10,	15,	10,	7,	15,	7,	15,	7},
-  {	1,	1,	15,	7,	1,	9,	15,	7,	15,	15,	15,	7,	15,	7,	15,	7},
-  {	10,	15,	10,	7,	15,	15,	15,	7,	10,	15,	10,	7,	15,	7,	15,	7},
-  {	11,	15,	15,	7,	15,	15,	15,	7,	15,	15,	15,	7,	15,	7,	15,	7},
-  {	4,	1,	10,	7,	1,	9,	15,	7,	10,	15,	10,	7,	15,	7,	15,	7},
-  {	5,	1,	15,	7,	1,	9,	15,	7,	15,	15,	15,	7,	15,	7,	15,	7},
-  {	14,	15,	10,	7,	15,	15,	15,	7,	10,	15,	10,	7,	15,	7,	15,	7},
-  {	15,	15,	15,	7,	15,	15,	15,	7,	15,	15,	15,	7,	15,	7,	15,	7},
+  { 0,  1,  10, 7,  1,  1,  15, 7,  10, 15, 10, 7,  15, 7,  15, 7},
+  { 1,  1,  15, 7,  1,  1,  15, 7,  15, 15, 15, 7,  15, 7,  15, 7},
+  { 10, 15, 10, 7,  15, 7,  15, 7,  10, 15, 10, 7,  15, 7,  15, 7},
+  { 11, 15, 15, 7,  15, 7,  15, 7,  15, 15, 15, 7,  15, 7,  15, 7},
+  { 4,  1,  10, 7,  1,  1,  15, 7,  10, 15, 10, 7,  15, 7,  15, 7},
+  { 5,  1,  15, 7,  1,  1,  15, 7,  15, 15, 15, 7,  15, 7,  15, 7},
+  { 14, 15, 10, 7,  15, 7,  15, 7,  10, 15, 10, 7,  15, 7,  15, 7},
+  { 15, 15, 15, 7,  15, 7,  15, 7,  15, 15, 15, 7,  15, 7,  15, 7},
+  { 0,  1,  10, 7,  1,  9,  15, 7,  10, 15, 10, 7,  15, 7,  15, 7},
+  { 1,  1,  15, 7,  1,  9,  15, 7,  15, 15, 15, 7,  15, 7,  15, 7},
+  { 10, 15, 10, 7,  15, 15, 15, 7,  10, 15, 10, 7,  15, 7,  15, 7},
+  { 11, 15, 15, 7,  15, 15, 15, 7,  15, 15, 15, 7,  15, 7,  15, 7},
+  { 4,  1,  10, 7,  1,  9,  15, 7,  10, 15, 10, 7,  15, 7,  15, 7},
+  { 5,  1,  15, 7,  1,  9,  15, 7,  15, 15, 15, 7,  15, 7,  15, 7},
+  { 14, 15, 10, 7,  15, 15, 15, 7,  10, 15, 10, 7,  15, 7,  15, 7},
+  { 15, 15, 15, 7,  15, 15, 15, 7,  15, 15, 15, 7,  15, 7,  15, 7},
 };
 
 ALIGNED_DECLARE (const int8_t, g_kiMapModeI4x4[14], 16) = {
@@ -269,45 +269,45 @@ void WelsMdIntraInit (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, con
     int32_t iStrideY, iStrideUV;
     int32_t iOffsetY, iOffsetUV;
 
-    iStrideY	= pCurLayer->iEncStride[0];
-    iStrideUV	= pCurLayer->iEncStride[1];
-    iOffsetY	= (kiMbX + kiMbY * iStrideY) << 4;
-    iOffsetUV	= (kiMbX + kiMbY * iStrideUV) << 3;
-    pMbCache->SPicData.pEncMb[0]		= pCurLayer->pEncData[0] + iOffsetY;
-    pMbCache->SPicData.pEncMb[1]		= pCurLayer->pEncData[1] + iOffsetUV;
-    pMbCache->SPicData.pEncMb[2]		= pCurLayer->pEncData[2] + iOffsetUV;
+    iStrideY    = pCurLayer->iEncStride[0];
+    iStrideUV   = pCurLayer->iEncStride[1];
+    iOffsetY    = (kiMbX + kiMbY * iStrideY) << 4;
+    iOffsetUV   = (kiMbX + kiMbY * iStrideUV) << 3;
+    pMbCache->SPicData.pEncMb[0]        = pCurLayer->pEncData[0] + iOffsetY;
+    pMbCache->SPicData.pEncMb[1]        = pCurLayer->pEncData[1] + iOffsetUV;
+    pMbCache->SPicData.pEncMb[2]        = pCurLayer->pEncData[2] + iOffsetUV;
 
-    iStrideY	= pCurLayer->iCsStride[0];
-    iStrideUV	= pCurLayer->iCsStride[1];
-    iOffsetY	= (kiMbX + kiMbY * iStrideY) << 4;
-    iOffsetUV	= (kiMbX + kiMbY * iStrideUV) << 3;
-    pMbCache->SPicData.pCsMb[0]			= pCurLayer->pCsData[0] + iOffsetY;
-    pMbCache->SPicData.pCsMb[1]			= pCurLayer->pCsData[1] + iOffsetUV;
-    pMbCache->SPicData.pCsMb[2]			= pCurLayer->pCsData[2] + iOffsetUV;
+    iStrideY    = pCurLayer->iCsStride[0];
+    iStrideUV   = pCurLayer->iCsStride[1];
+    iOffsetY    = (kiMbX + kiMbY * iStrideY) << 4;
+    iOffsetUV   = (kiMbX + kiMbY * iStrideUV) << 3;
+    pMbCache->SPicData.pCsMb[0]         = pCurLayer->pCsData[0] + iOffsetY;
+    pMbCache->SPicData.pCsMb[1]         = pCurLayer->pCsData[1] + iOffsetUV;
+    pMbCache->SPicData.pCsMb[2]         = pCurLayer->pCsData[2] + iOffsetUV;
 
-    iStrideY	= pCurLayer->pDecPic->iLineSize[0];
-    iStrideUV	= pCurLayer->pDecPic->iLineSize[1];
-    iOffsetY	= (kiMbX + kiMbY * iStrideY) << 4;
-    iOffsetUV	= (kiMbX + kiMbY * iStrideUV) << 3;
-    pMbCache->SPicData.pDecMb[0]		= pCurLayer->pDecPic->pData[0] + iOffsetY;
-    pMbCache->SPicData.pDecMb[1]		= pCurLayer->pDecPic->pData[1] + iOffsetUV;
-    pMbCache->SPicData.pDecMb[2]		= pCurLayer->pDecPic->pData[2] + iOffsetUV;
+    iStrideY    = pCurLayer->pDecPic->iLineSize[0];
+    iStrideUV   = pCurLayer->pDecPic->iLineSize[1];
+    iOffsetY    = (kiMbX + kiMbY * iStrideY) << 4;
+    iOffsetUV   = (kiMbX + kiMbY * iStrideUV) << 3;
+    pMbCache->SPicData.pDecMb[0]        = pCurLayer->pDecPic->pData[0] + iOffsetY;
+    pMbCache->SPicData.pDecMb[1]        = pCurLayer->pDecPic->pData[1] + iOffsetUV;
+    pMbCache->SPicData.pDecMb[2]        = pCurLayer->pDecPic->pData[2] + iOffsetUV;
   } else {
-    pMbCache->SPicData.pEncMb[0]	+= MB_WIDTH_LUMA;
-    pMbCache->SPicData.pEncMb[1]	+= MB_WIDTH_CHROMA;
-    pMbCache->SPicData.pEncMb[2]	+= MB_WIDTH_CHROMA;
+    pMbCache->SPicData.pEncMb[0]        += MB_WIDTH_LUMA;
+    pMbCache->SPicData.pEncMb[1]        += MB_WIDTH_CHROMA;
+    pMbCache->SPicData.pEncMb[2]        += MB_WIDTH_CHROMA;
 
-    pMbCache->SPicData.pDecMb[0]	+= MB_WIDTH_LUMA;
-    pMbCache->SPicData.pDecMb[1]	+= MB_WIDTH_CHROMA;
-    pMbCache->SPicData.pDecMb[2]	+= MB_WIDTH_CHROMA;
+    pMbCache->SPicData.pDecMb[0]        += MB_WIDTH_LUMA;
+    pMbCache->SPicData.pDecMb[1]        += MB_WIDTH_CHROMA;
+    pMbCache->SPicData.pDecMb[2]        += MB_WIDTH_CHROMA;
 
-    pMbCache->SPicData.pCsMb[0]		+= MB_WIDTH_LUMA;
-    pMbCache->SPicData.pCsMb[1]		+= MB_WIDTH_CHROMA;
-    pMbCache->SPicData.pCsMb[2]		+= MB_WIDTH_CHROMA;
+    pMbCache->SPicData.pCsMb[0]         += MB_WIDTH_LUMA;
+    pMbCache->SPicData.pCsMb[1]         += MB_WIDTH_CHROMA;
+    pMbCache->SPicData.pCsMb[2]         += MB_WIDTH_CHROMA;
   }
 
   //step 2. initial pWelsMd
-  pCurMb->uiCbp			= 0;
+  pCurMb->uiCbp = 0;
 
   //step 4: locating scaled_tcoeff
 
@@ -320,14 +320,14 @@ void WelsMdIntraInit (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, con
 
 void WelsMdInterInit (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb, const int32_t iSliceFirstMbXY) {
   SDqLayer* pCurLayer = pEncCtx->pCurDqLayer;
-  SMbCache* pMbCache	= &pSlice->sMbCacheInfo;
+  SMbCache* pMbCache  = &pSlice->sMbCacheInfo;
   const int32_t kiMbX  = pCurMb->iMbX;
   const int32_t kiMbY  = pCurMb->iMbY;
-  const int32_t kiMbXY	= pCurMb->iMbXY;
+  const int32_t kiMbXY = pCurMb->iMbXY;
   const int32_t kiMbWidth = pCurLayer->iMbWidth;
   const int32_t kiMbHeight = pCurLayer->iMbHeight;
 
-  pMbCache->pEncSad		= &pCurLayer->pDecPic->pMbSkipSad[kiMbXY];
+  pMbCache->pEncSad = &pCurLayer->pDecPic->pMbSkipSad[kiMbXY];
 
   //step 1. load neighbor cache
   pEncCtx->pFuncList->pfFillInterNeighborCache (pMbCache, pCurMb, kiMbWidth,
@@ -338,20 +338,20 @@ void WelsMdInterInit (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb, const i
   //step 4. locating current p_ref
   // merge loops
   if (0 == kiMbX || iSliceFirstMbXY == kiMbXY) {
-    const int32_t kiRefStrideY	= pCurLayer->pRefPic->iLineSize[0];
-    const int32_t kiRefStrideUV	= pCurLayer->pRefPic->iLineSize[1];
-    const int32_t kiCurStrideY	= (kiMbX + kiMbY * kiRefStrideY) << 4;
-    const int32_t kiCurStrideUV	= (kiMbX + kiMbY * kiRefStrideUV) << 3;
-    pMbCache->SPicData.pRefMb[0]	= pCurLayer->pRefPic->pData[0] + kiCurStrideY;
-    pMbCache->SPicData.pRefMb[1]	= pCurLayer->pRefPic->pData[1] + kiCurStrideUV;
-    pMbCache->SPicData.pRefMb[2]	= pCurLayer->pRefPic->pData[2] + kiCurStrideUV;
+    const int32_t kiRefStrideY          = pCurLayer->pRefPic->iLineSize[0];
+    const int32_t kiRefStrideUV         = pCurLayer->pRefPic->iLineSize[1];
+    const int32_t kiCurStrideY          = (kiMbX + kiMbY * kiRefStrideY) << 4;
+    const int32_t kiCurStrideUV         = (kiMbX + kiMbY * kiRefStrideUV) << 3;
+    pMbCache->SPicData.pRefMb[0]        = pCurLayer->pRefPic->pData[0] + kiCurStrideY;
+    pMbCache->SPicData.pRefMb[1]        = pCurLayer->pRefPic->pData[1] + kiCurStrideUV;
+    pMbCache->SPicData.pRefMb[2]        = pCurLayer->pRefPic->pData[2] + kiCurStrideUV;
   } else {
-    pMbCache->SPicData.pRefMb[0]	+= MB_WIDTH_LUMA;
-    pMbCache->SPicData.pRefMb[1]	+= MB_WIDTH_CHROMA;
-    pMbCache->SPicData.pRefMb[2]	+= MB_WIDTH_CHROMA;
+    pMbCache->SPicData.pRefMb[0]        += MB_WIDTH_LUMA;
+    pMbCache->SPicData.pRefMb[1]        += MB_WIDTH_CHROMA;
+    pMbCache->SPicData.pRefMb[2]        += MB_WIDTH_CHROMA;
   }
 
-  pMbCache->uiRefMbType	= pCurLayer->pRefPic->uiRefMbType[kiMbXY];
+  pMbCache->uiRefMbType = pCurLayer->pRefPic->uiRefMbType[kiMbXY];
   pMbCache->bCollocatedPredFlag = false;
 
   //comment: sometimes, mode decision process may skip the md_p16x16 and md_pskip function,
@@ -367,7 +367,7 @@ int32_t WelsMdI16x16 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SMbCache* 
   int32_t iAvailCount;
   int32_t iIdx = 0;
   uint8_t* pPredI16x16[2] = {pMbCache->pMemPredMb, pMbCache->pMemPredMb + 256};
-  uint8_t* pDst		= pPredI16x16[0];
+  uint8_t* pDst       = pPredI16x16[0];
   uint8_t* pDec       = pMbCache->SPicData.pCsMb[0];
   uint8_t* pEnc       = pMbCache->SPicData.pEncMb[0];
   int32_t iLineSizeDec = pCurDqLayer->iCsStride[0];
@@ -415,17 +415,15 @@ int32_t WelsMdI16x16 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SMbCache* 
   pMbCache->uiLumaI16x16Mode  = iBestMode;
   return iBestCost;
 }
-int32_t WelsMdI4x4 (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) {
-  sWelsEncCtx* pEncCtx	= (sWelsEncCtx*)pEnc;
-  SWelsFuncPtrList* pFunc		= pEncCtx->pFuncList;
-  SWelsMD* pWelsMd					= (SWelsMD*)pMd;
-  SDqLayer* pCurDqLayer			= pEncCtx->pCurDqLayer;
-  int32_t iLambda				= pWelsMd->iLambda;
-  int32_t iBestCostLuma				= pWelsMd->iCostLuma;
-  uint8_t* pEncMb					= pMbCache->SPicData.pEncMb[0];
-  uint8_t* pDecMb					= pMbCache->SPicData.pCsMb[0];
-  const int32_t kiLineSizeEnc		= pCurDqLayer->iEncStride[0];
-  const int32_t kiLineSizeDec		= pCurDqLayer->iCsStride[0];
+int32_t WelsMdI4x4 (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCache* pMbCache) {
+  SWelsFuncPtrList* pFunc       = pEncCtx->pFuncList;
+  SDqLayer* pCurDqLayer         = pEncCtx->pCurDqLayer;
+  int32_t iLambda               = pWelsMd->iLambda;
+  int32_t iBestCostLuma         = pWelsMd->iCostLuma;
+  uint8_t* pEncMb               = pMbCache->SPicData.pEncMb[0];
+  uint8_t* pDecMb               = pMbCache->SPicData.pCsMb[0];
+  const int32_t kiLineSizeEnc   = pCurDqLayer->iEncStride[0];
+  const int32_t kiLineSizeDec   = pCurDqLayer->iCsStride[0];
 
   uint8_t* pCurEnc, *pCurDec, *pDst;
 
@@ -434,16 +432,16 @@ int32_t WelsMdI4x4 (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) {
   int32_t iAvailCount;
   const uint8_t* kpAvailMode;
   int32_t i, j, iCoordinateX, iCoordinateY, iIdxStrideEnc, iIdxStrideDec;
-  int32_t lambda[2]						= {iLambda << 2, iLambda};
-  bool* pPrevIntra4x4PredModeFlag	= pMbCache->pPrevIntra4x4PredModeFlag;
-  int8_t* pRemIntra4x4PredModeFlag		= pMbCache->pRemIntra4x4PredModeFlag;
-  const uint8_t* kpIntra4x4AvailCount		= &g_kiIntra4AvailCount[0];
-  const uint8_t* kpCache48CountScan4		= &g_kuiCache48CountScan4Idx[0];
-  const int8_t* kpNeighborIntraToI4x4	= g_kiNeighborIntraToI4x4[pMbCache->uiNeighborIntra];
-  const int8_t* kpCoordinateIdxX			= &g_kiCoordinateIdx4x4X[0];
-  const int8_t* kpCoordinateIdxY			= &g_kiCoordinateIdx4x4Y[0];
-  int32_t iBestPredBufferNum			= 0;
-  int32_t iCosti4x4						= 0;
+  int32_t lambda[2] = {iLambda << 2, iLambda};
+  bool* pPrevIntra4x4PredModeFlag       = pMbCache->pPrevIntra4x4PredModeFlag;
+  int8_t* pRemIntra4x4PredModeFlag      = pMbCache->pRemIntra4x4PredModeFlag;
+  const uint8_t* kpIntra4x4AvailCount   = &g_kiIntra4AvailCount[0];
+  const uint8_t* kpCache48CountScan4    = &g_kuiCache48CountScan4Idx[0];
+  const int8_t* kpNeighborIntraToI4x4   = g_kiNeighborIntraToI4x4[pMbCache->uiNeighborIntra];
+  const int8_t* kpCoordinateIdxX        = &g_kiCoordinateIdx4x4X[0];
+  const int8_t* kpCoordinateIdxY        = &g_kiCoordinateIdx4x4Y[0];
+  int32_t iBestPredBufferNum            = 0;
+  int32_t iCosti4x4                     = 0;
 
 #if defined(X86_ASM)
   WelsPrefetchZero_mmx (g_kiMapModeI4x4);
@@ -451,7 +449,7 @@ int32_t WelsMdI4x4 (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) {
 #endif//X86_ASM
 
   for (i = 0; i < 16; i++) {
-    const int32_t kiOffset	= kpNeighborIntraToI4x4[i];
+    const int32_t kiOffset = kpNeighborIntraToI4x4[i];
 
     //step 1: locating current 4x4 block position in pEnc and pDecMb
     iCoordinateX = kpCoordinateIdxX[i];
@@ -533,7 +531,7 @@ int32_t WelsMdI4x4 (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) {
       *pRemIntra4x4PredModeFlag  = (iFinalMode < iPredMode ? iFinalMode : (iFinalMode - 1));
     }
     pRemIntra4x4PredModeFlag++;
-    //	pCurMb->pIntra4x4PredMode[g_kuiMbCountScan4Idx[i]] = iFinalMode;
+    // pCurMb->pIntra4x4PredMode[g_kuiMbCountScan4Idx[i]] = iFinalMode;
     pMbCache->iIntraPredMode[kpCache48CountScan4[i]] = iFinalMode;
 
     //step 6: encoding I_4x4
@@ -541,23 +539,21 @@ int32_t WelsMdI4x4 (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) {
   }
   ST32 (pCurMb->pIntra4x4PredMode, LD32 (&pMbCache->iIntraPredMode[33]));
   pCurMb->pIntra4x4PredMode[4] = pMbCache->iIntraPredMode[12];
-  pCurMb->pIntra4x4PredMode[5] =	pMbCache->iIntraPredMode[20];
+  pCurMb->pIntra4x4PredMode[5] = pMbCache->iIntraPredMode[20];
   pCurMb->pIntra4x4PredMode[6] = pMbCache->iIntraPredMode[28];
   iCosti4x4 += (iLambda << 4) + (iLambda << 3); //4*6*lambda from JVT SATD0
   return iCosti4x4;
 }
 
-int32_t WelsMdI4x4Fast (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) {
-  sWelsEncCtx* pEncCtx	= (sWelsEncCtx*)pEnc;
-  SWelsFuncPtrList* pFunc		= pEncCtx->pFuncList;
-  SWelsMD* pWelsMd					= (SWelsMD*)pMd;
-  SDqLayer* pCurDqLayer			= pEncCtx->pCurDqLayer;
-  int32_t iLambda				= pWelsMd->iLambda;
-  int32_t iBestCostLuma				= pWelsMd->iCostLuma;
-  uint8_t* pEncMb					= pMbCache->SPicData.pEncMb[0];
-  uint8_t* pDecMb					= pMbCache->SPicData.pCsMb[0];
-  const int32_t kiLineSizeEnc		= pCurDqLayer->iEncStride[0];
-  const int32_t kiLineSizeDec		= pCurDqLayer->iCsStride[0];
+int32_t WelsMdI4x4Fast (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCache* pMbCache) {
+  SWelsFuncPtrList* pFunc       = pEncCtx->pFuncList;
+  SDqLayer* pCurDqLayer         = pEncCtx->pCurDqLayer;
+  int32_t iLambda               = pWelsMd->iLambda;
+  int32_t iBestCostLuma         = pWelsMd->iCostLuma;
+  uint8_t* pEncMb               = pMbCache->SPicData.pEncMb[0];
+  uint8_t* pDecMb               = pMbCache->SPicData.pCsMb[0];
+  const int32_t kiLineSizeEnc   = pCurDqLayer->iEncStride[0];
+  const int32_t kiLineSizeDec   = pCurDqLayer->iCsStride[0];
 
   uint8_t* pCurEnc, *pCurDec, *pDst;
   int8_t iPredMode, iCurMode, iBestMode, iFinalMode;
@@ -566,25 +562,25 @@ int32_t WelsMdI4x4Fast (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) 
   const uint8_t* kpAvailMode;
   int32_t i, j, iCoordinateX, iCoordinateY, iIdxStrideEnc, iIdxStrideDec;
   int32_t iCostH, iCostV, iCostVR, iCostHD, iCostVL, iCostHU, iBestModeFake;
-  int32_t lambda[2]						= {iLambda << 2, iLambda};
-  bool* pPrevIntra4x4PredModeFlag	= pMbCache->pPrevIntra4x4PredModeFlag;
-  int8_t* pRemIntra4x4PredModeFlag		= pMbCache->pRemIntra4x4PredModeFlag;
-  const uint8_t* kpIntra4x4AvailCount		= &g_kiIntra4AvailCount[0];
-  const uint8_t* kpCache48CountScan4		= &g_kuiCache48CountScan4Idx[0];
-  const int8_t* kpNeighborIntraToI4x4	= g_kiNeighborIntraToI4x4[pMbCache->uiNeighborIntra];
-  const int8_t* kpCoordinateIdxX			= &g_kiCoordinateIdx4x4X[0];
-  const int8_t* kpCoordinateIdxY			= &g_kiCoordinateIdx4x4Y[0];
-  int32_t iBestPredBufferNum			= 0;
-  int32_t iCosti4x4						= 0;
+  int32_t lambda[2] = {iLambda << 2, iLambda};
+  bool* pPrevIntra4x4PredModeFlag       = pMbCache->pPrevIntra4x4PredModeFlag;
+  int8_t* pRemIntra4x4PredModeFlag      = pMbCache->pRemIntra4x4PredModeFlag;
+  const uint8_t* kpIntra4x4AvailCount   = &g_kiIntra4AvailCount[0];
+  const uint8_t* kpCache48CountScan4    = &g_kuiCache48CountScan4Idx[0];
+  const int8_t* kpNeighborIntraToI4x4   = g_kiNeighborIntraToI4x4[pMbCache->uiNeighborIntra];
+  const int8_t* kpCoordinateIdxX        = &g_kiCoordinateIdx4x4X[0];
+  const int8_t* kpCoordinateIdxY        = &g_kiCoordinateIdx4x4Y[0];
+  int32_t iBestPredBufferNum            = 0;
+  int32_t iCosti4x4                     = 0;
 #if defined(X86_ASM)
   WelsPrefetchZero_mmx (g_kiMapModeI4x4);
   WelsPrefetchZero_mmx ((int8_t*)&pFunc->pfGetLumaI4x4Pred);
 #endif//X86_ASM
 
   for (i = 0; i < 16; i++) {
-    const int32_t kiOffset	= kpNeighborIntraToI4x4[i];
-//		const int32_t i_next	= (1+i) & 15;												// next loop
-//		const uint8_t dummy_byte= pIntra4x4AvailCount[pNeighborIntraToI4x4[i_next]];	// prefetch pIntra4x4AvailCount of next loop to avoid cache missed
+    const int32_t kiOffset = kpNeighborIntraToI4x4[i];
+//    const int32_t i_next = (1+i) & 15; // next loop
+//    const uint8_t dummy_byte= pIntra4x4AvailCount[pNeighborIntraToI4x4[i_next]]; // prefetch pIntra4x4AvailCount of next loop to avoid cache missed
 
     //step 1: locating current 4x4 block position in pEnc and pDecMb
     iCoordinateX = kpCoordinateIdxX[i];
@@ -855,14 +851,14 @@ int32_t WelsMdI4x4Fast (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) 
       *pRemIntra4x4PredModeFlag  = (iFinalMode < iPredMode ? iFinalMode : (iFinalMode - 1));
     }
     pRemIntra4x4PredModeFlag++;
-    //	pCurMb->pIntra4x4PredMode[scan4[i]] = iFinalMode;
+    // pCurMb->pIntra4x4PredMode[scan4[i]] = iFinalMode;
     pMbCache->iIntraPredMode[kpCache48CountScan4[i]] = iFinalMode;
     //step 6: encoding I_4x4
     WelsEncRecI4x4Y (pEncCtx, pCurMb, pMbCache, i);
   }
   ST32 (pCurMb->pIntra4x4PredMode, LD32 (&pMbCache->iIntraPredMode[33]));
   pCurMb->pIntra4x4PredMode[4] = pMbCache->iIntraPredMode[12];
-  pCurMb->pIntra4x4PredMode[5] =	pMbCache->iIntraPredMode[20];
+  pCurMb->pIntra4x4PredMode[5] = pMbCache->iIntraPredMode[20];
   pCurMb->pIntra4x4PredMode[6] = pMbCache->iIntraPredMode[28];
   iCosti4x4 += (iLambda << 4) + (iLambda << 3); //4*6*lambda from JVT SATD0
   return iCosti4x4;
@@ -870,16 +866,16 @@ int32_t WelsMdI4x4Fast (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) 
 
 int32_t WelsMdIntraChroma (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SMbCache* pMbCache, int32_t iLambda) {
   const int8_t* kpAvailMode;
-  int32_t iAvailCount				= 0;
+  int32_t iAvailCount = 0;
   int32_t iChmaIdx = 0;
-  uint8_t* pPredIntraChma[2]	= {pMbCache->pMemPredChroma, pMbCache->pMemPredChroma + 128};
-  uint8_t* pDstChma				= pPredIntraChma[0];
-  uint8_t* pEncCb				= pMbCache->SPicData.pEncMb[1];
-  uint8_t* pEncCr				= pMbCache->SPicData.pEncMb[2];
-  uint8_t* pDecCb				= pMbCache->SPicData.pCsMb[1];//pMbCache->SPicData.pDecMb[1];
-  uint8_t* pDecCr				= pMbCache->SPicData.pCsMb[2];//pMbCache->SPicData.pDecMb[2];
-  const int32_t kiLineSizeEnc		= pCurDqLayer->iEncStride[1];
-  const int32_t kiLineSizeDec		= pCurDqLayer->iCsStride[1];//pMbCache->SPicData.i_stride_dec[1];
+  uint8_t* pPredIntraChma[2]    = {pMbCache->pMemPredChroma, pMbCache->pMemPredChroma + 128};
+  uint8_t* pDstChma             = pPredIntraChma[0];
+  uint8_t* pEncCb               = pMbCache->SPicData.pEncMb[1];
+  uint8_t* pEncCr               = pMbCache->SPicData.pEncMb[2];
+  uint8_t* pDecCb               = pMbCache->SPicData.pCsMb[1];//pMbCache->SPicData.pDecMb[1];
+  uint8_t* pDecCr               = pMbCache->SPicData.pCsMb[2];//pMbCache->SPicData.pDecMb[2];
+  const int32_t kiLineSizeEnc   = pCurDqLayer->iEncStride[1];
+  const int32_t kiLineSizeDec   = pCurDqLayer->iCsStride[1];//pMbCache->SPicData.i_stride_dec[1];
 
   int32_t i, iCurMode, iCurCost, iBestMode, iBestCost = INT_MAX;
 
@@ -912,8 +908,8 @@ int32_t WelsMdIntraChroma (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SMbCa
 
       assert (iCurMode >= 0 && iCurMode < 7);
 
-      //		pDstCb	= &pMbCache->mem_pred_intra_cb[iCurMode<<6];
-      //		pDstCr	= &pMbCache->mem_pred_intra_cr[iCurMode<<6];
+      // pDstCb = &pMbCache->mem_pred_intra_cb[iCurMode<<6];
+      // pDstCr = &pMbCache->mem_pred_intra_cr[iCurMode<<6];
       pFunc->pfGetChromaPred[iCurMode] (pDstChma, pDecCb, kiLineSizeDec); //Cb
       iCurCost = pFunc->sSampleDealingFuncs.pfMdCost[BLOCK_8x8] (pDstChma, 8, pEncCb, kiLineSizeEnc);
 
@@ -924,19 +920,16 @@ int32_t WelsMdIntraChroma (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SMbCa
         iBestMode = iCurMode;
         iBestCost = iCurCost;
         iChmaIdx = iChmaIdx ^ 0x01;
-        pDstChma	= pPredIntraChma[iChmaIdx];
+        pDstChma = pPredIntraChma[iChmaIdx];
       }
     }
   }
 
-  pMbCache->pBestPredIntraChroma	= pPredIntraChma[iChmaIdx ^ 0x01];
+  pMbCache->pBestPredIntraChroma = pPredIntraChma[iChmaIdx ^ 0x01];
   pMbCache->uiChmaI8x8Mode = iBestMode;
   return iBestCost;
 }
-int32_t WelsMdIntraFinePartition (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) {
-  sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pEnc;
-  SWelsMD* pWelsMd = (SWelsMD*)pMd;
-
+int32_t WelsMdIntraFinePartition (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCache* pMbCache) {
   int32_t iCosti4x4 = WelsMdI4x4 (pEncCtx, pWelsMd, pCurMb, pMbCache);
 
   if (iCosti4x4 < pWelsMd->iCostLuma) {
@@ -946,9 +939,7 @@ int32_t WelsMdIntraFinePartition (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* 
   return pWelsMd->iCostLuma;
 }
 
-int32_t WelsMdIntraFinePartitionVaa (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) {
-  sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pEnc;
-  SWelsMD* pWelsMd = (SWelsMD*)pMd;
+int32_t WelsMdIntraFinePartitionVaa (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCache* pMbCache) {
 
   if (MdIntraAnalysisVaaInfo (pEncCtx, pMbCache->SPicData.pEncMb[0])) {
     int32_t iCosti4x4 = WelsMdI4x4Fast (pEncCtx, pWelsMd, pCurMb, pMbCache);
@@ -988,8 +979,8 @@ int32_t WelsMdP16x16 (SWelsFuncPtrList* pFunc, SDqLayer* pCurLayer, SWelsMD* pWe
   SMbCache* pMbCache = &pSlice->sMbCacheInfo;
   SWelsME* pMe16x16 = &pWelsMd->sMe.sMe16x16;
   uint32_t uiNeighborAvail = pCurMb->uiNeighborAvail;
-  const int32_t kiMbWidth	= pCurLayer->iMbWidth;	// for assign once
-  const int32_t kiMbHeight	= pCurLayer->iMbHeight;
+  const int32_t kiMbWidth  = pCurLayer->iMbWidth;  // for assign once
+  const int32_t kiMbHeight = pCurLayer->iMbHeight;
   InitMe (*pWelsMd, BLOCK_16x16, pMbCache->SPicData.pEncMb[0], pMbCache->SPicData.pRefMb[0],
           pCurLayer->pRefPic->pScreenBlockFeatureStorage,
           *pMe16x16);
@@ -1048,7 +1039,7 @@ int32_t WelsMdP16x8 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pW
     sMe16x8->iCurMeBlockPixY = pWelsMd->iMbPixY + iPixelY;
     sMe16x8->uSadPredISatd.uiSadPred = pWelsMd->iSadPredMb >> 1;
 
-    pSlice->sMvc[0]	= sMe16x8->sMvBase;
+    pSlice->sMvc[0] = sMe16x8->sMvBase;
     pSlice->uiMvcNum = 1;
 
     PredInter16x8Mv (pMbCache, i << 3, 0, & (sMe16x8->sMvp));
@@ -1121,28 +1112,144 @@ int32_t WelsMdP8x8 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pWe
     pFunc->pfMotionSearch[pWelsMd->iBlock8x8StaticIdc[i]] (pFunc, pCurDqLayer, sMe8x8, pSlice);
     UpdateP8x8Motion2Cache (pMbCache, i << 2, pWelsMd->uiRef, & (sMe8x8->sMv));
     iCostP8x8 += sMe8x8->uiSatdCost;
-//		sMe8x8++;
+//    sMe8x8++;
   }
   return iCostP8x8;
 }
 
-void WelsMdInterFinePartition (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, int32_t iBestCost) {
-  sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pEnc;
-  SWelsMD* pWelsMd = (SWelsMD*)pMd;
+int32_t WelsMdP4x4 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pWelsMd, SSlice* pSlice,
+                    const int32_t ki8x8Idx) {
+  SMbCache* pMbCache = &pSlice->sMbCacheInfo;
+  int32_t iLineSizeEnc = pCurDqLayer->iEncStride[0];
+  int32_t iLineSizeRef = pCurDqLayer->pRefPic->iLineSize[0];
+  SWelsME* sMe4x4;
+  int32_t i4x4Idx, iIdxX, iIdxY, iPixelX, iPixelY, iStrideEnc, iStrideRef;
+  int32_t iCostP4x4 = 0;
+  for (i4x4Idx = 0; i4x4Idx < 4; ++i4x4Idx) {
+    int32_t iPartIdx = (ki8x8Idx << 2) + i4x4Idx;
+    iIdxX = ((ki8x8Idx & 1) << 1) + (i4x4Idx & 1);
+    iIdxY = ((ki8x8Idx >> 1) << 1) + (i4x4Idx >> 1);
+    iPixelX = (iIdxX << 2);
+    iPixelY = (iIdxY << 2);
+    iStrideEnc = iPixelX + (iPixelY * iLineSizeEnc);
+    iStrideRef = iPixelX + (iPixelY * iLineSizeRef);
 
+    sMe4x4 = &pWelsMd->sMe.sMe4x4[ki8x8Idx][i4x4Idx];
+    InitMe (*pWelsMd, BLOCK_4x4,
+            pMbCache->SPicData.pEncMb[0] + iStrideEnc,
+            pMbCache->SPicData.pRefMb[0] + iStrideRef,
+            pCurDqLayer->pRefPic->pScreenBlockFeatureStorage,
+            *sMe4x4);
+    //not putting these three lines below into InitMe to avoid judging mode in InitMe
+    sMe4x4->iCurMeBlockPixX = pWelsMd->iMbPixX + iPixelX;
+    sMe4x4->iCurMeBlockPixY = pWelsMd->iMbPixY + iPixelY;
+    sMe4x4->uSadPredISatd.uiSadPred = pWelsMd->iSadPredMb >> 2;
+
+    pSlice->sMvc[0] = sMe4x4->sMvBase;
+    pSlice->uiMvcNum = 1;
+
+    PredMv (&pMbCache->sMvComponents, iPartIdx, 1, pWelsMd->uiRef, & (sMe4x4->sMvp));
+    pFunc->pfMotionSearch[0] (pFunc, pCurDqLayer, sMe4x4, pSlice);
+    UpdateP4x4Motion2Cache (pMbCache, iPartIdx, pWelsMd->uiRef, & (sMe4x4->sMv));
+    iCostP4x4 += sMe4x4->uiSatdCost;
+  }
+  return iCostP4x4;
+}
+
+int32_t WelsMdP8x4 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pWelsMd, SSlice* pSlice,
+                    const int32_t ki8x8Idx) {
+  SMbCache* pMbCache = &pSlice->sMbCacheInfo;
+  int32_t iLineSizeEnc = pCurDqLayer->iEncStride[0];
+  int32_t iLineSizeRef = pCurDqLayer->pRefPic->iLineSize[0];
+  SWelsME* sMe8x4;
+  int32_t i8x4Idx, iIdxX, iIdxY, iPixelX, iPixelY, iStrideEnc, iStrideRef;
+  int32_t iCostP8x4 = 0;
+  for (i8x4Idx = 0; i8x4Idx < 2; ++i8x4Idx) {
+    int32_t iPartIdx = (ki8x8Idx << 2) + (i8x4Idx << 1);
+    iIdxX = ((ki8x8Idx & 1) << 1);
+    iIdxY = ((ki8x8Idx >> 1) << 1) + i8x4Idx;
+    iPixelX = (iIdxX << 2);
+    iPixelY = (iIdxY << 2);
+    iStrideEnc = iPixelX + (iPixelY * iLineSizeEnc);
+    iStrideRef = iPixelX + (iPixelY * iLineSizeRef);
+
+    sMe8x4 = &pWelsMd->sMe.sMe8x4[ki8x8Idx][i8x4Idx];
+    InitMe (*pWelsMd, BLOCK_8x4,
+            pMbCache->SPicData.pEncMb[0] + iStrideEnc,
+            pMbCache->SPicData.pRefMb[0] + iStrideRef,
+            pCurDqLayer->pRefPic->pScreenBlockFeatureStorage,
+            *sMe8x4);
+    //not putting these three lines below into InitMe to avoid judging mode in InitMe
+    sMe8x4->iCurMeBlockPixX = pWelsMd->iMbPixX + iPixelX;
+    sMe8x4->iCurMeBlockPixY = pWelsMd->iMbPixY + iPixelY;
+    sMe8x4->uSadPredISatd.uiSadPred = pWelsMd->iSadPredMb >> 2;
+
+    pSlice->sMvc[0] = sMe8x4->sMvBase;
+    pSlice->uiMvcNum = 1;
+
+    PredMv (&pMbCache->sMvComponents, iPartIdx, 2, pWelsMd->uiRef, & (sMe8x4->sMvp));
+    pFunc->pfMotionSearch[0] (pFunc, pCurDqLayer, sMe8x4, pSlice);
+    UpdateP8x4Motion2Cache (pMbCache, iPartIdx, pWelsMd->uiRef, & (sMe8x4->sMv));
+    iCostP8x4 += sMe8x4->uiSatdCost;
+  }
+  return iCostP8x4;
+}
+
+int32_t WelsMdP4x8 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pWelsMd, SSlice* pSlice,
+                    const int32_t ki8x8Idx) {
+  //Wayne, to be modified
+  SMbCache* pMbCache = &pSlice->sMbCacheInfo;
+  int32_t iLineSizeEnc = pCurDqLayer->iEncStride[0];
+  int32_t iLineSizeRef = pCurDqLayer->pRefPic->iLineSize[0];
+  SWelsME* sMe4x8;
+  int32_t i4x8Idx, iIdxX, iIdxY, iPixelX, iPixelY, iStrideEnc, iStrideRef;
+  int32_t iCostP4x8 = 0;
+  for (i4x8Idx = 0; i4x8Idx < 2; ++i4x8Idx) {
+    int32_t iPartIdx = (ki8x8Idx << 2) + i4x8Idx;
+    iIdxX = ((ki8x8Idx & 1) << 1) + i4x8Idx;
+    iIdxY = ((ki8x8Idx >> 1) << 1);
+    iPixelX = (iIdxX << 2);
+    iPixelY = (iIdxY << 2);
+    iStrideEnc = iPixelX + (iPixelY * iLineSizeEnc);
+    iStrideRef = iPixelX + (iPixelY * iLineSizeRef);
+
+    sMe4x8 = &pWelsMd->sMe.sMe4x8[ki8x8Idx][i4x8Idx];
+    InitMe (*pWelsMd, BLOCK_4x8,
+            pMbCache->SPicData.pEncMb[0] + iStrideEnc,
+            pMbCache->SPicData.pRefMb[0] + iStrideRef,
+            pCurDqLayer->pRefPic->pScreenBlockFeatureStorage,
+            *sMe4x8);
+    //not putting these three lines below into InitMe to avoid judging mode in InitMe
+    sMe4x8->iCurMeBlockPixX = pWelsMd->iMbPixX + iPixelX;
+    sMe4x8->iCurMeBlockPixY = pWelsMd->iMbPixY + iPixelY;
+    sMe4x8->uSadPredISatd.uiSadPred = pWelsMd->iSadPredMb >> 2;
+
+    pSlice->sMvc[0] = sMe4x8->sMvBase;
+    pSlice->uiMvcNum = 1;
+
+    PredMv (&pMbCache->sMvComponents, iPartIdx, 1, pWelsMd->uiRef, & (sMe4x8->sMvp));
+    pFunc->pfMotionSearch[0] (pFunc, pCurDqLayer, sMe4x8, pSlice);
+    UpdateP4x8Motion2Cache (pMbCache, iPartIdx, pWelsMd->uiRef, & (sMe4x8->sMv));
+    iCostP4x8 += sMe4x8->uiSatdCost;
+  }
+  return iCostP4x8;
+}
+
+void WelsMdInterFinePartition (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* pSlice, SMB* pCurMb, int32_t iBestCost) {
   SDqLayer* pCurDqLayer = pEncCtx->pCurDqLayer;
-//	SMbCache *pMbCache = &pSlice->sMbCacheInfo;
+//  SMbCache *pMbCache = &pSlice->sMbCacheInfo;
   int32_t iCost = 0;
 
-//	WelsLog( pEncCtx, WELS_LOG_INFO, "WelsMdP8x8, p_ref[0]= 0x%p", pMbCache->SPicData.pRefMb[0]);
+//  WelsLog( pEncCtx, WELS_LOG_INFO, "WelsMdP8x8, p_ref[0]= 0x%p", pMbCache->SPicData.pRefMb[0]);
 
   iCost = WelsMdP8x8 (pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice);
 
   if (iCost < iBestCost) {
     int32_t iCostPart;
     pCurMb->uiMbType = MB_TYPE_8x8;
+    memset (pCurMb->uiSubMbType, SUB_MB_TYPE_8x8, 4);
 
-//		WelsLog( pEncCtx, WELS_LOG_INFO, "WelsMdP16x8, p_ref[0]= 0x%p", pMbCache->SPicData.pRefMb[0]);
+//    WelsLog( pEncCtx, WELS_LOG_INFO, "WelsMdP16x8, p_ref[0]= 0x%p", pMbCache->SPicData.pRefMb[0]);
     iCostPart = WelsMdP16x8 (pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice);
     if (iCostPart <= iCost) {
       iCost = iCostPart;
@@ -1150,7 +1257,7 @@ void WelsMdInterFinePartition (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurM
       //pCurMb->mb_partition = 2;
     }
 
-//		WelsLog( pEncCtx, WELS_LOG_INFO, "WelsMdP8x16, p_ref[0]= 0x%p", pMbCache->SPicData.pRefMb[0]);
+//    WelsLog( pEncCtx, WELS_LOG_INFO, "WelsMdP8x16, p_ref[0]= 0x%p", pMbCache->SPicData.pRefMb[0]);
     iCostPart = WelsMdP8x16 (pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice);
     if (iCostPart <= iCost) {
       iCost = iCostPart;
@@ -1160,12 +1267,10 @@ void WelsMdInterFinePartition (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurM
   }
 }
 
-void WelsMdInterFinePartitionVaa (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, int32_t iBestCost) {
-  sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pEnc;
-  SWelsMD* pWelsMd = (SWelsMD*)pMd;
-
+void WelsMdInterFinePartitionVaa (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* pSlice, SMB* pCurMb,
+                                  int32_t iBestCost) {
   SDqLayer* pCurDqLayer = pEncCtx->pCurDqLayer;
-//	SMbCache *pMbCache = &pSlice->sMbCacheInfo;
+//  SMbCache *pMbCache = &pSlice->sMbCacheInfo;
   int32_t iCostP8x16, iCostP16x8, iCostP8x8;
   uint8_t uiMbSign = pEncCtx->pFuncList->pfGetMbSignFromInterVaa (&pEncCtx->pVaa->sVaaCalcInfo.pSad8x8[pCurMb->iMbXY][0]);
 
@@ -1173,12 +1278,12 @@ void WelsMdInterFinePartitionVaa (void* pEnc, void* pMd, SSlice* pSlice, SMB* pC
     return;
   }
 
-//	iCost = pWelsMd->sMe16x16.uiSatdCost;
+//  iCost = pWelsMd->sMe16x16.uiSatdCost;
 
   switch (uiMbSign) {
   case 3:
   case 12:
-//		WelsLog( pEncCtx, WELS_LOG_INFO, "WelsMdP16x8, p_ref[0]= 0x%p", pMbCache->SPicData.pRefMb[0]);
+//    WelsLog( pEncCtx, WELS_LOG_INFO, "WelsMdP16x8, p_ref[0]= 0x%p", pMbCache->SPicData.pRefMb[0]);
     iCostP16x8 = WelsMdP16x8 (pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice);
     if (iCostP16x8 < iBestCost) {
       iBestCost = iCostP16x8;
@@ -1189,7 +1294,7 @@ void WelsMdInterFinePartitionVaa (void* pEnc, void* pMd, SSlice* pSlice, SMB* pC
 
   case 5:
   case 10:
-//		WelsLog( pEncCtx, WELS_LOG_INFO, "WelsMdP8x16, p_ref[0]= 0x%p", pMbCache->SPicData.pRefMb[0]);
+//    WelsLog( pEncCtx, WELS_LOG_INFO, "WelsMdP8x16, p_ref[0]= 0x%p", pMbCache->SPicData.pRefMb[0]);
     iCostP8x16 = WelsMdP8x16 (pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice);
     if (iCostP8x16 < iBestCost) {
       iBestCost = iCostP8x16;
@@ -1204,6 +1309,7 @@ void WelsMdInterFinePartitionVaa (void* pEnc, void* pMd, SSlice* pSlice, SMB* pC
     if (iCostP8x8 < iBestCost) {
       iBestCost = iCostP8x8;
       pCurMb->uiMbType = MB_TYPE_8x8;
+      memset (pCurMb->uiSubMbType, SUB_MB_TYPE_8x8, 4);
     }
     break;
 
@@ -1212,6 +1318,7 @@ void WelsMdInterFinePartitionVaa (void* pEnc, void* pMd, SSlice* pSlice, SMB* pC
     if (iCostP8x8 < iBestCost) {
       iBestCost = iCostP8x8;
       pCurMb->uiMbType = MB_TYPE_8x8;
+      memset (pCurMb->uiSubMbType, SUB_MB_TYPE_8x8, 4);
 
       iCostP16x8 = WelsMdP16x8 (pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice);
       if (iCostP16x8 <= iBestCost) {
@@ -1232,41 +1339,39 @@ void WelsMdInterFinePartitionVaa (void* pEnc, void* pMd, SSlice* pSlice, SMB* pC
 
 
 inline void VaaBackgroundMbDataUpdate (SWelsFuncPtrList* pFunc, SVAAFrameInfo* pVaaInfo, SMB* pCurMb) {
-  const int32_t kiPicStride		= pVaaInfo->iPicStride;
-  const int32_t kiPicStrideUV	= pVaaInfo->iPicStrideUV;
-  const int32_t kiOffsetY		= (pCurMb->iMbY * kiPicStride + pCurMb->iMbX) << 4;
-  const int32_t kiOffsetUV		= (pCurMb->iMbY * kiPicStrideUV + pCurMb->iMbX) << 3;
+  const int32_t kiPicStride     = pVaaInfo->iPicStride;
+  const int32_t kiPicStrideUV   = pVaaInfo->iPicStrideUV;
+  const int32_t kiOffsetY       = (pCurMb->iMbY * kiPicStride + pCurMb->iMbX) << 4;
+  const int32_t kiOffsetUV      = (pCurMb->iMbY * kiPicStrideUV + pCurMb->iMbX) << 3;
 
   pFunc->pfCopy16x16Aligned (pVaaInfo->pCurY + kiOffsetY, kiPicStride, pVaaInfo->pRefY + kiOffsetY, kiPicStride);
   pFunc->pfCopy8x8Aligned (pVaaInfo->pCurU + kiOffsetUV, kiPicStrideUV, pVaaInfo->pRefU + kiOffsetUV, kiPicStrideUV);
   pFunc->pfCopy8x8Aligned (pVaaInfo->pCurV + kiOffsetUV, kiPicStrideUV, pVaaInfo->pRefV + kiOffsetUV, kiPicStrideUV);
 }
 
-void WelsMdBackgroundMbEnc (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache, SSlice* pSlice,
+void WelsMdBackgroundMbEnc (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCache* pMbCache, SSlice* pSlice,
                             bool bSkipMbFlag) {
-  sWelsEncCtx* pEncCtx	= (sWelsEncCtx*)pEnc;
-  SDqLayer* pCurDqLayer	= pEncCtx->pCurDqLayer;
-  SWelsMD* pWelsMd		= (SWelsMD*)pMd;
-  SWelsFuncPtrList* pFunc	= pEncCtx->pFuncList;
-  SMVUnitXY sMvp				= { 0 };
-  uint8_t* pRefLuma			= pMbCache->SPicData.pRefMb[0];
-  uint8_t* pRefCb				= pMbCache->SPicData.pRefMb[1];
-  uint8_t* pRefCr				= pMbCache->SPicData.pRefMb[2];
-  int32_t iLineSizeY			= pCurDqLayer->pRefPic->iLineSize[0];
-  int32_t iLineSizeUV			= pCurDqLayer->pRefPic->iLineSize[1];
-  uint8_t* pDstLuma			= pMbCache->pSkipMb;
-  uint8_t* pDstCb				= pMbCache->pSkipMb + 256;
-  uint8_t* pDstCr				= pMbCache->pSkipMb + 256 + 64;
+  SDqLayer* pCurDqLayer         = pEncCtx->pCurDqLayer;
+  SWelsFuncPtrList* pFunc       = pEncCtx->pFuncList;
+  SMVUnitXY sMvp                = { 0 };
+  uint8_t* pRefLuma             = pMbCache->SPicData.pRefMb[0];
+  uint8_t* pRefCb               = pMbCache->SPicData.pRefMb[1];
+  uint8_t* pRefCr               = pMbCache->SPicData.pRefMb[2];
+  int32_t iLineSizeY            = pCurDqLayer->pRefPic->iLineSize[0];
+  int32_t iLineSizeUV           = pCurDqLayer->pRefPic->iLineSize[1];
+  uint8_t* pDstLuma             = pMbCache->pSkipMb;
+  uint8_t* pDstCb               = pMbCache->pSkipMb + 256;
+  uint8_t* pDstCr               = pMbCache->pSkipMb + 256 + 64;
 
   if (!bSkipMbFlag) {
-    pDstLuma	= pMbCache->pMemPredLuma;
-    pDstCb	= pMbCache->pMemPredChroma;
-    pDstCr	= pMbCache->pMemPredChroma + 64;
+    pDstLuma    = pMbCache->pMemPredLuma;
+    pDstCb      = pMbCache->pMemPredChroma;
+    pDstCr      = pMbCache->pMemPredChroma + 64;
   }
   //MC
-  pFunc->sMcFuncs.pfLumaQuarpelMc[0] (pRefLuma, iLineSizeY, pDstLuma, 16, 16);
-  pFunc->sMcFuncs.pfChromaMc (pRefCb, iLineSizeUV, pDstCb, 8, sMvp, 8, 8); //Cb
-  pFunc->sMcFuncs.pfChromaMc (pRefCr, iLineSizeUV, pDstCr, 8, sMvp, 8, 8); //Cr
+  pFunc->sMcFuncs.pMcLumaFunc (pRefLuma, iLineSizeY, pDstLuma, 16, 0, 0, 16, 16);
+  pFunc->sMcFuncs.pMcChromaFunc (pRefCb, iLineSizeUV, pDstCb, 8, sMvp.iMvX, sMvp.iMvY, 8, 8); //Cb
+  pFunc->sMcFuncs.pMcChromaFunc (pRefCr, iLineSizeUV, pDstCr, 8, sMvp.iMvX, sMvp.iMvY, 8, 8); //Cr
 
   pCurMb->uiCbp = 0;
   pMbCache->bCollocatedPredFlag = true;
@@ -1315,11 +1420,9 @@ void WelsMdBackgroundMbEnc (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCac
   pFunc->pfCopy8x8Aligned (pMbCache->SPicData.pCsMb[2], pCurDqLayer->iCsStride[1], pMbCache->pMemPredChroma + 64, 8);
 }
 
-bool WelsMdPSkipEnc (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) {
-  sWelsEncCtx* pEncCtx	= (sWelsEncCtx*)pEnc;
-  SDqLayer* pCurLayer				= pEncCtx->pCurDqLayer;
-  SWelsMD* pWelsMd					= (SWelsMD*)pMd;
-  SWelsFuncPtrList* pFunc		= pEncCtx->pFuncList;
+bool WelsMdPSkipEnc (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCache* pMbCache) {
+  SDqLayer* pCurLayer           = pEncCtx->pCurDqLayer;
+  SWelsFuncPtrList* pFunc       = pEncCtx->pFuncList;
 
   uint8_t* pRefLuma = pMbCache->SPicData.pRefMb[0];
   uint8_t* pRefCb   = pMbCache->SPicData.pRefMb[1];
@@ -1332,11 +1435,10 @@ bool WelsMdPSkipEnc (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) {
   uint8_t* pDstCr   = pMbCache->pSkipMb + 256 + 64;
 
   SMVUnitXY sMvp = { 0 };
-  uint8_t uiMvpIdx;
   int32_t n;
 
-  int32_t iEncStride		= pCurLayer->iEncStride[0];
-  uint8_t* pEncMb			= pMbCache->SPicData.pEncMb[0];
+  int32_t iEncStride = pCurLayer->iEncStride[0];
+  uint8_t* pEncMb = pMbCache->SPicData.pEncMb[0];
   int32_t* pStrideEncBlockOffset = pEncCtx->pStrideTab->pStrideEncBlockOffset[pEncCtx->uiDependencyId];
   int32_t* pEncBlockOffset;
 
@@ -1362,19 +1464,18 @@ bool WelsMdPSkipEnc (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) {
 
   //luma
   pRefLuma += sQpelMvp.iMvY * iLineSizeY + sQpelMvp.iMvX;
-  uiMvpIdx = ((sMvp.iMvY & 0x03) << 2) + (sMvp.iMvX & 0x03);
-  pFunc->sMcFuncs.pfLumaQuarpelMc[uiMvpIdx] (pRefLuma, iLineSizeY, pDstLuma, 16, 16);
+  pFunc->sMcFuncs.pMcLumaFunc (pRefLuma, iLineSizeY, pDstLuma, 16, sMvp.iMvX, sMvp.iMvY, 16, 16);
   iSadCostLuma    = pFunc->sSampleDealingFuncs.pfSampleSad[BLOCK_16x16] (pMbCache->SPicData.pEncMb[0],
                     pCurLayer->iEncStride[0], pDstLuma, 16);
 
   const int32_t iStrideUV = (sQpelMvp.iMvY >> 1) * iLineSizeUV + (sQpelMvp.iMvX >> 1);
   pRefCb += iStrideUV;
-  pFunc->sMcFuncs.pfChromaMc (pRefCb, iLineSizeUV, pDstCb, 8, sMvp, 8, 8); //Cb
+  pFunc->sMcFuncs.pMcChromaFunc (pRefCb, iLineSizeUV, pDstCb, 8, sMvp.iMvX, sMvp.iMvY, 8, 8); //Cb
   iSadCostChroma  = pFunc->sSampleDealingFuncs.pfSampleSad[BLOCK_8x8] (pMbCache->SPicData.pEncMb[1],
                     pCurLayer->iEncStride[1], pDstCb, 8);
 
   pRefCr += iStrideUV;
-  pFunc->sMcFuncs.pfChromaMc (pRefCr, iLineSizeUV, pDstCr, 8, sMvp, 8, 8); //Cr
+  pFunc->sMcFuncs.pMcChromaFunc (pRefCr, iLineSizeUV, pDstCr, 8, sMvp.iMvX, sMvp.iMvY, 8, 8); //Cr
   iSadCostChroma += pFunc->sSampleDealingFuncs.pfSampleSad[BLOCK_8x8] (pMbCache->SPicData.pEncMb[2],
                     pCurLayer->iEncStride[2], pDstCr, 8);
 
@@ -1412,11 +1513,11 @@ bool WelsMdPSkipEnc (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) {
     iEncStride = pEncCtx->pCurDqLayer->iEncStride[1];
     pEncMb = pMbCache->SPicData.pEncMb[1];
     pEncBlockOffset = pStrideEncBlockOffset + 16;
-    pFunc->pfDctFourT4 (pMbCache->pCoeffLevel + 256, & (pEncMb[*pEncBlockOffset]), iEncStride,	pMbCache->pSkipMb + 256, 8);
+    pFunc->pfDctFourT4 (pMbCache->pCoeffLevel + 256, & (pEncMb[*pEncBlockOffset]), iEncStride, pMbCache->pSkipMb + 256, 8);
     if (WelsTryPUVskip (pEncCtx, pCurMb, pMbCache, 1)) {
       pEncMb = pMbCache->SPicData.pEncMb[2];
       pEncBlockOffset = pStrideEncBlockOffset + 20;
-      pFunc->pfDctFourT4 (pMbCache->pCoeffLevel + 320, & (pEncMb[*pEncBlockOffset]), iEncStride,	pMbCache->pSkipMb + 320, 8);
+      pFunc->pfDctFourT4 (pMbCache->pCoeffLevel + 320, & (pEncMb[*pEncBlockOffset]), iEncStride, pMbCache->pSkipMb + 320, 8);
       if (WelsTryPUVskip (pEncCtx, pCurMb, pMbCache, 2)) {
         //update motion info to current MB
         ST32 (pCurMb->pRefIndex, 0);
@@ -1446,16 +1547,43 @@ bool WelsMdPSkipEnc (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) {
 const int32_t g_kiPixStrideIdx8x8[4] = {  0,                                             ME_REFINE_BUF_WIDTH_BLK8,
                                           ME_REFINE_BUF_STRIDE_BLK8, ME_REFINE_BUF_STRIDE_BLK8 + ME_REFINE_BUF_WIDTH_BLK8
                                        };
+const int32_t g_kiPixStrideIdx4x4[4][4] = {
+  {
+    0,
+    0 + ME_REFINE_BUF_WIDTH_BLK4,
+    0 + ME_REFINE_BUF_STRIDE_BLK4,
+    0 + ME_REFINE_BUF_WIDTH_BLK4 + ME_REFINE_BUF_STRIDE_BLK4
+  }, //[0][]
+  {
+    ME_REFINE_BUF_WIDTH_BLK8,
+    ME_REFINE_BUF_WIDTH_BLK8 + ME_REFINE_BUF_WIDTH_BLK4,
+    ME_REFINE_BUF_WIDTH_BLK8 + ME_REFINE_BUF_STRIDE_BLK4,
+    ME_REFINE_BUF_WIDTH_BLK8 + ME_REFINE_BUF_WIDTH_BLK4 + ME_REFINE_BUF_STRIDE_BLK4
+  }, //[1][]
+  {
+    ME_REFINE_BUF_STRIDE_BLK8,
+    ME_REFINE_BUF_STRIDE_BLK8 + ME_REFINE_BUF_WIDTH_BLK4,
+    ME_REFINE_BUF_STRIDE_BLK8 + ME_REFINE_BUF_STRIDE_BLK4,
+    ME_REFINE_BUF_STRIDE_BLK8 + ME_REFINE_BUF_WIDTH_BLK4 + ME_REFINE_BUF_STRIDE_BLK4
+  }, //[2][]
+  {
+    ME_REFINE_BUF_STRIDE_BLK8 + ME_REFINE_BUF_WIDTH_BLK8,
+    ME_REFINE_BUF_STRIDE_BLK8 + ME_REFINE_BUF_WIDTH_BLK8 + ME_REFINE_BUF_WIDTH_BLK4,
+    ME_REFINE_BUF_STRIDE_BLK8 + ME_REFINE_BUF_WIDTH_BLK8 + ME_REFINE_BUF_STRIDE_BLK4,
+    ME_REFINE_BUF_STRIDE_BLK8 + ME_REFINE_BUF_WIDTH_BLK8 + ME_REFINE_BUF_WIDTH_BLK4 + ME_REFINE_BUF_STRIDE_BLK4
+  } //[3][]
+};
 
 void WelsMdInterMbRefinement (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCache* pMbCache) {
   SDqLayer* pCurDqLayer = pEncCtx->pCurDqLayer;
+  SWelsFuncPtrList* pFunc = pEncCtx->pFuncList;
   uint8_t* pTmpRefCb, *pTmpRefCr, *pTmpDstCb, *pTmpDstCr;
   int32_t iMvStride, iRefBlk4Stride, iDstBlk4Stride;
   SMVUnitXY* pMv;
   int32_t iBestSadCost = 0, iBestSatdCost = 0;
   SMeRefinePointer sMeRefine;
 
-  int32_t i, iIdx, iPixStride;
+  int32_t i, j, iIdx, iPixStride;
 
   uint8_t* pRefCb = pMbCache->SPicData.pRefMb[1];
   uint8_t* pRefCr = pMbCache->SPicData.pRefMb[2];
@@ -1469,6 +1597,8 @@ void WelsMdInterMbRefinement (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurM
   case MB_TYPE_16x16:
     //luma
     InitMeRefinePointer (&sMeRefine, pMbCache, 0);
+    sMeRefine.pfCopyBlockByMode =
+      pFunc->pfCopy16x16NotAligned; // dst can be align with 16 bytes, but not sure at pSrc, 12/29/2011
     MeRefineFracPixel (pEncCtx, pDstLuma, &pWelsMd->sMe.sMe16x16, &sMeRefine, 16, 16);
     UpdateP16x16MotionInfo (pMbCache, pCurMb, pWelsMd->uiRef, &pWelsMd->sMe.sMe16x16.sMv);
 
@@ -1482,8 +1612,8 @@ void WelsMdInterMbRefinement (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurM
     iMvStride = (pMv->iMvY >> 3) * iLineSizeRefUV + (pMv->iMvX >> 3);
     pTmpRefCb = pRefCb + iMvStride;
     pTmpRefCr = pRefCr + iMvStride;
-    pEncCtx->pFuncList->sMcFuncs.pfChromaMc (pTmpRefCb, iLineSizeRefUV, pDstCb, 8, *pMv, 8, 8); //Cb
-    pEncCtx->pFuncList->sMcFuncs.pfChromaMc (pTmpRefCr, iLineSizeRefUV, pDstCr, 8, *pMv, 8, 8); //Cr
+    pEncCtx->pFuncList->sMcFuncs.pMcChromaFunc (pTmpRefCb, iLineSizeRefUV, pDstCb, 8, pMv->iMvX, pMv->iMvY, 8, 8); //Cb
+    pEncCtx->pFuncList->sMcFuncs.pMcChromaFunc (pTmpRefCr, iLineSizeRefUV, pDstCr, 8, pMv->iMvX, pMv->iMvY, 8, 8); //Cr
 
     pWelsMd->iCostSkipMb = pEncCtx->pFuncList->sSampleDealingFuncs.pfSampleSad[BLOCK_16x16] (pMbCache->SPicData.pEncMb[0],
                            pCurDqLayer->iEncStride[0], pDstLuma, 16);
@@ -1495,6 +1625,8 @@ void WelsMdInterMbRefinement (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurM
 
   case MB_TYPE_16x8:
     iPixStride = 0;
+    sMeRefine.pfCopyBlockByMode =
+      pFunc->pfCopy16x8NotAligned; // dst can be align with 16 bytes, but not sure at pSrc, 12/29/2011
     for (i = 0; i < 2; i++) {
       //luma
       iIdx = i << 3;
@@ -1517,13 +1649,14 @@ void WelsMdInterMbRefinement (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurM
       pTmpRefCr = pRefCr + iRefBlk4Stride + iMvStride;
       pTmpDstCb = pDstCb + iDstBlk4Stride;
       pTmpDstCr = pDstCr + iDstBlk4Stride;
-      pEncCtx->pFuncList->sMcFuncs.pfChromaMc (pTmpRefCb, iLineSizeRefUV, pTmpDstCb, 8, *pMv, 8, 4); //Cb
-      pEncCtx->pFuncList->sMcFuncs.pfChromaMc (pTmpRefCr, iLineSizeRefUV, pTmpDstCr, 8, *pMv, 8, 4); //Cr
+      pEncCtx->pFuncList->sMcFuncs.pMcChromaFunc (pTmpRefCb, iLineSizeRefUV, pTmpDstCb, 8, pMv->iMvX, pMv->iMvY, 8, 4); //Cb
+      pEncCtx->pFuncList->sMcFuncs.pMcChromaFunc (pTmpRefCr, iLineSizeRefUV, pTmpDstCr, 8, pMv->iMvX, pMv->iMvY, 8, 4); //Cr
     }
     break;
 
   case MB_TYPE_8x16:
     iPixStride = 0;
+    sMeRefine.pfCopyBlockByMode = pFunc->pfCopy8x16Aligned;
     for (i = 0; i < 2; i++) {
       //luma
       iIdx = i << 2;
@@ -1545,43 +1678,146 @@ void WelsMdInterMbRefinement (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurM
       pTmpRefCr = pRefCr + iRefBlk4Stride + iMvStride;
       pTmpDstCb = pDstCb + iRefBlk4Stride;
       pTmpDstCr = pDstCr + iRefBlk4Stride;
-      pEncCtx->pFuncList->sMcFuncs.pfChromaMc (pTmpRefCb, iLineSizeRefUV, pTmpDstCb, 8, *pMv, 4, 8); //Cb
-      pEncCtx->pFuncList->sMcFuncs.pfChromaMc (pTmpRefCr, iLineSizeRefUV, pTmpDstCr, 8, *pMv, 4, 8); //Cr
+      pEncCtx->pFuncList->sMcFuncs.pMcChromaFunc (pTmpRefCb, iLineSizeRefUV, pTmpDstCb, 8, pMv->iMvX, pMv->iMvY, 4, 8); //Cb
+      pEncCtx->pFuncList->sMcFuncs.pMcChromaFunc (pTmpRefCr, iLineSizeRefUV, pTmpDstCr, 8, pMv->iMvX, pMv->iMvY, 4, 8); //Cr
     }
     break;
-
   case MB_TYPE_8x8:
+    pMbCache->sMvComponents.iRefIndexCache [9] = pMbCache->sMvComponents.iRefIndexCache [21] = REF_NOT_AVAIL;
     for (i = 0; i < 4; i++) {
       int32_t iBlk8Idx = i << 2; //0, 4, 8, 12
-      int32_t	iBlk4X, iBlk4Y;
+      int32_t iBlk4X, iBlk4Y, iBlk4x4Idx;
 
       pCurMb->pRefIndex[i] = pWelsMd->uiRef;
+      switch (pCurMb->uiSubMbType[i]) {
+      case SUB_MB_TYPE_8x8:
+        sMeRefine.pfCopyBlockByMode = pFunc->pfCopy8x8Aligned;
+        //luma
+        InitMeRefinePointer (&sMeRefine, pMbCache, g_kiPixStrideIdx8x8[i]);
+        PredMv (&pMbCache->sMvComponents, iBlk8Idx, 2, pWelsMd->uiRef, &pWelsMd->sMe.sMe8x8[i].sMvp);
+        MeRefineFracPixel (pEncCtx, pDstLuma + g_kuiSmb4AddrIn256[iBlk8Idx], &pWelsMd->sMe.sMe8x8[i], &sMeRefine, 8, 8);
+        UpdateP8x8MotionInfo (pMbCache, pCurMb, iBlk8Idx, pWelsMd->uiRef, &pWelsMd->sMe.sMe8x8[i].sMv);
+        pMbCache->sMbMvp[g_kuiMbCountScan4Idx[iBlk8Idx]] = pWelsMd->sMe.sMe8x8[i].sMvp;
+        iBestSadCost += pWelsMd->sMe.sMe8x8[i].uiSadCost;
+        iBestSatdCost += pWelsMd->sMe.sMe8x8[i].uiSatdCost;
 
-      //luma
-      InitMeRefinePointer (&sMeRefine, pMbCache, g_kiPixStrideIdx8x8[i]);
-      PredMv (&pMbCache->sMvComponents, iBlk8Idx, 2, pWelsMd->uiRef, &pWelsMd->sMe.sMe8x8[i].sMvp);
-      MeRefineFracPixel (pEncCtx, pDstLuma + g_kuiSmb4AddrIn256[iBlk8Idx], &pWelsMd->sMe.sMe8x8[i], &sMeRefine, 8, 8);
-      UpdateP8x8MotionInfo (pMbCache, pCurMb, iBlk8Idx, pWelsMd->uiRef, &pWelsMd->sMe.sMe8x8[i].sMv);
-      pMbCache->sMbMvp[i] = pWelsMd->sMe.sMe8x8[i].sMvp;
-      iBestSadCost += pWelsMd->sMe.sMe8x8[i].uiSadCost;
-      iBestSatdCost += pWelsMd->sMe.sMe8x8[i].uiSatdCost;
+        //chroma
+        pMv = &pWelsMd->sMe.sMe8x8[i].sMv;
+        iMvStride = (pMv->iMvY >> 3) * iLineSizeRefUV + (pMv->iMvX >> 3);
 
-      //chroma
-      pMv = &pWelsMd->sMe.sMe8x8[i].sMv;
-      iMvStride = (pMv->iMvY >> 3) * iLineSizeRefUV + (pMv->iMvX >> 3);
+        iBlk4X = (i & 1) << 2;
+        iBlk4Y = (i >> 1) << 2;
+        iRefBlk4Stride = iBlk4Y * iLineSizeRefUV + iBlk4X;
+        iDstBlk4Stride = (iBlk4Y << 3) + iBlk4X;
 
-      iBlk4X = (i & 1) << 2;
-      iBlk4Y = (i >> 1) << 2;
-      iRefBlk4Stride = iBlk4Y * iLineSizeRefUV + iBlk4X;
-      iDstBlk4Stride = (iBlk4Y << 3) + iBlk4X;
+        pTmpRefCb = pRefCb + iRefBlk4Stride;
+        pTmpDstCb = pDstCb + iDstBlk4Stride;
+        pTmpRefCr = pRefCr + iRefBlk4Stride;
+        pTmpDstCr = pDstCr + iDstBlk4Stride;
+        pEncCtx->pFuncList->sMcFuncs.pMcChromaFunc (pTmpRefCb + iMvStride, iLineSizeRefUV, pTmpDstCb, 8, pMv->iMvX, pMv->iMvY,
+            4, 4); //Cb
+        pEncCtx->pFuncList->sMcFuncs.pMcChromaFunc (pTmpRefCr + iMvStride, iLineSizeRefUV, pTmpDstCr, 8, pMv->iMvX, pMv->iMvY,
+            4, 4); //Cr
+        break;
+      case SUB_MB_TYPE_4x4:
+        sMeRefine.pfCopyBlockByMode = pFunc->pfCopy4x4;
+        //luma
+        for (j = 0; j < 4; ++j) {
+          iBlk4x4Idx = iBlk8Idx + j;
+          InitMeRefinePointer (&sMeRefine, pMbCache, g_kiPixStrideIdx4x4[i][j]);
+          PredMv (&pMbCache->sMvComponents, iBlk4x4Idx, 1, pWelsMd->uiRef, &pWelsMd->sMe.sMe4x4[i][j].sMvp);
+          MeRefineFracPixel (pEncCtx, pDstLuma + g_kuiSmb4AddrIn256[iBlk4x4Idx], &pWelsMd->sMe.sMe4x4[i][j], &sMeRefine, 4, 4);
+          UpdateP4x4MotionInfo (pMbCache, pCurMb, iBlk4x4Idx, pWelsMd->uiRef, &pWelsMd->sMe.sMe4x4[i][j].sMv);
+          pMbCache->sMbMvp[g_kuiMbCountScan4Idx[iBlk4x4Idx]] = pWelsMd->sMe.sMe4x4[i][j].sMvp;
+          iBestSadCost += pWelsMd->sMe.sMe4x4[i][j].uiSadCost;
+          iBestSatdCost += pWelsMd->sMe.sMe4x4[i][j].uiSatdCost;
 
-      pTmpRefCb = pRefCb + iRefBlk4Stride;
-      pTmpDstCb = pDstCb + iDstBlk4Stride;
-      pTmpRefCr = pRefCr + iRefBlk4Stride;
-      pTmpDstCr = pDstCr + iDstBlk4Stride;
-      pEncCtx->pFuncList->sMcFuncs.pfChromaMc (pTmpRefCb + iMvStride, iLineSizeRefUV, pTmpDstCb, 8, *pMv, 4, 4); //Cb
-      pEncCtx->pFuncList->sMcFuncs.pfChromaMc (pTmpRefCr + iMvStride, iLineSizeRefUV, pTmpDstCr, 8, *pMv, 4, 4); //Cr
+          //chroma
+          pMv = &pWelsMd->sMe.sMe4x4[i][j].sMv;
+          iMvStride = (pMv->iMvY >> 3) * iLineSizeRefUV + (pMv->iMvX >> 3);
 
+          iBlk4X = (((i & 1) << 1) + (j & 1)) << 1;
+          iBlk4Y = (((i >> 1) << 1) + (j >> 1)) << 1;
+          iRefBlk4Stride = iBlk4Y * iLineSizeRefUV + iBlk4X;
+          iDstBlk4Stride = (iBlk4Y << 3) + iBlk4X;
+
+          pTmpRefCb = pRefCb + iRefBlk4Stride;
+          pTmpDstCb = pDstCb + iDstBlk4Stride;
+          pTmpRefCr = pRefCr + iRefBlk4Stride;
+          pTmpDstCr = pDstCr + iDstBlk4Stride;
+          pEncCtx->pFuncList->sMcFuncs.pMcChromaFunc (pTmpRefCb + iMvStride, iLineSizeRefUV, pTmpDstCb, 8, pMv->iMvX, pMv->iMvY,
+              2, 2); //Cb
+          pEncCtx->pFuncList->sMcFuncs.pMcChromaFunc (pTmpRefCr + iMvStride, iLineSizeRefUV, pTmpDstCr, 8, pMv->iMvX, pMv->iMvY,
+              2, 2); //Cr
+        }
+        break;
+      case SUB_MB_TYPE_8x4:
+        sMeRefine.pfCopyBlockByMode = pFunc->pfCopy8x4;
+        //luma
+        for (j = 0; j < 2; ++j) {
+          iBlk4x4Idx = iBlk8Idx + (j << 1);
+          InitMeRefinePointer (&sMeRefine, pMbCache, g_kiPixStrideIdx4x4[i][j << 1]);
+          PredMv (&pMbCache->sMvComponents, iBlk4x4Idx, 2, pWelsMd->uiRef, &pWelsMd->sMe.sMe8x4[i][j].sMvp);
+          MeRefineFracPixel (pEncCtx, pDstLuma + g_kuiSmb4AddrIn256[iBlk4x4Idx], &pWelsMd->sMe.sMe8x4[i][j], &sMeRefine, 8, 4);
+          UpdateP8x4MotionInfo (pMbCache, pCurMb, iBlk4x4Idx, pWelsMd->uiRef, &pWelsMd->sMe.sMe8x4[i][j].sMv);
+          pMbCache->sMbMvp[g_kuiMbCountScan4Idx[    iBlk4x4Idx]] = pWelsMd->sMe.sMe8x4[i][j].sMvp;
+          //pMbCache->sMbMvp[g_kuiMbCountScan4Idx[1 + iBlk4x4Idx]] = pWelsMd->sMe.sMe8x4[i][j].sMvp;
+          iBestSadCost += pWelsMd->sMe.sMe8x4[i][j].uiSadCost;
+          iBestSatdCost += pWelsMd->sMe.sMe8x4[i][j].uiSatdCost;
+
+          //chroma
+          pMv = &pWelsMd->sMe.sMe8x4[i][j].sMv;
+          iMvStride = (pMv->iMvY >> 3) * iLineSizeRefUV + (pMv->iMvX >> 3);
+
+          iBlk4X = ((i & 1) << 1) << 1;
+          iBlk4Y = (((i >> 1) << 1) + j) << 1;
+          iRefBlk4Stride = iBlk4Y * iLineSizeRefUV + iBlk4X;
+          iDstBlk4Stride = (iBlk4Y << 3) + iBlk4X;
+
+          pTmpRefCb = pRefCb + iRefBlk4Stride;
+          pTmpDstCb = pDstCb + iDstBlk4Stride;
+          pTmpRefCr = pRefCr + iRefBlk4Stride;
+          pTmpDstCr = pDstCr + iDstBlk4Stride;
+          pEncCtx->pFuncList->sMcFuncs.pMcChromaFunc (pTmpRefCb + iMvStride, iLineSizeRefUV, pTmpDstCb, 8, pMv->iMvX, pMv->iMvY,
+              4, 2); //Cb
+          pEncCtx->pFuncList->sMcFuncs.pMcChromaFunc (pTmpRefCr + iMvStride, iLineSizeRefUV, pTmpDstCr, 8, pMv->iMvX, pMv->iMvY,
+              4, 2); //Cr
+        }
+        break;
+      case SUB_MB_TYPE_4x8:
+        sMeRefine.pfCopyBlockByMode = pFunc->pfCopy4x8;
+        //luma
+        for (j = 0; j < 2; ++j) {
+          iBlk4x4Idx = iBlk8Idx + j;
+          InitMeRefinePointer (&sMeRefine, pMbCache, g_kiPixStrideIdx4x4[i][j]);
+          PredMv (&pMbCache->sMvComponents, iBlk4x4Idx, 1, pWelsMd->uiRef, &pWelsMd->sMe.sMe4x8[i][j].sMvp);
+          MeRefineFracPixel (pEncCtx, pDstLuma + g_kuiSmb4AddrIn256[iBlk4x4Idx], &pWelsMd->sMe.sMe4x8[i][j], &sMeRefine, 4, 8);
+          UpdateP4x8MotionInfo (pMbCache, pCurMb, iBlk4x4Idx, pWelsMd->uiRef, &pWelsMd->sMe.sMe4x8[i][j].sMv);
+          pMbCache->sMbMvp[g_kuiMbCountScan4Idx[    iBlk4x4Idx]] = pWelsMd->sMe.sMe4x8[i][j].sMvp;
+          //pMbCache->sMbMvp[g_kuiMbCountScan4Idx[4 + iBlk4x4Idx]] = pWelsMd->sMe.sMe8x4[i][j].sMvp;
+          iBestSadCost += pWelsMd->sMe.sMe4x8[i][j].uiSadCost;
+          iBestSatdCost += pWelsMd->sMe.sMe4x8[i][j].uiSatdCost;
+
+          //chroma
+          pMv = &pWelsMd->sMe.sMe4x8[i][j].sMv;
+          iMvStride = (pMv->iMvY >> 3) * iLineSizeRefUV + (pMv->iMvX >> 3);
+
+          iBlk4X = (((i & 1) << 1) + j) << 1;
+          iBlk4Y = (((i >> 1) << 1)) << 1;
+          iRefBlk4Stride = iBlk4Y * iLineSizeRefUV + iBlk4X;
+          iDstBlk4Stride = (iBlk4Y << 3) + iBlk4X;
+
+          pTmpRefCb = pRefCb + iRefBlk4Stride;
+          pTmpDstCb = pDstCb + iDstBlk4Stride;
+          pTmpRefCr = pRefCr + iRefBlk4Stride;
+          pTmpDstCr = pDstCr + iDstBlk4Stride;
+          pEncCtx->pFuncList->sMcFuncs.pMcChromaFunc (pTmpRefCb + iMvStride, iLineSizeRefUV, pTmpDstCb, 8, pMv->iMvX, pMv->iMvY,
+              2, 4); //Cb
+          pEncCtx->pFuncList->sMcFuncs.pMcChromaFunc (pTmpRefCr + iMvStride, iLineSizeRefUV, pTmpDstCr, 8, pMv->iMvX, pMv->iMvY,
+              2, 4); //Cr
+        }
+        break;
+      }
     }
     break;
   default:
@@ -1594,10 +1830,8 @@ void WelsMdInterMbRefinement (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurM
     pWelsMd->iCostLuma = iBestSatdCost;
 
 }
-bool WelsMdFirstIntraMode (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache) {
-  sWelsEncCtx* pEncCtx	= (sWelsEncCtx*)pEnc;
-  SWelsFuncPtrList* pFunc	= pEncCtx->pFuncList;
-  SWelsMD* pWelsMd		= (SWelsMD*)pMd;
+bool WelsMdFirstIntraMode (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCache* pMbCache) {
+  SWelsFuncPtrList* pFunc = pEncCtx->pFuncList;
 
   int32_t iCostI16x16 = WelsMdI16x16 (pFunc, pEncCtx->pCurDqLayer, pMbCache, pWelsMd->iLambda);
 
@@ -1625,17 +1859,15 @@ bool WelsMdFirstIntraMode (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCach
   return false;
 }
 
-void WelsMdInterMb (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pUnused) {
-  sWelsEncCtx* pEncCtx	= (sWelsEncCtx*)pEnc;
-  SWelsMD* pWelsMd				= (SWelsMD*)pMd;
-  SDqLayer* pCurDqLayer			= pEncCtx->pCurDqLayer;
-  SMbCache* pMbCache			= &pSlice->sMbCacheInfo;
-  const uint32_t kuiNeighborAvail	= pCurMb->uiNeighborAvail;
-  const int32_t kiMbWidth			= pCurDqLayer->iMbWidth;
-  const  SMB* top_mb				= pCurMb - kiMbWidth;
-  const bool bMbLeftAvailPskip	= ((kuiNeighborAvail & LEFT_MB_POS) ? IS_SKIP ((pCurMb - 1)->uiMbType) : false);
-  const bool bMbTopAvailPskip		= ((kuiNeighborAvail & TOP_MB_POS) ? IS_SKIP (top_mb->uiMbType) : false);
-  const bool bMbTopLeftAvailPskip	= ((kuiNeighborAvail & TOPLEFT_MB_POS) ? IS_SKIP ((top_mb - 1)->uiMbType) : false);
+void WelsMdInterMb (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pUnused) {
+  SDqLayer* pCurDqLayer             = pEncCtx->pCurDqLayer;
+  SMbCache* pMbCache                = &pSlice->sMbCacheInfo;
+  const uint32_t kuiNeighborAvail   = pCurMb->uiNeighborAvail;
+  const int32_t kiMbWidth           = pCurDqLayer->iMbWidth;
+  const  SMB* top_mb                = pCurMb - kiMbWidth;
+  const bool bMbLeftAvailPskip      = ((kuiNeighborAvail & LEFT_MB_POS) ? IS_SKIP ((pCurMb - 1)->uiMbType) : false);
+  const bool bMbTopAvailPskip       = ((kuiNeighborAvail & TOP_MB_POS) ? IS_SKIP (top_mb->uiMbType) : false);
+  const bool bMbTopLeftAvailPskip   = ((kuiNeighborAvail & TOPLEFT_MB_POS) ? IS_SKIP ((top_mb - 1)->uiMbType) : false);
   const bool bMbTopRightAvailPskip = ((kuiNeighborAvail & TOPRIGHT_MB_POS) ? IS_SKIP ((top_mb + 1)->uiMbType) : false);
   bool bTrySkip = bMbLeftAvailPskip || bMbTopAvailPskip || bMbTopLeftAvailPskip || bMbTopRightAvailPskip;
   bool bKeepSkip = bMbLeftAvailPskip && bMbTopAvailPskip && bMbTopRightAvailPskip;
@@ -1735,7 +1967,7 @@ void WelsMdInterDecidedPskip (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb,
 //////
 void WelsMdInterEncode (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache) {
   SWelsFuncPtrList* pFunc = pEncCtx->pFuncList;
-  SDqLayer* pCurDqLayer	= pEncCtx->pCurDqLayer;
+  SDqLayer* pCurDqLayer = pEncCtx->pCurDqLayer;
 
   //add pEnc&rec to MD--2010.3.15
   const int32_t kiCsStrideY = pCurDqLayer->iCsStride[0];
@@ -1795,7 +2027,7 @@ void WelsMdInterSecondaryModesEnc (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlic
 void WelsMdIntraSecondaryModesEnc (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCache* pMbCache) {
   SWelsFuncPtrList* pFunc = pEncCtx->pFuncList;
   //initial prediction memory for I_4x4
-  pFunc->pfIntraFineMd (pEncCtx, pWelsMd, pCurMb, pMbCache);			//WelsMdIntraFinePartitionVaa
+  pFunc->pfIntraFineMd (pEncCtx, pWelsMd, pCurMb, pMbCache); //WelsMdIntraFinePartitionVaa
 
   //add pEnc&rec to MD--2010.3.15
   if (IS_INTRA16x16 (pCurMb->uiMbType)) {

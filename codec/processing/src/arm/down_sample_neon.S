@@ -30,8 +30,7 @@
  *
  */
 
-#ifdef  HAVE_NEON
-.text
+#ifdef HAVE_NEON
 #include "arm_arch_common_macro.S"
 
 
@@ -337,6 +336,123 @@ _LAST_ROW_WIDTH:
     bne     _LAST_ROW_WIDTH
 
     ldmia sp!, {r4-r12, lr}
+WELS_ASM_FUNC_END
+
+WELS_ASM_FUNC_BEGIN DyadicBilinearOneThirdDownsampler_neon
+    stmdb sp!, {r4-r8, lr}
+
+    //Get the width and height
+    ldr  r4, [sp, #24]  //src_width
+    ldr  r5, [sp, #28]  //src_height
+
+    //Initialize the register
+    mov r6, r2
+    mov r8, r0
+    mov lr, #0
+
+    //Save the tailer for the un-aligned size
+    mla  r7, r1, r5, r0
+    vld1.32 {q15}, [r7]
+
+    add r7, r2, r3
+    //processing a colume data
+comp_ds_bilinear_onethird_loop0:
+
+    vld3.8 {d0, d1, d2}, [r2]!
+    vld3.8 {d3, d4, d5}, [r2]!
+    vld3.8 {d16, d17, d18}, [r7]!
+    vld3.8 {d19, d20, d21}, [r7]!
+
+    vaddl.u8 q11, d0, d1
+    vaddl.u8 q12, d3, d4
+    vaddl.u8 q13, d16, d17
+    vaddl.u8 q14, d19, d20
+    vrshr.u16 q11, #1
+    vrshr.u16 q12, #1
+    vrshr.u16 q13, #1
+    vrshr.u16 q14, #1
+
+    vrhadd.u16 q11, q13
+    vrhadd.u16 q12, q14
+
+    vmovn.u16 d0, q11
+    vmovn.u16 d1, q12
+    vst1.8 {q0}, [r0]!
+
+    add lr, #48
+    cmp lr, r4
+    movcs lr, #0
+    addcs r6, r6, r3, lsl #1
+    addcs r6, r6, r3
+    movcs r2, r6
+    addcs r7, r2, r3
+    addcs r8, r1
+    movcs r0, r8
+    subscs r5, #1
+    bne comp_ds_bilinear_onethird_loop0
+
+    //restore the tailer for the un-aligned size
+    vst1.32 {q15}, [r0]
+
+    ldmia sp!, {r4-r8,lr}
+WELS_ASM_FUNC_END
+
+WELS_ASM_FUNC_BEGIN DyadicBilinearQuarterDownsampler_neon
+    stmdb sp!, {r4-r8, lr}
+
+    //Get the width and height
+    ldr  r4, [sp, #24]  //src_width
+    ldr  r5, [sp, #28]  //src_height
+
+    //Initialize the register
+    mov r6, r2
+    mov r8, r0
+    mov lr, #0
+    lsr r5, #2
+
+    //Save the tailer for the un-aligned size
+    mla  r7, r1, r5, r0
+    vld1.32 {q15}, [r7]
+
+    add r7, r2, r3
+    //processing a colume data
+comp_ds_bilinear_quarter_loop0:
+
+    vld2.16 {q0, q1}, [r2]!
+    vld2.16 {q2, q3}, [r2]!
+    vld2.16 {q8, q9}, [r7]!
+    vld2.16 {q10, q11}, [r7]!
+
+    vpaddl.u8 q0, q0
+    vpaddl.u8 q2, q2
+    vpaddl.u8 q8, q8
+    vpaddl.u8 q10, q10
+    vrshr.u16 q0, #1
+    vrshr.u16 q2, #1
+    vrshr.u16 q8, #1
+    vrshr.u16 q10, #1
+
+    vrhadd.u16 q0, q8
+    vrhadd.u16 q2, q10
+    vmovn.u16 d0, q0
+    vmovn.u16 d1, q2
+    vst1.8 {q0}, [r0]!
+
+    add lr, #64
+    cmp lr, r4
+    movcs lr, #0
+    addcs r6, r6, r3, lsl #2
+    movcs r2, r6
+    addcs r7, r2, r3
+    addcs r8, r1
+    movcs r0, r8
+    subscs r5, #1
+    bne comp_ds_bilinear_quarter_loop0
+
+    //restore the tailer for the un-aligned size
+    vst1.32 {q15}, [r0]
+
+    ldmia sp!, {r4-r8,lr}
 WELS_ASM_FUNC_END
 
 #endif

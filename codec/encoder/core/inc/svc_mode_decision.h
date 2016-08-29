@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	svc_mode_decision.h
+ * \file    svc_mode_decision.h
  *
- * \brief	SVC Spatial Enhancement Layer MD
+ * \brief   SVC Spatial Enhancement Layer MD
  *
- * \date	2009.7.29 Created
+ * \date    2009.7.29 Created
  *
  *************************************************************************************
  */
@@ -61,16 +61,16 @@ SCROLLED
 // NOILP ILFMD ENTRANCE
 void WelsMdSpatialelInterMbIlfmdNoilp (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* pSlice, SMB* pCurMb,
                                        const Mb_Type kuiRefMbType);
-void WelsMdInterMbEnhancelayer (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache);
+void WelsMdInterMbEnhancelayer (sWelsEncCtx* pEnc, SWelsMD* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache);
 SMB* GetRefMb (SDqLayer* pCurLayer, SMB* pCurMb);
 void SetMvBaseEnhancelayer (SWelsMD* pMd, SMB* pCurMb, const SMB* kpRefMb);
 
 //////////////
 // MD from background detection
 //////////////
-bool WelsMdInterJudgeBGDPskip (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
+bool WelsMdInterJudgeBGDPskip (sWelsEncCtx* pEnc, SWelsMD* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
                                bool* bKeepSkip);
-bool WelsMdInterJudgeBGDPskipFalse (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
+bool WelsMdInterJudgeBGDPskipFalse (sWelsEncCtx* pEnc, SWelsMD* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
                                     bool* bKeepSkip);
 
 void WelsMdInterUpdateBGDInfo (SDqLayer* pCurLayer,  SMB* pCurMb, const bool kbCollocatedPredFlag,
@@ -87,8 +87,8 @@ typedef bool (*pJudgeSkipFun) (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbC
 void SetBlockStaticIdcToMd (void* pVaa, void* pMd, SMB* pCurMb, void* pDqLay);
 void WelsInitSCDPskipFunc (SWelsFuncPtrList* pFuncList, const bool bScrollingDetection);
 
-void SetScrollingMvToMd (void* pVaa, void* pWelsMd);
-void SetScrollingMvToMdNull (void* pVaa, void* pWelsMd);
+void SetScrollingMvToMd (SVAAFrameInfo* pVaa, SWelsMD* pWelsMd);
+void SetScrollingMvToMdNull (SVAAFrameInfo* pVaa, SWelsMD* pWelsMd);
 }
 #endif //SVC_MODE_DECISION_H
 

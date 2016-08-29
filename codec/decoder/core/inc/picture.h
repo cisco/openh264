@@ -30,7 +30,7 @@
  *
  */
 
-//picture.h	-	reconstruction picture/ reference picture/ residual picture are declared here
+//picture.h     -       reconstruction picture/ reference picture/ residual picture are declared here
 #ifndef WELS_PICTURE_H__
 #define WELS_PICTURE_H__
 
@@ -39,15 +39,15 @@
 namespace WelsDec {
 
 /*
- *	Reconstructed Picture definition
- *	It is used to express reference picture, also consequent reconstruction picture for output
+ *  Reconstructed Picture definition
+ *  It is used to express reference picture, also consequent reconstruction picture for output
  */
 typedef struct TagPicture {
 /************************************payload data*********************************/
-uint8_t*		pBuffer[4];		// pointer to the first allocated byte, basical offset of buffer, dimension:
-uint8_t*		pData[4];		// pointer to picture planes respectively
-int32_t		iLinesize[4];// linesize of picture planes respectively used currently
-int32_t		iPlanes;			// How many planes are introduced due to color space format?
+uint8_t*        pBuffer[4];             // pointer to the first allocated byte, basical offset of buffer, dimension:
+uint8_t*        pData[4];               // pointer to picture planes respectively
+int32_t         iLinesize[4];// linesize of picture planes respectively used currently
+int32_t         iPlanes;                        // How many planes are introduced due to color space format?
 // picture information
 
 /*******************************from EC mv copy****************************/
@@ -55,30 +55,34 @@ bool bIdrFlag;
 
 /*******************************from other standard syntax****************************/
 /*from sps*/
-int32_t		iWidthInPixel;	// picture width in pixel
-int32_t		iHeightInPixel;// picture height in pixel
+int32_t         iWidthInPixel;  // picture width in pixel
+int32_t         iHeightInPixel;// picture height in pixel
 /*from slice header*/
-int32_t		iFramePoc;		// frame POC
+int32_t         iFramePoc;              // frame POC
 
 /*******************************sef_definition for misc use****************************/
-bool		bUsedAsRef;							//for ref pic management
-bool		bIsLongRef;	// long term reference frame flag	//for ref pic management
-uint8_t		uiRefCount;
-bool		bAvailableFlag;	// indicate whether it is available in this picture memory block.
+bool            bUsedAsRef;                                                     //for ref pic management
+bool            bIsLongRef;     // long term reference frame flag       //for ref pic management
+uint8_t         uiRefCount;
+bool            bAvailableFlag; // indicate whether it is available in this picture memory block.
 
-bool            bIsComplete;	// indicate whether current picture is complete, not from EC
+bool            bIsComplete;    // indicate whether current picture is complete, not from EC
 /*******************************for future use****************************/
-uint8_t		uiTemporalId;
-uint8_t		uiSpatialId;
-uint8_t		uiQualityId;
+uint8_t         uiTemporalId;
+uint8_t         uiSpatialId;
+uint8_t         uiQualityId;
 
-int32_t		iFrameNum;		// frame number			//for ref pic management
-int32_t		iLongTermFrameIdx;					//id for long term ref pic
+int32_t         iFrameNum;              // frame number                 //for ref pic management
+int32_t         iLongTermFrameIdx;                                      //id for long term ref pic
 
 int32_t     iSpsId; //against mosaic caused by cross-IDR interval reference.
 int32_t     iPpsId;
 unsigned long long uiTimeStamp;
-} SPicture, *PPicture;	// "Picture" declaration is comflict with Mac system
+bool bNewSeqBegin;
+int32_t iMbEcedNum;
+int32_t iMbEcedPropNum;
+int32_t iMbNum;
+} SPicture, *PPicture; // "Picture" declaration is comflict with Mac system
 
 } // namespace WelsDec
 

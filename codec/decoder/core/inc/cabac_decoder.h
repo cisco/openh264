@@ -28,11 +28,11 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	cabac_decoder.h
+ * \file    cabac_decoder.h
  *
- * \brief	Interfaces introduced for cabac decoder
+ * \brief   Interfaces introduced for cabac decoder
  *
- * \date	10/10/2014 Created
+ * \date    10/10/2014 Created
  *
  *************************************************************************************
  */

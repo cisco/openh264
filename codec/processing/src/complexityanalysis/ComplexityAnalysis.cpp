@@ -187,9 +187,7 @@ void CComplexityAnalysis::AnalyzeGomComplexityViaSad (SPixMap* pSrcPixMap, SPixM
   int32_t*  pGomForegroundBlockNum = (int32_t*)m_sComplexityAnalysisParam.pGomForegroundBlockNum;
   int32_t*  pGomComplexity = (int32_t*)m_sComplexityAnalysisParam.pGomComplexity;
 
-
   uint32_t uiGomSad = 0, uiFrameSad = 0;
-
   InitGomSadFunc (m_pfGomSad, m_sComplexityAnalysisParam.iCalcBgd);
 
   for (int32_t j = 0; j < iGomMbNum; j ++) {
@@ -212,11 +210,9 @@ void CComplexityAnalysis::AnalyzeGomComplexityViaSad (SPixMap* pSrcPixMap, SPixM
       iMbEndIndex = WELS_MIN (iMbEndIndex + iMbWidth , iGomMbEndIndex);
 
     } while (--iGomMbRowNum);
-
     pGomComplexity[j] = uiGomSad;
     uiFrameSad += pGomComplexity[j];
   }
-
   m_sComplexityAnalysisParam.iFrameComplexity = uiFrameSad;
 }
 
@@ -237,7 +233,7 @@ void CComplexityAnalysis::AnalyzeGomComplexityViaVar (SPixMap* pSrcPixMap, SPixM
 
   SVAACalcResult* pVaaCalcResults = m_sComplexityAnalysisParam.pCalcResult;
   int32_t*  pGomComplexity = (int32_t*)m_sComplexityAnalysisParam.pGomComplexity;
-
+  uint32_t  uiFrameSad = 0;
 
   uint32_t uiSampleSum = 0, uiSquareSum = 0;
 
@@ -266,7 +262,9 @@ void CComplexityAnalysis::AnalyzeGomComplexityViaVar (SPixMap* pSrcPixMap, SPixM
     } while (--iGomMbRowNum);
 
     pGomComplexity[j] = uiSquareSum - (uiSampleSum * uiSampleSum / iGomSampleNum);
+    uiFrameSad += pGomComplexity[j];
   }
+  m_sComplexityAnalysisParam.iFrameComplexity = uiFrameSad;
 }
 
 
@@ -324,7 +322,7 @@ EResult CComplexityAnalysisScreen::Process (int32_t nType, SPixMap* pSrc, SPixMa
   } else if (!bScrollFlag || ((iScrollMvX == 0) && (iScrollMvY == 0))) {
     GomComplexityAnalysisInter (pSrc, pRef, 0);
   } else {
-    GomComplexityAnalysisInter (pSrc, pRef, 1);;
+    GomComplexityAnalysisInter (pSrc, pRef, 1);
   }
 
   return RET_SUCCESS;
@@ -352,8 +350,8 @@ EResult CComplexityAnalysisScreen::Get (int32_t nType, void* pParam) {
 void CComplexityAnalysisScreen::GomComplexityAnalysisIntra (SPixMap* pSrc) {
   int32_t iWidth                  = pSrc->sRect.iRectWidth;
   int32_t iHeight                 = pSrc->sRect.iRectHeight;
-  int32_t iBlockWidth            = iWidth  >> 4;
-  int32_t iBlockHeight	       = iHeight >> 4;
+  int32_t iBlockWidth             = iWidth  >> 4;
+  int32_t iBlockHeight            = iHeight >> 4;
 
   int32_t iBlockSadH, iBlockSadV, iGomSad = 0;
   int32_t iIdx = 0;
@@ -377,7 +375,7 @@ void CComplexityAnalysisScreen::GomComplexityAnalysisIntra (SPixMap* pSrc) {
     pTmpCur = pPtrY;
 
     for (int32_t i = 0; i < iBlockWidth; i++) {
-      iBlockSadH = iBlockSadV = 0x7fffffff;	// INT_MAX
+      iBlockSadH = iBlockSadV = 0x7fffffff; // INT_MAX
       if (j > 0) {
         m_pIntraFunc[0] (iMemPredMb, pTmpCur, iStrideY);
         iBlockSadH = m_pSadFunc (pTmpCur, iStrideY, iMemPredMb, 16);
@@ -408,8 +406,8 @@ void CComplexityAnalysisScreen::GomComplexityAnalysisIntra (SPixMap* pSrc) {
 void CComplexityAnalysisScreen::GomComplexityAnalysisInter (SPixMap* pSrc, SPixMap* pRef, bool bScrollFlag) {
   int32_t iWidth                  = pSrc->sRect.iRectWidth;
   int32_t iHeight                 = pSrc->sRect.iRectHeight;
-  int32_t iBlockWidth            = iWidth  >> 4;
-  int32_t iBlockHeight	       = iHeight >> 4;
+  int32_t iBlockWidth             = iWidth  >> 4;
+  int32_t iBlockHeight            = iHeight >> 4;
 
   int32_t iInterSad, iScrollSad, iBlockSadH, iBlockSadV, iGomSad = 0;
   int32_t iIdx = 0;
@@ -459,7 +457,7 @@ void CComplexityAnalysisScreen::GomComplexityAnalysisInter (SPixMap* pSrc, SPixM
 
       }
 
-      iBlockSadH = iBlockSadV = 0x7fffffff;	// INT_MAX
+      iBlockSadH = iBlockSadV = 0x7fffffff; // INT_MAX
 
       if (j > 0) {
         m_pIntraFunc[0] (iMemPredMb, pTmpCur, iStrideY);

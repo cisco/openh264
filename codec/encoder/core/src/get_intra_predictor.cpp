@@ -29,13 +29,13 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	get_intra_predictor.c
+ * \file    get_intra_predictor.c
  *
- * \brief	implementation for get intra predictor about 16x16, 4x4, chroma.
+ * \brief   implementation for get intra predictor about 16x16, 4x4, chroma.
  *
- * \date	4/2/2009 Created
- *			9/14/2009 C level based optimization with high performance gained.
- *				[const, using ST32/ST64 to replace memset, memcpy and memmove etc.]
+ * \date    4/2/2009 Created
+ *          9/14/2009 C level based optimization with high performance gained.
+ *              [const, using ST32/ST64 to replace memset, memcpy and memmove etc.]
  *
  *************************************************************************************
  */
@@ -95,7 +95,7 @@ void WelsI4x4LumaPredH_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride)
   const uint8_t kuiVec2[4] = {kuiHor2, kuiHor2, kuiHor2, kuiHor2};
   const uint8_t kuiVec3[4] = {kuiHor3, kuiHor3, kuiHor3, kuiHor3};
   const uint8_t kuiVec4[4] = {kuiHor4, kuiHor4, kuiHor4, kuiHor4};
-  ENFORCE_STACK_ALIGN_1D (uint8_t, uiSrc, 16, 16)	// TobeCont'd about assign opt as follows
+  ENFORCE_STACK_ALIGN_1D (uint8_t, uiSrc, 16, 16) // TobeCont'd about assign opt as follows
   ST32 (&uiSrc[0], LD32 (kuiVec1));
   ST32 (&uiSrc[4], LD32 (kuiVec2));
   ST32 (&uiSrc[8], LD32 (kuiVec3));
@@ -104,22 +104,21 @@ void WelsI4x4LumaPredH_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride)
   WelsFillingPred8x2to16 (pPred, uiSrc);
 }
 void WelsI4x4LumaPredDc_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
-  const uint8_t kuiDcValue	= (pRef[-1] + pRef[kiStride - 1] + pRef[ (kiStride << 1) - 1] + pRef[ (kiStride << 1) +
-                               kiStride - 1] +
+  const uint8_t kuiDcValue = (pRef[-1] + pRef[kiStride - 1] + pRef[ (kiStride << 1) - 1] + pRef[ (kiStride << 1) + kiStride - 1] +
                                pRef[-kiStride] + pRef[1 - kiStride] + pRef[2 - kiStride] + pRef[3 - kiStride] + 4) >> 3;
 
   WelsFillingPred1to16 (pPred, kuiDcValue);
 }
 
 void WelsI4x4LumaPredDcLeft_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
-  const uint8_t kuiDcValue	= (pRef[-1] + pRef[kiStride - 1] + pRef[ (kiStride << 1) - 1] + pRef[ (kiStride << 1) +
+  const uint8_t kuiDcValue = (pRef[-1] + pRef[kiStride - 1] + pRef[ (kiStride << 1) - 1] + pRef[ (kiStride << 1) +
                                kiStride - 1] + 2) >> 2;
 
   WelsFillingPred1to16 (pPred, kuiDcValue);
 }
 
 void WelsI4x4LumaPredDcTop_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
-  const uint8_t kuiDcValue	= (pRef[-kiStride] + pRef[1 - kiStride] + pRef[2 - kiStride] + pRef[3 - kiStride] + 2) >> 2;
+  const uint8_t kuiDcValue = (pRef[-kiStride] + pRef[1 - kiStride] + pRef[2 - kiStride] + pRef[3 - kiStride] + 2) >> 2;
 
   WelsFillingPred1to16 (pPred, kuiDcValue);
 }
@@ -133,22 +132,22 @@ void WelsI4x4LumaPredDcNA_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStri
 /*down pLeft*/
 void WelsI4x4LumaPredDDL_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
   /*get pTop*/
-  const uint8_t kuiT0		= pRef[-kiStride];
-  const uint8_t kuiT1		= pRef[1 - kiStride];
-  const uint8_t kuiT2		= pRef[2 - kiStride];
-  const uint8_t kuiT3		= pRef[3 - kiStride];
-  const uint8_t kuiT4		= pRef[4 - kiStride];
-  const uint8_t kuiT5		= pRef[5 - kiStride];
-  const uint8_t kuiT6		= pRef[6 - kiStride];
-  const uint8_t kuiT7		= pRef[7 - kiStride];
-  const uint8_t kuiDDL0	= (2 + kuiT0 + kuiT2 + (kuiT1 << 1)) >> 2;	// uiDDL0
-  const uint8_t kuiDDL1	= (2 + kuiT1 + kuiT3 + (kuiT2 << 1)) >> 2;	// uiDDL1
-  const uint8_t kuiDDL2	= (2 + kuiT2 + kuiT4 + (kuiT3 << 1)) >> 2;	// uiDDL2
-  const uint8_t kuiDDL3	= (2 + kuiT3 + kuiT5 + (kuiT4 << 1)) >> 2;	// uiDDL3
-  const uint8_t kuiDDL4	= (2 + kuiT4 + kuiT6 + (kuiT5 << 1)) >> 2;	// uiDDL4
-  const uint8_t kuiDDL5	= (2 + kuiT5 + kuiT7 + (kuiT6 << 1)) >> 2;	// uiDDL5
-  const uint8_t kuiDDL6	= (2 + kuiT6 + kuiT7 + (kuiT7 << 1)) >> 2;	// uiDDL6
-  ENFORCE_STACK_ALIGN_1D (uint8_t, uiSrc, 16, 16)	// TobeCont'd about assign opt as follows
+  const uint8_t kuiT0   = pRef[-kiStride];
+  const uint8_t kuiT1   = pRef[1 - kiStride];
+  const uint8_t kuiT2   = pRef[2 - kiStride];
+  const uint8_t kuiT3   = pRef[3 - kiStride];
+  const uint8_t kuiT4   = pRef[4 - kiStride];
+  const uint8_t kuiT5   = pRef[5 - kiStride];
+  const uint8_t kuiT6   = pRef[6 - kiStride];
+  const uint8_t kuiT7   = pRef[7 - kiStride];
+  const uint8_t kuiDDL0 = (2 + kuiT0 + kuiT2 + (kuiT1 << 1)) >> 2;      // uiDDL0
+  const uint8_t kuiDDL1 = (2 + kuiT1 + kuiT3 + (kuiT2 << 1)) >> 2;      // uiDDL1
+  const uint8_t kuiDDL2 = (2 + kuiT2 + kuiT4 + (kuiT3 << 1)) >> 2;      // uiDDL2
+  const uint8_t kuiDDL3 = (2 + kuiT3 + kuiT5 + (kuiT4 << 1)) >> 2;      // uiDDL3
+  const uint8_t kuiDDL4 = (2 + kuiT4 + kuiT6 + (kuiT5 << 1)) >> 2;      // uiDDL4
+  const uint8_t kuiDDL5 = (2 + kuiT5 + kuiT7 + (kuiT6 << 1)) >> 2;      // uiDDL5
+  const uint8_t kuiDDL6 = (2 + kuiT6 + kuiT7 + (kuiT7 << 1)) >> 2;      // uiDDL6
+  ENFORCE_STACK_ALIGN_1D (uint8_t, uiSrc, 16, 16) // TobeCont'd about assign opt as follows
   uiSrc[0] = kuiDDL0;
   uiSrc[1] = uiSrc[4] = kuiDDL1;
   uiSrc[2] = uiSrc[5] = uiSrc[8] = kuiDDL2;
@@ -163,15 +162,15 @@ void WelsI4x4LumaPredDDL_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStrid
 /*down pLeft*/
 void WelsI4x4LumaPredDDLTop_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
   /*get pTop*/
-  const uint8_t kuiT0	= pRef[-kiStride];
-  const uint8_t kuiT1	= pRef[1 - kiStride];
-  const uint8_t kuiT2	= pRef[2 - kiStride];
-  const uint8_t kuiT3	= pRef[3 - kiStride];
-  const uint8_t kuiDLT0	= (2 + kuiT0 + kuiT2 + (kuiT1 << 1)) >> 2;	// uiDLT0
-  const uint8_t kuiDLT1	= (2 + kuiT1 + kuiT3 + (kuiT2 << 1)) >> 2;	// uiDLT1
-  const uint8_t kuiDLT2	= (2 + kuiT2 + kuiT3 + (kuiT3 << 1)) >> 2;	// uiDLT2
-  const uint8_t kuiDLT3	= (2 + (kuiT3 << 2)) >> 2;				// uiDLT3
-  ENFORCE_STACK_ALIGN_1D (uint8_t, uiSrc, 16, 16)	// TobeCont'd about assign opt as follows
+  const uint8_t kuiT0   = pRef[-kiStride];
+  const uint8_t kuiT1   = pRef[1 - kiStride];
+  const uint8_t kuiT2   = pRef[2 - kiStride];
+  const uint8_t kuiT3   = pRef[3 - kiStride];
+  const uint8_t kuiDLT0 = (2 + kuiT0 + kuiT2 + (kuiT1 << 1)) >> 2;      // uiDLT0
+  const uint8_t kuiDLT1 = (2 + kuiT1 + kuiT3 + (kuiT2 << 1)) >> 2;      // uiDLT1
+  const uint8_t kuiDLT2 = (2 + kuiT2 + kuiT3 + (kuiT3 << 1)) >> 2;      // uiDLT2
+  const uint8_t kuiDLT3 = (2 + (kuiT3 << 2)) >> 2;                      // uiDLT3
+  ENFORCE_STACK_ALIGN_1D (uint8_t, uiSrc, 16, 16) // TobeCont'd about assign opt as follows
   memset (&uiSrc[6], kuiDLT3, 10 * sizeof (uint8_t));
   uiSrc[0] = kuiDLT0;
   uiSrc[1] = uiSrc[4] = kuiDLT1;
@@ -184,34 +183,34 @@ void WelsI4x4LumaPredDDLTop_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiSt
 
 /*down right*/
 void WelsI4x4LumaPredDDR_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
-  const int32_t kiStridex2	= kiStride << 1;
-  const int32_t kiStridex3	= kiStride + kiStridex2;
-  const uint8_t kuiLT			= pRef[-kiStride - 1];	// pTop-pLeft
+  const int32_t kiStridex2  = kiStride << 1;
+  const int32_t kiStridex3  = kiStride + kiStridex2;
+  const uint8_t kuiLT       = pRef[-kiStride - 1];  // pTop-pLeft
   /*get pLeft and pTop*/
-  const uint8_t kuiL0			= pRef[-1];
-  const uint8_t kuiL1			= pRef[kiStride - 1];
-  const uint8_t kuiL2			= pRef[kiStridex2 - 1];
-  const uint8_t kuiL3			= pRef[kiStridex3 - 1];
-  const uint8_t kuiT0			= pRef[-kiStride];
-  const uint8_t kuiT1			= pRef[1 - kiStride];
-  const uint8_t kuiT2			= pRef[2 - kiStride];
-  const uint8_t kuiT3			= pRef[3 - kiStride];
-  const uint16_t kuiTL0		= 1 + kuiLT + kuiL0;
-  const uint16_t kuiLT0		= 1 + kuiLT + kuiT0;
-  const uint16_t kuiT01		= 1 + kuiT0 + kuiT1;
-  const uint16_t kuiT12		= 1 + kuiT1 + kuiT2;
-  const uint16_t kuiT23		= 1 + kuiT2 + kuiT3;
-  const uint16_t kuiL01		= 1 + kuiL0 + kuiL1;
-  const uint16_t kuiL12		= 1 + kuiL1 + kuiL2;
-  const uint16_t kuiL23		= 1 + kuiL2 + kuiL3;
-  const uint8_t kuiDDR0		= (kuiTL0 + kuiLT0) >> 2;
-  const uint8_t kuiDDR1		= (kuiLT0 + kuiT01) >> 2;
-  const uint8_t kuiDDR2		= (kuiT01 + kuiT12) >> 2;
-  const uint8_t kuiDDR3		= (kuiT12 + kuiT23) >> 2;
-  const uint8_t kuiDDR4		= (kuiTL0 + kuiL01) >> 2;
-  const uint8_t kuiDDR5		= (kuiL01 + kuiL12) >> 2;
-  const uint8_t kuiDDR6		= (kuiL12 + kuiL23) >> 2;
-  ENFORCE_STACK_ALIGN_1D (uint8_t, uiSrc, 16, 16)	// TobeCont'd about assign opt as follows
+  const uint8_t kuiL0       = pRef[-1];
+  const uint8_t kuiL1       = pRef[kiStride - 1];
+  const uint8_t kuiL2       = pRef[kiStridex2 - 1];
+  const uint8_t kuiL3       = pRef[kiStridex3 - 1];
+  const uint8_t kuiT0       = pRef[-kiStride];
+  const uint8_t kuiT1       = pRef[1 - kiStride];
+  const uint8_t kuiT2       = pRef[2 - kiStride];
+  const uint8_t kuiT3       = pRef[3 - kiStride];
+  const uint16_t kuiTL0     = 1 + kuiLT + kuiL0;
+  const uint16_t kuiLT0     = 1 + kuiLT + kuiT0;
+  const uint16_t kuiT01     = 1 + kuiT0 + kuiT1;
+  const uint16_t kuiT12     = 1 + kuiT1 + kuiT2;
+  const uint16_t kuiT23     = 1 + kuiT2 + kuiT3;
+  const uint16_t kuiL01     = 1 + kuiL0 + kuiL1;
+  const uint16_t kuiL12     = 1 + kuiL1 + kuiL2;
+  const uint16_t kuiL23     = 1 + kuiL2 + kuiL3;
+  const uint8_t kuiDDR0     = (kuiTL0 + kuiLT0) >> 2;
+  const uint8_t kuiDDR1     = (kuiLT0 + kuiT01) >> 2;
+  const uint8_t kuiDDR2     = (kuiT01 + kuiT12) >> 2;
+  const uint8_t kuiDDR3     = (kuiT12 + kuiT23) >> 2;
+  const uint8_t kuiDDR4     = (kuiTL0 + kuiL01) >> 2;
+  const uint8_t kuiDDR5     = (kuiL01 + kuiL12) >> 2;
+  const uint8_t kuiDDR6     = (kuiL12 + kuiL23) >> 2;
+  ENFORCE_STACK_ALIGN_1D (uint8_t, uiSrc, 16, 16) // TobeCont'd about assign opt as follows
   uiSrc[0] = uiSrc[5] = uiSrc[10] = uiSrc[15] = kuiDDR0;
   uiSrc[1] = uiSrc[6] = uiSrc[11] = kuiDDR1;
   uiSrc[2] = uiSrc[7] = kuiDDR2;
@@ -227,24 +226,24 @@ void WelsI4x4LumaPredDDR_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStrid
 /*vertical pLeft*/
 void WelsI4x4LumaPredVL_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
   /*get pTop*/
-  const uint8_t kuiT0		= pRef[-kiStride];
-  const uint8_t kuiT1		= pRef[1 - kiStride];
-  const uint8_t kuiT2		= pRef[2 - kiStride];
-  const uint8_t kuiT3		= pRef[3 - kiStride];
-  const uint8_t kuiT4		= pRef[4 - kiStride];
-  const uint8_t kuiT5		= pRef[5 - kiStride];
-  const uint8_t kuiT6		= pRef[6 - kiStride];
-  const uint8_t kuiVL0	= (1 + kuiT0 + kuiT1) >> 1;				// uiVL0
-  const uint8_t kuiVL1	= (1 + kuiT1 + kuiT2) >> 1;				// uiVL1
-  const uint8_t kuiVL2	= (1 + kuiT2 + kuiT3) >> 1;				// uiVL2
-  const uint8_t kuiVL3	= (1 + kuiT3 + kuiT4) >> 1;				// uiVL3
-  const uint8_t kuiVL4	= (1 + kuiT4 + kuiT5) >> 1;				// uiVL4
-  const uint8_t kuiVL5	= (2 + kuiT0 + (kuiT1 << 1) + kuiT2) >> 2;	// uiVL5
-  const uint8_t kuiVL6	= (2 + kuiT1 + (kuiT2 << 1) + kuiT3) >> 2;	// uiVL6
-  const uint8_t kuiVL7	= (2 + kuiT2 + (kuiT3 << 1) + kuiT4) >> 2;	// uiVL7
-  const uint8_t kuiVL8	= (2 + kuiT3 + (kuiT4 << 1) + kuiT5) >> 2;	// uiVL8
-  const uint8_t kuiVL9	= (2 + kuiT4 + (kuiT5 << 1) + kuiT6) >> 2;	// uiVL9
-  ENFORCE_STACK_ALIGN_1D (uint8_t, uiSrc, 16, 16)	// TobeCont'd about assign opt as follows
+  const uint8_t kuiT0   = pRef[-kiStride];
+  const uint8_t kuiT1   = pRef[1 - kiStride];
+  const uint8_t kuiT2   = pRef[2 - kiStride];
+  const uint8_t kuiT3   = pRef[3 - kiStride];
+  const uint8_t kuiT4   = pRef[4 - kiStride];
+  const uint8_t kuiT5   = pRef[5 - kiStride];
+  const uint8_t kuiT6   = pRef[6 - kiStride];
+  const uint8_t kuiVL0  = (1 + kuiT0 + kuiT1) >> 1;                     // uiVL0
+  const uint8_t kuiVL1  = (1 + kuiT1 + kuiT2) >> 1;                     // uiVL1
+  const uint8_t kuiVL2  = (1 + kuiT2 + kuiT3) >> 1;                     // uiVL2
+  const uint8_t kuiVL3  = (1 + kuiT3 + kuiT4) >> 1;                     // uiVL3
+  const uint8_t kuiVL4  = (1 + kuiT4 + kuiT5) >> 1;                     // uiVL4
+  const uint8_t kuiVL5  = (2 + kuiT0 + (kuiT1 << 1) + kuiT2) >> 2;      // uiVL5
+  const uint8_t kuiVL6  = (2 + kuiT1 + (kuiT2 << 1) + kuiT3) >> 2;      // uiVL6
+  const uint8_t kuiVL7  = (2 + kuiT2 + (kuiT3 << 1) + kuiT4) >> 2;      // uiVL7
+  const uint8_t kuiVL8  = (2 + kuiT3 + (kuiT4 << 1) + kuiT5) >> 2;      // uiVL8
+  const uint8_t kuiVL9  = (2 + kuiT4 + (kuiT5 << 1) + kuiT6) >> 2;      // uiVL9
+  ENFORCE_STACK_ALIGN_1D (uint8_t, uiSrc, 16, 16) // TobeCont'd about assign opt as follows
   uiSrc[0] = kuiVL0;
   uiSrc[1] = uiSrc[8] = kuiVL1;
   uiSrc[2] = uiSrc[9] = kuiVL2;
@@ -263,21 +262,21 @@ void WelsI4x4LumaPredVL_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride
 
 /*vertical pLeft*/
 void WelsI4x4LumaPredVLTop_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
-  uint8_t* pTopLeft		= &pRef[-kiStride - 1];	// pTop-pLeft
+  uint8_t* pTopLeft     = &pRef[-kiStride - 1]; // pTop-pLeft
   /*get pTop*/
-  const uint8_t kuiT0		= * (pTopLeft + 1);
-  const uint8_t kuiT1		= * (pTopLeft + 2);
-  const uint8_t kuiT2		= * (pTopLeft + 3);
-  const uint8_t kuiT3		= * (pTopLeft + 4);
-  const uint8_t kuiVLT0	= (1 + kuiT0 + kuiT1) >> 1;				// uiVLT0
-  const uint8_t kuiVLT1	= (1 + kuiT1 + kuiT2) >> 1;				// uiVLT1
-  const uint8_t kuiVLT2	= (1 + kuiT2 + kuiT3) >> 1;				// uiVLT2
-  const uint8_t kuiVLT3	= (1 + (kuiT3 << 1)) >> 1;				// uiVLT3
-  const uint8_t kuiVLT4	= (2 + kuiT0 + (kuiT1 << 1) + kuiT2) >> 2;	// uiVLT4
-  const uint8_t kuiVLT5	= (2 + kuiT1 + (kuiT2 << 1) + kuiT3) >> 2;	// uiVLT5
-  const uint8_t kuiVLT6	= (2 + kuiT2 + (kuiT3 << 1) + kuiT3) >> 2;	// uiVLT6
-  const uint8_t kuiVLT7	= (2 + (kuiT3 << 2)) >> 2;				// uiVLT7
-  ENFORCE_STACK_ALIGN_1D (uint8_t, uiSrc, 16, 16)	// TobeCont'd about assign opt as follows
+  const uint8_t kuiT0   = * (pTopLeft + 1);
+  const uint8_t kuiT1   = * (pTopLeft + 2);
+  const uint8_t kuiT2   = * (pTopLeft + 3);
+  const uint8_t kuiT3   = * (pTopLeft + 4);
+  const uint8_t kuiVLT0 = (1 + kuiT0 + kuiT1) >> 1;                     // uiVLT0
+  const uint8_t kuiVLT1 = (1 + kuiT1 + kuiT2) >> 1;                     // uiVLT1
+  const uint8_t kuiVLT2 = (1 + kuiT2 + kuiT3) >> 1;                     // uiVLT2
+  const uint8_t kuiVLT3 = (1 + (kuiT3 << 1)) >> 1;                      // uiVLT3
+  const uint8_t kuiVLT4 = (2 + kuiT0 + (kuiT1 << 1) + kuiT2) >> 2;      // uiVLT4
+  const uint8_t kuiVLT5 = (2 + kuiT1 + (kuiT2 << 1) + kuiT3) >> 2;      // uiVLT5
+  const uint8_t kuiVLT6 = (2 + kuiT2 + (kuiT3 << 1) + kuiT3) >> 2;      // uiVLT6
+  const uint8_t kuiVLT7 = (2 + (kuiT3 << 2)) >> 2;                      // uiVLT7
+  ENFORCE_STACK_ALIGN_1D (uint8_t, uiSrc, 16, 16) // TobeCont'd about assign opt as follows
   uiSrc[0] = kuiVLT0;
   uiSrc[1] = uiSrc[8] = kuiVLT1;
   uiSrc[2] = uiSrc[9] = kuiVLT2;
@@ -292,27 +291,27 @@ void WelsI4x4LumaPredVLTop_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStr
 
 /*vertical right*/
 void WelsI4x4LumaPredVR_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
-  const int32_t kiStridex2	= kiStride << 1;
-  const uint8_t kuiLT			= pRef[-kiStride - 1];	// pTop-pLeft
+  const int32_t kiStridex2  = kiStride << 1;
+  const uint8_t kuiLT       = pRef[-kiStride - 1];  // pTop-pLeft
   /*get pLeft and pTop*/
-  const uint8_t kuiL0			= pRef[-1];
-  const uint8_t kuiL1			= pRef[kiStride - 1];
-  const uint8_t kuiL2			= pRef[kiStridex2 - 1];
-  const uint8_t kuiT0			= pRef[-kiStride];
-  const uint8_t kuiT1			= pRef[1 - kiStride];
-  const uint8_t kuiT2			= pRef[2 - kiStride];
-  const uint8_t kuiT3			= pRef[3 - kiStride];
-  const uint8_t kuiVR0		= (1 + kuiLT + kuiT0) >> 1;
-  const uint8_t kuiVR1		= (1 + kuiT0 + kuiT1) >> 1;
-  const uint8_t kuiVR2		= (1 + kuiT1 + kuiT2) >> 1;
-  const uint8_t kuiVR3		= (1 + kuiT2 + kuiT3) >> 1;
-  const uint8_t kuiVR4		= (2 + kuiL0 + (kuiLT << 1) + kuiT0) >> 2;
-  const uint8_t kuiVR5		= (2 + kuiLT + (kuiT0 << 1) + kuiT1) >> 2;
-  const uint8_t kuiVR6		= (2 + kuiT0 + (kuiT1 << 1) + kuiT2) >> 2;
-  const uint8_t kuiVR7		= (2 + kuiT1 + (kuiT2 << 1) + kuiT3) >> 2;
-  const uint8_t kuiVR8		= (2 + kuiLT + (kuiL0 << 1) + kuiL1) >> 2;
-  const uint8_t kuiVR9		= (2 + kuiL0 + (kuiL1 << 1) + kuiL2) >> 2;
-  ENFORCE_STACK_ALIGN_1D (uint8_t, uiSrc, 16, 16)	// TobeCont'd about assign opt as follows
+  const uint8_t kuiL0       = pRef[-1];
+  const uint8_t kuiL1       = pRef[kiStride - 1];
+  const uint8_t kuiL2       = pRef[kiStridex2 - 1];
+  const uint8_t kuiT0       = pRef[-kiStride];
+  const uint8_t kuiT1       = pRef[1 - kiStride];
+  const uint8_t kuiT2       = pRef[2 - kiStride];
+  const uint8_t kuiT3       = pRef[3 - kiStride];
+  const uint8_t kuiVR0      = (1 + kuiLT + kuiT0) >> 1;
+  const uint8_t kuiVR1      = (1 + kuiT0 + kuiT1) >> 1;
+  const uint8_t kuiVR2      = (1 + kuiT1 + kuiT2) >> 1;
+  const uint8_t kuiVR3      = (1 + kuiT2 + kuiT3) >> 1;
+  const uint8_t kuiVR4      = (2 + kuiL0 + (kuiLT << 1) + kuiT0) >> 2;
+  const uint8_t kuiVR5      = (2 + kuiLT + (kuiT0 << 1) + kuiT1) >> 2;
+  const uint8_t kuiVR6      = (2 + kuiT0 + (kuiT1 << 1) + kuiT2) >> 2;
+  const uint8_t kuiVR7      = (2 + kuiT1 + (kuiT2 << 1) + kuiT3) >> 2;
+  const uint8_t kuiVR8      = (2 + kuiLT + (kuiL0 << 1) + kuiL1) >> 2;
+  const uint8_t kuiVR9      = (2 + kuiL0 + (kuiL1 << 1) + kuiL2) >> 2;
+  ENFORCE_STACK_ALIGN_1D (uint8_t, uiSrc, 16, 16) // TobeCont'd about assign opt as follows
   uiSrc[0] = uiSrc[9] = kuiVR0;
   uiSrc[1] = uiSrc[10] = kuiVR1;
   uiSrc[2] = uiSrc[11] = kuiVR2;
@@ -330,23 +329,23 @@ void WelsI4x4LumaPredVR_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride
 
 /*horizontal up*/
 void WelsI4x4LumaPredHU_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
-  const int32_t kiStridex2	= kiStride << 1;
-  const int32_t kiStridex3	= kiStride + kiStridex2;
+  const int32_t kiStridex2  = kiStride << 1;
+  const int32_t kiStridex3  = kiStride + kiStridex2;
   /*get pLeft*/
-  const uint8_t kuiL0			= pRef[-1];
-  const uint8_t kuiL1			= pRef[kiStride - 1];
-  const uint8_t kuiL2			= pRef[kiStridex2 - 1];
-  const uint8_t kuiL3			= pRef[kiStridex3 - 1];
-  const uint16_t kuiL01		= (1 + kuiL0 + kuiL1);
-  const uint16_t kuiL12		= (1 + kuiL1 + kuiL2);
-  const uint16_t kuiL23		= (1 + kuiL2 + kuiL3);
-  const uint8_t kuiHU0		= kuiL01 >> 1;
-  const uint8_t kuiHU1		= (kuiL01 + kuiL12) >> 2;
-  const uint8_t kuiHU2		= kuiL12 >> 1;
-  const uint8_t kuiHU3		= (kuiL12 + kuiL23) >> 2;
-  const uint8_t kuiHU4		= kuiL23 >> 1;
-  const uint8_t kuiHU5		= (1 + kuiL23 + (kuiL3 << 1)) >> 2;
-  ENFORCE_STACK_ALIGN_1D (uint8_t, uiSrc, 16, 16)	// TobeCont'd about assign opt as follows
+  const uint8_t kuiL0       = pRef[-1];
+  const uint8_t kuiL1       = pRef[kiStride - 1];
+  const uint8_t kuiL2       = pRef[kiStridex2 - 1];
+  const uint8_t kuiL3       = pRef[kiStridex3 - 1];
+  const uint16_t kuiL01     = (1 + kuiL0 + kuiL1);
+  const uint16_t kuiL12     = (1 + kuiL1 + kuiL2);
+  const uint16_t kuiL23     = (1 + kuiL2 + kuiL3);
+  const uint8_t kuiHU0      = kuiL01 >> 1;
+  const uint8_t kuiHU1      = (kuiL01 + kuiL12) >> 2;
+  const uint8_t kuiHU2      = kuiL12 >> 1;
+  const uint8_t kuiHU3      = (kuiL12 + kuiL23) >> 2;
+  const uint8_t kuiHU4      = kuiL23 >> 1;
+  const uint8_t kuiHU5      = (1 + kuiL23 + (kuiL3 << 1)) >> 2;
+  ENFORCE_STACK_ALIGN_1D (uint8_t, uiSrc, 16, 16) // TobeCont'd about assign opt as follows
   uiSrc[0] = kuiHU0;
   uiSrc[1] = kuiHU1;
   uiSrc[2] = uiSrc[4] = kuiHU2;
@@ -361,28 +360,28 @@ void WelsI4x4LumaPredHU_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride
 
 /*horizontal down*/
 void WelsI4x4LumaPredHD_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
-  const int32_t kiStridex2	= kiStride << 1;
-  const int32_t kiStridex3	= kiStride + kiStridex2;
-  const uint8_t kuiLT		= pRef[-kiStride - 1];	// pTop-pLeft
+  const int32_t kiStridex2  = kiStride << 1;
+  const int32_t kiStridex3  = kiStride + kiStridex2;
+  const uint8_t kuiLT       = pRef[-kiStride - 1];  // pTop-pLeft
   /*get pLeft and pTop*/
-  const uint8_t kuiL0		= pRef[-1];
-  const uint8_t kuiL1		= pRef[kiStride - 1];
-  const uint8_t kuiL2		= pRef[kiStridex2 - 1];
-  const uint8_t kuiL3		= pRef[kiStridex3 - 1];
-  const uint8_t kuiT0		= pRef[-kiStride];
-  const uint8_t kuiT1		= pRef[1 - kiStride];
-  const uint8_t kuiT2		= pRef[2 - kiStride];
-  const uint8_t kuiHD0		= (1 + kuiLT + kuiL0) >> 1;				// uiHD0
-  const uint8_t kuiHD1		= (2 + kuiL0 + (kuiLT << 1) + kuiT0) >> 2;	// uiHD1
-  const uint8_t kuiHD2		= (2 + kuiLT + (kuiT0 << 1) + kuiT1) >> 2;	// uiHD2
-  const uint8_t kuiHD3		= (2 + kuiT0 + (kuiT1 << 1) + kuiT2) >> 2;	// uiHD3
-  const uint8_t kuiHD4		= (1 + kuiL0 + kuiL1) >> 1;				// uiHD4
-  const uint8_t kuiHD5		= (2 + kuiLT + (kuiL0 << 1) + kuiL1) >> 2;	// uiHD5
-  const uint8_t kuiHD6		= (1 + kuiL1 + kuiL2) >> 1;				// uiHD6
-  const uint8_t kuiHD7		= (2 + kuiL0 + (kuiL1 << 1) + kuiL2) >> 2;	// uiHD7
-  const uint8_t kuiHD8		= (1 + kuiL2 + kuiL3) >> 1;				// uiHD8
-  const uint8_t kuiHD9		= (2 + kuiL1 + (kuiL2 << 1) + kuiL3) >> 2;	// uiHD9
-  ENFORCE_STACK_ALIGN_1D (uint8_t, uiSrc, 16, 16)	// TobeCont'd about assign opt as follows
+  const uint8_t kuiL0       = pRef[-1];
+  const uint8_t kuiL1       = pRef[kiStride - 1];
+  const uint8_t kuiL2       = pRef[kiStridex2 - 1];
+  const uint8_t kuiL3       = pRef[kiStridex3 - 1];
+  const uint8_t kuiT0       = pRef[-kiStride];
+  const uint8_t kuiT1       = pRef[1 - kiStride];
+  const uint8_t kuiT2       = pRef[2 - kiStride];
+  const uint8_t kuiHD0      = (1 + kuiLT + kuiL0) >> 1;                     // uiHD0
+  const uint8_t kuiHD1      = (2 + kuiL0 + (kuiLT << 1) + kuiT0) >> 2;      // uiHD1
+  const uint8_t kuiHD2      = (2 + kuiLT + (kuiT0 << 1) + kuiT1) >> 2;      // uiHD2
+  const uint8_t kuiHD3      = (2 + kuiT0 + (kuiT1 << 1) + kuiT2) >> 2;      // uiHD3
+  const uint8_t kuiHD4      = (1 + kuiL0 + kuiL1) >> 1;                     // uiHD4
+  const uint8_t kuiHD5      = (2 + kuiLT + (kuiL0 << 1) + kuiL1) >> 2;      // uiHD5
+  const uint8_t kuiHD6      = (1 + kuiL1 + kuiL2) >> 1;                     // uiHD6
+  const uint8_t kuiHD7      = (2 + kuiL0 + (kuiL1 << 1) + kuiL2) >> 2;      // uiHD7
+  const uint8_t kuiHD8      = (1 + kuiL2 + kuiL3) >> 1;                     // uiHD8
+  const uint8_t kuiHD9      = (2 + kuiL1 + (kuiL2 << 1) + kuiL3) >> 2;      // uiHD9
+  ENFORCE_STACK_ALIGN_1D (uint8_t, uiSrc, 16, 16) // TobeCont'd about assign opt as follows
   uiSrc[0] = uiSrc[6] = kuiHD0;
   uiSrc[1] = uiSrc[7] = kuiHD1;
   uiSrc[2] = kuiHD2;
@@ -404,7 +403,7 @@ void WelsI4x4LumaPredHD_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride
 void WelsIChromaPredV_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
   const uint64_t kuiSrc64 = LD64 (&pRef[-kiStride]);
 
-  ST64 (pPred   , kuiSrc64);
+  ST64 (pPred     , kuiSrc64);
   ST64 (pPred + 8 , kuiSrc64);
   ST64 (pPred + 16, kuiSrc64);
   ST64 (pPred + 24, kuiSrc64);
@@ -420,7 +419,7 @@ void WelsIChromaPredH_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) 
   uint8_t i = 7;
 
   do {
-    const uint8_t kuiLeft = pRef[iStridex7 - 1];	// pLeft value
+    const uint8_t kuiLeft = pRef[iStridex7 - 1]; // pLeft value
     uint64_t kuiSrc64 = (uint64_t) (0x0101010101010101ULL * kuiLeft);
     ST64 (pPred + iI8x8Stridex7, kuiSrc64);
 
@@ -463,8 +462,8 @@ void WelsIChromaPredDc_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride)
   const int32_t kuiL6 = kuiL5 + kiStride;
   const int32_t kuiL7 = kuiL6 + kiStride;
   /*caculate the iMean value*/
-  const uint8_t kuiMean1	= (pRef[-kiStride] + pRef[1 - kiStride] + pRef[2 - kiStride] + pRef[3 - kiStride] +
-                             pRef[-1] + pRef[kuiL1] + pRef[kuiL2] + pRef[kuiL3] + 4) >> 3;
+  const uint8_t kuiMean1 = (pRef[-kiStride] + pRef[1 - kiStride] + pRef[2 - kiStride] + pRef[3 - kiStride] +
+                            pRef[-1] + pRef[kuiL1] + pRef[kuiL2] + pRef[kuiL3] + 4) >> 3;
   const uint32_t kuiSum2 = pRef[4 - kiStride] + pRef[5 - kiStride] + pRef[6 - kiStride] + pRef[7 - kiStride];
   const uint32_t kuiSum3 = pRef[kuiL4] + pRef[kuiL5] + pRef[kuiL6] + pRef[kuiL7];
   const uint8_t kuiMean2 = (kuiSum2 + 2) >> 2;
@@ -476,7 +475,7 @@ void WelsIChromaPredDc_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride)
   const uint64_t kuiTopMean64 = LD64 (kuiTopMean);
   const uint64_t kuiBottomMean64 = LD64 (kuiBottomMean);
 
-  ST64 (pPred   , kuiTopMean64);
+  ST64 (pPred     , kuiTopMean64);
   ST64 (pPred + 8 , kuiTopMean64);
   ST64 (pPred + 16, kuiTopMean64);
   ST64 (pPred + 24, kuiTopMean64);
@@ -487,19 +486,19 @@ void WelsIChromaPredDc_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride)
 }
 
 void WelsIChromaPredDcLeft_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
-  const int32_t kuiL1	= kiStride - 1;
-  const int32_t kuiL2	= kuiL1 + kiStride;
-  const int32_t kuiL3	= kuiL2 + kiStride;
-  const int32_t kuiL4	= kuiL3 + kiStride;
-  const int32_t kuiL5	= kuiL4 + kiStride;
-  const int32_t kuiL6	= kuiL5 + kiStride;
-  const int32_t kuiL7	= kuiL6 + kiStride;
+  const int32_t kuiL1   = kiStride - 1;
+  const int32_t kuiL2   = kuiL1 + kiStride;
+  const int32_t kuiL3   = kuiL2 + kiStride;
+  const int32_t kuiL4   = kuiL3 + kiStride;
+  const int32_t kuiL5   = kuiL4 + kiStride;
+  const int32_t kuiL6   = kuiL5 + kiStride;
+  const int32_t kuiL7   = kuiL6 + kiStride;
   /*caculate the iMean value*/
-  const uint8_t kuiTopMean	= (pRef[-1] + pRef[kuiL1] + pRef[kuiL2] + pRef[kuiL3] + 2) >> 2 ;
-  const uint8_t kuiBottomMean	= (pRef[kuiL4] + pRef[kuiL5] + pRef[kuiL6] + pRef[kuiL7] + 2) >> 2;
-  const uint64_t kuiTopMean64	= (uint64_t) (0x0101010101010101ULL * kuiTopMean);
-  const uint64_t kuiBottomMean64	= (uint64_t) (0x0101010101010101ULL * kuiBottomMean);
-  ST64 (pPred   , kuiTopMean64);
+  const uint8_t kuiTopMean          = (pRef[-1] + pRef[kuiL1] + pRef[kuiL2] + pRef[kuiL3] + 2) >> 2 ;
+  const uint8_t kuiBottomMean       = (pRef[kuiL4] + pRef[kuiL5] + pRef[kuiL6] + pRef[kuiL7] + 2) >> 2;
+  const uint64_t kuiTopMean64       = (uint64_t) (0x0101010101010101ULL * kuiTopMean);
+  const uint64_t kuiBottomMean64    = (uint64_t) (0x0101010101010101ULL * kuiBottomMean);
+  ST64 (pPred     , kuiTopMean64);
   ST64 (pPred + 8 , kuiTopMean64);
   ST64 (pPred + 16, kuiTopMean64);
   ST64 (pPred + 24, kuiTopMean64);
@@ -516,7 +515,7 @@ void WelsIChromaPredDcTop_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStri
   const uint8_t kuiMean[8] = {kuiMean1, kuiMean1, kuiMean1, kuiMean1, kuiMean2, kuiMean2, kuiMean2, kuiMean2};
   const uint64_t kuiMean64 = LD64 (kuiMean);
 
-  ST64 (pPred   , kuiMean64);
+  ST64 (pPred     , kuiMean64);
   ST64 (pPred + 8 , kuiMean64);
   ST64 (pPred + 16, kuiMean64);
   ST64 (pPred + 24, kuiMean64);
@@ -528,7 +527,7 @@ void WelsIChromaPredDcTop_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStri
 
 void WelsIChromaPredDcNA_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
   const uint64_t kuiDcValue64 = (uint64_t)0x8080808080808080ULL;
-  ST64 (pPred   , kuiDcValue64);
+  ST64 (pPred     , kuiDcValue64);
   ST64 (pPred + 8 , kuiDcValue64);
   ST64 (pPred + 16, kuiDcValue64);
   ST64 (pPred + 24, kuiDcValue64);
@@ -660,9 +659,9 @@ void WelsInitIntraPredFuncs (SWelsFuncPtrList* pFuncList, const uint32_t kuiCpuF
     pFuncList->pfGetLumaI16x16Pred[I16_PRED_DC] = WelsI16x16LumaPredDc_neon;
     pFuncList->pfGetLumaI16x16Pred[I16_PRED_P] = WelsI16x16LumaPredPlane_neon;
 
-    pFuncList->pfGetChromaPred[C_PRED_DC]	= WelsIChromaPredDc_neon;
-    pFuncList->pfGetChromaPred[C_PRED_V]	= WelsIChromaPredV_neon;
-    pFuncList->pfGetChromaPred[C_PRED_P]	= WelsIChromaPredPlane_neon;
+    pFuncList->pfGetChromaPred[C_PRED_DC]   = WelsIChromaPredDc_neon;
+    pFuncList->pfGetChromaPred[C_PRED_V]    = WelsIChromaPredV_neon;
+    pFuncList->pfGetChromaPred[C_PRED_P]    = WelsIChromaPredPlane_neon;
     pFuncList->pfGetChromaPred[C_PRED_H]    = WelsIChromaPredH_neon;
   }
 #endif
@@ -715,9 +714,9 @@ void WelsInitIntraPredFuncs (SWelsFuncPtrList* pFuncList, const uint32_t kuiCpuF
     pFuncList->pfGetLumaI16x16Pred[I16_PRED_DC] = WelsI16x16LumaPredDc_sse2;
     pFuncList->pfGetLumaI16x16Pred[I16_PRED_P] = WelsI16x16LumaPredPlane_sse2;
 
-    pFuncList->pfGetChromaPred[C_PRED_DC]	= WelsIChromaPredDc_sse2;
-    pFuncList->pfGetChromaPred[C_PRED_V]	= WelsIChromaPredV_sse2;
-    pFuncList->pfGetChromaPred[C_PRED_P]	= WelsIChromaPredPlane_sse2;
+    pFuncList->pfGetChromaPred[C_PRED_DC]   = WelsIChromaPredDc_sse2;
+    pFuncList->pfGetChromaPred[C_PRED_V]    = WelsIChromaPredV_sse2;
+    pFuncList->pfGetChromaPred[C_PRED_P]    = WelsIChromaPredPlane_sse2;
   }
 #endif
 }

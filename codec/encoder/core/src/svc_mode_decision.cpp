@@ -29,13 +29,13 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	svc_mode_decision.c
+ * \file    svc_mode_decision.c
  *
  * \brief Algorithmetic MD for:
  * - multi-spatial Enhancement Layer MD;
  * - Scrolling PSkip Decision for screen content
  *
- * \date	2009.7.29
+ * \date    2009.7.29
  *
 
  **************************************************************************************
@@ -58,11 +58,10 @@ void WelsMdSpatialelInterMbIlfmdNoilp (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, S
   const uint32_t kuiNeighborAvail = pCurMb->uiNeighborAvail;
   const int32_t kiMbWidth = pCurDqLayer->iMbWidth;
   const  SMB* kpTopMb = pCurMb - kiMbWidth;
-  const bool kbMbLeftAvailPskip	= ((kuiNeighborAvail & LEFT_MB_POS) ? IS_SKIP ((pCurMb - 1)->uiMbType) : false);
-  const bool kbMbTopAvailPskip			= ((kuiNeighborAvail & TOP_MB_POS) ? IS_SKIP (kpTopMb->uiMbType) : false);
-  const bool kbMbTopLeftAvailPskip		= ((kuiNeighborAvail & TOPLEFT_MB_POS) ? IS_SKIP ((kpTopMb - 1)->uiMbType) : false);
-  const bool kbMbTopRightAvailPskip	= ((kuiNeighborAvail & TOPRIGHT_MB_POS) ? IS_SKIP ((
-                                         kpTopMb + 1)->uiMbType) : false);
+  const bool kbMbLeftAvailPskip = ((kuiNeighborAvail & LEFT_MB_POS) ? IS_SKIP ((pCurMb - 1)->uiMbType) : false);
+  const bool kbMbTopAvailPskip  = ((kuiNeighborAvail & TOP_MB_POS) ? IS_SKIP (kpTopMb->uiMbType) : false);
+  const bool kbMbTopLeftAvailPskip  = ((kuiNeighborAvail & TOPLEFT_MB_POS) ? IS_SKIP ((kpTopMb - 1)->uiMbType) : false);
+  const bool kbMbTopRightAvailPskip = ((kuiNeighborAvail & TOPRIGHT_MB_POS) ? IS_SKIP ((kpTopMb + 1)->uiMbType) : false);
 
   bool bTrySkip  = kbMbLeftAvailPskip | kbMbTopAvailPskip | kbMbTopLeftAvailPskip | kbMbTopRightAvailPskip;
   bool bKeepSkip = kbMbLeftAvailPskip & kbMbTopAvailPskip & kbMbTopRightAvailPskip;
@@ -106,12 +105,11 @@ void WelsMdSpatialelInterMbIlfmdNoilp (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, S
 
 
 
-void WelsMdInterMbEnhancelayer (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache) {
-  sWelsEncCtx* pEncCtx	= (sWelsEncCtx*)pEnc;
-  SDqLayer* pCurLayer				= pEncCtx->pCurDqLayer;
-  SWelsMD* pWelsMd					= (SWelsMD*)pMd;
-  const SMB* kpInterLayerRefMb		= GetRefMb (pCurLayer, pCurMb);
-  const Mb_Type kuiInterLayerRefMbType	= kpInterLayerRefMb->uiMbType;
+void WelsMdInterMbEnhancelayer (sWelsEncCtx* pEncCtx, SWelsMD* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache) {
+  SDqLayer* pCurLayer                   = pEncCtx->pCurDqLayer;
+  SWelsMD* pWelsMd                      = (SWelsMD*)pMd;
+  const SMB* kpInterLayerRefMb          = GetRefMb (pCurLayer, pCurMb);
+  const Mb_Type kuiInterLayerRefMbType  = kpInterLayerRefMb->uiMbType;
 
   SetMvBaseEnhancelayer (pWelsMd, pCurMb,
                          kpInterLayerRefMb); // initial sMvBase here only when pRef mb type is inter, if not sMvBase will be not used!
@@ -122,7 +120,7 @@ void WelsMdInterMbEnhancelayer (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCur
 
 // do initiation for noILP (needed by ILFMD)
 SMB* GetRefMb (SDqLayer* pCurLayer, SMB* pCurMb) {
-  const SDqLayer*  kpRefLayer		= pCurLayer->pRefLayer;
+  const SDqLayer*  kpRefLayer = pCurLayer->pRefLayer;
   const int32_t  kiRefMbIdx = (pCurMb->iMbY >> 1) * kpRefLayer->iMbWidth + (pCurMb->iMbX >>
                               1); //because current lower layer is half size on both vertical and horizontal
   return (&kpRefLayer->sMbDataP[kiRefMbIdx]);
@@ -135,8 +133,8 @@ void SetMvBaseEnhancelayer (SWelsMD* pMd, SMB* pCurMb, const SMB* kpRefMb) {
     SMVUnitXY sMv;
     int32_t iRefMbPartIdx = ((pCurMb->iMbY & 0x01) << 1) + (pCurMb->iMbX & 0x01); //may be need modified
     int32_t iScan4RefPartIdx = g_kuiMbCountScan4Idx[ (iRefMbPartIdx << 2)];
-    sMv.iMvX = kpRefMb->sMv[iScan4RefPartIdx].iMvX << 1;
-    sMv.iMvY = kpRefMb->sMv[iScan4RefPartIdx].iMvY << 1;
+    sMv.iMvX = kpRefMb->sMv[iScan4RefPartIdx].iMvX * (1 << 1);
+    sMv.iMvY = kpRefMb->sMv[iScan4RefPartIdx].iMvY * (1 << 1);
 
     pMd->sMe.sMe16x16.sMvBase = sMv;
 
@@ -181,12 +179,12 @@ bool CheckChromaCost (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMbCache* pMbCache
 
   uint8_t* pCbEnc = pMbCache->SPicData.pEncMb[1];
   uint8_t* pCrEnc = pMbCache->SPicData.pEncMb[2];
-  uint8_t* pCbRef	 = pMbCache->SPicData.pRefMb[1];
+  uint8_t* pCbRef = pMbCache->SPicData.pRefMb[1];
   uint8_t* pCrRef = pMbCache->SPicData.pRefMb[2];
 
   const int32_t iCbEncStride         = pCurDqLayer->iEncStride[1];
-  const int32_t iCrEncStride          = pCurDqLayer->iEncStride[2];
-  const int32_t iChromaRefStride	= pCurDqLayer->pRefPic->iLineSize[1];
+  const int32_t iCrEncStride         = pCurDqLayer->iEncStride[2];
+  const int32_t iChromaRefStride     = pCurDqLayer->pRefPic->iLineSize[1];
 
   const int32_t iCbSad = GetChromaCost (pSad, pCbEnc, iCbEncStride, pCbRef, iChromaRefStride);
   const int32_t iCrSad = GetChromaCost (pSad, pCrEnc, iCrEncStride, pCrRef, iChromaRefStride);
@@ -215,16 +213,13 @@ bool CheckChromaCost (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMbCache* pMbCache
 }
 
 //01/17/2013. USE the NEW BGD Pskip with COLOR CHECK for screen content and camera because of color artifact seen in test
-bool WelsMdInterJudgeBGDPskip (void* pCtx, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
+bool WelsMdInterJudgeBGDPskip (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
                                bool* bKeepSkip) {
-  sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
-  SWelsMD* pWelsMd = (SWelsMD*)pMd;
-
   SDqLayer* pCurDqLayer = pEncCtx->pCurDqLayer;
 
   const int32_t kiRefMbQp = pCurDqLayer->pRefPic->pRefMbQp[pCurMb->iMbXY];
   const int32_t kiCurMbQp = pCurMb->uiLumaQp;// unsigned -> signed
-  int8_t*	pVaaBgMbFlag = pEncCtx->pVaa->pVaaBackgroundMbFlag + pCurMb->iMbXY;
+  int8_t* pVaaBgMbFlag    = pEncCtx->pVaa->pVaaBackgroundMbFlag + pCurMb->iMbXY;
 
   const int32_t kiMbWidth = pCurDqLayer->iMbWidth;
 
@@ -249,7 +244,7 @@ bool WelsMdInterJudgeBGDPskip (void* pCtx, void* pMd, SSlice* pSlice, SMB* pCurM
     //TODO: consider reusing this result of ChromaCheck when SCDSkip needs this as well
 
     if (CheckChromaCost (pEncCtx, pWelsMd, pMbCache, pCurMb->iMbXY)) {
-      SMVUnitXY	sVaaPredSkipMv = { 0 };
+      SMVUnitXY sVaaPredSkipMv = { 0 };
       PredSkipMv (pMbCache, &sVaaPredSkipMv);
       WelsMdBackgroundMbEnc (pEncCtx, pWelsMd, pCurMb, pMbCache, pSlice, (LD32 (&sVaaPredSkipMv) == 0));
       return true;
@@ -259,7 +254,7 @@ bool WelsMdInterJudgeBGDPskip (void* pCtx, void* pMd, SSlice* pSlice, SMB* pCurM
   return false;
 }
 
-bool WelsMdInterJudgeBGDPskipFalse (void* pCtx, void* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
+bool WelsMdInterJudgeBGDPskipFalse (sWelsEncCtx* pCtx, SWelsMD* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
                                     bool* bKeepSkip) {
   return false;
 }
@@ -325,7 +320,7 @@ inline bool CheckBorder (int32_t iMbX, int32_t iMbY, int32_t iScrollMvX, int32_t
 
 
 bool JudgeStaticSkip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, SWelsMD* pWelsMd) {
-  SDqLayer* pCurDqLayer			= pEncCtx->pCurDqLayer;
+  SDqLayer* pCurDqLayer = pEncCtx->pCurDqLayer;
   const int32_t kiMbX = pCurMb->iMbX;
   const int32_t kiMbY = pCurMb->iMbY;
 
@@ -336,8 +331,8 @@ bool JudgeStaticSkip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, SWe
     SWelsFuncPtrList* pFunc = pEncCtx->pFuncList;
     SPicture* pRefOri = pCurDqLayer->pRefOri[0];
     if (pRefOri != NULL) {
-      iStrideUV	= pCurDqLayer->iEncStride[1];
-      iOffsetUV	= (kiMbX + kiMbY * iStrideUV) << 3;
+      iStrideUV = pCurDqLayer->iEncStride[1];
+      iOffsetUV = (kiMbX + kiMbY * iStrideUV) << 3;
 
       int32_t iSadCostCb = CalUVSadCost (pFunc, pMbCache->SPicData.pEncMb[1], iStrideUV, pRefOri->pData[1] + iOffsetUV,
                                          pRefOri->iLineSize[1]);
@@ -352,12 +347,12 @@ bool JudgeStaticSkip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, SWe
 }
 
 bool JudgeScrollSkip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, SWelsMD* pWelsMd) {
-  SDqLayer* pCurDqLayer			= pEncCtx->pCurDqLayer;
+  SDqLayer* pCurDqLayer = pEncCtx->pCurDqLayer;
   const int32_t kiMbX = pCurMb->iMbX;
   const int32_t kiMbY = pCurMb->iMbY;
   const int32_t kiMbWidth = pCurDqLayer->iMbWidth;
   const int32_t kiMbHeight = pCurDqLayer->iMbHeight;
-  //	const int32_t block_width = mb_width << 1;
+  // const int32_t block_width = mb_width << 1;
   SVAAFrameInfoExt_t* pVaaExt = static_cast<SVAAFrameInfoExt_t*> (pEncCtx->pVaa);
 
   bool bTryScrollSkip = false;
@@ -376,8 +371,8 @@ bool JudgeScrollSkip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, SWe
       if (CheckBorder (kiMbX, kiMbY, iScrollMvX, iScrollMvY, kiMbWidth, kiMbHeight)) {
         bTryScrollSkip =  false;
       } else {
-        iStrideUV	= pCurDqLayer->iEncStride[1];
-        iOffsetUV	= (kiMbX << 3) + (iScrollMvX >> 1) + ((kiMbY << 3) + (iScrollMvY >> 1)) * iStrideUV;
+        iStrideUV = pCurDqLayer->iEncStride[1];
+        iOffsetUV = (kiMbX << 3) + (iScrollMvX >> 1) + ((kiMbY << 3) + (iScrollMvY >> 1)) * iStrideUV;
 
         int32_t iSadCostCb = CalUVSadCost (pFunc, pMbCache->SPicData.pEncMb[1], iStrideUV, pRefOri->pData[1] + iOffsetUV,
                                            pRefOri->iLineSize[1]);
@@ -395,32 +390,32 @@ bool JudgeScrollSkip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, SWe
 void SvcMdSCDMbEnc (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCache* pMbCache, SSlice* pSlice,
                     bool bQpSimilarFlag,
                     bool bMbSkipFlag, SMVUnitXY sCurMbMv[], ESkipModes eSkipMode) {
-  SDqLayer* pCurDqLayer		= pEncCtx->pCurDqLayer;
-  SWelsFuncPtrList* pFunc	= pEncCtx->pFuncList;
-  SMVUnitXY sMvp					= { 0};
+  SDqLayer* pCurDqLayer         = pEncCtx->pCurDqLayer;
+  SWelsFuncPtrList* pFunc       = pEncCtx->pFuncList;
+  SMVUnitXY sMvp = { 0};
   ST16 (&sMvp.iMvX, sCurMbMv[eSkipMode].iMvX);
   ST16 (&sMvp.iMvY, sCurMbMv[eSkipMode].iMvY);
-  uint8_t* pRefLuma			= pMbCache->SPicData.pRefMb[0];
-  uint8_t* pRefCb				= pMbCache->SPicData.pRefMb[1];
-  uint8_t* pRefCr				= pMbCache->SPicData.pRefMb[2];
-  int32_t iLineSizeY		= pCurDqLayer->pRefPic->iLineSize[0];
-  int32_t iLineSizeUV		= pCurDqLayer->pRefPic->iLineSize[1];
-  uint8_t* pDstLuma			= pMbCache->pSkipMb;
-  uint8_t* pDstCb				= pMbCache->pSkipMb + 256;
-  uint8_t* pDstCr				= pMbCache->pSkipMb + 256 + 64;
+  uint8_t* pRefLuma             = pMbCache->SPicData.pRefMb[0];
+  uint8_t* pRefCb               = pMbCache->SPicData.pRefMb[1];
+  uint8_t* pRefCr               = pMbCache->SPicData.pRefMb[2];
+  int32_t iLineSizeY            = pCurDqLayer->pRefPic->iLineSize[0];
+  int32_t iLineSizeUV           = pCurDqLayer->pRefPic->iLineSize[1];
+  uint8_t* pDstLuma             = pMbCache->pSkipMb;
+  uint8_t* pDstCb               = pMbCache->pSkipMb + 256;
+  uint8_t* pDstCr               = pMbCache->pSkipMb + 256 + 64;
 
-  const int32_t iOffsetY	= (sCurMbMv[eSkipMode].iMvX >> 2) + (sCurMbMv[eSkipMode].iMvY >> 2) * iLineSizeY;
+  const int32_t iOffsetY  = (sCurMbMv[eSkipMode].iMvX >> 2) + (sCurMbMv[eSkipMode].iMvY >> 2) * iLineSizeY;
   const int32_t iOffsetUV = (sCurMbMv[eSkipMode].iMvX >> 3) + (sCurMbMv[eSkipMode].iMvY >> 3) * iLineSizeUV;
 
   if (!bQpSimilarFlag || !bMbSkipFlag) {
     pDstLuma = pMbCache->pMemPredLuma;
-    pDstCb	= pMbCache->pMemPredChroma;
-    pDstCr	= pMbCache->pMemPredChroma + 64;
+    pDstCb   = pMbCache->pMemPredChroma;
+    pDstCr   = pMbCache->pMemPredChroma + 64;
   }
   //MC
-  pFunc->sMcFuncs.pfLumaQuarpelMc[0] (pRefLuma + iOffsetY, iLineSizeY, pDstLuma, 16, 16);
-  pFunc->sMcFuncs.pfChromaMc (pRefCb + iOffsetUV, iLineSizeUV, pDstCb, 8, sMvp, 8, 8);
-  pFunc->sMcFuncs.pfChromaMc (pRefCr + iOffsetUV, iLineSizeUV, pDstCr, 8, sMvp, 8, 8);
+  pFunc->sMcFuncs.pMcLumaFunc (pRefLuma + iOffsetY, iLineSizeY, pDstLuma, 16, 0, 0, 16, 16);
+  pFunc->sMcFuncs.pMcChromaFunc (pRefCb + iOffsetUV, iLineSizeUV, pDstCb, 8, sMvp.iMvX, sMvp.iMvY, 8, 8);
+  pFunc->sMcFuncs.pMcChromaFunc (pRefCr + iOffsetUV, iLineSizeUV, pDstCr, 8, sMvp.iMvX, sMvp.iMvY, 8, 8);
 
   pCurMb->uiCbp = 0;
   pWelsMd->iCostLuma = 0;
@@ -470,8 +465,8 @@ void SvcMdSCDMbEnc (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCach
 
 bool MdInterSCDPskipProcess (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
                              ESkipModes eSkipMode) {
-  SVAAFrameInfoExt_t* pVaaExt		= static_cast<SVAAFrameInfoExt_t*> (pEncCtx->pVaa);
-  SDqLayer* pCurDqLayer			= pEncCtx->pCurDqLayer;
+  SVAAFrameInfoExt_t* pVaaExt   = static_cast<SVAAFrameInfoExt_t*> (pEncCtx->pVaa);
+  SDqLayer* pCurDqLayer         = pEncCtx->pCurDqLayer;
 
   const int32_t kiRefMbQp = pCurDqLayer->pRefPic->pRefMbQp[pCurMb->iMbXY];
   const int32_t kiCurMbQp = pCurMb->uiLumaQp;// unsigned -> signed
@@ -498,10 +493,8 @@ bool MdInterSCDPskipProcess (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* pSl
   return false;
 }
 
-void SetBlockStaticIdcToMd (void* pVaa, void* pMd, SMB* pCurMb, void* pDqLay) {
+void SetBlockStaticIdcToMd (void* pVaa, SWelsMD* pWelsMd, SMB* pCurMb, SDqLayer* pDqLayer) {
   SVAAFrameInfoExt_t* pVaaExt = static_cast<SVAAFrameInfoExt_t*> (pVaa);
-  SWelsMD* pWelsMd = static_cast<SWelsMD*> (pMd);
-  SDqLayer* pDqLayer = static_cast<SDqLayer*> (pDqLay);
 
   const int32_t kiMbX = pCurMb->iMbX;
   const int32_t kiMbY = pCurMb->iMbY;
@@ -522,10 +515,8 @@ void SetBlockStaticIdcToMd (void* pVaa, void* pMd, SMB* pCurMb, void* pDqLay) {
 ///////////////////////
 // Scene Change Detection (SCD) PSkip Decision for screen content
 ////////////////////////
-bool WelsMdInterJudgeSCDPskip (void* pCtx, void* pMd, SSlice* slice, SMB* pCurMb, SMbCache* pMbCache) {
-  sWelsEncCtx* pEncCtx	= (sWelsEncCtx*)pCtx;
-  SWelsMD* pWelsMd					= (SWelsMD*)pMd;
-  SDqLayer* pCurDqLayer			= pEncCtx->pCurDqLayer;
+bool WelsMdInterJudgeSCDPskip (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* slice, SMB* pCurMb, SMbCache* pMbCache) {
+  SDqLayer* pCurDqLayer = pEncCtx->pCurDqLayer;
 
   SetBlockStaticIdcToMd (pEncCtx->pVaa, pWelsMd, pCurMb, pCurDqLayer);
 
@@ -541,7 +532,8 @@ bool WelsMdInterJudgeSCDPskip (void* pCtx, void* pMd, SSlice* slice, SMB* pCurMb
 
   return false;
 }
-bool WelsMdInterJudgeSCDPskipFalse (void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb, SMbCache* pMbCache) {
+bool WelsMdInterJudgeSCDPskipFalse (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* slice, SMB* pCurMb,
+                                    SMbCache* pMbCache) {
   return false;
 }
 
@@ -615,9 +607,8 @@ bool TryModeMerge (SMbCache* pMbCache, SWelsMD* pWelsMd, SMB* pCurMb) {
 }
 
 
-void WelsMdInterFinePartitionVaaOnScreen (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, int32_t iBestCost) {
-  sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pEnc;
-  SWelsMD* pWelsMd = (SWelsMD*)pMd;
+void WelsMdInterFinePartitionVaaOnScreen (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* pSlice, SMB* pCurMb,
+    int32_t iBestCost) {
   SMbCache* pMbCache = &pSlice->sMbCacheInfo;
   SDqLayer* pCurDqLayer = pEncCtx->pCurDqLayer;
   int32_t iCostP8x8;
@@ -631,8 +622,37 @@ void WelsMdInterFinePartitionVaaOnScreen (void* pEnc, void* pMd, SSlice* pSlice,
   if (iCostP8x8 < iBestCost) {
     iBestCost = iCostP8x8;
     pCurMb->uiMbType = MB_TYPE_8x8;
-
-    TryModeMerge (pMbCache, pWelsMd, pCurMb);
+    memset (pCurMb->uiSubMbType, SUB_MB_TYPE_8x8, 4);
+#if 0 //Disable for sub8x8 modes for now
+    iBestCost = 0;
+    //reset neighbor info for sub8x8
+    pMbCache->sMvComponents.iRefIndexCache [9] = pMbCache->sMvComponents.iRefIndexCache [21] = REF_NOT_AVAIL;
+    for (int32_t i8x8Idx = 0; i8x8Idx < 4; ++i8x8Idx) {
+      int32_t iCurCostSub8x8, iBestCostSub8x8 = pWelsMd->sMe.sMe8x8[i8x8Idx].uiSatdCost;
+      //4x4
+      iCurCostSub8x8 = WelsMdP4x4 (pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice, i8x8Idx);
+      if (iCurCostSub8x8 < iBestCostSub8x8) {
+        pCurMb->uiSubMbType[i8x8Idx] = SUB_MB_TYPE_4x4;
+        iBestCostSub8x8 = iCurCostSub8x8;
+      }
+      //8x4
+      iCurCostSub8x8 = WelsMdP8x4 (pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice, i8x8Idx);
+      if (iCurCostSub8x8 < iBestCostSub8x8) {
+        pCurMb->uiSubMbType[i8x8Idx] = SUB_MB_TYPE_8x4;
+        iBestCostSub8x8 = iCurCostSub8x8;
+      }
+      //4x8
+      iCurCostSub8x8 = WelsMdP4x8 (pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice, i8x8Idx);
+      if (iCurCostSub8x8 < iBestCostSub8x8) {
+        pCurMb->uiSubMbType[i8x8Idx] = SUB_MB_TYPE_4x8;
+        iBestCostSub8x8 = iCurCostSub8x8;
+      }
+      iBestCost += iBestCostSub8x8;
+    }
+    if ((pCurMb->uiSubMbType[0] == SUB_MB_TYPE_8x8) && (pCurMb->uiSubMbType[1] == SUB_MB_TYPE_8x8)
+        && (pCurMb->uiSubMbType[2] == SUB_MB_TYPE_8x8) && (pCurMb->uiSubMbType[3] == SUB_MB_TYPE_8x8)) //all 8x8
+#endif
+      TryModeMerge (pMbCache, pWelsMd, pCurMb);
   }
   pWelsMd->iCostLuma = iBestCost;
 }
@@ -644,9 +664,8 @@ void WelsMdInterFinePartitionVaaOnScreen (void* pEnc, void* pMd, SSlice* pSlice,
 //
 // SetScrollingMvToMd
 //
-void SetScrollingMvToMd (void* pVaa, void* pMd) {
-  SVAAFrameInfoExt* pVaaExt		= static_cast<SVAAFrameInfoExt*> (pVaa);
-  SWelsMD* pWelsMd             = static_cast<SWelsMD*> (pMd);
+void SetScrollingMvToMd (SVAAFrameInfo* pVaa, SWelsMD* pWelsMd) {
+  SVAAFrameInfoExt* pVaaExt = static_cast<SVAAFrameInfoExt*> (pVaa);
 
   SMVUnitXY          sTempMv;
   sTempMv.iMvX = pVaaExt->sScrollDetectInfo.iScrollMvX;
@@ -659,7 +678,7 @@ void SetScrollingMvToMd (void* pVaa, void* pMd) {
           (pWelsMd->sMe.sMe8x8[3]).sDirectionalMv = sTempMv;
 }
 
-void SetScrollingMvToMdNull (void* pVaa, void* pWelsMd) {
+void SetScrollingMvToMdNull (SVAAFrameInfo* pVaa, SWelsMD* pWelsMd) {
 }
 
 } // namespace WelsEnc

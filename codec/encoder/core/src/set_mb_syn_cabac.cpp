@@ -29,23 +29,37 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	set_mb_syn_cabac.cpp
+ * \file    set_mb_syn_cabac.cpp
  *
- * \brief	cabac coding engine
+ * \brief   cabac coding engine
  *
- * \date	10/11/2014 Created
+ * \date    10/11/2014 Created
  *
  *************************************************************************************
  */
 #include <string.h>
 #include "typedefs.h"
 #include "macros.h"
-#include "wels_common_defs.h"
 #include "set_mb_syn_cabac.h"
 #include "encoder.h"
+#include "golomb_common.h"
+
+namespace {
+
+const int8_t g_kiClz5Table[32] = {
+  6, 5, 4, 4, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+};
+
+void PropagateCarry (uint8_t* pBufCur, uint8_t* pBufStart) {
+  for (; pBufCur > pBufStart; --pBufCur)
+    if (++*(pBufCur - 1))
+      break;
+}
+
+} // anon ns.
 
 namespace WelsEnc {
-
 
 void WelsCabacInit (void* pCtx) {
   sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
@@ -64,8 +78,7 @@ void WelsCabacInit (void* pCtx) {
           uiStateIdx = iPreCtxState - 64;
           uiValMps = 1;
         }
-        pEncCtx->sWelsCabacContexts[iModel][iQp][iIdx].m_uiState = uiStateIdx;
-        pEncCtx->sWelsCabacContexts[iModel][iQp][iIdx].m_uiValMps = uiValMps;
+        pEncCtx->sWelsCabacContexts[iModel][iQp][iIdx].Set (uiStateIdx, uiValMps);
       }
   }
 }
@@ -80,121 +93,76 @@ void WelsCabacContextInit (void* pCtx, SCabacCtx* pCbCtx, int32_t iModel) {
 
 void  WelsCabacEncodeInit (SCabacCtx* pCbCtx, uint8_t* pBuf,  uint8_t* pEnd) {
   pCbCtx->m_uiLow     = 0;
+  pCbCtx->m_iLowBitCnt = 9;
+  pCbCtx->m_iRenormCnt = 0;
   pCbCtx->m_uiRange   = 510;
-  pCbCtx->m_iBitsOutstanding = 0;
-  pCbCtx->m_uData = 0;
-  pCbCtx->m_uiBitsUsed = 0;
-  pCbCtx->m_iFirstFlag = 1;
   pCbCtx->m_pBufStart = pBuf;
   pCbCtx->m_pBufEnd = pEnd;
   pCbCtx->m_pBufCur = pBuf;
-  pCbCtx->m_uiBinCountsInNalUnits = 0;
 }
 
-void WelsCabacPutBit (SCabacCtx* pCbCtx, uint32_t iValue) {
-  if (pCbCtx->m_iFirstFlag != 0) {
-    pCbCtx->m_iFirstFlag = 0;
-  } else {
-    pCbCtx->m_uData = (pCbCtx->m_uData << 1) | iValue;
-    pCbCtx->m_uiBitsUsed++;
-  }
-  if (pCbCtx->m_iBitsOutstanding == 0) {
-    while (pCbCtx->m_uiBitsUsed >= 8) {
-      pCbCtx->m_uiBitsUsed -= 8;
-      uint32_t uiByte = pCbCtx->m_uData >> (pCbCtx->m_uiBitsUsed);
-      if (pCbCtx->m_uiBitsUsed == 0)
-        pCbCtx->m_uData = 0;
-      else
-        pCbCtx->m_uData &= (uint32_t) ((0xFFFFFFFF) >> (32 - pCbCtx->m_uiBitsUsed));
-      *pCbCtx->m_pBufCur ++ = uiByte;
-    }
-  } else {
+void WelsCabacEncodeUpdateLowNontrivial_ (SCabacCtx* pCbCtx) {
+  int32_t iLowBitCnt = pCbCtx->m_iLowBitCnt;
+  int32_t iRenormCnt = pCbCtx->m_iRenormCnt;
+  cabac_low_t uiLow = pCbCtx->m_uiLow;
 
-    while (pCbCtx->m_iBitsOutstanding > 0) {
-      pCbCtx->m_uData = (pCbCtx->m_uData << 1) | (1 - iValue);
-      pCbCtx->m_iBitsOutstanding--;
-      pCbCtx->m_uiBitsUsed++;
-      while (pCbCtx->m_uiBitsUsed >= 8) {
-        pCbCtx->m_uiBitsUsed -= 8;
-        uint32_t uiByte = pCbCtx->m_uData >> (pCbCtx->m_uiBitsUsed);
-        if (pCbCtx->m_uiBitsUsed == 0)
-          pCbCtx->m_uData = 0;
-        else
-          pCbCtx->m_uData &= (uint32_t) ((0xFFFFFFFF) >> (32 - pCbCtx->m_uiBitsUsed));
-        *pCbCtx->m_pBufCur ++ = uiByte;
-      }
-    }
-  }
-}
-void WelsCabacEncodeRenorm (SCabacCtx* pCbCtx) {
-  while (pCbCtx->m_uiRange < 256) {
-    if (pCbCtx->m_uiLow < 256) {
-      WelsCabacPutBit (pCbCtx, 0);
-    } else {
-      if (pCbCtx->m_uiLow >= 512) {
-        pCbCtx->m_uiLow -= 512;
-        WelsCabacPutBit (pCbCtx, 1);
-      } else {
-        pCbCtx->m_uiLow -= 256;
-        pCbCtx->m_iBitsOutstanding++;
-      }
-    }
-    pCbCtx->m_uiRange <<= 1;
-    pCbCtx->m_uiLow <<= 1;
-  }
-}
-void WelsCabacEncodeDecision (SCabacCtx* pCbCtx, int32_t iCtx, uint32_t uiBin) {
-  uint8_t uiState = pCbCtx->m_sStateCtx[iCtx].m_uiState;
-  uint8_t uiValMps = pCbCtx->m_sStateCtx[iCtx].m_uiValMps;
-  uint32_t uiRangeLps = g_kuiCabacRangeLps[uiState][ (pCbCtx->m_uiRange >> 6) & 3];
+  do {
+    uint8_t* pBufCur = pCbCtx->m_pBufCur;
+    const int32_t kiInc = CABAC_LOW_WIDTH - 1 - iLowBitCnt;
 
-  pCbCtx->m_uiRange -= uiRangeLps;
-  if (uiBin != uiValMps) { //LPS
-    pCbCtx->m_uiLow += pCbCtx->m_uiRange;
-    pCbCtx->m_uiRange = uiRangeLps;
-    if (uiState == 0)
-      uiValMps = 1 - uiValMps;
-    pCbCtx->m_sStateCtx[iCtx].m_uiState = g_kuiStateTransTable[uiState][0];
-    pCbCtx->m_sStateCtx[iCtx].m_uiValMps = uiValMps;
-  } else {
-    pCbCtx->m_sStateCtx[iCtx].m_uiState = g_kuiStateTransTable[uiState][1];
-  }
-  WelsCabacEncodeRenorm (pCbCtx);
-  pCbCtx->m_uiBinCountsInNalUnits++;
+    uiLow <<= kiInc;
+    if (uiLow & cabac_low_t (1) << (CABAC_LOW_WIDTH - 1))
+      PropagateCarry (pBufCur, pCbCtx->m_pBufStart);
+
+    if (CABAC_LOW_WIDTH > 32) {
+      WRITE_BE_32 (pBufCur, (uint32_t) (uiLow >> 31));
+      pBufCur += 4;
+    }
+    *pBufCur++ = (uint8_t) (uiLow >> 23);
+    *pBufCur++ = (uint8_t) (uiLow >> 15);
+    iRenormCnt -= kiInc;
+    iLowBitCnt = 15;
+    uiLow &= (1u << iLowBitCnt) - 1;
+    pCbCtx->m_pBufCur = pBufCur;
+  } while (iLowBitCnt + iRenormCnt > CABAC_LOW_WIDTH - 1);
+
+  pCbCtx->m_iLowBitCnt = iLowBitCnt + iRenormCnt;
+  pCbCtx->m_uiLow = uiLow << iRenormCnt;
 }
 
-void WelsCabacEncodeBypassOne (SCabacCtx* pCbCtx, uint32_t uiBin) {
-  pCbCtx->m_uiLow <<= 1;
-  if (uiBin) {
-    pCbCtx->m_uiLow += pCbCtx->m_uiRange;
-  }
-  if (pCbCtx->m_uiLow >= 1024) {
-    WelsCabacPutBit (pCbCtx, 1);
-    pCbCtx->m_uiLow -= 1024;
-  } else {
-    if (pCbCtx->m_uiLow < 512)
-      WelsCabacPutBit (pCbCtx, 0);
-    else {
-      pCbCtx->m_uiLow -= 512;
-      pCbCtx->m_iBitsOutstanding++;
-    }
-  }
-  pCbCtx->m_uiBinCountsInNalUnits++;
+void WelsCabacEncodeDecisionLps_ (SCabacCtx* pCbCtx, int32_t iCtx) {
+  const int32_t kiState = pCbCtx->m_sStateCtx[iCtx].State();
+  uint32_t uiRange = pCbCtx->m_uiRange;
+  uint32_t uiRangeLps = g_kuiCabacRangeLps[kiState][(uiRange & 0xff) >> 6];
+  uiRange -= uiRangeLps;
+  pCbCtx->m_sStateCtx[iCtx].Set (g_kuiStateTransTable[kiState][0],
+                                 pCbCtx->m_sStateCtx[iCtx].Mps() ^ (kiState == 0));
+
+  WelsCabacEncodeUpdateLow_ (pCbCtx);
+  pCbCtx->m_uiLow += uiRange;
+
+  const int32_t kiRenormAmount = g_kiClz5Table[uiRangeLps >> 3];
+  pCbCtx->m_uiRange = uiRangeLps << kiRenormAmount;
+  pCbCtx->m_iRenormCnt = kiRenormAmount;
 }
+
 void WelsCabacEncodeTerminate (SCabacCtx* pCbCtx, uint32_t uiBin) {
   pCbCtx->m_uiRange -= 2;
   if (uiBin) {
+    WelsCabacEncodeUpdateLow_ (pCbCtx);
     pCbCtx->m_uiLow  += pCbCtx->m_uiRange;
-    pCbCtx->m_uiRange = 2;
-    WelsCabacEncodeRenorm (pCbCtx);
-    WelsCabacPutBit (pCbCtx, ((pCbCtx->m_uiLow >> 9) & 1));
-    int32_t iLastTwoBits = (((pCbCtx->m_uiLow >> 7) & 3) | 1);
-    pCbCtx->m_uData = (pCbCtx->m_uData << 2) | iLastTwoBits;
-    pCbCtx->m_uiBitsUsed += 2;
+
+    const int32_t kiRenormAmount = 7;
+    pCbCtx->m_uiRange = 2 << kiRenormAmount;
+    pCbCtx->m_iRenormCnt = kiRenormAmount;
+
+    WelsCabacEncodeUpdateLow_ (pCbCtx);
+    pCbCtx->m_uiLow |= 0x80;
   } else {
-    WelsCabacEncodeRenorm (pCbCtx);
+    const int32_t kiRenormAmount = pCbCtx->m_uiRange >> 8 ^ 1;
+    pCbCtx->m_uiRange = pCbCtx->m_uiRange << kiRenormAmount;
+    pCbCtx->m_iRenormCnt += kiRenormAmount;
   }
-  pCbCtx->m_uiBinCountsInNalUnits++;
 }
 void WelsCabacEncodeUeBypass (SCabacCtx* pCbCtx, int32_t iExpBits, uint32_t uiVal) {
   int32_t iSufS = uiVal;
@@ -216,22 +184,18 @@ void WelsCabacEncodeUeBypass (SCabacCtx* pCbCtx, int32_t iExpBits, uint32_t uiVa
 
 void WelsCabacEncodeFlush (SCabacCtx* pCbCtx) {
   WelsCabacEncodeTerminate (pCbCtx, 1);
-  while (pCbCtx->m_uiBitsUsed > 0) {
-    if (pCbCtx->m_uiBitsUsed > 8) {
-      pCbCtx->m_uiBitsUsed -= 8;
-      uint32_t uiByte = pCbCtx->m_uData >> (pCbCtx->m_uiBitsUsed);
-      pCbCtx->m_uData &= (uint32_t) ((0xFFFFFFFF) >> (32 - pCbCtx->m_uiBitsUsed));
-      *pCbCtx->m_pBufCur ++ = uiByte;
-    } else {
-      if (pCbCtx->m_uiBitsUsed == 8) {
-        *pCbCtx->m_pBufCur ++ = pCbCtx->m_uData & 0xff;
-      } else {
-        *pCbCtx->m_pBufCur ++ = (pCbCtx->m_uData << (8 - pCbCtx->m_uiBitsUsed));
-      }
-      pCbCtx->m_uiBitsUsed = 0;
-    }
-  }
 
+  cabac_low_t uiLow = pCbCtx->m_uiLow;
+  int32_t iLowBitCnt = pCbCtx->m_iLowBitCnt;
+  uint8_t* pBufCur = pCbCtx->m_pBufCur;
+
+  uiLow <<= CABAC_LOW_WIDTH - 1 - iLowBitCnt;
+  if (uiLow & cabac_low_t (1) << (CABAC_LOW_WIDTH - 1))
+    PropagateCarry (pBufCur, pCbCtx->m_pBufStart);
+  for (; (iLowBitCnt -= 8) >= 0; uiLow <<= 8)
+    *pBufCur++ = (uint8_t) (uiLow >> (CABAC_LOW_WIDTH - 9));
+
+  pCbCtx->m_pBufCur = pBufCur;
 }
 
 uint8_t* WelsCabacEncodeGetPtr (SCabacCtx* pCbCtx) {

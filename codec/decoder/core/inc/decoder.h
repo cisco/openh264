@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	decoder.h
+ * \file    decoder.h
  *
- * \brief	Interfaces introduced in decoder system architecture
+ * \brief   Interfaces introduced in decoder system architecture
  *
- * \date	03/10/2009 Created
+ * \date    03/10/2009 Created
  *
  *************************************************************************************
  */
@@ -50,53 +50,58 @@ extern "C" {
 #endif//__cplusplus
 
 /*!
- * \brief	configure decoder parameters
+ * \brief   configure decoder parameters
  */
 int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpParam);
 
 /*!
- *************************************************************************************
- * \brief	Initialize Wels decoder parameters and memory
- *
- * \param 	pCtx	        input context to be initialized at first stage
- * \param   pTraceHandle    handle for trace
- * \param   pLo             log info pointer
- *
- * \return	0 - successed
- * \return	1 - failed
- *
- * \note	N/A
- *************************************************************************************
+ * \brief   fill in default values of decoder context
  */
-int32_t WelsInitDecoder (PWelsDecoderContext pCtx, const bool bParseOnly, SLogContext* pLogCtx);
+void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx);
 
 /*!
  *************************************************************************************
- * \brief	Uninitialize Wels decoder parameters and memory
+ * \brief   Initialize Wels decoder parameters and memory
  *
- * \param 	pCtx	input context to be uninitialized at release stage
+ * \param   pCtx            input context to be initialized at first stage
+ * \param   pTraceHandle    handle for trace
+ * \param   pLo             log info pointer
  *
- * \return	NONE
+ * \return  0 - successed
+ * \return  1 - failed
  *
- * \note	N/A
+ * \note    N/A
+ *************************************************************************************
+ */
+int32_t WelsInitDecoder (PWelsDecoderContext pCtx, SLogContext* pLogCtx);
+
+/*!
+ *************************************************************************************
+ * \brief   Uninitialize Wels decoder parameters and memory
+ *
+ * \param   pCtx    input context to be uninitialized at release stage
+ *
+ * \return  NONE
+ *
+ * \note    N/A
  *************************************************************************************
  */
 void WelsEndDecoder (PWelsDecoderContext pCtx);
 
 /*!
  *************************************************************************************
- * \brief	First entrance to decoding core interface.
+ * \brief   First entrance to decoding core interface.
  *
- * \param 	pCtx	        decoder context
- * \param	pBufBs	        bit streaming buffer
- * \param	kBsLen	        size in bytes length of bit streaming buffer input
- * \param	ppDst	        picture payload data to be output
- * \param	pDstBufInfo	    buf information of ouput data
+ * \param   pCtx            decoder context
+ * \param   pBufBs          bit streaming buffer
+ * \param   kBsLen          size in bytes length of bit streaming buffer input
+ * \param   ppDst           picture payload data to be output
+ * \param   pDstBufInfo     buf information of ouput data
  *
- * \return	0 - successed
- * \return	1 - failed
+ * \return  0 - successed
+ * \return  1 - failed
  *
- * \note	N/A
+ * \note    N/A
  *************************************************************************************
  */
 
@@ -104,37 +109,54 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
                       uint8_t** ppDst, SBufferInfo* pDstBufInfo, SParserBsInfo* pDstBsInfo);
 
 /*
- *	request memory blocks for decoder avc part
+ *  request memory blocks for decoder avc part
  */
-int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const int32_t kiMbHeight);
+int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const int32_t kiMbHeight, bool& bReallocFlag);
 
 
 /*
- *	free memory blocks in avc
+ *  free memory dynamically allocated during decoder
  */
-void WelsFreeMem (PWelsDecoderContext pCtx);
-
-/*
- * set colorspace format in decoder
- */
-int32_t DecoderSetCsp (PWelsDecoderContext pCtx, const int32_t kiColorFormat);
+void WelsFreeDynamicMemory (PWelsDecoderContext pCtx);
 
 /*!
- * \brief	make sure synchonozization picture resolution (get from slice header) among different parts (i.e, memory related and so on)
- *			over decoder internal
+ * \brief   make sure synchonozization picture resolution (get from slice header) among different parts (i.e, memory related and so on)
+ *          over decoder internal
  * ( MB coordinate and parts of data within decoder context structure )
- * \param	pCtx		Wels decoder context
- * \param	iMbWidth	MB width
- * \pram	iMbHeight	MB height
- * \return	0 - successful; none 0 - something wrong
+ * \param   pCtx        Wels decoder context
+ * \param   iMbWidth    MB width
+ * \pram    iMbHeight   MB height
+ * \return  0 - successful; none 0 - something wrong
  */
 int32_t SyncPictureResolutionExt (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const int32_t kiMbHeight);
 
-void AssignFuncPointerForRec (PWelsDecoderContext pCtx);
+/*!
+ * \brief   init decoder predictive function pointers including ASM functions during MB reconstruction
+ * \param   pCtx        Wels decoder context
+ * \param   uiCpuFlag   cpu assembly indication
+ */
+void InitPredFunc (PWelsDecoderContext pCtx, uint32_t uiCpuFlag);
+
+/*!
+ * \brief   init decoder internal function pointers including ASM functions
+ * \param   pCtx        Wels decoder context
+ * \param   uiCpuFlag   cpu assembly indication
+ */
+void InitDecFuncs (PWelsDecoderContext pCtx, uint32_t uiCpuFlag);
 
 void GetVclNalTemporalId (PWelsDecoderContext pCtx); //get the info that whether or not have VCL NAL in current AU,
 //and if YES, get the temporal ID
 
+//reset decoder number related statistics info
+void ResetDecStatNums (SDecoderStatistics* pDecStat);
+//update information when freezing occurs, including IDR/non-IDR number
+void UpdateDecStatFreezingInfo (const bool kbIdrFlag, SDecoderStatistics* pDecStat);
+//update information when no freezing occurs, including QP, correct IDR number, ECed IDR number
+void UpdateDecStatNoFreezingInfo (PWelsDecoderContext pCtx);
+//update decoder statistics information
+void UpdateDecStat (PWelsDecoderContext pCtx, const bool kbOutput);
+//Destroy picutre buffer
+void DestroyPicBuff (PPicBuff* ppPicBuf, CMemoryAlign* pMa);
 #ifdef __cplusplus
 }
 #endif//__cplusplus

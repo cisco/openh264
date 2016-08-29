@@ -28,9 +28,9 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
-* \file	        :  ComplexityAnalysis.h
+* \file         :  ComplexityAnalysis.h
 *
-* \brief	    :  complexity analysis class of wels video processor class
+* \brief        :  complexity analysis class of wels video processor class
 *
 * \date         :  2011/03/28
 *

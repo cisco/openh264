@@ -44,6 +44,7 @@ class welsCodecTrace {
   welsCodecTrace();
   ~welsCodecTrace();
 
+  void SetCodecInstance (void* pCodecInstance);
   void SetTraceLevel (const int32_t kiLevel);
   void SetTraceCallback (WelsTraceCallback func);
   void SetTraceCallbackContext (void* pCtx);
@@ -52,7 +53,7 @@ class welsCodecTrace {
   static void StaticCodecTrace (void* pCtx, const int32_t kiLevel, const char* kpStrFormat, va_list vl);
   void CodecTrace (const int32_t kiLevel, const char* kpStrFormat, va_list vl);
 
-  int32_t	m_iTraceLevel;
+  int32_t       m_iTraceLevel;
   WelsTraceCallback m_fpTrace;
   void*         m_pTraceCtx;
  public:

@@ -1,6 +1,9 @@
 ARCH = arm
 include $(SRC_PATH)build/arch.mk
 SHAREDLIBSUFFIX = so
+# Android APK/JARs expect libraries to be unversioned
+SHAREDLIBSUFFIXVER=$(SHAREDLIBSUFFIX)
+SHLDFLAGS =
 NDKLEVEL = 12
 ifeq ($(ARCH), arm)
   ifneq ($(APP_ABI), armeabi)
@@ -8,9 +11,6 @@ ifeq ($(ARCH), arm)
     CFLAGS += -mfpu=vfpv3-d16
     LDFLAGS += -march=armv7-a -Wl,--fix-cortex-a8
     APP_ABI = armeabi-v7a
-  endif
-  ifeq (Yes, $(USE_ASM))
-    ASMFLAGS += -march=armv7-a -mfpu=neon
   endif
 else ifeq ($(ARCH), arm64)
   APP_ABI = arm64-v8a
@@ -64,7 +64,7 @@ MODULE_INCLUDES = $(STL_INCLUDES)
 MODULE_LDFLAGS = $(STL_LIB)
 
 ifeq (./,$(SRC_PATH))
-binaries : decdemo encdemo
+binaries: decdemo encdemo
 
 decdemo: libraries
 	cd ./codec/build/android/dec && $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI) && android update project -t $(TARGET) -p . && ant debug
@@ -79,8 +79,6 @@ clean_Android_dec:
 clean_Android_enc:
 	-cd ./codec/build/android/enc && $(NDKROOT)/ndk-build APP_ABI=$(APP_ABI) clean && ant clean
 else
-all:
-	@:
 clean_Android:
 	@:
 endif

@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "memory_align.h"
 
-using namespace WelsEnc;
+using namespace WelsCommon;
 
 //Tests of WelsGetCacheLineSize Begin
 TEST (MemoryAlignTest, GetCacheLineSize_LoopWithin16K) {
@@ -30,16 +30,16 @@ TEST (MemoryAlignTest, WelsMallocAndFreeOnceFunctionVerify) {
   const uint32_t kuiTargetAlignSize[4] = {32, 16, 64, 8};
   const uint32_t kuiZero = 0;
   for (int i = 0; i < 4; i++) {
-    const uint32_t kuiTestAlignSize	= kuiTargetAlignSize[i];
-    const uint32_t kuiTestDataSize		= abs (rand());
+    const uint32_t kuiTestAlignSize = kuiTargetAlignSize[i];
+    const uint32_t kuiTestDataSize  = abs (rand());
 
     CMemoryAlign cTestMa (kuiTestAlignSize);
     const uint32_t uiSize = kuiTestDataSize;
     const char strUnitTestTag[100] = "pUnitTestData";
-    const uint32_t kuiUsedCacheLineSize	= ((kuiTestAlignSize == 0)
+    const uint32_t kuiUsedCacheLineSize = ((kuiTestAlignSize == 0)
                                            || (kuiTestAlignSize & 0x0F)) ? (16) : (kuiTestAlignSize);
-    const uint32_t kuiExtraAlignSize	= kuiUsedCacheLineSize - 1;
-    const uint32_t kuiExpectedSize	= sizeof (void**) + sizeof (int32_t) + kuiExtraAlignSize + uiSize;
+    const uint32_t kuiExtraAlignSize    = kuiUsedCacheLineSize - 1;
+    const uint32_t kuiExpectedSize      = sizeof (void**) + sizeof (int32_t) + kuiExtraAlignSize + uiSize;
     uint8_t* pUnitTestData = static_cast<uint8_t*> (cTestMa.WelsMalloc (uiSize, strUnitTestTag));
     if (pUnitTestData != NULL) {
       ASSERT_TRUE ((((uintptr_t) (pUnitTestData)) & kuiExtraAlignSize) == 0);

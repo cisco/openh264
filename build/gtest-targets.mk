@@ -1,4 +1,4 @@
-GTEST_SRCDIR=gtest
+GTEST_SRCDIR=gtest/googletest
 GTEST_CPP_SRCS=\
 	$(GTEST_SRCDIR)/src/gtest-all.cc\
 

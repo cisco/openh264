@@ -576,34 +576,36 @@ TEST (VAACalcFuncTest, func) { \
         if (0 == (m_uiCpuFeatureFlag & CPUFLAGS)) \
             return; \
     } \
-	ENFORCE_STACK_ALIGN_1D (uint8_t, cur_data_c, BUFFER_SIZE, 16); \
+    ENFORCE_STACK_ALIGN_1D (uint8_t, cur_data_c, BUFFER_SIZE, 16); \
     ENFORCE_STACK_ALIGN_1D (uint8_t, ref_data_c, BUFFER_SIZE, 16); \
     ENFORCE_STACK_ALIGN_1D (int32_t, psad8x8_c, BUFFER_SIZE/64, 16); \
-	int32_t pic_width_c; \
-	int32_t pic_height_c; \
-	int32_t pic_stride_c; \
-	int32_t psadframe_c; \
-	ENFORCE_STACK_ALIGN_1D (uint8_t, cur_data_a, BUFFER_SIZE, 16); \
+    int32_t pic_width_c; \
+    int32_t pic_height_c; \
+    int32_t pic_stride_c; \
+    int32_t psadframe_c; \
+    ENFORCE_STACK_ALIGN_1D (uint8_t, cur_data_a, BUFFER_SIZE, 16); \
     ENFORCE_STACK_ALIGN_1D (uint8_t, ref_data_a, BUFFER_SIZE, 16); \
     ENFORCE_STACK_ALIGN_1D (int32_t, psad8x8_a, BUFFER_SIZE/64, 16); \
-	int32_t pic_width_a; \
-	int32_t pic_height_a; \
-	int32_t pic_stride_a; \
-	int32_t psadframe_a; \
-    pic_width_c  = pic_width_a = 320-16; \
-    pic_height_c = pic_height_a = 320; \
-    pic_stride_c = pic_stride_a = 320; \
-    psadframe_c = psadframe_a = 0; \
-    for (int j=0; j<BUFFER_SIZE; j++) { \
-        cur_data_c[j] = cur_data_a[j] = (rand()%256); \
-        ref_data_c[j] = ref_data_a[j] = (rand()%256); \
-        psad8x8_c[j%(BUFFER_SIZE/64)] = psad8x8_a[j%(BUFFER_SIZE/64)] = (rand()%256); \
+    int32_t pic_width_a; \
+    int32_t pic_height_a; \
+    int32_t pic_stride_a; \
+    int32_t psadframe_a; \
+    for (int i=0; i<4; i++) { \
+        pic_width_c  = pic_width_a = 320-16*i; \
+        pic_height_c = pic_height_a = 320; \
+        pic_stride_c = pic_stride_a = 320; \
+        psadframe_c = psadframe_a = 0; \
+        for (int j=0; j<BUFFER_SIZE; j++) { \
+            cur_data_c[j] = cur_data_a[j] = (rand()%256); \
+            ref_data_c[j] = ref_data_a[j] = (rand()%256); \
+            psad8x8_c[j%(BUFFER_SIZE/64)] = psad8x8_a[j%(BUFFER_SIZE/64)] = (rand()%256); \
+        } \
+        VAACalcSad_ref (cur_data_c, ref_data_c, pic_width_c, pic_height_c, pic_stride_c, &psadframe_c, psad8x8_c); \
+        func (cur_data_a, ref_data_a, pic_width_a, pic_height_a, pic_stride_a, &psadframe_a, psad8x8_a); \
+        ASSERT_EQ (psadframe_a, psadframe_c); \
+        for (int j=0; j<(BUFFER_SIZE/64); j++) \
+            ASSERT_EQ (psad8x8_a[j], psad8x8_c[j]); \
     } \
-    VAACalcSad_ref (cur_data_c, ref_data_c, pic_width_c, pic_height_c, pic_stride_c, &psadframe_c, psad8x8_c); \
-    func (cur_data_a, ref_data_a, pic_width_a, pic_height_a, pic_stride_a, &psadframe_a, psad8x8_a); \
-    ASSERT_EQ (psadframe_a, psadframe_c); \
-    for (int j=0; j<(BUFFER_SIZE/64); j++) \
-        ASSERT_EQ (psad8x8_a[j], psad8x8_c[j]); \
 }
 
 
@@ -633,24 +635,26 @@ TEST (VAACalcFuncTest, func) { \
     int32_t pic_height_a; \
     int32_t pic_stride_a; \
     int32_t psadframe_a; \
-    pic_width_c  = pic_width_a = 320-16; \
-    pic_height_c = pic_height_a = 320; \
-    pic_stride_c = pic_stride_a = 320; \
-    psadframe_c = psadframe_a = 0; \
-    for (int j=0; j<BUFFER_SIZE; j++) { \
-        cur_data_c[j] = cur_data_a[j] = (rand()%256); \
-        ref_data_c[j] = ref_data_a[j] = (rand()%256); \
-        psad8x8_c[j%(BUFFER_SIZE/64)] = psad8x8_a[j%(BUFFER_SIZE/64)] = (rand()%256); \
-        psd8x8_c[j%(BUFFER_SIZE/64)]  = psd8x8_a[j%(BUFFER_SIZE/64)]  = (rand()%256); \
-        pmad8x8_c[j%(BUFFER_SIZE/64)] = pmad8x8_a[j%(BUFFER_SIZE/64)] = (rand()%256); \
-    } \
-    VAACalcSadBgd_ref (cur_data_c, ref_data_c, pic_width_c, pic_height_c, pic_stride_c, &psadframe_c, psad8x8_c, psd8x8_c, pmad8x8_c); \
-    func (cur_data_a, ref_data_a, pic_width_a, pic_height_a, pic_stride_a, &psadframe_a, psad8x8_a, psd8x8_a, pmad8x8_a); \
-    ASSERT_EQ (psadframe_a, psadframe_c); \
-    for (int j=0; j<(BUFFER_SIZE/64); j++) {\
-        ASSERT_EQ (psad8x8_a[j], psad8x8_c[j]); \
-        ASSERT_EQ (psd8x8_a[j], psd8x8_c[j]); \
-        ASSERT_EQ (pmad8x8_a[j], pmad8x8_c[j]); \
+    for (int i=0; i<4; i++) { \
+        pic_width_c  = pic_width_a = 320-16*i; \
+        pic_height_c = pic_height_a = 320; \
+        pic_stride_c = pic_stride_a = 320; \
+        psadframe_c = psadframe_a = 0; \
+        for (int j=0; j<BUFFER_SIZE; j++) { \
+            cur_data_c[j] = cur_data_a[j] = (rand()%256); \
+            ref_data_c[j] = ref_data_a[j] = (rand()%256); \
+            psad8x8_c[j%(BUFFER_SIZE/64)] = psad8x8_a[j%(BUFFER_SIZE/64)] = (rand()%256); \
+            psd8x8_c[j%(BUFFER_SIZE/64)]  = psd8x8_a[j%(BUFFER_SIZE/64)]  = (rand()%256); \
+            pmad8x8_c[j%(BUFFER_SIZE/64)] = pmad8x8_a[j%(BUFFER_SIZE/64)] = (rand()%256); \
+        } \
+        VAACalcSadBgd_ref (cur_data_c, ref_data_c, pic_width_c, pic_height_c, pic_stride_c, &psadframe_c, psad8x8_c, psd8x8_c, pmad8x8_c); \
+        func (cur_data_a, ref_data_a, pic_width_a, pic_height_a, pic_stride_a, &psadframe_a, psad8x8_a, psd8x8_a, pmad8x8_a); \
+        ASSERT_EQ (psadframe_a, psadframe_c); \
+        for (int j=0; j<(BUFFER_SIZE/64); j++) {\
+            ASSERT_EQ (psad8x8_a[j], psad8x8_c[j]); \
+            ASSERT_EQ (psd8x8_a[j], psd8x8_c[j]); \
+            ASSERT_EQ (pmad8x8_a[j], pmad8x8_c[j]); \
+        } \
     } \
 }
 
@@ -682,28 +686,30 @@ TEST (VAACalcFuncTest, func) { \
     int32_t pic_height_a; \
     int32_t pic_stride_a; \
     int32_t psadframe_a; \
-    pic_width_c  = pic_width_a = 320-16; \
-    pic_height_c = pic_height_a = 320; \
-    pic_stride_c = pic_stride_a = 320; \
-    psadframe_c = psadframe_a = 0; \
-    for (int j=0; j<BUFFER_SIZE; j++) { \
-        cur_data_c[j] = cur_data_a[j] = (rand()%256); \
-        ref_data_c[j] = ref_data_a[j] = (rand()%256); \
-        psad8x8_c[j%(BUFFER_SIZE/64)] = psad8x8_a[j%(BUFFER_SIZE/64)] = (rand()%256); \
-        psum16x16_c[j%(BUFFER_SIZE/256)]    = psum16x16_a[j%(BUFFER_SIZE/256)] = (rand()%256); \
-        psqsum16x16_c[j%(BUFFER_SIZE/256)]  = psqsum16x16_a[j%(BUFFER_SIZE/256)]  = (rand()%256); \
-        psqdiff16x16_c[j%(BUFFER_SIZE/256)] = psqdiff16x16_a[j%(BUFFER_SIZE/256)] = (rand()%256); \
-    } \
-    VAACalcSadSsd_ref (cur_data_c, ref_data_c, pic_width_c, pic_height_c, pic_stride_c, &psadframe_c, psad8x8_c, psum16x16_c, psqsum16x16_c, psqdiff16x16_c); \
-    func (cur_data_a, ref_data_a, pic_width_a, pic_height_a, pic_stride_a, &psadframe_a, psad8x8_a, psum16x16_a, psqsum16x16_a, psqdiff16x16_a); \
-    ASSERT_EQ (psadframe_a, psadframe_c); \
-    for (int j=0; j<(BUFFER_SIZE/64); j++) {\
-        ASSERT_EQ (psad8x8_a[j], psad8x8_c[j]); \
-    } \
-    for (int j=0; j<(BUFFER_SIZE/256); j++) {\
-        ASSERT_EQ (psum16x16_a[j], psum16x16_c[j]); \
-        ASSERT_EQ (psqsum16x16_a[j], psqsum16x16_c[j]); \
-        ASSERT_EQ (psqdiff16x16_a[j], psqdiff16x16_c[j]); \
+    for (int i=0; i<4; i++) { \
+        pic_width_c  = pic_width_a = 320-16*i; \
+        pic_height_c = pic_height_a = 320; \
+        pic_stride_c = pic_stride_a = 320; \
+        psadframe_c = psadframe_a = 0; \
+        for (int j=0; j<BUFFER_SIZE; j++) { \
+            cur_data_c[j] = cur_data_a[j] = (rand()%256); \
+            ref_data_c[j] = ref_data_a[j] = (rand()%256); \
+            psad8x8_c[j%(BUFFER_SIZE/64)] = psad8x8_a[j%(BUFFER_SIZE/64)] = (rand()%256); \
+            psum16x16_c[j%(BUFFER_SIZE/256)]    = psum16x16_a[j%(BUFFER_SIZE/256)] = (rand()%256); \
+            psqsum16x16_c[j%(BUFFER_SIZE/256)]  = psqsum16x16_a[j%(BUFFER_SIZE/256)]  = (rand()%256); \
+            psqdiff16x16_c[j%(BUFFER_SIZE/256)] = psqdiff16x16_a[j%(BUFFER_SIZE/256)] = (rand()%256); \
+        } \
+        VAACalcSadSsd_ref (cur_data_c, ref_data_c, pic_width_c, pic_height_c, pic_stride_c, &psadframe_c, psad8x8_c, psum16x16_c, psqsum16x16_c, psqdiff16x16_c); \
+        func (cur_data_a, ref_data_a, pic_width_a, pic_height_a, pic_stride_a, &psadframe_a, psad8x8_a, psum16x16_a, psqsum16x16_a, psqdiff16x16_a); \
+        ASSERT_EQ (psadframe_a, psadframe_c); \
+        for (int j=0; j<(BUFFER_SIZE/64); j++) {\
+            ASSERT_EQ (psad8x8_a[j], psad8x8_c[j]); \
+        } \
+        for (int j=0; j<(BUFFER_SIZE/256); j++) {\
+            ASSERT_EQ (psum16x16_a[j], psum16x16_c[j]); \
+            ASSERT_EQ (psqsum16x16_a[j], psqsum16x16_c[j]); \
+            ASSERT_EQ (psqdiff16x16_a[j], psqdiff16x16_c[j]); \
+        } \
     } \
 }
 
@@ -733,26 +739,28 @@ TEST (VAACalcFuncTest, func) { \
     int32_t pic_height_a; \
     int32_t pic_stride_a; \
     int32_t psadframe_a; \
-    pic_width_c  = pic_width_a = 320-16; \
-    pic_height_c = pic_height_a = 320; \
-    pic_stride_c = pic_stride_a = 320; \
-    psadframe_c = psadframe_a = 0; \
-    for (int j=0; j<BUFFER_SIZE; j++) { \
-        cur_data_c[j] = cur_data_a[j] = (rand()%256); \
-        ref_data_c[j] = ref_data_a[j] = (rand()%256); \
-        psad8x8_c[j%(BUFFER_SIZE/64)] = psad8x8_a[j%(BUFFER_SIZE/64)] = (rand()%256); \
-        psum16x16_c[j%(BUFFER_SIZE/256)]    = psum16x16_a[j%(BUFFER_SIZE/256)] = (rand()%256); \
-        psqsum16x16_c[j%(BUFFER_SIZE/256)]  = psqsum16x16_a[j%(BUFFER_SIZE/256)]  = (rand()%256); \
-    } \
-    VAACalcSadVar_ref (cur_data_c, ref_data_c, pic_width_c, pic_height_c, pic_stride_c, &psadframe_c, psad8x8_c, psum16x16_c, psqsum16x16_c); \
-    func (cur_data_a, ref_data_a, pic_width_a, pic_height_a, pic_stride_a, &psadframe_a, psad8x8_a, psum16x16_a, psqsum16x16_a); \
-    ASSERT_EQ (psadframe_a, psadframe_c); \
-    for (int j=0; j<(BUFFER_SIZE/64); j++) {\
-        ASSERT_EQ (psad8x8_a[j], psad8x8_c[j]); \
-    } \
-    for (int j=0; j<(BUFFER_SIZE/256); j++) {\
-        ASSERT_EQ (psum16x16_a[j], psum16x16_c[j]); \
-        ASSERT_EQ (psqsum16x16_a[j], psqsum16x16_c[j]); \
+    for (int i=0; i<4; i++) { \
+        pic_width_c  = pic_width_a = 320-16*i; \
+        pic_height_c = pic_height_a = 320; \
+        pic_stride_c = pic_stride_a = 320; \
+        psadframe_c = psadframe_a = 0; \
+        for (int j=0; j<BUFFER_SIZE; j++) { \
+            cur_data_c[j] = cur_data_a[j] = (rand()%256); \
+            ref_data_c[j] = ref_data_a[j] = (rand()%256); \
+            psad8x8_c[j%(BUFFER_SIZE/64)] = psad8x8_a[j%(BUFFER_SIZE/64)] = (rand()%256); \
+            psum16x16_c[j%(BUFFER_SIZE/256)]    = psum16x16_a[j%(BUFFER_SIZE/256)] = (rand()%256); \
+            psqsum16x16_c[j%(BUFFER_SIZE/256)]  = psqsum16x16_a[j%(BUFFER_SIZE/256)]  = (rand()%256); \
+        } \
+        VAACalcSadVar_ref (cur_data_c, ref_data_c, pic_width_c, pic_height_c, pic_stride_c, &psadframe_c, psad8x8_c, psum16x16_c, psqsum16x16_c); \
+        func (cur_data_a, ref_data_a, pic_width_a, pic_height_a, pic_stride_a, &psadframe_a, psad8x8_a, psum16x16_a, psqsum16x16_a); \
+        ASSERT_EQ (psadframe_a, psadframe_c); \
+        for (int j=0; j<(BUFFER_SIZE/64); j++) {\
+            ASSERT_EQ (psad8x8_a[j], psad8x8_c[j]); \
+        } \
+        for (int j=0; j<(BUFFER_SIZE/256); j++) {\
+            ASSERT_EQ (psum16x16_a[j], psum16x16_c[j]); \
+            ASSERT_EQ (psqsum16x16_a[j], psqsum16x16_c[j]); \
+        } \
     } \
 }
 
@@ -788,32 +796,34 @@ TEST (VAACalcFuncTest, func) { \
     int32_t pic_height_a; \
     int32_t pic_stride_a; \
     int32_t psadframe_a; \
-    pic_width_c  = pic_width_a = 320-16; \
-    pic_height_c = pic_height_a = 320; \
-    pic_stride_c = pic_stride_a = 320; \
-    psadframe_c = psadframe_a = 0; \
-    for (int j=0; j<BUFFER_SIZE; j++) { \
-        cur_data_c[j] = cur_data_a[j] = (rand()%256); \
-        ref_data_c[j] = ref_data_a[j] = (rand()%256); \
-        psad8x8_c[j%(BUFFER_SIZE/64)] = psad8x8_a[j%(BUFFER_SIZE/64)] = (rand()%256); \
-        psd8x8_c[j%(BUFFER_SIZE/64)]  = psd8x8_a[j%(BUFFER_SIZE/64)]  = (rand()%256); \
-        pmad8x8_c[j%(BUFFER_SIZE/64)] = pmad8x8_a[j%(BUFFER_SIZE/64)] = (rand()%256); \
-        psum16x16_c[j%(BUFFER_SIZE/256)]    = psum16x16_a[j%(BUFFER_SIZE/256)] = (rand()%256); \
-        psqsum16x16_c[j%(BUFFER_SIZE/256)]  = psqsum16x16_a[j%(BUFFER_SIZE/256)]  = (rand()%256); \
-        psqdiff16x16_c[j%(BUFFER_SIZE/256)] = psqdiff16x16_a[j%(BUFFER_SIZE/256)] = (rand()%256); \
-    } \
-    VAACalcSadSsdBgd_ref (cur_data_c, ref_data_c, pic_width_c, pic_height_c, pic_stride_c, &psadframe_c, psad8x8_c, psum16x16_c, psqsum16x16_c, psqdiff16x16_c, psd8x8_c, pmad8x8_c); \
-    func (cur_data_a, ref_data_a, pic_width_a, pic_height_a, pic_stride_a, &psadframe_a, psad8x8_a, psum16x16_a, psqsum16x16_a, psqdiff16x16_a, psd8x8_a, pmad8x8_a); \
-    ASSERT_EQ (psadframe_a, psadframe_c); \
-    for (int j=0; j<(BUFFER_SIZE/64); j++) {\
-        ASSERT_EQ (psad8x8_a[j], psad8x8_c[j]); \
-        ASSERT_EQ (psd8x8_a[j], psd8x8_c[j]); \
-        ASSERT_EQ (pmad8x8_a[j], pmad8x8_c[j]); \
-    } \
-    for (int j=0; j<(BUFFER_SIZE/256); j++) {\
-        ASSERT_EQ (psum16x16_a[j], psum16x16_c[j]); \
-        ASSERT_EQ (psqsum16x16_a[j], psqsum16x16_c[j]); \
-        ASSERT_EQ (psqdiff16x16_a[j], psqdiff16x16_c[j]); \
+    for (int i=0; i<4; i++) { \
+        pic_width_c  = pic_width_a = 320-16*i; \
+        pic_height_c = pic_height_a = 320; \
+        pic_stride_c = pic_stride_a = 320; \
+        psadframe_c = psadframe_a = 0; \
+        for (int j=0; j<BUFFER_SIZE; j++) { \
+            cur_data_c[j] = cur_data_a[j] = (rand()%256); \
+            ref_data_c[j] = ref_data_a[j] = (rand()%256); \
+            psad8x8_c[j%(BUFFER_SIZE/64)] = psad8x8_a[j%(BUFFER_SIZE/64)] = (rand()%256); \
+            psd8x8_c[j%(BUFFER_SIZE/64)]  = psd8x8_a[j%(BUFFER_SIZE/64)]  = (rand()%256); \
+            pmad8x8_c[j%(BUFFER_SIZE/64)] = pmad8x8_a[j%(BUFFER_SIZE/64)] = (rand()%256); \
+            psum16x16_c[j%(BUFFER_SIZE/256)]    = psum16x16_a[j%(BUFFER_SIZE/256)] = (rand()%256); \
+            psqsum16x16_c[j%(BUFFER_SIZE/256)]  = psqsum16x16_a[j%(BUFFER_SIZE/256)]  = (rand()%256); \
+            psqdiff16x16_c[j%(BUFFER_SIZE/256)] = psqdiff16x16_a[j%(BUFFER_SIZE/256)] = (rand()%256); \
+        } \
+        VAACalcSadSsdBgd_ref (cur_data_c, ref_data_c, pic_width_c, pic_height_c, pic_stride_c, &psadframe_c, psad8x8_c, psum16x16_c, psqsum16x16_c, psqdiff16x16_c, psd8x8_c, pmad8x8_c); \
+        func (cur_data_a, ref_data_a, pic_width_a, pic_height_a, pic_stride_a, &psadframe_a, psad8x8_a, psum16x16_a, psqsum16x16_a, psqdiff16x16_a, psd8x8_a, pmad8x8_a); \
+        ASSERT_EQ (psadframe_a, psadframe_c); \
+        for (int j=0; j<(BUFFER_SIZE/64); j++) {\
+            ASSERT_EQ (psad8x8_a[j], psad8x8_c[j]); \
+            ASSERT_EQ (psd8x8_a[j], psd8x8_c[j]); \
+            ASSERT_EQ (pmad8x8_a[j], pmad8x8_c[j]); \
+        } \
+        for (int j=0; j<(BUFFER_SIZE/256); j++) {\
+            ASSERT_EQ (psum16x16_a[j], psum16x16_c[j]); \
+            ASSERT_EQ (psqsum16x16_a[j], psqsum16x16_c[j]); \
+            ASSERT_EQ (psqdiff16x16_a[j], psqdiff16x16_c[j]); \
+        } \
     } \
 }
 
@@ -828,6 +838,12 @@ GENERATE_VAACalcSadBgd_UT (VAACalcSadBgd_sse2, 1, WELS_CPU_SSE2)
 GENERATE_VAACalcSadSsdBgd_UT (VAACalcSadSsdBgd_sse2, 1, WELS_CPU_SSE2)
 GENERATE_VAACalcSadSsd_UT (VAACalcSadSsd_sse2, 1, WELS_CPU_SSE2)
 GENERATE_VAACalcSadVar_UT (VAACalcSadVar_sse2, 1, WELS_CPU_SSE2)
+
+GENERATE_VAACalcSad_UT (VAACalcSad_avx2, 1, WELS_CPU_AVX2)
+GENERATE_VAACalcSadBgd_UT (VAACalcSadBgd_avx2, 1, WELS_CPU_AVX2)
+GENERATE_VAACalcSadSsdBgd_UT (VAACalcSadSsdBgd_avx2, 1, WELS_CPU_AVX2)
+GENERATE_VAACalcSadSsd_UT (VAACalcSadSsd_avx2, 1, WELS_CPU_AVX2)
+GENERATE_VAACalcSadVar_UT (VAACalcSadVar_avx2, 1, WELS_CPU_AVX2)
 #endif
 
 #if defined(HAVE_NEON)

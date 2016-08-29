@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	rec_mb.c
+ * \file    rec_mb.c
  *
- * \brief	implementation for all macroblock decoding process after mb syntax parsing and residual decoding with cavlc.
+ * \brief   implementation for all macroblock decoding process after mb syntax parsing and residual decoding with cavlc.
  *
- * \date	3/18/2009 Created
+ * \date    3/18/2009 Created
  *
  *************************************************************************************
  */
@@ -61,11 +61,65 @@ void WelsFillRecNeededMbInfo (PWelsDecoderContext pCtx, bool bOutput, PDqLayer p
   }
 }
 
+int32_t RecI8x8Mb (int32_t iMbXy, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
+  RecI8x8Luma (iMbXy, pCtx, pScoeffLevel, pDqLayer);
+  RecI4x4Chroma (iMbXy, pCtx, pScoeffLevel, pDqLayer);
+  return ERR_NONE;
+}
+
+int32_t RecI8x8Luma (int32_t iMbXy, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
+  /*****get local variable from outer variable********/
+  /*prediction info*/
+  uint8_t* pPred = pDqLayer->pPred[0];
+
+  int32_t iLumaStride = pDqLayer->iLumaStride;
+  int32_t* pBlockOffset = pCtx->iDecBlockOffsetArray;
+  PGetIntraPred8x8Func* pGetI8x8LumaPredFunc = pCtx->pGetI8x8LumaPredFunc;
+
+  int8_t* pIntra8x8PredMode = pDqLayer->pIntra4x4FinalMode[iMbXy]; // I_NxN
+  int16_t* pRS = pScoeffLevel;
+  /*itransform info*/
+  PIdctResAddPredFunc pIdctResAddPredFunc = pCtx->pIdctResAddPredFunc8x8;
+
+  /*************local variable********************/
+  uint8_t i = 0;
+  bool bTLAvail[4], bTRAvail[4];
+  // Top-Right : Left : Top-Left : Top
+  bTLAvail[0] = !! (pDqLayer->pIntraNxNAvailFlag[iMbXy] & 0x02);
+  bTLAvail[1] = !! (pDqLayer->pIntraNxNAvailFlag[iMbXy] & 0x01);
+  bTLAvail[2] = !! (pDqLayer->pIntraNxNAvailFlag[iMbXy] & 0x04);
+  bTLAvail[3] = true;
+
+  bTRAvail[0] = !! (pDqLayer->pIntraNxNAvailFlag[iMbXy] & 0x01);
+  bTRAvail[1] = !! (pDqLayer->pIntraNxNAvailFlag[iMbXy] & 0x08);
+  bTRAvail[2] = true;
+  bTRAvail[3] = false;
+
+  /*************real process*********************/
+  for (i = 0; i < 4; i++) {
+
+    uint8_t* pPredI8x8 = pPred + pBlockOffset[i << 2];
+    uint8_t uiMode = pIntra8x8PredMode[g_kuiScan4[i << 2]];
+
+    pGetI8x8LumaPredFunc[uiMode] (pPredI8x8, iLumaStride, bTLAvail[i], bTRAvail[i]);
+
+    int32_t iIndex = g_kuiMbCountScan4Idx[i << 2];
+    if (pDqLayer->pNzc[iMbXy][iIndex] || pDqLayer->pNzc[iMbXy][iIndex + 1] || pDqLayer->pNzc[iMbXy][iIndex + 4]
+        || pDqLayer->pNzc[iMbXy][iIndex + 5]) {
+      int16_t* pRSI8x8 = &pRS[i << 6];
+      pIdctResAddPredFunc (pPredI8x8, iLumaStride, pRSI8x8);
+    }
+  }
+
+  return ERR_NONE;
+}
+
 int32_t RecI4x4Mb (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
   RecI4x4Luma (iMBXY, pCtx, pScoeffLevel, pDqLayer);
   RecI4x4Chroma (iMBXY, pCtx, pScoeffLevel, pDqLayer);
   return ERR_NONE;
 }
+
 
 int32_t RecI4x4Luma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
   /*****get local variable from outer variable********/
@@ -79,7 +133,7 @@ int32_t RecI4x4Luma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLe
   int8_t* pIntra4x4PredMode = pDqLayer->pIntra4x4FinalMode[iMBXY];
   int16_t* pRS = pScoeffLevel;
   /*itransform info*/
-  PIdctResAddPredFunc	pIdctResAddPredFunc = pCtx->pIdctResAddPredFunc;
+  PIdctResAddPredFunc pIdctResAddPredFunc = pCtx->pIdctResAddPredFunc;
 
 
   /*************local variable********************/
@@ -132,27 +186,21 @@ int32_t RecI16x16Mb (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLe
 
   /*common use by decoder&encoder*/
   int32_t iYStride = pDqLayer->iLumaStride;
-  int32_t* pBlockOffset = pCtx->iDecBlockOffsetArray;
   int16_t* pRS = pScoeffLevel;
 
   uint8_t* pPred = pDqLayer->pPred[0];
 
-  PIdctResAddPredFunc pIdctResAddPredFunc = pCtx->pIdctResAddPredFunc;
-
-  uint8_t i = 0;
+  PIdctFourResAddPredFunc pIdctFourResAddPredFunc = pCtx->pIdctFourResAddPredFunc;
 
   /*decode i16x16 y*/
   pGetI16x16LumaPredFunc[iI16x16PredMode] (pPred, iYStride);
 
   /*1 mb is divided 16 4x4_block to idct*/
-  for (i = 0; i < 16; i++) {
-    int16_t* pRSI4x4 = pRS + (i << 4);
-    uint8_t* pPredI4x4 = pPred + pBlockOffset[i];
-
-    if (pDqLayer->pNzc[iMBXY][g_kuiMbCountScan4Idx[i]] || pRSI4x4[0]) {
-      pIdctResAddPredFunc (pPredI4x4, iYStride, pRSI4x4);
-    }
-  }
+  const int8_t* pNzc = pDqLayer->pNzc[iMBXY];
+  pIdctFourResAddPredFunc (pPred + 0 * iYStride + 0, iYStride, pRS + 0 * 64, pNzc +  0);
+  pIdctFourResAddPredFunc (pPred + 0 * iYStride + 8, iYStride, pRS + 1 * 64, pNzc +  2);
+  pIdctFourResAddPredFunc (pPred + 8 * iYStride + 0, iYStride, pRS + 2 * 64, pNzc +  8);
+  pIdctFourResAddPredFunc (pPred + 8 * iYStride + 8, iYStride, pRS + 3 * 64, pNzc + 10);
 
   /*decode intra mb cb&cr*/
   pPred = pDqLayer->pPred[1];
@@ -186,11 +234,11 @@ static inline void GetRefPic (sMCRefMember* pMCRefMem, PWelsDecoderContext pCtx,
 #define MC_FLOW_SIMPLE_JUDGE 1
 #endif //MC_FLOW_SIMPLE_JUDGE
 void BaseMC (sMCRefMember* pMCRefMem, int32_t iXOffset, int32_t iYOffset, SMcFunc* pMCFunc,
-                           int32_t iBlkWidth, int32_t iBlkHeight, int16_t iMVs[2]) {
+             int32_t iBlkWidth, int32_t iBlkHeight, int16_t iMVs[2]) {
   int32_t iFullMVx = (iXOffset << 2) + iMVs[0]; //quarter pixel
   int32_t iFullMVy = (iYOffset << 2) + iMVs[1];
-  iFullMVx = WELS_CLIP3 (iFullMVx, ((-PADDING_LENGTH + 2) << 2), ((pMCRefMem->iPicWidth + PADDING_LENGTH - 19) << 2));
-  iFullMVy = WELS_CLIP3 (iFullMVy, ((-PADDING_LENGTH + 2) << 2), ((pMCRefMem->iPicHeight + PADDING_LENGTH - 19) << 2));
+  iFullMVx = WELS_CLIP3 (iFullMVx, ((-PADDING_LENGTH + 2) * (1 << 2)), ((pMCRefMem->iPicWidth + PADDING_LENGTH - 19) * (1 << 2)));
+  iFullMVy = WELS_CLIP3 (iFullMVy, ((-PADDING_LENGTH + 2) * (1 << 2)), ((pMCRefMem->iPicHeight + PADDING_LENGTH - 19) * (1 << 2)));
 
   int32_t iSrcPixOffsetLuma = (iFullMVx >> 2) + (iFullMVy >> 2) * pMCRefMem->iSrcLineLuma;
   int32_t iSrcPixOffsetChroma = (iFullMVx >> 3) + (iFullMVy >> 3) * pMCRefMem->iSrcLineChroma;
@@ -213,6 +261,74 @@ void BaseMC (sMCRefMember* pMCRefMem, int32_t iXOffset, int32_t iYOffset, SMcFun
                           iBlkWidthChroma, iBlkHeightChroma);
 
 }
+
+void WeightPrediction (PDqLayer pCurDqLayer, sMCRefMember* pMCRefMem, int32_t iRefIdx, int32_t iBlkWidth,
+                       int32_t iBlkHeight) {
+
+
+  int32_t iLog2denom, iWoc, iOoc;
+  int32_t iPredTemp, iLineStride;
+  int32_t iPixel = 0;
+  uint8_t* pDst;
+  //luma
+  iLog2denom = pCurDqLayer->pPredWeightTable->uiLumaLog2WeightDenom;
+  iWoc = pCurDqLayer->pPredWeightTable->sPredList[LIST_0].iLumaWeight[iRefIdx];
+  iOoc = pCurDqLayer->pPredWeightTable->sPredList[LIST_0].iLumaOffset[iRefIdx];
+  iLineStride = pMCRefMem->iDstLineLuma;
+
+  for (int i = 0; i < iBlkHeight; i++) {
+    for (int j = 0; j < iBlkWidth; j++) {
+      iPixel = j + i * (iLineStride);
+      if (iLog2denom >= 1) {
+        iPredTemp = ((pMCRefMem->pDstY[iPixel] * iWoc + (1 << (iLog2denom - 1))) >> iLog2denom) + iOoc;
+
+        pMCRefMem->pDstY[iPixel] = WELS_CLIP3 (iPredTemp, 0, 255);
+      } else {
+        iPredTemp = pMCRefMem->pDstY[iPixel] * iWoc + iOoc;
+
+        pMCRefMem->pDstY[iPixel] = WELS_CLIP3 (iPredTemp, 0, 255);
+
+      }
+    }
+  }
+
+
+  //UV
+  iBlkWidth = iBlkWidth >> 2;
+  iBlkHeight = iBlkHeight >> 2;
+  iLog2denom = pCurDqLayer->pPredWeightTable->uiChromaLog2WeightDenom;
+  iLineStride = pMCRefMem->iDstLineChroma;
+
+  for (int i = 0; i < 2; i++) {
+
+
+    //iLog2denom = pCurDqLayer->pPredWeightTable->uiChromaLog2WeightDenom;
+    iWoc =  pCurDqLayer->pPredWeightTable->sPredList[LIST_0].iChromaWeight[iRefIdx][i];
+    iOoc = pCurDqLayer->pPredWeightTable->sPredList[LIST_0].iChromaOffset[iRefIdx][i];
+    pDst = i ? pMCRefMem->pDstV : pMCRefMem->pDstU;
+    //iLineStride = pMCRefMem->iDstLineChroma;
+
+    for (int i = 0; i < iBlkHeight ; i++) {
+      for (int j = 0; j < iBlkWidth; j++) {
+        iPixel = j + i * (iLineStride);
+        if (iLog2denom >= 1) {
+          iPredTemp = ((pDst[iPixel] * iWoc + (1 << (iLog2denom - 1))) >> iLog2denom) + iOoc;
+
+          pDst[iPixel] = WELS_CLIP3 (iPredTemp, 0, 255);
+        } else {
+          iPredTemp = pDst[iPixel] * iWoc + iOoc;
+
+          pDst[iPixel] = WELS_CLIP3 (iPredTemp, 0, 255);
+
+        }
+      }
+
+    }
+
+
+  }
+}
+
 
 void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDecoderContext pCtx) {
   sMCRefMember pMCRefMem;
@@ -242,6 +358,9 @@ void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDec
 
   pMCRefMem.iDstLineLuma   = iDstLineLuma;
   pMCRefMem.iDstLineChroma = iDstLineChroma;
+
+  int32_t iRefIndex = 0;
+
   switch (iMBType) {
   case MB_TYPE_SKIP:
   case MB_TYPE_16x16:
@@ -249,12 +368,22 @@ void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDec
     iMVs[1] = pCurDqLayer->pMv[0][iMBXY][0][1];
     GetRefPic (&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[0][iMBXY], 0);
     BaseMC (&pMCRefMem, iMBOffsetX, iMBOffsetY, pMCFunc, 16, 16, iMVs);
+
+    if (pCurDqLayer->bUseWeightPredictionFlag) {
+      iRefIndex = pCurDqLayer->pRefIndex[0][iMBXY][0];
+      WeightPrediction (pCurDqLayer, &pMCRefMem, iRefIndex, 16, 16);
+    }
     break;
   case MB_TYPE_16x8:
     iMVs[0] = pCurDqLayer->pMv[0][iMBXY][0][0];
     iMVs[1] = pCurDqLayer->pMv[0][iMBXY][0][1];
     GetRefPic (&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[0][iMBXY], 0);
     BaseMC (&pMCRefMem, iMBOffsetX, iMBOffsetY, pMCFunc, 16, 8, iMVs);
+
+    if (pCurDqLayer->bUseWeightPredictionFlag) {
+      iRefIndex = pCurDqLayer->pRefIndex[0][iMBXY][0];
+      WeightPrediction (pCurDqLayer, &pMCRefMem, iRefIndex, 16, 8);
+    }
 
     iMVs[0] = pCurDqLayer->pMv[0][iMBXY][8][0];
     iMVs[1] = pCurDqLayer->pMv[0][iMBXY][8][1];
@@ -263,12 +392,21 @@ void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDec
     pMCRefMem.pDstU = pPredCb + (iDstLineChroma << 2);
     pMCRefMem.pDstV = pPredCr + (iDstLineChroma << 2);
     BaseMC (&pMCRefMem, iMBOffsetX, iMBOffsetY + 8, pMCFunc, 16, 8, iMVs);
+
+    if (pCurDqLayer->bUseWeightPredictionFlag) {
+      iRefIndex = pCurDqLayer->pRefIndex[0][iMBXY][8];
+      WeightPrediction (pCurDqLayer, &pMCRefMem, iRefIndex, 16, 8);
+    }
     break;
   case MB_TYPE_8x16:
     iMVs[0] = pCurDqLayer->pMv[0][iMBXY][0][0];
     iMVs[1] = pCurDqLayer->pMv[0][iMBXY][0][1];
     GetRefPic (&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[0][iMBXY], 0);
     BaseMC (&pMCRefMem, iMBOffsetX, iMBOffsetY, pMCFunc, 8, 16, iMVs);
+    if (pCurDqLayer->bUseWeightPredictionFlag) {
+      iRefIndex = pCurDqLayer->pRefIndex[0][iMBXY][0];
+      WeightPrediction (pCurDqLayer, &pMCRefMem, iRefIndex, 8, 16);
+    }
 
     iMVs[0] = pCurDqLayer->pMv[0][iMBXY][2][0];
     iMVs[1] = pCurDqLayer->pMv[0][iMBXY][2][1];
@@ -277,6 +415,11 @@ void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDec
     pMCRefMem.pDstU = pPredCb + 4;
     pMCRefMem.pDstV = pPredCr + 4;
     BaseMC (&pMCRefMem, iMBOffsetX + 8, iMBOffsetY, pMCFunc, 8, 16, iMVs);
+
+    if (pCurDqLayer->bUseWeightPredictionFlag) {
+      iRefIndex = pCurDqLayer->pRefIndex[0][iMBXY][2];
+      WeightPrediction (pCurDqLayer, &pMCRefMem, iRefIndex, 8, 16);
+    }
     break;
   case MB_TYPE_8x8:
   case MB_TYPE_8x8_REF0: {
@@ -292,6 +435,7 @@ void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDec
 
       iIIdx = ((i >> 1) << 3) + ((i & 1) << 1);
       GetRefPic (&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[0][iMBXY], iIIdx);
+      iRefIndex = pCurDqLayer->bUseWeightPredictionFlag ? pCurDqLayer->pRefIndex[0][iMBXY][iIIdx] : 0;
 
       pDstY = pPredY + iBlk8X + iBlk8Y * iDstLineLuma;
       pDstU = pPredCb + (iBlk8X >> 1) + (iBlk8Y >> 1) * iDstLineChroma;
@@ -304,11 +448,21 @@ void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDec
         iMVs[0] = pCurDqLayer->pMv[0][iMBXY][iIIdx][0];
         iMVs[1] = pCurDqLayer->pMv[0][iMBXY][iIIdx][1];
         BaseMC (&pMCRefMem, iXOffset, iYOffset, pMCFunc, 8, 8, iMVs);
+        if (pCurDqLayer->bUseWeightPredictionFlag) {
+
+          WeightPrediction (pCurDqLayer, &pMCRefMem, iRefIndex, 8, 8);
+        }
+
         break;
       case SUB_MB_TYPE_8x4:
         iMVs[0] = pCurDqLayer->pMv[0][iMBXY][iIIdx][0];
         iMVs[1] = pCurDqLayer->pMv[0][iMBXY][iIIdx][1];
         BaseMC (&pMCRefMem, iXOffset, iYOffset, pMCFunc, 8, 4, iMVs);
+        if (pCurDqLayer->bUseWeightPredictionFlag) {
+
+          WeightPrediction (pCurDqLayer, &pMCRefMem, iRefIndex, 8, 4);
+        }
+
 
         iMVs[0] = pCurDqLayer->pMv[0][iMBXY][iIIdx + 4][0];
         iMVs[1] = pCurDqLayer->pMv[0][iMBXY][iIIdx + 4][1];
@@ -316,11 +470,21 @@ void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDec
         pMCRefMem.pDstU += (iDstLineChroma << 1);
         pMCRefMem.pDstV += (iDstLineChroma << 1);
         BaseMC (&pMCRefMem, iXOffset, iYOffset + 4, pMCFunc, 8, 4, iMVs);
+        if (pCurDqLayer->bUseWeightPredictionFlag) {
+
+          WeightPrediction (pCurDqLayer, &pMCRefMem, iRefIndex, 8, 4);
+        }
+
         break;
       case SUB_MB_TYPE_4x8:
         iMVs[0] = pCurDqLayer->pMv[0][iMBXY][iIIdx][0];
         iMVs[1] = pCurDqLayer->pMv[0][iMBXY][iIIdx][1];
         BaseMC (&pMCRefMem, iXOffset, iYOffset, pMCFunc, 4, 8, iMVs);
+        if (pCurDqLayer->bUseWeightPredictionFlag) {
+
+          WeightPrediction (pCurDqLayer, &pMCRefMem, iRefIndex, 4, 8);
+        }
+
 
         iMVs[0] = pCurDqLayer->pMv[0][iMBXY][iIIdx + 1][0];
         iMVs[1] = pCurDqLayer->pMv[0][iMBXY][iIIdx + 1][1];
@@ -328,6 +492,11 @@ void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDec
         pMCRefMem.pDstU += 2;
         pMCRefMem.pDstV += 2;
         BaseMC (&pMCRefMem, iXOffset + 4, iYOffset, pMCFunc, 4, 8, iMVs);
+        if (pCurDqLayer->bUseWeightPredictionFlag) {
+
+          WeightPrediction (pCurDqLayer, &pMCRefMem, iRefIndex, 4, 8);
+        }
+
         break;
       case SUB_MB_TYPE_4x4: {
         for (j = 0; j < 4; j++) {
@@ -345,6 +514,11 @@ void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDec
           iMVs[0] = pCurDqLayer->pMv[0][iMBXY][iIIdx + iJIdx][0];
           iMVs[1] = pCurDqLayer->pMv[0][iMBXY][iIIdx + iJIdx][1];
           BaseMC (&pMCRefMem, iXOffset + iBlk4X, iYOffset + iBlk4Y, pMCFunc, 4, 4, iMVs);
+          if (pCurDqLayer->bUseWeightPredictionFlag) {
+
+            WeightPrediction (pCurDqLayer, &pMCRefMem, iRefIndex, 4, 4);
+          }
+
         }
       }
       break;
@@ -361,28 +535,21 @@ void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDec
 
 int32_t RecChroma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
   int32_t iChromaStride = pCtx->pCurDqLayer->pDec->iLinesize[1];
-  PIdctResAddPredFunc pIdctResAddPredFunc = pCtx->pIdctResAddPredFunc;
+  PIdctFourResAddPredFunc pIdctFourResAddPredFunc = pCtx->pIdctFourResAddPredFunc;
 
-  uint8_t i = 0, j = 0;
+  uint8_t i = 0;
   uint8_t uiCbpC = pDqLayer->pCbp[iMBXY] >> 4;
 
   if (1 == uiCbpC || 2 == uiCbpC) {
-    WelsChromaDcIdct (pScoeffLevel + 256);	// 256 = 16*16
-    WelsChromaDcIdct (pScoeffLevel + 320);	// 256 = 16*16
+    WelsChromaDcIdct (pScoeffLevel + 256);      // 256 = 16*16
+    WelsChromaDcIdct (pScoeffLevel + 320);      // 256 = 16*16
     for (i = 0; i < 2; i++) {
       int16_t* pRS = pScoeffLevel + 256 + (i << 6);
       uint8_t* pPred = pDqLayer->pPred[i + 1];
-      int32_t* pBlockOffset = i == 0 ? &pCtx->iDecBlockOffsetArray[16] : &pCtx->iDecBlockOffsetArray[20];
+      const int8_t* pNzc = pDqLayer->pNzc[iMBXY] + 16 + 2 * i;
 
       /*1 chroma is divided 4 4x4_block to idct*/
-      for (j = 0; j < 4; j++) {
-        int16_t* pRSI4x4 = &pRS[j << 4];
-        uint8_t* pPredI4x4 = pPred + pBlockOffset[j];
-
-        if (pDqLayer->pNzc[iMBXY][g_kuiMbCountScan4Idx[16 + (i << 2) + j]] || pRSI4x4[0]) {
-          pIdctResAddPredFunc (pPredI4x4, iChromaStride, pRSI4x4);
-        }
-      }
+      pIdctFourResAddPredFunc (pPred, iChromaStride, pRS, pNzc);
     }
   }
 

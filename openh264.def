@@ -1,5 +1,7 @@
 EXPORTS
-	WelsCreateDecoder
-	WelsDestroyDecoder
-	WelsCreateSVCEncoder
-	WelsDestroySVCEncoder
+    WelsCreateDecoder
+    WelsDestroyDecoder
+    WelsCreateSVCEncoder
+    WelsDestroySVCEncoder
+    WelsGetCodecVersion
+    WelsGetCodecVersionEx

@@ -30,24 +30,10 @@
  *
  */
 
-#ifdef  HAVE_NEON
+#ifdef HAVE_NEON
 //Global macro
-.text
 #include "arm_arch_common_macro.S"
 
-#ifdef __APPLE__
-//Global macro
-.macro GET_8BYTE_DATA
-    vld1.8 {$0[0]}, [$1], $2
-    vld1.8 {$0[1]}, [$1], $2
-    vld1.8 {$0[2]}, [$1], $2
-    vld1.8 {$0[3]}, [$1], $2
-    vld1.8 {$0[4]}, [$1], $2
-    vld1.8 {$0[5]}, [$1], $2
-    vld1.8 {$0[6]}, [$1], $2
-    vld1.8 {$0[7]}, [$1], $2
-.endmacro
-#else
 //Global macro
 .macro GET_8BYTE_DATA arg0, arg1, arg2
     vld1.8 {\arg0[0]}, [\arg1], \arg2
@@ -59,7 +45,6 @@
     vld1.8 {\arg0[6]}, [\arg1], \arg2
     vld1.8 {\arg0[7]}, [\arg1], \arg2
 .endm
-#endif
 
 
 WELS_ASM_FUNC_BEGIN WelsDecoderI16x16LumaPredV_neon

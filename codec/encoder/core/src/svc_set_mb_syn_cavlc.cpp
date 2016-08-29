@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	svc_set_mb_syn_cavlc.h
+ * \file    svc_set_mb_syn_cavlc.h
  *
- * \brief	Seting all syntax elements of mb and decoding residual with cavlc
+ * \brief   Seting all syntax elements of mb and decoding residual with cavlc
  *
- * \date	2009.8.12 Created
+ * \date    2009.8.12 Created
  *
  *************************************************************************************
  */
@@ -57,8 +57,8 @@ const uint32_t g_kuiInterCbpMap[48] = {
 
 //============================Enhance Layer CAVLC Writing===========================
 void WelsSpatialWriteMbPred (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb) {
-  SMbCache* pMbCache	= &pSlice->sMbCacheInfo;
-  SBitStringAux* pBs	= pSlice->pSliceBsa;
+  SMbCache* pMbCache = &pSlice->sMbCacheInfo;
+  SBitStringAux* pBs = pSlice->pSliceBsa;
   SSliceHeaderExt* pSliceHeadExt = &pSlice->sSliceHeaderExt;
   int32_t iNumRefIdxl0ActiveMinus1 = pSliceHeadExt->sSliceHeader.uiNumRefIdxL0Active - 1;
 
@@ -169,8 +169,8 @@ void WelsSpatialWriteMbPred (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb) 
 }
 
 void WelsSpatialWriteSubMbPred (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb) {
-  SMbCache* pMbCache	= &pSlice->sMbCacheInfo;
-  SBitStringAux* pBs	= pSlice->pSliceBsa;
+  SMbCache* pMbCache = &pSlice->sMbCacheInfo;
+  SBitStringAux* pBs = pSlice->pSliceBsa;
   SSliceHeaderExt* pSliceHeadExt = &pSlice->sSliceHeaderExt;
 
   int32_t iNumRefIdxl0ActiveMinus1 = pSliceHeadExt->sSliceHeader.uiNumRefIdxL0Active - 1;
@@ -190,7 +190,22 @@ void WelsSpatialWriteSubMbPred (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurM
 
   //step 1: sub_mb_type
   for (i = 0; i < 4; i++) {
-    BsWriteUE (pBs, 0);
+    switch (pCurMb->uiSubMbType[i]) {
+    case SUB_MB_TYPE_8x8:
+      BsWriteUE (pBs, 0);
+      break;
+    case SUB_MB_TYPE_8x4:
+      BsWriteUE (pBs, 1);
+      break;
+    case SUB_MB_TYPE_4x8:
+      BsWriteUE (pBs, 2);
+      break;
+    case SUB_MB_TYPE_4x4:
+      BsWriteUE (pBs, 3);
+      break;
+    default: //should not enter
+      break;
+    }
   }
 
   //step 2: get and write uiRefIndex and sMvd
@@ -202,32 +217,53 @@ void WelsSpatialWriteSubMbPred (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurM
   }
   //write sMvd
   for (i = 0; i < 4; i++) {
-    BsWriteSE (pBs, pCurMb->sMv[*kpScan4].iMvX - pMbCache->sMbMvp[i].iMvX);
-    BsWriteSE (pBs, pCurMb->sMv[*kpScan4].iMvY - pMbCache->sMbMvp[i].iMvY);
+    uint32_t uiSubMbType = pCurMb->uiSubMbType[i];
+    if (SUB_MB_TYPE_8x8 == uiSubMbType) {
+      BsWriteSE (pBs, pCurMb->sMv[*kpScan4].iMvX - pMbCache->sMbMvp[*kpScan4].iMvX);
+      BsWriteSE (pBs, pCurMb->sMv[*kpScan4].iMvY - pMbCache->sMbMvp[*kpScan4].iMvY);
+    } else if (SUB_MB_TYPE_4x4 == uiSubMbType) {
+      BsWriteSE (pBs, pCurMb->sMv[*kpScan4].iMvX - pMbCache->sMbMvp[*kpScan4].iMvX);
+      BsWriteSE (pBs, pCurMb->sMv[*kpScan4].iMvY - pMbCache->sMbMvp[*kpScan4].iMvY);
+      BsWriteSE (pBs, pCurMb->sMv[* (kpScan4 + 1)].iMvX - pMbCache->sMbMvp[* (kpScan4 + 1)].iMvX);
+      BsWriteSE (pBs, pCurMb->sMv[* (kpScan4 + 1)].iMvY - pMbCache->sMbMvp[* (kpScan4 + 1)].iMvY);
+      BsWriteSE (pBs, pCurMb->sMv[* (kpScan4 + 2)].iMvX - pMbCache->sMbMvp[* (kpScan4 + 2)].iMvX);
+      BsWriteSE (pBs, pCurMb->sMv[* (kpScan4 + 2)].iMvY - pMbCache->sMbMvp[* (kpScan4 + 2)].iMvY);
+      BsWriteSE (pBs, pCurMb->sMv[* (kpScan4 + 3)].iMvX - pMbCache->sMbMvp[* (kpScan4 + 3)].iMvX);
+      BsWriteSE (pBs, pCurMb->sMv[* (kpScan4 + 3)].iMvY - pMbCache->sMbMvp[* (kpScan4 + 3)].iMvY);
+    } else if (SUB_MB_TYPE_8x4 == uiSubMbType) {
+      BsWriteSE (pBs, pCurMb->sMv[*kpScan4].iMvX - pMbCache->sMbMvp[*kpScan4].iMvX);
+      BsWriteSE (pBs, pCurMb->sMv[*kpScan4].iMvY - pMbCache->sMbMvp[*kpScan4].iMvY);
+      BsWriteSE (pBs, pCurMb->sMv[* (kpScan4 + 2)].iMvX - pMbCache->sMbMvp[* (kpScan4 + 2)].iMvX);
+      BsWriteSE (pBs, pCurMb->sMv[* (kpScan4 + 2)].iMvY - pMbCache->sMbMvp[* (kpScan4 + 2)].iMvY);
+    } else if (SUB_MB_TYPE_4x8 == uiSubMbType) {
+      BsWriteSE (pBs, pCurMb->sMv[*kpScan4].iMvX - pMbCache->sMbMvp[*kpScan4].iMvX);
+      BsWriteSE (pBs, pCurMb->sMv[*kpScan4].iMvY - pMbCache->sMbMvp[*kpScan4].iMvY);
+      BsWriteSE (pBs, pCurMb->sMv[* (kpScan4 + 1)].iMvX - pMbCache->sMbMvp[* (kpScan4 + 1)].iMvX);
+      BsWriteSE (pBs, pCurMb->sMv[* (kpScan4 + 1)].iMvY - pMbCache->sMbMvp[* (kpScan4 + 1)].iMvY);
+    }
     kpScan4 += 4;
   }
 }
 
-int32_t CheckBitstreamBuffer (const uint32_t	kuiSliceIdx, sWelsEncCtx* pEncCtx,  SBitStringAux* pBs) {
-  const intX_t iLeftLength = pBs->pBufEnd - pBs->pBufPtr - 1;
+int32_t CheckBitstreamBuffer (const uint32_t kuiSliceIdx, sWelsEncCtx* pEncCtx, SBitStringAux* pBs) {
+  const intX_t iLeftLength = pBs->pEndBuf - pBs->pCurBuf - 1;
   assert (iLeftLength > 0);
 
-  if (iLeftLength < MAX_MACROBLOCK_SIZE_IN_BYTE) {
-    return ENC_RETURN_MEMALLOCERR;
+  if (iLeftLength < MAX_MACROBLOCK_SIZE_IN_BYTE_x2) {
+    return ENC_RETURN_VLCOVERFLOWFOUND;//ENC_RETURN_MEMALLOCERR;
     //TODO: call the realloc&copy instead
   }
   return ENC_RETURN_SUCCESS;
 }
 
 //============================Base Layer CAVLC Writing===============================
-int32_t WelsSpatialWriteMbSyn (void* pCtx, SSlice* pSlice, SMB* pCurMb) {
-  sWelsEncCtx* pEncCtx = (sWelsEncCtx*)pCtx;
+int32_t WelsSpatialWriteMbSyn (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb) {
   SBitStringAux* pBs = pSlice->pSliceBsa;
   SMbCache* pMbCache = &pSlice->sMbCacheInfo;
   const uint8_t kuiChromaQpIndexOffset = pEncCtx->pCurDqLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset;
 
   if (IS_SKIP (pCurMb->uiMbType)) {
-    pCurMb->uiLumaQp	= pSlice->uiLastMbQp;
+    pCurMb->uiLumaQp = pSlice->uiLastMbQp;
     pCurMb->uiChromaQp = g_kuiChromaQpTable[CLIP3_QP_0_51 (pCurMb->uiLumaQp + kuiChromaQpIndexOffset)];
 
     pSlice->iMbSkipRun++;
@@ -272,10 +308,10 @@ int32_t WelsSpatialWriteMbSyn (void* pCtx, SSlice* pSlice, SMB* pCurMb) {
 
 int32_t WelsWriteMbResidual (SWelsFuncPtrList* pFuncList, SMbCache* sMbCacheInfo, SMB* pCurMb, SBitStringAux* pBs) {
   int32_t i;
-  Mb_Type uiMbType					= pCurMb->uiMbType;
-  const int32_t kiCbpChroma		= pCurMb->uiCbp >> 4;
-  const int32_t kiCbpLuma			= pCurMb->uiCbp & 0x0F;
-  int8_t* pNonZeroCoeffCount	= sMbCacheInfo->iNonZeroCoeffCount;
+  Mb_Type uiMbType              = pCurMb->uiMbType;
+  const int32_t kiCbpChroma     = pCurMb->uiCbp >> 4;
+  const int32_t kiCbpLuma       = pCurMb->uiCbp & 0x0F;
+  int8_t* pNonZeroCoeffCount    = sMbCacheInfo->iNonZeroCoeffCount;
   int16_t* pBlock;
   int8_t iA, iB, iC;
 

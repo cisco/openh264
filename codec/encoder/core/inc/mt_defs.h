@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	mt_defs.h
+ * \file    mt_defs.h
  *
- * \brief	Main macros for multiple threading implementation
+ * \brief   Main macros for multiple threading implementation
  *
- * \date	2/26/2010 Created
+ * \date    2/26/2010 Created
  *
  *************************************************************************************
  */
@@ -44,52 +44,51 @@
 #include "codec_app_def.h"
 #include "wels_const.h"
 #include "WelsThreadLib.h"
+#include "slice.h"
 
+using namespace WelsEnc;
 /*
- *	MT_DEBUG: output trace MT related into log file
+ *  MT_DEBUG: output trace MT related into log file
  */
 //#define MT_DEBUG
 //#define ENABLE_TRACE_MT
 
-
-#define DYNAMIC_DETECT_CPU_CORES
-
-#define THRESHOLD_RMSE_CORE8	0.0320f	// v1.1: 0.0320f; v1.0: 0.02f
-#define THRESHOLD_RMSE_CORE4	0.0215f	// v1.1: 0.0215f; v1.0: 0.03f
-#define THRESHOLD_RMSE_CORE2	0.0200f	// v1.1: 0.0200f; v1.0: 0.04f
+#define THRESHOLD_RMSE_CORE8    0.0320f // v1.1: 0.0320f; v1.0: 0.02f
+#define THRESHOLD_RMSE_CORE4    0.0215f // v1.1: 0.0215f; v1.0: 0.03f
+#define THRESHOLD_RMSE_CORE2    0.0200f // v1.1: 0.0200f; v1.0: 0.04f
 
 typedef struct TagSliceThreadPrivateData {
-void*		pWelsPEncCtx;
-SLayerBSInfo*	pLayerBs;
-int32_t		iSliceIndex;	// slice index, zero based
-int32_t		iThreadIndex;	// thread index, zero based
+void*           pWelsPEncCtx;
+SFrameBSInfo*   pFrameBsInfo;
+int32_t         iSliceIndex;    // slice index, zero based
+int32_t         iThreadIndex;   // thread index, zero based
 
 // for dynamic slicing mode
-int32_t		iStartMbIndex;	// inclusive
-int32_t		iEndMbIndex;	// exclusive
+int32_t         iStartMbIndex;  // inclusive
+int32_t         iEndMbIndex;    // exclusive
 } SSliceThreadPrivateData;
 
 typedef struct TagSliceThreading {
-SSliceThreadPrivateData*	pThreadPEncCtx;// thread context, [iThreadIdx]
+SSliceThreadPrivateData*        pThreadPEncCtx;// thread context, [iThreadIdx]
 char eventNamespace[100];
-WELS_THREAD_HANDLE			pThreadHandles[MAX_THREADS_NUM];// thread handles, [iThreadIdx]
-WELS_EVENT					pSliceCodedEvent[MAX_THREADS_NUM];// events for slice coded state, [iThreadIdx]
-WELS_EVENT					pSliceCodedMasterEvent;	// events for signalling that some event in pSliceCodedEvent has been signalled
-WELS_EVENT					pReadySliceCodingEvent[MAX_THREADS_NUM];	// events for slice coding ready, [iThreadIdx]
-WELS_EVENT					pUpdateMbListEvent[MAX_THREADS_NUM];		// signal to update mb list neighbor for various slices
-WELS_EVENT					pFinUpdateMbListEvent[MAX_THREADS_NUM];	// signal to indicate finish updating mb list
-WELS_EVENT					pExitEncodeEvent[MAX_THREADS_NUM];			// event for exit encoding event
-WELS_EVENT
-pThreadMasterEvent[MAX_THREADS_NUM];	// event for indicating that some event has been signalled to the thread
+WELS_THREAD_HANDLE              pThreadHandles[MAX_THREADS_NUM];// thread handles, [iThreadIdx]
+WELS_EVENT                      pSliceCodedEvent[MAX_THREADS_NUM];// events for slice coded state, [iThreadIdx]
+WELS_EVENT                      pSliceCodedMasterEvent; // events for signalling that some event in pSliceCodedEvent has been signalled
+WELS_EVENT                      pReadySliceCodingEvent[MAX_THREADS_NUM];        // events for slice coding ready, [iThreadIdx]
+WELS_EVENT                      pUpdateMbListEvent[MAX_THREADS_NUM];            // signal to update mb list neighbor for various slices
+WELS_EVENT                      pFinUpdateMbListEvent[MAX_THREADS_NUM]; // signal to indicate finish updating mb list
+WELS_EVENT                      pExitEncodeEvent[MAX_THREADS_NUM];                      // event for exit encoding event
+WELS_EVENT                      pThreadMasterEvent[MAX_THREADS_NUM];    // event for indicating that some event has been signalled to the thread
 
-WELS_MUTEX					mutexSliceNumUpdate;	// for dynamic slicing mode MT
-
-uint32_t*					pSliceConsumeTime[MAX_DEPENDENCY_LAYER];	// consuming time for each slice, [iSpatialIdx][uiSliceIdx]
-int32_t*					pSliceComplexRatio[MAX_DEPENDENCY_LAYER]; // *INT_MULTIPLY
+WELS_MUTEX                      mutexSliceNumUpdate;    // for dynamic slicing mode MT
 
 #ifdef MT_DEBUG
-FILE*						pFSliceDiff;	// file handle for debug
+FILE*                           pFSliceDiff;    // file handle for debug
 #endif//MT_DEBUG
+
+uint8_t*                        pThreadBsBuffer[MAX_THREADS_NUM]; //actual memory for slice buffer
+bool                            bThreadBsBufferUsage[MAX_THREADS_NUM];
+WELS_MUTEX                      mutexThreadBsBufferUsage;
 
 } SSliceThreading;
 

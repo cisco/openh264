@@ -31,70 +31,9 @@
  */
 
 #ifdef HAVE_NEON
-.text
 #include "arm_arch_common_macro.S"
 
 
-#ifdef __APPLE__
- //The data sequence will be used
-.macro GET_8BYTE_DATA_L0
-    vld1.8 {$0[0]}, [$1], $2
-    vld1.8 {$0[1]}, [$1], $2
-    vld1.8 {$0[2]}, [$1], $2
-    vld1.8 {$0[3]}, [$1], $2
-    vld1.8 {$0[4]}, [$1], $2
-    vld1.8 {$0[5]}, [$1], $2
-    vld1.8 {$0[6]}, [$1], $2
-    vld1.8 {$0[7]}, [$1], $2
-.endm
-
-
-.macro HDM_TRANSFORM_4X4_L0
-
-    //Do the vertical transform
-    vaddl.u8 q0, $0, $1 //{0,4,8,12,1,5,9,13}
-    vsubl.u8 q1, $0, $1 //{2,6,10,14,3,7,11,15}
-    vswp  d1, d2
-    vadd.s16 q2, q0, q1 //{0,1,2,3,4,5,6,7}
-    vsub.s16 q1, q0, q1 //{12,13,14,15,8,9,10,11}
-
-    //Do the horizontal transform
-    vtrn.32 q2, q1
-    vadd.s16 q0, q2, q1
-    vsub.s16 q1, q2, q1
-
-    vtrn.16 q0, q1
-    vadd.s16 q2, q0, q1
-    vsub.s16 q1, q0, q1
-
-    vmov.s16 d0, d4
-    vmov.s16 d1, d2
-
-    vabs.s16 d3, d3
-
-    //16x16_v
-    vtrn.32 d0, d1 //{0,1,3,2}
-    vaba.s16 $5, d0, $2 //16x16_v
-    vaba.s16 $5, d1, $8
-    vaba.s16 $5, d5, $8
-    vadd.u16 $5, d3
-
-    //16x16_h
-    vtrn.16 d4, d5 //{0,4,12,8}
-    vaba.s16 $6, d4, $3 //16x16_h
-    vabs.s16 d2, d2
-    vabs.s16 d5, d5
-    vadd.u16 d2, d3
-    vadd.u16 d2, d5
-    vadd.u16 $6, d2
-
-    //16x16_dc_both
-    vaba.s16 $7, d4, $4 //16x16_dc_both
-    vadd.u16 $7, d2
-
-.endm
-
-#else
  //The data sequence will be used
 .macro GET_8BYTE_DATA_L0 arg0, arg1, arg2
     vld1.8 {\arg0[0]}, [\arg1], \arg2
@@ -150,7 +89,6 @@
     vaba.s16 \arg7, d4, \arg4 //16x16_dc_both
     vadd.u16 \arg7, d2
 .endm
-#endif
 
 WELS_ASM_FUNC_BEGIN WelsIntra16x16Combined3Satd_neon
     stmdb sp!, {r4-r7, lr}

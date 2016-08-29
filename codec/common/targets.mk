@@ -7,15 +7,21 @@ COMMON_CPP_SRCS=\
 	$(COMMON_SRCDIR)/src/deblocking_common.cpp\
 	$(COMMON_SRCDIR)/src/expand_pic.cpp\
 	$(COMMON_SRCDIR)/src/intra_pred_common.cpp\
+	$(COMMON_SRCDIR)/src/mc.cpp\
+	$(COMMON_SRCDIR)/src/memory_align.cpp\
 	$(COMMON_SRCDIR)/src/sad_common.cpp\
 	$(COMMON_SRCDIR)/src/utils.cpp\
 	$(COMMON_SRCDIR)/src/welsCodecTrace.cpp\
+	$(COMMON_SRCDIR)/src/WelsTaskThread.cpp\
+	$(COMMON_SRCDIR)/src/WelsThread.cpp\
 	$(COMMON_SRCDIR)/src/WelsThreadLib.cpp\
+	$(COMMON_SRCDIR)/src/WelsThreadPool.cpp\
 
 COMMON_OBJS += $(COMMON_CPP_SRCS:.cpp=.$(OBJ))
 
 COMMON_ASM_SRCS=\
 	$(COMMON_SRCDIR)/x86/cpuid.asm\
+	$(COMMON_SRCDIR)/x86/dct.asm\
 	$(COMMON_SRCDIR)/x86/deblock.asm\
 	$(COMMON_SRCDIR)/x86/expand_picture.asm\
 	$(COMMON_SRCDIR)/x86/intra_pred_com.asm\

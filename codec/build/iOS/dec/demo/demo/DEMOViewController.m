@@ -47,7 +47,7 @@ extern int DecMain(int argc, char * argv[]);
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
+    // Do any additional setup after loading the view, typically from a nib.
     //Add the testing codes
     self.resFileArray = [[NSMutableArray alloc] init];
     self.selectedRow = 0;

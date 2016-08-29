@@ -59,7 +59,7 @@ int32_t WelsMbIntraPredictionConstruction (PWelsDecoderContext pCtx, PDqLayer pC
 int32_t WelsMbInterSampleConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLayer,
                                        uint8_t* pDstY, uint8_t* pDstU, uint8_t* pDstV, int32_t iStrideL, int32_t iStrideC);
 int32_t WelsMbInterConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLayer);
-void WelsLumaDcDequantIdct (int16_t* pBlock, int32_t iQp);
+void WelsLumaDcDequantIdct (int16_t* pBlock, int32_t iQp,PWelsDecoderContext pCtx);
 int32_t WelsMbInterPrediction (PWelsDecoderContext pCtx, PDqLayer pCurLayer);
 void WelsChromaDcIdct (int16_t* pBlock);
 
@@ -73,21 +73,17 @@ void WelsBlockZero8x8_sse2(int16_t * block, int32_t stride);
 #endif
 
 #if defined(HAVE_NEON)
-void SetNonZeroCount_neon (int8_t* pNonZeroCount);
 void WelsBlockZero16x16_neon(int16_t * block, int32_t stride);
 void WelsBlockZero8x8_neon(int16_t * block, int32_t stride);
 #endif
 
 #if defined(HAVE_NEON_AARCH64)
-void SetNonZeroCount_AArch64_neon (int8_t* pNonZeroCount);
 void WelsBlockZero16x16_AArch64_neon(int16_t * block, int32_t stride);
 void WelsBlockZero8x8_AArch64_neon(int16_t * block, int32_t stride);
 #endif
 #ifdef __cplusplus
 }
 #endif//__cplusplus
-
-void SetNonZeroCount_c (int8_t* pNonZeroCount);
 
 void WelsBlockFuncInit (SBlockFunc* pFunc,  int32_t iCpu);
 void WelsBlockZero16x16_c(int16_t * block, int32_t stride);

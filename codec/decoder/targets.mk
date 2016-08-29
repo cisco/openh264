@@ -13,8 +13,6 @@ DECODER_CPP_SRCS=\
 	$(DECODER_SRCDIR)/core/src/fmo.cpp\
 	$(DECODER_SRCDIR)/core/src/get_intra_predictor.cpp\
 	$(DECODER_SRCDIR)/core/src/manage_dec_ref.cpp\
-	$(DECODER_SRCDIR)/core/src/mc.cpp\
-	$(DECODER_SRCDIR)/core/src/mem_align.cpp\
 	$(DECODER_SRCDIR)/core/src/memmgr_nal_unit.cpp\
 	$(DECODER_SRCDIR)/core/src/mv_pred.cpp\
 	$(DECODER_SRCDIR)/core/src/parse_mb_syn_cabac.cpp\

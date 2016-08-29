@@ -14,4 +14,4 @@ python build/mktargets.py --directory test/processing --prefix processing_unitte
 python build/mktargets.py --directory test/api --prefix api_test
 python build/mktargets.py --directory test/common --prefix common_unittest
 python build/mktargets.py --directory module --prefix module
-python build/mktargets.py --directory gtest --library gtest --out build/gtest-targets.mk --cpp-suffix .cc --include gtest-all.cc
+python build/mktargets.py --directory gtest/googletest --library gtest --out build/gtest-targets.mk --cpp-suffix .cc --include gtest-all.cc

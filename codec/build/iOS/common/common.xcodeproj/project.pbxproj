@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0DD32A861B467902009181A1 /* WelsThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0DD32A851B467902009181A1 /* WelsThread.cpp */; };
+		0DD32A881B467911009181A1 /* WelsTaskThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0DD32A871B467911009181A1 /* WelsTaskThread.cpp */; };
+		0DD32A941B468F77009181A1 /* WelsThreadPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0DD32A931B468F77009181A1 /* WelsThreadPool.cpp */; };
 		4C3406C918D96EA600DFA14A /* arm_arch_common_macro.S in Sources */ = {isa = PBXBuildFile; fileRef = 4C3406B218D96EA600DFA14A /* arm_arch_common_macro.S */; };
 		4C3406CA18D96EA600DFA14A /* deblocking_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4C3406B318D96EA600DFA14A /* deblocking_neon.S */; };
 		4C3406CB18D96EA600DFA14A /* expand_picture_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = 4C3406B418D96EA600DFA14A /* expand_picture_neon.S */; };
@@ -19,6 +22,8 @@
 		4CE443D918B722CD0017DF25 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CE443D818B722CD0017DF25 /* Foundation.framework */; };
 		53C1C9BC193F0FB000404D8F /* expand_pic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 53C1C9BB193F0FB000404D8F /* expand_pic.cpp */; };
 		5BA8F2C019603F5F00011CE4 /* common_tables.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BA8F2BF19603F5F00011CE4 /* common_tables.cpp */; };
+		5BD896BA1A7B839B00D32B7D /* memory_align.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BD896B91A7B839B00D32B7D /* memory_align.cpp */; };
+		5BDD15ED1A79027600B6CA2E /* mc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BDD15EC1A79027600B6CA2E /* mc.cpp */; };
 		F0B204F918FD23BF005DA23F /* copy_mb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F0B204F818FD23BF005DA23F /* copy_mb.cpp */; };
 		F556A8241906673900E156A8 /* arm_arch64_common_macro.S in Sources */ = {isa = PBXBuildFile; fileRef = F556A8221906673900E156A8 /* arm_arch64_common_macro.S */; };
 		F556A8251906673900E156A8 /* expand_picture_aarch64_neon.S in Sources */ = {isa = PBXBuildFile; fileRef = F556A8231906673900E156A8 /* expand_picture_aarch64_neon.S */; };
@@ -44,6 +49,16 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0DB71EF31BAB273500EABC51 /* WelsCircleQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WelsCircleQueue.h; sourceTree = "<group>"; };
+		0DD32A851B467902009181A1 /* WelsThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WelsThread.cpp; sourceTree = "<group>"; };
+		0DD32A871B467911009181A1 /* WelsTaskThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WelsTaskThread.cpp; sourceTree = "<group>"; };
+		0DD32A8E1B467B83009181A1 /* WelsLock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WelsLock.h; sourceTree = "<group>"; };
+		0DD32A8F1B467C73009181A1 /* WelsTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WelsTask.h; sourceTree = "<group>"; };
+		0DD32A901B467C73009181A1 /* WelsTaskThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WelsTaskThread.h; sourceTree = "<group>"; };
+		0DD32A911B467C73009181A1 /* WelsThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WelsThread.h; sourceTree = "<group>"; };
+		0DD32A921B467C73009181A1 /* WelsThreadPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WelsThreadPool.h; sourceTree = "<group>"; };
+		0DD32A931B468F77009181A1 /* WelsThreadPool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WelsThreadPool.cpp; sourceTree = "<group>"; };
+		0DEA477E1BB36FE100ADD134 /* WelsList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WelsList.h; sourceTree = "<group>"; };
 		4C3406B218D96EA600DFA14A /* arm_arch_common_macro.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = arm_arch_common_macro.S; sourceTree = "<group>"; };
 		4C3406B318D96EA600DFA14A /* deblocking_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = deblocking_neon.S; sourceTree = "<group>"; };
 		4C3406B418D96EA600DFA14A /* expand_picture_neon.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = expand_picture_neon.S; sourceTree = "<group>"; };
@@ -54,7 +69,6 @@
 		4C3406BA18D96EA600DFA14A /* deblocking_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = deblocking_common.h; sourceTree = "<group>"; };
 		4C3406BD18D96EA600DFA14A /* ls_defines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ls_defines.h; sourceTree = "<group>"; };
 		4C3406BE18D96EA600DFA14A /* macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = macros.h; sourceTree = "<group>"; };
-		4C3406BF18D96EA600DFA14A /* mc_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mc_common.h; sourceTree = "<group>"; };
 		4C3406C018D96EA600DFA14A /* measure_time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = measure_time.h; sourceTree = "<group>"; };
 		4C3406C118D96EA600DFA14A /* typedefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = typedefs.h; sourceTree = "<group>"; };
 		4C3406C218D96EA600DFA14A /* WelsThreadLib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WelsThreadLib.h; sourceTree = "<group>"; };
@@ -68,8 +82,13 @@
 		4CE443E918B722CD0017DF25 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		53C1C9BA193F0F9E00404D8F /* expand_pic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = expand_pic.h; sourceTree = "<group>"; };
 		53C1C9BB193F0FB000404D8F /* expand_pic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = expand_pic.cpp; sourceTree = "<group>"; };
+		5B9196F91A7F8BA40075D641 /* wels_const_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wels_const_common.h; sourceTree = "<group>"; };
 		5BA8F2BE19603F3500011CE4 /* wels_common_defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wels_common_defs.h; sourceTree = "<group>"; };
 		5BA8F2BF19603F5F00011CE4 /* common_tables.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = common_tables.cpp; sourceTree = "<group>"; };
+		5BD896B81A7B837700D32B7D /* memory_align.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = memory_align.h; sourceTree = "<group>"; };
+		5BD896B91A7B839B00D32B7D /* memory_align.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = memory_align.cpp; sourceTree = "<group>"; };
+		5BDD15EB1A79026A00B6CA2E /* mc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mc.h; sourceTree = "<group>"; };
+		5BDD15EC1A79027600B6CA2E /* mc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mc.cpp; sourceTree = "<group>"; };
 		F0B204F718FD23B6005DA23F /* copy_mb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = copy_mb.h; sourceTree = "<group>"; };
 		F0B204F818FD23BF005DA23F /* copy_mb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = copy_mb.cpp; sourceTree = "<group>"; };
 		F556A8221906673900E156A8 /* arm_arch64_common_macro.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = arm_arch64_common_macro.S; path = arm64/arm_arch64_common_macro.S; sourceTree = "<group>"; };
@@ -123,10 +142,19 @@
 				4C3406BA18D96EA600DFA14A /* deblocking_common.h */,
 				4C3406BD18D96EA600DFA14A /* ls_defines.h */,
 				4C3406BE18D96EA600DFA14A /* macros.h */,
-				4C3406BF18D96EA600DFA14A /* mc_common.h */,
+				5BDD15EB1A79026A00B6CA2E /* mc.h */,
 				4C3406C018D96EA600DFA14A /* measure_time.h */,
+				5BD896B81A7B837700D32B7D /* memory_align.h */,
 				4C3406C118D96EA600DFA14A /* typedefs.h */,
 				5BA8F2BE19603F3500011CE4 /* wels_common_defs.h */,
+				0DB71EF31BAB273500EABC51 /* WelsCircleQueue.h */,
+				0DEA477E1BB36FE100ADD134 /* WelsList.h */,
+				0DD32A8E1B467B83009181A1 /* WelsLock.h */,
+				0DD32A8F1B467C73009181A1 /* WelsTask.h */,
+				0DD32A901B467C73009181A1 /* WelsTaskThread.h */,
+				0DD32A911B467C73009181A1 /* WelsThread.h */,
+				0DD32A921B467C73009181A1 /* WelsThreadPool.h */,
+				5B9196F91A7F8BA40075D641 /* wels_const_common.h */,
 				4C3406C218D96EA600DFA14A /* WelsThreadLib.h */,
 			);
 			path = inc;
@@ -143,6 +171,11 @@
 				4C3406C518D96EA600DFA14A /* crt_util_safe_x.cpp */,
 				53C1C9BB193F0FB000404D8F /* expand_pic.cpp */,
 				4C3406C618D96EA600DFA14A /* deblocking_common.cpp */,
+				5BDD15EC1A79027600B6CA2E /* mc.cpp */,
+				5BD896B91A7B839B00D32B7D /* memory_align.cpp */,
+				0DD32A871B467911009181A1 /* WelsTaskThread.cpp */,
+				0DD32A931B468F77009181A1 /* WelsThreadPool.cpp */,
+				0DD32A851B467902009181A1 /* WelsThread.cpp */,
 				4C3406C818D96EA600DFA14A /* WelsThreadLib.cpp */,
 			);
 			path = src;
@@ -250,14 +283,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0DD32A941B468F77009181A1 /* WelsThreadPool.cpp in Sources */,
 				F5B8D82D190757290037849A /* mc_aarch64_neon.S in Sources */,
 				4C3406C918D96EA600DFA14A /* arm_arch_common_macro.S in Sources */,
 				F556A8241906673900E156A8 /* arm_arch64_common_macro.S in Sources */,
+				5BDD15ED1A79027600B6CA2E /* mc.cpp in Sources */,
 				F5AC94FF193EB7D800F58154 /* deblocking_aarch64_neon.S in Sources */,
 				4C3406CE18D96EA600DFA14A /* crt_util_safe_x.cpp in Sources */,
 				F791965919D3BE2200F60C6B /* intra_pred_common.cpp in Sources */,
+				5BD896BA1A7B839B00D32B7D /* memory_align.cpp in Sources */,
+				0DD32A881B467911009181A1 /* WelsTaskThread.cpp in Sources */,
 				4C3406CF18D96EA600DFA14A /* deblocking_common.cpp in Sources */,
 				5BA8F2C019603F5F00011CE4 /* common_tables.cpp in Sources */,
+				0DD32A861B467902009181A1 /* WelsThread.cpp in Sources */,
 				F791965419D3B89D00F60C6B /* intra_pred_common_aarch64_neon.S in Sources */,
 				4C3406D118D96EA600DFA14A /* WelsThreadLib.cpp in Sources */,
 				4C3406CC18D96EA600DFA14A /* mc_neon.S in Sources */,
@@ -368,6 +406,11 @@
 					HAVE_NEON,
 				);
 				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(SRCROOT)/../../../api/svc",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -395,6 +438,11 @@
 					HAVE_NEON,
 				);
 				"GCC_PREPROCESSOR_DEFINITIONS[sdk=iphonesimulator*]" = APPLE_IOS;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(SRCROOT)/../../../api/svc",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

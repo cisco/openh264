@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "wels_common_basis.h"
-#include "mem_align.h"
+#include "memory_align.h"
 #include "mv_pred.h"
 #include "ls_defines.h"
 
@@ -266,7 +266,7 @@ void AnchorPredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]) {
 
   int32_t iCurSliceIdc, iTopSliceIdc, iLeftTopSliceIdc, iRightTopSliceIdc, iLeftSliceIdc;
   int32_t iLeftTopType, iRightTopType, iTopType, iLeftType;
-  int32_t iCurX, iCurY, iCurXy, iLeftXy, iTopXy, iLeftTopXy, iRightTopXy = 0;
+  int32_t iCurX, iCurY, iCurXy, iLeftXy, iTopXy = 0, iLeftTopXy = 0, iRightTopXy = 0;
 
   int8_t iLeftRef;
   int8_t iTopRef;
@@ -414,22 +414,22 @@ void AnchorPredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]) {
 
 int32_t AllocLayerData (PDqLayer pDqLayer) {
 
-  pDqLayer->pSliceIdc = (int32_t*) WelsMalloc (pDqLayer->iMbWidth * pDqLayer->iMbHeight * sizeof (int32_t),
+  pDqLayer->pSliceIdc = (int32_t*) WelsMallocz (pDqLayer->iMbWidth * pDqLayer->iMbHeight * sizeof (int32_t),
                         "pDqLayer->pSliceIdc");
   if (pDqLayer->pSliceIdc == NULL)
     return 1;
 
-  pDqLayer->pMbType = (int8_t*) WelsMalloc (pDqLayer->iMbWidth * pDqLayer->iMbHeight * sizeof (int8_t),
+  pDqLayer->pMbType = (int16_t*) WelsMallocz (pDqLayer->iMbWidth * pDqLayer->iMbHeight * sizeof (int16_t),
                       "pDqLayer->pMbType");
   if (pDqLayer->pMbType == NULL)
     return 1;
 
-  pDqLayer->pMv[0] = (int16_t (*)[MB_BLOCK4x4_NUM][MV_A]) WelsMalloc (pDqLayer->iMbWidth * pDqLayer->iMbHeight * sizeof (
+  pDqLayer->pMv[0] = (int16_t (*)[MB_BLOCK4x4_NUM][MV_A]) WelsMallocz (pDqLayer->iMbWidth * pDqLayer->iMbHeight * sizeof (
                        int16_t) * MV_A * MB_BLOCK4x4_NUM, "pDqLayer->pMv");
   if (pDqLayer->pMv[0] == NULL)
     return 1;
 
-  pDqLayer->pRefIndex[0] = (int8_t (*)[MB_BLOCK4x4_NUM]) WelsMalloc (pDqLayer->iMbWidth * pDqLayer->iMbHeight * sizeof (
+  pDqLayer->pRefIndex[0] = (int8_t (*)[MB_BLOCK4x4_NUM]) WelsMallocz (pDqLayer->iMbWidth * pDqLayer->iMbHeight * sizeof (
                              int8_t) * MB_BLOCK4x4_NUM, "pDqLayer->pRefIndex");
   if (pDqLayer->pRefIndex[0] == NULL)
     return 1;
@@ -476,7 +476,7 @@ void InitRandomLayerSliceIdc (PDqLayer pDqLayer) {
 
 void InitRandomLayerMbType (PDqLayer pDqLayer) {
   for (int32_t i = 0; i < pDqLayer->iMbWidth * pDqLayer->iMbHeight; ++i) {
-    pDqLayer->pMbType[i] = (rand() & 0x0f) + 1; //1 ~ 16
+    pDqLayer->pMbType[i] = 1 << (rand() % 11); //2^(1 ~ 10)
   }
 }
 
@@ -515,6 +515,7 @@ TEST (PredMvTest, PredSkipMvFromNeighbor) {
   bool bOK = true;
   SDqLayer sDqLayer;
   int16_t iAncMvp[2], iWelsMvp[2];
+  int i;
 
   memset (&sDqLayer, 0, sizeof (SDqLayer));
   //Assume the input data as 352x288 size
@@ -537,6 +538,7 @@ TEST (PredMvTest, PredSkipMvFromNeighbor) {
 #define RIGHT_TOP_MB_IDX (sDqLayer.iMbXyIndex - sDqLayer.iMbWidth + 1)
 #define RIGHT_TOP_MB_BLK 12
 
+  int32_t iTotalMbNum = sDqLayer.iMbHeight * sDqLayer.iMbWidth;
   //CASE 1: test MB [0,0], expect mvp = (0,0)
   sDqLayer.iMbX = 0;
   sDqLayer.iMbY = 0;
@@ -560,18 +562,20 @@ TEST (PredMvTest, PredSkipMvFromNeighbor) {
   sDqLayer.iMbY = rand() % (sDqLayer.iMbHeight - 1) + 1; //not equal to 0
   sDqLayer.iMbXyIndex = sDqLayer.iMbY * sDqLayer.iMbWidth + sDqLayer.iMbX;
   //CASE 4.1.1: same slice_idc, assume = 0
-  memset (sDqLayer.pSliceIdc, 0, sDqLayer.iMbWidth * sDqLayer.iMbHeight * sizeof (int32_t));
+  memset (sDqLayer.pSliceIdc, 0, iTotalMbNum * sizeof (int32_t));
   //CASE 4.1.1.1: ALL P modes
-  memset (sDqLayer.pMbType, MB_TYPE_16x16, sDqLayer.iMbWidth * sDqLayer.iMbHeight * sizeof (int8_t));
+  for (i = 0; i < iTotalMbNum; ++i) {
+    sDqLayer.pMbType[i] = MB_TYPE_16x16;
+  }
   //CASE 4.1.1.1.1: ref_idx = 0, left MV = 0, top MV != 0, expect mvp = (0,0)
-  memset (sDqLayer.pRefIndex[0], 0, sDqLayer.iMbWidth * sDqLayer.iMbHeight * MB_BLOCK4x4_NUM * sizeof (int8_t));
+  memset (sDqLayer.pRefIndex[0], 0, iTotalMbNum * MB_BLOCK4x4_NUM * sizeof (int8_t));
   InitRandomLayerMvData (&sDqLayer); //reset Mv data
   sDqLayer.pMv[0][LEFT_MB_IDX][LEFT_MB_BLK][0] = sDqLayer.pMv[0][LEFT_MB_IDX][LEFT_MB_BLK][1] = 0; //left_mv = 0
   sDqLayer.pMv[0][ TOP_MB_IDX][ TOP_MB_BLK][0] = sDqLayer.pMv[0][ TOP_MB_IDX][ TOP_MB_BLK][1] = 1; //top_mv != 0
   iAncMvp[0] = iAncMvp[1] = 0; //expect anchor result to 0
   TEST_SKIP_MV_PRED;
   //CASE 4.1.1.1.2: ref_idx = 0, left MV != 0, top MV = 0, expect mvp = (0,0)
-  memset (sDqLayer.pRefIndex[0], 0, sDqLayer.iMbWidth * sDqLayer.iMbHeight * MB_BLOCK4x4_NUM * sizeof (int8_t));
+  memset (sDqLayer.pRefIndex[0], 0, iTotalMbNum * MB_BLOCK4x4_NUM * sizeof (int8_t));
   InitRandomLayerMvData (&sDqLayer); //reset Mv data
   sDqLayer.pMv[0][LEFT_MB_IDX][LEFT_MB_BLK][0] = sDqLayer.pMv[0][LEFT_MB_IDX][LEFT_MB_BLK][1] = 1; //left_mv != 0
   sDqLayer.pMv[0][ TOP_MB_IDX][ TOP_MB_BLK][0] = sDqLayer.pMv[0][ TOP_MB_IDX][ TOP_MB_BLK][1] = 0; //top_mv = 0
@@ -593,16 +597,19 @@ TEST (PredMvTest, PredSkipMvFromNeighbor) {
   iAncMvp[1] = sDqLayer.pMv[0][LEFT_MB_IDX][LEFT_MB_BLK][1];
   TEST_SKIP_MV_PRED;
   //CASE 4.1.1.2: All I
-  memset (sDqLayer.pMbType, MB_TYPE_INTRA16x16, sDqLayer.iMbWidth * sDqLayer.iMbHeight * sizeof (int8_t));
+  for (i = 0; i < iTotalMbNum; ++i) {
+    sDqLayer.pMbType[i] = MB_TYPE_INTRA16x16;
+  }
   //CASE 4.1.1.2.1: left P, expect mvp = left mv
   sDqLayer.pMbType[LEFT_MB_IDX] = MB_TYPE_16x16; //left P
   iAncMvp[0] = sDqLayer.pMv[0][LEFT_MB_IDX][LEFT_MB_BLK][0];
   iAncMvp[1] = sDqLayer.pMv[0][LEFT_MB_IDX][LEFT_MB_BLK][1];
   TEST_SKIP_MV_PRED;
   //CASE 4.1.1.3: only top P, top ref_idx = 0, expect mvp = top mv
-  memset (sDqLayer.pMbType, MB_TYPE_INTRA16x16, sDqLayer.iMbWidth * sDqLayer.iMbHeight * sizeof (int8_t)); // All I MB
-  memset (sDqLayer.pRefIndex[0], 1, sDqLayer.iMbWidth * sDqLayer.iMbHeight * MB_BLOCK4x4_NUM * sizeof (
-            int8_t)); // All ref_idx = 1
+  for (i = 0; i < iTotalMbNum; ++i) {  // All I MB
+    sDqLayer.pMbType[i] = MB_TYPE_INTRA16x16;
+  }
+  memset (sDqLayer.pRefIndex[0], 1, iTotalMbNum * MB_BLOCK4x4_NUM * sizeof (int8_t)); // All ref_idx = 1
   sDqLayer.pMbType[TOP_MB_IDX] = MB_TYPE_16x16; //top P
   sDqLayer.pRefIndex[0][TOP_MB_IDX][TOP_MB_BLK] = 0; //top ref_idx = 0
   iAncMvp[0] = sDqLayer.pMv[0][TOP_MB_IDX][TOP_MB_BLK][0];
@@ -612,9 +619,10 @@ TEST (PredMvTest, PredSkipMvFromNeighbor) {
   sDqLayer.iMbX = (rand() % (sDqLayer.iMbWidth - 2)) + 1; //1 ~ (mb_width - 2)
   sDqLayer.iMbY = (rand() % (sDqLayer.iMbHeight - 2)) + 1; //1 ~ (mb_height - 2)
   sDqLayer.iMbXyIndex = sDqLayer.iMbY * sDqLayer.iMbWidth + sDqLayer.iMbX;
-  memset (sDqLayer.pMbType, MB_TYPE_INTRA16x16, sDqLayer.iMbWidth * sDqLayer.iMbHeight * sizeof (int8_t)); // All I MB
-  memset (sDqLayer.pRefIndex[0], 1, sDqLayer.iMbWidth * sDqLayer.iMbHeight * MB_BLOCK4x4_NUM * sizeof (
-            int8_t)); // All ref_idx = 1
+  for (i = 0; i < iTotalMbNum; ++i) {  // All I MB
+    sDqLayer.pMbType[i] = MB_TYPE_INTRA16x16;
+  }
+  memset (sDqLayer.pRefIndex[0], 1, iTotalMbNum * MB_BLOCK4x4_NUM * sizeof (int8_t)); // All ref_idx = 1
   sDqLayer.pMbType[LEFT_TOP_MB_IDX] = MB_TYPE_16x16; //top P
   sDqLayer.pRefIndex[0][LEFT_TOP_MB_IDX][LEFT_TOP_MB_BLK] = 0; //top ref_idx = 0
   iAncMvp[0] = iAncMvp[1] = 0; //expect anchor result to 0
@@ -623,18 +631,20 @@ TEST (PredMvTest, PredSkipMvFromNeighbor) {
   sDqLayer.iMbX = (rand() % (sDqLayer.iMbWidth - 2)) + 1; //1 ~ (mb_width - 2)
   sDqLayer.iMbY = (rand() % (sDqLayer.iMbHeight - 2)) + 1; //1 ~ (mb_height - 2)
   sDqLayer.iMbXyIndex = sDqLayer.iMbY * sDqLayer.iMbWidth + sDqLayer.iMbX;
-  memset (sDqLayer.pMbType, MB_TYPE_INTRA16x16, sDqLayer.iMbWidth * sDqLayer.iMbHeight * sizeof (int8_t)); // All I MB
-  memset (sDqLayer.pRefIndex[0], 1, sDqLayer.iMbWidth * sDqLayer.iMbHeight * MB_BLOCK4x4_NUM * sizeof (
-            int8_t)); // All ref_idx = 1
+  for (i = 0; i < iTotalMbNum; ++i) {  // All I MB
+    sDqLayer.pMbType[i] = MB_TYPE_INTRA16x16;
+  }
+  memset (sDqLayer.pRefIndex[0], 1, iTotalMbNum * MB_BLOCK4x4_NUM * sizeof (int8_t)); // All ref_idx = 1
   sDqLayer.pMbType[RIGHT_TOP_MB_IDX] = MB_TYPE_16x16; //top P
   sDqLayer.pRefIndex[0][RIGHT_TOP_MB_IDX][RIGHT_TOP_MB_BLK] = 0; //top ref_idx = 0
   iAncMvp[0] = sDqLayer.pMv[0][RIGHT_TOP_MB_IDX][RIGHT_TOP_MB_BLK][0];
   iAncMvp[1] = sDqLayer.pMv[0][RIGHT_TOP_MB_IDX][RIGHT_TOP_MB_BLK][1];
   TEST_SKIP_MV_PRED;
   //CASE 4.1.2: different neighbor slice idc for all P and ref_idx = 0, expect mvp = 0
-  memset (sDqLayer.pMbType, MB_TYPE_16x16, sDqLayer.iMbWidth * sDqLayer.iMbHeight * sizeof (int8_t)); // All I MB
-  memset (sDqLayer.pRefIndex[0], 0, sDqLayer.iMbWidth * sDqLayer.iMbHeight * MB_BLOCK4x4_NUM * sizeof (
-            int8_t)); // All ref_idx = 1
+  for (i = 0; i < iTotalMbNum; ++i) {  // All P MB
+    sDqLayer.pMbType[i] = MB_TYPE_16x16;
+  }
+  memset (sDqLayer.pRefIndex[0], 0, iTotalMbNum * MB_BLOCK4x4_NUM * sizeof (int8_t)); // All ref_idx = 1
   sDqLayer.iMbX = (rand() % (sDqLayer.iMbWidth - 2)) + 1; //1 ~ (mb_width - 2)
   sDqLayer.iMbY = (rand() % (sDqLayer.iMbHeight - 2)) + 1; //1 ~ (mb_height - 2)
   sDqLayer.iMbXyIndex = sDqLayer.iMbY * sDqLayer.iMbWidth + sDqLayer.iMbX;
@@ -649,7 +659,7 @@ TEST (PredMvTest, PredSkipMvFromNeighbor) {
   //add new specific tests here
 
   //normal tests
-  int32_t i = 0;
+  i = 0;
   while (i++ < kiRandTime) {
     InitRandomLayerData (&sDqLayer); //init MV data, as it would not affect the following logic test
     AnchorPredPSkipMvFromNeighbor (&sDqLayer, iAncMvp);

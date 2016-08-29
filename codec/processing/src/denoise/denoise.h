@@ -28,9 +28,9 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	    :  denoise.h
+ * \file        :  denoise.h
  *
- * \brief	    :  denoise class of wels video processor class
+ * \brief       :  denoise class of wels video processor class
  *
  * \date        :  2011/03/15
  *
@@ -52,7 +52,7 @@
 #define DENOISE_GRAY_SIGMA  (2)
 
 #define UV_WINDOWS_RADIUS   (2)
-#define TAIL_OF_LINE8		(7)
+#define TAIL_OF_LINE8       (7)
 
 #define DENOISE_Y_COMPONENT (1)
 #define DENOISE_U_COMPONENT (2)
@@ -79,8 +79,8 @@ WELSVP_EXTERN_C_END
 #endif
 
 typedef  struct TagDenoiseFuncs {
-  DenoiseFilterFuncPtr	pfBilateralLumaFilter8;//on 8 samples
-  DenoiseFilterFuncPtr	pfWaverageChromaFilter8;//on 8 samples
+  DenoiseFilterFuncPtr pfBilateralLumaFilter8;//on 8 samples
+  DenoiseFilterFuncPtr pfWaverageChromaFilter8;//on 8 samples
 } SDenoiseFuncs;
 
 class CDenoiser : public IStrategy {
@@ -96,9 +96,9 @@ class CDenoiser : public IStrategy {
   void WaverageDenoiseChroma (uint8_t* pSrcUV, int32_t width, int32_t height, int32_t stride);
 
  private:
-  float		 m_fSigmaGrey;			//sigma for grey scale similarity, suggestion 2.5-3
-  uint16_t	 m_uiSpaceRadius;			//filter windows radius: 1-3x3, 2-5x5,3-7x7. Larger size, slower speed
-  uint16_t	 m_uiType;					//do denoising on which component 1-Y, 2-U, 4-V; 7-YUV, 3-YU, 5-YV, 6-UV
+  float          m_fSigmaGrey;                  //sigma for grey scale similarity, suggestion 2.5-3
+  uint16_t       m_uiSpaceRadius;               //filter windows radius: 1-3x3, 2-5x5,3-7x7. Larger size, slower speed
+  uint16_t       m_uiType;                      //do denoising on which component 1-Y, 2-U, 4-V; 7-YUV, 3-YU, 5-YV, 6-UV
 
   SDenoiseFuncs m_pfDenoise;
   int32_t      m_CPUFlag;

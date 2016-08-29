@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	mv_pred.c
+ * \file    mv_pred.c
  *
- * \brief	Get MV predictor and update motion vector of mb cache
+ * \brief   Get MV predictor and update motion vector of mb cache
  *
- * \date	05/22/2009 Created
+ * \date    05/22/2009 Created
  *
  *************************************************************************************
  */
@@ -48,7 +48,7 @@ void PredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]) {
 
   int32_t iCurSliceIdc, iTopSliceIdc, iLeftTopSliceIdc, iRightTopSliceIdc, iLeftSliceIdc;
   int32_t iLeftTopType, iRightTopType, iTopType, iLeftType;
-  int32_t iCurX, iCurY, iCurXy, iLeftXy, iTopXy, iLeftTopXy, iRightTopXy = 0;
+  int32_t iCurX, iCurY, iCurXy, iLeftXy, iTopXy = 0, iLeftTopXy = 0, iRightTopXy = 0;
 
   int8_t iLeftRef;
   int8_t iTopRef;
@@ -196,15 +196,15 @@ void PredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]) {
 //basic iMVs prediction unit for iMVs partition width (4, 2, 1)
 void PredMv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30],
              int32_t iPartIdx, int32_t iPartWidth, int8_t iRef, int16_t iMVP[2]) {
-  const uint8_t kuiLeftIdx	= g_kuiCache30ScanIdx[iPartIdx] - 1;
-  const uint8_t kuiTopIdx		= g_kuiCache30ScanIdx[iPartIdx] - 6;
-  const uint8_t kuiRightTopIdx = kuiTopIdx + iPartWidth;
-  const uint8_t kuiLeftTopIdx	= kuiTopIdx - 1;
+  const uint8_t kuiLeftIdx      = g_kuiCache30ScanIdx[iPartIdx] - 1;
+  const uint8_t kuiTopIdx       = g_kuiCache30ScanIdx[iPartIdx] - 6;
+  const uint8_t kuiRightTopIdx  = kuiTopIdx + iPartWidth;
+  const uint8_t kuiLeftTopIdx   = kuiTopIdx - 1;
 
   const int8_t kiLeftRef      = iRefIndex[0][kuiLeftIdx];
   const int8_t kiTopRef       = iRefIndex[0][ kuiTopIdx];
-  const int8_t kiRightTopRef = iRefIndex[0][kuiRightTopIdx];
-  const int8_t kiLeftTopRef  = iRefIndex[0][ kuiLeftTopIdx];
+  const int8_t kiRightTopRef  = iRefIndex[0][kuiRightTopIdx];
+  const int8_t kiLeftTopRef   = iRefIndex[0][ kuiLeftTopIdx];
   int8_t iDiagonalRef  = kiRightTopRef;
 
   int8_t iMatchRef = 0;
@@ -286,8 +286,8 @@ void PredInter16x8Mv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[
 //update iMVs and iRefIndex cache for current MB, only for P_16*16 (SKIP inclusive)
 /* can be further optimized */
 void UpdateP16x16MotionInfo (PDqLayer pCurDqLayer, int8_t iRef, int16_t iMVs[2]) {
-  const int16_t kiRef2		= (iRef << 8) | iRef;
-  const int32_t kiMV32		= LD32 (iMVs);
+  const int16_t kiRef2 = (iRef << 8) | iRef;
+  const int32_t kiMV32 = LD32 (iMVs);
   int32_t i;
   int32_t iMbXy = pCurDqLayer->iMbXyIndex;
 

@@ -28,9 +28,9 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	    :  downsample.h
+ * \file        :  downsample.h
  *
- * \brief	    :  downsample class of wels video processor class
+ * \brief       :  downsample class of wels video processor class
  *
  * \date        :  2011/03/33
  *
@@ -54,60 +54,98 @@ typedef void (HalveDownsampleFunc) (uint8_t* pDst, const int32_t kiDstStride,
                                     uint8_t* pSrc, const int32_t kiSrcStride,
                                     const int32_t kiSrcWidth, const int32_t kiSrcHeight);
 
+typedef void (SpecificDownsampleFunc) (uint8_t* pDst, const int32_t kiDstStride,
+                                       uint8_t* pSrc, const int32_t kiSrcStride,
+                                       const int32_t kiSrcWidth, const int32_t kiHeight);
+
 typedef void (GeneralDownsampleFunc) (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth,
                                       const int32_t kiDstHeight,
                                       uint8_t* pSrc, const int32_t kiSrcStride, const int32_t kiSrcWidth, const int32_t kiSrcHeight);
 
-typedef HalveDownsampleFunc*		PHalveDownsampleFunc;
-typedef GeneralDownsampleFunc*	PGeneralDownsampleFunc;
+typedef HalveDownsampleFunc*    PHalveDownsampleFunc;
+typedef SpecificDownsampleFunc* PSpecificDownsampleFunc;
+typedef GeneralDownsampleFunc*  PGeneralDownsampleFunc;
 
-HalveDownsampleFunc   DyadicBilinearDownsampler_c;
+HalveDownsampleFunc     DyadicBilinearDownsampler_c;
 GeneralDownsampleFunc GeneralBilinearFastDownsampler_c;
 GeneralDownsampleFunc GeneralBilinearAccurateDownsampler_c;
+SpecificDownsampleFunc  DyadicBilinearOneThirdDownsampler_c;
+SpecificDownsampleFunc  DyadicBilinearQuarterDownsampler_c;
 
 typedef struct {
-  // align_index: 0 = x32; 1 = x16; 2 = x8; 3 = common case left;
-  PHalveDownsampleFunc			pfHalfAverage[4];
-  PGeneralDownsampleFunc		pfGeneralRatioLuma;
-  PGeneralDownsampleFunc		pfGeneralRatioChroma;
+  PHalveDownsampleFunc          pfHalfAverageWidthx32;
+  PHalveDownsampleFunc          pfHalfAverageWidthx16;
+  PSpecificDownsampleFunc       pfOneThirdDownsampler;
+  PSpecificDownsampleFunc       pfQuarterDownsampler;
+  PGeneralDownsampleFunc        pfGeneralRatioLuma;
+  PGeneralDownsampleFunc        pfGeneralRatioChroma;
 } SDownsampleFuncs;
 
 
 #ifdef X86_ASM
 WELSVP_EXTERN_C_BEGIN
 // used for scr width is multipler of 8 pixels
-HalveDownsampleFunc		DyadicBilinearDownsamplerWidthx8_sse;
+HalveDownsampleFunc     DyadicBilinearDownsamplerWidthx8_sse;
 // iSrcWidth= x16 pixels
-HalveDownsampleFunc		DyadicBilinearDownsamplerWidthx16_sse;
+HalveDownsampleFunc     DyadicBilinearDownsamplerWidthx16_sse;
 // iSrcWidth= x32 pixels
-HalveDownsampleFunc		DyadicBilinearDownsamplerWidthx32_sse;
+HalveDownsampleFunc     DyadicBilinearDownsamplerWidthx32_sse;
 // used for scr width is multipler of 16 pixels
-HalveDownsampleFunc		DyadicBilinearDownsamplerWidthx16_ssse3;
+HalveDownsampleFunc     DyadicBilinearDownsamplerWidthx16_ssse3;
 // iSrcWidth= x32 pixels
-HalveDownsampleFunc		DyadicBilinearDownsamplerWidthx32_ssse3;
-// iSrcWidth= x16 pixels
-HalveDownsampleFunc		DyadicBilinearDownsamplerWidthx16_sse4;
-// iSrcWidth= x32 pixels
-HalveDownsampleFunc		DyadicBilinearDownsamplerWidthx32_sse4;
+HalveDownsampleFunc     DyadicBilinearDownsamplerWidthx32_ssse3;
 
 GeneralDownsampleFunc GeneralBilinearFastDownsamplerWrap_sse2;
 GeneralDownsampleFunc GeneralBilinearAccurateDownsamplerWrap_sse2;
+GeneralDownsampleFunc GeneralBilinearFastDownsamplerWrap_ssse3;
+GeneralDownsampleFunc GeneralBilinearAccurateDownsamplerWrap_sse41;
+#ifdef HAVE_AVX2
+GeneralDownsampleFunc GeneralBilinearFastDownsamplerWrap_avx2;
+GeneralDownsampleFunc GeneralBilinearAccurateDownsamplerWrap_avx2;
+#endif
+
+SpecificDownsampleFunc  DyadicBilinearOneThirdDownsampler_ssse3;
+SpecificDownsampleFunc  DyadicBilinearOneThirdDownsampler_sse4;
+SpecificDownsampleFunc  DyadicBilinearQuarterDownsampler_sse;
+SpecificDownsampleFunc  DyadicBilinearQuarterDownsampler_ssse3;
+SpecificDownsampleFunc  DyadicBilinearQuarterDownsampler_sse4;
 
 void GeneralBilinearFastDownsampler_sse2 (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth,
-    const int32_t kiDstHeight, uint8_t* pSrc, const int32_t kiSrcStride, const uint32_t kuiScaleX, const uint32_t kuiScaleY);
+    const int32_t kiDstHeight, uint8_t* pSrc, const int32_t kiSrcStride, const uint32_t kuiScaleX,
+    const uint32_t kuiScaleY);
 void GeneralBilinearAccurateDownsampler_sse2 (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth,
-    const int32_t kiDstHeight, uint8_t* pSrc, const int32_t kiSrcStride, const uint32_t kuiScaleX, const uint32_t kuiScaleY);
+    const int32_t kiDstHeight, uint8_t* pSrc, const int32_t kiSrcStride, const uint32_t kuiScaleX,
+    const uint32_t kuiScaleY);
+void GeneralBilinearFastDownsampler_ssse3 (uint8_t* pDst, int32_t iDstStride, int32_t iDstWidth,
+    int32_t iDstHeight, uint8_t* pSrc, int32_t iSrcStride, uint32_t uiScaleX,
+    uint32_t uiScaleY);
+void GeneralBilinearAccurateDownsampler_sse41 (uint8_t* pDst, int32_t iDstStride, int32_t iDstWidth,
+    int32_t iDstHeight, uint8_t* pSrc, int32_t iSrcStride, uint32_t uiScaleX,
+    uint32_t uiScaleY);
+#ifdef HAVE_AVX2
+void GeneralBilinearFastDownsampler_avx2 (uint8_t* pDst, int32_t iDstStride, int32_t iDstWidth,
+    int32_t iDstHeight, uint8_t* pSrc, int32_t iSrcStride, uint32_t uiScaleX,
+    uint32_t uiScaleY);
+void GeneralBilinearAccurateDownsampler_avx2 (uint8_t* pDst, int32_t iDstStride, int32_t iDstWidth,
+    int32_t iDstHeight, uint8_t* pSrc, int32_t iSrcStride, uint32_t uiScaleX,
+    uint32_t uiScaleY);
+#endif
+
 WELSVP_EXTERN_C_END
 #endif
 
 #ifdef HAVE_NEON
 WELSVP_EXTERN_C_BEGIN
 // iSrcWidth no limitation
-HalveDownsampleFunc		DyadicBilinearDownsampler_neon;
+HalveDownsampleFunc     DyadicBilinearDownsampler_neon;
 // iSrcWidth = x32 pixels
-HalveDownsampleFunc		DyadicBilinearDownsamplerWidthx32_neon;
+HalveDownsampleFunc     DyadicBilinearDownsamplerWidthx32_neon;
 
 GeneralDownsampleFunc   GeneralBilinearAccurateDownsamplerWrap_neon;
+
+SpecificDownsampleFunc  DyadicBilinearOneThirdDownsampler_neon;
+
+SpecificDownsampleFunc  DyadicBilinearQuarterDownsampler_neon;
 
 void GeneralBilinearAccurateDownsampler_neon (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth,
     const int32_t kiDstHeight,
@@ -119,14 +157,19 @@ WELSVP_EXTERN_C_END
 #ifdef HAVE_NEON_AARCH64
 WELSVP_EXTERN_C_BEGIN
 // iSrcWidth no limitation
-HalveDownsampleFunc		DyadicBilinearDownsampler_AArch64_neon;
+HalveDownsampleFunc     DyadicBilinearDownsampler_AArch64_neon;
 // iSrcWidth = x32 pixels
-HalveDownsampleFunc		DyadicBilinearDownsamplerWidthx32_AArch64_neon;
+HalveDownsampleFunc     DyadicBilinearDownsamplerWidthx32_AArch64_neon;
 
 GeneralDownsampleFunc   GeneralBilinearAccurateDownsamplerWrap_AArch64_neon;
 
-void GeneralBilinearAccurateDownsampler_AArch64_neon (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth, const int32_t kiDstHeight,
-                                                      uint8_t* pSrc, const int32_t kiSrcStride, const uint32_t kuiScaleX, const uint32_t kuiScaleY);
+SpecificDownsampleFunc  DyadicBilinearOneThirdDownsampler_AArch64_neon;
+
+SpecificDownsampleFunc  DyadicBilinearQuarterDownsampler_AArch64_neon;
+
+void GeneralBilinearAccurateDownsampler_AArch64_neon (uint8_t* pDst, const int32_t kiDstStride,
+    const int32_t kiDstWidth, const int32_t kiDstHeight,
+    uint8_t* pSrc, const int32_t kiSrcStride, const uint32_t kuiScaleX, const uint32_t kuiScaleY);
 
 WELSVP_EXTERN_C_END
 #endif
@@ -142,11 +185,15 @@ class CDownsampling : public IStrategy {
  private:
   void InitDownsampleFuncs (SDownsampleFuncs& sDownsampleFunc, int32_t iCpuFlag);
 
-  int32_t GetAlignedIndex (const int32_t kiSrcWidth);
-
+  void DownsampleHalfAverage (uint8_t* pDst, int32_t iDstStride,
+      uint8_t* pSrc, int32_t iSrcStride, int32_t iSrcWidth, int32_t iSrcHeight);
+  bool AllocateSampleBuffer();
+  void FreeSampleBuffer();
  private:
   SDownsampleFuncs m_pfDownsample;
   int32_t  m_iCPUFlag;
+  uint8_t  *m_pSampleBuffer[2][3];
+  bool     m_bNoSampleBuffer;
 };
 
 WELSVP_NAMESPACE_END

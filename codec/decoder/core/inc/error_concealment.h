@@ -28,11 +28,11 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	error_concealment.h
+ * \file    error_concealment.h
  *
- * \brief	Interfaces introduced for error concealment
+ * \brief   Interfaces introduced for error concealment
  *
- * \date	04/14/2014 Created
+ * \date    04/14/2014 Created
  *
  *************************************************************************************
  */

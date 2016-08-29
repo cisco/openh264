@@ -31,268 +31,8 @@
  */
 
 #ifdef HAVE_NEON_AARCH64
-.text
 
 #include "arm_arch64_common_macro.S"
-#ifdef __APPLE__
-
-.macro MASK_MATRIX
-    uabd    $6.16b, $1.16b, $2.16b
-    cmhi    $6.16b, $4.16b, $6.16b
-
-    uabd    $4.16b, $0.16b, $1.16b
-    cmhi    $4.16b, $5.16b, $4.16b
-    and     $6.16b, $6.16b, $4.16b
-
-    uabd    $4.16b, $3.16b, $2.16b
-    cmhi    $4.16b, $5.16b, $4.16b
-    and     $6.16b, $6.16b, $4.16b
-.endm
-
-.macro DIFF_LUMA_LT4_P1_Q1 //(Use Tmp v23, v24)
-    //v0, v1, v2, v3, v17(beta), v18(-Tc0), v6(Tc0), v7(flag), v19, v20
-    urhadd    $8.16b, $2.16b, $3.16b
-    uhadd   $8.16b, $0.16b, $8.16b
-    usubl   $9.8h, $8.8b, $1.8b
-    sqxtn   $9.8b, $9.8h
-    usubl2  $8.8h, $8.16b, $1.16b
-    sqxtn2  $9.16b, $8.8h
-    smax    $8.16b, $9.16b, $5.16b
-//
-    smin  $8.16b, $8.16b, $6.16b
-    uabd  $9.16b, $0.16b, $2.16b
-    cmhi  $9.16b, $4.16b, $9.16b
-    and     $8.16b, $8.16b, $9.16b
-    and     $8.16b, $8.16b, $7.16b
-    add     $8.16b, $1.16b, $8.16b
-    abs     $9.16b, $9.16b
-.endm
-
-.macro DIFF_LUMA_LT4_P0_Q0_1
-    usubl $5.8h, $0.8b, $3.8b
-    usubl $6.8h, $2.8b, $1.8b
-    shl     $6.8h, $6.8h, #2
-    add     $5.8h, $5.8h, $6.8h
-    sqrshrn  $4.8b, $5.8h, #3
-.endm
-
-.macro DIFF_LUMA_LT4_P0_Q0_2
-    usubl2    $5.8h, $0.16b, $3.16b
-    usubl2    $6.8h, $2.16b, $1.16b
-    shl     $6.8h, $6.8h, #2
-    add     $5.8h, $5.8h, $6.8h
-    sqrshrn2  $4.16b, $5.8h, #3
-.endm
-
-.macro EXTRACT_DELTA_INTO_TWO_PART
-    cmge  $1.16b, $0.16b, #0
-    and     $1.16b, $0.16b, $1.16b
-    sub     $0.16b, $1.16b, $0.16b
-.endm
-
-.macro DIFF_LUMA_EQ4_P2P1P0_1
-    uaddl $8.8h, $1.8b, $2.8b
-    uaddl $9.8h, $3.8b, $4.8b
-    add   $9.8h, $9.8h, $8.8h
-
-    uaddl $8.8h, $0.8b, $1.8b
-    shl   $8.8h, $8.8h, #1
-    add   $8.8h, $9.8h, $8.8h
-
-    rshrn $0.8b, $9.8h, #2
-    rshrn $7.8b, $8.8h, #3
-    shl     $9.8h, $9.8h, #1
-    usubl   $8.8h, $5.8b, $1.8b
-    add     $9.8h, $8.8h, $9.8h
-
-    uaddl $8.8h, $2.8b, $5.8b
-    uaddw $8.8h, $8.8h, $2.8b
-    uaddw $8.8h, $8.8h, $3.8b
-
-    rshrn $9.8b, $9.8h, #3
-    rshrn $8.8b, $8.8h, #2
-    bsl       $6.8b, $9.8b, $8.8b
-.endm
-
-.macro DIFF_LUMA_EQ4_P2P1P0_2
-    uaddl2 $8.8h, $1.16b, $2.16b
-    uaddl2 $9.8h, $3.16b, $4.16b
-    add   $9.8h, $9.8h, $8.8h
-
-    uaddl2 $8.8h, $0.16b, $1.16b
-    shl   $8.8h, $8.8h, #1
-    add   $8.8h, $9.8h, $8.8h
-
-    rshrn2    $0.16b, $9.8h, #2
-    rshrn2    $7.16b, $8.8h, #3
-    shl     $9.8h, $9.8h, #1
-    usubl2   $8.8h, $5.16b, $1.16b
-    add     $9.8h, $8.8h, $9.8h
-
-    uaddl2    $8.8h, $2.16b, $5.16b
-    uaddw2    $8.8h, $8.8h, $2.16b
-    uaddw2    $8.8h, $8.8h, $3.16b
-
-    rshrn2    $9.16b, $9.8h, #3
-    rshrn2    $8.16b, $8.8h, #2
-    bsl       $6.16b, $9.16b, $8.16b
-.endm
-
-
-.macro DIFF_CHROMA_EQ4_P0Q0_1
-    uaddl $4.8h, $0.8b, $3.8b
-    shl   $4.8h, $4.8h, #1
-    usubl $5.8h, $1.8b, $3.8b
-    add   $5.8h, $5.8h, $4.8h
-    rshrn $6.8b, $5.8h, #2
-    usubl $5.8h, $2.8b, $0.8b
-    add   $5.8h, $5.8h, $4.8h
-    rshrn $7.8b, $5.8h, #2
-.endm
-
-.macro DIFF_CHROMA_EQ4_P0Q0_2
-    uaddl2 $4.8h, $0.16b, $3.16b
-    shl   $4.8h, $4.8h, #1
-    usubl2 $5.8h, $1.16b, $3.16b
-    add   $5.8h, $5.8h, $4.8h
-    rshrn2 $6.16b, $5.8h, #2
-    usubl2 $5.8h, $2.16b, $0.16b
-    add   $5.8h, $5.8h, $4.8h
-    rshrn2 $7.16b, $5.8h, #2
-.endm
-
-.macro DIFF_LUMA_EQ4_MASK
-    mov.16b   $3, $2
-    bsl   $3.16b, $0.16b, $1.16b
-.endm
-
-.macro LOAD_LUMA_DATA_3
-    ld3   {$0.b, $1.b, $2.b} [$6], [x2], x1
-    ld3   {$3.b, $4.b, $5.b} [$6], [x0], x1
-.endm
-
-.macro LOAD_LUMA_DATA_4
-    ld4   {$0.b, $1.b, $2.b, $3.b} [$8], [x3], x1
-    ld4   {$4.b, $5.b, $6.b, $7.b} [$8], [x0], x1
-.endm
-
-.macro STORE_LUMA_DATA_4
-    st4   {$0.b, $1.b, $2.b, $3.b} [$4], [x0], x1
-    st4   {$0.b, $1.b, $2.b, $3.b} [$5], [x2], x1
-.endm
-
-.macro STORE_LUMA_DATA_3
-    st3 {$0.b, $1.b, $2.b} [$6], [x3], x1
-    st3   {$3.b, $4.b, $5.b} [$6], [x0], x1
-.endm
-
-.macro LOAD_CHROMA_DATA_4
-    ld4   {$0.b, $1.b, $2.b, $3.b} [$5], [$4], x2
-.endm
-
-.macro STORE_CHROMA_DATA_2
-    st2   {$0.b, $1.b} [$3], [$2], x2
-.endm
-
-.macro ZERO_JUMP_END
-    mov $1, $0.d[0]
-    mov $2, $0.d[1]
-    orr $1, $1, $2
-    cbz $1, $3
-.endm
-
-.macro BS_NZC_CHECK
-    ld1 {v0.16b}, [$0]
-    //Arrange the input data --- TOP
-    ands     x6, $1, #2
-    cbz      x6, bs_nzc_check_jump0
-    sub      x6, $0, $2, lsl #4
-    sub      x6, x6, $2, lsl #3
-    add      x6, x6, #12
-    ld1      {v1.s} [3], [x6]
-
-    bs_nzc_check_jump0:
-    ext      v1.16b, v1.16b, v0.16b, #12
-    add      $3.16b, v0.16b, v1.16b
-
-    // Arrange the input data --- LEFT
-    ands     x6, $1, #1
-    cbz      x6, bs_nzc_check_jump1
-
-    sub      x6, $0, #21
-    add      x7, x6, #4
-    ld1      {v1.b} [12], [x6]
-    add      x6, x7, #4
-    ld1      {v1.b} [13], [x7]
-    add      x7, x6, #4
-    ld1      {v1.b} [14], [x6]
-    ld1      {v1.b} [15], [x7]
-
-bs_nzc_check_jump1:
-    ins      v2.d[0], v0.d[1]
-    zip1     v0.16b, v0.16b, v2.16b
-    ins      v2.d[0], v0.d[1]
-    zip1     v0.16b, v0.16b, v2.16b
-    ext      v1.16b, v1.16b, v0.16b, #12
-    add      $4.16b, v0.16b, v1.16b
-.endm
-
-.macro BS_COMPARE_MV //in: $0,$1(const),$2(const),$3(const),$4(const); out:$5
-    mov   w6, #4
-    sabd  v20.8h, $0.8h, $1.8h
-    sabd  v21.8h, $1.8h, $2.8h
-    dup   $0.8h, w6
-    sabd  v22.8h, $2.8h, $3.8h
-    sabd  v23.8h, $3.8h, $4.8h
-
-    cmge  v20.8h, v20.8h, $0.8h
-    cmge  v21.8h, v21.8h, $0.8h
-    cmge  v22.8h, v22.8h, $0.8h
-    cmge  v23.8h, v23.8h, $0.8h
-
-    addp v20.8h, v20.8h, v21.8h
-    addp v21.8h, v22.8h, v23.8h
-
-    addhn  $5.8b, v20.8h, v20.8h
-    addhn2  $5.16b, v21.8h, v21.8h
-.endm
-
-.macro BS_MV_CHECK
-    ldp q0, q1, [$0], #32
-    ldp q2, q3, [$0]
-    sub $0, $0, #32
-    // Arrenge the input data --- TOP
-    ands     x6, $1, #2
-    cbz     x6, bs_mv_check_jump0
-    sub      x6, $0, $2, lsl #6
-    add      x6, x6, #48
-    ld1      {v4.16b}, [x6]
-bs_mv_check_jump0:
-    BS_COMPARE_MV  v4, v0, v1, v2, v3, $3
-    // Arrange the input data --- LEFT
-    ands     x6, $1, #1
-    cbz      x6, bs_mv_check_jump1
-    sub      x6, $0, #52
-    add      x7, x6, #16
-    ld1      {v4.s} [0], [x6]
-    add      x6, x7, #16
-    ld1      {v4.s} [1], [x7]
-    add      x7, x6, #16
-    ld1      {v4.s} [2], [x6]
-    ld1      {v4.s} [3], [x7]
-bs_mv_check_jump1:
-    zip1  $5.4s, v0.4s, v2.4s
-    zip2  $6.4s, v0.4s, v2.4s
-    zip1  v0.4s, v1.4s, v3.4s
-    zip2  v2.4s, v1.4s, v3.4s
-    zip2  v1.4s, $5.4s, v0.4s
-    zip1  v0.4s, $5.4s, v0.4s
-    zip2  v3.4s, $6.4s, v2.4s
-    zip1  v2.4s, $6.4s, v2.4s
-    BS_COMPARE_MV  v4, v0, v1, v2, v3, $4
-.endm
-
-#else
 
 .macro MASK_MATRIX arg0, arg1, arg2, arg3, arg4, arg5, arg6
     uabd    \arg6\().16b, \arg1\().16b, \arg2\().16b
@@ -420,7 +160,7 @@ bs_mv_check_jump1:
 .endm
 
 .macro DIFF_LUMA_EQ4_MASK arg0, arg1, arg2, arg3
-    mov.16b   \arg3, \arg2
+    mov   \arg3\().16b, \arg2\().16b
     bsl   \arg3\().16b, \arg0\().16b, \arg1\().16b
 .endm
 
@@ -550,19 +290,14 @@ bs_mv_check_jump1:
     zip1  v2.4s, \arg6\().4s, v2.4s
     BS_COMPARE_MV  v4, v0, v1, v2, v3, \arg4
 .endm
-#endif
 
 WELS_ASM_AARCH64_FUNC_BEGIN WelsNonZeroCount_AArch64_neon
+    mov w1, #1
+    dup v3.8b, w1
     ld1 {v0.8b, v1.8b, v2.8b}, [x0]
-    ins v0.d[1], v1.d[0]
-    uzp1 v0.2d, v0.2d, v1.2d
-    cmeq v0.16b, v0.16b, #0
-    cmeq v2.8b, v2.8b, #0
-    mvn v0.16b, v0.16b
-    mvn v2.8b, v2.8b
-    abs v0.16b, v0.16b
-    abs v2.8b, v2.8b
-    ins v1.d[0], v0.d[1]
+    umin  v0.8b, v0.8b, v3.8b
+    umin  v1.8b, v1.8b, v3.8b
+    umin  v2.8b, v2.8b, v3.8b
     st1 {v0.8b, v1.8b, v2.8b}, [x0]
 WELS_ASM_AARCH64_FUNC_END
 
@@ -570,6 +305,7 @@ WELS_ASM_AARCH64_FUNC_END
 WELS_ASM_AARCH64_FUNC_BEGIN DeblockLumaLt4V_AArch64_neon //uint8_t* pPix, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* tc
     dup v16.16b, w2 //alpha
     dup v17.16b, w3 //beta
+    SIGN_EXTENSION x1,w1
     add x2, x1, x1, lsl #1
     sub x2, x0, x2
     movi v23.16b, #128
@@ -628,8 +364,8 @@ WELS_ASM_AARCH64_FUNC_END
 WELS_ASM_AARCH64_FUNC_BEGIN DeblockLumaEq4V_AArch64_neon
     dup     v16.16b, w2 //alpha
     dup     v17.16b, w3 //beta
+    SIGN_EXTENSION x1,w1
     sub     x3, x0, x1, lsl #2
-
     ld1     {v0.16b}, [x3], x1
     ld1     {v4.16b}, [x0], x1
     ld1     {v1.16b}, [x3], x1
@@ -656,10 +392,10 @@ WELS_ASM_AARCH64_FUNC_BEGIN DeblockLumaEq4V_AArch64_neon
     and     v22.16b, v22.16b, v20.16b //(iDetaP0Q0 < ((iAlpha >> 2) + 2))&&bDetaQ2Q0
     and     v20.16b, v20.16b, v18.16b //(iDetaP0Q0 < iAlpha) && bDetaP1P0 && bDetaQ1Q0&&(iDetaP0Q0 < ((iAlpha >> 2) + 2))
 
-    mov.16b v23, v21
-    mov.16b v24, v21
+    mov v23.16b, v21.16b
+    mov v24.16b, v21.16b
 
-    mov.16b v25, v0
+    mov v25.16b, v0.16b
     DIFF_LUMA_EQ4_P2P1P0_1        v0, v1, v2, v3, v4, v5, v23, v19, v17, v16
     DIFF_LUMA_EQ4_P2P1P0_2        v25, v1, v2, v3, v4, v5, v24, v19, v17, v16
     ins v0.d[1], v25.d[1]
@@ -673,9 +409,9 @@ WELS_ASM_AARCH64_FUNC_BEGIN DeblockLumaEq4V_AArch64_neon
     st1   {v17.16b}, [x3], x1
 
 
-    mov.16b v23, v22
-    mov.16b v24, v22
-    mov.16b v25, v7
+    mov v23.16b, v22.16b
+    mov v24.16b, v22.16b
+    mov v25.16b, v7.16b
     DIFF_LUMA_EQ4_P2P1P0_1        v7, v6, v5, v4, v3, v2, v23, v19, v17, v16
     DIFF_LUMA_EQ4_P2P1P0_2        v25, v6, v5, v4, v3, v2, v24, v19, v17, v16
     ins v7.d[1], v25.d[1]
@@ -696,7 +432,7 @@ WELS_ASM_AARCH64_FUNC_BEGIN DeblockLumaLt4H_AArch64_neon //uint8_t* pPix, int32_
     dup v17.16b, w3 //beta
     sub x2, x0, #3
     movi v23.16b, #128
-
+    SIGN_EXTENSION x1,w1
     LOAD_LUMA_DATA_3      v0, v1, v2, v3, v4, v5, 0
     LOAD_LUMA_DATA_3      v0, v1, v2, v3, v4, v5, 1
     LOAD_LUMA_DATA_3      v0, v1, v2, v3, v4, v5, 2
@@ -732,7 +468,7 @@ WELS_ASM_AARCH64_FUNC_BEGIN DeblockLumaLt4H_AArch64_neon //uint8_t* pPix, int32_
     sub v18.16b, v18.16b, v6.16b // -iTc0: 0000, 1111, 2222, 3333
 
     DIFF_LUMA_LT4_P1_Q1   v0, v1, v2, v3, v17, v18, v6, v7, v19, v20 //Use Tmp v23,v24
-    mov.16b v25, v19
+    mov v25.16b, v19.16b
 
     DIFF_LUMA_LT4_P1_Q1   v5, v4, v3, v2, v17, v18, v6, v7, v21, v22 //Use Tmp v23,v24
 
@@ -753,11 +489,11 @@ WELS_ASM_AARCH64_FUNC_BEGIN DeblockLumaLt4H_AArch64_neon //uint8_t* pPix, int32_
     EXTRACT_DELTA_INTO_TWO_PART   v19, v20
     uqadd v2.16b, v2.16b, v20.16b
     uqsub v2.16b, v2.16b, v19.16b
-    mov.16b v26, v2
+    mov v26.16b, v2.16b
     uqsub v3.16b, v3.16b, v20.16b
     uqadd v3.16b, v3.16b, v19.16b
-    mov.16b v27, v3
-    mov.16b v28, v21
+    mov v27.16b, v3.16b
+    mov v28.16b, v21.16b
 
     sub   x0, x0, #2
     add   x2, x0, x1
@@ -780,7 +516,7 @@ WELS_ASM_AARCH64_FUNC_BEGIN DeblockLumaEq4H_AArch64_neon
     dup     v16.16b, w2 //alpha
     dup     v17.16b, w3 //beta
     sub     x3, x0, #4
-
+    SIGN_EXTENSION x1,w1
     LOAD_LUMA_DATA_4      v0, v1, v2, v3, v4, v5, v6, v7, 0
     LOAD_LUMA_DATA_4      v0, v1, v2, v3, v4, v5, v6, v7, 1
     LOAD_LUMA_DATA_4      v0, v1, v2, v3, v4, v5, v6, v7, 2
@@ -820,37 +556,37 @@ WELS_ASM_AARCH64_FUNC_BEGIN DeblockLumaEq4H_AArch64_neon
     and     v22.16b, v22.16b, v20.16b //(iDetaP0Q0 < ((iAlpha >> 2) + 2))&&bDetaQ2Q0
     and     v20.16b, v20.16b, v18.16b //(iDetaP0Q0 < iAlpha) && bDetaP1P0 && bDetaQ1Q0&&(iDetaP0Q0 < ((iAlpha >> 2) + 2))
 
-    mov.16b v23, v21
-    mov.16b v24, v21
+    mov v23.16b, v21.16b
+    mov v24.16b, v21.16b
 
-    mov.16b v25, v0
+    mov v25.16b, v0.16b
     DIFF_LUMA_EQ4_P2P1P0_1        v0, v1, v2, v3, v4, v5, v23, v19, v17, v16
     DIFF_LUMA_EQ4_P2P1P0_2        v25, v1, v2, v3, v4, v5, v24, v19, v17, v16
     ins v0.d[1], v25.d[1]
     ins v23.d[1], v24.d[1]
     and   v21.16b, v20.16b, v21.16b
     DIFF_LUMA_EQ4_MASK    v19, v1, v21, v17
-    mov.16b v26, v17
+    mov v26.16b, v17.16b
     DIFF_LUMA_EQ4_MASK    v0, v2, v21, v17
-    mov.16b v27, v17
+    mov v27.16b, v17.16b
     DIFF_LUMA_EQ4_MASK    v23, v3, v18, v17
-    mov.16b v28, v17
+    mov v28.16b, v17.16b
 
 
-    mov.16b v23, v22
-    mov.16b v24, v22
-    mov.16b v25, v7
+    mov v23.16b, v22.16b
+    mov v24.16b, v22.16b
+    mov v25.16b, v7.16b
     DIFF_LUMA_EQ4_P2P1P0_1        v7, v6, v5, v4, v3, v2, v23, v19, v17, v16
     DIFF_LUMA_EQ4_P2P1P0_2        v25, v6, v5, v4, v3, v2, v24, v19, v17, v16
     ins v7.d[1], v25.d[1]
     ins v23.d[1], v24.d[1]
     and   v22.16b, v20.16b, v22.16b
     DIFF_LUMA_EQ4_MASK    v23, v4, v18, v17
-    mov.16b v29, v17
+    mov v29.16b, v17.16b
     DIFF_LUMA_EQ4_MASK    v7, v5, v22, v17
-    mov.16b v30, v17
+    mov v30.16b, v17.16b
     DIFF_LUMA_EQ4_MASK    v19, v6, v22, v17
-    mov.16b v31, v17
+    mov v31.16b, v17.16b
 
     STORE_LUMA_DATA_3     v26, v27, v28, v29, v30, v31, 0
     STORE_LUMA_DATA_3     v26, v27, v28, v29, v30, v31, 1
@@ -1017,7 +753,7 @@ WELS_ASM_AARCH64_FUNC_BEGIN DeblockChromaEq4V_AArch64_neon //uint8_t* pPixCb, ui
     DIFF_CHROMA_EQ4_P0Q0_1 v0, v1, v2, v3, v18, v19, v20, v21
     DIFF_CHROMA_EQ4_P0Q0_2 v0, v1, v2, v3, v18, v19, v20, v21
 
-    mov.16b v6, v7
+    mov v6.16b, v7.16b
     bsl v6.16b, v20.16b, v1.16b
     bsl v7.16b, v21.16b, v2.16b
 
@@ -1063,7 +799,7 @@ WELS_ASM_AARCH64_FUNC_BEGIN DeblockChromaEq4H_AArch64_neon //uint8_t* pPixCb, ui
     DIFF_CHROMA_EQ4_P0Q0_1 v0, v1, v2, v3, v18, v19, v20, v21
     DIFF_CHROMA_EQ4_P0Q0_2 v0, v1, v2, v3, v18, v19, v20, v21
 
-    mov.16b v6, v7
+    mov v6.16b, v7.16b
     bsl v6.16b, v20.16b, v1.16b
     bsl v7.16b, v21.16b, v2.16b
 

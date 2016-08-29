@@ -386,7 +386,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\src\mc.cpp"
+				RelativePath="..\..\..\common\src\mc.cpp"
 				>
 			</File>
 			<File
@@ -394,7 +394,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\src\memory_align.cpp"
+				RelativePath="..\..\..\common\src\memory_align.cpp"
 				>
 			</File>
 			<File
@@ -406,11 +406,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\src\picture_handle.cpp"
+				RelativePath="..\..\..\encoder\core\src\paraset_strategy.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\src\property.cpp"
+				RelativePath="..\..\..\encoder\core\src\picture_handle.cpp"
 				>
 			</File>
 			<File
@@ -478,7 +478,31 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\encoder\core\src\wels_task_base.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\encoder\core\src\wels_task_encoder.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\encoder\core\src\wels_task_management.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\src\WelsTaskThread.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\src\WelsThread.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\common\src\WelsThreadLib.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\src\WelsThreadPool.cpp"
 				>
 			</File>
 		</Filter>
@@ -492,10 +516,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\encoder\core\inc\au_set.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\encoder\core\inc\bit_stream.h"
 				>
 			</File>
 			<File
@@ -551,6 +571,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\common\inc\golomb_common.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\common\inc\ls_defines.h"
 				>
 			</File>
@@ -563,11 +587,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\inc\mc.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\common\inc\mc_common.h"
+				RelativePath="..\..\..\common\inc\mc.h"
 				>
 			</File>
 			<File
@@ -579,7 +599,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\inc\memory_align.h"
+				RelativePath="..\..\..\common\inc\memory_align.h"
 				>
 			</File>
 			<File
@@ -595,10 +615,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\inc\nal_prefix.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\encoder\core\inc\param_svc.h"
 				>
 			</File>
@@ -607,15 +623,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\encoder\core\inc\paraset_strategy.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\encoder\core\inc\picture.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\encoder\core\inc\picture_handle.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\encoder\core\inc\property.h"
 				>
 			</File>
 			<File
@@ -699,10 +715,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\inc\trace.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\common\inc\typedefs.h"
 				>
 			</File>
@@ -719,11 +731,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\encoder\core\inc\wels_common_defs.h"
+				RelativePath="..\..\..\common\inc\wels_common_defs.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\encoder\core\inc\wels_const.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\inc\wels_const_common.h"
 				>
 			</File>
 			<File
@@ -816,6 +832,46 @@
 						Name="VCCustomBuildTool"
 						CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win64 -DWIN64 -o $(IntDir)\$(InputName).obj $(InputPath)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\common\x86\dct.asm"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName)_common.obj $(InputPath)&#x0D;&#x0A;"
+						Outputs="$(IntDir)\$(InputName)_common.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win64 -DWIN64 -o $(IntDir)\$(InputName)_common.obj $(InputPath)&#x0D;&#x0A;"
+						Outputs="$(IntDir)\$(InputName)_common.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win32 -DPREFIX -DX86_32 -o $(IntDir)\$(InputName)_common.obj $(InputPath)&#x0D;&#x0A;"
+						Outputs="$(IntDir)\$(InputName)_common.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="nasm -I$(InputDir) -I$(InputDir)/../../../common/x86/ -f win64 -DWIN64 -o $(IntDir)\$(InputName)_common.obj $(InputPath)&#x0D;&#x0A;"
+						Outputs="$(IntDir)\$(InputName)_common.obj"
 					/>
 				</FileConfiguration>
 			</File>

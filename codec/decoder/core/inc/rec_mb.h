@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	rec_mb.h
+ * \file    rec_mb.h
  *
- * \brief	interfaces for all macroblock decoding process after mb syntax parsing and residual decoding with cavlc.
+ * \brief   interfaces for all macroblock decoding process after mb syntax parsing and residual decoding with cavlc.
  *
- * \date	3/4/2009 Created
+ * \date    3/4/2009 Created
  *
  *************************************************************************************
  */
@@ -77,6 +77,10 @@ int32_t RecI4x4Mb (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLeve
 int32_t RecI4x4Luma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer);
 
 int32_t RecI4x4Chroma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer);
+
+int32_t RecI8x8Mb (int32_t iMbXy, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer);
+
+int32_t RecI8x8Luma (int32_t iMbXy, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer);
 
 int32_t RecI16x16Mb (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer);
 

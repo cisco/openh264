@@ -105,12 +105,12 @@ extern const uint8_t g_kuiZeroLeftBitNumMap[16];
 #if defined(_MSC_VER) && defined(_M_IX86)
 //TODO need linux version
 #define WELS_GET_PREFIX_BITS(inval,outval){\
-	uint32_t local = inval;\
-	__asm xor		eax,	eax\
-	__asm bsr		eax,	local\
-	__asm sub		eax,	32\
-	__asm neg		eax\
-	__asm mov		outval,	eax\
+  uint32_t local = inval;\
+  __asm xor       eax,    eax\
+  __asm bsr       eax,    local\
+  __asm sub       eax,    32\
+  __asm neg       eax\
+  __asm mov       outval, eax\
 }
 #else
 #define WELS_GET_PREFIX_BITS(inval, outval) outval = GetPrefixBits(inval)

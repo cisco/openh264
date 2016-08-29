@@ -29,7 +29,7 @@ TEST_F (DecoderCapabilityTest, JustInit) {
   EXPECT_EQ (sDecCap.iMaxCpb, 20000);
   EXPECT_EQ (sDecCap.iMaxDpb, 20480);
   EXPECT_EQ (sDecCap.iMaxBr, 20000);
-  EXPECT_EQ (sDecCap.bRedPicCap, 0);
+  EXPECT_EQ (sDecCap.bRedPicCap, false);
 }
 
 

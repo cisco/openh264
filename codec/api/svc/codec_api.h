@@ -36,7 +36,7 @@
 #define WELS_VIDEO_CODEC_SVC_API_H__
 
 #ifndef __cplusplus
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && (_MSC_VER < 1800)
 typedef unsigned char bool;
 #else
 #include <stdbool.h>
@@ -77,69 +77,72 @@ typedef unsigned char bool;
   *  //decoder declaration
   *  ISVCDecoder *pSvcDecoder;
   *  //input: encoded bitstream start position; should include start code prefix
-  *	 unsigned char *pBuf =...;
+  *  unsigned char *pBuf =...;
   *  //input: encoded bit stream length; should include the size of start code prefix
-  *	 int iSize =...;
+  *  int iSize =...;
   *  //output: [0~2] for Y,U,V buffer for Decoding only
-  *	 unsigned char *pData[3] =...;
+  *  unsigned char *pData[3] =...;
   *  //in-out: for Decoding only: declare and initialize the output buffer info, this should never co-exist with Parsing only
   *  SBufferInfo sDstBufInfo;
-  *	 memset(&sDstBufInfo, 0, sizeof(SBufferInfo));
+  *  memset(&sDstBufInfo, 0, sizeof(SBufferInfo));
   *  //in-out: for Parsing only: declare and initialize the output bitstream buffer info for parse only, this should never co-exist with Decoding only
   *  SParserBsInfo sDstParseInfo;
-  *      memset(&sDstParseInfo, 0, sizeof(SParserBsInfo));
-  *      sDstParseInfo.pDstBuff = new unsigned char[PARSE_SIZE]; //In Parsing only, allocate enough buffer to save transcoded bitstream for a frame
+  *  memset(&sDstParseInfo, 0, sizeof(SParserBsInfo));
+  *  sDstParseInfo.pDstBuff = new unsigned char[PARSE_SIZE]; //In Parsing only, allocate enough buffer to save transcoded bitstream for a frame
   *
   * @endcode
   *
-  *	Step 2:decoder creation
+  * Step 2:decoder creation
   * @code
   *  CreateDecoder(pSvcDecoder);
   * @endcode
   *
-  *	Step 3:declare required parameter, used to differentiate Decoding only and Parsing only
+  * Step 3:declare required parameter, used to differentiate Decoding only and Parsing only
   * @code
   *  SDecodingParam sDecParam = {0};
-  *	 sDecParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_AVC;
+  *  sDecParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_AVC;
   *  //for Parsing only, the assignment is mandatory
   *  sDecParam.bParseOnly = true;
   * @endcode
   *
-  *	Step 4:initialize the parameter and decoder context, allocate memory
+  * Step 4:initialize the parameter and decoder context, allocate memory
   * @code
   *  Initialize(&sDecParam);
   * @endcode
   *
-  *	Step 5:do actual decoding process in slice level;
+  * Step 5:do actual decoding process in slice level;
   *        this can be done in a loop until data ends
   * @code
   *  //for Decoding only
+  *  iRet = DecodeFrameNoDelay(pBuf, iSize, pData, &sDstBufInfo);
+  *  //or
   *  iRet = DecodeFrame2(pBuf, iSize, pData, &sDstBufInfo);
   *  //for Parsing only
   *  iRet = DecodeParser(pBuf, iSize, &sDstParseInfo);
   *  //decode failed
-  *	 If (iRet != 0){
-  *	     RequestIDR or something like that.
+  *  If (iRet != 0){
+  *      RequestIDR or something like that.
   *  }
   *  //for Decoding only, pData can be used for render.
   *  if (sDstBufInfo.iBufferStatus==1){
   *      output pData[0], pData[1], pData[2];
   *  }
   * //for Parsing only, sDstParseInfo can be used for, e.g., HW decoding
-  *  if (sDstBufInfo.iBufferStatus==1){
+  *  if (sDstBufInfo.iNalNum > 0){
   *      Hardware decoding sDstParseInfo;
   *  }
-  *  //no-delay decoding can be realized by directly calling decoder again with NULL input, as in the following. In this case, decoder would immediately reconstruct the input data. This can also be used similarly for Parsing only. Consequent decoding error and output indication should also be considered as above.
+  *  //no-delay decoding can be realized by directly calling DecodeFrameNoDelay(), which is the recommended usage.
+  *  //no-delay decoding can also be realized by directly calling DecodeFrame2() again with NULL input, as in the following. In this case, decoder would immediately reconstruct the input data. This can also be used similarly for Parsing only. Consequent decoding error and output indication should also be considered as above.
   *  iRet = DecodeFrame2(NULL, 0, pData, &sDstBufInfo);
   *  judge iRet, sDstBufInfo.iBufferStatus ...
   * @endcode
   *
-  *	Step 6:uninitialize the decoder and memory free
+  * Step 6:uninitialize the decoder and memory free
   * @code
   *  Uninitialize();
   * @endcode
   *
-  *	Step 7:destroy the decoder
+  * Step 7:destroy the decoder
   * @code
   *  DestroyDecoder();
   * @endcode
@@ -168,13 +171,14 @@ typedef unsigned char bool;
   *  param.iPicWidth = width;
   *  param.iPicHeight = height;
   *  param.iTargetBitrate = 5000000;
-  *  param.iInputCsp = videoFormatI420;
   *  encoder_->Initialize (&param);
   * @endcode
   *
   * Step3:set option, set option during encoding process
   * @code
   *  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &g_LevelSetting);
+  *  int videoFormat = videoFormatI420;
+  *  encoder_->SetOption (ENCODER_OPTION_DATAFORMAT, &videoFormat);
   * @endcode
   *
   * Step4: encode and  store ouput bistream
@@ -231,7 +235,6 @@ typedef unsigned char bool;
   *  param.iPicWidth = width;
   *  param.iPicHeight = height;
   *  param.iTargetBitrate = 5000000;
-  *  param.iInputCsp = videoFormatI420;
   *  param.bEnableDenoise = denoise;
   *  param.iSpatialLayerNum = layers;
   *  //SM_DYN_SLICE don't support multi-thread now
@@ -252,6 +255,8 @@ typedef unsigned char bool;
   *  }
   *  param.iTargetBitrate *= param.iSpatialLayerNum;
   *  encoder_->InitializeExt (&param);
+  *  int videoFormat = videoFormatI420;
+  *  encoder_->SetOption (ENCODER_OPTION_DATAFORMAT, &videoFormat);
   *
   * @endcode
   */
@@ -367,6 +372,23 @@ class ISVCDecoder {
       int& iWidth,
       int& iHeight) = 0;
 
+/**
+  * @brief    For slice level DecodeFrameNoDelay() (4 parameters input),
+  *           whatever the function return value is, the output data
+  *           of I420 format will only be available when pDstInfo->iBufferStatus == 1,.
+  *           This function will parse and reconstruct the input frame immediately if it is complete
+  *           It is recommended as the main decoding function for H.264/AVC format input
+  * @param   pSrc the h264 stream to be decoded
+  * @param   iSrcLen the length of h264 stream
+  * @param   ppDst buffer pointer of decoded data (YUV)
+  * @param   pDstInfo information provided to API(width, height, etc.)
+  * @return  0 - success; otherwise -failed;
+  */
+  virtual DECODING_STATE EXTAPI DecodeFrameNoDelay (const unsigned char* pSrc,
+      const int iSrcLen,
+      unsigned char** ppDst,
+      SBufferInfo* pDstInfo) = 0;
+
   /**
   * @brief    For slice level DecodeFrame2() (4 parameters input),
   *           whatever the function return value is, the output data
@@ -470,6 +492,11 @@ DECODING_STATE (*DecodeFrame) (ISVCDecoder*, const unsigned char* pSrc,
                                int* iWidth,
                                int* iHeight);
 
+DECODING_STATE (*DecodeFrameNoDelay) (ISVCDecoder*, const unsigned char* pSrc,
+                                const int iSrcLen,
+                                unsigned char** ppDst,
+                                SBufferInfo* pDstInfo);
+
 DECODING_STATE (*DecodeFrame2) (ISVCDecoder*, const unsigned char* pSrc,
                                 const int iSrcLen,
                                 unsigned char** ppDst,
@@ -528,6 +555,19 @@ long WelsCreateDecoder (ISVCDecoder** ppDecoder);
  *  @return  void
 */
 void WelsDestroyDecoder (ISVCDecoder* pDecoder);
+
+/** @brief   Get codec version
+ *           Note, old versions of Mingw (GCC < 4.7) are buggy and use an
+ *           incorrect/different ABI for calling this function, making it
+ *           incompatible with MSVC builds.
+ *  @return  The linked codec version
+*/
+OpenH264Version WelsGetCodecVersion (void);
+
+/** @brief   Get codec version
+ *  @param   pVersion  struct to fill in with the version
+*/
+void WelsGetCodecVersionEx (OpenH264Version *pVersion);
 
 #ifdef __cplusplus
 }

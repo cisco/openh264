@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	intra_pred_common.h
+ * \file    intra_pred_common.h
  *
- * \brief	interfaces for intra predictor about 16x16.
+ * \brief   interfaces for intra predictor about 16x16.
  *
- * \date	4/2/2014 Created
+ * \date    4/2/2014 Created
  *
  *************************************************************************************
  */

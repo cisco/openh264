@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	mv_pred.h
+ * \file    mv_pred.h
  *
- * \brief	Get MV predictor and update motion vector of mb cache
+ * \brief   Get MV predictor and update motion vector of mb cache
  *
- * \date	05/22/2009 Created
+ * \date    05/22/2009 Created
  *
  *************************************************************************************
  */
@@ -46,7 +46,7 @@
 namespace WelsDec {
 
 /*!
-* \brief	 update mv and ref_index cache for current MB, only for P_16x16 (SKIP inclusive)
+* \brief     update mv and ref_index cache for current MB, only for P_16x16 (SKIP inclusive)
 * \param
 * \param
 */
@@ -63,7 +63,7 @@ void UpdateP16x8MotionInfo (PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A][
 
 
 /*!
- * \brief	 update mv and ref_index cache for current MB, only for P_8x16
+ * \brief    update mv and ref_index cache for current MB, only for P_8x16
  * \param
  * \param
  */
@@ -74,14 +74,14 @@ void UpdateP8x16MotionInfo (PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A][
 /*!
  * \brief   get the motion predictor for skip mode
  * \param
- * \param 	output iMvp[]
+ * \param   output iMvp[]
  */
 void PredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]);
 
 /*!
  * \brief   get the motion predictor for 4*4 or 8*8 or 16*16 block
  * \param
- * \param 	output iMvp[]
+ * \param   output iMvp[]
  */
 void PredMv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30],
              int32_t iPartIdx, int32_t iPartWidth, int8_t iRef, int16_t iMVP[2]);
@@ -89,7 +89,7 @@ void PredMv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][3
 /*!
  * \brief   get the motion predictor for inter16x8 MB
  * \param
- * \param 	output mvp_x and mvp_y
+ * \param   output mvp_x and mvp_y
  */
 void PredInter16x8Mv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30],
                       int32_t iPartIdx, int8_t iRef, int16_t iMVP[2]);
@@ -97,7 +97,7 @@ void PredInter16x8Mv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[
 /*!
  * \brief   get the motion predictor for inter8x16 MB
  * \param
- * \param 	output mvp_x and mvp_y
+ * \param   output mvp_x and mvp_y
  */
 void PredInter8x16Mv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30],
                       int32_t iPartIdx, int8_t iRef, int16_t iMVP[2]);

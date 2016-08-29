@@ -49,7 +49,7 @@ int32_t        iCurrentIdx;
 } SPicBuff, *PPicBuff;
 
 /*
- *	Interfaces
+ *  Interfaces
  */
 
 PPicture PrefetchPic (PPicBuff pPicBuff);  // To get current node applicable

@@ -51,47 +51,56 @@ CVAACalculation::~CVAACalculation() {
 }
 
 void CVAACalculation::InitVaaFuncs (SVaaFuncs& sVaaFuncs, int32_t iCpuFlag) {
-  sVaaFuncs.pfVAACalcSad				= VAACalcSad_c;
-  sVaaFuncs.pfVAACalcSadBgd			= VAACalcSadBgd_c;
-  sVaaFuncs.pfVAACalcSadSsd			= VAACalcSadSsd_c;
-  sVaaFuncs.pfVAACalcSadSsdBgd		= VAACalcSadSsdBgd_c;
-  sVaaFuncs.pfVAACalcSadVar			= VAACalcSadVar_c;
+  sVaaFuncs.pfVAACalcSad         = VAACalcSad_c;
+  sVaaFuncs.pfVAACalcSadBgd      = VAACalcSadBgd_c;
+  sVaaFuncs.pfVAACalcSadSsd      = VAACalcSadSsd_c;
+  sVaaFuncs.pfVAACalcSadSsdBgd   = VAACalcSadSsdBgd_c;
+  sVaaFuncs.pfVAACalcSadVar      = VAACalcSadVar_c;
 #ifdef X86_ASM
   if ((iCpuFlag & WELS_CPU_SSE2) == WELS_CPU_SSE2) {
-    sVaaFuncs.pfVAACalcSad			= VAACalcSad_sse2;
-    sVaaFuncs.pfVAACalcSadBgd		= VAACalcSadBgd_sse2;
-    sVaaFuncs.pfVAACalcSadSsd		= VAACalcSadSsd_sse2;
+    sVaaFuncs.pfVAACalcSad       = VAACalcSad_sse2;
+    sVaaFuncs.pfVAACalcSadBgd    = VAACalcSadBgd_sse2;
+    sVaaFuncs.pfVAACalcSadSsd    = VAACalcSadSsd_sse2;
     sVaaFuncs.pfVAACalcSadSsdBgd = VAACalcSadSsdBgd_sse2;
-    sVaaFuncs.pfVAACalcSadVar		= VAACalcSadVar_sse2;
+    sVaaFuncs.pfVAACalcSadVar    = VAACalcSadVar_sse2;
   }
+#ifdef HAVE_AVX2
+  if (iCpuFlag & WELS_CPU_AVX2) {
+    sVaaFuncs.pfVAACalcSad       = VAACalcSad_avx2;
+    sVaaFuncs.pfVAACalcSadBgd    = VAACalcSadBgd_avx2;
+    sVaaFuncs.pfVAACalcSadSsd    = VAACalcSadSsd_avx2;
+    sVaaFuncs.pfVAACalcSadSsdBgd = VAACalcSadSsdBgd_avx2;
+    sVaaFuncs.pfVAACalcSadVar    = VAACalcSadVar_avx2;
+  }
+#endif
 #endif//X86_ASM
 #ifdef HAVE_NEON
   if ((iCpuFlag & WELS_CPU_NEON) == WELS_CPU_NEON) {
-    sVaaFuncs.pfVAACalcSad			= VAACalcSad_neon;
-    sVaaFuncs.pfVAACalcSadBgd		= VAACalcSadBgd_neon;
-    sVaaFuncs.pfVAACalcSadSsd		= VAACalcSadSsd_neon;
+    sVaaFuncs.pfVAACalcSad       = VAACalcSad_neon;
+    sVaaFuncs.pfVAACalcSadBgd    = VAACalcSadBgd_neon;
+    sVaaFuncs.pfVAACalcSadSsd    = VAACalcSadSsd_neon;
     sVaaFuncs.pfVAACalcSadSsdBgd = VAACalcSadSsdBgd_neon;
-    sVaaFuncs.pfVAACalcSadVar		= VAACalcSadVar_neon;
+    sVaaFuncs.pfVAACalcSadVar    = VAACalcSadVar_neon;
   }
 #endif//HAVE_NEON
 
 #ifdef HAVE_NEON_AARCH64
   if ((iCpuFlag & WELS_CPU_NEON) == WELS_CPU_NEON) {
-    sVaaFuncs.pfVAACalcSad			= VAACalcSad_AArch64_neon;
-    sVaaFuncs.pfVAACalcSadBgd		= VAACalcSadBgd_AArch64_neon;
-    sVaaFuncs.pfVAACalcSadSsd		= VAACalcSadSsd_AArch64_neon;
+    sVaaFuncs.pfVAACalcSad       = VAACalcSad_AArch64_neon;
+    sVaaFuncs.pfVAACalcSadBgd    = VAACalcSadBgd_AArch64_neon;
+    sVaaFuncs.pfVAACalcSadSsd    = VAACalcSadSsd_AArch64_neon;
     sVaaFuncs.pfVAACalcSadSsdBgd = VAACalcSadSsdBgd_AArch64_neon;
-    sVaaFuncs.pfVAACalcSadVar		= VAACalcSadVar_AArch64_neon;
+    sVaaFuncs.pfVAACalcSadVar    = VAACalcSadVar_AArch64_neon;
   }
 #endif//HAVE_NEON_AARCH64
 }
 
 EResult CVAACalculation::Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pRefPixMap) {
-  uint8_t* pCurData	= (uint8_t*)pSrcPixMap->pPixel[0];
-  uint8_t* pRefData	= (uint8_t*)pRefPixMap->pPixel[0];
-  int32_t iPicWidth	= pSrcPixMap->sRect.iRectWidth;
-  int32_t iPicHeight	= pSrcPixMap->sRect.iRectHeight;
-  int32_t iPicStride	= pSrcPixMap->iStride[0];
+  uint8_t* pCurData     = (uint8_t*)pSrcPixMap->pPixel[0];
+  uint8_t* pRefData     = (uint8_t*)pRefPixMap->pPixel[0];
+  int32_t iPicWidth     = pSrcPixMap->sRect.iRectWidth;
+  int32_t iPicHeight    = pSrcPixMap->sRect.iRectHeight;
+  int32_t iPicStride    = pSrcPixMap->iStride[0];
 
   SVAACalcResult* pResult = m_sCalcParam.pCalcResult;
 
