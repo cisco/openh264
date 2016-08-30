@@ -1204,30 +1204,42 @@ static const EncodeOptionParam kOptionParamArray[] = {
   {true, true, false, 30, 140, 196, 51, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""},
   {true, true, false, 30, 110, 296, 50, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""},
   {true, true, false, 30, 104, 416, 44, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""},
-  {true, true, false, 30, 16, 16, 2, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""},
+  {true, true, false, 30, 16, 16, 2, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""}, //5
   {true, false, true, 30, 600, 460, 1, SM_SIZELIMITED_SLICE, 450, 15.0, 1, ""},
   {true, false, true, 30, 340, 96, 24, SM_SIZELIMITED_SLICE, 1000, 30.0, 1, ""},
   {true, false, true, 30, 140, 196, 51, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""},
   {true, false, true, 30, 110, 296, 50, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""},
-  {true, false, true, 30, 104, 416, 44, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""},
+  {true, false, true, 30, 104, 416, 44, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""}, //10
   {true, false, true, 30, 16, 16, 2, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""},
   {true, true, true, 30, 600, 460, 1, SM_SIZELIMITED_SLICE, 450, 15.0, 1, ""},
   {true, true, true, 30, 340, 96, 24, SM_SIZELIMITED_SLICE, 1000, 30.0, 1, ""},
   {true, true, true, 30, 140, 196, 51, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""},
-  {true, true, true, 30, 110, 296, 50, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""},
+  {true, true, true, 30, 110, 296, 50, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""}, //15
   {true, true, true, 30, 104, 416, 44, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""},
   {true, true, true, 30, 16, 16, 2, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""},
-  {false, false, true, 3, 4096, 2304, 2, SM_SINGLE_SLICE, 0, 7.5, 1, ""}, // large picture size
   {false, true, false, 30, 32, 16, 2, SM_SIZELIMITED_SLICE, 500, 7.5, 1, ""},
   {false, true, false, 30, 600, 460, 1, SM_SIZELIMITED_SLICE, 450, 15.0, 4, ""},
-  {false, true, false, 30, 340, 96, 24, SM_SIZELIMITED_SLICE, 1000, 30.0, 2, ""},
+  {false, true, false, 30, 340, 96, 24, SM_SIZELIMITED_SLICE, 1000, 30.0, 2, ""}, //20
   {false, true, false, 30, 140, 196, 51, SM_SIZELIMITED_SLICE, 500, 7.5, 3, ""},
   {false, true, false, 30, 110, 296, 50, SM_SIZELIMITED_SLICE, 500, 7.5, 2, ""},
   {false, true, false, 30, 104, 416, 44, SM_SIZELIMITED_SLICE, 500, 7.5, 2, ""},
   {false, true, false, 30, 16, 16, 2, SM_SIZELIMITED_SLICE, 500, 7.5, 3, ""},
-  {false, true, false, 30, 32, 16, 2, SM_SIZELIMITED_SLICE, 500, 7.5, 3, ""},
+  {false, true, false, 30, 32, 16, 2, SM_SIZELIMITED_SLICE, 500, 7.5, 3, ""}, //25
   {false, false, true, 30, 600, 460, 1, SM_FIXEDSLCNUM_SLICE, 0, 15.0, 4, ""},
   {false, false, true, 30, 600, 460, 1, SM_FIXEDSLCNUM_SLICE, 0, 15.0, 8, ""},
+  //for large size tests
+  {true, false, true, 30, 4096, 2304, 1, SM_RESERVED, 0, 7.5, 1, ""}, // large picture size
+  {true, false, true, 30, 2304, 4096, 1, SM_RESERVED, 0, 15.0, 1, ""},
+  {true, false, true, 30, 3072, 3072, 1, SM_RESERVED, 0, 15.0, 1, ""},
+  //{true, false, true, 30, 3072, 3072, 1, SM_RESERVED, 0, 15.0, 4, ""}, //14760
+  {false, false, true, 30, 1072, 8576, 1, SM_RESERVED, 0, 15.0, 1, ""},
+  //{false, true, true, 30, 8576, 1072, 24, SM_SINGLE_SLICE, 0, 15.0, 1, ""}, //14754
+  //{false, false, false, 2, 8576, 1088, 24, SM_SINGLE_SLICE, 0, 15.0, 1, ""}, //14755
+  //{false, false, false, 2, 1088, 8576, 24, SM_SINGLE_SLICE, 0, 15.0, 1, ""}, //14755
+  {false, false, true, 1, 8688, 1072, 24, SM_SINGLE_SLICE, 0, 15.0, 1, ""}, //Annex A: PicWidthInMbs <= sqrt(36864*8) = 543; 543*16=8688; 36864/543=67; 67*16=1072
+  {false, false, true, 1, 1072, 8688, 24, SM_SINGLE_SLICE, 0, 15.0, 1, ""}, //Annex A: FrameHeightInMbs <= sqrt(36864*8) = 543; 543*16=8688; 36864/543=67; 67*16=1072
+  //{false, false, true, 30, 589824, 16, 24, SM_RESERVED, 0, 15.0, 1, ""},
+  //{false, false, true, 30, 589824, 16, 24, SM_RESERVED, 0, 15.0, 1, ""},
 };
 
 class EncodeTestAPI : public ::testing::TestWithParam<EncodeOptionParam>, public ::EncodeDecodeTestAPIBase {
@@ -1259,10 +1271,6 @@ INSTANTIATE_TEST_CASE_P (EncodeDecodeTestAPIBase, EncodeTestAPI,
 
 TEST_P (EncodeTestAPI, SetEncOptionSize) {
   EncodeOptionParam p = GetParam();
-  FILE* pFile = NULL;
-  if (p.sFileSave != NULL && strlen (p.sFileSave) > 0) {
-    pFile = fopen (p.sFileSave, "wb");
-  }
   memset (&param_, 0, sizeof (SEncParamExt));
   encoder_->GetDefaultParams (&param_);
   param_.uiMaxNalSize = p.uiMaxNalLen;
@@ -1275,66 +1283,95 @@ TEST_P (EncodeTestAPI, SetEncOptionSize) {
   param_.iRCMode = RC_OFF_MODE; //rc off
   param_.iMultipleThreadIdc = p.iThreads;
   param_.iNumRefFrame = AUTO_REF_PIC_COUNT;
-  param_.sSpatialLayers[0].iVideoWidth = p.iWidth ;
+  param_.sSpatialLayers[0].iVideoWidth = p.iWidth;
   param_.sSpatialLayers[0].iVideoHeight = p.iHeight;
   param_.sSpatialLayers[0].fFrameRate = p.fFramerate;
-  param_.sSpatialLayers[0].sSliceArgument.uiSliceMode = p.eSliceMode;
-  if (SM_FIXEDSLCNUM_SLICE == p.eSliceMode) {
-    param_.sSpatialLayers[0].sSliceArgument.uiSliceNum = 8;
+
+  int iSliceModeTestNum = 1;
+  if (SM_RESERVED == p.eSliceMode) {
+    iSliceModeTestNum = SLICE_MODE_NUM;
   }
 
-  encoder_->Uninitialize();
-  int rv = encoder_->InitializeExt (&param_);
-  ASSERT_TRUE (rv == cmResultSuccess);
-  InitialEncDec (p.iWidth, p.iHeight);
-
-  int32_t iTraceLevel = WELS_LOG_QUIET;
-  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
-  decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
-  int32_t iSpsPpsIdAddition = 1;
-  encoder_->SetOption (ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION, &iSpsPpsIdAddition);
-  int32_t iIDRPeriod = (int32_t) pow (2.0f, (param_.iTemporalLayerNum - 1)) * ((rand() % 5) + 1);
-  encoder_->SetOption (ENCODER_OPTION_IDR_INTERVAL, &iIDRPeriod);
-  int iIdx = 0;
-  int iLen;
-  unsigned char* pData[3] = { NULL };
-
-  //FIXME: remove this after the multi-thread case is correctly handled in encoder
-  if (p.iThreads > 1 && SM_SIZELIMITED_SLICE == p.eSliceMode) {
-    p.bAllRandom = false;
-  }
-
-  while (iIdx <= p.iNumframes) {
-    EncodeOneFrameRandom (0, p.bAllRandom);
-    encToDecData (info, iLen);
-    if (pFile) {
-      fwrite (info.sLayerInfo[0].pBsBuf, iLen, 1, pFile);
-      fflush (pFile);
+  for (int iSliceIdx = 0; iSliceIdx < iSliceModeTestNum; iSliceIdx++) {
+    if (1 == iSliceModeTestNum) {
+      param_.sSpatialLayers[0].sSliceArgument.uiSliceMode = p.eSliceMode;
+    } else {
+      param_.sSpatialLayers[0].sSliceArgument.uiSliceMode = static_cast<SliceModeEnum> (iSliceIdx);
     }
-    memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
-    if (iLen && p.bTestDecoder) {
-      rv = decoder_->DecodeFrameNoDelay (info.sLayerInfo[0].pBsBuf, iLen, pData, &dstBufInfo_);
-      ASSERT_EQ (rv, 0);
-      ASSERT_EQ (dstBufInfo_.iBufferStatus, 1);
+
+    FILE* pFile = NULL;
+    if (p.sFileSave != NULL && strlen (p.sFileSave) > 0) {
+      pFile = fopen (p.sFileSave, "wb");
     }
-    int iLayer = 0;
-    while (iLayer < info.iLayerNum) {
-      SLayerBSInfo* pLayerBsInfo = &info.sLayerInfo[iLayer];
-      if (pLayerBsInfo != NULL) {
-        int iNalIdx = WELS_MAX (pLayerBsInfo->iNalCount - 2, 0); // ignore last slice under single slice mode
-        do {
-          if (p.bTestNalSize) { // ignore the case that 2 MBs in one picture, and the multithreads case, enable them when code is ready
-            ASSERT_GE (((int)param_.uiMaxNalSize), pLayerBsInfo->pNalLengthInByte[iNalIdx]);
-          }
-          -- iNalIdx;
-        } while (iNalIdx >= 0);
+
+    if (SM_FIXEDSLCNUM_SLICE == param_.sSpatialLayers[0].sSliceArgument.uiSliceMode) {
+      param_.sSpatialLayers[0].sSliceArgument.uiSliceNum = 8;
+    } else if (SM_RASTER_SLICE == param_.sSpatialLayers[0].sSliceArgument.uiSliceMode) {
+      param_.sSpatialLayers[0].sSliceArgument.uiSliceMbNum[0] =
+        param_.sSpatialLayers[0].sSliceArgument.uiSliceMbNum[1] =
+          param_.sSpatialLayers[0].sSliceArgument.uiSliceMbNum[2] =
+            param_.sSpatialLayers[0].sSliceArgument.uiSliceMbNum[3] = ((p.iWidth * p.iHeight) >> 10);
+    } else if (SM_SIZELIMITED_SLICE == param_.sSpatialLayers[0].sSliceArgument.uiSliceMode && 450 > p.uiMaxNalLen) {
+      param_.uiMaxNalSize = 450;
+      param_.sSpatialLayers[0].sSliceArgument.uiSliceSizeConstraint = 450;
+    }
+
+    int32_t iTraceLevel = WELS_LOG_QUIET;
+    encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+    decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+
+    encoder_->Uninitialize();
+    int rv = encoder_->InitializeExt (&param_);
+    ASSERT_TRUE (rv == cmResultSuccess);
+    InitialEncDec (p.iWidth, p.iHeight);
+
+
+    int32_t iSpsPpsIdAddition = 1;
+    encoder_->SetOption (ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION, &iSpsPpsIdAddition);
+    int32_t iIDRPeriod = (int32_t) pow (2.0f, (param_.iTemporalLayerNum - 1)) * ((rand() % 5) + 1);
+    encoder_->SetOption (ENCODER_OPTION_IDR_INTERVAL, &iIDRPeriod);
+    int iIdx = 0;
+    int iLen;
+    unsigned char* pData[3] = { NULL };
+
+    //FIXME: remove this after the multi-thread case is correctly handled in encoder
+    if (p.iThreads > 1 && SM_SIZELIMITED_SLICE == p.eSliceMode) {
+      p.bAllRandom = false;
+    }
+
+    while (iIdx <= p.iNumframes) {
+      EncodeOneFrameRandom (0, p.bAllRandom);
+      encToDecData (info, iLen);
+      if (pFile) {
+        fwrite (info.sLayerInfo[0].pBsBuf, iLen, 1, pFile);
+        fflush (pFile);
       }
-      ++ iLayer;
+      memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+      if (iLen && p.bTestDecoder) {
+        rv = decoder_->DecodeFrameNoDelay (info.sLayerInfo[0].pBsBuf, iLen, pData, &dstBufInfo_);
+        ASSERT_EQ (rv, 0);
+        ASSERT_EQ (dstBufInfo_.iBufferStatus, 1);
+      }
+      int iLayer = 0;
+      while (iLayer < info.iLayerNum) {
+        SLayerBSInfo* pLayerBsInfo = &info.sLayerInfo[iLayer];
+        if (pLayerBsInfo != NULL) {
+          int iNalIdx = WELS_MAX (pLayerBsInfo->iNalCount - 2, 0); // ignore last slice under single slice mode
+          do {
+            if (SM_SIZELIMITED_SLICE == p.eSliceMode
+                && p.bTestNalSize) { // ignore the case that 2 MBs in one picture, and the multithreads case, enable them when code is ready
+              ASSERT_GE (((int)param_.uiMaxNalSize), pLayerBsInfo->pNalLengthInByte[iNalIdx]);
+            }
+            -- iNalIdx;
+          } while (iNalIdx >= 0);
+        }
+        ++ iLayer;
+      }
+      iIdx++;
     }
-    iIdx++;
-  }
-  if (pFile) {
-    fclose (pFile);
+    if (pFile) {
+      fclose (pFile);
+    }
   }
 }
 
