@@ -18,7 +18,7 @@
 *.so
 *.so.*
 *.dylib
-
+*solog -id
 # Executables
 *.exe
 *.out
