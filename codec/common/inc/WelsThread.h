@@ -58,7 +58,7 @@ class CWelsThread {
   virtual void ExecuteTask() = 0;
   virtual WELS_THREAD_ERROR_CODE Start();
   virtual void Kill();
-
+  WELS_MUTEX          m_hMutex;
  protected:
   static WELS_THREAD_ROUTINE_TYPE  TheThread (void* pParam);
 

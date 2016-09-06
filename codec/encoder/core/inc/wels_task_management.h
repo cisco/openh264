@@ -105,7 +105,7 @@ class  CWelsTaskManageBase : public IWelsTaskManage, public WelsCommon::IWelsTas
 
   int32_t          m_iWaitTaskNum;
   WELS_EVENT       m_hTaskEvent;
-
+  WELS_MUTEX       m_hEventMutex;
   WelsCommon::CWelsLock  m_cWaitTaskNumLock;
 
  private:

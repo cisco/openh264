@@ -133,11 +133,10 @@ WELS_THREAD_ERROR_CODE    WelsMutexDestroy (WELS_MUTEX* mutex) {
 
 WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT* event, const char* event_name) {
   WELS_EVENT   h = CreateEvent (NULL, FALSE, FALSE, NULL);
-
+  *event = h;
   if (h == NULL) {
     return WELS_THREAD_ERROR_GENERAL;
   }
-  *event = h;
   return WELS_THREAD_ERROR_OK;
 }
 
@@ -148,24 +147,18 @@ WELS_THREAD_ERROR_CODE    WelsEventSignal (WELS_EVENT* event) {
   return WELS_THREAD_ERROR_GENERAL;
 }
 
-WELS_THREAD_ERROR_CODE    WelsEventWait (WELS_EVENT* event) {
+WELS_THREAD_ERROR_CODE    WelsEventWait (WELS_EVENT* event, WELS_MUTEX* pMutex) {
   return WaitForSingleObject (*event, INFINITE);
 }
 
-WELS_THREAD_ERROR_CODE    WelsEventWaitWithTimeOut (WELS_EVENT* event, uint32_t dwMilliseconds) {
+WELS_THREAD_ERROR_CODE    WelsEventWaitWithTimeOut (WELS_EVENT* event, uint32_t dwMilliseconds, WELS_MUTEX* pMutex) {
   return WaitForSingleObject (*event, dwMilliseconds);
 }
 
 WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking (uint32_t nCount,
-    WELS_EVENT* event_list, WELS_EVENT* master_event) {
+    WELS_EVENT* event_list, WELS_EVENT* master_even, WELS_MUTEX* pMutext) {
   // Don't need/use the master event for anything, since windows has got WaitForMultipleObjects
   return WaitForMultipleObjects (nCount, event_list, FALSE, INFINITE);
-}
-
-WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount,
-    WELS_EVENT* event_list, WELS_EVENT* master_event) {
-  // Don't need/use the master event for anything, since windows has got WaitForMultipleObjects
-  return WaitForMultipleObjects (nCount, event_list, TRUE, INFINITE);
 }
 
 WELS_THREAD_ERROR_CODE    WelsEventClose (WELS_EVENT* event, const char* event_name) {
@@ -278,10 +271,10 @@ WELS_THREAD_ERROR_CODE    WelsThreadCreate (WELS_THREAD_HANDLE* thread,  LPWELS_
 
 WELS_THREAD_ERROR_CODE WelsThreadSetName (const char* thread_name) {
 #ifdef APPLE_IOS
-  pthread_setname_np(thread_name);
+  pthread_setname_np (thread_name);
 #endif
 #if defined(__ANDROID__) && __ANDROID_API__ >= 9
-  pthread_setname_np(pthread_self(), thread_name);
+  pthread_setname_np (pthread_self(), thread_name);
 #endif
   // do nothing
   return WELS_THREAD_ERROR_OK;
@@ -299,46 +292,33 @@ WELS_THREAD_HANDLE        WelsThreadSelf() {
 
 WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT* p_event, const char* event_name) {
 #ifdef __APPLE__
-  if (p_event == NULL) {
-    return WELS_THREAD_ERROR_GENERAL;
-  }
-  char    strSuffix[100] = { 0 };
-  if (NULL == event_name) {
-    sprintf (strSuffix, "WelsSem%ld_p%ld", (intptr_t)p_event, (long) (getpid()));
-    event_name = &strSuffix[0];
-  }
-  *p_event = sem_open (event_name, O_CREAT, (S_IRUSR | S_IWUSR)/*0600*/, 0);
-  if (*p_event == (sem_t*)SEM_FAILED) {
-    sem_unlink (event_name);
-    *p_event = NULL;
-    return WELS_THREAD_ERROR_GENERAL;
-  } else {
-    //printf("event_open:%x, %s\n", p_event, event_name);
-    return WELS_THREAD_ERROR_OK;
-  }
+  WELS_THREAD_ERROR_CODE err= pthread_cond_init (p_event, NULL);
+  return err;
 #else
   WELS_EVENT event = (WELS_EVENT) malloc (sizeof (*event));
-  if (event == NULL)
+  if (event == NULL){
+    *p_event = NULL;
     return WELS_THREAD_ERROR_GENERAL;
+  }
   WELS_THREAD_ERROR_CODE err = sem_init (event, 0, 0);
   if (!err) {
     *p_event = event;
     return err;
   }
   free (event);
+  *p_event = NULL;
   return err;
 #endif
 }
 WELS_THREAD_ERROR_CODE    WelsEventClose (WELS_EVENT* event, const char* event_name) {
   //printf("event_close:%x, %s\n", event, event_name);
 #ifdef __APPLE__
-  WELS_THREAD_ERROR_CODE err = sem_close (*event); // match with sem_open
-  if (event_name)
-    sem_unlink (event_name);
+  WELS_THREAD_ERROR_CODE err = pthread_cond_destroy (event);
   return err;
 #else
   WELS_THREAD_ERROR_CODE err = sem_destroy (*event); // match with sem_init
   free (*event);
+  *event = NULL;
   return err;
 #endif
 }
@@ -349,37 +329,37 @@ void WelsSleep (uint32_t dwMilliSecond) {
 
 WELS_THREAD_ERROR_CODE   WelsEventSignal (WELS_EVENT* event) {
   WELS_THREAD_ERROR_CODE err = 0;
+#ifdef __APPLE__
+  err = pthread_cond_signal (event);
+#else
 //  int32_t val = 0;
 //  sem_getvalue(event, &val);
 //  fprintf( stderr, "before signal it, val= %d..\n",val );
-  err = sem_post (*event);
+  if (event != NULL)
+    err = sem_post (*event);
 //  sem_getvalue(event, &val);
 //  fprintf( stderr, "after signal it, val= %d..\n",val );
+#endif
   return err;
 }
 
-WELS_THREAD_ERROR_CODE WelsEventWait (WELS_EVENT* event) {
+WELS_THREAD_ERROR_CODE WelsEventWait (WELS_EVENT* event, WELS_MUTEX* pMutex) {
+#ifdef __APPLE__
+  return pthread_cond_wait (event, pMutex);
+#else
   return sem_wait (*event); // blocking until signaled
+#endif
 }
 
-WELS_THREAD_ERROR_CODE    WelsEventWaitWithTimeOut (WELS_EVENT* event, uint32_t dwMilliseconds) {
+WELS_THREAD_ERROR_CODE    WelsEventWaitWithTimeOut (WELS_EVENT* event, uint32_t dwMilliseconds, WELS_MUTEX* pMutex) {
+
   if (dwMilliseconds != (uint32_t) - 1) {
-    return sem_wait (*event);
-  } else {
 #if defined(__APPLE__)
-    int32_t err = 0;
-    int32_t wait_count = 0;
-    do {
-      err = sem_trywait (*event);
-      if (WELS_THREAD_ERROR_OK == err)
-        break;// WELS_THREAD_ERROR_OK;
-      else if (wait_count > 0)
-        break;
-      usleep (dwMilliseconds * 1000);
-      ++ wait_count;
-    } while (1);
-    return err;
+    return pthread_cond_wait (event, pMutex);
 #else
+    return sem_wait (*event);
+#endif
+  } else {
     struct timespec ts;
     struct timeval tv;
 
@@ -389,19 +369,68 @@ WELS_THREAD_ERROR_CODE    WelsEventWaitWithTimeOut (WELS_EVENT* event, uint32_t 
     ts.tv_sec = tv.tv_sec + ts.tv_nsec / 1000000000;
     ts.tv_nsec %= 1000000000;
 
+#if defined(__APPLE__)
+    return pthread_cond_timedwait (event, pMutex, &ts);
+#else
     return sem_timedwait (*event, &ts);
-#endif//__APPLE__
+#endif
   }
+
 }
 
 WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking (uint32_t nCount,
-    WELS_EVENT* event_list, WELS_EVENT* master_event) {
+    WELS_EVENT* event_list, WELS_EVENT* master_event, WELS_MUTEX* pMutex) {
   uint32_t nIdx = 0;
   uint32_t uiAccessTime = 2; // 2 us once
 
   if (nCount == 0)
     return WELS_THREAD_ERROR_WAIT_FAILED;
+#if defined(__APPLE__)
+  if (master_event != NULL) {
+    // This design relies on the events actually being semaphores;
+    // if multiple events in the list have been signalled, the master
+    // event should have a similar count (events in windows can't keep
+    // track of the actual count, but the master event isn't needed there
+    // since it uses WaitForMultipleObjects).
+    int32_t err = pthread_cond_wait (master_event, pMutex);
+    if (err != WELS_THREAD_ERROR_OK)
+      return err;
+    uiAccessTime = 0; // no blocking, just quickly loop through all to find the one that was signalled
+  }
 
+  while (1) {
+    nIdx = 0; // access each event by order
+    while (nIdx < nCount) {
+      int32_t err = 0;
+      int32_t wait_count = 0;
+
+      /*
+       * although such interface is not used in __GNUC__ like platform, to use
+       * pthread_cond_timedwait() might be better choice if need
+       */
+      do {
+        err = pthread_cond_wait (&event_list[nIdx], pMutex);
+        if (WELS_THREAD_ERROR_OK == err)
+          return WELS_THREAD_ERROR_WAIT_OBJECT_0 + nIdx;
+        else if (wait_count > 0 || uiAccessTime == 0)
+          break;
+        usleep (uiAccessTime);
+        ++ wait_count;
+      } while (1);
+      // we do need access next event next time
+      ++ nIdx;
+    }
+    usleep (1); // switch to working threads
+    if (master_event != NULL) {
+      // A master event was used and was signalled, but none of the events in the
+      // list was found to be signalled, thus wait a little more when rechecking
+      // the list to avoid busylooping here.
+      // If we ever hit this codepath it's mostly a bug in the code that signals
+      // the events.
+      uiAccessTime = 2;
+    }
+  }
+#else
   if (master_event != NULL) {
     // This design relies on the events actually being semaphores;
     // if multiple events in the list have been signalled, the master
@@ -447,59 +476,7 @@ WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking (uint32_t nCount,
     }
   }
 
-  return WELS_THREAD_ERROR_WAIT_FAILED;
-}
-
-WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount,
-    WELS_EVENT* event_list, WELS_EVENT* master_event) {
-  uint32_t nIdx = 0;
-  uint32_t uiCountSignals = 0;
-  uint32_t uiSignalFlag = 0;    // UGLY: suppose maximal event number up to 32
-
-  if (nCount == 0 || nCount > (sizeof (uint32_t) << 3))
-    return WELS_THREAD_ERROR_WAIT_FAILED;
-
-  while (1) {
-    nIdx = 0; // access each event by order
-    while (nIdx < nCount) {
-      const uint32_t kuiBitwiseFlag = (1 << nIdx);
-
-      if ((uiSignalFlag & kuiBitwiseFlag) != kuiBitwiseFlag) { // non-blocking mode
-        int32_t err = 0;
-//        fprintf( stderr, "sem_wait(): start to wait event %d..\n", nIdx );
-        if (master_event == NULL) {
-          err = sem_wait (event_list[nIdx]);
-        } else {
-          err = sem_wait (*master_event);
-          if (err == WELS_THREAD_ERROR_OK) {
-            err = sem_wait (event_list[nIdx]);
-            if (err != WELS_THREAD_ERROR_OK) {
-              // We successfully waited for the master event,
-              // but waiting for the individual event failed (e.g. EINTR?).
-              // Increase the master event count so that the next retry will
-              // work as intended.
-              sem_post (*master_event);
-            }
-          }
-        }
-//        fprintf( stderr, "sem_wait(): wait event %d result %d errno %d..\n", nIdx, err, errno );
-        if (WELS_THREAD_ERROR_OK == err) {
-//          int32_t val = 0;
-//          sem_getvalue(&event_list[nIdx], &val);
-//          fprintf( stderr, "after sem_timedwait(), event_list[%d] semaphore value= %d..\n", nIdx, val);
-
-          uiSignalFlag |= kuiBitwiseFlag;
-          ++ uiCountSignals;
-          if (uiCountSignals >= nCount) {
-            return WELS_THREAD_ERROR_OK;
-          }
-        }
-      }
-      // we do need access next event next time
-      ++ nIdx;
-    }
-  }
-
+#endif
   return WELS_THREAD_ERROR_WAIT_FAILED;
 }
 
@@ -519,7 +496,7 @@ WELS_THREAD_ERROR_CODE    WelsQueryLogicalProcessInfo (WelsLogicalProcessInfo* p
 #else
     int32_t count = 0;
     for (int i = 0; i < CPU_SETSIZE; i++) {
-      if (CPU_ISSET(i, &cpuset)) {
+      if (CPU_ISSET (i, &cpuset)) {
         count++;
       }
     }
