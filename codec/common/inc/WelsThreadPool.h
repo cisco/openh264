@@ -86,7 +86,7 @@ class  CWelsThreadPool : public CWelsThread, public IWelsTaskThreadSink {
   WELS_THREAD_ERROR_CODE AddThreadToIdleQueue (CWelsTaskThread* pThread);
   WELS_THREAD_ERROR_CODE AddThreadToBusyList (CWelsTaskThread* pThread);
   WELS_THREAD_ERROR_CODE RemoveThreadFromBusyList (CWelsTaskThread* pThread);
-  void           AddTaskToWaitedList (IWelsTask* pTask);
+  bool           AddTaskToWaitedList (IWelsTask* pTask);
   CWelsTaskThread*   GetIdleThread();
   IWelsTask*         GetWaitedTask();
   int32_t            GetIdleThreadNum();
