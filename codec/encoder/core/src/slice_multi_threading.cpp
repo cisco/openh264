@@ -361,7 +361,8 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
   memset (&pSmt->bThreadBsBufferUsage, 0, MAX_THREADS_NUM * sizeof (bool));
   iReturn = WelsMutexInit (&pSmt->mutexThreadBsBufferUsage);
   WELS_VERIFY_RETURN_PROC_IF (1, (WELS_THREAD_ERROR_OK != iReturn), FreeMemorySvc (ppCtx))
-
+  iReturn = WelsMutexInit (&pSmt->mutexEvent);
+  WELS_VERIFY_RETURN_PROC_IF (1, (WELS_THREAD_ERROR_OK != iReturn), FreeMemorySvc (ppCtx));
   iReturn = WelsMutexInit (& (*ppCtx)->mutexEncoderError);
   WELS_VERIFY_RETURN_PROC_IF (1, (WELS_THREAD_ERROR_OK != iReturn), FreeMemorySvc (ppCtx))
 
@@ -411,7 +412,7 @@ void ReleaseMtResource (sWelsEncCtx** ppCtx) {
   WelsMutexDestroy (&pSmt->mutexSliceNumUpdate);
   WelsMutexDestroy (&pSmt->mutexThreadBsBufferUsage);
   WelsMutexDestroy (& ((*ppCtx)->mutexEncoderError));
-
+  WelsMutexDestroy (&pSmt->mutexEvent);
   if (pSmt->pThreadPEncCtx != NULL) {
     pMa->WelsFree (pSmt->pThreadPEncCtx, "pThreadPEncCtx");
     pSmt->pThreadPEncCtx = NULL;
@@ -585,7 +586,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
                   pEventsList[0], pEventsList[1], pEventsList[1], (void*)pEncPEncCtx);
     iWaitRet = WelsMultipleEventsWaitSingleBlocking (iEventCount,
                &pEventsList[0],
-               &pEncPEncCtx->pSliceThreading->pThreadMasterEvent[iEventIdx]); // blocking until at least one event is signalled
+               &pEncPEncCtx->pSliceThreading->pThreadMasterEvent[iEventIdx],&pEncPEncCtx->pSliceThreading->mutexEvent); // blocking until at least one event is signalled
     if (WELS_THREAD_ERROR_WAIT_OBJECT_0 == iWaitRet) { // start pSlice coding signal waited
       //int             iLayerIndex  = pEncPEncCtx->pOut->iLayerBsIndex;
       //SFrameBSInfo*   pFrameBsInfo = pPrivateData->pFrameBsInfo;
@@ -877,10 +878,8 @@ int32_t FiredSliceThreads (sWelsEncCtx* pCtx, SSliceThreadPrivateData* pPriData,
     pPriData[iIdx].pFrameBsInfo = pFrameBsInfo;
     pPriData[iIdx].iSliceIndex  = iIdx;
     SetOneSliceBsBufferUnderMultithread (pCtx, iIdx, iIdx);
-    if (pEventsList[iIdx])
-      WelsEventSignal (&pEventsList[iIdx]);
-    if (pMasterEventsList[iIdx])
-      WelsEventSignal (&pMasterEventsList[iIdx]);
+    WelsEventSignal (&pEventsList[iIdx]);
+    WelsEventSignal (&pMasterEventsList[iIdx]);
     ++ iIdx;
   }
 

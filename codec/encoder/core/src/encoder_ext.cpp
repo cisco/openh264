@@ -3804,24 +3804,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       else if ((SM_SIZELIMITED_SLICE == pParam->sSliceArgument.uiSliceMode) && (pSvcParam->iMultipleThreadIdc > 1)) {
         const int32_t kiPartitionCnt = pCtx->iActiveThreadsNum;
 
-#if 0 //TODO: temporarily use this to keep old codes for a while, will remove old codes later
-        int32_t iRet = 0;
-        // to fire slice coding threads
-        iRet = FiredSliceThreads (pCtx, &pCtx->pSliceThreading->pThreadPEncCtx[0],
-                                  &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
-                                  &pCtx->pSliceThreading->pThreadMasterEvent[0],
-                                  pFbi, kiPartitionCnt, &pCtx->pCurDqLayer->sSliceEncCtx, true);
-        if (iRet) {
-          WelsLog (pLogCtx, WELS_LOG_ERROR,
-                   "[MT] WelsEncoderEncodeExt(), FiredSliceThreads return(%d) failed and exit encoding frame, iSliceCount= %d, uiSliceMode= %d, iMultipleThreadIdc= %d!!",
-                   iRet, iSliceCount, pParam->sSliceArgument.uiSliceMode, pSvcParam->iMultipleThreadIdc);
-          return ENC_RETURN_UNEXPECTED;
-        }
-
-        WelsMultipleEventsWaitAllBlocking (kiPartitionCnt, &pCtx->pSliceThreading->pSliceCodedEvent[0],
-                                           &pCtx->pSliceThreading->pSliceCodedMasterEvent);
-        WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
-#else
         int32_t iEndMbIdx = pCtx->pCurDqLayer->sSliceEncCtx.iMbNumInFrame;
         for (int32_t iIdx = kiPartitionCnt - 1; iIdx >= 0; --iIdx) {
           const int32_t iFirstMbIdx         =
@@ -3857,7 +3839,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
                    pParam->sSliceArgument.uiSliceMode, pCtx->iEncoderError);
           return pCtx->iEncoderError;
         }
-#endif
 
         iLayerSize = AppendSliceToFrameBs (pCtx, pLayerBsInfo, kiPartitionCnt);
       } else { // for non-dynamic-slicing mode single threading branch..
