@@ -89,7 +89,7 @@ FILE*                           pFSliceDiff;    // file handle for debug
 uint8_t*                        pThreadBsBuffer[MAX_THREADS_NUM]; //actual memory for slice buffer
 bool                            bThreadBsBufferUsage[MAX_THREADS_NUM];
 WELS_MUTEX                      mutexThreadBsBufferUsage;
-
+WELS_MUTEX                      mutexEvent;
 } SSliceThreading;
 
 #endif//MULTIPLE_THREADING_DEFINES_H__

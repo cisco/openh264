@@ -46,22 +46,21 @@ CWelsThread::CWelsThread() :
   m_hThread (0),
   m_bRunning (false),
   m_bEndFlag (false) {
-  WELS_THREAD_ERROR_CODE rc = WelsEventOpen (&m_hEvent);
 
-  if (WELS_THREAD_ERROR_OK != rc) {
-    m_hEvent = NULL;
-  }
+  WelsEventOpen (&m_hEvent);
+  WelsMutexInit(&m_hMutex);
+
 }
 
 CWelsThread::~CWelsThread() {
   Kill();
   WelsEventClose (&m_hEvent);
-  m_hEvent = NULL;
+  WelsMutexDestroy(&m_hMutex);
 }
 
 void CWelsThread::Thread() {
   while (true) {
-    WelsEventWait (&m_hEvent);
+    WelsEventWait (&m_hEvent,&m_hMutex);
 
     if (GetEndFlag()) {
       break;
@@ -74,10 +73,11 @@ void CWelsThread::Thread() {
 }
 
 WELS_THREAD_ERROR_CODE CWelsThread::Start() {
+#ifndef __APPLE__
   if (NULL == m_hEvent) {
     return WELS_THREAD_ERROR_GENERAL;
   }
-
+#endif
   if (GetRunning()) {
     return WELS_THREAD_ERROR_OK;
   }

@@ -85,6 +85,7 @@ CWelsTaskManageBase::CWelsTaskManageBase()
   }
 
   WelsEventOpen (&m_hTaskEvent);
+  WelsMutexInit(&m_hEventMutex);
 }
 
 CWelsTaskManageBase::~CWelsTaskManageBase() {
@@ -131,6 +132,7 @@ void   CWelsTaskManageBase::Uninit() {
     WELS_DELETE_OP(m_cPreEncodingTaskList[iDid]);
   }
   WelsEventClose (&m_hTaskEvent);
+  WelsMutexDestroy(&m_hEventMutex);
 }
 
 WelsErrorType CWelsTaskManageBase::CreateTasks (sWelsEncCtx* pEncCtx, const int32_t kiCurDid) {
@@ -225,7 +227,7 @@ WelsErrorType  CWelsTaskManageBase::ExecuteTaskList (TASKLIST_TYPE** pTaskList) 
     m_pThreadPool->QueueTask (pTargetTaskList->GetIndexNode (iIdx));
     iIdx ++;
   }
-  WelsEventWait (&m_hTaskEvent);
+  WelsEventWait (&m_hTaskEvent,&m_hEventMutex);
 
   return ENC_RETURN_SUCCESS;
 }

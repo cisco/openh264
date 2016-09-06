@@ -75,9 +75,9 @@ WELS_THREAD_ERROR_CODE CWelsTaskThread::SetTask (WelsCommon::IWelsTask* pTask) {
   if (!GetRunning()) {
     return WELS_THREAD_ERROR_GENERAL;
   }
-
+  WelsMutexLock(&m_hMutex);
   m_pTask = pTask;
-
+  WelsMutexUnlock(&m_hMutex);
   SignalThread();
 
   return WELS_THREAD_ERROR_OK;
