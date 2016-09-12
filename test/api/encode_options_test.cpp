@@ -1228,18 +1228,18 @@ static const EncodeOptionParam kOptionParamArray[] = {
   {false, false, true, 30, 600, 460, 1, SM_FIXEDSLCNUM_SLICE, 0, 15.0, 4, ""},
   {false, false, true, 30, 600, 460, 1, SM_FIXEDSLCNUM_SLICE, 0, 15.0, 8, ""},
   //for large size tests
-  {true, false, true, 30, 4096, 2304, 1, SM_RESERVED, 0, 7.5, 1, ""}, // large picture size
-  {true, false, true, 30, 2304, 4096, 1, SM_RESERVED, 0, 15.0, 1, ""},
-  {true, false, true, 30, 3072, 3072, 1, SM_RESERVED, 0, 15.0, 1, ""},
-  //{true, false, true, 30, 3072, 3072, 1, SM_RESERVED, 0, 15.0, 4, ""}, //14760
-  {false, false, true, 30, 1072, 8576, 1, SM_RESERVED, 0, 15.0, 1, ""},
-  //{false, true, true, 30, 8576, 1072, 24, SM_SINGLE_SLICE, 0, 15.0, 1, ""}, //14754
+  {true, false, true, 2, 4096, 2304, 1, SM_RESERVED, 0, 7.5, 1, ""}, // large picture size, //28
+  {true, false, true, 2, 2304, 4096, 1, SM_RESERVED, 0, 15.0, 1, ""}, //29
+  {true, false, true, 2, 3072, 3072, 1, SM_RESERVED, 0, 15.0, 1, ""}, //30
+  //{true, false, true, 2, 3072, 3072, 1, SM_RESERVED, 0, 15.0, 4, ""}, //14760
+  {false, false, true, 2, 1072, 8576, 1, SM_RESERVED, 0, 15.0, 1, ""},
+  //{false, true, true, 2, 8576, 1072, 24, SM_SINGLE_SLICE, 0, 15.0, 1, ""}, //14754
   //{false, false, false, 2, 8576, 1088, 24, SM_SINGLE_SLICE, 0, 15.0, 1, ""}, //14755
   //{false, false, false, 2, 1088, 8576, 24, SM_SINGLE_SLICE, 0, 15.0, 1, ""}, //14755
-  {false, false, true, 1, 8688, 1072, 24, SM_SINGLE_SLICE, 0, 15.0, 1, ""}, //Annex A: PicWidthInMbs <= sqrt(36864*8) = 543; 543*16=8688; 36864/543=67; 67*16=1072
-  {false, false, true, 1, 1072, 8688, 24, SM_SINGLE_SLICE, 0, 15.0, 1, ""}, //Annex A: FrameHeightInMbs <= sqrt(36864*8) = 543; 543*16=8688; 36864/543=67; 67*16=1072
-  //{false, false, true, 30, 589824, 16, 24, SM_RESERVED, 0, 15.0, 1, ""},
-  //{false, false, true, 30, 589824, 16, 24, SM_RESERVED, 0, 15.0, 1, ""},
+  {false, false, true, 2, 8688, 1072, 24, SM_SINGLE_SLICE, 0, 15.0, 1, ""}, //Annex A: PicWidthInMbs <= sqrt(36864*8) = 543; 543*16=8688; 36864/543=67; 67*16=1072
+  {false, false, true, 2, 1072, 8688, 24, SM_SINGLE_SLICE, 0, 15.0, 1, ""}, //Annex A: FrameHeightInMbs <= sqrt(36864*8) = 543; 543*16=8688; 36864/543=67; 67*16=1072
+  //{false, false, true, 2, 589824, 16, 24, SM_RESERVED, 0, 15.0, 1, ""},
+  //{false, false, true, 2, 589824, 16, 24, SM_RESERVED, 0, 15.0, 1, ""},
 };
 
 class EncodeTestAPI : public ::testing::TestWithParam<EncodeOptionParam>, public ::EncodeDecodeTestAPIBase {
