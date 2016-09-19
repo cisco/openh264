@@ -52,12 +52,13 @@ class CWelsCircleQueue {
  public:
   CWelsCircleQueue() {
     m_iMaxNodeCount = 50;
-    m_pCurrentQueue = static_cast<TNodeType**> (malloc (m_iMaxNodeCount * sizeof (TNodeType*)));
+    m_pCurrentQueue = NULL;
     //here using array to simulate list is to avoid the frequent malloc/free of Nodes which may cause fragmented memory
     m_iCurrentListStart = m_iCurrentListEnd = 0;
   };
   ~CWelsCircleQueue() {
-    free (m_pCurrentQueue);
+	  if (m_pCurrentQueue)
+	    free (m_pCurrentQueue);
   };
 
   int32_t size() {
@@ -67,6 +68,13 @@ class CWelsCircleQueue {
   }
 
   int32_t push_back (TNodeType* pNode) {
+	if (NULL == m_pCurrentQueue)
+	{
+		m_pCurrentQueue = static_cast<TNodeType**> (malloc (m_iMaxNodeCount * sizeof (TNodeType*)));
+		if (NULL == m_pCurrentQueue)
+			return 1;	
+	}
+	
     if ((NULL != pNode) && (find (pNode))) {      //not checking NULL for easier testing
       return 1;
     }
