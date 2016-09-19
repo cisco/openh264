@@ -178,7 +178,7 @@ class CWelsList {
     m_iMaxNodeCount = m_iMaxNodeCount * 2;
 	m_pFirst = &(m_pCurrentList[0]);
 	m_pLast = &(m_pCurrentList[m_iMaxNodeCount - 1]);
-    m_pCurrent = &(m_pCurrentList[m_iCurrentNodeCount - 1]);
+    m_pCurrent = &(m_pCurrentList[m_iCurrentNodeCount]);
     return true;
   }
 
