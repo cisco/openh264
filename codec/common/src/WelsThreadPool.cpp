@@ -234,7 +234,9 @@ WELS_THREAD_ERROR_CODE CWelsThreadPool::QueueTask (IWelsTask* pTask) {
     }
   }
   //fprintf(stdout, "ThreadPool:  AddTaskToWaitedList: %x\n", pTask);
-  AddTaskToWaitedList (pTask);
+  if (false == AddTaskToWaitedList (pTask)){
+      return WELS_THREAD_ERROR_GENERAL;
+  }
 
   //fprintf(stdout, "ThreadPool:  SignalThread: %x\n", pTask);
   SignalThread();
@@ -285,12 +287,12 @@ WELS_THREAD_ERROR_CODE CWelsThreadPool::RemoveThreadFromBusyList (CWelsTaskThrea
   }
 }
 
-void  CWelsThreadPool::AddTaskToWaitedList (IWelsTask* pTask) {
+bool  CWelsThreadPool::AddTaskToWaitedList (IWelsTask* pTask) {
   CWelsAutoLock  cLock (m_cLockWaitedTasks);
 
-  m_cWaitedTasks->push_back (pTask);
+  int32_t nRet = m_cWaitedTasks->push_back (pTask);
   //fprintf(stdout, "CWelsThreadPool::AddTaskToWaitedList=%d, pTask=%x\n", m_cWaitedTasks->size(), pTask);
-  return;
+  return (0==nRet ? true : false);
 }
 
 CWelsTaskThread*   CWelsThreadPool::GetIdleThread() {

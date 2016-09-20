@@ -59,12 +59,15 @@ class CWelsList {
   CWelsList() {
     m_iCurrentNodeCount = 0;
     m_iMaxNodeCount = 50;
-    m_pCurrentList = static_cast<SNode<TNodeType>*> (malloc (m_iMaxNodeCount * sizeof (SNode<TNodeType>)));
-    //here using array storage to simulate list is to avoid the frequent malloc/free of Nodes which may cause fragmented memory
-    ResetStorage();
+
+    m_pCurrentList = NULL;
+    m_pFirst = NULL;
+    m_pCurrent = NULL;
+    m_pLast = NULL;
   };
   ~CWelsList() {
-    free (m_pCurrentList);
+    if (m_pCurrentList)
+      free (m_pCurrentList);
   };
 
   int32_t size() {
@@ -72,22 +75,24 @@ class CWelsList {
   }
 
   bool push_back (TNodeType* pNode) {
-    m_pCurrent->pPointer = pNode;
-    if (0 == m_iCurrentNodeCount) {
-      m_pFirst = m_pCurrent;
+    if (NULL == m_pCurrentList) {
+      m_pCurrentList = static_cast<SNode<TNodeType>*> (malloc (m_iMaxNodeCount * sizeof (SNode<TNodeType>)));
+      if (NULL == m_pCurrentList) {
+        return false;
+      } else {
+        ResetStorage();
+      }
     }
 
-    m_iCurrentNodeCount++;
-    if (m_iCurrentNodeCount == m_iMaxNodeCount) {
+    if (NULL == m_pCurrent) {
       if (!ExpandList()) {
         return false;
       }
     }
 
-    SNode<TNodeType>* pNext = FindNextStorage();
-    m_pCurrent->pNextNode = pNext;
-    pNext->pPrevNode = m_pCurrent;
-    m_pCurrent = pNext;
+    m_pCurrent->pPointer = pNode;
+    m_pCurrent = m_pCurrent->pNextNode;
+    m_iCurrentNodeCount++;
 
     return true;
   }
@@ -105,18 +110,20 @@ class CWelsList {
     }
 
     SNode<TNodeType>* pTemp = m_pFirst;
-    if (m_iCurrentNodeCount > 0) {
-      m_iCurrentNodeCount --;
-    }
 
-    if (0 == m_iCurrentNodeCount) {
-      ResetStorage();
-    } else {
-      m_pFirst = m_pFirst->pNextNode;
-      m_pFirst->pPrevNode = NULL;
+    m_pFirst = m_pFirst->pNextNode;
+    m_pFirst->pPrevNode = NULL;
 
-      CleanOneNode (pTemp);
-    }
+    CleanOneNode (pTemp);
+
+    m_pLast->pNextNode = pTemp;
+    pTemp->pPrevNode = m_pLast;
+    m_pLast = pTemp;
+
+    if (NULL == m_pCurrent)
+      m_pCurrent = m_pLast;
+
+    m_iCurrentNodeCount --;
   }
 
   bool erase (TNodeType* pNode) {
@@ -139,15 +146,17 @@ class CWelsList {
 
         CleanOneNode (pTemp);
         m_iCurrentNodeCount --;
+
+        m_pLast->pNextNode = pTemp;
+        pTemp->pPrevNode = m_pLast;
+        m_pLast = pTemp;
+
         return true;
       }
 
-      if (pTemp->pNextNode) {
-        pTemp = pTemp->pNextNode;
-      } else {
-        break;
-      }
-    } while (pTemp->pPointer && pTemp->pNextNode);
+      pTemp = pTemp->pNextNode;
+
+    } while (pTemp && pTemp->pPointer);
     return false;
   }
 
@@ -170,8 +179,9 @@ class CWelsList {
     m_pCurrentList = tmpCurrentList;
     m_iCurrentNodeCount = m_iMaxNodeCount;
     m_iMaxNodeCount = m_iMaxNodeCount * 2;
-    m_pFirst = m_pCurrentList;
-    m_pCurrent = & (m_pCurrentList[m_iCurrentNodeCount - 1]);
+    m_pFirst = & (m_pCurrentList[0]);
+    m_pLast = & (m_pCurrentList[m_iMaxNodeCount - 1]);
+    m_pCurrent = & (m_pCurrentList[m_iCurrentNodeCount]);
     return true;
   }
 
@@ -189,21 +199,6 @@ class CWelsList {
     pList[iMaxIndex].pNextNode = NULL;
   }
 
-  SNode<TNodeType>* FindNextStorage() {
-
-    if (NULL != m_pCurrent->pNextNode) {
-      if (NULL == m_pCurrent->pNextNode->pPointer) {
-        return (m_pCurrent->pNextNode);
-      }
-    }
-
-    for (int32_t i = 0; i < m_iMaxNodeCount; i++) {
-      if (NULL == m_pCurrentList[i].pPointer) {
-        return (&m_pCurrentList[i]);
-      }
-    }
-    return NULL;
-  }
 
   void CleanOneNode (SNode<TNodeType>* pSNode) {
     pSNode->pPointer = NULL;
@@ -212,15 +207,17 @@ class CWelsList {
   }
 
   void ResetStorage() {
-    m_pFirst = NULL;
-    m_pCurrent = m_pCurrentList;
     InitStorage (m_pCurrentList, m_iMaxNodeCount - 1);
+    m_pCurrent = m_pCurrentList;
+    m_pFirst = & (m_pCurrentList[0]);
+    m_pLast = & (m_pCurrentList[m_iMaxNodeCount - 1]);
   }
 
   int32_t m_iCurrentNodeCount;
   int32_t m_iMaxNodeCount;
   SNode<TNodeType>* m_pCurrentList;
   SNode<TNodeType>* m_pFirst;
+  SNode<TNodeType>* m_pLast;
   SNode<TNodeType>* m_pCurrent;
 };
 

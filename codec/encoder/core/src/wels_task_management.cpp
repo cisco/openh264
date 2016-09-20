@@ -149,7 +149,7 @@ WelsErrorType CWelsTaskManageBase::CreateTasks (sWelsEncCtx* pEncCtx, const int3
   for (int idx = 0; idx < kiTaskCount; idx++) {
     pTask = WELS_NEW_OP (CWelsUpdateMbMapTask (this, pEncCtx, idx), CWelsUpdateMbMapTask);
     WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == pTask)
-    m_cPreEncodingTaskList[kiCurDid]->push_back (pTask);
+    WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, 0 != m_cPreEncodingTaskList[kiCurDid]->push_back (pTask));
   }
 
   for (int idx = 0; idx < kiTaskCount; idx++) {
@@ -164,7 +164,7 @@ WelsErrorType CWelsTaskManageBase::CreateTasks (sWelsEncCtx* pEncCtx, const int3
       }
     }
     WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == pTask)
-    m_cEncodingTaskList[kiCurDid]->push_back (pTask);
+    WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, 0 != m_cEncodingTaskList[kiCurDid]->push_back (pTask) );
   }
 
   //fprintf(stdout, "CWelsTaskManageBase CreateTasks m_iThreadNum %d kiTaskCount=%d\n", m_iThreadNum, kiTaskCount);

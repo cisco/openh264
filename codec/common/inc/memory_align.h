@@ -108,7 +108,7 @@ void WelsFree (void* pPtr, const char* kpTag);
   (type*)(new object);
 
 #define  WELS_DELETE_OP(p) \
-  delete p;            \
+  if(p) delete p;            \
   p = NULL;
 
 }
