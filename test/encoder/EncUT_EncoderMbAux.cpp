@@ -210,6 +210,7 @@ TEST (EncodeMbAuxTest, WelsDctFourT4_sse2) {
   TestDctFourT4 (WelsDctFourT4_sse2);
 }
 
+#ifdef HAVE_AVX2
 TEST (EncodeMbAuxTest, WelsDctT4_avx2) {
   if (WelsCPUFeatureDetect (0) & WELS_CPU_AVX2)
     TestDctT4 (WelsDctT4_avx2);
@@ -219,6 +220,7 @@ TEST (EncodeMbAuxTest, WelsDctFourT4_avx2) {
   if (WelsCPUFeatureDetect (0) & WELS_CPU_AVX2)
     TestDctFourT4 (WelsDctFourT4_avx2);
 }
+#endif //HAVE_AVX2
 
 TEST (EncodeMbAuxTest, WelsCalculateSingleCtr4x4_sse2) {
   CMemoryAlign cMemoryAlign (0);
@@ -452,6 +454,7 @@ TEST (EncodeMbAuxTest, WelsQuantFour4x4_sse2) {
 TEST (EncodeMbAuxTest, WelsQuantFour4x4Max_sse2) {
   TestWelsQuantFour4x4Max (WelsQuantFour4x4Max_sse2);
 }
+#ifdef HAVE_AVX2
 TEST (EncodeMbAuxTest, WelsQuant4x4_avx2) {
   if (WelsCPUFeatureDetect (0) & WELS_CPU_AVX2)
     TestWelsQuant4x4 (WelsQuant4x4_avx2);
@@ -468,6 +471,7 @@ TEST (EncodeMbAuxTest, WelsQuantFour4x4Max_avx2) {
   if (WelsCPUFeatureDetect (0) & WELS_CPU_AVX2)
     TestWelsQuantFour4x4Max (WelsQuantFour4x4Max_avx2);
 }
+#endif //HAVE_AVX2
 #endif
 int32_t WelsHadamardQuant2x2SkipAnchor (int16_t* rs, int16_t ff,  int16_t mf) {
   int16_t pDct[4], s[4];

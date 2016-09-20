@@ -636,10 +636,12 @@ GENERATE_Sad8x16_UT (WelsSampleSatd8x16_sse41, WelsSampleSatd8x16_c, WELS_CPU_SS
 GENERATE_Sad16x8_UT (WelsSampleSatd16x8_sse41, WelsSampleSatd16x8_c, WELS_CPU_SSE41)
 GENERATE_Sad16x16_UT (WelsSampleSatd16x16_sse41, WelsSampleSatd16x16_c, WELS_CPU_SSE41)
 
+#ifdef HAVE_AVX2
 GENERATE_Sad8x8_UT (WelsSampleSatd8x8_avx2, WelsSampleSatd8x8_c, WELS_CPU_AVX2)
 GENERATE_Sad8x16_UT (WelsSampleSatd8x16_avx2, WelsSampleSatd8x16_c, WELS_CPU_AVX2)
 GENERATE_Sad16x8_UT (WelsSampleSatd16x8_avx2, WelsSampleSatd16x8_c, WELS_CPU_AVX2)
 GENERATE_Sad16x16_UT (WelsSampleSatd16x16_avx2, WelsSampleSatd16x16_c, WELS_CPU_AVX2)
+#endif //HAVE_AVX2
 #endif
 
 #ifdef HAVE_NEON
