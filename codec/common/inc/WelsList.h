@@ -120,6 +120,9 @@ class CWelsList {
     pTemp->pPrevNode = m_pLast;
     m_pLast = pTemp;
 
+    if (NULL == m_pCurrent)
+      m_pCurrent = m_pLast;
+
     m_iCurrentNodeCount --;
   }
 
