@@ -63,11 +63,11 @@ class CWelsList {
     m_pCurrentList = NULL;
     m_pFirst = NULL;
     m_pCurrent = NULL;
-	m_pLast = NULL;
+    m_pLast = NULL;
   };
   ~CWelsList() {
-	  if (m_pCurrentList)
-		free (m_pCurrentList);
+    if (m_pCurrentList)
+      free (m_pCurrentList);
   };
 
   int32_t size() {
@@ -75,23 +75,23 @@ class CWelsList {
   }
 
   bool push_back (TNodeType* pNode) {
-    if (NULL == m_pCurrentList){
-		m_pCurrentList = static_cast<SNode<TNodeType>*> (malloc (m_iMaxNodeCount * sizeof (SNode<TNodeType>)));
-		if (NULL == m_pCurrentList){
-			return false;
-		}else{
-			ResetStorage();
-		}
+    if (NULL == m_pCurrentList) {
+      m_pCurrentList = static_cast<SNode<TNodeType>*> (malloc (m_iMaxNodeCount * sizeof (SNode<TNodeType>)));
+      if (NULL == m_pCurrentList) {
+        return false;
+      } else {
+        ResetStorage();
+      }
     }
-    
-	if (NULL == m_pCurrent) {
-		if (!ExpandList()) {
-			return false;
-		}
-	}
+
+    if (NULL == m_pCurrent) {
+      if (!ExpandList()) {
+        return false;
+      }
+    }
 
     m_pCurrent->pPointer = pNode;
-	m_pCurrent = m_pCurrent->pNextNode;
+    m_pCurrent = m_pCurrent->pNextNode;
     m_iCurrentNodeCount++;
 
     return true;
@@ -110,17 +110,17 @@ class CWelsList {
     }
 
     SNode<TNodeType>* pTemp = m_pFirst;
-    
-	m_pFirst = m_pFirst->pNextNode;
-	m_pFirst->pPrevNode = NULL;
 
-	CleanOneNode (pTemp);
+    m_pFirst = m_pFirst->pNextNode;
+    m_pFirst->pPrevNode = NULL;
 
-	m_pLast->pNextNode = pTemp;
-	pTemp->pPrevNode = m_pLast;
-	m_pLast = pTemp;
+    CleanOneNode (pTemp);
 
-	m_iCurrentNodeCount --;
+    m_pLast->pNextNode = pTemp;
+    pTemp->pPrevNode = m_pLast;
+    m_pLast = pTemp;
+
+    m_iCurrentNodeCount --;
   }
 
   bool erase (TNodeType* pNode) {
@@ -144,9 +144,9 @@ class CWelsList {
         CleanOneNode (pTemp);
         m_iCurrentNodeCount --;
 
-		m_pLast->pNextNode = pTemp;
-		pTemp->pPrevNode = m_pLast;
-		m_pLast = pTemp;
+        m_pLast->pNextNode = pTemp;
+        pTemp->pPrevNode = m_pLast;
+        m_pLast = pTemp;
 
         return true;
       }
@@ -176,9 +176,9 @@ class CWelsList {
     m_pCurrentList = tmpCurrentList;
     m_iCurrentNodeCount = m_iMaxNodeCount;
     m_iMaxNodeCount = m_iMaxNodeCount * 2;
-	m_pFirst = &(m_pCurrentList[0]);
-	m_pLast = &(m_pCurrentList[m_iMaxNodeCount - 1]);
-    m_pCurrent = &(m_pCurrentList[m_iCurrentNodeCount]);
+    m_pFirst = & (m_pCurrentList[0]);
+    m_pLast = & (m_pCurrentList[m_iMaxNodeCount - 1]);
+    m_pCurrent = & (m_pCurrentList[m_iCurrentNodeCount]);
     return true;
   }
 
@@ -205,9 +205,9 @@ class CWelsList {
 
   void ResetStorage() {
     InitStorage (m_pCurrentList, m_iMaxNodeCount - 1);
-	m_pCurrent = m_pCurrentList;
-	m_pFirst = &(m_pCurrentList[0]);
-	m_pLast = &(m_pCurrentList[m_iMaxNodeCount - 1]);
+    m_pCurrent = m_pCurrentList;
+    m_pFirst = & (m_pCurrentList[0]);
+    m_pLast = & (m_pCurrentList[m_iMaxNodeCount - 1]);
   }
 
   int32_t m_iCurrentNodeCount;

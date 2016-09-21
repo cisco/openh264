@@ -57,8 +57,8 @@ class CWelsCircleQueue {
     m_iCurrentListStart = m_iCurrentListEnd = 0;
   };
   ~CWelsCircleQueue() {
-	  if (m_pCurrentQueue)
-	    free (m_pCurrentQueue);
+    if (m_pCurrentQueue)
+      free (m_pCurrentQueue);
   };
 
   int32_t size() {
@@ -68,13 +68,12 @@ class CWelsCircleQueue {
   }
 
   int32_t push_back (TNodeType* pNode) {
-	if (NULL == m_pCurrentQueue)
-	{
-		m_pCurrentQueue = static_cast<TNodeType**> (malloc (m_iMaxNodeCount * sizeof (TNodeType*)));
-		if (NULL == m_pCurrentQueue)
-			return 1;	
-	}
-	
+    if (NULL == m_pCurrentQueue) {
+      m_pCurrentQueue = static_cast<TNodeType**> (malloc (m_iMaxNodeCount * sizeof (TNodeType*)));
+      if (NULL == m_pCurrentQueue)
+        return 1;
+    }
+
     if ((NULL != pNode) && (find (pNode))) {      //not checking NULL for easier testing
       return 1;
     }
