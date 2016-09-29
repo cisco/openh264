@@ -137,6 +137,10 @@ TEST (CWelsList, CWelsListEraseAll) {
   }
   EXPECT_TRUE (cTestList.size() == TEST_LEN);
 
+  for (int i = 0; i < TEST_LEN; i++) {
+    EXPECT_TRUE (* (cTestList.index (i)) == data[i]);
+  }
+
   int iCurrentLen = TEST_LEN;
   do {
     int iEraseIdx = rand() % TEST_LEN;
