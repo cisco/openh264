@@ -72,9 +72,9 @@ runBitStreamToYUV()
     TestYUVName=`echo ${TestYUVName} | awk 'BEGIN {FS="/"}  {print $NF}   ' `
     StreamName=`echo ${StreamFileFullPath} | awk 'BEGIN {FS="/"}  {print $NF}  ' `
     echo ""
-    echo "TestYUVName    is  ${TestYUVName}"
-    echo "StreamName     is  ${StreamName} "
-    echo "SHA1Table        is  ${SHA1Table}"
+    echo "TestYUVName is  ${TestYUVName}"
+    echo "StreamName  is  ${StreamName}"
+    echo "SHA1Table   is  ${SHA1Table}"
     echo ""
 }
 
@@ -147,10 +147,10 @@ runPostAction()
 
     if [ ${TestType} = "TravisTest" ]
     then
-    if [ -d ${FinalResultDir} ]
-            then
-                ${EncoderTestDir}/Scripts/run_SafeDelete.sh ${FinalResultDir}
-    fi
+        if [ -d ${FinalResultDir} ]
+        then
+            ${EncoderTestDir}/Scripts/run_SafeDelete.sh ${FinalResultDir}
+        fi
     fi
  }
 

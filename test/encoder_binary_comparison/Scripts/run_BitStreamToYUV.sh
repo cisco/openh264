@@ -110,7 +110,7 @@ runMain()
     run_BitStream2YUV  ${BitStreameFile}  ${DecodedYUVName}  ${DecoderLogFile}
     if [  ! $?  -eq 0  ]
     then
-            echo "bit stream decoded  failed!"
+        echo "bit stream decoded  failed!"
         return 1
     fi
     #*********************

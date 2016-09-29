@@ -239,10 +239,12 @@ TEST (DecodeMbAuxTest, WelsIDctT4Rec_mmx) {
 TEST (DecodeMbAuxTest, WelsIDctT4Rec_sse2) {
   TestIDctT4Rec<int16_t> (WelsIDctT4Rec_sse2);
 }
+#if defined(HAVE_AVX2)
 TEST (DecodeMbAuxTest, WelsIDctT4Rec_avx2) {
   if (WelsCPUFeatureDetect (0) & WELS_CPU_AVX2)
     TestIDctT4Rec<int16_t> (WelsIDctT4Rec_avx2);
 }
+#endif
 #endif
 template<typename clip_t>
 void WelsIDctT8Anchor (uint8_t* p_dst, int16_t dct[4][16]) {
@@ -340,10 +342,12 @@ TEST (DecodeMbAuxTest, WelsIDctRecI16x16Dc_c) {
 TEST (DecodeMbAuxTest, WelsIDctFourT4Rec_sse2) {
   TestIDctFourT4Rec<int16_t> (WelsIDctFourT4Rec_sse2);
 }
+#if defined(HAVE_AVX2)
 TEST (DecodeMbAuxTest, WelsIDctFourT4Rec_avx2) {
   if (WelsCPUFeatureDetect (0) & WELS_CPU_AVX2)
     TestIDctFourT4Rec<int16_t> (WelsIDctFourT4Rec_avx2);
 }
+#endif
 TEST (DecodeMbAuxTest, WelsIDctRecI16x16Dc_sse2) {
   int32_t iCpuCores = 0;
   uint32_t uiCpuFeatureFlag = WelsCPUFeatureDetect (&iCpuCores);
