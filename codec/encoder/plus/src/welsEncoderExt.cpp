@@ -393,9 +393,6 @@ int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSIn
            "CWelsH264SVCEncoder::EncodeFrame(), m_uiCountFrameNum= %d,", m_uiCountFrameNum);
 #endif//REC_FRAME_COUNT
 
-#ifdef DUMP_SRC_PICTURE
-  DumpSrcPicture (pSrc);
-#endif // DUMP_SRC_PICTURE
   return kiEncoderReturn;
 }
 
@@ -461,7 +458,7 @@ int CWelsH264SVCEncoder ::EncodeFrameInternal (const SSourcePicture*  pSrcPic, S
   }
 #endif //OUTPUT_BIT_STREAM
 #ifdef DUMP_SRC_PICTURE
-  DumpSrcPicture (pSrcPicList[0]->pData[0]);
+  DumpSrcPicture (pSrcPic, m_pEncContext->pSvcParam->iUsageType);
 #endif // DUMP_SRC_PICTURE
 
   return cmResultSuccess;
@@ -491,7 +488,7 @@ int CWelsH264SVCEncoder::ForceIntraFrame (bool bIDR) {
 void CWelsH264SVCEncoder::TraceParamInfo (SEncParamExt* pParam) {
   WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
            "iUsageType = %d,iPicWidth= %d;iPicHeight= %d;iTargetBitrate= %d;iMaxBitrate= %d;iRCMode= %d;iPaddingFlag= %d;iTemporalLayerNum= %d;iSpatialLayerNum= %d;fFrameRate= %.6ff;uiIntraPeriod= %d;"
-           "eSpsPpsIdStrategy = %d;bPrefixNalAddingCtrl = %d;bSimulcastAVC=%d;bEnableDenoise= %d;bEnableBackgroundDetection= %d;bEnableSceneChangeDetect = %d;bEnableAdaptiveQuant= %d;bEnableFrameSkip= %d;bEnableLongTermReference= %d;iLtrMarkPeriod= %d;"
+           "eSpsPpsIdStrategy = %d;bPrefixNalAddingCtrl = %d;bSimulcastAVC=%d;bEnableDenoise= %d;bEnableBackgroundDetection= %d;bEnableSceneChangeDetect = %d;bEnableAdaptiveQuant= %d;bEnableFrameSkip= %d;bEnableLongTermReference= %d;iLtrMarkPeriod= %d, bIsLosslessLink=%d;"
            "iComplexityMode = %d;iNumRefFrame = %d;iEntropyCodingModeFlag = %d;uiMaxNalSize = %d;iLTRRefNum = %d;iMultipleThreadIdc = %d;iLoopFilterDisableIdc = %d (offset(alpha/beta): %d,%d;iMaxQp = %d;iMinQp = %d)",
            pParam->iUsageType,
            pParam->iPicWidth,
@@ -514,6 +511,7 @@ void CWelsH264SVCEncoder::TraceParamInfo (SEncParamExt* pParam) {
            pParam->bEnableFrameSkip,
            pParam->bEnableLongTermReference,
            pParam->iLtrMarkPeriod,
+           pParam->bIsLosslessLink,
            pParam->iComplexityMode,
            pParam->iNumRefFrame,
            pParam->iEntropyCodingModeFlag,
@@ -1273,57 +1271,51 @@ int CWelsH264SVCEncoder::GetOption (ENCODER_OPTION eOptionId, void* pOption) {
   return 0;
 }
 
-void CWelsH264SVCEncoder::DumpSrcPicture (const uint8_t* pSrc) {
+void CWelsH264SVCEncoder::DumpSrcPicture (const SSourcePicture*  pSrcPic, const int iUsageType) {
 #ifdef DUMP_SRC_PICTURE
   FILE* pFile = NULL;
   char strFileName[256] = {0};
   const int32_t iDataLength = m_iMaxPicWidth * m_iMaxPicHeight;
 
-  WelsStrncpy (strFileName, 256, "pic_in_"); // confirmed_safe_unsafe_usage
+  WelsSnprintf (strFileName, sizeof (strFileName), "pic_in_%dx%d.yuv", m_iMaxPicWidth, m_iMaxPicHeight);// confirmed_safe_unsafe_usage
 
-  if (m_iMaxPicWidth == 640) {
-    WelsStrcat (strFileName, 256, "360p."); // confirmed_safe_unsafe_usage
-  } else if (m_iMaxPicWidth == 320) {
-    WelsStrcat (strFileName, 256, "180p."); // confirmed_safe_unsafe_usage
-  } else if (m_iMaxPicWidth == 160) {
-    WelsStrcat (strFileName, 256, "90p."); // confirmed_safe_unsafe_usage
-  }
-
-  switch (m_iCspInternal) {
+  switch (pSrcPic->iColorFormat) {
   case videoFormatI420:
   case videoFormatYV12:
-    WelsStrcat (strFileName, 256, "yuv"); // confirmed_safe_unsafe_usage
     pFile = WelsFopen (strFileName, "ab+");
-    // WelsLog( &m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "WELS_CSP_I420, m_iCspInternal= 0x%x", m_iCspInternal);
+
     if (NULL != pFile) {
-      fwrite (pSrc, sizeof (uint8_t), (iDataLength * 3) >> 1, pFile);
+      fwrite (pSrcPic->pData[0], sizeof (uint8_t), pSrcPic->iStride[0]*m_iMaxPicHeight, pFile);
+      fwrite (pSrcPic->pData[1], sizeof (uint8_t), pSrcPic->iStride[1]*(m_iMaxPicHeight >> 1), pFile);
+      fwrite (pSrcPic->pData[2], sizeof (uint8_t), pSrcPic->iStride[2]*(m_iMaxPicHeight >> 1), pFile);
       fflush (pFile);
       fclose (pFile);
+    } else {
+      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "DumpSrcPicture, strFileName %s open failed!", strFileName);
     }
     break;
   case videoFormatRGB:
-    WelsStrcat (strFileName, 256, "rgb"); // confirmed_safe_unsafe_usage
+    WelsStrcat (strFileName, 256, ".rgb"); // confirmed_safe_unsafe_usage
     pFile = WelsFopen (strFileName, "ab+");
     if (NULL != pFile) {
-      fwrite (pSrc, sizeof (uint8_t), iDataLength * 3, pFile);
+      fwrite (pSrcPic->pData[0], sizeof (uint8_t), iDataLength * 3, pFile);
       fflush (pFile);
       fclose (pFile);
     }
   case videoFormatBGR:
-    WelsStrcat (strFileName, 256, "bgr"); // confirmed_safe_unsafe_usage
+    WelsStrcat (strFileName, 256, ".bgr"); // confirmed_safe_unsafe_usage
     pFile = WelsFopen (strFileName, "ab+");
-    // WelsLog( &m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "WELS_CSP_BGR, m_iCspInternal= 0x%x", m_iCspInternal);
     if (NULL != pFile) {
-      fwrite (pSrc, sizeof (uint8_t), iDataLength * 3, pFile);
+      fwrite (pSrcPic->pData[0], sizeof (uint8_t), iDataLength * 3, pFile);
       fflush (pFile);
       fclose (pFile);
     }
     break;
   case videoFormatYUY2:
-    WelsStrcat (strFileName, 256, "yuy2"); // confirmed_safe_unsafe_usage
+    WelsStrcat (strFileName, 256, ".yuy2"); // confirmed_safe_unsafe_usage
     pFile = WelsFopen (strFileName, "ab+");
     if (NULL != pFile) {
-      fwrite (pSrc, sizeof (uint8_t), (CALC_BI_STRIDE (m_iMaxPicWidth,  16)) * m_iMaxPicHeight, pFile);
+      fwrite (pSrcPic->pData[0], sizeof (uint8_t), (CALC_BI_STRIDE (m_iMaxPicWidth,  16)) * m_iMaxPicHeight, pFile);
       fflush (pFile);
       fclose (pFile);
     }
