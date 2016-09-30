@@ -22,14 +22,16 @@ before_script:
 env:
   - TASK=UnitTest;      TestParameter=""
   - TASK=BinaryCompare; TestParameter=BA_MW_D.264
-  - TASK=BinaryCompare; TestParameter=CVPCMNL1_SVA_C.264
-
+  - TASK=BinaryCompare; TestParameter=Zhling_1280x720.264
+  - TASK=BinaryCompare; TestParameter=Adobe_PDF_sample_a_1024x768_50Frms.264
 matrix:
   exclude:
     - compiler: clang
       env: TASK=BinaryCompare; TestParameter=BA_MW_D.264
     - compiler: clang
-      env: TASK=BinaryCompare; TestParameter=CVPCMNL1_SVA_C.264
+      env: TASK=BinaryCompare; TestParameter=Zhling_1280x720.264
+    - compiler: clang
+      env: TASK=BinaryCompare; TestParameter=Adobe_PDF_sample_a_1024x768_50Frms.264
 script:
   -  echo "currrent test is for ${TASK}"
   -  echo "test parameter is ${TestParameter}"
