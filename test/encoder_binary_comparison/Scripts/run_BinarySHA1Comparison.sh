@@ -54,10 +54,11 @@ runEncoderCommandInital()
                          "-frout 0" "-frout 1" "-frout 2" "-frout 3" \
                          "-lqp 0" "-lqp 1" "-lqp 2" "-lqp 3" \
                          -rc -fs -tarb "-ltarb 0"   "-ltarb 1" "-ltarb 2" "-ltarb 3" \
+                         "-lmaxb 0"   "-lmaxb 1"  "-lmaxb 2"  "-lmaxb 3" \
                          "-slcmd 0" "-slcnum 0" "-slcmd 1" "-slcnum 1"\
                          "-slcmd 2" "-slcnum 2" "-slcmd 3" "-slcnum 3"\
                          -nalsize \
-                         -iper     -thread    -ltr \
+                         -iper     -thread  "-loadbalancing"  -ltr \
                          -db    -denois    -scene    -bgd    -aq )
 
     aEncoderCommandName=(usagetype    frms  numl   numtl \
@@ -65,12 +66,12 @@ runEncoderCommandInital()
                          frout0 frout1 frout2 frout3 \
                          lqp0 lqp1 lqp2 lqp3 \
                          rc FrSkip tarb ltarb0  ltarb1 ltarb2 ltarb3 \
+                         lmaxb0  lmaxb1 lmaxb2 lmaxb3 \
                          slcmd0 slcnum0 slcmd1 slcnum1 \
                          slcmd2 slcnum2 slcmd3 slcnum3 \
-                         MaxNalSZ    \
-                         iper     thread  ltr \
+                         MaxNalSZ \
+                         iper thread  loadbalancing ltr \
                          db    denois  scene  bgd  aq )
-
 
     NumParameter=${#aEncoderCommandSet[@]}
     for ((i=0;i<NumParameter; i++))
@@ -94,31 +95,31 @@ runGlobalVariableInitial()
     UnpassCaseFile="${FinalResultPath}/${TestYUVName}_unpassCaseOutput.csv"
     UpdateSHA1TableFile="${FinalResultPath}/${TestYUVName}_UpdateSHA1Table.csv"
 
-   HeadLine1="EncoderFlag, DecoderFlag, FPS, BitSreamSHA1, BitSreamMD5, InputYUVSHA1, InputYUVMD5,\
+   HeadLine1="EncoderFlag, DecoderFlag, FPS, BitSreamSHA1, InputYUVSHA1, \
               -utype,    -frms,  -numl,  -numtl, -sw, -sh,\
               -dw 0, -dh 0, -dw 1, -dh 1, -dw 2, -dh 2, -dw 3, -dh 3,\
               -frout 0,    -frout 1, -frout 2, -frout 3,\
               -lqp 0, -lqp 1, -lqp 2, -lqp 3,\
               -rc,-fs, -tarb, -ltarb 0, -ltarb 1, -ltarb 2, -ltarb 3,\
+              -lmaxb 0,   -lmaxb 1,  -lmaxb 2,  -lmaxb 3,\
               -slcmd 0, -slcnum 0, -slcmd 1, -slcnum 1,\
               -slcmd 2, -slcnum 2, -slcmd 3, -slcnum 3,\
               -nalsize,\
-              -iper, -thread, -ltr, -db, -denois,\
+              -iper, -thread, -loadbalancing, -ltr, -db, -denois,\
               -scene,    -bgd ,  -aq, "
 
-    HeadLine2="BitSreamSHA1, BitSreamMD5, InputYUVSHA1, InputYUVMD5,\
+    HeadLine2="BitSreamSHA1, InputYUVSHA1,\
               -utype,    -frms,  -numl,  -numtl, -sw, -sh,\
               -dw 0, -dh 0, -dw 1, -dh 1,-dw 2, -dh 2, -dw 3, -dh 3,\
               -frout 0,    -frout 1, -frout 2, -frout 3,\
               -lqp 0, -lqp 1, -lqp 2, -lqp 3,\
               -rc, -fs, -tarb, -ltarb 0, -ltarb 1, -ltarb 2, -ltarb 3,\
+              -lmaxb 0,   -lmaxb 1,  -lmaxb 2,  -lmaxb 3,\
               -slcmd 0, -slcnum 0, -slcmd 1, -slcnum 1,\
               -slcmd 2, -slcnum 2, -slcmd 3, -slcnum 3,\
               -nalsize,\
-              -iper, -thread, -ltr, -db, -denois,\
+              -iper, -thread, -loadbalancing, -ltr, -db, -denois,\
               -scene    , bgd  , -aq "
-
-
 
     echo ${HeadLine1}>${AllCasePassStatusFile}
     echo ${HeadLine1}>${UnpassCaseFile}
@@ -156,8 +157,8 @@ runParseCaseInfo()
 
     local CaseData=$@
     BenchmarkSHA1=`echo $CaseData |awk 'BEGIN {FS="[,\r]"} {print $1} ' `
-    BenchmarkYUVSHA1=`echo $CaseData |awk 'BEGIN {FS="[,\r]"} {print $3} ' `
-    aEncoderCommandValue=(`echo $CaseData |awk 'BEGIN {FS="[,\r]"} {for(i=5;i<=NF;i++) printf(" %s",$i)} ' `)
+    BenchmarkYUVSHA1=`echo $CaseData |awk 'BEGIN {FS="[,\r]"} {print $2} ' `
+    aEncoderCommandValue=(`echo $CaseData |awk 'BEGIN {FS="[,\r]"} {for(i=3;i<=NF;i++) printf(" %s",$i)} ' `)
     BitstreamTarget=${TempDataPath}/${TestYUVName}_codec_target.264
 }
 
@@ -204,9 +205,7 @@ runBitStreamVerify()
     echo -e "Bit stream SHA1 value comparison.... "
     #*******************************************
     TargetSHA1="NULL"
-    TargetMD5="NULL"
     TargetYUVSHA1="NULL"
-    TargetYUVMD5="NULL"
 
     if [ ${EncoderFlag} -eq 1 ]
     then
@@ -253,7 +252,11 @@ runSingleCasePostAction()
         return 1
     fi
     local CaseData=$@
-    CaseInfo=`echo $CaseData | awk 'BEGIN {FS="[,\r]"} {for(i=5;i<=NF;i++) printf(" %s,",$i)} '`
+    #formating for update, keep the same with origin SHA1 table
+    CaseInfo=`echo $CaseData | awk 'BEGIN {FS="[,\r]"} {for(i=3;i<=NF-1;i++) printf("%s,",$i)} '`
+    LastEncCommandOption=`echo $CaseData | awk 'BEGIN {FS="[,\r]"} {print $NF} '`
+    CaseInfo="${CaseInfo}${LastEncCommandOption}"
+
     PassStatusInfo="${DiffFlag}, ${TargetSHA1}, ${BenchmarkSHA1}, ${TargetYUVSHA1}, ${BenchmarkYUVSHA1}, ${CaseInfo}, ${EncoderCommand} "
     echo "${PassStatusInfo}">>${AllCasePassStatusFile}
     if [ "$DiffFlag" != "0:passed!"  ]
@@ -261,7 +264,7 @@ runSingleCasePostAction()
         echo "${PassStatusInfo}">>${UnpassCaseFile}
     fi
 
-    echo "${TargetSHA1}, ${TargetMD5},${TargetYUVMD5}, ${TargetYUVSHA1},${CaseInfo}">>${UpdateSHA1TableFile}
+    echo "${TargetSHA1}, ${TargetYUVSHA1},${CaseInfo}">>${UpdateSHA1TableFile}
     #./run_SafeDelete.sh ${BitstreamTarget} >>${AllCaseConsoleLogFile}
 }
 
