@@ -319,7 +319,7 @@ class ISVCEncoder {
   * @param  bIDR true: force encoder to encode frame as IDR frame;false, return 1 and nothing to do
   * @return 0 - success; otherwise - failed;
   */
-  virtual int EXTAPI ForceIntraFrame (bool bIDR) = 0;
+  virtual int EXTAPI ForceIntraFrame (bool bIDR,int iLayerId = -1) = 0;
 
   /**
   * @brief   Set option for encoder, detail option type, please refer to enumurate ENCODER_OPTION.

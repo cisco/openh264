@@ -47,7 +47,7 @@ struct SVCEncoderImpl : public ISVCEncoder {
     EXPECT_TRUE (gThis == this);
     return 6;
   }
-  virtual int EXTAPI ForceIntraFrame (bool bIDR) {
+  virtual int EXTAPI ForceIntraFrame (bool bIDR,int iLayerId = -1) {
     EXPECT_TRUE (gThis == this);
     return 7;
   }
