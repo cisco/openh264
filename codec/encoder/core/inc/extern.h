@@ -100,7 +100,7 @@ int32_t WelsEncoderEncodeParameterSets (sWelsEncCtx* pCtx, void* pDst);
 /*
  * Force coding IDR as follows
  */
-int32_t ForceCodingIDR (sWelsEncCtx* pCtx);
+int32_t ForceCodingIDR (sWelsEncCtx* pCtx,int32_t iLayerId);
 
 /*!
  * \brief   Wels SVC encoder parameters adjustment

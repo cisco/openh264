@@ -85,7 +85,7 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
   /*
    * return: 0 - success; otherwise - failed;
    */
-  virtual int EXTAPI ForceIntraFrame (bool bIDR);
+  virtual int EXTAPI ForceIntraFrame (bool bIDR,int32_t iLayerId = -1);
 
   /************************************************************************
    * InDataFormat, IDRInterval, SVC Encode Param, Frame Rate, Bitrate,..

@@ -3140,22 +3140,38 @@ int32_t WritePadding (sWelsEncCtx* pCtx, int32_t iLen, int32_t& iSize) {
 /*
  * Force coding IDR as follows
  */
-int32_t ForceCodingIDR (sWelsEncCtx* pCtx) {
+int32_t ForceCodingIDR (sWelsEncCtx* pCtx, int32_t iLayerId) {
   if (NULL == pCtx)
     return 1;
-  for (int32_t iDid = 0; iDid < pCtx->pSvcParam->iSpatialLayerNum; iDid++) {
-    SSpatialLayerInternal* pParamInternal = &pCtx->pSvcParam->sDependencyLayers[iDid];
+  if ((iLayerId < 0) || (iLayerId >= MAX_SPATIAL_LAYER_NUM) || (!pCtx->pSvcParam->bSimulcastAVC)) {
+    for (int32_t iDid = 0; iDid < pCtx->pSvcParam->iSpatialLayerNum; iDid++) {
+      SSpatialLayerInternal* pParamInternal = &pCtx->pSvcParam->sDependencyLayers[iDid];
+      pParamInternal->iCodingIndex = 0;
+      pParamInternal->iFrameIndex = 0;
+      pParamInternal->iFrameNum = 0;
+      pParamInternal->iPOC = 0;
+      pParamInternal->bEncCurFrmAsIdrFlag = true;
+      pCtx->sEncoderStatistics[0].uiIDRReqNum++;
+    }
+    WelsLog (&pCtx->sLogCtx, WELS_LOG_INFO, "ForceCodingIDR(iDid 0-%d)at InputFrameCount=%d\n",
+             pCtx->pSvcParam->iSpatialLayerNum - 1, pCtx->sEncoderStatistics[0].uiInputFrameCount);
+
+
+
+  } else {
+    SSpatialLayerInternal* pParamInternal = &pCtx->pSvcParam->sDependencyLayers[iLayerId];
     pParamInternal->iCodingIndex = 0;
     pParamInternal->iFrameIndex = 0;
     pParamInternal->iFrameNum = 0;
     pParamInternal->iPOC = 0;
     pParamInternal->bEncCurFrmAsIdrFlag = true;
+    pCtx->sEncoderStatistics[iLayerId].uiIDRReqNum++;
+    WelsLog (&pCtx->sLogCtx, WELS_LOG_INFO, "ForceCodingIDR(iDid %d)at InputFrameCount=%d\n", iLayerId,
+             pCtx->sEncoderStatistics[iLayerId].uiInputFrameCount);
   }
-
   pCtx->bCheckWindowStatusRefreshFlag = false;
 
-  WelsLog (&pCtx->sLogCtx, WELS_LOG_INFO, "ForceCodingIDR at InputFrameCount=%d\n",
-           pCtx->sEncoderStatistics[0].uiInputFrameCount);
+
   return 0;
 }
 
@@ -3430,7 +3446,7 @@ void StackBackEncoderStatus (sWelsEncCtx* pEncCtx,
     pEncCtx->uiIdrPicId --;
 
     //set the next frame to be IDR
-    ForceCodingIDR (pEncCtx);
+    ForceCodingIDR (pEncCtx, pEncCtx->uiDependencyId);
   } else { // B pictures are not supported now, any else?
     assert (0);
   }
@@ -4096,7 +4112,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     }
 
     if (pCtx->pVpp->UpdateSpatialPictures (pCtx, pSvcParam, iCurTid, iCurDid) != 0) {
-      ForceCodingIDR (pCtx);
+      ForceCodingIDR (pCtx, iCurDid);
       WelsLog (pLogCtx, WELS_LOG_WARNING,
                "WelsEncoderEncodeExt(), Logic Error Found in Preprocess updating. ForceCodingIDR!");
       //the above is to set the next frame IDR
@@ -4122,7 +4138,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
   if (ENC_RETURN_CORRECTED == pCtx->iEncoderError) {
     pCtx->pVpp->UpdateSpatialPictures (pCtx, pSvcParam, iCurTid, (pSpatialIndexMap + iSpatialIdx)->iDid);
-    ForceCodingIDR (pCtx);
+    ForceCodingIDR (pCtx, (pSpatialIndexMap + iSpatialIdx)->iDid);
     WelsLog (pLogCtx, WELS_LOG_ERROR, "WelsEncoderEncodeExt(), Logic Error Found in temporal level. ForceCodingIDR!");
     //the above is to set the next frame IDR
     pFbi->eFrameType = eFrameType;
