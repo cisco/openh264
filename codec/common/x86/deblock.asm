@@ -157,9 +157,25 @@ SECTION .text
     ; Unbias and split into a non-negative and a non-positive part.
     ; Clip each part to iTc via minub.
     ; Add/subtract each part to/from p0/q0 and clip.
+%ifdef X86_32_PICASM
+    push       r0
+    mov        r0, esp
+    sub        esp, 16
+    and        esp, -16
+    push       0x60606060    ;WELS_DB96_16
+    push       0x60606060
+    push       0x60606060
+    push       0x60606060
+    movdqa     %6, [esp]
+    psubusb    %6, %8
+    psubusb    %8, [esp]
+    mov        esp, r0
+    pop        r0
+%else
     movdqa     %6, [WELS_DB96_16]
     psubusb    %6, %8
     psubusb    %8, [WELS_DB96_16]
+%endif
     pminub     %6, %5
     pminub     %8, %5
     psubusb    %2, %6
@@ -182,8 +198,21 @@ WELS_EXTERN DeblockLumaLt4V_ssse3
     movd     xmm1, arg3d
     movd     xmm2, arg4d
     pxor     xmm3, xmm3
+%ifdef X86_32_PICASM
+    push     r4
+    mov      r4, esp
+    sub      esp, 16
+    and      esp, -16
+    push     0x7f7f7f7f
+    push     0x7f7f7f7f
+    push     0x7f7f7f7f
+    push     0x7f7f7f7f
+    pxor     xmm1, [esp]
+    pxor     xmm2, [esp]
+%else
     pxor     xmm1, [WELS_DB127_16]
     pxor     xmm2, [WELS_DB127_16]
+%endif
     pshufb   xmm1, xmm3                       ; iAlpha ^ 0x7f
     pshufb   xmm2, xmm3                       ; iBeta  ^ 0x7f
     mov      r2, r1                           ; iStride
@@ -196,22 +225,40 @@ WELS_EXTERN DeblockLumaLt4V_ssse3
     MOVDQ    xmm0, [r0 + 0 * r2]              ; q0
     movdqa   xmm4, xmm6
     SSE2_AbsDiffUB xmm6, xmm0, xmm3           ; |p0 - q0|
+%ifdef X86_32_PICASM
+    SSE2_CmpltUB xmm6, xmm1, [esp]  ; bDeltaP0Q0 = |p0 - q0| < iAlpha
+%else
     SSE2_CmpltUB xmm6, xmm1, [WELS_DB127_16]  ; bDeltaP0Q0 = |p0 - q0| < iAlpha
+%endif
     MOVDQ    xmm1, [r0 + 1 * r2]              ; q1
     SSE2_AbsDiffUB xmm7, xmm4, xmm3           ; |p1 - p0|
     SSE2_AbsDiffUB xmm0, xmm1, xmm3           ; |q1 - q0|
     pmaxub   xmm7, xmm0                       ; max(|p1 - p0|, |q1 - q0|)
+%ifdef X86_32_PICASM
+    SSE2_CmpltUB xmm7, xmm2, [esp]  ; bDeltaP1P0 & bDeltaQ1Q0 = max(|p1 - p0|, |q1 - q0|) < iBeta
+%else
     SSE2_CmpltUB xmm7, xmm2, [WELS_DB127_16]  ; bDeltaP1P0 & bDeltaQ1Q0 = max(|p1 - p0|, |q1 - q0|) < iBeta
+%endif
     pand     xmm6, xmm7                       ; bDeltaP0Q0P1P0Q1Q0 = bDeltaP0Q0 & bDeltaP1P0 & bDeltaQ1Q0
     MOVDQ    xmm7, [r3 + 2 * r1]              ; p2
     movdqa   xmm0, xmm7
     SSE2_AbsDiffUB xmm7, xmm4, xmm3           ; |p2 - p0|
+%ifdef X86_32_PICASM
+    SSE2_CmpltUB xmm7, xmm2, [esp]  ; bDeltaP2P0 = |p2 - p0| < iBeta
+%else
     SSE2_CmpltUB xmm7, xmm2, [WELS_DB127_16]  ; bDeltaP2P0 = |p2 - p0| < iBeta
+%endif
     MOVDQ    xmm5, [r0 + 2 * r2]              ; q2
     MOVDQ    xmm3, [r0 + 0 * r2]              ; q0
     movdqa   xmm1, xmm5
     SSE2_AbsDiffUB xmm5, xmm3, xmm4           ; |q2 - q0|
+%ifdef X86_32_PICASM
+    SSE2_CmpltUB xmm5, xmm2, [esp]  ; bDeltaQ2Q0 = |q2 - q0| < iBeta
+    mov      esp, r4
+    pop      r4
+%else
     SSE2_CmpltUB xmm5, xmm2, [WELS_DB127_16]  ; bDeltaQ2Q0 = |q2 - q0| < iBeta
+%endif
 
     pavgb    xmm3, [r3 + 0 * r1]
     pcmpeqw  xmm2, xmm2  ; FFh
@@ -226,7 +273,21 @@ WELS_EXTERN DeblockLumaLt4V_ssse3
     pxor     xmm1, xmm2
 
     movd     xmm3, [r4]
+%ifdef X86_32_PICASM
+    push     r0
+    mov      r0, esp
+    sub      esp, 16
+    and      esp, -16
+    push     0x03030303    ;WELS_SHUFB0000111122223333
+    push     0x02020202
+    push     0x01010101
+    push     0x00000000
+    pshufb   xmm3, [esp] ; iTc
+    mov      esp, r0
+    pop      r0
+%else
     pshufb   xmm3, [WELS_SHUFB0000111122223333] ; iTc
+%endif
     movdqa   xmm4, xmm3  ; iTc0 = iTc
     pcmpgtb  xmm3, xmm2  ; iTc > -1 ? 0xff : 0x00
     pand     xmm6, xmm3  ; bDeltaP0Q0P1P0Q1Q0 &= iTc > -1
@@ -328,8 +389,21 @@ WELS_EXTERN DeblockLumaEq4V_ssse3
     add      r2, 1
     movd     xmm3, r2d
     pxor     xmm4, xmm4
+%ifdef X86_32_PICASM
+    push     r4
+    mov      r4, esp
+    sub      esp, 16
+    and      esp, -16
+    push     0x7f7f7f7f    ;WELS_DB127_16
+    push     0x7f7f7f7f
+    push     0x7f7f7f7f
+    push     0x7f7f7f7f
+    pxor     xmm1, [esp]
+    pxor     xmm2, [esp]
+%else
     pxor     xmm1, [WELS_DB127_16]
     pxor     xmm2, [WELS_DB127_16]
+%endif
     pshufb   xmm1, xmm4                       ; iAlpha ^ 0x7f
     pshufb   xmm2, xmm4                       ; iBeta  ^ 0x7f
     pshufb   xmm3, xmm4                       ; (iAlpha >> 2) + 1
@@ -344,23 +418,41 @@ WELS_EXTERN DeblockLumaEq4V_ssse3
     movdqa   xmm4, xmm6
     SSE2_AbsDiffUB xmm6, xmm0, xmm5           ; |p0 - q0|
     SSE2_CmpgeUB xmm3, xmm6                   ; |p0 - q0| < (iAlpha >> 2) + 2
+%ifdef X86_32_PICASM
+    SSE2_CmpltUB xmm6, xmm1, [esp]  ; bDeltaP0Q0 = |p0 - q0| < iAlpha
+%else
     SSE2_CmpltUB xmm6, xmm1, [WELS_DB127_16]  ; bDeltaP0Q0 = |p0 - q0| < iAlpha
+%endif
     MOVDQ    xmm1, [r0 + 1 * r2]              ; q1
     SSE2_AbsDiffUB xmm7, xmm4, xmm5           ; |p1 - p0|
     SSE2_AbsDiffUB xmm0, xmm1, xmm5           ; |q1 - q0|
     pmaxub   xmm7, xmm0                       ; max(|p1 - p0|, |q1 - q0|)
+%ifdef X86_32_PICASM
+    SSE2_CmpltUB xmm7, xmm2, [esp]  ; bDeltaP1P0 & bDeltaQ1Q0 = max(|p1 - p0|, |q1 - q0|) < iBeta
+%else
     SSE2_CmpltUB xmm7, xmm2, [WELS_DB127_16]  ; bDeltaP1P0 & bDeltaQ1Q0 = max(|p1 - p0|, |q1 - q0|) < iBeta
+%endif
     pand     xmm6, xmm7                       ; & bDeltaP0Q0
 
     MOVDQ    xmm7, [r3 + 2 * r1]              ; p2
     SSE2_AbsDiffUB xmm7, xmm4, xmm5           ; |p2 - p0|
+%ifdef X86_32_PICASM
+    SSE2_CmpltUB xmm7, xmm2, [esp]  ; bDeltaP2P0 = |p2 - p0| < iBeta
+%else
     SSE2_CmpltUB xmm7, xmm2, [WELS_DB127_16]  ; bDeltaP2P0 = |p2 - p0| < iBeta
+%endif
     pand     xmm7, xmm3                       ; &= |p0 - q0| < (iAlpha >> 2) + 2
 
     MOVDQ    xmm0, [r0 + 0 * r2]              ; q0
     MOVDQ    xmm5, [r0 + 2 * r2]              ; q2
     SSE2_AbsDiffUB xmm5, xmm0, xmm4           ; |q2 - q0|
+%ifdef X86_32_PICASM
+    SSE2_CmpltUB xmm5, xmm2, [esp]  ; bDeltaQ2Q0 = |q2 - q0| < iBeta
+    mov      esp, r4
+    pop      r4
+%else
     SSE2_CmpltUB xmm5, xmm2, [WELS_DB127_16]  ; bDeltaQ2Q0 = |q2 - q0| < iBeta
+%endif
     pand     xmm5, xmm3                       ; &= |p0 - q0| < (iAlpha >> 2) + 2
 
 %ifdef X86_32
@@ -369,12 +461,26 @@ WELS_EXTERN DeblockLumaEq4V_ssse3
     mov      r2, esp
     sub      esp,  16
     and      esp, -16
+%ifdef X86_32_PICASM
+    push     0x01010101
+    push     0x01010101
+    push     0x01010101
+    push     0x01010101
+    sub      esp, 16
+    movdqa   [esp], xmm5
+    SSE2_DeblockLumaEq4_3x16P r3, r1, xmm0, xmm1, xmm6, xmm7, xmm2, xmm3, xmm5, xmm4, 1, [esp+16]
+    movdqa   xmm5, [esp]
+    neg      r1
+    SSE2_DeblockLumaEq4_3x16P r0, r1, xmm0, xmm1, xmm6, xmm5, xmm2, xmm3, xmm7, xmm4, 0, [esp+16]
+    mov      esp, r2
+%else
     movdqa   [esp], xmm5
     SSE2_DeblockLumaEq4_3x16P r3, r1, xmm0, xmm1, xmm6, xmm7, xmm2, xmm3, xmm5, xmm4, 1, [WELS_DB1_16]
     movdqa   xmm5, [esp]
     mov      esp, r2
     neg      r1
     SSE2_DeblockLumaEq4_3x16P r0, r1, xmm0, xmm1, xmm6, xmm5, xmm2, xmm3, xmm7, xmm4, 0, [WELS_DB1_16]
+%endif
 %else
     movdqa   xmm9, [WELS_DB1_16]
     SSE2_DeblockLumaEq4_3x16P r3, r1, xmm0, xmm1, xmm6, xmm7, xmm2, xmm3, xmm8, xmm4, 1, xmm9

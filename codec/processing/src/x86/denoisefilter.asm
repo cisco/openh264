@@ -147,7 +147,20 @@ SECTION .text
     movdqa      %2, %1
     psrldq      %2, 2
     punpcklbw   %2, %4
+%ifdef X86_32_PICASM
+    push        r0
+    mov         r0, esp
+    and         esp, 0xfffffff0
+    push        0x00140014
+    push        0x00140014
+    push        0x00140014
+    push        0x00140014
+    pmullw      %2, [esp]
+    mov         esp, r0
+    pop         r0
+%else
     pmullw      %2, [sse2_20]
+%endif
     paddw       %3, %2
 
     movdqa      %2, %1
@@ -184,7 +197,13 @@ WELS_EXTERN BilateralLumaFilter8_sse2
 
     movq        xmm6,   [r0]
     punpcklbw   xmm6,   xmm7
+%ifdef X86_32_PICASM
+    pcmpeqw     xmm3,   xmm3
+    psrlw       xmm3,   15
+    psllw       xmm3,   5
+%else
     movdqa      xmm3,   [sse2_32]
+%endif
     pxor        xmm4,   xmm4        ; nTotWeight
     pxor        xmm5,   xmm5        ; nSum
 

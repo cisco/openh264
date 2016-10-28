@@ -369,6 +369,7 @@ SECTION .text
 
 %ifdef X86_32
 
+%ifndef X86_32_PICASM
 ;***********************************************************************
 ;int32_t CavlcParamCal_sse2(int16_t*coffLevel, uint8_t* run, int16_t *Level, int32_t* total_coeffs , int32_t endIdx);
 ;***********************************************************************
@@ -506,8 +507,10 @@ WELS_EXTERN CavlcParamCal_sse2
     pop edi
     pop ebx
     ret
-%endif
+%endif ;%ifndef X86_32_PICASM
+%endif ;%ifdef X86_32
 
+%ifndef X86_32_PICASM
 ;***********************************************************************
 ;int32_t CavlcParamCal_sse42(int16_t*coffLevel, uint8_t* run, int16_t *Level, int32_t* total_coeffs , int32_t endIdx);
 ;***********************************************************************
@@ -670,3 +673,5 @@ WELS_EXTERN CavlcParamCal_sse42
 %undef r_tmp2d
 %undef p_shufb_lut
 %undef p_run_lut
+
+%endif  ;ifndef X86_32_PICASM

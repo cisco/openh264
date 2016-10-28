@@ -119,7 +119,14 @@ WELS_EXTERN McChromaWidthEq4_mmx
     paddw mm0, mm1
     movq mm1,mm7
 
+%ifdef X86_32_PICASM
+    pcmpeqw mm7, mm7
+    psrlw   mm7, 15
+    psllw   mm7, 5
+    paddw   mm0, mm7
+%else
     paddw mm0, [h264_d0x20_mmx]
+%endif
     psrlw mm0, 6
 
     WELS_Zero mm7
@@ -194,7 +201,14 @@ WELS_EXTERN McChromaWidthEq8_sse2
     paddw xmm0, xmm1
     movdqa xmm1,xmm7
 
+%ifdef X86_32_PICASM
+    pcmpeqw xmm7, xmm7
+    psrlw   xmm7, 15
+    psllw   xmm7, 5
+    paddw   xmm0, xmm7
+%else
     paddw xmm0, [h264_d0x20_sse2]
+%endif
     psrlw xmm0, 6
 
     WELS_Zero xmm7
@@ -243,7 +257,13 @@ WELS_EXTERN McChromaWidthEq8_ssse3
 
     sub r2, r3 ;sub esi, edi
     sub r2, r3
+%ifdef X86_32_PICASM
+    pcmpeqw xmm7, xmm7
+    psrlw   xmm7, 15
+    psllw   xmm7, 5
+%else
     movdqa xmm7, [h264_d0x20_sse2]
+%endif
 
     movdqu xmm0, [r0]
     movdqa xmm1, xmm0

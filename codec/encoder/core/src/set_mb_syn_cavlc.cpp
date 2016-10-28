@@ -280,14 +280,19 @@ void InitCoeffFunc (SWelsFuncPtrList* pFuncList, const uint32_t uiCpuFlag, int32
   pFuncList->pfCavlcParamCal = CavlcParamCal_c;
 
 #if defined(X86_32_ASM)
+#ifndef X86_32_PICASM
   if (uiCpuFlag & WELS_CPU_SSE2) {
     pFuncList->pfCavlcParamCal = CavlcParamCal_sse2;
   }
 #endif
+#endif
+
 #ifdef X86_ASM
+#ifndef X86_32_PICASM
   if (uiCpuFlag & WELS_CPU_SSE42) {
     pFuncList->pfCavlcParamCal = CavlcParamCal_sse42;
   }
+#endif
 #endif
   if (iEntropyCodingModeFlag) {
     pFuncList->pfStashMBStatus = StashMBStatusCabac;

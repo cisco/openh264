@@ -500,7 +500,9 @@ void WelsInitEncodingFuncs (SWelsFuncPtrList* pFuncList, uint32_t  uiCpuFlag) {
     pFuncList->pfCopy8x16Aligned        = WelsCopy8x16_mmx;
   }
   if (uiCpuFlag & WELS_CPU_SSE2) {
+#ifndef X86_32_PICASM
     pFuncList->pfGetNoneZeroCount       = WelsGetNoneZeroCount_sse2;
+#endif
     pFuncList->pfTransformHadamard4x4Dc = WelsHadamardT4Dc_sse2;
 
     pFuncList->pfQuantization4x4        = WelsQuant4x4_sse2;
@@ -514,7 +516,9 @@ void WelsInitEncodingFuncs (SWelsFuncPtrList* pFuncList, uint32_t  uiCpuFlag) {
 
     pFuncList->pfScan4x4                = WelsScan4x4DcAc_sse2;
     pFuncList->pfScan4x4Ac              = WelsScan4x4Ac_sse2;
+#ifndef X86_32_PICASM
     pFuncList->pfCalculateSingleCtr4x4  = WelsCalculateSingleCtr4x4_sse2;
+#endif
 
     pFuncList->pfDctT4                  = WelsDctT4_sse2;
     pFuncList->pfDctFourT4              = WelsDctFourT4_sse2;

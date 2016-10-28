@@ -207,8 +207,26 @@ WELS_EXTERN WelsScan4x4DcAc_ssse3
     pextrw      r1d,  xmm1, 0           ; eax = [8]
     pinsrw      xmm0, r1d, 7            ; xmm0[7]   =   [8]
     pinsrw      xmm1, r2d, 0            ; xmm1[0]   =   [7]
+%ifdef X86_32_PICASM
+    push        r0
+    mov         r0, esp
+    and         esp, 0xfffffff0
+    push        0x0d0c0706              ;pb_scanacdc_maska
+    push        0x05040b0a
+    push        0x0f0e0908
+    push        0x03020100
+    push        0x0f0e0d0c              ;pb_scanacdc_maskb
+    push        0x07060100
+    push        0x05040b0a
+    push        0x09080302
+    pshufb      xmm1, [esp]
+    pshufb      xmm0, [esp+16]
+    mov         esp, r0
+    pop         r0
+%else
     pshufb      xmm1, [pb_scanacdc_maskb]
     pshufb      xmm0, [pb_scanacdc_maska]
+%endif
 
     movdqa     [r0],xmm0
     movdqa     [r0+16], xmm1
@@ -250,6 +268,7 @@ WELS_EXTERN WelsScan4x4Ac_sse2
     ret
 
 
+%ifndef X86_32_PICASM
 ;***********************************************************************
 ;void int32_t WelsCalculateSingleCtr4x4_sse2( int16_t *pDct );
 ;***********************************************************************
@@ -306,8 +325,10 @@ WELS_EXTERN WelsCalculateSingleCtr4x4_sse2
     mov retrd, r0d
     %endif
     ret
+%endif ;ifndef X86_32_PICASM
 
 
+%ifndef X86_32_PICASM
 ;***********************************************************************
 ; int32_t WelsGetNoneZeroCount_sse2(int16_t* level);
 ;***********************************************************************
@@ -336,6 +357,7 @@ WELS_EXTERN WelsGetNoneZeroCount_sse2
     add   retrq, r1
     ;add       al,  [nozero_count_table+r1]
     ret
+%endif ;%ifndef X86_32_PICASM
 
 ;***********************************************************************
 ; int32_t WelsGetNoneZeroCount_sse42(int16_t* level);
