@@ -87,7 +87,7 @@ int32_t DecoderInterfaceTest::Init() {
   m_sDecParam.uiTargetDqLayer = rand() % 100;
   m_sDecParam.eEcActiveIdc = (ERROR_CON_IDC) (rand() & 7);
   m_sDecParam.sVideoProperty.size = sizeof (SVideoProperty);
-  m_sDecParam.sVideoProperty.eVideoBsType = (VIDEO_BITSTREAM_TYPE) (rand() % 3);
+  m_sDecParam.sVideoProperty.eVideoBsType = (VIDEO_BITSTREAM_TYPE) (rand() % 2);
 
   m_pData[0] = m_pData[1] = m_pData[2] = NULL;
   m_szBuffer[0] = m_szBuffer[1] = m_szBuffer[2] = 0;
@@ -276,7 +276,7 @@ void DecoderInterfaceTest::TestParseOnlyAPI() {
     m_sDecParam.bParseOnly = true;
     m_sDecParam.eEcActiveIdc = (ERROR_CON_IDC) iNum;
     m_sDecParam.sVideoProperty.size = sizeof (SVideoProperty);
-    m_sDecParam.sVideoProperty.eVideoBsType = (VIDEO_BITSTREAM_TYPE) (rand() % 3);
+    m_sDecParam.sVideoProperty.eVideoBsType = (VIDEO_BITSTREAM_TYPE) (rand() % 2);
 
     iRet = m_pDec->Initialize (&m_sDecParam);
     ASSERT_EQ (iRet, (int32_t) cmResultSuccess);
@@ -309,7 +309,7 @@ void DecoderInterfaceTest::TestParseOnlyAPI() {
     m_sDecParam.bParseOnly = false;
     m_sDecParam.eEcActiveIdc = (ERROR_CON_IDC) iNum;
     m_sDecParam.sVideoProperty.size = sizeof (SVideoProperty);
-    m_sDecParam.sVideoProperty.eVideoBsType = (VIDEO_BITSTREAM_TYPE) (rand() % 3);
+    m_sDecParam.sVideoProperty.eVideoBsType = (VIDEO_BITSTREAM_TYPE) (rand() % 2);
 
     iRet = m_pDec->Initialize (&m_sDecParam);
     ASSERT_EQ (iRet, (int32_t) cmResultSuccess);
