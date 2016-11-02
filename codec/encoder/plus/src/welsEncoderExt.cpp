@@ -473,15 +473,15 @@ int CWelsH264SVCEncoder::EncodeParameterSets (SFrameBSInfo* pBsInfo) {
  *  Force key frame
  */
 int CWelsH264SVCEncoder::ForceIntraFrame (bool bIDR, int iLayerId) {
-  if (! (m_pEncContext && m_bInitialFlag)) {
-    return 1;
-  }
-
-  //WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
-  //         "CWelsH264SVCEncoder::ForceIntraFrame(), bIDR= %d", bIDR);
-
   if ( bIDR ) {
+    if (! (m_pEncContext && m_bInitialFlag)) {
+      return 1;
+    }
+
     ForceCodingIDR(m_pEncContext, iLayerId);
+  } else {
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+            "CWelsH264SVCEncoder::ForceIntraFrame(),nothing to do as bIDR set to false");
   }
 
   return 0;
