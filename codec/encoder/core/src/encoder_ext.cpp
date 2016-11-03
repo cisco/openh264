@@ -4202,7 +4202,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     if ((pCtx->iActiveThreadsNum > 1) && (MAX_NAL_UNITS_IN_LAYER < pFbi->sLayerInfo[k].iNalCount)) {
       WelsLog (& pCtx->sLogCtx, WELS_LOG_ERROR,
                "WelsEncoderEncodeExt(), iCountNumNals(%d) > MAX_NAL_UNITS_IN_LAYER(%d) under multi-thread(%d) NOT supported!",
-               pFbi->sLayerInfo[k].iNalCount, MAX_NAL_UNITS_IN_LAYER), pCtx->iActiveThreadsNum;
+               pFbi->sLayerInfo[k].iNalCount, MAX_NAL_UNITS_IN_LAYER, pCtx->iActiveThreadsNum);
       return ENC_RETURN_UNEXPECTED;
     }
   }
