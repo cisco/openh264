@@ -1111,7 +1111,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
   case ENCODER_OPTION_DELIVERY_STATUS: {
     SDeliveryStatus* pValue = (static_cast<SDeliveryStatus*> (pOption));
     m_pEncContext->bDeliveryFlag = pValue->bDeliveryFlag;
-    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_DEBUG,
              "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_DELIVERY_STATUS,bDeliveryFlag = %d", pValue->bDeliveryFlag);
   }
   break;
