@@ -458,7 +458,10 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
     return dsInvalidArgument;
   }
   if (CheckBsBuffer (m_pDecContext, kiSrcLen)) {
-    return dsOutOfMemory;
+    if (ResetDecoder())
+      return dsOutOfMemory;
+
+    return dsErrorFree;
   }
   if (kiSrcLen > 0 && kpSrc != NULL) {
 #ifdef OUTPUT_BIT_STREAM
@@ -513,6 +516,8 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
     if (m_pDecContext->iErrorCode & dsOutOfMemory) {
       if (ResetDecoder())
         return dsOutOfMemory;
+
+      return dsErrorFree;
     }
     //for AVC bitstream (excluding AVC with temporal scalability, including TP), as long as error occur, SHOULD notify upper layer key frame loss.
     if ((IS_PARAM_SETS_NALS (eNalType) || NAL_UNIT_CODED_SLICE_IDR == eNalType) ||
@@ -611,7 +616,10 @@ DECODING_STATE CWelsDecoder::DecodeParser (const unsigned char* kpSrc,
     return dsInvalidArgument;
   }
   if (CheckBsBuffer (m_pDecContext, kiSrcLen)) {
-    return dsOutOfMemory;
+    if (ResetDecoder())
+      return dsOutOfMemory;
+
+    return dsErrorFree;
   }
   if (kiSrcLen > 0 && kpSrc != NULL) {
 #ifdef OUTPUT_BITSTREAM
