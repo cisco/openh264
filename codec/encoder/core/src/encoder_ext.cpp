@@ -285,6 +285,10 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
     }
 
   }
+
+  //turn off adaptive quant now, algorithms needs to be refactored
+  pCfg->bEnableAdaptiveQuant = false;
+
   if (pCfg->iSpatialLayerNum > 1) {
     for (i = pCfg->iSpatialLayerNum - 1; i > 0; i--) {
       SSpatialLayerConfig* fDlpUp = &pCfg->sSpatialLayers[i];
@@ -358,10 +362,7 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
                  "bEnableFrameSkip = %d,bitrate can't be controlled for RC_QUALITY_MODE,RC_BITRATE_MODE and RC_TIMESTAMP_MODE without enabling skip frame.",
                  pCfg->bEnableFrameSkip);
 
-    if (pCfg->iRCMode == RC_QUALITY_MODE) {
-      pCfg->iMinQp = GOM_MIN_QP_MODE;
-      pCfg->iMaxQp = GOM_MAX_QP_MODE;
-    } else if (pCfg->iUsageType == SCREEN_CONTENT_REAL_TIME) {
+    if (pCfg->iUsageType == SCREEN_CONTENT_REAL_TIME) {
       pCfg->iMinQp = MIN_SCREEN_QP;
       pCfg->iMaxQp = MAX_SCREEN_QP;
     } else {
