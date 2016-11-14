@@ -345,9 +345,11 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_WARNING,
              "CWelsDecoder::SetOption():DECODER_OPTION_GET_STATISTICS: this option is get-only!");
     return cmInitParaError;
+  } else if (eOptID == DECODER_OPTION_GET_SAR_INFO) {
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_WARNING,
+             "CWelsDecoder::SetOption():DECODER_OPTION_GET_SAR_INFO: this option is get-only!");
+    return cmInitParaError;
   }
-
-
   return cmInitParaError;
 }
 
@@ -412,6 +414,17 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
            m_pDecContext->sDecoderStatistics.uiFreezingNonIDRNum);
     }
     return cmResultSuccess;
+  } else if (DECODER_OPTION_GET_SAR_INFO == eOptID) { //get decoder SAR info in VUI
+    PVuiSarInfo pVuiSarInfo = (static_cast<PVuiSarInfo> (pOption));
+    memset (pVuiSarInfo, 0, sizeof (SVuiSarInfo));
+    if (!m_pDecContext->pSps) {
+      return cmInitExpected;
+    } else {
+      pVuiSarInfo->uiSarWidth = m_pDecContext->pSps->sVui.uiSarWidth;
+      pVuiSarInfo->uiSarHeight = m_pDecContext->pSps->sVui.uiSarHeight;
+      pVuiSarInfo->bOverscanAppropriateFlag = m_pDecContext->pSps->sVui.bOverscanAppropriateFlag;
+      return cmResultSuccess;
+    }
   }
 
   return cmInitParaError;

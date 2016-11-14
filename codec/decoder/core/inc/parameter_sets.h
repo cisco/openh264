@@ -38,7 +38,30 @@
 #include "wels_common_basis.h"
 
 namespace WelsDec {
-
+  /* VUI syntax in Sequence Parameter Set, refer to E.1 in Rec */
+  typedef struct TagVui {
+    bool bAspectRatioInfoPresentFlag;
+    uint32_t uiAspectRatioIdc;
+    uint32_t uiSarWidth;
+    uint32_t uiSarHeight;
+    bool bOverscanInfoPresentFlag;
+    bool bOverscanAppropriateFlag;
+    bool bVideoSignalTypePresentFlag;
+    uint8_t uiVideoFormat;
+    bool bVideoFullRangeFlag;
+    bool bColourDescripPresentFlag;
+    uint8_t uiColourPrimaries;
+    uint8_t uiTransferCharacteristics;
+    uint8_t uiMatrixCoeffs;
+    bool bChromaLocInfoPresentFlag;
+    uint32_t uiChromaSampleLocTypeTopField;
+    uint32_t uiChromaSampleLocTypeBottomField;
+    bool bTimingInfoPresentFlag;
+    uint32_t uiNumUnitsInTick;
+    uint32_t uiTimeScale;
+    bool bFixedFrameRateFlag;
+    bool bNalHrdParamPresentFlag;
+  } SVui, *PVui;
 
 /* Sequence Parameter Set, refer to Page 57 in JVT X201wcm */
 typedef struct TagSps {
@@ -91,7 +114,7 @@ typedef struct TagSps {
   //Add scaling list supporting
   uint8_t  iScalingList4x4[6][16];
   uint8_t  iScalingList8x8[6][64];
-
+  SVui sVui;
 const SLevelLimits* pSLevelLimits;
 } SSps, *PSps;
 

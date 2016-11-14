@@ -160,7 +160,8 @@ typedef enum {
   DECODER_OPTION_TRACE_CALLBACK,        ///< a void (*)(void* context, int level, const char* message) function which receives log messages
   DECODER_OPTION_TRACE_CALLBACK_CONTEXT,///< context info of trace callbac
 
-  DECODER_OPTION_GET_STATISTICS
+  DECODER_OPTION_GET_STATISTICS,        ///< feedback decoder statistics
+  DECODER_OPTION_GET_SAR_INFO,          ///< feedback decoder Sample Aspect Ratio info in Vui
 
 } DECODER_OPTION;
 
@@ -670,7 +671,7 @@ typedef struct TagDecoderCapability {
 } SDecoderCapability;
 
 /**
-* @brief to do
+* @brief Structure for parse only output
 */
 typedef struct TagParserBsInfo {
   int iNalNum;                                 ///< total NAL number in current AU
@@ -737,5 +738,14 @@ typedef struct TagVideoDecoderStatistics {
   int iSubSpsNoExistNalNum;                    ///< number of SubSps NoExist Nal
   int iPpsNoExistNalNum;                       ///< number of Pps NoExist Nal
 } SDecoderStatistics; // in building, coming soon
+
+/**
+* @brief Structure for sample aspect ratio (SAR) info in VUI
+*/
+typedef struct TagVuiSarInfo {
+  unsigned int uiSarWidth;                     ///< SAR width
+  unsigned int uiSarHeight;                    ///< SAR height
+  bool bOverscanAppropriateFlag;               ///< SAR overscan flag
+} SVuiSarInfo, *PVuiSarInfo;
 
 #endif//WELS_VIDEO_CODEC_APPLICATION_DEFINITION_H__
