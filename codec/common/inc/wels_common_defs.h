@@ -214,6 +214,17 @@ enum EMmcoCode {
   MMCO_LONG         = 6
 };
 
+enum EVuiVideoFormat {
+   VUI_COMPONENT   = 0,
+   VUI_PAL         = 1,
+   VUI_NTSC        = 2,
+   VUI_SECAM       = 3,
+   VUI_MAC         = 4,
+   VUI_UNSPECIFIED = 5,
+   VUI_RESERVED1   = 6,
+   VUI_RESERVED2   = 7
+};
+
 /*
  *  Bit-stream auxiliary reading / writing
  */

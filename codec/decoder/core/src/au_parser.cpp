@@ -1134,7 +1134,9 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   }
   WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //vui_parameters_present_flag
   pSps->bVuiParamPresentFlag = !!uiCode;
-
+  if (pSps->bVuiParamPresentFlag && !kbUseSubsetFlag) { //parse Part of Vui Parameters in avc sps only
+    WELS_READ_VERIFY (ParseVui (pCtx, pSps, pBsAux));
+  }
   if (pCtx->pParam->bParseOnly) {
     if (kSrcNalLen >= SPS_PPS_BS_SIZE - 4) { //sps bs exceeds!
       pCtx->iErrorCode |= dsOutOfMemory;
@@ -1425,9 +1427,10 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
     if (memcmp (pCtx->pPps, pPps, sizeof (*pPps)) != 0) {
       memcpy (&pCtx->sPpsBuffer[MAX_PPS_COUNT], pPps, sizeof (SPps));
       pCtx->iOverwriteFlags |= OVERWRITE_PPS;
-      pCtx->bAuReadyFlag = true;
-      pCtx->pAccessUnitList->uiEndPos = (pCtx->pAccessUnitList->uiAvailUnitsNum > 0 ? (pCtx->pAccessUnitList->uiAvailUnitsNum
-                                         - 1) : 0);
+      if (pCtx->pAccessUnitList->uiAvailUnitsNum > 0) {
+        pCtx->bAuReadyFlag = true;
+        pCtx->pAccessUnitList->uiEndPos = pCtx->pAccessUnitList->uiAvailUnitsNum - 1;
+      }
     }
   } else {
     memcpy (&pCtx->sPpsBuffer[uiPpsId], pPps, sizeof (SPps));
@@ -1456,7 +1459,75 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
   }
   return ERR_NONE;
 }
+int32_t ParseVui (PWelsDecoderContext pCtx, PSps pSps, PBitStringAux pBsAux) {
+  uint32_t uiCode;
+  PVui pVui = &pSps->sVui;
+  WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //aspect_ratio_info_present_flag
+  pVui->bAspectRatioInfoPresentFlag = !!uiCode;
+  if (pSps->sVui.bAspectRatioInfoPresentFlag) {
+    WELS_READ_VERIFY (BsGetBits (pBsAux, 8, &uiCode)); //aspect_ratio_idc
+    pVui->uiAspectRatioIdc = uiCode;
+    if (pVui->uiAspectRatioIdc < 17) {
+      pVui->uiSarWidth  = g_ksVuiSampleAspectRatio[pVui->uiAspectRatioIdc].uiWidth;
+      pVui->uiSarHeight = g_ksVuiSampleAspectRatio[pVui->uiAspectRatioIdc].uiHeight;
+    } else if (pVui->uiAspectRatioIdc == EXTENDED_SAR) {
+      WELS_READ_VERIFY (BsGetBits (pBsAux, 16, &uiCode)); //sar_width
+      pVui->uiSarWidth = uiCode;
+      WELS_READ_VERIFY (BsGetBits (pBsAux, 16, &uiCode)); //sar_height
+      pVui->uiSarHeight = uiCode;
+    }
+  }
+  WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //overscan_info_present_flag
+  pVui->bOverscanInfoPresentFlag = !!uiCode;
+  if (pVui->bOverscanInfoPresentFlag) {
+    WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //overscan_appropriate_flag
+    pVui->bOverscanAppropriateFlag = !!uiCode;
+  }
+  WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //video_signal_type_present_flag
+  pVui->bVideoSignalTypePresentFlag = !!uiCode;
+  if (pVui->bVideoSignalTypePresentFlag) {
+    WELS_READ_VERIFY (BsGetBits (pBsAux, 3, &uiCode)); //video_format
+    pVui->uiVideoFormat = uiCode;
+    WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //video_full_range_flag
+    pVui->bVideoFullRangeFlag = !!uiCode;
+    WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //colour_description_present_flag
+    pVui->bColourDescripPresentFlag = !!uiCode;
+    if (pVui->bColourDescripPresentFlag) {
+      WELS_READ_VERIFY (BsGetBits (pBsAux, 8, &uiCode)); //colour_primaries
+      pVui->uiColourPrimaries = uiCode;
+      WELS_READ_VERIFY (BsGetBits (pBsAux, 8, &uiCode)); //transfer_characteristics
+      pVui->uiTransferCharacteristics = uiCode;
+      WELS_READ_VERIFY (BsGetBits (pBsAux, 8, &uiCode)); //matrix_coefficients
+      pVui->uiMatrixCoeffs = uiCode;
+    }
+  }
+  WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //chroma_loc_info_present_flag
+  pVui->bChromaLocInfoPresentFlag = !!uiCode;
+  if (pVui->bChromaLocInfoPresentFlag) {
+    WELS_READ_VERIFY (BsGetUe (pBsAux, &uiCode)); //chroma_sample_loc_type_top_field
+    pVui->uiChromaSampleLocTypeTopField = uiCode;
+    WELS_CHECK_SE_UPPER_WARNING (pVui->uiChromaSampleLocTypeTopField, VUI_MAX_CHROMA_LOG_TYPE_TOP_BOTTOM_FIELD,
+                                 "chroma_sample_loc_type_top_field");
+    WELS_READ_VERIFY (BsGetUe (pBsAux, &uiCode)); //chroma_sample_loc_type_bottom_field
+    pVui->uiChromaSampleLocTypeBottomField = uiCode;
+    WELS_CHECK_SE_UPPER_WARNING (pVui->uiChromaSampleLocTypeBottomField, VUI_MAX_CHROMA_LOG_TYPE_TOP_BOTTOM_FIELD,
+                                 "chroma_sample_loc_type_bottom_field");
+  }
+  WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //timing_info_present_flag
+  pVui->bTimingInfoPresentFlag = !!uiCode;
+  if (pVui->bTimingInfoPresentFlag) {
+    WELS_READ_VERIFY (BsGetBits (pBsAux, 32, &uiCode)); //num_units_in_tick
+    pVui->uiNumUnitsInTick = uiCode;
+    WELS_CHECK_SE_LOWER_WARNING (pVui->uiNumUnitsInTick, 1, "num_units_in_tick");
+    WELS_READ_VERIFY (BsGetBits (pBsAux, 32, &uiCode)); //time_scale
+    pVui->uiTimeScale = uiCode;
+    WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //fixed_frame_rate_flag
+    pVui->bFixedFrameRateFlag = !!uiCode;
+  }
+  //following HRD related parameters, omitted
 
+  return ERR_NONE;
+}
 /*!
  *************************************************************************************
  * \brief   to parse SEI message payload

@@ -251,6 +251,18 @@ static const SPartMbInfo g_ksInterSubMbTypeInfo[4] = {
     {SUB_MB_TYPE_4x4, 4, 1},
 };
 
+typedef struct TagSar {
+  uint32_t uiWidth;
+  uint32_t uiHeight;
+} sSar;
+static const sSar g_ksVuiSampleAspectRatio[17] = { //Table E-1
+  { 0,  0}, { 1,  1}, {12, 11}, { 10, 11}, {16,11}, //0~4
+  {40, 33}, {24, 11}, {20, 11}, { 32, 11}, {80,33}, //5~9
+  {18, 11}, {15, 11}, {64, 33}, {160, 99}, { 4, 3}, //10~14
+  { 3,  2}, { 2,  1}                                //15~16
+};
+
+
 } // namespace WelsDec
 
 #endif//WELS_COMMON_BASIS_H__

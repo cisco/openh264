@@ -132,6 +132,22 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
 int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux, uint8_t* pSrcNal, const int32_t kSrcNalLen);
 
 /*!
+*************************************************************************************
+* \brief   to parse Video Usability Information (VUI) parameter of the SPS
+*
+* \param   pCtx        Decoder context
+* \param   pSps        the sps which current Vui parameter belongs to
+* \param   pBsAux      bitstream reader auxiliary
+*
+* \return  0 - successed
+*          1 - failed
+*
+* \note    Call it in case the flag "vui_parameters_present_flag" in sps is true.
+*************************************************************************************
+*/
+int32_t ParseVui(PWelsDecoderContext pCtx, PSps pSps, PBitStringAux pBsAux);
+
+/*!
  *************************************************************************************
  * \brief to parse scaling list message payload
  *

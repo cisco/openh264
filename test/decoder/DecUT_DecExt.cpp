@@ -63,6 +63,8 @@ class DecoderInterfaceTest : public ::testing::Test {
   void TestTraceCallbackContext();
   //DECODER_OPTION_GET_DECODER_STATICTIS
   void TestGetDecStatistics();
+  //DECODER_OPTION_GET_SAR_INFO
+  void TestGetDecSarInfo();
   //Do whole tests here
   void DecoderInterfaceAll();
 
@@ -607,6 +609,33 @@ void DecoderInterfaceTest::TestGetDecStatistics() {
   Uninit();
 
 }
+
+//DECODER_OPTION_GET_SAR_INFO
+void DecoderInterfaceTest::TestGetDecSarInfo() {
+  CM_RETURN eRet;
+  int32_t iRet;
+  SVuiSarInfo sVuiSarInfo;
+
+  iRet = ValidInit();
+  ASSERT_EQ (iRet, ERR_NONE);
+  //GetOption before decoding
+  m_pDec->GetOption (DECODER_OPTION_GET_SAR_INFO, &sVuiSarInfo);
+  EXPECT_EQ (0u, sVuiSarInfo.uiSarWidth);
+  EXPECT_EQ (0u, sVuiSarInfo.uiSarHeight);
+  EXPECT_EQ (0u, sVuiSarInfo.bOverscanAppropriateFlag);
+  // setoption not support,
+  eRet = (CM_RETURN)m_pDec->SetOption (DECODER_OPTION_GET_SAR_INFO, NULL);
+  EXPECT_EQ (eRet, cmInitParaError);
+
+  //Decoder specific bs
+  DecoderBs ("res/SarVui.264");
+  m_pDec->GetOption (DECODER_OPTION_GET_SAR_INFO, &sVuiSarInfo);
+  EXPECT_EQ (80u, sVuiSarInfo.uiSarWidth);  //DO NOT MODIFY the data value
+  EXPECT_EQ (33u, sVuiSarInfo.uiSarHeight); //DO NOT MODIFY the data value
+  EXPECT_EQ (1u, sVuiSarInfo.bOverscanAppropriateFlag); //DO NOT MODIFY the data value
+  Uninit();
+}
+
 //TEST here for whole tests
 TEST_F (DecoderInterfaceTest, DecoderInterfaceAll) {
 
@@ -636,6 +665,8 @@ TEST_F (DecoderInterfaceTest, DecoderInterfaceAll) {
   TestTraceCallbackContext();
   //DECODER_OPTION_GET_STATISTICS
   TestGetDecStatistics();
+  //DECODER_OPTION_GET_SAR_INFO
+  TestGetDecSarInfo();
 }
 
 
