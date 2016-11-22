@@ -1516,11 +1516,18 @@ int32_t ParseVui (PWelsDecoderContext pCtx, PSps pSps, PBitStringAux pBsAux) {
   WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //timing_info_present_flag
   pVui->bTimingInfoPresentFlag = !!uiCode;
   if (pVui->bTimingInfoPresentFlag) {
-    WELS_READ_VERIFY (BsGetBits (pBsAux, 32, &uiCode)); //num_units_in_tick
-    pVui->uiNumUnitsInTick = uiCode;
+    uint32_t uiTmp = 0;
+    WELS_READ_VERIFY (BsGetBits (pBsAux, 16, &uiCode)); //num_units_in_tick
+    uiTmp = (uiCode << 16);
+    WELS_READ_VERIFY (BsGetBits (pBsAux, 16, &uiCode)); //num_units_in_tick
+    uiTmp |= uiCode;
+    pVui->uiNumUnitsInTick = uiTmp;
     WELS_CHECK_SE_LOWER_WARNING (pVui->uiNumUnitsInTick, 1, "num_units_in_tick");
-    WELS_READ_VERIFY (BsGetBits (pBsAux, 32, &uiCode)); //time_scale
-    pVui->uiTimeScale = uiCode;
+    WELS_READ_VERIFY (BsGetBits (pBsAux, 16, &uiCode)); //time_scale
+    uiTmp = (uiCode << 16);
+    WELS_READ_VERIFY (BsGetBits (pBsAux, 16, &uiCode)); //time_scale
+    uiTmp |= uiCode;
+    pVui->uiTimeScale = uiTmp;
     WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //fixed_frame_rate_flag
     pVui->bFixedFrameRateFlag = !!uiCode;
   }

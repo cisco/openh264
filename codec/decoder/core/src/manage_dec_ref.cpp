@@ -369,13 +369,13 @@ static int32_t MMCOProcess (PWelsDecoderContext pCtx, uint32_t uiMmcoType,
   case MMCO_SHORT2UNUSED:
     pPic = WelsDelShortFromListSetUnref (pRefPic, iShortFrameNum);
     if (pPic == NULL) {
-      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "MMCO_SHORT2UNUSED: delete a empty entry from short term list");
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "MMCO_SHORT2UNUSED: delete an empty entry from short term list");
     }
     break;
   case MMCO_LONG2UNUSED:
     pPic = WelsDelLongFromListSetUnref (pRefPic, uiLongTermPicNum);
     if (pPic == NULL) {
-      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "MMCO_LONG2UNUSED: delete a empty entry from long term list");
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "MMCO_LONG2UNUSED: delete an empty entry from long term list");
     }
     break;
   case MMCO_SHORT2LONG:
@@ -384,7 +384,7 @@ static int32_t MMCOProcess (PWelsDecoderContext pCtx, uint32_t uiMmcoType,
     }
     pPic = WelsDelShortFromList (pRefPic, iShortFrameNum);
     if (pPic == NULL) {
-      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "MMCO_LONG2LONG: delete a empty entry from short term list");
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "MMCO_LONG2LONG: delete an empty entry from short term list");
       break;
     }
     WelsDelLongFromListSetUnref (pRefPic, iLongTermFrameIdx);
