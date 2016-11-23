@@ -622,7 +622,7 @@ void DecoderInterfaceTest::TestGetDecSarInfo() {
   m_pDec->GetOption (DECODER_OPTION_GET_SAR_INFO, &sVuiSarInfo);
   EXPECT_EQ (0u, sVuiSarInfo.uiSarWidth);
   EXPECT_EQ (0u, sVuiSarInfo.uiSarHeight);
-  EXPECT_EQ (0u, sVuiSarInfo.bOverscanAppropriateFlag);
+  EXPECT_EQ (sVuiSarInfo.bOverscanAppropriateFlag, false); // EXPECT_EQ does not like "false" as its first arg
   // setoption not support,
   eRet = (CM_RETURN)m_pDec->SetOption (DECODER_OPTION_GET_SAR_INFO, NULL);
   EXPECT_EQ (eRet, cmInitParaError);
@@ -632,7 +632,7 @@ void DecoderInterfaceTest::TestGetDecSarInfo() {
   m_pDec->GetOption (DECODER_OPTION_GET_SAR_INFO, &sVuiSarInfo);
   EXPECT_EQ (80u, sVuiSarInfo.uiSarWidth);  //DO NOT MODIFY the data value
   EXPECT_EQ (33u, sVuiSarInfo.uiSarHeight); //DO NOT MODIFY the data value
-  EXPECT_EQ (1u, sVuiSarInfo.bOverscanAppropriateFlag); //DO NOT MODIFY the data value
+  EXPECT_EQ (true, sVuiSarInfo.bOverscanAppropriateFlag); //DO NOT MODIFY the data value
   Uninit();
 }
 
