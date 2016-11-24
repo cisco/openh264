@@ -114,7 +114,8 @@ int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc) {
 
   if ((pCtx->sRefPic.uiShortRefCount[LIST_0] + pCtx->sRefPic.uiLongRefCount[LIST_0] <= 0) && (pCtx->eSliceType != I_SLICE
       && pCtx->eSliceType != SI_SLICE)) {
-    if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) { //IDR lost!, recover it for future decoding with data all set to 0
+    if (pCtx->pParam->eEcActiveIdc !=
+        ERROR_CON_DISABLE) { //IDR lost!, recover it for future decoding with data all set to 0
       PPicture pRef = PrefetchPic (pCtx->pPicBuff[0]);
       if (pRef != NULL) {
         // IDR lost, set new
@@ -122,11 +123,11 @@ int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc) {
         pRef->iSpsId = pCtx->pSps->iSpsId;
         pRef->iPpsId = pCtx->pPps->iPpsId;
         pCtx->iErrorCode |= dsDataErrorConcealed;
-        bool bCopyPrevious = ((ERROR_CON_FRAME_COPY_CROSS_IDR == pCtx->eErrorConMethod)
-                              || (ERROR_CON_SLICE_COPY_CROSS_IDR == pCtx->eErrorConMethod)
-                              || (ERROR_CON_SLICE_COPY_CROSS_IDR_FREEZE_RES_CHANGE == pCtx->eErrorConMethod)
-                              || (ERROR_CON_SLICE_MV_COPY_CROSS_IDR == pCtx->eErrorConMethod)
-                              || (ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE == pCtx->eErrorConMethod))
+        bool bCopyPrevious = ((ERROR_CON_FRAME_COPY_CROSS_IDR == pCtx->pParam->eEcActiveIdc)
+                              || (ERROR_CON_SLICE_COPY_CROSS_IDR == pCtx->pParam->eEcActiveIdc)
+                              || (ERROR_CON_SLICE_COPY_CROSS_IDR_FREEZE_RES_CHANGE == pCtx->pParam->eEcActiveIdc)
+                              || (ERROR_CON_SLICE_MV_COPY_CROSS_IDR == pCtx->pParam->eEcActiveIdc)
+                              || (ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE == pCtx->pParam->eEcActiveIdc))
                              && (NULL != pCtx->pPreviousDecodedPictureInDpb);
         bCopyPrevious = bCopyPrevious && (pRef->iWidthInPixel == pCtx->pPreviousDecodedPictureInDpb->iWidthInPixel)
                         && (pRef->iHeightInPixel == pCtx->pPreviousDecodedPictureInDpb->iHeightInPixel);
@@ -292,7 +293,7 @@ int32_t WelsMarkAsRef (PWelsDecoderContext pCtx) {
     if (pRefPicMarking->bAdaptiveRefPicMarkingModeFlag) {
       iRet = MMCO (pCtx, pRefPicMarking);
       if (iRet != ERR_NONE) {
-        if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) {
+        if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE) {
           iRet = RemainOneBufferInDpbForEC (pCtx);
           WELS_VERIFY_RETURN_IF (iRet, iRet);
         } else {
@@ -308,7 +309,7 @@ int32_t WelsMarkAsRef (PWelsDecoderContext pCtx) {
     } else {
       iRet = SlidingWindow (pCtx);
       if (iRet != ERR_NONE) {
-        if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) {
+        if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE) {
           iRet = RemainOneBufferInDpbForEC (pCtx);
           WELS_VERIFY_RETURN_IF (iRet, iRet);
         } else {
@@ -320,7 +321,7 @@ int32_t WelsMarkAsRef (PWelsDecoderContext pCtx) {
 
   if (!pCtx->pDec->bIsLongRef) {
     if (pRefPic->uiLongRefCount[LIST_0] + pRefPic->uiShortRefCount[LIST_0] >= WELS_MAX (1, pCtx->pSps->iNumRefFrames)) {
-      if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) {
+      if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE) {
         iRet = RemainOneBufferInDpbForEC (pCtx);
         WELS_VERIFY_RETURN_IF (iRet, iRet);
       } else {

@@ -373,7 +373,6 @@ typedef struct TagWelsDecoderContext {
   bool       bNewSeqBegin;
   bool       bNextNewSeqBegin;
   int        iOverwriteFlags;
-  ERROR_CON_IDC eErrorConMethod; //
 
 //for Parse only
   bool bFramePending;

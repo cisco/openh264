@@ -208,7 +208,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
 
       if (uiAvailNalNum > 0) {
         pCurAu->uiEndPos = uiAvailNalNum - 1;
-        if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
+        if (pCtx->pParam->eEcActiveIdc == ERROR_CON_DISABLE) {
           pCtx->bAuReadyFlag = true;
         }
       }
@@ -227,7 +227,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
 
       if (uiAvailNalNum > 0) {
         pCurAu->uiEndPos = uiAvailNalNum - 1;
-        if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
+        if (pCtx->pParam->eEcActiveIdc == ERROR_CON_DISABLE) {
           pCtx->bAuReadyFlag = true;
         }
       }
@@ -284,7 +284,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
 
         if (uiAvailNalNum > 1) {
           pCurAu->uiEndPos = uiAvailNalNum - 2;
-          if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
+          if (pCtx->pParam->eEcActiveIdc == ERROR_CON_DISABLE) {
             pCtx->bAuReadyFlag = true;
           }
         }
@@ -306,7 +306,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
 
         if (uiAvailNalNum > 1) {
           pCurAu->uiEndPos = uiAvailNalNum - 2;
-          if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
+          if (pCtx->pParam->eEcActiveIdc == ERROR_CON_DISABLE) {
             pCtx->bAuReadyFlag = true;
           }
         }
@@ -381,7 +381,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
       ForceClearCurrentNal (pCurAu);
       if (uiAvailNalNum > 1) {
         pCurAu->uiEndPos = uiAvailNalNum - 2;
-        if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
+        if (pCtx->pParam->eEcActiveIdc == ERROR_CON_DISABLE) {
           pCtx->bAuReadyFlag = true;
         }
       }
@@ -400,7 +400,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
 
       if (uiAvailNalNum > 1) {
         pCurAu->uiEndPos = uiAvailNalNum - 2;
-        if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
+        if (pCtx->pParam->eEcActiveIdc == ERROR_CON_DISABLE) {
           pCtx->bAuReadyFlag = true;
         }
       }
@@ -589,7 +589,7 @@ int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t 
     if (iBitSize > 0) {
       iErr = DecInitBits (pBs, pRbsp, iBitSize);
       if (ERR_NONE != iErr) {
-        if (pCtx->eErrorConMethod == ERROR_CON_DISABLE)
+        if (pCtx->pParam->eEcActiveIdc == ERROR_CON_DISABLE)
           pCtx->iErrorCode |= dsNoParamSets;
         else
           pCtx->iErrorCode |= dsBitstreamError;
@@ -598,7 +598,7 @@ int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t 
     }
     iErr = ParseSps (pCtx, pBs, &iPicWidth, &iPicHeight, pSrcNal, kSrcNalLen);
     if (ERR_NONE != iErr) { // modified for pSps/pSubsetSps invalid, 12/1/2009
-      if (pCtx->eErrorConMethod == ERROR_CON_DISABLE)
+      if (pCtx->pParam->eEcActiveIdc == ERROR_CON_DISABLE)
         pCtx->iErrorCode |= dsNoParamSets;
       else
         pCtx->iErrorCode |= dsBitstreamError;
@@ -611,7 +611,7 @@ int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t 
     if (iBitSize > 0) {
       iErr = DecInitBits (pBs, pRbsp, iBitSize);
       if (ERR_NONE != iErr) {
-        if (pCtx->eErrorConMethod == ERROR_CON_DISABLE)
+        if (pCtx->pParam->eEcActiveIdc == ERROR_CON_DISABLE)
           pCtx->iErrorCode |= dsNoParamSets;
         else
           pCtx->iErrorCode |= dsBitstreamError;
@@ -620,7 +620,7 @@ int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t 
     }
     iErr = ParsePps (pCtx, &pCtx->sPpsBuffer[0], pBs, pSrcNal, kSrcNalLen);
     if (ERR_NONE != iErr) { // modified for pps invalid, 12/1/2009
-      if (pCtx->eErrorConMethod == ERROR_CON_DISABLE)
+      if (pCtx->pParam->eEcActiveIdc == ERROR_CON_DISABLE)
         pCtx->iErrorCode |= dsNoParamSets;
       else
         pCtx->iErrorCode |= dsBitstreamError;

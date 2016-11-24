@@ -199,11 +199,11 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
                        || (pCtx->iLastImgHeightInPixel != pDstInfo->UsrData.sSystemBuffer.iHeight);
   pCtx->iLastImgWidthInPixel = pDstInfo->UsrData.sSystemBuffer.iWidth;
   pCtx->iLastImgHeightInPixel = pDstInfo->UsrData.sSystemBuffer.iHeight;
-  if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) //no buffer output if EC is disabled and frame incomplete
+  if (pCtx->pParam->eEcActiveIdc == ERROR_CON_DISABLE) //no buffer output if EC is disabled and frame incomplete
     pDstInfo->iBufferStatus = (int32_t) (bFrameCompleteFlag
                                          && pPic->bIsComplete); // When EC disable, ECed picture not output
-  else if ((pCtx->eErrorConMethod == ERROR_CON_SLICE_COPY_CROSS_IDR_FREEZE_RES_CHANGE
-            || pCtx->eErrorConMethod == ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE)
+  else if ((pCtx->pParam->eEcActiveIdc == ERROR_CON_SLICE_COPY_CROSS_IDR_FREEZE_RES_CHANGE
+            || pCtx->pParam->eEcActiveIdc == ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE)
            && pCtx->iErrorCode && bOutResChange)
     pCtx->bFreezeOutput = true;
 
@@ -1247,7 +1247,7 @@ int32_t UpdateAccessUnit (PWelsDecoderContext pCtx) {
         WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
                  "UpdateAccessUnit():::::Key frame lost.....CAN NOT find IDR from current AU.");
       pCtx->iErrorCode |= dsRefLost;
-      if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
+      if (pCtx->pParam->eEcActiveIdc == ERROR_CON_DISABLE) {
 #ifdef LONG_TERM_REF
         pCtx->iErrorCode |= dsNoParamSets;
         return dsNoParamSets;
@@ -2283,7 +2283,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
 
             bAllRefComplete = false;
             pCtx->iErrorCode |= dsRefLost;
-            if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
+            if (pCtx->pParam->eEcActiveIdc == ERROR_CON_DISABLE) {
 #ifdef LONG_TERM_REF
               pCtx->bParamSetsLostFlag = true;
 #else
@@ -2303,7 +2303,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
             WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG,
                      "reference picture introduced by this frame is lost during transmission! uiTId: %d",
                      pNalCur->sNalHeaderExt.uiTemporalId);
-            if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
+            if (pCtx->pParam->eEcActiveIdc == ERROR_CON_DISABLE) {
               if (pCtx->iTotalNumMbRec == 0)
                 pCtx->pDec = NULL;
               return iRet;
@@ -2320,7 +2320,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
                    iRet, pSh->iFrameNum, iCurrIdD, iCurrIdQ);
           bAllRefComplete = false;
           HandleReferenceLostL0 (pCtx, pNalCur);
-          if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
+          if (pCtx->pParam->eEcActiveIdc == ERROR_CON_DISABLE) {
             if (pCtx->iTotalNumMbRec == 0)
               pCtx->pDec = NULL;
             return iRet;
@@ -2380,7 +2380,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
       if (!pCtx->bInstantDecFlag) {
         if (!pCtx->pParam->bParseOnly) {
           //Do error concealment here
-          if ((NeedErrorCon (pCtx)) && (pCtx->eErrorConMethod != ERROR_CON_DISABLE)) {
+          if ((NeedErrorCon (pCtx)) && (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE)) {
             ImplementErrorCon (pCtx);
             pCtx->iTotalNumMbRec = pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight;
             pCtx->pDec->iSpsId = pCtx->pSps->iSpsId;
@@ -2399,7 +2399,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         if (iRet != ERR_NONE) {
           if (iRet == ERR_INFO_DUPLICATE_FRAME_NUM)
             pCtx->iErrorCode |= dsBitstreamError;
-          if (pCtx->eErrorConMethod == ERROR_CON_DISABLE) {
+          if (pCtx->pParam->eEcActiveIdc == ERROR_CON_DISABLE) {
             pCtx->pDec = NULL;
             return iRet;
           }
@@ -2449,7 +2449,7 @@ bool CheckAndFinishLastPic (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferIn
 
   //Do Error Concealment here
   if (bAuBoundaryFlag && (pCtx->iTotalNumMbRec != 0) && NeedErrorCon (pCtx)) { //AU ready but frame not completely reconed
-    if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) {
+    if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE) {
       ImplementErrorCon (pCtx);
       pCtx->iTotalNumMbRec = pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight;
       pCtx->pDec->iSpsId = pCtx->pSps->iSpsId;
