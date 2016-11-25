@@ -1748,6 +1748,13 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx, SExistingParasetList* pExistingPa
   (*ppCtx)->iFrameBsSize = iTotalLength;
   (*ppCtx)->iPosBsBuffer = 0;
 
+  // for dynamic slice mode&& CABAC,allocate slice buffer to restore slice data
+  if (bDynamicSlice && pParam->iEntropyCodingModeFlag) {
+    for (int32_t iIdx = 0; iIdx < MAX_THREADS_NUM; iIdx++) {
+      (*ppCtx)->pDynamicBsBuffer[iIdx] = (uint8_t*)pMa->WelsMalloc (iMaxSliceBufferSize, "DynamicSliceBs");
+      WELS_VERIFY_RETURN_PROC_IF (1, (NULL == (*ppCtx)->pDynamicBsBuffer[iIdx]), FreeMemorySvc (ppCtx))
+    }
+  }
   // for pSlice bs buffers
   if (pParam->iMultipleThreadIdc > 1
       && RequestMtResource (ppCtx, pParam, iCountBsLen, iMaxSliceBufferSize, bDynamicSlice)) {
@@ -1957,7 +1964,11 @@ void FreeMemorySvc (sWelsEncCtx** ppCtx) {
       pMa->WelsFree (pCtx->pFrameBs, "pFrameBs");
       pCtx->pFrameBs = NULL;
     }
+    for (int32_t iIdx = 0; iIdx < MAX_THREADS_NUM; iIdx++) {
+      pMa->WelsFree (pCtx->pDynamicBsBuffer[iIdx], "DynamicSliceBs");
+      pCtx->pDynamicBsBuffer[iIdx] = NULL;
 
+    }
     // pSpsArray
     if (NULL != pCtx->pSpsArray) {
       pMa->WelsFree (pCtx->pSpsArray, "pSpsArray");
