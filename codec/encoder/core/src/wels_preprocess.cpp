@@ -359,7 +359,7 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
   int32_t iTargetHeight             = 0;
   int32_t iTemporalId = 0;
   SSpatialPicIndex* pSpatialIndexMap = &pCtx->sSpatialIndexMap[0];
-  int32_t iClosestDid =  iDependencyId;
+  int32_t iClosestIdx = iDependencyId; // default use the higest layer(large)
   pDlayerParamInternal = &pSvcParam->sDependencyLayers[iDependencyId];
   pDlayerParam = &pSvcParam->sSpatialLayers[iDependencyId];
   iTargetWidth   = pDlayerParam->iVideoWidth;
@@ -422,6 +422,7 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
   int iActualSpatialNum = iSpatialNum - 1;
   if (iTemporalId != INVALID_TEMPORAL_ID) {
     WelsUpdateSpatialIdxMap (pCtx, iActualSpatialNum, pDstPic, iDependencyId);
+    iClosestIdx = iActualSpatialNum; // update
     -- iActualSpatialNum;
   }
 
@@ -437,7 +438,9 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
     while (iDependencyId >= 0) {
       pDlayerParamInternal = &pSvcParam->sDependencyLayers[iDependencyId];
       pDlayerParam = &pSvcParam->sSpatialLayers[iDependencyId];
-      SPicture* pSrcPic  = (pSpatialIndexMap + iClosestDid)->pSrc;; // large
+
+      SPicture* pSrcPic  = (pSpatialIndexMap + iClosestIdx)->pSrc;; // large
+      int iPicDid = (pSpatialIndexMap + iClosestIdx)->iDid;         // pSrcPic's did
       //SPicture* pSrcPic  = (pSpatialIndexMap + (pSvcParam->iSpatialLayerNum - 1))->pSrc;; // large
       iTargetWidth  = pDlayerParam->iVideoWidth;
       iTargetHeight = pDlayerParam->iVideoHeight;
@@ -445,8 +448,8 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
                     (pSvcParam->uiGopSize - 1)];
 
       // down sampling performed
-      int32_t iSrcWidth                 = pScaledPicture->iScaledWidth[iClosestDid];
-      int32_t iSrcHeight                = pScaledPicture->iScaledHeight[iClosestDid];
+      int32_t iSrcWidth                 = pScaledPicture->iScaledWidth[iPicDid];
+      int32_t iSrcHeight                = pScaledPicture->iScaledHeight[iPicDid];
       pDstPic = GetCurrentOrigFrame (iDependencyId); // small
       iShrinkWidth = pScaledPicture->iScaledWidth[iDependencyId];
       iShrinkHeight = pScaledPicture->iScaledHeight[iDependencyId];
@@ -455,14 +458,13 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
 
       if ((iTemporalId != INVALID_TEMPORAL_ID)) {
         WelsUpdateSpatialIdxMap (pCtx, iActualSpatialNum, pDstPic, iDependencyId);
+        iClosestIdx = iActualSpatialNum; // update(large -> small)
         iActualSpatialNum--;
       }
 
       m_pLastSpatialPicture[iDependencyId][1] = pDstPic;
 
-      iClosestDid = iDependencyId;
       -- iDependencyId;
-
     }
   }
   return iSpatialNum;
