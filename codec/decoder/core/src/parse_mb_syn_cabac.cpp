@@ -397,7 +397,7 @@ int32_t ParseInterMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pNe
                                         iRef[0]));
     if ((iRef[0] < 0) || (iRef[0] >= pRefCount[0]) || (ppRefPic[iRef[0]] == NULL)) { //error ref_idx
       pCtx->bMbRefConcealed = true;
-      if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) {
+      if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE) {
         iRef[0] = 0;
         pCtx->iErrorCode |= dsBitstreamError;
       } else {
@@ -423,7 +423,7 @@ int32_t ParseInterMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pNe
                                           iRef[i]));
       if ((iRef[i] < 0) || (iRef[i] >= pRefCount[0]) || (ppRefPic[iRef[i]] == NULL)) { //error ref_idx
         pCtx->bMbRefConcealed = true;
-        if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) {
+        if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE) {
           iRef[i] = 0;
           pCtx->iErrorCode |= dsBitstreamError;
         } else {
@@ -453,7 +453,7 @@ int32_t ParseInterMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pNe
                                           iRef[i]));
       if ((iRef[i] < 0) || (iRef[i] >= pRefCount[0]) || (ppRefPic[iRef[i]] == NULL)) { //error ref_idx
         pCtx->bMbRefConcealed = true;
-        if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) {
+        if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE) {
           iRef[i] = 0;
           pCtx->iErrorCode |= dsBitstreamError;
         } else {
@@ -501,7 +501,7 @@ int32_t ParseInterMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pNe
                                           pRefIdx[i]));
       if ((pRefIdx[i] < 0) || (pRefIdx[i] >= pRefCount[0]) || (ppRefPic[pRefIdx[i]] == NULL)) { //error ref_idx
         pCtx->bMbRefConcealed = true;
-        if (pCtx->eErrorConMethod != ERROR_CON_DISABLE) {
+        if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE) {
           pRefIdx[i] = 0;
           pCtx->iErrorCode |= dsBitstreamError;
         } else {

@@ -310,7 +310,6 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   pCtx->pPicBuff[LIST_1]          = NULL;
 
   pCtx->bAvcBasedFlag             = true;
-  pCtx->eErrorConMethod = ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE;
   pCtx->pPreviousDecodedPictureInDpb = NULL;
   pCtx->sDecoderStatistics.iAvgLumaQp = -1;
   pCtx->bSpsLatePps = false;
@@ -534,10 +533,9 @@ int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpPa
              ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE);
     pCtx->pParam->eEcActiveIdc = ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE;
   }
-  pCtx->eErrorConMethod = pCtx->pParam->eEcActiveIdc;
 
   if (pCtx->pParam->bParseOnly) //parse only, disable EC method
-    pCtx->eErrorConMethod = ERROR_CON_DISABLE;
+    pCtx->pParam->eEcActiveIdc = ERROR_CON_DISABLE;
   InitErrorCon (pCtx);
 
   if (VIDEO_BITSTREAM_SVC == pCtx->pParam->sVideoProperty.eVideoBsType ||
