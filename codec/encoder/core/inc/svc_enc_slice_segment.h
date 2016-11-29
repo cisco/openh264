@@ -102,6 +102,7 @@ int32_t         iBsStackLeftBits;
 SCabacCtx       sStoredCabac;
 int32_t         iMbSkipRunStack;
 uint8_t         uiLastMbQp;
+uint8_t*        pRestoreBuffer;
 } SDynamicSlicingStack;
 
 /*!

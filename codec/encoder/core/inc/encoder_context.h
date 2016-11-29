@@ -237,7 +237,7 @@ typedef struct TagWelsEncCtx {
   bool bDependencyRecFlag[MAX_DEPENDENCY_LAYER];
 #endif
   int64_t            uiLastTimestamp;
-
+  uint8_t*           pDynamicBsBuffer[MAX_THREADS_NUM];
 } sWelsEncCtx/*, *PWelsEncCtx*/;
 }
 #endif//sWelsEncCtx_H__
