@@ -1253,7 +1253,20 @@ FAST_WIDTH:
     pmaddwd     xmm2,   xmm1
     pshufd  xmm1,   xmm2,   00000001b
     paddd   xmm2,   xmm1
+%ifdef X86_32_PICASM
+    push    r0
+    mov     r0, esp
+    and     esp, 0xffffffe0
+    push    0x00000000
+    push    0x00000000
+    push    0x00000000
+    push    0x00004000
+    movdqa  xmm1,   [esp]
+    mov     esp, r0
+    pop     r0
+%else
     movdqa  xmm1,   [add_extra_half]
+%endif
     paddd   xmm2,   xmm1
     psrld   xmm2,   15
 
@@ -1554,7 +1567,20 @@ FAST_WIDTH:
     pmaddwd     xmm2,   xmm1
     pshufd  xmm1,   xmm2,   00000001b
     paddd   xmm2,   xmm1
+%ifdef X86_32_PICASM
+    push    r0
+    mov     r0, esp
+    and     esp, 0xffffffe0
+    push    0x00000000
+    push    0x00000000
+    push    0x00000000
+    push    0x00004000
+    movdqa  xmm1,   [esp]
+    mov     esp, r0
+    pop     r0
+%else
     movdqa  xmm1,   [add_extra_half]
+%endif
     paddd   xmm2,   xmm1
     psrld   xmm2,   15
 
@@ -1671,15 +1697,52 @@ WELS_EXTERN DyadicBilinearOneThirdDownsampler_ssse3
     ;1st line
     movdqa xmm0, [r2]                         ;F * e E * d D * c C * b B * a A
     movdqa xmm1, xmm0
+%ifdef X86_32_PICASM
+    push   r0
+    mov    r0, esp
+    and    esp, 0xfffffff0
+    push   0x80808080    ;shufb_mask_onethird_low_1
+    push   0x80808080
+    push   0x80800f0c
+    push   0x09060300
+    push   0x80808080    ;shufb_mask_onethird_high_1
+    push   0x80808080
+    push   0x8080800d
+    push   0x0a070401
+    push   0x80808080    ;shufb_mask_onethird_low_2
+    push   0x800e0b08
+    push   0x05028080
+    push   0x80808080
+    push   0x80808080    ;shufb_mask_onethird_high_2
+    push   0x800f0c09
+    push   0x06030080
+    push   0x80808080
+    push   0x0d0a0704    ;shufb_mask_onethird_low_3
+    push   0x01808080
+    push   0x80808080
+    push   0x80808080
+    push   0x0e0b0805    ;shufb_mask_onethird_high_3
+    push   0x02808080
+    push   0x80808080
+    push   0x80808080
+    movdqa xmm5, [esp+80]
+    movdqa xmm6, [esp+64]
+%else
     movdqa xmm5, [shufb_mask_onethird_low_1]
     movdqa xmm6, [shufb_mask_onethird_high_1]
+%endif
     pshufb xmm0, xmm5                           ;0 0 0 0 0 0 0 0 0 0 F E D C B A -> xmm0
     pshufb xmm1, xmm6                           ;0 0 0 0 0 0 0 0 0 0 0 e d c b a -> xmm1
 
     movdqa xmm2, [r2+16]                      ;k K * j J * i I * h H * g G * f
     movdqa xmm3, xmm2
+%ifdef X86_32_PICASM
+    movdqa xmm5, [esp+48]
+    movdqa xmm6, [esp+32]
+%else
     movdqa xmm5, [shufb_mask_onethird_low_2]
     movdqa xmm6, [shufb_mask_onethird_high_2]
+%endif
     pshufb xmm2, xmm5                           ;0 0 0 0 0 K J I H G 0 0 0 0 0 0 -> xmm2
     pshufb xmm3, xmm6                           ;0 0 0 0 0 k j i h g f 0 0 0 0 0 -> xmm3
 
@@ -1688,8 +1751,13 @@ WELS_EXTERN DyadicBilinearOneThirdDownsampler_ssse3
 
     movdqa xmm2, [r2+32]                      ;* p P * o O * n N * m M * l L *
     movdqa xmm3, xmm2
+%ifdef X86_32_PICASM
+    movdqa xmm5, [esp+16]
+    movdqa xmm6, [esp]
+%else
     movdqa xmm5, [shufb_mask_onethird_low_3]
     movdqa xmm6, [shufb_mask_onethird_high_3]
+%endif
     pshufb xmm2, xmm5                           ;P O N M L 0 0 0 0 0 0 0 0 0 0 0 -> xmm2
     pshufb xmm3, xmm6                           ;p o n m l 0 0 0 0 0 0 0 0 0 0 0 -> xmm3
 
@@ -1700,15 +1768,25 @@ WELS_EXTERN DyadicBilinearOneThirdDownsampler_ssse3
     ;2nd line
     movdqa xmm2, [r2+r3]                      ;F' *  e' E' *  d' D' *  c' C' *  b' B' *  a' A'
     movdqa xmm3, xmm2
+%ifdef X86_32_PICASM
+    movdqa xmm5, [esp+80]
+    movdqa xmm6, [esp+64]
+%else
     movdqa xmm5, [shufb_mask_onethird_low_1]
     movdqa xmm6, [shufb_mask_onethird_high_1]
+%endif
     pshufb xmm2, xmm5                           ;0 0 0 0 0 0 0 0 0 0 F' E' D' C' B' A' -> xmm2
     pshufb xmm3, xmm6                           ;0 0 0 0 0 0 0 0 0 0 0  e' d' c' b' a' -> xmm3
 
     movdqa xmm1, [r2+r3+16]                   ;k' K' *  j' J' *  i' I' *  h' H' *  g' G' *  f'
     movdqa xmm4, xmm1
+%ifdef X86_32_PICASM
+    movdqa xmm5, [esp+48]
+    movdqa xmm6, [esp+32]
+%else
     movdqa xmm5, [shufb_mask_onethird_low_2]
     movdqa xmm6, [shufb_mask_onethird_high_2]
+%endif
     pshufb xmm1, xmm5                           ;0 0 0 0 0 K' J' I' H' G' 0  0 0 0 0 0 -> xmm1
     pshufb xmm4, xmm6                           ;0 0 0 0 0 k' j' i' h' g' f' 0 0 0 0 0 -> xmm4
 
@@ -1717,8 +1795,15 @@ WELS_EXTERN DyadicBilinearOneThirdDownsampler_ssse3
 
     movdqa xmm1, [r2+r3+32]                   ; *  p' P' *  o' O' *  n' N' *  m' M' *  l' L' *
     movdqa xmm4, xmm1
+%ifdef X86_32_PICASM
+    movdqa xmm5, [esp+16]
+    movdqa xmm6, [esp]
+    mov    esp, r0
+    pop    r0
+%else
     movdqa xmm5, [shufb_mask_onethird_low_3]
     movdqa xmm6, [shufb_mask_onethird_high_3]
+%endif
     pshufb xmm1, xmm5                           ;P' O' N' M' L' 0 0 0 0 0 0 0 0 0 0 0 -> xmm1
     pshufb xmm4, xmm6                           ;p' o' n' m' l' 0 0 0 0 0 0 0 0 0 0 0 -> xmm4
 
@@ -1821,15 +1906,52 @@ WELS_EXTERN DyadicBilinearOneThirdDownsampler_sse4
     ;1st line
     movntdqa xmm0, [r2]                         ;F * e E * d D * c C * b B * a A
     movdqa xmm1, xmm0
+%ifdef X86_32_PICASM
+    push   r0
+    mov    r0, esp
+    and    esp, 0xfffffff0
+    push   0x80808080    ;shufb_mask_onethird_low_1
+    push   0x80808080
+    push   0x80800f0c
+    push   0x09060300
+    push   0x80808080    ;shufb_mask_onethird_high_1
+    push   0x80808080
+    push   0x8080800d
+    push   0x0a070401
+    push   0x80808080    ;shufb_mask_onethird_low_2
+    push   0x800e0b08
+    push   0x05028080
+    push   0x80808080
+    push   0x80808080    ;shufb_mask_onethird_high_2
+    push   0x800f0c09
+    push   0x06030080
+    push   0x80808080
+    push   0x0d0a0704    ;shufb_mask_onethird_low_3
+    push   0x01808080
+    push   0x80808080
+    push   0x80808080
+    push   0x0e0b0805    ;shufb_mask_onethird_high_3
+    push   0x02808080
+    push   0x80808080
+    push   0x80808080
+    movdqa xmm5, [esp+80]
+    movdqa xmm6, [esp+64]
+%else
     movdqa xmm5, [shufb_mask_onethird_low_1]
     movdqa xmm6, [shufb_mask_onethird_high_1]
+%endif
     pshufb xmm0, xmm5                           ;0 0 0 0 0 0 0 0 0 0 F E D C B A -> xmm0
     pshufb xmm1, xmm6                           ;0 0 0 0 0 0 0 0 0 0 0 e d c b a -> xmm1
 
     movntdqa xmm2, [r2+16]                      ;k K * j J * i I * h H * g G * f
     movdqa xmm3, xmm2
+%ifdef X86_32_PICASM
+    movdqa xmm5, [esp+48]
+    movdqa xmm6, [esp+32]
+%else
     movdqa xmm5, [shufb_mask_onethird_low_2]
     movdqa xmm6, [shufb_mask_onethird_high_2]
+%endif
     pshufb xmm2, xmm5                           ;0 0 0 0 0 K J I H G 0 0 0 0 0 0 -> xmm2
     pshufb xmm3, xmm6                           ;0 0 0 0 0 k j i h g f 0 0 0 0 0 -> xmm3
 
@@ -1838,8 +1960,13 @@ WELS_EXTERN DyadicBilinearOneThirdDownsampler_sse4
 
     movntdqa xmm2, [r2+32]                      ;* p P * o O * n N * m M * l L *
     movdqa xmm3, xmm2
+%ifdef X86_32_PICASM
+    movdqa xmm5, [esp+16]
+    movdqa xmm6, [esp]
+%else
     movdqa xmm5, [shufb_mask_onethird_low_3]
     movdqa xmm6, [shufb_mask_onethird_high_3]
+%endif
     pshufb xmm2, xmm5                           ;P O N M L 0 0 0 0 0 0 0 0 0 0 0 -> xmm2
     pshufb xmm3, xmm6                           ;p o n m l 0 0 0 0 0 0 0 0 0 0 0 -> xmm3
 
@@ -1850,15 +1977,25 @@ WELS_EXTERN DyadicBilinearOneThirdDownsampler_sse4
     ;2nd line
     movntdqa xmm2, [r2+r3]                      ;F' *  e' E' *  d' D' *  c' C' *  b' B' *  a' A'
     movdqa xmm3, xmm2
+%ifdef X86_32_PICASM
+    movdqa xmm5, [esp+80]
+    movdqa xmm6, [esp+64]
+%else
     movdqa xmm5, [shufb_mask_onethird_low_1]
     movdqa xmm6, [shufb_mask_onethird_high_1]
+%endif
     pshufb xmm2, xmm5                           ;0 0 0 0 0 0 0 0 0 0 F' E' D' C' B' A' -> xmm2
     pshufb xmm3, xmm6                           ;0 0 0 0 0 0 0 0 0 0 0  e' d' c' b' a' -> xmm3
 
     movntdqa xmm1, [r2+r3+16]                   ;k' K' *  j' J' *  i' I' *  h' H' *  g' G' *  f'
     movdqa xmm4, xmm1
+%ifdef X86_32_PICASM
+    movdqa xmm5, [esp+48]
+    movdqa xmm6, [esp+32]
+%else
     movdqa xmm5, [shufb_mask_onethird_low_2]
     movdqa xmm6, [shufb_mask_onethird_high_2]
+%endif
     pshufb xmm1, xmm5                           ;0 0 0 0 0 K' J' I' H' G' 0  0 0 0 0 0 -> xmm1
     pshufb xmm4, xmm6                           ;0 0 0 0 0 k' j' i' h' g' f' 0 0 0 0 0 -> xmm4
 
@@ -1867,8 +2004,15 @@ WELS_EXTERN DyadicBilinearOneThirdDownsampler_sse4
 
     movntdqa xmm1, [r2+r3+32]                   ; *  p' P' *  o' O' *  n' N' *  m' M' *  l' L' *
     movdqa xmm4, xmm1
+%ifdef X86_32_PICASM
+    movdqa xmm5, [esp+16]
+    movdqa xmm6, [esp]
+    mov    esp, r0
+    pop    r0
+%else
     movdqa xmm5, [shufb_mask_onethird_low_3]
     movdqa xmm6, [shufb_mask_onethird_high_3]
+%endif
     pshufb xmm1, xmm5                           ;P' O' N' M' L' 0 0 0 0 0 0 0 0 0 0 0 -> xmm1
     pshufb xmm4, xmm6                           ;p' o' n' m' l' 0 0 0 0 0 0 0 0 0 0 0 -> xmm4
 
@@ -2112,7 +2256,20 @@ WELS_EXTERN DyadicBilinearQuarterDownsampler_ssse3
     add r6, r0
     movq xmm7, [r6]
 
+%ifdef X86_32_PICASM
+    push   r0
+    mov    r0, esp
+    and    esp, 0xfffffff0
+    push   0x80808080
+    push   0x0d090501
+    push   0x80808080
+    push   0x0c080400
+    movdqa xmm6, [esp]
+    mov    esp, r0
+    pop    r0
+%else
     movdqa xmm6, [shufb_mask_quarter]
+%endif
 .yloops_quarter_sse3:
     ;mov eax, [esp+40]   ; iSrcWidth
     ;sar eax, $02            ; iSrcWidth >> 2
@@ -2221,7 +2378,20 @@ WELS_EXTERN DyadicBilinearQuarterDownsampler_sse4
     add r6, r0
     movq xmm7, [r6]
 
+%ifdef X86_32_PICASM
+    push   r0
+    mov    r0, esp
+    and    esp, 0xfffffff0
+    push   0x80808080
+    push   0x0d090501
+    push   0x80808080
+    push   0x0c080400
+    movdqa xmm6, [esp]
+    mov    esp, r0
+    pop    r0
+%else
     movdqa xmm6, [shufb_mask_quarter]    ;mask
+%endif
 
 .yloops_quarter_sse4:
 %ifdef X86_32
@@ -2364,7 +2534,20 @@ WELS_EXTERN DyadicBilinearQuarterDownsampler_sse4
 
 %macro SSSE3_BilinearFastDownsample4xOrLess_8px 0
     movdqa          xmm_tmp0, xmm_xpos_int
+%ifdef X86_32_PICASM
+    push            r0
+    mov             r0, esp
+    and             esp, 0xfffffff0
+    push            0x08080808
+    push            0x08080808
+    push            0x00000000
+    push            0x00000000
+    pshufb          xmm_tmp0, [esp]
+    mov             esp, r0
+    pop             r0
+%else
     pshufb          xmm_tmp0, [shufb_0000000088888888]
+%endif
     psubb           xmm_xpos_int, xmm_tmp0
     SSE2_UnpckXFracuw xmm_tmp0, xmm_tmp1, xmm_xpos_frac
     mov             r_tmp0, i_xpos
@@ -2372,7 +2555,24 @@ WELS_EXTERN DyadicBilinearQuarterDownsampler_sse4
     lddqu           xmm_tmp3, [p_src_row0 + r_tmp0]
     lddqu           xmm_tmp4, [p_src_row1 + r_tmp0]
     movdqa          xmm_tmp2, xmm_xpos_int
+%ifdef X86_32_PICASM
+    push            r5
+    mov             r5, esp
+    and             esp, 0xffffffe0
+    push            0x80808080    ;db80h_256
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    punpcklbw       xmm_tmp2, [esp]
+    mov             esp, r5
+    pop             r5
+%else
     punpcklbw       xmm_tmp2, [db80h_256]
+%endif
     pshufb          xmm_tmp3, xmm_tmp2
     pshufb          xmm_tmp4, xmm_tmp2
     SSE2_BilinearFastCalcXYFrac xmm_tmp0, xmm_tmp2, xmm_yfrac0, xmm_yfrac1
@@ -2385,7 +2585,24 @@ WELS_EXTERN DyadicBilinearQuarterDownsampler_sse4
     lddqu           xmm_tmp3, [p_src_row0 + r_tmp0]
     lddqu           xmm_tmp4, [p_src_row1 + r_tmp0]
     movdqa          xmm_tmp2, xmm_xpos_int
+%ifdef X86_32_PICASM
+    push            r5
+    mov             r5, esp
+    and             esp, 0xffffffe0
+    push            0x80808080    ;db80h_256
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    punpckhbw       xmm_tmp2, [esp]
+    mov             esp, r5
+    pop             r5
+%else
     punpckhbw       xmm_tmp2, [db80h_256]
+%endif
     pshufb          xmm_tmp3, xmm_tmp2
     pshufb          xmm_tmp4, xmm_tmp2
     SSE2_BilinearFastCalcXYFrac xmm_tmp1, xmm_tmp2, xmm_yfrac0, xmm_yfrac1
@@ -2524,13 +2741,43 @@ WELS_EXTERN DyadicBilinearQuarterDownsampler_sse4
 
 %macro SSE41_BilinearAccurateDownsample4xOrLess_8px 0
     movdqa          xmm_tmp0, xmm_xpos_int
+%ifdef X86_32_PICASM
+    push            r0
+    mov             r0, esp
+    and             esp, 0xfffffff0
+    push            0x08080808
+    push            0x08080808
+    push            0x00000000
+    push            0x00000000
+    pshufb          xmm_tmp0, [esp]
+    mov             esp, r0
+    pop             r0
+%else
     pshufb          xmm_tmp0, [shufb_0000000088888888]
+%endif
     psubb           xmm_xpos_int, xmm_tmp0
     SSE2_UnpckXFracw xmm_tmp0, xmm_tmp1, xmm_xpos_frac, xmm_7fff
     mov             r_tmp0, i_xpos
     shr             r_tmp0, 16
     movdqa          xmm_tmp3, xmm_xpos_int
+%ifdef X86_32_PICASM
+    push            r5
+    mov             r5, esp
+    and             esp, 0xffffffe0
+    push            0x80808080    ;db80h_256
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    punpcklbw       xmm_tmp3, [esp]
+    mov             esp, r5
+    pop             r5
+%else
     punpcklbw       xmm_tmp3, [db80h_256]
+%endif
     lddqu           xmm_tmp4, [p_src_row0 + r_tmp0]
     lddqu           xmm_tmp2, [p_src_row1 + r_tmp0]
     lea             r_tmp0, [i_xpos + 4 * i_scalex]
@@ -2542,7 +2789,24 @@ WELS_EXTERN DyadicBilinearQuarterDownsampler_sse4
     pmaddwd         xmm_tmp2, xmm_tmp0
     SSE41_LinearAccurateInterpolateVerticalDwords xmm_tmp0, xmm_tmp4, xmm_tmp2, xmm_yfrac0, xmm_yfrac1, xmm_tmp3
     movdqa          xmm_tmp2, xmm_xpos_int
+%ifdef X86_32_PICASM
+    push            r5
+    mov             r5, esp
+    and             esp, 0xffffffe0
+    push            0x80808080    ;db80h_256
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    punpckhbw       xmm_tmp2, [esp]
+    mov             esp, r5
+    pop             r5
+%else
     punpckhbw       xmm_tmp2, [db80h_256]
+%endif
     lddqu           xmm_tmp4, [p_src_row0 + r_tmp0]
     lddqu           xmm_tmp3, [p_src_row1 + r_tmp0]
     pshufb          xmm_tmp4, xmm_tmp2
@@ -3321,7 +3585,20 @@ WELS_EXTERN GeneralBilinearAccurateDownsampler_sse41
 %endmacro
 
 %macro AVX2_BilinearFastDownsample4xOrLess_16px 0
+%ifdef X86_32_PICASM
+    push            r0
+    mov             r0, esp
+    and             esp, 0xfffffff0
+    push            0x08080808
+    push            0x08080808
+    push            0x00000000
+    push            0x00000000
+    vbroadcasti128  ymm_tmp0, [esp]
+    mov             esp, r0
+    pop             r0
+%else
     vbroadcasti128  ymm_tmp0, [shufb_0000000088888888]
+%endif
     vpshufb         ymm_tmp0, ymm_xpos_int, ymm_tmp0
     vpsubb          ymm_xpos_int, ymm_xpos_int, ymm_tmp0
     AVX2_UnpckXFrac ymm_tmp0, ymm_tmp1, ymm_xpos_frac, ymm_ffff
@@ -3365,7 +3642,20 @@ WELS_EXTERN GeneralBilinearAccurateDownsampler_sse41
 %endmacro
 
 %macro AVX2_BilinearFastDownsample8xOrLess_16px 0
+%ifdef X86_32_PICASM
+    push            r0
+    mov             r0, esp
+    and             esp, 0xffffffe0
+    push            0x0c0c0c0c
+    push            0x08080808
+    push            0x04040404
+    push            0x00000000
+    vbroadcasti128  ymm_tmp0, [esp]
+    mov             esp, r0
+    pop             r0
+%else
     vbroadcasti128  ymm_tmp0, [shufb_000044448888CCCC]
+%endif
     vpshufb         ymm_tmp0, ymm_xpos_int, ymm_tmp0
     vpsubb          ymm_xpos_int, ymm_xpos_int, ymm_tmp0
     mov             r_tmp0, i_xpos
@@ -3604,7 +3894,20 @@ WELS_EXTERN GeneralBilinearAccurateDownsampler_sse41
 %endmacro
 
 %macro AVX2_BilinearAccurateDownsample4xOrLess_16px 0
+%ifdef X86_32_PICASM
+    push            r5
+    mov             r5, esp
+    and             esp, 0xffffffe0
+    push            0x08080808    ;shufb_0000000088888888
+    push            0x08080808
+    push            0x00000000
+    push            0x00000000
+    vbroadcasti128  ymm_tmp0, [esp]
+    mov             esp, r5
+    pop             r5
+%else
     vbroadcasti128  ymm_tmp0, [shufb_0000000088888888]
+%endif
     vpshufb         ymm_tmp0, ymm_xpos_int, ymm_tmp0
     vpsubb          ymm_xpos_int, ymm_xpos_int, ymm_tmp0
     AVX2_UnpckXFrac ymm_tmp0, ymm_tmp1, ymm_xpos_frac, ymm_7fff
@@ -3619,7 +3922,24 @@ WELS_EXTERN GeneralBilinearAccurateDownsampler_sse41
     lea             r_tmp0, [i_xpos + 2 * i_scalex2]
     lea             i_xpos, [r_tmp0 + 4 * i_scalex2]
     shr             r_tmp0, 16
+%ifdef X86_32_PICASM
+    push            r5
+    mov             r5, esp
+    and             esp, 0xffffffe0
+    push            0x80808080    ;db80h_256
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    vpunpcklbw      ymm_tmp3, ymm_xpos_int, [esp]
+    mov             esp, r5
+    pop             r5
+%else
     vpunpcklbw      ymm_tmp3, ymm_xpos_int, [db80h_256]
+%endif
     vpshufb         ymm_tmp4, ymm_tmp4, ymm_tmp3
     vpshufb         ymm_tmp2, ymm_tmp2, ymm_tmp3
     vpmaddwd        ymm_tmp4, ymm_tmp4, ymm_tmp0
@@ -3632,7 +3952,24 @@ WELS_EXTERN GeneralBilinearAccurateDownsampler_sse41
     shr             r_tmp0, 16
     vinserti128     ymm_tmp4, ymm_tmp4, [p_src_row0 + r_tmp0], 1
     vinserti128     ymm_tmp2, ymm_tmp2, [p_src_row1 + r_tmp0], 1
+%ifdef X86_32_PICASM
+    push            r5
+    mov             r5, esp
+    and             esp, 0xffffffe0
+    push            0x80808080    ;db80h_256
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    vpunpckhbw      ymm_tmp3, ymm_xpos_int, [esp]
+    mov             esp, r5
+    pop             r5
+%else
     vpunpckhbw      ymm_tmp3, ymm_xpos_int, [db80h_256]
+%endif
     vpshufb         ymm_tmp4, ymm_tmp4, ymm_tmp3
     vpshufb         ymm_tmp2, ymm_tmp2, ymm_tmp3
     vpmaddwd        ymm_tmp4, ymm_tmp4, ymm_tmp1
@@ -3648,7 +3985,20 @@ WELS_EXTERN GeneralBilinearAccurateDownsampler_sse41
 %endmacro
 
 %macro AVX2_BilinearAccurateDownsample8xOrLess_16px 0
+%ifdef X86_32_PICASM
+    push            r5
+    mov             r5, esp
+    and             esp, 0xffffffe0
+    push            0x0c0c0c0c    ;shufb_000044448888cccc
+    push            0x08080808
+    push            0x04040404
+    push            0x00000000
+    vbroadcasti128  ymm_tmp0, [esp]
+    mov             esp, r5
+    pop             r5
+%else
     vbroadcasti128  ymm_tmp0, [shufb_000044448888CCCC]
+%endif
     vpshufb         ymm_tmp0, ymm_xpos_int, ymm_tmp0
     vpsubb          ymm_xpos_int, ymm_xpos_int, ymm_tmp0
     mov             r_tmp0, i_xpos
@@ -3669,7 +4019,24 @@ WELS_EXTERN GeneralBilinearAccurateDownsampler_sse41
     shr             r_tmp0, 16
     vinserti128     ymm_tmp0, ymm_tmp0, [p_src_row0 + r_tmp0], 1
     vinserti128     ymm_tmp1, ymm_tmp1, [p_src_row1 + r_tmp0], 1
+%ifdef X86_32_PICASM
+    push            r5
+    mov             r5, esp
+    and             esp, 0xffffffe0
+    push            0x80808080    ;db80h_256
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    push            0x80808080
+    vpunpcklbw      ymm_tmp3, ymm_xpos_int, [esp]
+    mov             esp, r5
+    pop             r5
+%else
     vpunpcklbw      ymm_tmp3, ymm_xpos_int, [db80h_256]
+%endif
     vpshufb         ymm_tmp4, ymm_tmp4, ymm_tmp3
     vpshufb         ymm_tmp5, ymm_tmp5, ymm_tmp3
     vpshufb         ymm_tmp0, ymm_tmp0, ymm_tmp3

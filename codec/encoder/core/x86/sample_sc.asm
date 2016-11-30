@@ -696,9 +696,26 @@ WELS_EXTERN FillQpelLocationByFeatureValue_sse2
     mov     ebx,    [height]
     mov     [i_height], ebx
 
+%ifdef X86_32_PICASM
+    push    r0
+    mov     r0, esp
+    and     esp, 0xfffffff0
+    push    0x00100010                  ;mv_x_inc_x4
+    push    0x00100010
+    push    0x00040004                  ;mv_y_inc_x4
+    push    0x00040004
+    push    0x000c0008                  ;mx_x_offset_x4
+    push    0x00040000
+    movq    xmm7,   [esp+16]            ; x_qpel inc
+    movq    xmm6,   [esp+8]             ; y_qpel inc
+    movq    xmm5,   [esp]               ; x_qpel vector
+    mov     esp,    r0
+    pop     r0
+%else
     movq    xmm7,   [mv_x_inc_x4]       ; x_qpel inc
     movq    xmm6,   [mv_y_inc_x4]       ; y_qpel inc
     movq    xmm5,   [mx_x_offset_x4]    ; x_qpel vector
+%endif
     pxor    xmm4,   xmm4
     pxor    xmm3,   xmm3                ; y_qpel vector
 HASH_HEIGHT_LOOP_SSE2:
@@ -1398,9 +1415,24 @@ WELS_EXTERN FillQpelLocationByFeatureValue_sse2
     push r13
     mov     r12,    r2
 
+%ifdef X86_32_PICASM
+    push    r0
+    mov     r0, esp
+    and     esp, 0xfffffff0
+    push    0x00100010                  ;mv_x_inc_x4
+    push    0x00100010
+    push    0x00040004                  ;mv_y_inc_x4
+    push    0x00040004
+    push    0x000c0008                  ;mx_x_offset_x4
+    push    0x00040000
+    movq    xmm7,   [esp+16]            ; x_qpel inc
+    movq    xmm6,   [esp+8]             ; y_qpel inc
+    movq    xmm5,   [esp]               ; x_qpel vector
+%else
     movq    xmm7,   [mv_x_inc_x4]       ; x_qpel inc
     movq    xmm6,   [mv_y_inc_x4]       ; y_qpel inc
     movq    xmm5,   [mx_x_offset_x4]    ; x_qpel vector
+%endif
     pxor    xmm4,   xmm4
     pxor    xmm3,   xmm3                ; y_qpel vector
 HASH_HEIGHT_LOOP_SSE2:
