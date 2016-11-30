@@ -251,7 +251,8 @@ void StashMBStatusCabac (SDynamicSlicingStack* pDss, SSlice* pSlice, int32_t iMb
   SCabacCtx* pCtx = &pSlice->sCabacCtx;
   memcpy (&pDss->sStoredCabac, pCtx, sizeof (SCabacCtx));
   if (pDss->pRestoreBuffer) {
-    int32_t iLen = GetBsPosCabac (pSlice) - pDss->iStartPos;
+    int32_t iPosBitOffset =  GetBsPosCabac (pSlice) - pDss->iStartPos;
+    int32_t iLen = ((iPosBitOffset >> 3) + ((iPosBitOffset & 0x07) ? 1 : 0));
     memcpy (pDss->pRestoreBuffer, pCtx->m_pBufStart, iLen);
   }
   pDss->uiLastMbQp =  pSlice->uiLastMbQp;
@@ -260,9 +261,9 @@ void StashMBStatusCabac (SDynamicSlicingStack* pDss, SSlice* pSlice, int32_t iMb
 int32_t StashPopMBStatusCabac (SDynamicSlicingStack* pDss, SSlice* pSlice) {
   SCabacCtx* pCtx = &pSlice->sCabacCtx;
   memcpy (pCtx, &pDss->sStoredCabac, sizeof (SCabacCtx));
-
   if (pDss->pRestoreBuffer) {
-    int32_t iLen = GetBsPosCabac (pSlice) - pDss->iStartPos;
+    int32_t iPosBitOffset = GetBsPosCabac (pSlice) - pDss->iStartPos;
+    int32_t iLen = ((iPosBitOffset >> 3) + ((iPosBitOffset & 0x07) ? 1 : 0));
     memcpy (pCtx->m_pBufStart, pDss->pRestoreBuffer, iLen);
   }
   pSlice->uiLastMbQp = pDss->uiLastMbQp;
