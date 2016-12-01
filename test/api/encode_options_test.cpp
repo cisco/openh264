@@ -34,7 +34,6 @@ void EncodeDecodeTestAPIBase::InitialEncDec (int iWidth, int iHeight) {
   //set a fixed random value
   iRandValue = rand() % 256;
 }
-
 void EncodeDecodeTestAPIBase::RandomParamExtCombination() {
 
   param_.iPicWidth  = WelsClip3 ((((rand() % MAX_WIDTH) >> 1)  + 1) << 1, 2, MAX_WIDTH);
@@ -320,6 +319,51 @@ TEST_F (EncodeDecodeTestAPI, SetOptionEncParamExt) {
     //to do
     // currently, there are still some error cases even though under condition cmResultSuccess == iResult
     // so need to enhance the validation check for any random value of each variable in ParamExt
+
+    if (cmResultSuccess == iResult) {
+      InitialEncDec (param_.iPicWidth, param_.iPicHeight);
+      EncodeOneFrame (0);
+      encToDecData (info, len);
+      pData[0] = pData[1] = pData[2] = 0;
+      memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
+
+      iResult = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
+      ASSERT_TRUE (iResult == cmResultSuccess);
+      iResult = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_);
+      ASSERT_TRUE (iResult == cmResultSuccess);
+      EXPECT_EQ (dstBufInfo_.iBufferStatus, 1);
+    }
+  }
+
+  iTraceLevel = WELS_LOG_ERROR;
+  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+}
+
+
+TEST_F (EncodeDecodeTestAPI, SetOptionEncParamBase) {
+  int iSpatialLayerNum = 4;
+  int iWidth       = WelsClip3 ((((rand() % MAX_WIDTH) >> 1)  + 1) << 1, 1 << iSpatialLayerNum, MAX_WIDTH);
+  int iHeight      = WelsClip3 ((((rand() % MAX_HEIGHT) >> 1)  + 1) << 1, 1 << iSpatialLayerNum, MAX_HEIGHT);
+  float fFrameRate = rand() + 0.5f;
+  int iEncFrameNum = WelsClip3 ((rand() % ENCODE_FRAME_NUM) + 1, 1, ENCODE_FRAME_NUM);
+  int iSliceNum        = 1;
+  encoder_->GetDefaultParams (&param_);
+  prepareParamDefault (iSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate, &param_);
+
+  int rv = encoder_->InitializeExt (&param_);
+  ASSERT_TRUE (rv == cmResultSuccess);
+
+  int iTraceLevel = WELS_LOG_QUIET;
+  rv = encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  ASSERT_TRUE (rv == cmResultSuccess);
+
+  for (int i = 0; i < iEncFrameNum; i++) {
+    int iResult;
+    int len = 0;
+    unsigned char* pData[3] = { NULL };
+
+    param_.iTargetBitrate     = rand() % BIT_RATE_RANGE;
+    iResult = encoder_->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_BASE, &param_);
 
     if (cmResultSuccess == iResult) {
       InitialEncDec (param_.iPicWidth, param_.iPicHeight);
