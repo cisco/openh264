@@ -473,15 +473,15 @@ int CWelsH264SVCEncoder::EncodeParameterSets (SFrameBSInfo* pBsInfo) {
  *  Force key frame
  */
 int CWelsH264SVCEncoder::ForceIntraFrame (bool bIDR, int iLayerId) {
-  if ( bIDR ) {
+  if (bIDR) {
     if (! (m_pEncContext && m_bInitialFlag)) {
       return 1;
     }
 
-    ForceCodingIDR(m_pEncContext, iLayerId);
+    ForceCodingIDR (m_pEncContext, iLayerId);
   } else {
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
-            "CWelsH264SVCEncoder::ForceIntraFrame(),nothing to do as bIDR set to false");
+             "CWelsH264SVCEncoder::ForceIntraFrame(),nothing to do as bIDR set to false");
   }
 
   return 0;
@@ -740,6 +740,11 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
         || m_iMaxPicHeight != iTargetHeight) {
       m_iMaxPicWidth    = iTargetWidth;
       m_iMaxPicHeight   = iTargetHeight;
+    }
+    if (sConfig.DetermineTemporalSettings()) {
+      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+               "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_SVC_ENCODE_PARAM_BASE, DetermineTemporalSettings failed!");
+      return cmInitParaError;
     }
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
              "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_SVC_ENCODE_PARAM_BASE iUsageType = %d,iPicWidth= %d;iPicHeight= %d;iTargetBitrate= %d;fMaxFrameRate=  %.6ff;iRCMode= %d",
@@ -1278,7 +1283,8 @@ void CWelsH264SVCEncoder::DumpSrcPicture (const SSourcePicture*  pSrcPic, const 
   char strFileName[256] = {0};
   const int32_t iDataLength = m_iMaxPicWidth * m_iMaxPicHeight;
 
-  WelsSnprintf (strFileName, sizeof (strFileName), "pic_in_%dx%d.yuv", m_iMaxPicWidth, m_iMaxPicHeight);// confirmed_safe_unsafe_usage
+  WelsSnprintf (strFileName, sizeof (strFileName), "pic_in_%dx%d.yuv", m_iMaxPicWidth,
+                m_iMaxPicHeight);// confirmed_safe_unsafe_usage
 
   switch (pSrcPic->iColorFormat) {
   case videoFormatI420:
@@ -1287,8 +1293,8 @@ void CWelsH264SVCEncoder::DumpSrcPicture (const SSourcePicture*  pSrcPic, const 
 
     if (NULL != pFile) {
       fwrite (pSrcPic->pData[0], sizeof (uint8_t), pSrcPic->iStride[0]*m_iMaxPicHeight, pFile);
-      fwrite (pSrcPic->pData[1], sizeof (uint8_t), pSrcPic->iStride[1]*(m_iMaxPicHeight >> 1), pFile);
-      fwrite (pSrcPic->pData[2], sizeof (uint8_t), pSrcPic->iStride[2]*(m_iMaxPicHeight >> 1), pFile);
+      fwrite (pSrcPic->pData[1], sizeof (uint8_t), pSrcPic->iStride[1] * (m_iMaxPicHeight >> 1), pFile);
+      fwrite (pSrcPic->pData[2], sizeof (uint8_t), pSrcPic->iStride[2] * (m_iMaxPicHeight >> 1), pFile);
       fflush (pFile);
       fclose (pFile);
     } else {
