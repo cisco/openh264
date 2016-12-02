@@ -730,7 +730,18 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     int32_t iTargetHeight = 0;
 
     memcpy (&sEncodingParam, pOption, sizeof (SEncParamBase)); // confirmed_safe_unsafe_usage
+#ifdef OUTPUT_BIT_STREAM
+    if ((sEncodingParam.iPicWidth  != m_pEncContext->pSvcParam->sDependencyLayers[m_pEncContext->pSvcParam->iSpatialLayerNum
+         - 1].iActualWidth) ||
+        (sEncodingParam.iPicHeight != m_pEncContext->pSvcParam->sDependencyLayers[m_pEncContext->pSvcParam->iSpatialLayerNum -
+            1].iActualHeight)) {
+      ++m_iSwitchTimes;
+      m_bSwitch = true;
+    }
+#endif//OUTPUT_BIT_STREAM
     if (sConfig.ParamBaseTranscode (sEncodingParam)) {
+      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR,
+               "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_SVC_ENCODE_PARAM_BASE, ParamTranscode failed!");
       return cmInitParaError;
     }
     /* New configuration available here */
@@ -742,7 +753,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
       m_iMaxPicHeight   = iTargetHeight;
     }
     if (sConfig.DetermineTemporalSettings()) {
-      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR,
                "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_SVC_ENCODE_PARAM_BASE, DetermineTemporalSettings failed!");
       return cmInitParaError;
     }
@@ -757,6 +768,11 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     if (WelsEncoderParamAdjust (&m_pEncContext, &sConfig)) {
       return cmInitParaError;
     }
+
+    //LogStatistics
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_SVC_ENCODE_PARAM_BASE, LogStatisticsBeforeNewEncoding");
+    LogStatistics (m_pEncContext->iLastStatisticsLogTs, 0);
   }
   break;
 
@@ -769,33 +785,35 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     memcpy (&sEncodingParam, pOption, sizeof (SEncParamExt)); // confirmed_safe_unsafe_usage
     TraceParamInfo (&sEncodingParam);
 #ifdef OUTPUT_BIT_STREAM
-    if (sEncodingParam.sSpatialLayers[sEncodingParam.iSpatialLayerNum - 1].iVideoWidth !=
-        m_pEncContext->pSvcParam->sDependencyLayers[m_pEncContext->pSvcParam->iSpatialLayerNum - 1].iActualWidth) {
+    if ((sEncodingParam.sSpatialLayers[sEncodingParam.iSpatialLayerNum - 1].iVideoWidth !=
+         m_pEncContext->pSvcParam->sDependencyLayers[m_pEncContext->pSvcParam->iSpatialLayerNum - 1].iActualWidth) ||
+        (sEncodingParam.sSpatialLayers[sEncodingParam.iSpatialLayerNum - 1].iVideoHeight !=
+         m_pEncContext->pSvcParam->sDependencyLayers[m_pEncContext->pSvcParam->iSpatialLayerNum - 1].iActualHeight)) {
       ++ m_iSwitchTimes;
       m_bSwitch = true;
     }
 #endif//OUTPUT_BIT_STREAM
     if (sEncodingParam.iSpatialLayerNum < 1
         || sEncodingParam.iSpatialLayerNum > MAX_SPATIAL_LAYER_NUM) { // verify number of spatial layer
-      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR,
                "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, iSpatialLayerNum(%d) failed!",
                sEncodingParam.iSpatialLayerNum);
       return cmInitParaError;
     }
 
     if (sConfig.ParamTranscode (sEncodingParam)) {
-      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR,
                "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, ParamTranscode failed!");
       return cmInitParaError;
     }
     if (sConfig.iSpatialLayerNum < 1) {
-      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR,
                "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, iSpatialLayerNum(%d) failed!",
                sConfig.iSpatialLayerNum);
       return cmInitParaError;
     }
     if (sConfig.DetermineTemporalSettings()) {
-      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR,
                "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, DetermineTemporalSettings failed!");
       return cmInitParaError;
     }
