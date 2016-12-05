@@ -378,7 +378,7 @@ void RcUpdateTemporalZero (sWelsEncCtx* pEncCtx) {
 }
 
 
-void RcInitIdrQp (sWelsEncCtx* pEncCtx) {
+void RcCalculateIdrQp (sWelsEncCtx* pEncCtx) {
   double dBpp = 0;
   int32_t i;
 
@@ -389,6 +389,7 @@ void RcInitIdrQp (sWelsEncCtx* pEncCtx) {
   double dBppArray[4][3] = {{0.5, 0.75, 1.0}, {0.2, 0.3, 0.4}, {0.05, 0.09, 0.13}, {0.03, 0.06, 0.1}};
   int32_t dInitialQPArray[4][4] = {{28, 26, 24, 22}, {30, 28, 26, 24}, {32, 30, 28, 26}, {34, 32, 30, 28}};
   int32_t iBppIndex = 0;
+  int32_t iQpRangeArray[4][2] = {{37, 25}, {36, 24}, {35, 23}, {34, 22}};
 
   SWelsSvcRc* pWelsSvcRc                = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
   SSpatialLayerConfig* pDLayerParam     = &pEncCtx->pSvcParam->sSpatialLayers[pEncCtx->uiDependencyId];
@@ -414,41 +415,34 @@ void RcInitIdrQp (sWelsEncCtx* pEncCtx) {
     if (dBpp <= dBppArray[iBppIndex][i])
       break;
   }
-  pWelsSvcRc->iInitialQp = dInitialQPArray[iBppIndex][i];
-  pWelsSvcRc->iInitialQp = WELS_CLIP3 (pWelsSvcRc->iInitialQp, pEncCtx->pSvcParam->iMinQp, pEncCtx->pSvcParam->iMaxQp);
-  pEncCtx->iGlobalQp = pWelsSvcRc->iInitialQp;
-  pWelsSvcRc->iQStep = RcConvertQp2QStep (pEncCtx->iGlobalQp);
-  pWelsSvcRc->iLastCalculatedQScale = pEncCtx->iGlobalQp;
-  pWelsSvcRc->iMinFrameQp = WELS_CLIP3 (pEncCtx->iGlobalQp - DELTA_QP_BGD_THD, pEncCtx->pSvcParam->iMinQp,
-                                        pEncCtx->pSvcParam->iMaxQp);
-  pWelsSvcRc->iMaxFrameQp = WELS_CLIP3 (pEncCtx->iGlobalQp + DELTA_QP_BGD_THD, pEncCtx->pSvcParam->iMinQp,
-                                        pEncCtx->pSvcParam->iMaxQp);
-}
+  int32_t iMaxQp = iQpRangeArray[i][0];
+  int32_t iMinQp = iQpRangeArray[i][1];
+  if (0 == pWelsSvcRc->iIdrNum) { //the first IDR frame
+    pWelsSvcRc->iInitialQp = dInitialQPArray[iBppIndex][i];
+  } else {
 
-void RcCalculateIdrQp (sWelsEncCtx* pEncCtx) {
-  SWelsSvcRc* pWelsSvcRc = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
-//obtain the idr qp using previous idr complexity
-  if (pWelsSvcRc->iNumberMbFrame != pWelsSvcRc->iIntraMbCount) {
-    pWelsSvcRc->iIntraComplexity = pWelsSvcRc->iIntraComplexity * pWelsSvcRc->iNumberMbFrame /
-                                   pWelsSvcRc->iIntraMbCount;
+    //obtain the idr qp using previous idr complexity
+    if (pWelsSvcRc->iNumberMbFrame != pWelsSvcRc->iIntraMbCount) {
+      pWelsSvcRc->iIntraComplexity = pWelsSvcRc->iIntraComplexity * pWelsSvcRc->iNumberMbFrame /
+                                     pWelsSvcRc->iIntraMbCount;
+    }
+
+    int64_t iCmplxRatio = WELS_DIV_ROUND64 (pEncCtx->pVaa->sComplexityAnalysisParam.iFrameComplexity * INT_MULTIPLY,
+                                            pWelsSvcRc->iIntraComplxMean);
+    iCmplxRatio = WELS_CLIP3 (iCmplxRatio, INT_MULTIPLY - FRAME_CMPLX_RATIO_RANGE, INT_MULTIPLY + FRAME_CMPLX_RATIO_RANGE);
+    pWelsSvcRc->iQStep = WELS_DIV_ROUND ((pWelsSvcRc->iIntraComplexity * iCmplxRatio),
+                                         (pWelsSvcRc->iTargetBits * INT_MULTIPLY));
+    pWelsSvcRc->iInitialQp = RcConvertQStep2Qp (pWelsSvcRc->iQStep);
+
   }
-
-  int64_t iCmplxRatio = WELS_DIV_ROUND64 (pEncCtx->pVaa->sComplexityAnalysisParam.iFrameComplexity * INT_MULTIPLY,
-                                          pWelsSvcRc->iIntraComplxMean);
-  iCmplxRatio = WELS_CLIP3 (iCmplxRatio, INT_MULTIPLY - FRAME_CMPLX_RATIO_RANGE, INT_MULTIPLY + FRAME_CMPLX_RATIO_RANGE);
-  pWelsSvcRc->iQStep = WELS_DIV_ROUND ((pWelsSvcRc->iIntraComplexity * iCmplxRatio),
-                                       (pWelsSvcRc->iTargetBits * INT_MULTIPLY));
-  pWelsSvcRc->iInitialQp = RcConvertQStep2Qp (pWelsSvcRc->iQStep);
-  pWelsSvcRc->iInitialQp = WELS_CLIP3 (pWelsSvcRc->iInitialQp, pEncCtx->pSvcParam->iMinQp, pEncCtx->pSvcParam->iMaxQp);
+  pWelsSvcRc->iInitialQp = WELS_CLIP3 (pWelsSvcRc->iInitialQp, iMinQp, iMaxQp);
   pEncCtx->iGlobalQp = pWelsSvcRc->iInitialQp;
   pWelsSvcRc->iQStep = RcConvertQp2QStep (pEncCtx->iGlobalQp);
   pWelsSvcRc->iLastCalculatedQScale = pEncCtx->iGlobalQp;
-  pWelsSvcRc->iMinFrameQp = WELS_CLIP3 (pEncCtx->iGlobalQp - DELTA_QP_BGD_THD, pEncCtx->pSvcParam->iMinQp,
-                                        pEncCtx->pSvcParam->iMaxQp);
-  pWelsSvcRc->iMaxFrameQp = WELS_CLIP3 (pEncCtx->iGlobalQp + DELTA_QP_BGD_THD, pEncCtx->pSvcParam->iMinQp,
-                                        pEncCtx->pSvcParam->iMaxQp);
-}
+  pWelsSvcRc->iMinFrameQp = WELS_CLIP3 (pEncCtx->iGlobalQp - DELTA_QP_BGD_THD, iMinQp, iMaxQp);
+  pWelsSvcRc->iMaxFrameQp = WELS_CLIP3 (pEncCtx->iGlobalQp + DELTA_QP_BGD_THD, iMinQp, iMaxQp);
 
+}
 
 void RcCalculatePictureQp (sWelsEncCtx* pEncCtx) {
   SWelsSvcRc* pWelsSvcRc        = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
@@ -1147,11 +1141,7 @@ void  WelsRcPictureInitGom (sWelsEncCtx* pEncCtx, long long uiTimeStamp) {
 
   //decide globe_qp
   if (pEncCtx->eSliceType == I_SLICE) {
-    if (0 == pWelsSvcRc->iIdrNum)
-      RcInitIdrQp (pEncCtx);
-    else {
-      RcCalculateIdrQp (pEncCtx);
-    }
+    RcCalculateIdrQp (pEncCtx);
   } else {
     RcCalculatePictureQp (pEncCtx);
   }
