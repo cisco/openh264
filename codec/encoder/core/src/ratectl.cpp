@@ -1287,6 +1287,7 @@ void WelRcPictureInitBufferBasedQp (sWelsEncCtx* pEncCtx, long long uiTimeStamp)
   else
     pEncCtx->iGlobalQp += 2;
   pEncCtx->iGlobalQp = WELS_CLIP3 (pEncCtx->iGlobalQp, iMinQp, pWelsSvcRc->iMaxQp);
+  pWelsSvcRc->iAverageFrameQp = pEncCtx->iGlobalQp;
 }
 void WelRcPictureInitScc (sWelsEncCtx* pEncCtx, long long uiTimeStamp) {
   SWelsSvcRc* pWelsSvcRc =  &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
