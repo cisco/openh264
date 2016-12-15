@@ -148,7 +148,7 @@ int32_t   iGopBitsDq;
 //P frame level R-Q Model
 int64_t   iLinearCmplx; // *INT_MULTIPLY
 int32_t   iPFrameNum;
-int32_t   iFrameCmplxMean;
+int64_t   iFrameCmplxMean;
 int32_t   iMaxQp;
 int32_t   iMinQp;
 } SRCTemporal;
