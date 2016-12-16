@@ -473,7 +473,7 @@ void RcCalculatePictureQp (sWelsEncCtx* pEncCtx) {
     pWelsSvcRc->iQStep = WELS_DIV_ROUND ((pTOverRc->iLinearCmplx * iCmplxRatio), (pWelsSvcRc->iTargetBits * INT_MULTIPLY));
     iLumaQp = RcConvertQStep2Qp (pWelsSvcRc->iQStep);
     WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG,
-             "iCmplxRatio = %d,frameComplexity = %lld,iFrameCmplxMean = %d,iQStep = %d,iLumaQp = %d", (int)iCmplxRatio,
+             "iCmplxRatio = %d,frameComplexity = %lld,iFrameCmplxMean = %" PRId64 ",iQStep = %d,iLumaQp = %d", (int)iCmplxRatio,
              pEncCtx->pVaa->sComplexityAnalysisParam.iFrameComplexity, pTOverRc->iFrameCmplxMean, pWelsSvcRc->iQStep, iLumaQp);
 //limit QP
     int32_t iLastIdxCodecInVGop = pWelsSvcRc->iFrameCodedInVGop - 1;
@@ -1043,7 +1043,7 @@ void RcUpdateIntraComplexity (sWelsEncCtx* pEncCtx) {
     pWelsSvcRc->iIntraComplexity = iIntraCmplx;
     pWelsSvcRc->iIntraComplxMean = pEncCtx->pVaa->sComplexityAnalysisParam.iFrameComplexity;
   } else {
-    pWelsSvcRc->iIntraComplexity = WELS_DIV_ROUND (((LINEAR_MODEL_DECAY_FACTOR) * pWelsSvcRc->iIntraComplexity +
+    pWelsSvcRc->iIntraComplexity = WELS_DIV_ROUND64 (((LINEAR_MODEL_DECAY_FACTOR) * pWelsSvcRc->iIntraComplexity +
                                    (INT_MULTIPLY - LINEAR_MODEL_DECAY_FACTOR) *
                                    iIntraCmplx), INT_MULTIPLY);
 
@@ -1080,7 +1080,7 @@ void RcUpdateFrameComplexity (sWelsEncCtx* pEncCtx) {
     pTOverRc->iLinearCmplx = WELS_DIV_ROUND64 (((LINEAR_MODEL_DECAY_FACTOR) * (int64_t)pTOverRc->iLinearCmplx
                              + (INT_MULTIPLY - LINEAR_MODEL_DECAY_FACTOR) * ((int64_t)pWelsSvcRc->iFrameDqBits * iQStep)),
                              INT_MULTIPLY);
-    pTOverRc->iFrameCmplxMean = WELS_DIV_ROUND (((LINEAR_MODEL_DECAY_FACTOR) * static_cast<int64_t>
+    pTOverRc->iFrameCmplxMean = WELS_DIV_ROUND64 (((LINEAR_MODEL_DECAY_FACTOR) * static_cast<int64_t>
                                 (pTOverRc->iFrameCmplxMean)
                                 + (INT_MULTIPLY - LINEAR_MODEL_DECAY_FACTOR) * pEncCtx->pVaa->sComplexityAnalysisParam.iFrameComplexity),
                                 INT_MULTIPLY);
@@ -1094,7 +1094,7 @@ void RcUpdateFrameComplexity (sWelsEncCtx* pEncCtx) {
            "RcUpdateFrameComplexity iFrameDqBits = %d,iQStep= %d,pWelsSvcRc->iQStep= %d,pTOverRc->iLinearCmplx = %" PRId64,
            pWelsSvcRc->iFrameDqBits,
            iQStep, pWelsSvcRc->iQStep, pTOverRc->iLinearCmplx);
-  WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG, "iFrameCmplxMean = %d,iFrameComplexity = %lld",
+  WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG, "iFrameCmplxMean = %" PRId64 ",iFrameComplexity = %lld",
            pTOverRc->iFrameCmplxMean, pEncCtx->pVaa->sComplexityAnalysisParam.iFrameComplexity);
 }
 
