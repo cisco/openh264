@@ -390,7 +390,11 @@ void RcCalculateIdrQp (sWelsEncCtx* pEncCtx) {
   int32_t dInitialQPArray[4][4] = {{28, 26, 24, 22}, {30, 28, 26, 24}, {32, 30, 28, 26}, {34, 32, 30, 28}};
   int32_t iBppIndex = 0;
   int32_t iQpRangeArray[4][2] = {{37, 25}, {36, 24}, {35, 23}, {34, 22}};
-
+  int64_t iFrameComplexity = pEncCtx->pVaa->sComplexityAnalysisParam.iFrameComplexity;
+  if (pEncCtx->pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME) {
+    SVAAFrameInfoExt* pVaa = static_cast<SVAAFrameInfoExt*> (pEncCtx->pVaa);
+    iFrameComplexity = pVaa->sComplexityScreenParam.iFrameComplexity;
+  }
   SWelsSvcRc* pWelsSvcRc                = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
   SSpatialLayerConfig* pDLayerParam     = &pEncCtx->pSvcParam->sSpatialLayers[pEncCtx->uiDependencyId];
   SSpatialLayerInternal* pDLayerParamInternal       = &pEncCtx->pSvcParam->sDependencyLayers[pEncCtx->uiDependencyId];
@@ -427,13 +431,12 @@ void RcCalculateIdrQp (sWelsEncCtx* pEncCtx) {
                                      pWelsSvcRc->iIntraMbCount;
     }
 
-    int64_t iCmplxRatio = WELS_DIV_ROUND64 (pEncCtx->pVaa->sComplexityAnalysisParam.iFrameComplexity * INT_MULTIPLY,
+    int64_t iCmplxRatio = WELS_DIV_ROUND64 (iFrameComplexity * INT_MULTIPLY,
                                             pWelsSvcRc->iIntraComplxMean);
     iCmplxRatio = WELS_CLIP3 (iCmplxRatio, INT_MULTIPLY - FRAME_CMPLX_RATIO_RANGE, INT_MULTIPLY + FRAME_CMPLX_RATIO_RANGE);
     pWelsSvcRc->iQStep = WELS_DIV_ROUND ((pWelsSvcRc->iIntraComplexity * iCmplxRatio),
                                          (pWelsSvcRc->iTargetBits * INT_MULTIPLY));
     pWelsSvcRc->iInitialQp = RcConvertQStep2Qp (pWelsSvcRc->iQStep);
-
   }
   pWelsSvcRc->iInitialQp = WELS_CLIP3 (pWelsSvcRc->iInitialQp, iMinQp, iMaxQp);
   pEncCtx->iGlobalQp = pWelsSvcRc->iInitialQp;
@@ -450,6 +453,11 @@ void RcCalculatePictureQp (sWelsEncCtx* pEncCtx) {
   SRCTemporal* pTOverRc         = &pWelsSvcRc->pTemporalOverRc[iTl];
   int32_t iLumaQp = 0;
   int32_t iDeltaQpTemporal = 0;
+  int64_t iFrameComplexity = pEncCtx->pVaa->sComplexityAnalysisParam.iFrameComplexity;
+  if (pEncCtx->pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME) {
+    SVAAFrameInfoExt* pVaa = static_cast<SVAAFrameInfoExt*> (pEncCtx->pVaa);
+    iFrameComplexity = pVaa->sComplexityScreenParam.iFrameComplexity;
+  }
   if (0 == pTOverRc->iPFrameNum) {
     iLumaQp = pWelsSvcRc->iInitialQp;
   } else if (pWelsSvcRc->iCurrentBitsLevel == BITS_EXCEEDED) {
@@ -466,7 +474,7 @@ void RcCalculatePictureQp (sWelsEncCtx* pEncCtx) {
       iDeltaQpTemporal -= 1;
 
   } else {
-    int64_t iCmplxRatio = WELS_DIV_ROUND64 (pEncCtx->pVaa->sComplexityAnalysisParam.iFrameComplexity * INT_MULTIPLY,
+    int64_t iCmplxRatio = WELS_DIV_ROUND64 (iFrameComplexity * INT_MULTIPLY,
                                             pTOverRc->iFrameCmplxMean);
     iCmplxRatio = WELS_CLIP3 (iCmplxRatio, INT_MULTIPLY - FRAME_CMPLX_RATIO_RANGE, INT_MULTIPLY + FRAME_CMPLX_RATIO_RANGE);
 
@@ -1039,9 +1047,14 @@ void RcUpdateIntraComplexity (sWelsEncCtx* pEncCtx) {
   if (iAlpha < (INT_MULTIPLY / 4)) iAlpha = INT_MULTIPLY / 4;
   int32_t iQStep = RcConvertQp2QStep (pWelsSvcRc->iAverageFrameQp);
   int64_t iIntraCmplx = iQStep * static_cast<int64_t> (pWelsSvcRc->iFrameDqBits);
+  int64_t iFrameComplexity = pEncCtx->pVaa->sComplexityAnalysisParam.iFrameComplexity;
+  if (pEncCtx->pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME) {
+    SVAAFrameInfoExt* pVaa = static_cast<SVAAFrameInfoExt*> (pEncCtx->pVaa);
+    iFrameComplexity = pVaa->sComplexityScreenParam.iFrameComplexity;
+  }
   if (pWelsSvcRc->iIdrNum == 0) {
     pWelsSvcRc->iIntraComplexity = iIntraCmplx;
-    pWelsSvcRc->iIntraComplxMean = pEncCtx->pVaa->sComplexityAnalysisParam.iFrameComplexity;
+    pWelsSvcRc->iIntraComplxMean = iFrameComplexity;
   } else {
     pWelsSvcRc->iIntraComplexity = WELS_DIV_ROUND64 (((LINEAR_MODEL_DECAY_FACTOR) * pWelsSvcRc->iIntraComplexity +
                                    (INT_MULTIPLY - LINEAR_MODEL_DECAY_FACTOR) *
@@ -1050,7 +1063,7 @@ void RcUpdateIntraComplexity (sWelsEncCtx* pEncCtx) {
 
     pWelsSvcRc->iIntraComplxMean = WELS_DIV_ROUND64 (((LINEAR_MODEL_DECAY_FACTOR) * static_cast<int64_t>
                                    (pWelsSvcRc->iIntraComplxMean)
-                                   + (INT_MULTIPLY - LINEAR_MODEL_DECAY_FACTOR) * (pEncCtx->pVaa->sComplexityAnalysisParam.iFrameComplexity)),
+                                   + (INT_MULTIPLY - LINEAR_MODEL_DECAY_FACTOR) * (iFrameComplexity)),
                                    INT_MULTIPLY);
   }
 
@@ -1069,20 +1082,25 @@ void RcUpdateFrameComplexity (sWelsEncCtx* pEncCtx) {
   const int32_t kiTl            = pEncCtx->uiTemporalId;
   SRCTemporal* pTOverRc         = &pWelsSvcRc->pTemporalOverRc[kiTl];
 
+  int64_t iFrameComplexity = pEncCtx->pVaa->sComplexityAnalysisParam.iFrameComplexity;
+  if (pEncCtx->pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME) {
+    SVAAFrameInfoExt* pVaa = static_cast<SVAAFrameInfoExt*> (pEncCtx->pVaa);
+    iFrameComplexity = pVaa->sComplexityScreenParam.iFrameComplexity;
+  }
   int32_t iQStep = RcConvertQp2QStep (pWelsSvcRc->iAverageFrameQp);
   int32_t iAlpha = WELS_DIV_ROUND (INT_MULTIPLY, (1 + pTOverRc->iPFrameNum));
   if (iAlpha < SMOOTH_FACTOR_MIN_VALUE)
     iAlpha = SMOOTH_FACTOR_MIN_VALUE;
   if (0 == pTOverRc->iPFrameNum) {
     pTOverRc->iLinearCmplx = ((int64_t)pWelsSvcRc->iFrameDqBits) * iQStep;
-    pTOverRc->iFrameCmplxMean = (int32_t)pEncCtx->pVaa->sComplexityAnalysisParam.iFrameComplexity;
+    pTOverRc->iFrameCmplxMean = (int32_t)iFrameComplexity;
   } else {
     pTOverRc->iLinearCmplx = WELS_DIV_ROUND64 (((LINEAR_MODEL_DECAY_FACTOR) * (int64_t)pTOverRc->iLinearCmplx
                              + (INT_MULTIPLY - LINEAR_MODEL_DECAY_FACTOR) * ((int64_t)pWelsSvcRc->iFrameDqBits * iQStep)),
                              INT_MULTIPLY);
     pTOverRc->iFrameCmplxMean = WELS_DIV_ROUND64 (((LINEAR_MODEL_DECAY_FACTOR) * static_cast<int64_t>
                                 (pTOverRc->iFrameCmplxMean)
-                                + (INT_MULTIPLY - LINEAR_MODEL_DECAY_FACTOR) * pEncCtx->pVaa->sComplexityAnalysisParam.iFrameComplexity),
+                                + (INT_MULTIPLY - LINEAR_MODEL_DECAY_FACTOR) * iFrameComplexity),
                                 INT_MULTIPLY);
   }
 
@@ -1094,8 +1112,8 @@ void RcUpdateFrameComplexity (sWelsEncCtx* pEncCtx) {
            "RcUpdateFrameComplexity iFrameDqBits = %d,iQStep= %d,pWelsSvcRc->iQStep= %d,pTOverRc->iLinearCmplx = %" PRId64,
            pWelsSvcRc->iFrameDqBits,
            iQStep, pWelsSvcRc->iQStep, pTOverRc->iLinearCmplx);
-  WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG, "iFrameCmplxMean = %" PRId64 ",iFrameComplexity = %lld",
-           pTOverRc->iFrameCmplxMean, pEncCtx->pVaa->sComplexityAnalysisParam.iFrameComplexity);
+  WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG, "iFrameCmplxMean = %" PRId64 ",iFrameComplexity = %" PRId64 ,
+           pTOverRc->iFrameCmplxMean, iFrameComplexity);
 }
 
 int32_t RcCalculateCascadingQp (struct TagWelsEncCtx* pEncCtx, int32_t iQp) {
@@ -1480,18 +1498,12 @@ void  WelsRcInitFuncPointers (sWelsEncCtx* pEncCtx, RC_MODES iRcMode) {
     pRcf->pfWelsRcPostFrameSkipping = WelsRcPostFrameSkipping;
     break;
   case RC_TIMESTAMP_MODE:
-    if (pEncCtx->pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME) {
-      pRcf->pfWelsRcPictureInit = WelRcPictureInitScc;
-      pRcf->pfWelsRcPictureInfoUpdate = WelsRcPictureInfoUpdateScc;
-      pRcf->pfWelsRcMbInit = WelsRcMbInitScc;
-      pRcf->pfWelsRcMbInfoUpdate = WelsRcMbInfoUpdateDisable;
 
-    } else {
-      pRcf->pfWelsRcPictureInit = WelsRcPictureInitGom;
-      pRcf->pfWelsRcPictureInfoUpdate = WelsRcPictureInfoUpdateGomTimeStamp;
-      pRcf->pfWelsRcMbInit = WelsRcMbInitGom;
-      pRcf->pfWelsRcMbInfoUpdate = WelsRcMbInfoUpdateGom;
-    }
+    pRcf->pfWelsRcPictureInit = WelsRcPictureInitGom;
+    pRcf->pfWelsRcPictureInfoUpdate = WelsRcPictureInfoUpdateGomTimeStamp;
+    pRcf->pfWelsRcMbInit = WelsRcMbInitGom;
+    pRcf->pfWelsRcMbInfoUpdate = WelsRcMbInfoUpdateGom;
+
     pRcf->pfWelsRcPicDelayJudge = WelsRcFrameDelayJudgeTimeStamp;
     pRcf->pfWelsCheckSkipBasedMaxbr = NULL;
     pRcf->pfWelsUpdateBufferWhenSkip = NULL;
