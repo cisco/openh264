@@ -102,6 +102,10 @@ void FreeSliceBuffer (SSlice*& pSliceList,
                       CMemoryAlign* pMa,
                       const char* kpTag);
 
+void InitSliceHeadWithBase (SSlice* pSlice, SSlice* pBaseSlice);
+
+void InitSliceRefInfoWithBase (SSlice* pSlice, SSlice* pBaseSlice, const uint8_t kuiRefCount);
+
 int32_t InitSliceList (sWelsEncCtx* pCtx,
                        SDqLayer* pDqLayer,
                        SSlice*& pSliceList,
