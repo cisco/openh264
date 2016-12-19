@@ -970,7 +970,6 @@ void WelsMarkPicScreen (sWelsEncCtx* pCtx) {
 
   const int32_t iSliceNum = GetCurrentSliceNum (pCtx->pCurDqLayer);
 
-
   ppSliceList = pCtx->pCurDqLayer->ppSliceInLayer;
   WlesMarkMMCORefInfoScreen (pCtx, pLtr, ppSliceList, iSliceNum);
 

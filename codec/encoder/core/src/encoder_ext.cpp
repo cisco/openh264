@@ -2505,7 +2505,6 @@ void WelsInitCurrentLayer (sWelsEncCtx* pCtx,
   SPicture* pDecPic             = pCtx->pDecPic;
   SDqLayer* pCurDq              = pCtx->pCurDqLayer;
   SSlice*   pBaseSlice          = pCurDq->ppSliceInLayer[0];
-  SSlice*   pSlice              = NULL;
   const uint8_t kiCurDid        = pCtx->uiDependencyId;
   const bool kbUseSubsetSpsFlag = (!pParam->bSimulcastAVC) && (kiCurDid > BASE_DEPENDENCY_ID);
   SSpatialLayerConfig* fDlp     = &pParam->sSpatialLayers[kiCurDid];
@@ -2551,13 +2550,7 @@ void WelsInitCurrentLayer (sWelsEncCtx* pCtx,
 
   iIdx = 1;
   while (iIdx < iSliceCount) {
-    pSlice = pCurDq->ppSliceInLayer[iIdx];
-
-    pSlice->sSliceHeaderExt.sSliceHeader.iPpsId = pBaseSlice->sSliceHeaderExt.sSliceHeader.iPpsId;
-    pSlice->sSliceHeaderExt.sSliceHeader.pPps   = pBaseSlice->sSliceHeaderExt.sSliceHeader.pPps;
-    pSlice->sSliceHeaderExt.sSliceHeader.iSpsId = pBaseSlice->sSliceHeaderExt.sSliceHeader.iSpsId;
-    pSlice->sSliceHeaderExt.sSliceHeader.pSps   = pBaseSlice->sSliceHeaderExt.sSliceHeader.pSps;
-    pSlice->bSliceHeaderExtFlag                 = pBaseSlice->bSliceHeaderExtFlag;
+    InitSliceHeadWithBase (pCurDq->ppSliceInLayer[iIdx], pBaseSlice);
     ++ iIdx;
   }
 
@@ -3740,6 +3733,9 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
                    pParam->sSliceArgument.uiSliceMode, pCtx->iEncoderError);
           return pCtx->iEncoderError;
         }
+
+        //TO DO: add update ppSliceInLayer module based on pSliceInThread[ThreadNum]
+        // UpdateSliceInLayerInfo(); // reordering
 
         //TO DO: add update ppSliceInLayer module based on pSliceInThread[ThreadNum]
         // UpdateSliceInLayerInfo(); // reordering

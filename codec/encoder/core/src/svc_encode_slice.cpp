@@ -1091,25 +1091,27 @@ int32_t InitSliceInLayer (sWelsEncCtx* pCtx,
   return ENC_RETURN_SUCCESS;
 }
 
-static inline int32_t InitSliceHeadWithBase (SSlice* pSlice, SSlice* pBaseSlice, const uint8_t kuiRefCount) {
+void InitSliceHeadWithBase (SSlice* pSlice, SSlice* pBaseSlice) {
   SSliceHeaderExt* pBaseSHExt  = &pBaseSlice->sSliceHeaderExt;
   SSliceHeaderExt* pSHExt      = &pSlice->sSliceHeaderExt;
-
-  if (NULL == pSlice || NULL == pBaseSlice)
-    return ENC_RETURN_INVALIDINPUT;
 
   pSlice->bSliceHeaderExtFlag  = pBaseSlice->bSliceHeaderExtFlag;
   pSHExt->sSliceHeader.iPpsId     = pBaseSHExt->sSliceHeader.iPpsId;
   pSHExt->sSliceHeader.pPps       = pBaseSHExt->sSliceHeader.pPps;
   pSHExt->sSliceHeader.iSpsId     = pBaseSHExt->sSliceHeader.iSpsId;
   pSHExt->sSliceHeader.pSps       = pBaseSHExt->sSliceHeader.pSps;
+}
+
+void InitSliceRefInfoWithBase (SSlice* pSlice, SSlice* pBaseSlice, const uint8_t kuiRefCount) {
+  SSliceHeaderExt* pBaseSHExt  = &pBaseSlice->sSliceHeaderExt;
+  SSliceHeaderExt* pSHExt      = &pSlice->sSliceHeaderExt;
+
   pSHExt->sSliceHeader.uiRefCount = kuiRefCount;
   memcpy (&pSHExt->sSliceHeader.sRefMarking, &pBaseSHExt->sSliceHeader.sRefMarking, sizeof (SRefPicMarking));
   memcpy (&pSHExt->sSliceHeader.sRefReordering, &pBaseSHExt->sSliceHeader.sRefReordering,
           sizeof (SRefPicListReorderSyntax));
-  return ENC_RETURN_SUCCESS;
-
 }
+
 static inline int32_t InitSliceRC (SSlice* pSlice, const int32_t kiGlobalQp, const int32_t kiBitsPerMb) {
 
   if (NULL == pSlice || kiGlobalQp < 0 ||  kiBitsPerMb < 0)
@@ -1195,11 +1197,8 @@ int32_t ReallocateSliceList (sWelsEncCtx* pCtx,
       return iRet;
     }
 
-    iRet = InitSliceHeadWithBase (pSlice, pBaseSlice, pCtx->iNumRef0);
-    if (ENC_RETURN_SUCCESS != iRet) {
-      FreeSliceBuffer(pNewSliceList, kiMaxSliceNumNew, pMA, "ReallocateSliceList()::InitSliceBsBuffer()");
-      return iRet;
-    }
+    InitSliceHeadWithBase (pSlice, pBaseSlice);
+    InitSliceRefInfoWithBase (pSlice, pBaseSlice, pCtx->iNumRef0);
 
     iRet = InitSliceRC (pSlice, pCtx->iGlobalQp, iBitsPerMb);
     if (ENC_RETURN_SUCCESS != iRet) {
