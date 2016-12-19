@@ -492,6 +492,7 @@ int32_t InitSlicePEncCtx (SDqLayer* pCurDq,
   return 0;
 }
 
+
 /*!
  * \brief   Uninitialize Wels SSlice context (Single/multiple slices and FMO)
  *

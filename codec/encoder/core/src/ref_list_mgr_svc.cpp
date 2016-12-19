@@ -686,7 +686,8 @@ void WelsUpdateSliceHeaderSyntax (sWelsEncCtx* pCtx,  const int32_t iAbsDiffPicN
 void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t iPOC, const int32_t uiFrameType) {
 
   int32_t iAbsDiffPicNumMinus1   = -1;
-  SSlice** pSliceList = NULL;
+
+  SSlice** ppSliceList = NULL;
   SSpatialLayerInternal* pParamD    = &pCtx->pSvcParam->sDependencyLayers[pCtx->uiDependencyId];
   /*syntax for ref_pic_list_reordering()*/
   if (pCtx->iNumRef0 > 0) {
@@ -700,9 +701,8 @@ void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t iPOC, const int32_t u
     }
   }
 
-  pSliceList = pCtx->pCurDqLayer->ppSliceInLayer;
-  WelsUpdateSliceHeaderSyntax (pCtx, iAbsDiffPicNumMinus1, pSliceList, uiFrameType);
-
+  ppSliceList = pCtx->pCurDqLayer->ppSliceInLayer;
+  WelsUpdateSliceHeaderSyntax (pCtx, iAbsDiffPicNumMinus1, ppSliceList, uiFrameType);
 }
 
 static inline void UpdateOriginalPicInfo (SPicture* pOrigPic, SPicture* pReconPic) {
