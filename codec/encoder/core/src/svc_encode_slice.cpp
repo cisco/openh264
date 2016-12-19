@@ -1325,6 +1325,110 @@ int32_t ReallocSliceBuffer (sWelsEncCtx* pCtx) {
   return ENC_RETURN_SUCCESS;
 }
 
+/*
+int32_t ReOrderSliceInLayer (SDqLayer* pCurLayer,
+                             const int32_t kiThreadNum,
+                             const int32_t kiPartitionNum) {
+  SSlice* pSliceInThread    = NULL;
+  int32_t iThreadIdx        = 0;
+  int32_t iPartitionIdx     = 0;
+  int32_t iPartitionID      = 0;
+  int32_t iSliceIdx         = 0;
+  int32_t iSliceNumInThread = 0;
+  int32_t iPartitionOffset  = 0;
+  int32_t iActualSliceIdx   = 0;
+  int32_t aiPartitionOffset[MAX_THREADS_NUM] = {0};
+
+  //for non-dynamic slice mode, kiPartitionNum = 1, iPartitionOffset = 0
+  for(iPartitionIdx = 0; iPartitionIdx < kiPartitionNum; iPartitionIdx++) {
+    aiPartitionOffset[iPartitionIdx] = iPartitionOffset;
+    iPartitionOffset                += pCurLayer->pNumSliceCodedOfPartition[iPartitionIdx];
+  }
+
+  for (iThreadIdx = 0; iThreadIdx < kiThreadNum; iThreadIdx++) {
+    iSliceNumInThread = pCurLayer->sSliceThreadInfo.iEncodedSliceNumInThread[iThreadIdx];
+
+    for(iSliceIdx =0; iSliceIdx < iSliceNumInThread; iSliceIdx++) {
+      pSliceInThread = pCurLayer->sSliceThreadInfo.pSliceInThread[iThreadIdx] + iSliceIdx;
+      if (NULL == pSliceInThread) {
+        return ENC_RETURN_UNEXPECTED;
+      }
+
+      iPartitionID    = pSliceInThread->uiSliceIdx % kiPartitionNum;
+      iActualSliceIdx = aiPartitionOffset[iPartitionID] + pSliceInThread->uiSliceIdx / kiPartitionNum;
+      pCurLayer->ppSliceInLayer[iActualSliceIdx] = pSliceInThread;
+    }
+  }
+
+  return ENC_RETURN_SUCCESS;
+}
+
+static inline int32_t CheckAllSliceBuffer(SDqLayer* pCurLayer, const int32_t kiCodedSliceNum) {
+  int32_t iSliceIdx = 0;
+  for(; iSliceIdx <kiCodedSliceNum ; iSliceIdx ++ ) {
+    if ( NULL == pCurLayer->ppSliceInLayer[iSliceIdx]) {
+      return ENC_RETURN_UNEXPECTED;
+    }
+
+    if ( iSliceIdx != pCurLayer->ppSliceInLayer[iSliceIdx]->uiSliceIdx) {
+      return ENC_RETURN_UNEXPECTED;
+    }
+  }
+
+  return ENC_RETURN_SUCCESS;
+}
+
+int32_t SliceLayerInfoUpdate (sWelsEncCtx* pCtx, const int32_t kiDlayerIndex) {
+
+  CMemoryAlign* pMA       = pCtx->pMemAlign;
+  SDqLayer* pCurLayer     = pCtx->pCurDqLayer;
+  SSlice** ppSlice        = NULL;
+  int32_t iCodedSliceNum  = 0;
+  int32_t iThreadIdx      = 0;
+  int32_t iRet            = 0;
+  SSliceArgument* pSliceArgument = & pCtx->pSvcParam->sSpatialLayers[kiDlayerIndex].sSliceArgument;
+  int32_t iPartitionNum   = (SM_SIZELIMITED_SLICE == pSliceArgument->uiSliceMode) ? pCtx->iActiveThreadsNum : 1;
+
+  for ( ; iThreadIdx < pCtx->iActiveThreadsNum; iThreadIdx++) {
+    iCodedSliceNum += pCurLayer->sSliceThreadInfo.iMaxSliceNumInThread[iThreadIdx];
+  }
+
+  if (iCodedSliceNum <= 0) {
+    return ENC_RETURN_UNEXPECTED;
+  }
+
+  //reallocate ppSliceInLayer if total encoded slice num exceed max slice num
+  if (iCodedSliceNum > pCurLayer->sSliceEncCtx.iMaxSliceNumConstraint) {
+    ppSlice = (SSlice**)pMA->WelsMallocz (sizeof (SSlice*) * iCodedSliceNum, "ppSlice");
+    if (NULL == ppSlice) {
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "CWelsH264SVCEncoder::SliceLayerInfoUpdate: ppSlice is NULL");
+      return ENC_RETURN_MEMALLOCERR;
+    }
+
+    pMA->WelsFree (pCurLayer->ppSliceInLayer, "ppSliceInLayer");
+    pCurLayer->ppSliceInLayer = ppSlice;
+    pCurLayer->sSliceEncCtx.iMaxSliceNumConstraint = iCodedSliceNum;
+  }
+
+  //update ppSliceInLayer based on pSliceInThread, reordering based on slice index
+  iRet = ReOrderSliceInLayer (pCurLayer, pCtx->iActiveThreadsNum, iPartitionNum);
+  if (ENC_RETURN_SUCCESS != iRet) {
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR,
+             "CWelsH264SVCEncoder::SliceLayerInfoUpdate: ReOrderSliceInLayer failed");
+    return iRet;
+  }
+
+  iRet = CheckAllSliceBuffer(pCurLayer, pCtx->iActiveThreadsNum);
+  if (ENC_RETURN_SUCCESS != iRet) {
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR,
+             "CWelsH264SVCEncoder::SliceLayerInfoUpdate: ReOrderSliceInLayerDynamic failed");
+    return iRet;
+  }
+
+  return ENC_RETURN_SUCCESS;
+}
+*/
+
 int32_t WelsCodeOneSlice (sWelsEncCtx* pEncCtx, const int32_t kiSliceIdx, const int32_t kiNalType) {
   SDqLayer* pCurLayer                   = pEncCtx->pCurDqLayer;
   SNalUnitHeaderExt* pNalHeadExt        = &pCurLayer->sLayerInfo.sNalHeaderExt;

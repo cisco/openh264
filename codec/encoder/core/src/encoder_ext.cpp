@@ -989,7 +989,6 @@ void  FreeRefList (SRefList*& pRefList, CMemoryAlign* pMa, const int iMaxNumRefF
   pRefList = NULL;
 }
 
-
 /*!
  * \brief   initialize ppDqLayerList and slicepEncCtx_list due to count number of layers available
  * \pParam  pCtx            sWelsEncCtx*
@@ -3781,6 +3780,9 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
                    pParam->sSliceArgument.uiSliceMode, pCtx->iEncoderError);
           return pCtx->iEncoderError;
         }
+
+        //TO DO: add update ppSliceInLayer module based on pSliceInThread[ThreadNum]
+        // UpdateSliceInLayerInfo(); // reordering
 
         //TO DO: add update ppSliceInLayer module based on pSliceInThread[ThreadNum]
         // UpdateSliceInLayerInfo(); // reordering
