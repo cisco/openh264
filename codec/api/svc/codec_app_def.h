@@ -235,6 +235,7 @@ typedef struct {
   unsigned int uiIDRPicId;           ///< distinguish request from different IDR
   int          iLastCorrectFrameNum;
   int          iCurrentFrameNum;     ///< specify current decoder frame_num.
+  int          iLayerId;           //specify the layer for recovery request
 } SLTRRecoverRequest;
 
 /**
@@ -244,6 +245,7 @@ typedef struct {
   unsigned int  uiFeedbackType; ///< mark failed or successful
   unsigned int  uiIDRPicId;     ///< distinguish request from different IDR
   int           iLTRFrameNum;   ///< specify current decoder frame_num
+  int           iLayerId;        //specify the layer for LTR marking feedback
 } SLTRMarkingFeedback;
 
 /**
