@@ -132,6 +132,7 @@ int32_t NeedDynamicAdjust (SSlice** ppSliceInLayer, const int32_t iSliceNum) {
     if ( NULL == ppSliceInLayer[iSliceIdx] ) {
       return false;
     }
+
     uiTotalConsume += ppSliceInLayer[iSliceIdx]->uiSliceConsumeTime;
     iSliceIdx ++;
   }
