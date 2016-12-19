@@ -658,7 +658,7 @@ void  DeblockingFilterFrameAvcbase (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc) {
   const int32_t kiMbWidth   = pCurDq->iMbWidth;
   const int32_t kiMbHeight  = pCurDq->iMbHeight;
   SMB* pCurrentMbBlock      = pCurDq->sMbDataP;
-  SSliceHeaderExt* sSliceHeaderExt = &pCurDq->sLayerInfo.pSliceInLayer[0].sSliceHeaderExt;
+  SSliceHeaderExt* sSliceHeaderExt = &pCurDq->ppSliceInLayer[0]->sSliceHeaderExt;
   SDeblockingFilter pFilter;
 
   /* Step1: parameters set */
@@ -692,7 +692,7 @@ void  DeblockingFilterFrameAvcbase (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc) {
 
 void DeblockingFilterSliceAvcbase (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc, const int32_t kiSliceIdx) {
   SMB* pMbList                          = pCurDq->sMbDataP;
-  SSliceHeaderExt* sSliceHeaderExt      = &pCurDq->sLayerInfo.pSliceInLayer[kiSliceIdx].sSliceHeaderExt;
+  SSliceHeaderExt* sSliceHeaderExt      = &pCurDq->ppSliceInLayer[kiSliceIdx]->sSliceHeaderExt;
   SMB* pCurrentMbBlock;
 
   const int32_t kiMbWidth               = pCurDq->iMbWidth;
