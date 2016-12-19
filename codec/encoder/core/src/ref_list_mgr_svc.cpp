@@ -686,7 +686,6 @@ void WelsUpdateSliceHeaderSyntax (sWelsEncCtx* pCtx,  const int32_t iAbsDiffPicN
 void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t iPOC, const int32_t uiFrameType) {
 
   int32_t iAbsDiffPicNumMinus1   = -1;
-
   SSlice** ppSliceList = NULL;
   SSpatialLayerInternal* pParamD    = &pCtx->pSvcParam->sDependencyLayers[pCtx->uiDependencyId];
   /*syntax for ref_pic_list_reordering()*/
@@ -970,6 +969,8 @@ void WelsMarkPicScreen (sWelsEncCtx* pCtx) {
   }
 
   const int32_t iSliceNum = GetCurrentSliceNum (pCtx->pCurDqLayer);
+
+
   ppSliceList = pCtx->pCurDqLayer->ppSliceInLayer;
   WlesMarkMMCORefInfoScreen (pCtx, pLtr, ppSliceList, iSliceNum);
 
