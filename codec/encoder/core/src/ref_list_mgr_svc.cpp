@@ -494,7 +494,6 @@ void WlesMarkMMCORefInfo (sWelsEncCtx* pCtx, SLTRState* pLtr,
 void WelsMarkPic (sWelsEncCtx* pCtx) {
   SLTRState* pLtr               = &pCtx->pLtr[pCtx->uiDependencyId];
   const int32_t kiCountSliceNum = GetCurrentSliceNum (pCtx->pCurDqLayer);
-  SSlice** ppSliceList          = NULL;
 
   if (pCtx->pSvcParam->bEnableLongTermReference && pLtr->bLTRMarkEnable && pCtx->uiTemporalId == 0) {
     if (!pLtr->bReceivedT0LostFlag && pLtr->uiLtrMarkInterval > pCtx->pSvcParam->iLtrMarkPeriod
@@ -512,8 +511,7 @@ void WelsMarkPic (sWelsEncCtx* pCtx) {
     }
   }
 
-  ppSliceList = pCtx->pCurDqLayer->ppSliceInLayer;
-  WlesMarkMMCORefInfo (pCtx, pLtr, ppSliceList, kiCountSliceNum);
+  WlesMarkMMCORefInfo (pCtx, pLtr, pCtx->pCurDqLayer->ppSliceInLayer, kiCountSliceNum);
 }
 
 int32_t FilterLTRRecoveryRequest (sWelsEncCtx* pCtx, SLTRRecoverRequest* pLTRRecoverRequest) {
@@ -710,9 +708,8 @@ void WelsUpdateSliceHeaderSyntax (sWelsEncCtx* pCtx,  const int32_t iAbsDiffPicN
  */
 void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t iPOC, const int32_t uiFrameType) {
 
-  int32_t iAbsDiffPicNumMinus1   = -1;
-  SSlice** ppSliceList = NULL;
-  SSpatialLayerInternal* pParamD    = &pCtx->pSvcParam->sDependencyLayers[pCtx->uiDependencyId];
+  int32_t iAbsDiffPicNumMinus1    = -1;
+  SSpatialLayerInternal* pParamD  = &pCtx->pSvcParam->sDependencyLayers[pCtx->uiDependencyId];
   /*syntax for ref_pic_list_reordering()*/
   if (pCtx->iNumRef0 > 0) {
     iAbsDiffPicNumMinus1 = pParamD->iFrameNum - (pCtx->pRefList0[0]->iFrameNum) - 1;
@@ -725,8 +722,7 @@ void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t iPOC, const int32_t u
     }
   }
 
-  ppSliceList = pCtx->pCurDqLayer->ppSliceInLayer;
-  WelsUpdateSliceHeaderSyntax (pCtx, iAbsDiffPicNumMinus1, ppSliceList, uiFrameType);
+  WelsUpdateSliceHeaderSyntax (pCtx, iAbsDiffPicNumMinus1, pCtx->pCurDqLayer->ppSliceInLayer, uiFrameType);
 }
 
 static inline void UpdateOriginalPicInfo (SPicture* pOrigPic, SPicture* pReconPic) {
@@ -916,7 +912,7 @@ void WelsMarkPicScreen (sWelsEncCtx* pCtx) {
   SLTRState* pLtr          = &pCtx->pLtr[pCtx->uiDependencyId];
   int32_t iMaxTid          = WELS_LOG2 (pCtx->pSvcParam->uiGopSize);
   int32_t iMaxActualLtrIdx = -1;
-  SSlice** ppSliceList     = NULL;
+
   SSpatialLayerInternal* pParamD    = &pCtx->pSvcParam->sDependencyLayers[pCtx->uiDependencyId];
   if (pCtx->pSvcParam->bEnableLongTermReference)
     iMaxActualLtrIdx = pCtx->pSvcParam->iNumRefFrame - STR_ROOM - 1 -  WELS_MAX (iMaxTid , 1);
@@ -993,8 +989,7 @@ void WelsMarkPicScreen (sWelsEncCtx* pCtx) {
 
   const int32_t iSliceNum = GetCurrentSliceNum (pCtx->pCurDqLayer);
 
-  ppSliceList = pCtx->pCurDqLayer->ppSliceInLayer;
-  WlesMarkMMCORefInfoScreen (pCtx, pLtr, ppSliceList, iSliceNum);
+  WlesMarkMMCORefInfoScreen (pCtx, pLtr, pCtx->pCurDqLayer->ppSliceInLayer, iSliceNum);
 
   return;
 }
