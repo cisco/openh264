@@ -1170,6 +1170,7 @@ static inline int32_t InitDqLayers (sWelsEncCtx** ppCtx, SExistingParasetList* p
     pParamInternal->iFrameIndex = 0;
     pParamInternal->iFrameNum = 0;
     pParamInternal->iPOC = 0;
+    pParamInternal->uiIdrPicId = 0;
     pParamInternal->bEncCurFrmAsIdrFlag = true;  // make sure first frame is IDR
     // pDq layers list
     pDqLayer = (SDqLayer*)pMa->WelsMallocz (sizeof (SDqLayer), "pDqLayer");
@@ -2658,7 +2659,7 @@ void WelsInitCurrentLayer (sWelsEncCtx* pCtx,
   int32_t iCurSpsId = pDqIdc->iSpsId;
 
   iCurPpsId = pCtx->pFuncList->pParametersetStrategy->GetCurrentPpsId (iCurPpsId,
-              WELS_ABS (pCtx->uiIdrPicId - 1) % MAX_PPS_COUNT);
+              WELS_ABS (pParamInternal->uiIdrPicId - 1) % MAX_PPS_COUNT);
 
   pBaseSlice->sSliceHeaderExt.sSliceHeader.iPpsId       = iCurPpsId;
   pCurDq->sLayerInfo.pPpsP                              =
@@ -3243,7 +3244,14 @@ int32_t WriteSsvcParaset (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
   int32_t iNonVclSize = 0, iCountNal = 0, iReturn = ENC_RETURN_SUCCESS;
   iReturn = WelsWriteParameterSets (pCtx, &pLayerBsInfo->pNalLengthInByte[0], &iCountNal, &iNonVclSize);
   WELS_VERIFY_RETURN_IFNEQ (iReturn, ENC_RETURN_SUCCESS)
-
+  for (int32_t iSpatialId = 0; iSpatialId < kiSpatialNum; iSpatialId++) {
+    SSpatialLayerInternal* pParamInternal = &pCtx->pSvcParam->sDependencyLayers[iSpatialId];
+    if (pParamInternal->uiIdrPicId < 65535) {
+      ++ pParamInternal->uiIdrPicId;
+    } else {
+      pParamInternal->uiIdrPicId = 0;
+    }
+  }
   pLayerBsInfo->uiSpatialId     = 0;
   pLayerBsInfo->uiTemporalId    = 0;
   pLayerBsInfo->uiQualityId     = 0;
@@ -3359,7 +3367,15 @@ int32_t WriteSavcParaset_Listing (sWelsEncCtx* pCtx, const int32_t kiSpatialNum,
   iNonVclSize = 0;
 
   for (int32_t iSpatialId = 0; iSpatialId < kiSpatialNum; iSpatialId++) {
+    SSpatialLayerInternal* pParamInternal = &pCtx->pSvcParam->sDependencyLayers[iSpatialId];
+    if (pParamInternal->uiIdrPicId < 65535) {
+      ++ pParamInternal->uiIdrPicId;
+    } else {
+      pParamInternal->uiIdrPicId = 0;
+    }
+
     iCountNal = 0;
+
     for (int32_t iIdx = 0; iIdx < pCtx->iSpsNum; iIdx++) {
       //writing one NAL
       int32_t iNalSize = 0;
@@ -3456,7 +3472,7 @@ void StackBackEncoderStatus (sWelsEncCtx* pEncCtx,
     pEncCtx->eSliceType   = P_SLICE;
     //pEncCtx->eNalPriority = pEncCtx->eLastNalPriority; //not need this since eNalPriority will be updated at the beginning of coding a frame
   } else if (keFrameType == videoFrameTypeIDR) {
-    pEncCtx->uiIdrPicId --;
+    pParamInternal->uiIdrPicId --;
 
     //set the next frame to be IDR
     ForceCodingIDR (pEncCtx, pEncCtx->uiDependencyId);
@@ -3510,7 +3526,7 @@ EVideoFrameType PrepareEncodeFrame (sWelsEncCtx* pCtx, SLayerBSInfo*& pLayerBsIn
   } else {
     SSpatialLayerInternal* pParamInternal = &pSvcParam->sDependencyLayers[iCurDid];
 
-    iCurTid = GetTemporalLevel (&pSvcParam->sDependencyLayers[iCurDid], pParamInternal->iCodingIndex,
+    iCurTid = GetTemporalLevel (pParamInternal, pParamInternal->iCodingIndex,
                                 pSvcParam->uiGopSize);
     pCtx->uiTemporalId = iCurTid;
     if (eFrameType == videoFrameTypeIDR) {
@@ -3519,15 +3535,14 @@ EVideoFrameType PrepareEncodeFrame (sWelsEncCtx* pCtx, SLayerBSInfo*& pLayerBsIn
       if (! (SPS_LISTING & pCtx->pSvcParam->eSpsPpsIdStrategy)) {
         if (pSvcParam->bSimulcastAVC) {
           pCtx->iEncoderError = WriteSavcParaset (pCtx, iCurDid, pLayerBsInfo, iLayerNum, iFrameSize);
-          ++ pCtx->uiIdrPicId;
+          ++ pParamInternal->uiIdrPicId;
         } else {
           pCtx->iEncoderError = WriteSsvcParaset (pCtx, iSpatialNum, pLayerBsInfo, iLayerNum, iFrameSize);
-          ++ pCtx->uiIdrPicId;
         }
       } else {
         pCtx->iEncoderError = WriteSavcParaset_Listing (pCtx, iSpatialNum, pLayerBsInfo, iLayerNum, iFrameSize);
 
-        ++ pCtx->uiIdrPicId;
+
       }
     }
   }
@@ -4331,7 +4346,12 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
     int32_t iOldSpsPpsIdStrategy = pOldParam->eSpsPpsIdStrategy;
     SParaSetOffsetVariable sTmpPsoVariable[PARA_SET_TYPE];
     int32_t  iTmpPpsIdList[MAX_DQ_LAYER_NUM * MAX_PPS_COUNT];
-    uint16_t uiTmpIdrPicId = (*ppCtx)->uiIdrPicId;//this is for LTR!
+    //for LTR or SPS,PPS ID update
+    uint16_t uiMaxIdrPicId = 0;
+    for (iIndexD = 0; iIndexD < pOldParam->iSpatialLayerNum; iIndexD++) {
+      if (pOldParam->sDependencyLayers[iIndexD].uiIdrPicId > uiMaxIdrPicId)
+        uiMaxIdrPicId = pOldParam->sDependencyLayers[iIndexD].uiIdrPicId;
+    }
 
     SEncoderStatistics sTempEncoderStatistics[MAX_DEPENDENCY_LAYER];
     memcpy (sTempEncoderStatistics, (*ppCtx)->sEncoderStatistics, sizeof (sTempEncoderStatistics));
@@ -4355,8 +4375,10 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
     if (WelsInitEncoderExt (ppCtx, pNewParam, &sLogCtx, pExistingParasetList))
       return 1;
     //if WelsInitEncoderExt succeed
-    //for LTR
-    (*ppCtx)->uiIdrPicId = uiTmpIdrPicId ;//this is for LTR!; //this is for LTR!
+    //for LTR or SPS,PPS ID update
+    for (iIndexD = 0; iIndexD < pNewParam->iSpatialLayerNum; iIndexD++) {
+      pNewParam->sDependencyLayers[iIndexD].uiIdrPicId = uiMaxIdrPicId;
+    }
 
     //for sEncoderStatistics
     memcpy ((*ppCtx)->sEncoderStatistics, sTempEncoderStatistics, sizeof (sTempEncoderStatistics));
@@ -4446,7 +4468,6 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
       /* Derived variants below */
       pOldDlpInternal->iTemporalResolution      = pNewDlpInternal->iTemporalResolution;
       pOldDlpInternal->iDecompositionStages     = pNewDlpInternal->iDecompositionStages;
-
       memcpy (pOldDlpInternal->uiCodingIdx2TemporalId, pNewDlpInternal->uiCodingIdx2TemporalId,
               sizeof (pOldDlpInternal->uiCodingIdx2TemporalId)); // confirmed_safe_unsafe_usage
       ++ iIndexD;

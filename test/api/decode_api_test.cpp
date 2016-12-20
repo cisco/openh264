@@ -190,6 +190,8 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_AVC_NOPREFIX) {
   SLTRMarkingFeedback m_LTR_Marking_Feedback;
   SLTRRecoverRequest m_LTR_Recover_Request;
   m_LTR_Recover_Request.uiIDRPicId = 0;
+  m_LTR_Recover_Request.iLayerId = 0;
+  m_LTR_Marking_Feedback.iLayerId = 0;
   EncodeDecodeFileParamBase p = GetParam();
   prepareParamDefault (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
   param_.bPrefixNalAddingCtrl = false;
@@ -259,6 +261,8 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_AVC_WITH_PREFIX_NOLOSS) {
   SLTRMarkingFeedback m_LTR_Marking_Feedback;
   SLTRRecoverRequest m_LTR_Recover_Request;
   m_LTR_Recover_Request.uiIDRPicId = 0;
+  m_LTR_Recover_Request.iLayerId = 0;
+  m_LTR_Marking_Feedback.iLayerId = 0;
   EncodeDecodeFileParamBase p = GetParam();
   prepareParamDefault (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
   param_.bPrefixNalAddingCtrl = true;
@@ -314,6 +318,8 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_SVC_L1_NOLOSS) {
   SLTRMarkingFeedback m_LTR_Marking_Feedback;
   SLTRRecoverRequest m_LTR_Recover_Request;
   m_LTR_Recover_Request.uiIDRPicId = 0;
+  m_LTR_Recover_Request.iLayerId = 0;
+  m_LTR_Marking_Feedback.iLayerId = 0;
   EncodeDecodeFileParamBase p = GetParam();
   prepareParamDefault (2, p.slicenum,  p.width, p.height, p.frameRate, &param_);
   param_.iTemporalLayerNum = (rand() % 4) + 1;
@@ -370,6 +376,8 @@ TEST_P (EncodeDecodeTestAPI, SetOption_Trace) {
   SLTRMarkingFeedback m_LTR_Marking_Feedback;
   SLTRRecoverRequest m_LTR_Recover_Request;
   m_LTR_Recover_Request.uiIDRPicId = 0;
+  m_LTR_Recover_Request.iLayerId = 0;
+  m_LTR_Marking_Feedback.iLayerId = 0;
   EncodeDecodeFileParamBase p = GetParam();
   prepareParamDefault (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
   param_.iSpatialLayerNum = 1;
@@ -434,6 +442,8 @@ TEST_P (EncodeDecodeTestAPI, SetOption_Trace_NULL) {
   SLTRMarkingFeedback m_LTR_Marking_Feedback;
   SLTRRecoverRequest m_LTR_Recover_Request;
   m_LTR_Recover_Request.uiIDRPicId = 0;
+  m_LTR_Recover_Request.iLayerId = 0;
+  m_LTR_Marking_Feedback.iLayerId = 0;
   EncodeDecodeFileParamBase p = GetParam();
   prepareParamDefault (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
   param_.iSpatialLayerNum = 1;

@@ -45,6 +45,8 @@ TEST_P (EncodeDecodeTestAPI, GetOptionLTR_ALLIDR) {
 TEST_P (EncodeDecodeTestAPI, GetOptionLTR_ALLLTR) {
   SLTRMarkingFeedback m_LTR_Marking_Feedback;
   SLTRRecoverRequest m_LTR_Recover_Request;
+  m_LTR_Recover_Request.iLayerId = 0;
+  m_LTR_Marking_Feedback.iLayerId = 0;
   EncodeDecodeFileParamBase p = GetParam();
   prepareParamDefault (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
   encoder_->Uninitialize();
@@ -105,6 +107,8 @@ TEST_P (EncodeDecodeTestAPI, GetOptionLTR_Engine) {
   SLTRMarkingFeedback m_LTR_Marking_Feedback;
   SLTRRecoverRequest m_LTR_Recover_Request;
   m_LTR_Recover_Request.uiIDRPicId = 0;
+  m_LTR_Recover_Request.iLayerId = 0;
+  m_LTR_Marking_Feedback.iLayerId = 0;
   EncodeDecodeFileParamBase p = GetParam();
   prepareParamDefault (1, p.slicenum,  p.width, p.height, p.frameRate, &param_);
   encoder_->Uninitialize();

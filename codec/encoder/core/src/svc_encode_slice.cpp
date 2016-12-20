@@ -97,8 +97,7 @@ void WelsSliceHeaderExtInit (sWelsEncCtx* pEncCtx, SDqLayer* pCurLayer, SSlice* 
   pCurSliceHeader->iFirstMbInSlice = WelsGetFirstMbOfSlice (pCurLayer->sLayerInfo.pSliceInLayer, pSlice->uiSliceIdx);
 
   pCurSliceHeader->iFrameNum      = pParamInternal->iFrameNum;
-  pCurSliceHeader->uiIdrPicId     = pEncCtx->uiIdrPicId;
-
+  pCurSliceHeader->uiIdrPicId     = pParamInternal->uiIdrPicId;
   pCurSliceHeader->iPicOrderCntLsb = pEncCtx->pEncPic->iFramePoc;      // 0
 
   if (P_SLICE == pEncCtx->eSliceType) {
