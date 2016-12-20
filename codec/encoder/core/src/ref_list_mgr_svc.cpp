@@ -707,7 +707,6 @@ void WelsUpdateSliceHeaderSyntax (sWelsEncCtx* pCtx,  const int32_t iAbsDiffPicN
  *  update syntax for reference base related
  */
 void WelsUpdateRefSyntax (sWelsEncCtx* pCtx, const int32_t iPOC, const int32_t uiFrameType) {
-
   int32_t iAbsDiffPicNumMinus1    = -1;
   SSpatialLayerInternal* pParamD  = &pCtx->pSvcParam->sDependencyLayers[pCtx->uiDependencyId];
   /*syntax for ref_pic_list_reordering()*/
