@@ -113,13 +113,13 @@ WelsErrorType CWelsSliceEncodingTask::InitTask() {
   }
 
   //  InitOneSliceInThread();
-  SetOneSliceBsBufferUnderMultithread (m_pCtx, m_iThreadIdx, m_iSliceIdx);
-
-  m_pSlice = m_pCtx->pCurDqLayer->ppSliceInLayer[m_iSliceIdx];
+  m_pSlice   = m_pCtx->pCurDqLayer->ppSliceInLayer[m_iSliceIdx];
   m_pSliceBs = &m_pSlice->sSliceBs;
 
   m_pSliceBs->uiBsPos       = 0;
   m_pSliceBs->iNalIndex     = 0;
+
+  SetOneSliceBsBufferUnderMultithread (m_pCtx, m_iThreadIdx, m_pSlice);
 
   assert ((void*) (&m_pSliceBs->sBsWrite) == (void*)m_pSlice->pSliceBsa);
   InitBits (&m_pSliceBs->sBsWrite, m_pSliceBs->pBsBuffer, m_pSliceBs->uiSize);
@@ -262,12 +262,13 @@ WelsErrorType CWelsConstrainedSizeSlicingEncodingTask::ExecuteTask() {
       return ENC_RETURN_KNOWN_ISSUE;
     }
 
-    SetOneSliceBsBufferUnderMultithread (m_pCtx, m_iThreadIdx, iLocalSliceIdx);
     m_pSlice = pCurDq->ppSliceInLayer[iLocalSliceIdx];
     m_pSliceBs = &m_pSlice->sSliceBs;
 
     m_pSliceBs->uiBsPos     = 0;
     m_pSliceBs->iNalIndex   = 0;
+
+    SetOneSliceBsBufferUnderMultithread (m_pCtx, m_iThreadIdx, m_pSlice);
     InitBits (&m_pSliceBs->sBsWrite, m_pSliceBs->pBsBuffer, m_pSliceBs->uiSize);
 
     if (m_bNeedPrefix) {
