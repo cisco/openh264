@@ -3749,6 +3749,9 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         //TO DO: add update ppSliceInLayer module based on pSliceInThread[ThreadNum]
         // UpdateSliceInLayerInfo(); // reordering
 
+        //TO DO: add update ppSliceInLayer module based on pSliceInThread[ThreadNum]
+        // UpdateSliceInLayerInfo(); // reordering
+
         iLayerSize = AppendSliceToFrameBs (pCtx, pLayerBsInfo, kiPartitionCnt);
       } else { // for non-dynamic-slicing mode single threading branch..
         const bool bNeedPrefix = pCtx->bNeedPrefixNalFlag;
