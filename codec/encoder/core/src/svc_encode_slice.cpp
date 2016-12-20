@@ -946,7 +946,7 @@ int32_t InitSliceList (sWelsEncCtx* pCtx,
                               iMaxSliceBufferSize,
                               pMa);
     if (ENC_RETURN_SUCCESS != iRet) {
-        return iRet;
+      return iRet;
     }
 
     iRet = InitSliceMBInfo (pSliceArgument, pSlice,
@@ -1012,14 +1012,14 @@ int32_t InitSliceThreadInfo (sWelsEncCtx* pCtx,
   int32_t iRet                        = 0;
 
   assert (iThreadNum > 0);
-  iMaxSliceNumInThread = (pCtx->iMaxSliceCount / iThreadNum + 1) * 2;
+  //iMaxSliceNumInThread = (pCtx->iMaxSliceCount / iThreadNum + 1) * 2;
+  iMaxSliceNumInThread = pDqLayer->iMaxSliceNum;
   iMaxSliceNumInThread =  WELS_MIN (pCtx->iMaxSliceCount, (int) iMaxSliceNumInThread);
 
   while (iIdx < iThreadNum) {
     pSliceThreadInfo->iMaxSliceNumInThread[iIdx]     = iMaxSliceNumInThread;
     pSliceThreadInfo->iEncodedSliceNumInThread[iIdx] = 0;
-    pSliceThreadInfo->pSliceInThread[iIdx] = (SSlice*)pMa->WelsMallocz (sizeof (SSlice) *
-        iMaxSliceNumInThread, "pSliceInThread");
+    pSliceThreadInfo->pSliceInThread[iIdx] = (SSlice*)pMa->WelsMallocz (sizeof (SSlice) * iMaxSliceNumInThread, "pSliceInThread");
     if (NULL == pSliceThreadInfo->pSliceInThread[iIdx]) {
       WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR,
                "CWelsH264SVCEncoder::InitSliceThreadInfo: pSliceThreadInfo->pSliceInThread[iIdx] is NULL");
@@ -1067,25 +1067,8 @@ int32_t InitSliceInLayer (sWelsEncCtx* pCtx,
     return iRet;
   }
 
-  pDqLayer->sLayerInfo.pSliceInLayer = (SSlice*)pMa->WelsMallocz (sizeof (SSlice) * iMaxSliceNum, "pSliceInLayer");
-  if (NULL ==  pDqLayer->sLayerInfo.pSliceInLayer) {
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR,
-             "CWelsH264SVCEncoder::InitSliceInLayer: pDqLayer->sLayerInfo.pSliceInLayeris NULL");
-    return ENC_RETURN_MEMALLOCERR;
-  }
-
-  iRet = InitSliceList (pCtx,
-                        pDqLayer,
-                        pDqLayer->sLayerInfo.pSliceInLayer,
-                        iMaxSliceNum,
-                        kiDlayerIndex,
-                        pMa);
-  if (ENC_RETURN_SUCCESS != iRet) {
-    return iRet;
-  }
-
   for (iSliceIdx = 0; iSliceIdx < iMaxSliceNum; iSliceIdx++) {
-    pDqLayer->ppSliceInLayer[iSliceIdx] = &pDqLayer->sLayerInfo.pSliceInLayer[iSliceIdx];
+    pDqLayer->ppSliceInLayer[iSliceIdx] = pDqLayer->sSliceThreadInfo.pSliceInThread[0] + iSliceIdx;
   }
 
   return ENC_RETURN_SUCCESS;
@@ -1281,7 +1264,7 @@ int32_t ReallocSliceBuffer (sWelsEncCtx* pCtx) {
   int32_t iSliceIdx        = 0;
   const int32_t kiCurDid   = pCtx->uiDependencyId;
 
-  SSlice* pLastCodedSlice        = pCurLayer->sLayerInfo.pSliceInLayer + (iMaxSliceNumOld - 1);
+  SSlice* pLastCodedSlice        = pCurLayer->sSliceThreadInfo.pSliceInThread[0] + (iMaxSliceNumOld - 1);
   SSliceArgument* pSliceArgument = & pCtx->pSvcParam->sSpatialLayers[kiCurDid].sSliceArgument;
   iRet = CalculateNewSliceNum (pCurLayer,
                                pLastCodedSlice,
@@ -1294,7 +1277,7 @@ int32_t ReallocSliceBuffer (sWelsEncCtx* pCtx) {
 
   iRet = ReallocateSliceList (pCtx,
                               pSliceArgument,
-                              pCurLayer->sLayerInfo.pSliceInLayer,
+                              pCurLayer->sSliceThreadInfo.pSliceInThread[0],
                               iMaxSliceNumOld,
                               iMaxSliceNumNew);
   if (ENC_RETURN_SUCCESS != iRet) {
@@ -1311,14 +1294,15 @@ int32_t ReallocSliceBuffer (sWelsEncCtx* pCtx) {
   pCurLayer->ppSliceInLayer = ppSlice;
 
   for (iSliceIdx = 0; iSliceIdx < iMaxSliceNumNew; iSliceIdx++) {
-    pCurLayer->ppSliceInLayer[iSliceIdx] = &pCurLayer->sLayerInfo.pSliceInLayer[iSliceIdx];
+    pCurLayer->ppSliceInLayer[iSliceIdx] = pCurLayer->sSliceThreadInfo.pSliceInThread[0] + iSliceIdx;
   }
 
   if (pCtx->iMaxSliceCount < iMaxSliceNumNew) {
     pCtx->iMaxSliceCount = iMaxSliceNumNew;
   }
 
-  pCurLayer->sSliceEncCtx.iMaxSliceNumConstraint = iMaxSliceNumNew;
+  pCurLayer->sSliceEncCtx.iMaxSliceNumConstraint      = iMaxSliceNumNew;
+  pCurLayer->sSliceThreadInfo.iMaxSliceNumInThread[0] = iMaxSliceNumNew;
   pCurLayer->iMaxSliceNum = iMaxSliceNumNew;
   return ENC_RETURN_SUCCESS;
 }
