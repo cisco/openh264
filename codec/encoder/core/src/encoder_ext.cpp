@@ -2464,6 +2464,7 @@ void UpdateSlicepEncCtxWithPartition (SDqLayer* pCurDq, int32_t iPartitionNum) {
 void WelsInitCurrentDlayerMltslc (sWelsEncCtx* pCtx, int32_t iPartitionNum) {
   SDqLayer* pCurDq      = pCtx->pCurDqLayer;
   SSliceCtx* pSliceCtx  = &pCurDq->sSliceEncCtx;
+  uint32_t  uiMiniPacketSize  = 0;
 
   UpdateSlicepEncCtxWithPartition (pCurDq, iPartitionNum);
 
@@ -2494,12 +2495,9 @@ void WelsInitCurrentDlayerMltslc (sWelsEncCtx* pCtx, int32_t iPartitionNum) {
     }
 
     //MINPACKETSIZE_CONSTRAINT
-    if (pSliceCtx->uiSliceSizeConstraint
-        <
-        (uint32_t) (uiFrmByte//suppose 16 byte per mb at average
-                    / (pSliceCtx->iMaxSliceNumConstraint))
-       ) {
-
+    //suppose 16 byte per mb at average
+    uiMiniPacketSize = (uint32_t) (uiFrmByte / pSliceCtx->iMaxSliceNumConstraint);
+    if (pSliceCtx->uiSliceSizeConstraint < uiMiniPacketSize ) {
       WelsLog (& (pCtx->sLogCtx),
                WELS_LOG_WARNING,
                "Set-SliceConstraint(%d) too small for current resolution (MB# %d) under QP/BR!",
@@ -3772,6 +3770,9 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         //TO DO: add update ppSliceInLayer module based on pSliceInThread[ThreadNum]
         // UpdateSliceInLayerInfo(); // reordering
 
+        //TO DO: add update ppSliceInLayer module based on pSliceInThread[ThreadNum]
+        // UpdateSliceInLayerInfo(); // reordering
+
         iLayerSize = AppendSliceToFrameBs (pCtx, pLayerBsInfo, kiPartitionCnt);
       } else { // for non-dynamic-slicing mode single threading branch..
         const bool bNeedPrefix = pCtx->bNeedPrefixNalFlag;
@@ -4419,7 +4420,7 @@ int32_t FrameBsRealloc (sWelsEncCtx* pCtx,
   SDqLayer* pCurLayer = pCtx->pCurDqLayer;
 
   int32_t iCountNals = pCtx->pOut->iCountNals;
-  int32_t iMaxSliceNumOld = pCurLayer->sSliceEncCtx.iMaxSliceNumConstraint;
+  int32_t iMaxSliceNumOld = pCurLayer->iMaxSliceNum;
   int32_t iMaxSliceNum = iMaxSliceNumOld;
   iCountNals += iMaxSliceNum * (pCtx->pSvcParam->iSpatialLayerNum + pCtx->bNeedPrefixNalFlag);
   iMaxSliceNum *= SLICE_NUM_EXPAND_COEF;
@@ -4486,7 +4487,6 @@ int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
                                 ) {
 
   SDqLayer* pCurLayer                   = pCtx->pCurDqLayer;
-  SSliceCtx* pSliceCtx                  = &pCurLayer->sSliceEncCtx;
   SSlice* pStartSlice                   = pCurLayer->ppSliceInLayer[iStartSliceIdx];
   int32_t iNalIdxInLayer                = *pNalIdxInLayer;
   int32_t iSliceIdx                     = iStartSliceIdx;
@@ -4512,7 +4512,7 @@ int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
     int32_t iPayloadSize    = 0;
     SSlice* pCurSlice = NULL;
 
-    if (iSliceIdx >= (pSliceCtx->iMaxSliceNumConstraint - kiSliceIdxStep)) { // insufficient memory in pSliceInLayer[]
+    if (iSliceIdx >= (pCurLayer->iMaxSliceNum - kiSliceIdxStep)) { // insufficient memory in pSliceInLayer[]
       if (pCtx->iActiveThreadsNum == 1) {
         //only single thread support re-alloc now
         if (DynSliceRealloc (pCtx, pFrameBSInfo, pLayerBsInfo)) {
@@ -4520,10 +4520,10 @@ int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
                    "CWelsH264SVCEncoder::WelsCodeOnePicPartition: DynSliceRealloc not successful");
           return ENC_RETURN_MEMALLOCERR;
         }
-      } else if (iSliceIdx >= pSliceCtx->iMaxSliceNumConstraint) {
+      } else if (iSliceIdx >= pCurLayer->iMaxSliceNum) {
         WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR,
-                 "CWelsH264SVCEncoder::WelsCodeOnePicPartition: iSliceIdx(%d) over iMaxSliceNumConstraint(%d)", iSliceIdx,
-                 pSliceCtx->iMaxSliceNumConstraint);
+                 "CWelsH264SVCEncoder::WelsCodeOnePicPartition: iSliceIdx(%d) over iMaxSliceNum(%d)", iSliceIdx,
+                 pCurLayer->iMaxSliceNum);
         return ENC_RETURN_MEMALLOCERR;
       }
     }
