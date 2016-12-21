@@ -112,7 +112,8 @@ WelsErrorType CWelsSliceEncodingTask::InitTask() {
     return ENC_RETURN_UNEXPECTED;
   }
 
-  //  InitOneSliceInThread();
+  //m_pCtx->iEncoderError = InitOneSliceInThread (m_pCtx, m_pSlice, m_iThreadIdx, m_pCtx->uiDependencyId, m_iSliceIdx);
+  //WELS_VERIFY_RETURN_IFNEQ (m_pCtx->iEncoderError, ENC_RETURN_SUCCESS)
   m_pSlice = &m_pCtx->pCurDqLayer->sSliceThreadInfo.pSliceInThread[0][m_iSliceIdx];
   m_pSliceBs = &m_pSlice->sSliceBs;
 
@@ -195,6 +196,8 @@ WelsErrorType CWelsSliceEncodingTask::ExecuteTask() {
 #if MT_DEBUG_BS_WR
   m_pSliceBs->bSliceCodedFlag = true;
 #endif//MT_DEBUG_BS_WR
+
+  //m_pCtx->pCurDqLayer->sSliceThreadInfo.iEncodedSliceNumInThread[m_iThreadIdx] ++;
 
   return ENC_RETURN_SUCCESS;
 }
