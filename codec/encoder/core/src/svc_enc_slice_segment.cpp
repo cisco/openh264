@@ -125,7 +125,7 @@ int32_t AssignMbMapMultipleSlices (SDqLayer* pCurDq,const SSliceArgument* kpSlic
 bool CheckFixedSliceNumMultiSliceSetting (const int32_t kiMbNumInFrame, SSliceArgument* pSliceArg) {
   int32_t* pSlicesAssignList    = (int32_t*) & (pSliceArg->uiSliceMbNum[0]);
   const uint32_t kuiSliceNum    = pSliceArg->uiSliceNum;
-  uint32_t uiSliceIdx           = 0;
+  int32_t uiSliceIdx            = 0;
   const int32_t kiMbNumPerSlice = kiMbNumInFrame / kuiSliceNum;
   int32_t iNumMbLeft            = kiMbNumInFrame;
 
