@@ -637,7 +637,6 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
         WelsLoadNalForSlice (pSliceBs, eNalType, eNalRefIdc);
         pCurSlice = pEncPEncCtx->pCurDqLayer->ppSliceInLayer[iSliceIdx];
         assert (iSliceIdx == (int) pCurSlice->uiSliceIdx);
-
         iReturn = SetSliceBoundaryInfo(pEncPEncCtx->pCurDqLayer, pCurSlice, iSliceIdx);
         if (ENC_RETURN_SUCCESS != iReturn) {
           uiThrdRet = iReturn;
