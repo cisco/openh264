@@ -167,7 +167,7 @@ WelsErrorType CWelsSliceEncodingTask::ExecuteTask() {
 
   WelsLoadNalForSlice (m_pSliceBs, m_eNalType, m_eNalRefIdc);
 
-  assert (m_iSliceIdx == (int) m_pSlice->uiSliceIdx);
+  assert (m_iSliceIdx == (int) m_pSlice->iSliceIdx);
   int32_t iReturn = WelsCodeOneSlice (m_pCtx, m_pSlice, m_eNalType);
   if (ENC_RETURN_SUCCESS != iReturn) {
     return iReturn;
@@ -284,7 +284,7 @@ WelsErrorType CWelsConstrainedSizeSlicingEncodingTask::ExecuteTask() {
 
     WelsLoadNalForSlice (m_pSliceBs, m_eNalType, m_eNalRefIdc);
 
-    assert (iLocalSliceIdx == (int) m_pSlice->uiSliceIdx);
+    assert (iLocalSliceIdx == (int) m_pSlice->iSliceIdx);
     int32_t iReturn = WelsCodeOneSlice (m_pCtx, m_pSlice, m_eNalType);
     if (ENC_RETURN_SUCCESS != iReturn) {
       return iReturn;

@@ -3682,7 +3682,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       }
 
       WelsLoadNal (pCtx->pOut, eNalType, eNalRefIdc);
-      assert (0 == (int) pCurSlice->uiSliceIdx);
+      assert (0 == (int) pCurSlice->iSliceIdx);
       pCtx->iEncoderError   = SetSliceBoundaryInfo(pCtx->pCurDqLayer, pCurSlice, 0);
       WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
 
@@ -3809,7 +3809,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         iLayerSize = AppendSliceToFrameBs (pCtx, pLayerBsInfo, kiPartitionCnt);
       } else { // for non-dynamic-slicing mode single threading branch..
         const bool bNeedPrefix = pCtx->bNeedPrefixNalFlag;
-
         int32_t iSliceIdx    = 0;
         uint32_t uiTheadIdx  = 0;
         SSlice* pCurSlice    = NULL;
@@ -3830,7 +3829,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
           WelsLoadNal (pCtx->pOut, eNalType, eNalRefIdc);
 
           pCurSlice = &pCtx->pCurDqLayer->sSliceThreadInfo.pSliceInThread[uiTheadIdx][iSliceIdx];
-          assert (iSliceIdx == (int) pCurSlice->uiSliceIdx);
+          assert (iSliceIdx == pCurSlice->iSliceIdx);
           pCtx->iEncoderError   = SetSliceBoundaryInfo(pCtx->pCurDqLayer, pCurSlice, iSliceIdx);
           WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
 
@@ -4574,7 +4573,7 @@ int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
     WelsLoadNal (pCtx->pOut, keNalType, keNalRefIdc);
 
     pCurSlice = &pCtx->pCurDqLayer->sSliceThreadInfo.pSliceInThread[uiTheadIdx][iSliceIdx];
-    assert (iSliceIdx == (int) pCurSlice->uiSliceIdx);
+    assert (iSliceIdx == pCurSlice->iSliceIdx);
 
     iReturn = WelsCodeOneSlice (pCtx, pCurSlice, keNalType);
     WELS_VERIFY_RETURN_IFNEQ (iReturn, ENC_RETURN_SUCCESS)
@@ -4601,7 +4600,8 @@ int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
 #endif//SLICE_INFO_OUTPUT
 
     ++ iNalIdxInLayer;
-    iSliceIdx += kiSliceStep; //if uiSliceIdx is not continuous
+
+    iSliceIdx += kiSliceStep; //if iSliceIdx is not continuous
     iAnyMbLeftInPartition = iEndMbIdxInPartition - pCurLayer->pLastCodedMbIdxOfPartition[kiPartitionId];
   }
 
