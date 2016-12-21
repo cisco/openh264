@@ -1433,6 +1433,9 @@ int32_t WelsCodeOneSlice (sWelsEncCtx* pEncCtx, const int32_t kiSliceIdx, const 
 
   WelsSliceHeaderExtInit (pEncCtx, pCurLayer, pCurSlice);
 
+  //init slice RC information
+  RCInitOneSliceInformation(pEncCtx, pCurSlice);
+
   g_pWelsWriteSliceHeader[pCurSlice->bSliceHeaderExtFlag] (pEncCtx, pBs, pCurLayer, pCurSlice,
       pEncCtx->pFuncList->pParametersetStrategy);
 
