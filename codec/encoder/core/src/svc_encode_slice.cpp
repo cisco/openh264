@@ -1265,6 +1265,7 @@ int32_t ReallocateSliceInThread (sWelsEncCtx* pCtx,
 }
 */
 
+
 int32_t ReallocSliceBuffer (sWelsEncCtx* pCtx) {
 
   CMemoryAlign* pMA        = pCtx->pMemAlign;
@@ -1447,16 +1448,12 @@ int32_t SliceLayerInfoUpdate (sWelsEncCtx* pCtx, const int32_t kiDlayerIndex) {
 }
 */
 
-int32_t WelsCodeOneSlice (sWelsEncCtx* pEncCtx, const int32_t kiSliceIdx, const int32_t kiNalType) {
+int32_t WelsCodeOneSlice (sWelsEncCtx* pEncCtx, SSlice* pCurSlice, const int32_t kiNalType) {
   SDqLayer* pCurLayer                   = pEncCtx->pCurDqLayer;
   SNalUnitHeaderExt* pNalHeadExt        = &pCurLayer->sLayerInfo.sNalHeaderExt;
-  SSlice* pCurSlice                     = pCurLayer->ppSliceInLayer[kiSliceIdx];
   SBitStringAux* pBs                    = pCurSlice->pSliceBsa;
   const int32_t kiDynamicSliceFlag      = (pEncCtx->pSvcParam->sSpatialLayers[pEncCtx->uiDependencyId].sSliceArgument.uiSliceMode
                                           == SM_SIZELIMITED_SLICE);
-
-  assert (kiSliceIdx == (int) pCurSlice->uiSliceIdx);
-
   if (I_SLICE == pEncCtx->eSliceType) {
     pNalHeadExt->bIdrFlag = 1;
     pCurSlice->sScaleShift = 0;
