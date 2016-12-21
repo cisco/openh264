@@ -455,8 +455,8 @@ void UninitSliceSegment (SDqLayer* pCurDq, CMemoryAlign* pMa) {
     pSliceSeg->iMbHeight        = 0;
     pSliceSeg->iSliceNumInFrame = 0;
     pSliceSeg->iMbNumInFrame    = 0;
-    pSliceSeg->uiSliceSizeConstraint = 0;
-    pSliceSeg->iMaxSliceNumConstraint    = 0;
+    pSliceSeg->uiSliceSizeConstraint   = 0;
+    pSliceSeg->iMaxSliceNumConstraint  = 0;
   }
 }
 
