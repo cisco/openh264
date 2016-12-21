@@ -168,6 +168,7 @@ double    dPreviousFps;
 
 // bits allocation and status
 int32_t   iRemainingBits;
+int32_t   iBitsPerMb;
 int32_t   iTargetBits;
 int32_t   iCurrentBitsLevel;//0:normal; 1:limited; 2:exceeded.
 
@@ -261,6 +262,7 @@ PWelsUpdateMaxBrCheckWindowStatusFunc pfWelsUpdateMaxBrWindowStatus;
 PWelsRCPostFrameSkippingFunc    pfWelsRcPostFrameSkipping;
 } SWelsRcFunc;
 
+void RCInitOneSliceInformation(sWelsEncCtx* pEncCtx, SSlice* pSlice);
 void CheckFrameSkipBasedMaxbr (sWelsEncCtx* pCtx,const long long uiTimeStamp, int32_t iDidIdx);
 void UpdateBufferWhenFrameSkipped(sWelsEncCtx* pCtx, int32_t iSpatialNum);
 void UpdateMaxBrCheckWindowStatus(sWelsEncCtx* pCtx, int32_t iSpatialNum, const long long uiTimeStamp);
