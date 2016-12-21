@@ -943,6 +943,16 @@ void FreeDqLayer (SDqLayer*& pDq, CMemoryAlign* pMa) {
     pDq->ppSliceInLayer = NULL;
   }
 
+  if (pDq->pFirstMbIdxOfSlice) {
+    pMa->WelsFree (pDq->pFirstMbIdxOfSlice, "pDq->pFirstMbIdxOfSlice");
+    pDq->pFirstMbIdxOfSlice = NULL;
+  }
+
+  if (pDq->pCountMbNumInSlice) {
+    pMa->WelsFree (pDq->pCountMbNumInSlice, "pDq->pCountMbNumInSlice");
+    pDq->pCountMbNumInSlice = NULL;
+  }
+
   if (pDq->pNumSliceCodedOfPartition) {
     pMa->WelsFree (pDq->pNumSliceCodedOfPartition, "pNumSliceCodedOfPartition");
     pDq->pNumSliceCodedOfPartition = NULL;
@@ -3674,6 +3684,9 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
       WelsLoadNal (pCtx->pOut, eNalType, eNalRefIdc);
       assert (0 == (int) pCurSlice->uiSliceIdx);
+      pCtx->iEncoderError   = SetSliceBoundaryInfo(pCtx->pCurDqLayer, pCurSlice, 0);
+      WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
+
       pCtx->iEncoderError   = WelsCodeOneSlice (pCtx, pCurSlice, eNalType);
       WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
 
@@ -3805,6 +3818,9 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         //TO DO: add update ppSliceInLayer module based on pSliceInThread[ThreadNum]
         // UpdateSliceInLayerInfo(); // reordering
 
+        //TO DO: add update ppSliceInLayer module based on pSliceInThread[ThreadNum]
+        // UpdateSliceInLayerInfo(); // reordering
+
         iLayerSize = AppendSliceToFrameBs (pCtx, pLayerBsInfo, kiPartitionCnt);
       } else { // for non-dynamic-slicing mode single threading branch..
         const bool bNeedPrefix = pCtx->bNeedPrefixNalFlag;
@@ -3826,6 +3842,10 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
           WelsLoadNal (pCtx->pOut, eNalType, eNalRefIdc);
           pCurSlice = pCtx->pCurDqLayer->ppSliceInLayer[iSliceIdx];
           assert (iSliceIdx == (int) pCurSlice->uiSliceIdx);
+
+          pCtx->iEncoderError   = SetSliceBoundaryInfo(pCtx->pCurDqLayer, pCurSlice, iSliceIdx);
+          WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
+
           pCtx->iEncoderError = WelsCodeOneSlice (pCtx, pCurSlice, eNalType);
           WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
 
