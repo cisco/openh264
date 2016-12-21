@@ -713,6 +713,7 @@ void RcGomTargetBits (sWelsEncCtx* pEncCtx, SSlice* pSlice) {
 }
 
 
+
 void RcCalculateGomQp (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb) {
   SWelsSvcRc* pWelsSvcRc    = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
   SRCSlicing* pSOverRc      = &pSlice->sSlicingOverRc;

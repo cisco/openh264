@@ -3769,18 +3769,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         //TO DO: add update ppSliceInLayer module based on pSliceInThread[ThreadNum]
         // UpdateSliceInLayerInfo(); // reordering
 
-        //TO DO: add update ppSliceInLayer module based on pSliceInThread[ThreadNum]
-        // UpdateSliceInLayerInfo(); // reordering
-
-        //TO DO: add update ppSliceInLayer module based on pSliceInThread[ThreadNum]
-        // UpdateSliceInLayerInfo(); // reordering
-
-        //TO DO: add update ppSliceInLayer module based on pSliceInThread[ThreadNum]
-        // UpdateSliceInLayerInfo(); // reordering
-
-        //TO DO: add update ppSliceInLayer module based on pSliceInThread[ThreadNum]
-        // UpdateSliceInLayerInfo(); // reordering
-
         iLayerSize = AppendSliceToFrameBs (pCtx, pLayerBsInfo, kiPartitionCnt);
       } else { // for non-dynamic-slicing mode single threading branch..
         const bool bNeedPrefix = pCtx->bNeedPrefixNalFlag;
@@ -3802,7 +3790,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
           WelsLoadNal (pCtx->pOut, eNalType, eNalRefIdc);
           pCurSlice = pCtx->pCurDqLayer->ppSliceInLayer[iSliceIdx];
           assert (iSliceIdx == (int) pCurSlice->uiSliceIdx);
-
           pCtx->iEncoderError   = SetSliceBoundaryInfo(pCtx->pCurDqLayer, pCurSlice, iSliceIdx);
           WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
 
