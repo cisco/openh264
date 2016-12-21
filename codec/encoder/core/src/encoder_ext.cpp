@@ -3808,18 +3808,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         //TO DO: add update ppSliceInLayer module based on pSliceInThread[ThreadNum]
         // UpdateSliceInLayerInfo(); // reordering
 
-        //TO DO: add update ppSliceInLayer module based on pSliceInThread[ThreadNum]
-        // UpdateSliceInLayerInfo(); // reordering
-
-        //TO DO: add update ppSliceInLayer module based on pSliceInThread[ThreadNum]
-        // UpdateSliceInLayerInfo(); // reordering
-
-        //TO DO: add update ppSliceInLayer module based on pSliceInThread[ThreadNum]
-        // UpdateSliceInLayerInfo(); // reordering
-
-        //TO DO: add update ppSliceInLayer module based on pSliceInThread[ThreadNum]
-        // UpdateSliceInLayerInfo(); // reordering
-
         iLayerSize = AppendSliceToFrameBs (pCtx, pLayerBsInfo, kiPartitionCnt);
       } else { // for non-dynamic-slicing mode single threading branch..
         const bool bNeedPrefix = pCtx->bNeedPrefixNalFlag;
@@ -4460,57 +4448,13 @@ int32_t WelsEncoderApplyLTR (SLogContext* pLogCtx, sWelsEncCtx** ppCtx, SLTRConf
   iRet = WelsEncoderParamAdjust (ppCtx, &sConfig);
   return iRet;
 }
-int32_t FrameBsRealloc (sWelsEncCtx* pCtx,
-                        SFrameBSInfo* pFrameBsInfo,
-                        SLayerBSInfo* pLayerBsInfo) {
-  CMemoryAlign* pMA = pCtx->pMemAlign;
-  SDqLayer* pCurLayer = pCtx->pCurDqLayer;
-
-  int32_t iCountNals = pCtx->pOut->iCountNals;
-  int32_t iMaxSliceNumOld = pCurLayer->iMaxSliceNum;
-  int32_t iMaxSliceNum = iMaxSliceNumOld;
-  iCountNals += iMaxSliceNum * (pCtx->pSvcParam->iSpatialLayerNum + pCtx->bNeedPrefixNalFlag);
-  iMaxSliceNum *= SLICE_NUM_EXPAND_COEF;
-
-  SWelsNalRaw* pNalList = (SWelsNalRaw*)pMA->WelsMallocz (iCountNals * sizeof (SWelsNalRaw), "pOut->sNalList");
-  if (NULL == pNalList) {
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "CWelsH264SVCEncoder::FrameBsRealloc: pNalList is NULL");
-    return ENC_RETURN_MEMALLOCERR;
-  }
-  memcpy (pNalList, pCtx->pOut->sNalList, sizeof (SWelsNalRaw) * pCtx->pOut->iCountNals);
-  pMA->WelsFree (pCtx->pOut->sNalList, "pOut->sNalList");
-  pCtx->pOut->sNalList = pNalList;
-
-  int32_t* pNalLen = (int32_t*)pMA->WelsMallocz (iCountNals * sizeof (int32_t), "pOut->pNalLen");
-  if (NULL == pNalLen) {
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "CWelsH264SVCEncoder::FrameBsRealloc: pNalLen is NULL");
-    return ENC_RETURN_MEMALLOCERR;
-  }
-  memcpy (pNalLen, pCtx->pOut->pNalLen, sizeof (int32_t) * pCtx->pOut->iCountNals);
-  pMA->WelsFree (pCtx->pOut->pNalLen, "pOut->pNalLen");
-  pCtx->pOut->pNalLen = pNalLen;
-
-  pCtx->pOut->iCountNals = iCountNals;
-  SLayerBSInfo* pLBI1, *pLBI2;
-  pLBI1 = &pFrameBsInfo->sLayerInfo[0];
-  pLBI1->pNalLengthInByte = pCtx->pOut->pNalLen;
-  while (pLBI1 != pLayerBsInfo) {
-    pLBI2 = pLBI1;
-    ++ pLBI1;
-    pLBI1->pNalLengthInByte = pLBI2->pNalLengthInByte + pLBI2->iNalCount;
-  }
-
-  return ENC_RETURN_SUCCESS;
-
-}
 
 int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
                          SFrameBSInfo* pFrameBsInfo,
                          SLayerBSInfo* pLayerBsInfo) {
   int32_t iRet = 0;
 
-  iRet = FrameBsRealloc (pCtx, pFrameBsInfo, pLayerBsInfo);
-
+  iRet = FrameBsRealloc (pCtx, pFrameBsInfo, pLayerBsInfo, pCtx->pCurDqLayer->iMaxSliceNum);
   if(ENC_RETURN_SUCCESS != iRet) {
     return iRet;
   }
@@ -4585,7 +4529,6 @@ int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
     }
 
     WelsLoadNal (pCtx->pOut, keNalType, keNalRefIdc);
-
     pCurSlice = &pCtx->pCurDqLayer->sSliceThreadInfo.pSliceInThread[uiTheadIdx][iSliceIdx];
     assert (iSliceIdx == pCurSlice->iSliceIdx);
 
@@ -4614,7 +4557,6 @@ int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
 #endif//SLICE_INFO_OUTPUT
 
     ++ iNalIdxInLayer;
-
     iSliceIdx += kiSliceStep; //if iSliceIdx is not continuous
     iAnyMbLeftInPartition = iEndMbIdxInPartition - pCurLayer->pLastCodedMbIdxOfPartition[kiPartitionId];
   }

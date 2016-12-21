@@ -112,6 +112,8 @@ int32_t InitSliceList (sWelsEncCtx* pCtx,
                        const int32_t kiDlayerIndex,
                        CMemoryAlign* pMa);
 
+int32_t InitAllSlicesInThread (sWelsEncCtx* pCtx);
+
 int32_t InitOneSliceInThread (sWelsEncCtx* pCtx,
                               SSlice*& pSlice,
                               const int32_t kiThreadIdx,
@@ -136,7 +138,15 @@ int32_t ReallocateSliceInThread (sWelsEncCtx* pCtx,
 
 int32_t ReallocSliceBuffer (sWelsEncCtx* pCtx);
 
-int32_t SliceLayerInfoUpdate (sWelsEncCtx* pCtx);
+int32_t FrameBsRealloc (sWelsEncCtx* pCtx,
+                        SFrameBSInfo* pFrameBsInfo,
+                        SLayerBSInfo* pLayerBsInfo,
+                        const int32_t kiMaxSliceNumOld);
+
+int32_t SliceLayerInfoUpdate (sWelsEncCtx* pCtx,
+                              SFrameBSInfo* pFrameBsInfo,
+                              SLayerBSInfo* pLayerBsInfo,
+                              const int32_t kiPartitionNum);
 
 //slice encoding process
 int32_t WelsCodePSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice);
