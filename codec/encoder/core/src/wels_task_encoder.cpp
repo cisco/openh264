@@ -113,7 +113,7 @@ WelsErrorType CWelsSliceEncodingTask::InitTask() {
   }
 
   //  InitOneSliceInThread();
-  m_pSlice   = m_pCtx->pCurDqLayer->ppSliceInLayer[m_iSliceIdx];
+  m_pSlice = &m_pCtx->pCurDqLayer->sSliceThreadInfo.pSliceInThread[0][m_iSliceIdx];
   m_pSliceBs = &m_pSlice->sSliceBs;
 
   m_pSliceBs->uiBsPos       = 0;
@@ -166,9 +166,9 @@ WelsErrorType CWelsSliceEncodingTask::ExecuteTask() {
   }
 
   WelsLoadNalForSlice (m_pSliceBs, m_eNalType, m_eNalRefIdc);
-  SSlice* pCurSlice    = m_pCtx->pCurDqLayer->ppSliceInLayer[m_iSliceIdx];
-  assert (m_iSliceIdx == (int) pCurSlice->uiSliceIdx);
-  int32_t iReturn = WelsCodeOneSlice (m_pCtx, pCurSlice, m_eNalType);
+
+  assert (m_iSliceIdx == (int) m_pSlice->uiSliceIdx);
+  int32_t iReturn = WelsCodeOneSlice (m_pCtx, m_pSlice, m_eNalType);
   if (ENC_RETURN_SUCCESS != iReturn) {
     return iReturn;
   }
@@ -239,11 +239,11 @@ WelsErrorType CWelsConstrainedSizeSlicingEncodingTask::ExecuteTask() {
   SSliceCtx* pSliceCtx                    = &pCurDq->sSliceEncCtx;
   const int32_t kiSliceIdxStep            = m_pCtx->iActiveThreadsNum;
   SSpatialLayerInternal* pParamInternal   = &m_pCtx->pSvcParam->sDependencyLayers[m_pCtx->uiDependencyId];
-  SSliceHeaderExt* pStartSliceHeaderExt   = &pCurDq->ppSliceInLayer[m_iSliceIdx]->sSliceHeaderExt;
   const int32_t kiPartitionId             = m_iSliceIdx % kiSliceIdxStep;
   const int32_t kiFirstMbInPartition      = pCurDq->pFirstMbIdxOfPartition[kiPartitionId];
   const int32_t kiEndMbIdxInPartition     = pCurDq->pEndMbIdxOfPartition[kiPartitionId];
-  pStartSliceHeaderExt->sSliceHeader.iFirstMbInSlice      = kiFirstMbInPartition;
+  m_pSlice                                = &pCurDq->sSliceThreadInfo.pSliceInThread[0][m_iSliceIdx];
+  m_pSlice->sSliceHeaderExt.sSliceHeader.iFirstMbInSlice  = kiFirstMbInPartition;
   pCurDq->pNumSliceCodedOfPartition[kiPartitionId]        = 1;
   pCurDq->pLastCodedMbIdxOfPartition[kiPartitionId]       = 0;
 
@@ -261,7 +261,7 @@ WelsErrorType CWelsConstrainedSizeSlicingEncodingTask::ExecuteTask() {
       return ENC_RETURN_KNOWN_ISSUE;
     }
 
-    m_pSlice = pCurDq->ppSliceInLayer[iLocalSliceIdx];
+    m_pSlice = &pCurDq->sSliceThreadInfo.pSliceInThread[0][iLocalSliceIdx];
     m_pSliceBs = &m_pSlice->sSliceBs;
 
     m_pSliceBs->uiBsPos     = 0;
@@ -283,9 +283,9 @@ WelsErrorType CWelsConstrainedSizeSlicingEncodingTask::ExecuteTask() {
     }
 
     WelsLoadNalForSlice (m_pSliceBs, m_eNalType, m_eNalRefIdc);
-    SSlice* pCurSlice    = m_pCtx->pCurDqLayer->ppSliceInLayer[iLocalSliceIdx];
-    assert (iLocalSliceIdx == (int) pCurSlice->uiSliceIdx);
-    int32_t iReturn = WelsCodeOneSlice (m_pCtx, pCurSlice, m_eNalType);
+
+    assert (iLocalSliceIdx == (int) m_pSlice->uiSliceIdx);
+    int32_t iReturn = WelsCodeOneSlice (m_pCtx, m_pSlice, m_eNalType);
     if (ENC_RETURN_SUCCESS != iReturn) {
       return iReturn;
     }
