@@ -753,7 +753,6 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
           }
 
           WelsLoadNalForSlice (pSliceBs, eNalType, eNalRefIdc);
-
           assert (iSliceIdx == pSlice->iSliceIdx);
           iReturn = WelsCodeOneSlice (pEncPEncCtx, pSlice, eNalType);
           if (ENC_RETURN_SUCCESS != iReturn) {
