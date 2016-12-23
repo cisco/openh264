@@ -162,7 +162,8 @@ typedef enum {
 
   DECODER_OPTION_GET_STATISTICS,        ///< feedback decoder statistics
   DECODER_OPTION_GET_SAR_INFO,          ///< feedback decoder Sample Aspect Ratio info in Vui
-
+  DECODER_OPTION_PROFILE,               ///< get current AU profile info, only is used in GetOption
+  DECODER_OPTION_LEVEL                  ///< get current AU level info,only is used in GetOption
 } DECODER_OPTION;
 
 /**
