@@ -425,6 +425,20 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
       pVuiSarInfo->bOverscanAppropriateFlag = m_pDecContext->pSps->sVui.bOverscanAppropriateFlag;
       return cmResultSuccess;
     }
+  } else if (DECODER_OPTION_PROFILE == eOptID) {
+    if (!m_pDecContext->pSps) {
+      return cmInitExpected;
+    }
+    iVal = (int) m_pDecContext->pSps->uiProfileIdc;
+    * ((int*)pOption) = iVal;
+    return cmResultSuccess;
+  } else if (DECODER_OPTION_LEVEL == eOptID) {
+    if (!m_pDecContext->pSps) {
+      return cmInitExpected;
+    }
+    iVal = (int) m_pDecContext->pSps->uiLevelIdc;
+    * ((int*)pOption) = iVal;
+    return cmResultSuccess;
   }
 
   return cmInitParaError;
