@@ -462,7 +462,6 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     const uint8_t* pTemporalIdList = &g_kuiTemporalIdListTable[iDecStages][0];
     SSpatialLayerInternal* pDlp    = &sDependencyLayers[0];
     SSpatialLayerConfig* pSpatialLayer = &sSpatialLayers[0];
-    EProfileIdc uiProfileIdc = iEntropyCodingModeFlag ? PRO_MAIN : PRO_BASELINE;
     int8_t i = 0;
 
     while (i < iSpatialLayerNum) {
@@ -475,8 +474,6 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
       int8_t iMaxTemporalId = 0;
 
       memset (pDlp->uiCodingIdx2TemporalId, INVALID_TEMPORAL_ID, sizeof (pDlp->uiCodingIdx2TemporalId));
-      pSpatialLayer->uiProfileIdc = uiProfileIdc; // PRO_BASELINE, PRO_SCALABLE_BASELINE;
-
       iNotCodedMask = (1 << (kuiLogFactorInOutRate + kuiLogFactorMaxInRate)) - 1;
       for (uint32_t uiFrameIdx = 0; uiFrameIdx <= uiGopSize; ++ uiFrameIdx) {
         if (0 == (uiFrameIdx & iNotCodedMask)) {
@@ -494,9 +491,6 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
       if (pDlp->iDecompositionStages < 0) {
         return ENC_RETURN_INVALIDINPUT;
       }
-
-      uiProfileIdc = bSimulcastAVC ? (iEntropyCodingModeFlag ? PRO_HIGH : PRO_BASELINE) :
-                      (iEntropyCodingModeFlag ? PRO_SCALABLE_HIGH : PRO_SCALABLE_BASELINE);
       ++ pDlp;
       ++ pSpatialLayer;
       ++ i;

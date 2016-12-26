@@ -79,8 +79,10 @@ int32_t WelsBitRateVerification (SLogContext* pLogCtx, SSpatialLayerConfig* pLay
   }
 
   // deal with LEVEL_MAX_BR and MAX_BR setting
-  const int32_t iLevelMaxBitrate = (pLayerParam->uiLevelIdc != LEVEL_UNKNOWN) ? (g_ksLevelLimits[pLayerParam->uiLevelIdc -
-                                   1].uiMaxBR * CpbBrNalFactor) : UNSPECIFIED_BIT_RATE;
+  const SLevelLimits* pCurLevelLimit = g_ksLevelLimits;
+  while ((pCurLevelLimit->uiLevelIdc != LEVEL_5_2) && (pCurLevelLimit->uiLevelIdc != pLayerParam->uiLevelIdc))
+    pCurLevelLimit++;
+  const int32_t iLevelMaxBitrate = pCurLevelLimit->uiMaxBR * CpbBrNalFactor;
   const int32_t iLevel52MaxBitrate = g_ksLevelLimits[LEVEL_NUMBER - 1].uiMaxBR * CpbBrNalFactor;
   if (UNSPECIFIED_BIT_RATE != iLevelMaxBitrate) {
     if ((pLayerParam->iMaxSpatialBitrate == UNSPECIFIED_BIT_RATE)
@@ -91,7 +93,7 @@ int32_t WelsBitRateVerification (SLogContext* pLogCtx, SSpatialLayerConfig* pLay
                pLayerParam->iMaxSpatialBitrate, pLayerParam->uiLevelIdc);
     } else if (pLayerParam->iMaxSpatialBitrate > iLevelMaxBitrate) {
       ELevelIdc iCurLevel = pLayerParam->uiLevelIdc;
-      WelsAdjustLevel (pLayerParam);
+      WelsAdjustLevel (pLayerParam, pCurLevelLimit);
       WelsLog (pLogCtx, WELS_LOG_INFO,
                "LevelIdc is changed from (%d) to (%d) according to the iMaxSpatialBitrate(%d)",
                iCurLevel, pLayerParam->uiLevelIdc, pLayerParam->iMaxSpatialBitrate);
@@ -123,36 +125,55 @@ int32_t WelsBitRateVerification (SLogContext* pLogCtx, SSpatialLayerConfig* pLay
 
 void CheckProfileSetting (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, int32_t iLayer, EProfileIdc uiProfileIdc) {
   SSpatialLayerConfig* pLayerInfo = &pParam->sSpatialLayers[iLayer];
-  if (PRO_UNKNOWN == uiProfileIdc) {
-    pLayerInfo->uiProfileIdc = (((iLayer == SPATIAL_LAYER_0)
-                                 || pParam->bSimulcastAVC) ? PRO_BASELINE : PRO_SCALABLE_BASELINE);
-  } else {
-    pLayerInfo->uiProfileIdc = uiProfileIdc;
-    if ((iLayer == SPATIAL_LAYER_0) && (uiProfileIdc != PRO_BASELINE)) {
-      WelsLog (pLogCtx, WELS_LOG_WARNING, "doesn't support profile(%d), change to baseline profile",
+  pLayerInfo->uiProfileIdc = uiProfileIdc;
+  if (pParam->bSimulcastAVC) {
+    if ((uiProfileIdc != PRO_BASELINE) && (uiProfileIdc != PRO_MAIN) && (uiProfileIdc != PRO_HIGH)) {
+      WelsLog (pLogCtx, WELS_LOG_WARNING, "layerId(%d) doesn't support profile(%d), change to baseline profile", iLayer,
                uiProfileIdc);
       pLayerInfo->uiProfileIdc = PRO_BASELINE;
     }
-    if (iLayer > SPATIAL_LAYER_0) {
-      if (pParam->bSimulcastAVC && (uiProfileIdc != PRO_BASELINE)) {
-        pLayerInfo->uiProfileIdc = PRO_BASELINE;
-        WelsLog (pLogCtx, WELS_LOG_WARNING, "doesn't support profile(%d) with bSimulcastAVC, change to baseline profile",
+    if (pParam->iEntropyCodingModeFlag && pLayerInfo->uiProfileIdc == PRO_BASELINE) {
+      pLayerInfo->uiProfileIdc = PRO_MAIN;
+      WelsLog (pLogCtx, WELS_LOG_WARNING, "layerId(%d) change to main profile because cabac is enabled", iLayer);
+    }
+  } else {
+    if (iLayer == SPATIAL_LAYER_0) {
+      if ((uiProfileIdc != PRO_BASELINE) && (uiProfileIdc != PRO_MAIN) && (uiProfileIdc != PRO_HIGH)) {
+        WelsLog (pLogCtx, WELS_LOG_WARNING, "layerId(%d) doesn't support profile(%d), change to baseline profile", iLayer,
                  uiProfileIdc);
+        pLayerInfo->uiProfileIdc = PRO_BASELINE;
       }
-      if ((uiProfileIdc != PRO_BASELINE) || (uiProfileIdc != PRO_SCALABLE_BASELINE)) {
-        pLayerInfo->uiProfileIdc = PRO_BASELINE;
-        WelsLog (pLogCtx, WELS_LOG_WARNING, "doesn't support profile(%d), change to baseline profile",
-                 uiProfileIdc);
+      if (pParam->iEntropyCodingModeFlag && (pLayerInfo->uiProfileIdc == PRO_BASELINE)) {
+        pLayerInfo->uiProfileIdc = PRO_MAIN;
+        WelsLog (pLogCtx, WELS_LOG_WARNING, "layerId(%d) change to main profile because cabac is enabled", iLayer);
+      }
+    } else {
+      if ((uiProfileIdc != PRO_SCALABLE_BASELINE) && (uiProfileIdc != PRO_SCALABLE_HIGH)) {
+        pLayerInfo->uiProfileIdc = PRO_SCALABLE_BASELINE;
+        WelsLog (pLogCtx, WELS_LOG_WARNING, "layerId(%d) doesn't support profile(%d), change to scalable baseline profile",
+                 iLayer, uiProfileIdc);
+      }
+      if (pParam->iEntropyCodingModeFlag && (pLayerInfo->uiProfileIdc == PRO_SCALABLE_BASELINE)) {
+        pLayerInfo->uiProfileIdc = PRO_SCALABLE_HIGH;
+        WelsLog (pLogCtx, WELS_LOG_WARNING, "layerId(%d) change to scalable hight profile because cabac is enabled", iLayer);
       }
     }
   }
 }
 void CheckLevelSetting (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, int32_t iLayer, ELevelIdc uiLevelIdc) {
   SSpatialLayerConfig* pLayerInfo = &pParam->sSpatialLayers[iLayer];
-  pLayerInfo->uiLevelIdc = uiLevelIdc;
-  if (uiLevelIdc > LEVEL_5_2) {
-    WelsLog (pLogCtx, WELS_LOG_INFO, "change unexpected levelidc(%d) setting to LEVEL_UNKNOWN", pLayerInfo->uiLevelIdc);
-    pLayerInfo->uiLevelIdc = LEVEL_UNKNOWN;
+  pLayerInfo->uiLevelIdc = LEVEL_UNKNOWN;
+  int32_t iLevelIdx = LEVEL_NUMBER - 1;
+  do {
+    if (g_ksLevelLimits[iLevelIdx].uiLevelIdc == uiLevelIdc) {
+      pLayerInfo->uiLevelIdc = uiLevelIdc;
+      break;
+    }
+    iLevelIdx--;
+  } while (iLevelIdx >= 0);
+  if (pLayerInfo->uiLevelIdc == LEVEL_UNKNOWN) {
+    WelsLog (pLogCtx, WELS_LOG_INFO, "change unexpected levelidc(%d) setting to LEVEL_5_2", pLayerInfo->uiLevelIdc);
+    pLayerInfo->uiLevelIdc = LEVEL_5_2;
   }
 }
 void CheckReferenceNumSetting (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, int32_t iNumRef) {
@@ -1626,8 +1647,11 @@ void GetMvMvdRange (SWelsSvcCodingParam* pParam, int32_t& iMvRange, int32_t& iMv
     if (pParam->sSpatialLayers[iLayer].uiLevelIdc < iMinLevelIdc)
       iMinLevelIdc = pParam->sSpatialLayers[iLayer].uiLevelIdc;
   }
-  iMinMv = (g_ksLevelLimits[iMinLevelIdc - 1].iMinVmv) >> 2;
-  iMaxMv = (g_ksLevelLimits[iMinLevelIdc - 1].iMaxVmv) >> 2;
+  const SLevelLimits* pLevelLimit = g_ksLevelLimits;
+  while ((pLevelLimit->uiLevelIdc != LEVEL_5_2) && (pLevelLimit->uiLevelIdc != iMinLevelIdc))
+    pLevelLimit++;
+  iMinMv = (pLevelLimit->iMinVmv) >> 2;
+  iMaxMv = (pLevelLimit->iMaxVmv) >> 2;
 
   iMvRange = WELS_MIN (WELS_ABS (iMinMv), iMaxMv);
 
@@ -3990,9 +4014,10 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     iFrameSize += iLayerSize;
     //check MinCr
     {
-      int32_t iImageSize = (pParam->iVideoWidth * pParam->iVideoHeight * 3) >> 1;
-      int32_t iMinCr = g_ksLevelLimits[pParam->uiLevelIdc - 1].uiMinCR;
-      if (iFrameSize > (iImageSize / iMinCr))
+      int32_t iMinCrFrameSize = (pParam->iVideoWidth * pParam->iVideoHeight * 3) >> 2; //MinCr = 2;
+      if (pParam->uiLevelIdc == LEVEL_3_1 || pParam->uiLevelIdc == LEVEL_3_2 || pParam->uiLevelIdc == LEVEL_4_0)
+        iMinCrFrameSize >>= 1; //MinCr = 4
+      if (iFrameSize > iMinCrFrameSize)
         WelsLog (pLogCtx, WELS_LOG_WARNING,
                  "WelsEncoderEncodeExt()MinCr Checking,codec bitstream size is larger than Level limitation");
     }
