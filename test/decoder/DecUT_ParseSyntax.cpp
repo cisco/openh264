@@ -259,17 +259,25 @@ void DecoderParseSyntaxTest::TestScalingList() {
     {10, 14, 20, 24, 14, 20, 24, 27, 20, 24, 27, 30, 24, 27, 30, 34 },
     { 9, 13, 18, 21, 13, 18, 21, 24, 18, 21, 24, 27, 21, 24, 27, 27 }
   };
-  uint8_t iScalingListPPS[6][16];
-  memset (iScalingListPPS, 0, 6 * 16 * sizeof (uint8_t));
+  uint8_t iScalingListPPS[6][16] = {
+    { 17, 17, 16, 16, 17, 16, 15, 15, 16, 15, 15, 15, 16, 15, 15, 15 },
+    { 6, 12, 19, 26, 12, 19, 26, 31, 19, 26, 31, 35, 26, 31, 35, 39 },
+    { 6, 12, 19, 26, 12, 19, 26, 31, 19, 26, 31, 35, 26, 31, 35, 40 },
+    { 17, 17, 16, 16, 17, 16, 15, 15, 16, 15, 15, 15, 16, 15, 15, 14 },
+    { 10, 14, 20, 24, 14, 20, 24, 27, 20, 24, 27, 30, 24, 27, 30, 34 },
+    { 9, 13, 18, 21, 13, 18, 21, 24, 18, 21, 24, 27, 21, 24, 27, 27 }
+  };
+  uint8_t iScalingListZero[6][16];
+  memset (iScalingListZero, 0, 6 * 16 * sizeof (uint8_t));
   //Scalinglist matrix not written into sps or pps
   int32_t iRet = ERR_NONE;
   iRet = Init();
   ASSERT_EQ (iRet, ERR_NONE);
   DecodeBs ("res/BA_MW_D.264");
   ASSERT_TRUE (m_pCtx->sSpsBuffer[0].bSeqScalingMatrixPresentFlag == false);
-  EXPECT_EQ (0, memcmp (iScalingListPPS, m_pCtx->sSpsBuffer[0].iScalingList4x4, 6 * 16 * sizeof (uint8_t)));
+  EXPECT_EQ (0, memcmp (iScalingListZero, m_pCtx->sSpsBuffer[0].iScalingList4x4, 6 * 16 * sizeof (uint8_t)));
   ASSERT_TRUE (m_pCtx->sPpsBuffer[0].bPicScalingMatrixPresentFlag == false);
-  EXPECT_EQ (0, memcmp (iScalingListPPS, m_pCtx->sPpsBuffer[0].iScalingList4x4, 6 * 16 * sizeof (uint8_t)));
+  EXPECT_EQ (0, memcmp (iScalingListZero, m_pCtx->sPpsBuffer[0].iScalingList4x4, 6 * 16 * sizeof (uint8_t)));
   Uninit();
   //Scalinglist value just written into sps and pps
   iRet = Init();
@@ -280,8 +288,10 @@ void DecoderParseSyntaxTest::TestScalingList() {
     EXPECT_EQ (0, memcmp (iScalingList[i], m_pCtx->sSpsBuffer[0].iScalingList4x4[i], 16 * sizeof (uint8_t)));
   }
 
-  ASSERT_TRUE (m_pCtx->sPpsBuffer[0].bPicScalingMatrixPresentFlag == false);
-  EXPECT_EQ (0, memcmp (iScalingListPPS, m_pCtx->sPpsBuffer[0].iScalingList4x4, 6 * 16 * sizeof (uint8_t)));
+  ASSERT_TRUE (m_pCtx->sPpsBuffer[0].bPicScalingMatrixPresentFlag == true);
+  for (int i = 0; i < 6; i++) {
+    EXPECT_EQ (0, memcmp (iScalingListPPS[i], m_pCtx->sPpsBuffer[0].iScalingList4x4[i], 16 * sizeof (uint8_t)));
+  }
   Uninit();
 }
 

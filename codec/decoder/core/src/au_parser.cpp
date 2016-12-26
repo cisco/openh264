@@ -1005,7 +1005,7 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
     pSps->bSeqScalingMatrixPresentFlag = !!uiCode;
 
     if (pSps->bSeqScalingMatrixPresentFlag) {
-      WELS_READ_VERIFY (ParseScalingList (pSps, pBs, 0, pSps->bSeqScalingListPresentFlag, pSps->iScalingList4x4,
+      WELS_READ_VERIFY (ParseScalingList (pSps, pBs, 0, 0, pSps->bSeqScalingListPresentFlag, pSps->iScalingList4x4,
                                           pSps->iScalingList8x8));
     }
   }
@@ -1134,9 +1134,18 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
   }
   WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //vui_parameters_present_flag
   pSps->bVuiParamPresentFlag = !!uiCode;
-  if (pSps->bVuiParamPresentFlag && !kbUseSubsetFlag) { //parse Part of Vui Parameters in avc sps only
-    WELS_READ_VERIFY (ParseVui (pCtx, pSps, pBsAux));
+  if (pSps->bVuiParamPresentFlag) {
+    int iRetVui = ParseVui (pCtx, pSps, pBsAux);
+    if (iRetVui == GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_VUI_HRD)) {
+      if (kbUseSubsetFlag) { //Currently do no support VUI with HRD enable in subsetSPS
+        WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "hrd parse in vui of subsetSPS is not supported!");
+        return iRetVui;
+      }
+    } else {
+      WELS_READ_VERIFY (iRetVui);
+    }
   }
+
   if (pCtx->pParam->bParseOnly) {
     if (kSrcNalLen >= SPS_PPS_BS_SIZE - 4) { //sps bs exceeds!
       pCtx->iErrorCode |= dsOutOfMemory;
@@ -1408,12 +1417,12 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
     pPps->bPicScalingMatrixPresentFlag = !!uiCode;
     if (pPps->bPicScalingMatrixPresentFlag) {
       if (pCtx->bSpsAvailFlags[pPps->iSpsId]) {
-        WELS_READ_VERIFY (ParseScalingList (&pCtx->sSpsBuffer[pPps->iSpsId], pBsAux, 1, pPps->bPicScalingListPresentFlag,
-                                            pPps->iScalingList4x4, pPps->iScalingList8x8));
+        WELS_READ_VERIFY (ParseScalingList (&pCtx->sSpsBuffer[pPps->iSpsId], pBsAux, 1, pPps->bTransform8x8ModeFlag,
+                                            pPps->bPicScalingListPresentFlag, pPps->iScalingList4x4, pPps->iScalingList8x8));
       } else {
         pCtx->bSpsLatePps = true;
-        WELS_READ_VERIFY (ParseScalingList (NULL, pBsAux, 1, pPps->bPicScalingListPresentFlag, pPps->iScalingList4x4,
-                                            pPps->iScalingList8x8));
+        WELS_READ_VERIFY (ParseScalingList (NULL, pBsAux, 1, pPps->bTransform8x8ModeFlag, pPps->bPicScalingListPresentFlag,
+                                            pPps->iScalingList4x4, pPps->iScalingList8x8));
       }
     }
     WELS_READ_VERIFY (BsGetSe (pBsAux, &iCode)); //second_chroma_qp_index_offset
@@ -1459,6 +1468,15 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
   }
   return ERR_NONE;
 }
+
+#define VUI_MAX_CHROMA_LOG_TYPE_TOP_BOTTOM_FIELD_MAX 5
+#define VUI_NUM_UNITS_IN_TICK_MIN 1
+#define VUI_TIME_SCALE_MIN 1
+#define VUI_MAX_BYTES_PER_PIC_DENOM_MAX 16
+#define VUI_MAX_BITS_PER_MB_DENOM_MAX 16
+#define VUI_LOG2_MAX_MV_LENGTH_HOR_MAX 16
+#define VUI_LOG2_MAX_MV_LENGTH_VER_MAX 16
+#define VUI_MAX_DEC_FRAME_BUFFERING_MAX 16
 int32_t ParseVui (PWelsDecoderContext pCtx, PSps pSps, PBitStringAux pBsAux) {
   uint32_t uiCode;
   PVui pVui = &pSps->sVui;
@@ -1506,11 +1524,11 @@ int32_t ParseVui (PWelsDecoderContext pCtx, PSps pSps, PBitStringAux pBsAux) {
   if (pVui->bChromaLocInfoPresentFlag) {
     WELS_READ_VERIFY (BsGetUe (pBsAux, &uiCode)); //chroma_sample_loc_type_top_field
     pVui->uiChromaSampleLocTypeTopField = uiCode;
-    WELS_CHECK_SE_UPPER_WARNING (pVui->uiChromaSampleLocTypeTopField, VUI_MAX_CHROMA_LOG_TYPE_TOP_BOTTOM_FIELD,
+    WELS_CHECK_SE_UPPER_WARNING (pVui->uiChromaSampleLocTypeTopField, VUI_MAX_CHROMA_LOG_TYPE_TOP_BOTTOM_FIELD_MAX,
                                  "chroma_sample_loc_type_top_field");
     WELS_READ_VERIFY (BsGetUe (pBsAux, &uiCode)); //chroma_sample_loc_type_bottom_field
     pVui->uiChromaSampleLocTypeBottomField = uiCode;
-    WELS_CHECK_SE_UPPER_WARNING (pVui->uiChromaSampleLocTypeBottomField, VUI_MAX_CHROMA_LOG_TYPE_TOP_BOTTOM_FIELD,
+    WELS_CHECK_SE_UPPER_WARNING (pVui->uiChromaSampleLocTypeBottomField, VUI_MAX_CHROMA_LOG_TYPE_TOP_BOTTOM_FIELD_MAX,
                                  "chroma_sample_loc_type_bottom_field");
   }
   WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //timing_info_present_flag
@@ -1522,17 +1540,60 @@ int32_t ParseVui (PWelsDecoderContext pCtx, PSps pSps, PBitStringAux pBsAux) {
     WELS_READ_VERIFY (BsGetBits (pBsAux, 16, &uiCode)); //num_units_in_tick
     uiTmp |= uiCode;
     pVui->uiNumUnitsInTick = uiTmp;
-    WELS_CHECK_SE_LOWER_WARNING (pVui->uiNumUnitsInTick, 1, "num_units_in_tick");
+    WELS_CHECK_SE_LOWER_WARNING (pVui->uiNumUnitsInTick, VUI_NUM_UNITS_IN_TICK_MIN, "num_units_in_tick");
     WELS_READ_VERIFY (BsGetBits (pBsAux, 16, &uiCode)); //time_scale
     uiTmp = (uiCode << 16);
     WELS_READ_VERIFY (BsGetBits (pBsAux, 16, &uiCode)); //time_scale
     uiTmp |= uiCode;
     pVui->uiTimeScale = uiTmp;
+    WELS_CHECK_SE_LOWER_WARNING (pVui->uiNumUnitsInTick, VUI_TIME_SCALE_MIN, "time_scale");
     WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //fixed_frame_rate_flag
     pVui->bFixedFrameRateFlag = !!uiCode;
   }
-  //following HRD related parameters, omitted
-
+  WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //nal_hrd_parameters_present_flag
+  pVui->bNalHrdParamPresentFlag = !!uiCode;
+  if (pVui->bNalHrdParamPresentFlag) { //HRD parse not supported
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "nal_hrd_parameters_present_flag = 1 not supported.");
+    return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_VUI_HRD);
+  }
+  WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //vcl_hrd_parameters_present_flag
+  pVui->bVclHrdParamPresentFlag = !!uiCode;
+  if (pVui->bVclHrdParamPresentFlag) { //HRD parse not supported
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "vcl_hrd_parameters_present_flag = 1 not supported.");
+    return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_VUI_HRD);
+  }
+  WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //pic_struct_present_flag
+  pVui->bPicStructPresentFlag = !!uiCode;
+  WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //bitstream_restriction_flag
+  pVui->bBitstreamRestrictionFlag = !!uiCode;
+  if (pVui->bBitstreamRestrictionFlag) {
+    WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //motion_vectors_over_pic_boundaries_flag
+    pVui->bMotionVectorsOverPicBoundariesFlag = !!uiCode;
+    WELS_READ_VERIFY (BsGetUe (pBsAux, &uiCode)); //max_bytes_per_pic_denom
+    pVui->uiMaxBytesPerPicDenom = uiCode;
+    WELS_CHECK_SE_UPPER_WARNING (pVui->uiMaxBytesPerPicDenom, VUI_MAX_BYTES_PER_PIC_DENOM_MAX,
+                                 "max_bytes_per_pic_denom");
+    WELS_READ_VERIFY (BsGetUe (pBsAux, &uiCode)); //max_bits_per_mb_denom
+    pVui->uiMaxBitsPerMbDenom = uiCode;
+    WELS_CHECK_SE_UPPER_WARNING (pVui->uiMaxBitsPerMbDenom, VUI_MAX_BITS_PER_MB_DENOM_MAX,
+                                 "max_bits_per_mb_denom");
+    WELS_READ_VERIFY (BsGetUe (pBsAux, &uiCode)); //log2_max_mv_length_horizontal
+    pVui->uiLog2MaxMvLengthHorizontal = uiCode;
+    WELS_CHECK_SE_UPPER_WARNING (pVui->uiLog2MaxMvLengthHorizontal, VUI_LOG2_MAX_MV_LENGTH_HOR_MAX,
+                                 "log2_max_mv_length_horizontal");
+    WELS_READ_VERIFY (BsGetUe (pBsAux, &uiCode)); //log2_max_mv_length_vertical
+    pVui->uiLog2MaxMvLengthVertical = uiCode;
+    WELS_CHECK_SE_UPPER_WARNING (pVui->uiLog2MaxMvLengthVertical, VUI_LOG2_MAX_MV_LENGTH_VER_MAX,
+                                 "log2_max_mv_length_vertical");
+    WELS_READ_VERIFY (BsGetUe (pBsAux, &uiCode)); //max_num_reorder_frames
+    pVui->uiMaxNumReorderFrames = uiCode;
+    WELS_CHECK_SE_UPPER_WARNING (pVui->uiMaxNumReorderFrames, VUI_MAX_DEC_FRAME_BUFFERING_MAX,
+                                 "max_num_reorder_frames");
+    WELS_READ_VERIFY (BsGetUe (pBsAux, &uiCode)); //max_dec_frame_buffering
+    pVui->uiMaxDecFrameBuffering = uiCode;
+    WELS_CHECK_SE_UPPER_WARNING (pVui->uiMaxDecFrameBuffering, VUI_MAX_DEC_FRAME_BUFFERING_MAX,
+                                 "max_num_reorder_frames");
+  }
   return ERR_NONE;
 }
 /*!
@@ -1593,8 +1654,8 @@ int32_t SetScalingListValue (uint8_t* pScalingList, int iScalingListNum, bool* b
   return ERR_NONE;
 }
 
-int32_t ParseScalingList (PSps pSps, PBitStringAux pBs, bool bPPS, bool* pScalingListPresentFlag,
-                          uint8_t (*iScalingList4x4)[16], uint8_t (*iScalingList8x8)[64]) {
+int32_t ParseScalingList (PSps pSps, PBitStringAux pBs, bool bPPS, const bool kbTrans8x8ModeFlag,
+                          bool* pScalingListPresentFlag, uint8_t (*iScalingList4x4)[16], uint8_t (*iScalingList8x8)[64]) {
   uint32_t uiScalingListNum;
   uint32_t uiCode;
 
@@ -1603,11 +1664,15 @@ int32_t ParseScalingList (PSps pSps, PBitStringAux pBs, bool bPPS, bool* pScalin
   bool bInit = false;
   const uint8_t* defaultScaling[4];
 
-  if (pSps != NULL) {
-    uiScalingListNum = (pSps->uiChromaFormatIdc != 3) ? 8 : 12;
-    bInit = bPPS && pSps->bSeqScalingMatrixPresentFlag;
-  } else
-    uiScalingListNum = 12;
+  if (!bPPS) { //sps scaling_list
+    if (pSps != NULL) {
+      uiScalingListNum = (pSps->uiChromaFormatIdc != 3) ? 8 : 12;
+      bInit = bPPS && pSps->bSeqScalingMatrixPresentFlag;
+    } else
+      uiScalingListNum = 12;
+  } else { //pps scaling_list
+    uiScalingListNum = 6 + (int32_t) kbTrans8x8ModeFlag * ((pSps->uiChromaFormatIdc != 3) ? 2 : 6);
+  }
 
 //Init default_scaling_list value for sps or pps
   defaultScaling[0] = bInit ? pSps->iScalingList4x4[0] : g_kuiDequantScaling4x4Default[0];

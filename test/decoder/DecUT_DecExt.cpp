@@ -65,6 +65,8 @@ class DecoderInterfaceTest : public ::testing::Test {
   void TestGetDecStatistics();
   //DECODER_OPTION_GET_SAR_INFO
   void TestGetDecSarInfo();
+  //Additional test on correctness of vui in subset sps
+  void TestVuiInSubsetSps();
   //Do whole tests here
   void DecoderInterfaceAll();
 
@@ -636,6 +638,28 @@ void DecoderInterfaceTest::TestGetDecSarInfo() {
   Uninit();
 }
 
+//DECODER_OPTION_GET_SAR_INFO, test Vui in subset sps
+void DecoderInterfaceTest::TestVuiInSubsetSps() {
+  int32_t iRet;
+  SVuiSarInfo sVuiSarInfo;
+
+  iRet = ValidInit();
+  ASSERT_EQ (iRet, ERR_NONE);
+
+  //GetOption before decoding
+  m_pDec->GetOption (DECODER_OPTION_GET_SAR_INFO, &sVuiSarInfo);
+  EXPECT_EQ (0u, sVuiSarInfo.uiSarWidth);
+  EXPECT_EQ (0u, sVuiSarInfo.uiSarHeight);
+  EXPECT_EQ (sVuiSarInfo.bOverscanAppropriateFlag, false);
+
+  DecoderBs ("res/sps_subsetsps_bothVUI.264");
+  m_pDec->GetOption (DECODER_OPTION_GET_SAR_INFO, &sVuiSarInfo);
+  EXPECT_EQ (1u, sVuiSarInfo.uiSarWidth); //DO NOT MODIFY the data value
+  EXPECT_EQ (1u, sVuiSarInfo.uiSarHeight); //DO NOT MODIFY the data value
+  EXPECT_EQ (sVuiSarInfo.bOverscanAppropriateFlag, false); //DO NOT MODIFY the data value
+  Uninit();
+}
+
 //TEST here for whole tests
 TEST_F (DecoderInterfaceTest, DecoderInterfaceAll) {
 
@@ -667,6 +691,8 @@ TEST_F (DecoderInterfaceTest, DecoderInterfaceAll) {
   TestGetDecStatistics();
   //DECODER_OPTION_GET_SAR_INFO
   TestGetDecSarInfo();
+  //DECODER_OPTION_GET_SAR_INFO with vui in subsetsps
+  TestVuiInSubsetSps();
 }
 
 

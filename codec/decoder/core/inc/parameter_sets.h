@@ -61,6 +61,16 @@ namespace WelsDec {
     uint32_t uiTimeScale;
     bool bFixedFrameRateFlag;
     bool bNalHrdParamPresentFlag;
+    bool bVclHrdParamPresentFlag;
+    bool bPicStructPresentFlag;
+    bool bBitstreamRestrictionFlag;
+    bool bMotionVectorsOverPicBoundariesFlag;
+    uint32_t uiMaxBytesPerPicDenom;
+    uint32_t uiMaxBitsPerMbDenom;
+    uint32_t uiLog2MaxMvLengthHorizontal;
+    uint32_t uiLog2MaxMvLengthVertical;
+    uint32_t uiMaxNumReorderFrames;
+    uint32_t uiMaxDecFrameBuffering;
   } SVui, *PVui;
 
 /* Sequence Parameter Set, refer to Page 57 in JVT X201wcm */
