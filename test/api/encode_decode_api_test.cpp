@@ -101,9 +101,8 @@ void EncodeDecodeTestAPIBase::EncDecOneFrame (const int iWidth, const int iHeigh
     //call decoder
     unsigned char* pData[3] = { NULL };
     memset (&dstBufInfo_, 0, sizeof (SBufferInfo));
-    rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf, iLen, pData, &dstBufInfo_);
+    rv = decoder_->DecodeFrameNoDelay (info.sLayerInfo[0].pBsBuf, iLen, pData, &dstBufInfo_);
     EXPECT_TRUE (rv == cmResultSuccess) << " rv = " << rv << " iFrameIdx = " << iFrame;
-
     if (NULL != pfEnc) {
       fwrite (info.sLayerInfo[0].pBsBuf, iLen, 1, pfEnc);
     }

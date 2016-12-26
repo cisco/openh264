@@ -146,7 +146,7 @@ int32_t WelsInitPps (SWelsPPS* pPps,
 int32_t WelsCheckRefFrameLimitationNumRefFirst (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam);
 int32_t WelsCheckRefFrameLimitationLevelIdcFirst (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam);
 
-int32_t WelsAdjustLevel (SSpatialLayerConfig* pSpatialLayer);
+int32_t WelsAdjustLevel (SSpatialLayerConfig* pSpatialLayer,const SLevelLimits *pCurLevel);
 
 }
 #endif//WELS_ACCESS_UNIT_PARSER_H__
