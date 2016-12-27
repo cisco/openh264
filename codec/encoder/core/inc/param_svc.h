@@ -186,6 +186,12 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
       param.sSpatialLayers[iLayer].sSliceArgument.uiSliceMode = SM_SINGLE_SLICE;
       param.sSpatialLayers[iLayer].sSliceArgument.uiSliceNum = 0; //AUTO, using number of CPU cores
       param.sSpatialLayers[iLayer].sSliceArgument.uiSliceSizeConstraint = 1500;
+
+      param.sSpatialLayers[iLayer].bAspectRatioPresent = false; // do not write any of the following information to the header
+      param.sSpatialLayers[iLayer].eAspectRatio = ASP_UNSPECIFIED;
+      param.sSpatialLayers[iLayer].sAspectRatioExtWidth = 0;
+      param.sSpatialLayers[iLayer].sAspectRatioExtHeight = 0;
+
       const int32_t kiLesserSliceNum = ((MAX_SLICES_NUM < MAX_SLICES_NUM_TMP) ? MAX_SLICES_NUM : MAX_SLICES_NUM_TMP);
       for (int32_t idx = 0; idx < kiLesserSliceNum; idx++)
         param.sSpatialLayers[iLayer].sSliceArgument.uiSliceMbNum[idx] = 0; //default, using one row a slice if uiSliceMode is SM_RASTER_MODE
@@ -425,6 +431,11 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
       pSpatialLayer->uiColorPrimaries =          pCodingParam.sSpatialLayers[iIdxSpatial].uiColorPrimaries;
       pSpatialLayer->uiTransferCharacteristics = pCodingParam.sSpatialLayers[iIdxSpatial].uiTransferCharacteristics;
       pSpatialLayer->uiColorMatrix =             pCodingParam.sSpatialLayers[iIdxSpatial].uiColorMatrix;
+
+      pSpatialLayer->bAspectRatioPresent = pCodingParam.sSpatialLayers[iIdxSpatial].bAspectRatioPresent;
+      pSpatialLayer->eAspectRatio = pCodingParam.sSpatialLayers[iIdxSpatial].eAspectRatio;
+      pSpatialLayer->sAspectRatioExtWidth = pCodingParam.sSpatialLayers[iIdxSpatial].sAspectRatioExtWidth;
+      pSpatialLayer->sAspectRatioExtHeight = pCodingParam.sSpatialLayers[iIdxSpatial].sAspectRatioExtHeight;
 
       uiProfileIdc = (!bSimulcastAVC) ? PRO_SCALABLE_BASELINE : PRO_BASELINE;
       ++ pDlp;

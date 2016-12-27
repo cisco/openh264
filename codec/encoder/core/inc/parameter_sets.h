@@ -98,6 +98,12 @@ bool            bConstraintSet2Flag;
 bool            bConstraintSet3Flag;
 // bool            bSeparateColorPlaneFlag;  // =false,: only used in decoder, encoder in general_***; it can be removed when removed general up_sample
 
+// aspect ratio in VUI
+bool            bAspectRatioPresent;
+ESampleAspectRatio  eAspectRatio;
+uint16_t            sAspectRatioExtWidth;
+uint16_t            sAspectRatioExtHeight;
+
 } SWelsSPS, *PWelsSPS;
 
 
