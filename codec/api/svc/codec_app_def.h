@@ -418,6 +418,30 @@ typedef enum {
   CM_NUM_ENUM
 } EColorMatrix;
 
+
+/**
+* @brief Enumerate the type of sample aspect ratio
+*/
+typedef enum {
+  ASP_UNSPECIFIED = 0,
+  ASP_1x1 = 1,
+  ASP_12x11 = 2,
+  ASP_10x11 = 3,
+  ASP_16x11 = 4,
+  ASP_40x33 = 5,
+  ASP_24x11 = 6,
+  ASP_20x11 = 7,
+  ASP_32x11 = 8,
+  ASP_80x33 = 9,
+  ASP_18x11 = 10,
+  ASP_15x11 = 11,
+  ASP_64x33 = 12,
+  ASP_160x99 = 13,
+  
+  ASP_EXT_SAR = 255
+} ESampleAspectRatio;
+
+
 /**
 * @brief  Structure for spatial layer configuration
 */
@@ -444,6 +468,12 @@ typedef struct {
 										    //   smpte240m, linear, log100, log316, iec61966-2-4, bt1361e, iec61966-2-1, bt2020-10, bt2020-12
   unsigned char	uiColorMatrix;				// EColorMatrix; 8 bits in header (corresponds to FFmpeg "colorspace"); 0 - 10 => GBR, bt709,
 										    //   undef, ???, fcc, bt470bg, smpte170m, smpte240m, YCgCo, bt2020nc, bt2020c
+
+  bool bAspectRatioPresent; ///< aspect ratio present in VUI
+  ESampleAspectRatio eAspectRatio; ///< aspect ratio idc
+  unsigned short sAspectRatioExtWidth; ///< use if aspect ratio idc == 255
+  unsigned short sAspectRatioExtHeight; ///< use if aspect ratio idc == 255
+
 } SSpatialLayerConfig;
 
 /**

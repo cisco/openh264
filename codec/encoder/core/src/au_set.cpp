@@ -198,7 +198,14 @@ int32_t WelsWriteVUI (SWelsSPS* pSps, SBitStringAux* pBitStringAux) {
   SBitStringAux* pLocalBitStringAux = pBitStringAux;
   assert (pSps != NULL && pBitStringAux != NULL);
 
-  BsWriteOneBit (pLocalBitStringAux, false); //aspect_ratio_info_present_flag
+  BsWriteOneBit(pLocalBitStringAux, pSps->bAspectRatioPresent); //aspect_ratio_info_present_flag
+  if (pSps->bAspectRatioPresent) {
+    BsWriteBits(pLocalBitStringAux, 8, pSps->eAspectRatio); // aspect_ratio_idc
+    if (pSps->eAspectRatio == ASP_EXT_SAR) {
+      BsWriteBits(pLocalBitStringAux, 16, pSps->sAspectRatioExtWidth); // sar_width
+      BsWriteBits(pLocalBitStringAux, 16, pSps->sAspectRatioExtHeight); // sar_height
+    }
+  }
   BsWriteOneBit (pLocalBitStringAux, false); //overscan_info_present_flag
 
   // See codec_app_def.h and parameter_sets.h for more info about members bVideoSignalTypePresent through uiColorMatrix.
@@ -518,6 +525,11 @@ int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialL
     pSps->bGapsInFrameNumValueAllowedFlag = true;
 
   pSps->bVuiParamPresentFlag = true;
+
+  pSps->bAspectRatioPresent = pLayerParam->bAspectRatioPresent;
+  pSps->eAspectRatio = pLayerParam->eAspectRatio;
+  pSps->sAspectRatioExtWidth = pLayerParam->sAspectRatioExtWidth;
+  pSps->sAspectRatioExtHeight = pLayerParam->sAspectRatioExtHeight;
 
   // See codec_app_def.h and parameter_sets.h for more info about members bVideoSignalTypePresent through uiColorMatrix.
   pSps->bVideoSignalTypePresent =   pLayerParam->bVideoSignalTypePresent;
