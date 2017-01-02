@@ -11,7 +11,6 @@ SHLDFLAGS = -dynamiclib -twolevel_namespace -undefined dynamic_lookup \
 SHARED = -dynamiclib
 SHARED += -current_version $(CURRENT_VERSION) -compatibility_version $(COMPATIBILITY_VERSION)
 CFLAGS += -Wall -fPIC -MMD -MP
-LDFLAGS += -lpthread
 ifeq ($(ASM_ARCH), x86)
 ASMFLAGS += -DPREFIX
 ifeq ($(ARCH), x86_64)
