@@ -195,7 +195,7 @@ WelsErrorType CWelsSliceEncodingTask::ExecuteTask() {
 #if MT_DEBUG_BS_WR
   m_pSliceBs->bSliceCodedFlag = true;
 #endif//MT_DEBUG_BS_WR
-    m_pCtx->pCurDqLayer->sSliceThreadInfo.iEncodedSliceNumInThread[m_iThreadIdx] ++;
+    m_pCtx->pCurDqLayer->sSliceThreadInfo[m_iThreadIdx].iCodedSliceNum ++;
   return ENC_RETURN_SUCCESS;
 }
 
@@ -240,8 +240,8 @@ WelsErrorType CWelsConstrainedSizeSlicingEncodingTask::ExecuteTask() {
   const int32_t kiPartitionId             = m_iSliceIdx % kiSliceIdxStep;
   const int32_t kiFirstMbInPartition      = pCurDq->FirstMbIdxOfPartition[kiPartitionId];
   const int32_t kiEndMbIdxInPartition     = pCurDq->EndMbIdxOfPartition[kiPartitionId];
-  const int32_t kiCodedSliceNumByThread   = pCurDq->sSliceThreadInfo.iEncodedSliceNumInThread[m_iThreadIdx];
-  m_pSlice                                = &pCurDq->sSliceThreadInfo.pSliceInThread[m_iThreadIdx][kiCodedSliceNumByThread];
+  const int32_t kiCodedSliceNumByThread   = pCurDq->sSliceThreadInfo[m_iThreadIdx].iCodedSliceNum;
+  m_pSlice                                = &pCurDq->sSliceThreadInfo[m_iThreadIdx].pSliceInThread[kiCodedSliceNumByThread];
   m_pSlice->sSliceHeaderExt.sSliceHeader.iFirstMbInSlice  = kiFirstMbInPartition;
   int32_t iReturn      = 0;
   bool bNeedReallocate = false;
@@ -256,8 +256,8 @@ WelsErrorType CWelsConstrainedSizeSlicingEncodingTask::ExecuteTask() {
   int32_t iAnyMbLeftInPartition = iDiffMbIdx + 1;
   int32_t iLocalSliceIdx = m_iSliceIdx;
   while (iAnyMbLeftInPartition > 0) {
-      bNeedReallocate = (pCurDq->sSliceThreadInfo.iEncodedSliceNumInThread[m_iThreadIdx]
-                         >=  pCurDq->sSliceThreadInfo.iMaxSliceNumInThread[m_iThreadIdx] -1) ? true : false;
+      bNeedReallocate = (pCurDq->sSliceThreadInfo[m_iThreadIdx].iCodedSliceNum
+                         >=  pCurDq->sSliceThreadInfo[m_iThreadIdx].iMaxSliceNum -1) ? true : false;
       if (bNeedReallocate) {
           WelsMutexLock (&m_pCtx->pSliceThreading->mutexThreadSlcBuffReallocate);
           //for memory statistic variable
@@ -302,7 +302,6 @@ WelsErrorType CWelsConstrainedSizeSlicingEncodingTask::ExecuteTask() {
                iLocalSliceIdx, m_pSliceBs->uiSize, m_iSliceSize, m_pSliceBs->sNalList[0].iPayloadSize);
       return iReturn;
     }
-
     m_pCtx->pFuncList->pfDeblocking.pfDeblockingFilterSlice (pCurDq, m_pCtx->pFuncList, m_pSlice);
 
     WelsLog (&m_pCtx->sLogCtx, WELS_LOG_DETAIL,
@@ -320,8 +319,7 @@ WelsErrorType CWelsConstrainedSizeSlicingEncodingTask::ExecuteTask() {
 
     iAnyMbLeftInPartition = kiEndMbIdxInPartition - pCurDq->LastCodedMbIdxOfPartition[kiPartitionId];
     iLocalSliceIdx += kiSliceIdxStep;
-    m_pCtx->pCurDqLayer->sSliceThreadInfo.iEncodedSliceNumInThread[m_iThreadIdx] ++;
-
+    m_pCtx->pCurDqLayer->sSliceThreadInfo[m_iThreadIdx].iCodedSliceNum ++;
   }
 
   return ENC_RETURN_SUCCESS;

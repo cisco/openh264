@@ -565,6 +565,7 @@ void RcDecideTargetBits (sWelsEncCtx* pEncCtx) {
     pWelsSvcRc->iTargetBits = WELS_CLIP3 (pWelsSvcRc->iTargetBits, pTOverRc->iMinBitsTl, pTOverRc->iMaxBitsTl);
   }
   pWelsSvcRc->iRemainingWeights -= pTOverRc->iTlayerWeight;
+
 }
 
 void RcDecideTargetBitsTimestamp (sWelsEncCtx* pEncCtx) {
@@ -573,8 +574,8 @@ void RcDecideTargetBitsTimestamp (sWelsEncCtx* pEncCtx) {
   SSpatialLayerConfig* pDLayerParam = &pEncCtx->pSvcParam->sSpatialLayers[pEncCtx->uiDependencyId];
   int32_t iTl                 = pEncCtx->uiTemporalId;
   SRCTemporal* pTOverRc       = &pWelsSvcRc->pTemporalOverRc[iTl];
-
   pWelsSvcRc->iCurrentBitsLevel = BITS_NORMAL;
+
   if (pEncCtx->eSliceType == I_SLICE) {
     int32_t iBufferTh = static_cast<int32_t> (pWelsSvcRc->iBufferSizeSkip - pWelsSvcRc->iBufferFullnessSkip);
     if (iBufferTh <= 0) {
