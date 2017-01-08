@@ -690,9 +690,9 @@ void  DeblockingFilterFrameAvcbase (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc) {
   }
 }
 
-void DeblockingFilterSliceAvcbase (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc, const int32_t kiSliceIdx) {
+void DeblockingFilterSliceAvcbase (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc, SSlice* pSlice) {
   SMB* pMbList                          = pCurDq->sMbDataP;
-  SSliceHeaderExt* sSliceHeaderExt      = &pCurDq->ppSliceInLayer[kiSliceIdx]->sSliceHeaderExt;
+  SSliceHeaderExt* sSliceHeaderExt      = &pSlice->sSliceHeaderExt;
   SMB* pCurrentMbBlock;
 
   const int32_t kiMbWidth               = pCurDq->iMbWidth;
@@ -738,14 +738,12 @@ void DeblockingFilterSliceAvcbase (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc, co
   }
 }
 
-void DeblockingFilterSliceAvcbaseNull (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc, const int32_t kiSliceIdx) {
+void DeblockingFilterSliceAvcbaseNull (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc, SSlice* pSlice) {
 }
 
 void PerformDeblockingFilter (sWelsEncCtx* pEnc) {
-  const int32_t kiCurDid                = pEnc->uiDependencyId;
-  SWelsSvcCodingParam* pSvcParam        = pEnc->pSvcParam;
-  SSpatialLayerConfig* pSpatialLayer    = &pSvcParam->sSpatialLayers[kiCurDid];
-  SDqLayer* pCurLayer                   = pEnc->pCurDqLayer;
+  SDqLayer* pCurLayer = pEnc->pCurDqLayer;
+  SSlice* pSlice      = NULL;
 
   if (pCurLayer->iLoopFilterDisableIdc == 0) {
     DeblockingFilterFrameAvcbase (pCurLayer, pEnc->pFuncList);
@@ -753,26 +751,13 @@ void PerformDeblockingFilter (sWelsEncCtx* pEnc) {
     int32_t iSliceCount = 0;
     int32_t iSliceIdx   = 0;
 
-    if (SM_SIZELIMITED_SLICE != pSpatialLayer->sSliceArgument.uiSliceMode) {
-      iSliceCount = GetCurrentSliceNum (pCurLayer);
-      do {
-        DeblockingFilterSliceAvcbase (pCurLayer, pEnc->pFuncList, iSliceIdx);
-        ++ iSliceIdx;
-      } while (iSliceIdx < iSliceCount);
-    } else { // for dynamic slicing mode
-      const int32_t kiNumPicPartition = pEnc->iActiveThreadsNum;
-      int32_t iPartitionIdx = 0;
-
-      while (iPartitionIdx < kiNumPicPartition) {
-        iSliceCount     = pCurLayer->pNumSliceCodedOfPartition[iPartitionIdx];
-        iSliceIdx       = iPartitionIdx;
-        do {
-          DeblockingFilterSliceAvcbase (pCurLayer, pEnc->pFuncList, iSliceIdx);
-          iSliceIdx += kiNumPicPartition;
-        } while (iSliceIdx < iSliceCount);
-        ++ iPartitionIdx;
-      }
-    }
+    iSliceCount = GetCurrentSliceNum (pCurLayer);
+    do {
+      pSlice = pCurLayer->ppSliceInLayer[iSliceIdx];
+      assert( NULL != pSlice);
+      DeblockingFilterSliceAvcbase (pCurLayer, pEnc->pFuncList, pSlice);
+      ++ iSliceIdx;
+    } while (iSliceIdx < iSliceCount);
   }
 }
 

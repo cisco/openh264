@@ -140,6 +140,9 @@ int32_t ReallocateSliceInThread (sWelsEncCtx* pCtx,
 
 int32_t ReallocSliceBuffer (sWelsEncCtx* pCtx);
 
+int32_t GetCurLayerNalCount(const SDqLayer* pCurDq, const int32_t kiCodedSliceNum);
+int32_t GetTotalCodedNalCount(SFrameBSInfo* pFbi);
+
 int32_t FrameBsRealloc (sWelsEncCtx* pCtx,
                         SFrameBSInfo* pFrameBsInfo,
                         SLayerBSInfo* pLayerBsInfo,
@@ -148,7 +151,7 @@ int32_t FrameBsRealloc (sWelsEncCtx* pCtx,
 int32_t SliceLayerInfoUpdate (sWelsEncCtx* pCtx,
                               SFrameBSInfo* pFrameBsInfo,
                               SLayerBSInfo* pLayerBsInfo,
-                              const int32_t kiPartitionNum);
+                              const SliceModeEnum kuiSliceMode);
 
 //slice encoding process
 int32_t WelsCodePSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice);
