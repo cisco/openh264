@@ -104,7 +104,6 @@ void WelsUnloadNalForSlice (SWelsSliceBs* pSliceBs) {
 
   /* count payload size of pRawNal NAL */
   pRawNal->iPayloadSize = kiEndPos - pRawNal->iStartPos;
-
   ++ (*pIdx);
 }
 

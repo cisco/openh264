@@ -549,7 +549,7 @@ void RcDecideTargetBits (sWelsEncCtx* pEncCtx) {
   SRCTemporal* pTOverRc         = &pWelsSvcRc->pTemporalOverRc[pEncCtx->uiTemporalId];
 
   pWelsSvcRc->iCurrentBitsLevel = BITS_NORMAL;
-//allocate bits
+  //allocate bits
   if (pEncCtx->eSliceType == I_SLICE) {
     pWelsSvcRc->iTargetBits = pWelsSvcRc->iBitsPerFrame * IDR_BITRATE_RATIO;
   } else {

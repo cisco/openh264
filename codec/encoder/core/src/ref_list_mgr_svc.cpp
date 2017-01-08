@@ -493,7 +493,7 @@ void WlesMarkMMCORefInfo (sWelsEncCtx* pCtx, SLTRState* pLtr,
 
 void WelsMarkPic (sWelsEncCtx* pCtx) {
   SLTRState* pLtr               = &pCtx->pLtr[pCtx->uiDependencyId];
-  const int32_t kiCountSliceNum = GetCurrentSliceNum (pCtx->pCurDqLayer);
+  const int32_t kiCountSliceNum = pCtx->pCurDqLayer->iMaxSliceNum;
 
   if (pCtx->pSvcParam->bEnableLongTermReference && pLtr->bLTRMarkEnable && pCtx->uiTemporalId == 0) {
     if (!pLtr->bReceivedT0LostFlag && pLtr->uiLtrMarkInterval > pCtx->pSvcParam->iLtrMarkPeriod
@@ -660,7 +660,7 @@ static void UpdateBlockStatic (sWelsEncCtx* pCtx) {
 
 void WelsUpdateSliceHeaderSyntax (sWelsEncCtx* pCtx,  const int32_t iAbsDiffPicNumMinus1,
                                   SSlice** ppSliceList, const int32_t uiFrameType) {
-  const int32_t kiCountSliceNum = GetCurrentSliceNum (pCtx->pCurDqLayer);
+  const int32_t kiCountSliceNum = pCtx->pCurDqLayer->iMaxSliceNum;
   SLTRState* pLtr               = &pCtx->pLtr[pCtx->uiDependencyId];
   int32_t iIdx = 0;
 
@@ -985,7 +985,7 @@ void WelsMarkPicScreen (sWelsEncCtx* pCtx) {
     }
   }
 
-  const int32_t iSliceNum = GetCurrentSliceNum (pCtx->pCurDqLayer);
+  const int32_t iSliceNum = pCtx->pCurDqLayer->iMaxSliceNum;
 
   WlesMarkMMCORefInfoScreen (pCtx, pLtr, pCtx->pCurDqLayer->ppSliceInLayer, iSliceNum);
 
