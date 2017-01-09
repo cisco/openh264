@@ -3627,6 +3627,11 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   }
   // perform csc/denoise/downsample/padding, generate spatial layers
   iSpatialNum = pCtx->pVpp->BuildSpatialPicList (pCtx, pSrcPic);
+  if (iSpatialNum == -1) {
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "Failed in allocating memory in BuildSpatialPicList");
+    return ENC_RETURN_MEMALLOCERR;
+  }
+
   if (pCtx->pFuncList->pfRc.pfWelsUpdateMaxBrWindowStatus) {
     pCtx->pFuncList->pfRc.pfWelsUpdateMaxBrWindowStatus (pCtx, iSpatialNum, pFbi->uiTimeStamp);
   }
