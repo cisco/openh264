@@ -251,7 +251,7 @@ int32_t CWelsDecoder::InitDecoder (const SDecodingParam* pParam) {
     return cmMallocMemeError;
   int32_t iCacheLineSize = 16;   // on chip cache line size in byte
   m_pDecContext->pMemAlign = new CMemoryAlign (iCacheLineSize);
-  WELS_VERIFY_RETURN_PROC_IF (1, (NULL == m_pDecContext->pMemAlign), UninitDecoder())
+  WELS_VERIFY_RETURN_PROC_IF (cmMallocMemeError, (NULL == m_pDecContext->pMemAlign), UninitDecoder())
 
   //fill in default value into context
   WelsDecoderDefaults (m_pDecContext, &m_pWelsTrace->m_sLogCtx);
@@ -264,7 +264,7 @@ int32_t CWelsDecoder::InitDecoder (const SDecodingParam* pParam) {
   WELS_VERIFY_RETURN_IFNEQ (iRet, cmResultSuccess);
 
   //init decoder
-  WELS_VERIFY_RETURN_PROC_IF (cmInitParaError, WelsInitDecoder (m_pDecContext, &m_pWelsTrace->m_sLogCtx), UninitDecoder())
+  WELS_VERIFY_RETURN_PROC_IF (cmMallocMemeError, WelsInitDecoder (m_pDecContext, &m_pWelsTrace->m_sLogCtx), UninitDecoder())
 
   return cmResultSuccess;
 }
