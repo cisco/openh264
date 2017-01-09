@@ -73,8 +73,11 @@ FREE_RET:
 void CDownsampling::FreeSampleBuffer() {
   for (int32_t i = 0; i < 2; i++) {
     WelsFree (m_pSampleBuffer[i][0]);
+    m_pSampleBuffer[i][0] = NULL;
     WelsFree (m_pSampleBuffer[i][1]);
+    m_pSampleBuffer[i][1] = NULL;
     WelsFree (m_pSampleBuffer[i][2]);
+    m_pSampleBuffer[i][2] = NULL;
   }
 }
 
