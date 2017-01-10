@@ -259,26 +259,20 @@ bool FmoParamSetsChanged (PFmo pFmo, const int32_t kiCountNumMb, const int32_t k
  *
  * \return  true - update/insert successfully; false - failed;
  */
-bool FmoParamUpdate (PFmo pFmo, PSps pSps, PPps pPps, int32_t* pActiveFmoNum, CMemoryAlign* pMa) {
+int32_t FmoParamUpdate (PFmo pFmo, PSps pSps, PPps pPps, int32_t* pActiveFmoNum, CMemoryAlign* pMa) {
   const uint32_t kuiMbWidth = pSps->iMbWidth;
   const uint32_t kuiMbHeight = pSps->iMbHeight;
+  int32_t iRet = ERR_NONE;
+  if (FmoParamSetsChanged (pFmo, kuiMbWidth * kuiMbHeight, pPps->uiSliceGroupMapType, pPps->uiNumSliceGroups)) {
+    iRet = InitFmo (pFmo, pPps, kuiMbWidth, kuiMbHeight, pMa);
+    WELS_VERIFY_RETURN_IF (iRet, iRet);
 
-  if (FmoParamSetsChanged (pFmo,
-                           kuiMbWidth * kuiMbHeight,
-                           pPps->uiSliceGroupMapType,
-                           pPps->uiNumSliceGroups)) {
-
-    if (InitFmo (pFmo, pPps, kuiMbWidth, kuiMbHeight, pMa)) {
-      return false;
-    } else {
-      if (!pFmo->bActiveFlag && *pActiveFmoNum < MAX_PPS_COUNT) {
-        ++ (*pActiveFmoNum);
-        pFmo->bActiveFlag = true;
-      }
+    if (!pFmo->bActiveFlag && *pActiveFmoNum < MAX_PPS_COUNT) {
+      ++ (*pActiveFmoNum);
+      pFmo->bActiveFlag = true;
     }
   }
-
-  return true;
+  return iRet;
 }
 
 /*!
