@@ -189,7 +189,11 @@ static inline uint8_t WelsClip1 (int32_t iX) {
 #define WELS_SIGN(iX) ((int32_t)(iX) >> 31)
 #endif //WELS_SIGN
 #ifndef WELS_ABS
+#if 1
+#define WELS_ABS(iX) ((iX)>0 ? (iX) : -(iX))
+#else
 #define WELS_ABS(iX) ((WELS_SIGN(iX) ^ (int32_t)(iX)) - WELS_SIGN(iX))
+#endif
 #endif //WELS_ABS
 
 // WELS_CLIP3
