@@ -80,15 +80,15 @@ int32_t WelsPSliceMdEncDynamic (sWelsEncCtx* pEncCtx, SSlice* pSlice,  const boo
 int32_t WelsISliceMdEnc (sWelsEncCtx* pEncCtx, SSlice* pSlice);         // for intra non-dynamic slice
 int32_t WelsISliceMdEncDynamic (sWelsEncCtx* pEncCtx, SSlice* pSlice);  // for intra dynamic slice
 
-//slice buffer init, allocate and free process
+//slice buffer init, allocate/re-allocate and free process
 int32_t AllocMbCacheAligned (SMbCache* pMbCache, CMemoryAlign* pMa);
 void FreeMbCache (SMbCache* pMbCache, CMemoryAlign* pMa);
 
-int32_t InitSliceMBInfo (SSliceArgument* pSliceArgument,
-                         SSlice* pSlice,
-                         const int32_t kiMBWidth,
-                         const int32_t kiMBHeight,
-                         CMemoryAlign* pMa);
+int32_t InitSliceBoundaryInfo (SDqLayer* pCurLayer,
+                               SSliceArgument* pSliceArgument,
+                               const int32_t kiSliceNumInFrame);
+
+int32_t SetSliceBoundaryInfo(SDqLayer* pCurLayer, SSlice* pSlice, const int32_t kiSliceIdx);
 
 int32_t AllocateSliceMBBuffer (SSlice* pSlice, CMemoryAlign* pMa);
 
@@ -98,16 +98,66 @@ int32_t InitSliceBsBuffer (SSlice* pSlice,
                            const int32_t iMaxSliceBufferSize,
                            CMemoryAlign* pMa);
 
-void FreeSliceBuffer(SSlice*& pSliceList,
-                     const int32_t kiMaxSliceNum,
-                     CMemoryAlign* pMa,
-                     const char* kpTag);
+void FreeSliceBuffer (SSlice*& pSliceList,
+                      const int32_t kiMaxSliceNum,
+                      CMemoryAlign* pMa,
+                      const char* kpTag);
+
+void InitSliceHeadWithBase (SSlice* pSlice, SSlice* pBaseSlice);
+
+void InitSliceRefInfoWithBase (SSlice* pSlice, SSlice* pBaseSlice, const uint8_t kuiRefCount);
+
+int32_t InitSliceList (sWelsEncCtx* pCtx,
+                       SDqLayer* pDqLayer,
+                       SSlice*& pSliceList,
+                       const int32_t kiMaxSliceNum,
+                       const int32_t kiDlayerIndex,
+                       CMemoryAlign* pMa);
+
+int32_t InitAllSlicesInThread (sWelsEncCtx* pCtx);
+
+int32_t InitOneSliceInThread (sWelsEncCtx* pCtx,
+                              SSlice*& pSlice,
+                              const int32_t kiThreadIdx,
+                              const int32_t kiDlayerIdx,
+                              const int32_t kiSliceIdx);
+
+int32_t InitSliceInLayer (sWelsEncCtx* pCtx,
+                          SDqLayer* pDqLayer,
+                          const int32_t kiDlayerIndex,
+                          CMemoryAlign* pMa);
+
+int32_t ReallocateSliceList (sWelsEncCtx* pCtx,
+                             SSliceArgument* pSliceArgument,
+                             SSlice*& pSliceList,
+                             const int32_t kiMaxSliceNumOld,
+                             const int32_t kiMaxSliceNumNew);
+
+int32_t ReallocateSliceInThread (sWelsEncCtx* pCtx,
+                                 SDqLayer* pDqLayer,
+                                 const int32_t kiDlayerIdx,
+                                 const int32_t kiThreadIndex);
+
+int32_t ReallocSliceBuffer (sWelsEncCtx* pCtx);
+
+int32_t GetCurLayerNalCount(const SDqLayer* pCurDq, const int32_t kiCodedSliceNum);
+int32_t GetTotalCodedNalCount(SFrameBSInfo* pFbi);
+
+int32_t FrameBsRealloc (sWelsEncCtx* pCtx,
+                        SFrameBSInfo* pFrameBsInfo,
+                        SLayerBSInfo* pLayerBsInfo,
+                        const int32_t kiMaxSliceNumOld);
+
+int32_t SliceLayerInfoUpdate (sWelsEncCtx* pCtx,
+                              SFrameBSInfo* pFrameBsInfo,
+                              SLayerBSInfo* pLayerBsInfo,
+                              const SliceModeEnum kuiSliceMode);
 
 //slice encoding process
 int32_t WelsCodePSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice);
 int32_t WelsCodePOverDynamicSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice);
 
-int32_t WelsCodeOneSlice (sWelsEncCtx* pEncCtx, const int32_t kiSliceIdx,
+int32_t WelsCodeOneSlice (sWelsEncCtx* pEncCtx, SSlice* pCurSlice,
                           const int32_t keNalType);
 
 void WelsInitSliceEncodingFuncs (uint32_t uiCpuFlag);

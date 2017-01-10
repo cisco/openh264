@@ -149,12 +149,12 @@ uint16_t WelsMbToSliceIdc (SDqLayer* pCurDq, const int32_t kiMbXY);
 /*!
  * \brief   Get first mb in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
  *
- * \param   pSliceInLayer   slice list in current layer
+ * \param   pCurLayer       current layer
  * \param   kiSliceIdc      slice idc
  *
  * \return  first_mb - successful; -1 - failed;
  */
-int32_t WelsGetFirstMbOfSlice (SSlice* pSliceInLayer, const int32_t kiSliceIdc);
+int32_t WelsGetFirstMbOfSlice (SDqLayer* pCurLayer, const int32_t kiSliceIdc);
 
 /*!
  * \brief   Get successive mb to be processed in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
@@ -180,11 +180,12 @@ int32_t WelsGetPrevMbOfSlice (SDqLayer* pCurDq, const int32_t kiMbXY);
  * \brief   Get number of mb in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
  *
  * \param   pCurDq          current layer info
+ * \param   pSlice          slice which request slice num
  * \param   kiSliceIdc      slice/slice_group idc
  *
  * \return  count_num_of_mb - successful; -1 - failed;
  */
-int32_t WelsGetNumMbInSlice (SDqLayer* pCurDq, const int32_t kiSliceIdc);
+int32_t WelsGetNumMbInSlice (SDqLayer* pCurDq, SSlice* pSlice, const int32_t kuiSliceIdc);
 
 /*!
  *  Get slice count for multiple slice segment

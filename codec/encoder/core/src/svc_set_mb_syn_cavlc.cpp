@@ -302,7 +302,7 @@ int32_t WelsSpatialWriteMbSyn (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb
     }
 
     /* Step 4: Check the left buffer */
-    return CheckBitstreamBuffer (pSlice->uiSliceIdx, pEncCtx, pBs);
+    return CheckBitstreamBuffer (pSlice->iSliceIdx, pEncCtx, pBs);
   }
 }
 

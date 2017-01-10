@@ -57,7 +57,7 @@ void UpdateMbListNeighborParallel (SDqLayer* pCurDq,
 
 void CalcSliceComplexRatio (SDqLayer* pCurDq);
 
-int32_t NeedDynamicAdjust (void* pConsumeTime, const int32_t kiSliceNum);
+int32_t NeedDynamicAdjust (SSlice** ppSliceInLayer, const int32_t iSliceNum);
 
 void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
                            SDqLayer* pCurDqLayer,
@@ -79,8 +79,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg);
 int32_t CreateSliceThreads (sWelsEncCtx* pCtx);
 
 int32_t FiredSliceThreads (sWelsEncCtx* pCtx, SSliceThreadPrivateData* pPriData, WELS_EVENT* pEventsList,
-                           WELS_EVENT* pMasterEventsList, SFrameBSInfo* pFrameBsInfo,
-                           const uint32_t kuiNumThreads, SSliceCtx* pSliceCtx, const bool kbIsDynamicSlicingMode);
+                           WELS_EVENT* pMasterEventsList, SFrameBSInfo* pFrameBsInfo, const uint32_t kuiNumThreads);
 
 int32_t DynamicDetectCpuCores();
 
@@ -97,7 +96,7 @@ void TrackSliceComplexities (sWelsEncCtx* pCtx, const int32_t kiCurDid);
 void TrackSliceConsumeTime (sWelsEncCtx* pCtx, int32_t* pDidList, const int32_t kiSpatialNum);
 #endif//defined(MT_DEBUG)
 
-void SetOneSliceBsBufferUnderMultithread(sWelsEncCtx* pCtx, const int32_t kiThreadIdx, const int32_t iSliceIdx);
+void SetOneSliceBsBufferUnderMultithread(sWelsEncCtx* pCtx, const int32_t kiThreadIdx, SSlice* pSlice);
 int32_t WriteSliceBs (sWelsEncCtx* pCtx,SWelsSliceBs* pSliceBs,const int32_t iSliceIdx,int32_t& iSliceSize);
 }
 
