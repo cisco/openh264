@@ -312,7 +312,6 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   pCtx->bAvcBasedFlag             = true;
   pCtx->pPreviousDecodedPictureInDpb = NULL;
   pCtx->sDecoderStatistics.iAvgLumaQp = -1;
-  pCtx->bSpsLatePps = false;
   pCtx->bUseScalingList = false;
   pCtx->iSpsErrorIgnored = 0;
   pCtx->iSubSpsErrorIgnored = 0;

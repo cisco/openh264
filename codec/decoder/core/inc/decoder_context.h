@@ -447,7 +447,6 @@ typedef struct TagWelsDecoderContext {
   uint16_t (*pDequant_coeff8x8[6])[64];//64 residual coeff ,with 6 kinds of residual type, 52 qp level
   int iDequantCoeffPpsid;//When a new pps actived, reinitialised the scaling list value
   bool bDequantCoeff4x4Init;
-  bool bSpsLatePps;
   bool bUseScalingList;
   CMemoryAlign*     pMemAlign;
 } SWelsDecoderContext, *PWelsDecoderContext;

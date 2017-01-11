@@ -1420,9 +1420,10 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
         WELS_READ_VERIFY (ParseScalingList (&pCtx->sSpsBuffer[pPps->iSpsId], pBsAux, 1, pPps->bTransform8x8ModeFlag,
                                             pPps->bPicScalingListPresentFlag, pPps->iScalingList4x4, pPps->iScalingList8x8));
       } else {
-        pCtx->bSpsLatePps = true;
-        WELS_READ_VERIFY (ParseScalingList (NULL, pBsAux, 1, pPps->bTransform8x8ModeFlag, pPps->bPicScalingListPresentFlag,
-                                            pPps->iScalingList4x4, pPps->iScalingList8x8));
+        WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
+                 "ParsePps(): sps_id (%d) does not exist for scaling_list. This PPS (%d) is marked as invalid.", pPps->iSpsId,
+                 pPps->iPpsId);
+        return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_SPS_ID);
       }
     }
     WELS_READ_VERIFY (BsGetSe (pBsAux, &iCode)); //second_chroma_qp_index_offset
@@ -1665,13 +1666,10 @@ int32_t ParseScalingList (PSps pSps, PBitStringAux pBs, bool bPPS, const bool kb
   const uint8_t* defaultScaling[4];
 
   if (!bPPS) { //sps scaling_list
-    if (pSps != NULL) {
-      uiScalingListNum = (pSps->uiChromaFormatIdc != 3) ? 8 : 12;
-      bInit = bPPS && pSps->bSeqScalingMatrixPresentFlag;
-    } else
-      uiScalingListNum = 12;
+    uiScalingListNum = (pSps->uiChromaFormatIdc != 3) ? 8 : 12;
   } else { //pps scaling_list
     uiScalingListNum = 6 + (int32_t) kbTrans8x8ModeFlag * ((pSps->uiChromaFormatIdc != 3) ? 2 : 6);
+    bInit = pSps->bSeqScalingMatrixPresentFlag;
   }
 
 //Init default_scaling_list value for sps or pps
