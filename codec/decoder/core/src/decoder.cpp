@@ -474,7 +474,7 @@ void WelsFreeDynamicMemory (PWelsDecoderContext pCtx) {
 /*!
  * \brief   Open decoder
  */
-int32_t WelsOpenDecoder (PWelsDecoderContext pCtx) {
+int32_t WelsOpenDecoder (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   int iRet = ERR_NONE;
   // function pointers
   InitDecFuncs (pCtx, pCtx->uiCpuFlag);
@@ -484,8 +484,11 @@ int32_t WelsOpenDecoder (PWelsDecoderContext pCtx) {
 
   // static memory
   iRet = WelsInitStaticMemory (pCtx);
-  if (ERR_NONE != iRet)
+  if (ERR_NONE != iRet) {
+    pCtx->iErrorCode |= dsOutOfMemory;
+    WelsLog (pLogCtx, WELS_LOG_ERROR, "WelsInitStaticMemory() failed in WelsOpenDecoder().");
     return iRet;
+  }
 
 #ifdef LONG_TERM_REF
   pCtx->bParamSetsLostFlag = true;
@@ -567,7 +570,7 @@ int32_t WelsInitDecoder (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   }
 
   // open decoder
-  return WelsOpenDecoder (pCtx);
+  return WelsOpenDecoder (pCtx, pLogCtx);
 }
 
 /*!
@@ -816,17 +819,17 @@ int32_t SyncPictureResolutionExt (PWelsDecoderContext pCtx, const int32_t kiMbWi
   bool bReallocFlag = false;
   iErr = WelsRequestMem (pCtx, kiMbWidth, kiMbHeight, bReallocFlag); // common memory used
   if (ERR_NONE != iErr) {
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR,
              "SyncPictureResolutionExt()::WelsRequestMem--buffer allocated failure.");
-    pCtx->iErrorCode = dsOutOfMemory;
+    pCtx->iErrorCode |= dsOutOfMemory;
     return iErr;
   }
 
   iErr = InitialDqLayersContext (pCtx, kiPicWidth, kiPicHeight);
   if (ERR_NONE != iErr) {
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR,
              "SyncPictureResolutionExt()::InitialDqLayersContext--buffer allocated failure.");
-    pCtx->iErrorCode = dsOutOfMemory;
+    pCtx->iErrorCode |= dsOutOfMemory;
   }
 #if defined(MEMORY_MONITOR)
   if (bReallocFlag) {

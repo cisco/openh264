@@ -1148,7 +1148,9 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
 
   if (pCtx->pParam->bParseOnly) {
     if (kSrcNalLen >= SPS_PPS_BS_SIZE - 4) { //sps bs exceeds!
-      pCtx->iErrorCode |= dsOutOfMemory;
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "sps payload size (%d) too large for parse only (%d), not supported!",
+               kSrcNalLen, SPS_PPS_BS_SIZE - 4);
+      pCtx->iErrorCode |= dsBitstreamError;
       return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_OUT_OF_MEMORY);
     }
     if (!kbUseSubsetFlag) { //SPS
@@ -1181,6 +1183,7 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
       uint8_t* pBsBuf = static_cast<uint8_t*> (pMa->WelsMallocz (SPS_PPS_BS_SIZE + 4,
                         "Temp buffer for parse only usage.")); //to reserve 4 bytes for UVLC writing buffer
       if (NULL == pBsBuf) {
+        WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "sps buffer alloc failed for parse only!");
         pCtx->iErrorCode |= dsOutOfMemory;
         return pCtx->iErrorCode;
       }
@@ -1448,7 +1451,9 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
   }
   if (pCtx->pParam->bParseOnly) {
     if (kSrcNalLen >= SPS_PPS_BS_SIZE - 4) { //pps bs exceeds
-      pCtx->iErrorCode |= dsOutOfMemory;
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "pps payload size (%d) too large for parse only (%d), not supported!",
+               kSrcNalLen, SPS_PPS_BS_SIZE - 4);
+      pCtx->iErrorCode |= dsBitstreamError;
       return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_OUT_OF_MEMORY);
     }
     SPpsBsInfo* pPpsBs = &pCtx->sPpsBsInfo [uiPpsId];
