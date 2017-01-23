@@ -131,8 +131,9 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
         pParser->iNalLenInByte [pParser->iNalNum ++] = iNalLen;
         if (pDstBuf - pParser->pDstBuff + iNalLen >= MAX_ACCESS_UNIT_CAPACITY) {
           WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR,
-                   "DecodeFrameConstruction(): composed output size (%ld) exceeds (%d). Failed to parse. \n",
-                   (long) (pDstBuf - pParser->pDstBuff + iNalLen), MAX_ACCESS_UNIT_CAPACITY);
+                   "DecodeFrameConstruction(): composed output size (%ld) exceeds (%d). Failed to parse. current data pos %d out of %d:, previously accumulated num: %d, total num: %d, previously accumulated len: %d, current len: %d, current buf pos: %p, header buf pos: %p \n",
+                   (long) (pDstBuf - pParser->pDstBuff + iNalLen), MAX_ACCESS_UNIT_CAPACITY, iIdx, iEndIdx, iNum, pParser->iNalNum,
+                   iTotalNalLen, iNalLen, pDstBuf, pParser->pDstBuff);
           pCtx->iErrorCode |= dsOutOfMemory;
           pCtx->pParserBsInfo->iNalNum = 0;
           return ERR_INFO_OUT_OF_MEMORY;
@@ -2260,11 +2261,11 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
       if (ERR_NONE != iRet) {
         if (iRet == ERR_INFO_OUT_OF_MEMORY) {
           pCtx->iErrorCode |= dsOutOfMemory;
-          WelsLog (&(pCtx->sLogCtx), WELS_LOG_ERROR, "DecodeCurrentAccessUnit(), Fmo param alloc failed");
+          WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "DecodeCurrentAccessUnit(), Fmo param alloc failed");
         } else {
           pCtx->iErrorCode |= dsBitstreamError;
-          WelsLog(&(pCtx->sLogCtx), WELS_LOG_WARNING, "DecodeCurrentAccessUnit(), FmoParamUpdate failed, eSliceType: %d.",
-            pSh->eSliceType);
+          WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "DecodeCurrentAccessUnit(), FmoParamUpdate failed, eSliceType: %d.",
+                   pSh->eSliceType);
         }
         return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_FMO_INIT_FAIL);
       }
