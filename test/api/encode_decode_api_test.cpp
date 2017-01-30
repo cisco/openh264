@@ -82,8 +82,9 @@ void EncodeDecodeTestAPIBase::prepareParamDefault (int iLayers, int iSlices, int
 
 void EncodeDecodeTestAPIBase::EncodeOneFrame (int iCheckTypeIndex) {
     int frameSize = EncPic.iPicWidth * EncPic.iPicHeight * 3 / 2;
-    memset (buf_.data(), iRandValue, (frameSize >> 2));
-    memset (buf_.data() + (frameSize >> 2), rand() % 256, (frameSize - (frameSize >> 2)));
+    int lumaSize = EncPic.iPicWidth * EncPic.iPicHeight;
+    memset (buf_.data(), iRandValue, lumaSize);
+    memset (buf_.data() + lumaSize, rand() % 256, (frameSize - lumaSize));
     int rv = encoder_->EncodeFrame (&EncPic, &info);
     if (0 == iCheckTypeIndex)
       ASSERT_TRUE (rv == cmResultSuccess);
