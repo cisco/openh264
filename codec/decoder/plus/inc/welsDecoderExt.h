@@ -113,6 +113,8 @@ int32_t InitDecoder (const SDecodingParam* pParam);
 void UninitDecoder (void);
 int32_t ResetDecoder();
 
+void OutputStatisticsLog (SDecoderStatistics& sDecoderStatistics);
+
 #ifdef OUTPUT_BIT_STREAM
 WelsFileHandle* m_pFBS;
 WelsFileHandle* m_pFBSSize;

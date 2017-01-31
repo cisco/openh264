@@ -163,7 +163,9 @@ typedef enum {
   DECODER_OPTION_GET_STATISTICS,        ///< feedback decoder statistics
   DECODER_OPTION_GET_SAR_INFO,          ///< feedback decoder Sample Aspect Ratio info in Vui
   DECODER_OPTION_PROFILE,               ///< get current AU profile info, only is used in GetOption
-  DECODER_OPTION_LEVEL                  ///< get current AU level info,only is used in GetOption
+  DECODER_OPTION_LEVEL,                 ///< get current AU level info,only is used in GetOption
+  DECODER_OPTION_STATISTICS_LOG_INTERVAL,///< set log output interval
+
 } DECODER_OPTION;
 
 /**
@@ -770,6 +772,14 @@ typedef struct TagVideoDecoderStatistics {
   int iSpsNoExistNalNum;                       ///< number of Sps NoExist Nal
   int iSubSpsNoExistNalNum;                    ///< number of SubSps NoExist Nal
   int iPpsNoExistNalNum;                       ///< number of Pps NoExist Nal
+
+  unsigned int uiProfile;                ///< Profile idc in syntax
+  unsigned int uiLevel;                  ///< level idc according to Annex A-1
+
+  int iCurrentActiveSpsId;                     ///< current active SPS id
+  int iCurrentActivePpsId;                     ///< current active PPS id
+
+  unsigned int iStatisticsLogInterval;                  ///< frame interval of statistics log
 } SDecoderStatistics; // in building, coming soon
 
 /**
