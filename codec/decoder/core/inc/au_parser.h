@@ -193,8 +193,6 @@ int32_t ParseSei (void* pSei, PBitStringAux pBsAux); // reserved Sei_Msg type
  */
 int32_t ResetFmoList (PWelsDecoderContext pCtx);
 
-
-const SLevelLimits* GetLevelLimits (int32_t iLevelIdx, bool bConstraint3);
 } // namespace WelsDec
 
 #endif//WELS_ACCESS_UNIT_PARSER_H__
