@@ -347,7 +347,10 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
              "CWelsDecoder::SetOption():DECODER_OPTION_GET_STATISTICS: this option is get-only!");
     return cmInitParaError;
   } else if (eOptID == DECODER_OPTION_STATISTICS_LOG_INTERVAL) {
-    m_pDecContext->sDecoderStatistics.iStatisticsLogInterval = (* ((unsigned int*)pOption));
+    if (pOption) {
+      m_pDecContext->sDecoderStatistics.iStatisticsLogInterval = (* ((unsigned int*)pOption));
+      return cmResultSuccess;
+    }
   } else if (eOptID == DECODER_OPTION_GET_SAR_INFO) {
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_WARNING,
              "CWelsDecoder::SetOption():DECODER_OPTION_GET_SAR_INFO: this option is get-only!");
@@ -418,8 +421,11 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
     }
     return cmResultSuccess;
   } else if (eOptID == DECODER_OPTION_STATISTICS_LOG_INTERVAL) {
-    iVal = m_pDecContext->sDecoderStatistics.iStatisticsLogInterval;
-    * ((unsigned int*)pOption) = iVal;
+    if (pOption) {
+      iVal = m_pDecContext->sDecoderStatistics.iStatisticsLogInterval;
+      * ((unsigned int*)pOption) = iVal;
+      return cmResultSuccess;
+    }
   } else if (DECODER_OPTION_GET_SAR_INFO == eOptID) { //get decoder SAR info in VUI
     PVuiSarInfo pVuiSarInfo = (static_cast<PVuiSarInfo> (pOption));
     memset (pVuiSarInfo, 0, sizeof (SVuiSarInfo));

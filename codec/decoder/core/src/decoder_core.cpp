@@ -677,8 +677,8 @@ void DecodeNalHeaderExt (PNalUnit pNal, uint8_t* pSrc) {
 
 
 void UpdateDecoderStatisticsForActiveParaset(SDecoderStatistics* pDecoderStatistics,
-                                             PSps pSps, PPps pPps, const int32_t iSpsId) {
-  pDecoderStatistics->iCurrentActiveSpsId = iSpsId;
+                                             PSps pSps, PPps pPps) {
+  pDecoderStatistics->iCurrentActiveSpsId = pSps->iSpsId;
 
   pDecoderStatistics->iCurrentActivePpsId = pPps->iPpsId;
   pDecoderStatistics->uiProfile = static_cast<unsigned int> (pSps->uiProfileIdc);
@@ -2119,8 +2119,7 @@ void WelsDqLayerDecodeStart (PWelsDecoderContext pCtx, PNalUnit pCurNal, PSps pS
   pCtx->iFrameNum    = pSh->iFrameNum;
 
   UpdateDecoderStatisticsForActiveParaset(&(pCtx->sDecoderStatistics),
-                                          pSps, pPps,
-                                          (pCurNal->sNalData.sVclNal.bSliceHeaderExtFlag) ? (pCurNal->sNalData.sVclNal.sSliceHeaderExt.pSubsetSps->sSps.iSpsId) : (pSps->iSpsId) );
+                                          pSps, pPps);
 }
 
 int32_t InitRefPicList (PWelsDecoderContext pCtx, const uint8_t kuiNRi, int32_t iPoc) {
