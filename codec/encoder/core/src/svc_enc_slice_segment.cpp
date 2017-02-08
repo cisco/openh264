@@ -316,24 +316,24 @@ bool GomValidCheckSliceMbNum (const int32_t kiMbWidth, const int32_t kiMbHeight,
  *  Get slice count for multiple slice segment
  *
  */
-int32_t GetInitialSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, SSliceArgument* pSliceArgument) {
+int32_t GetInitialSliceNum (SSliceArgument* pSliceArgument) {
   if (NULL == pSliceArgument)
     return -1;
 
   switch (pSliceArgument->uiSliceMode) {
-  case SM_SINGLE_SLICE:
-  case SM_FIXEDSLCNUM_SLICE:
-  case SM_RASTER_SLICE:
-    {
-    return pSliceArgument->uiSliceNum;
-  }
-  case SM_SIZELIMITED_SLICE: {
-    return AVERSLICENUM_CONSTRAINT;//at the beginning of dynamic slicing, set the uiSliceNum to be 1
-  }
-  case SM_RESERVED:
-  default: {
-    return -1;
-  }
+    case SM_SINGLE_SLICE:
+    case SM_FIXEDSLCNUM_SLICE:
+    case SM_RASTER_SLICE:
+      {
+        return pSliceArgument->uiSliceNum;
+    }
+    case SM_SIZELIMITED_SLICE: {
+      return AVERSLICENUM_CONSTRAINT;//at the beginning of dynamic slicing, set the uiSliceNum to be 1
+    }
+    case SM_RESERVED:
+    default: {
+      return -1;
+    }
   }
 
   return -1;
@@ -404,7 +404,7 @@ int32_t InitSliceSegment (SDqLayer* pCurDq,
     WelsSetMemMultiplebytes_c(pSliceSeg->pOverallMbMap, 0, kiCountMbNum, sizeof(uint16_t));
 
     //SM_SIZELIMITED_SLICE: init, set pSliceSeg->iSliceNumInFrame = 1;
-    pSliceSeg->iSliceNumInFrame = GetInitialSliceNum (kiMbWidth, kiMbHeight, pSliceArgument);
+    pSliceSeg->iSliceNumInFrame = GetInitialSliceNum (pSliceArgument);
     if (-1 == pSliceSeg->iSliceNumInFrame)
       return 1;
 
