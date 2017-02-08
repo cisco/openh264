@@ -106,7 +106,7 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
           pSpsBs = bSubSps ? &pCtx->sSubsetSpsBsInfo [iSpsId] : &pCtx->sSpsBsInfo [iSpsId];
           pPpsBs = &pCtx->sPpsBsInfo [iPpsId];
           if (pDstBuf - pParser->pDstBuff + pSpsBs->uiSpsBsLen + pPpsBs->uiPpsBsLen >= MAX_ACCESS_UNIT_CAPACITY) {
-            WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
+            WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR,
                      "DecodeFrameConstruction(): sps pps size: (%d %d) too large. Failed to parse. \n", pSpsBs->uiSpsBsLen,
                      pPpsBs->uiPpsBsLen);
             pCtx->iErrorCode |= dsOutOfMemory;
@@ -130,9 +130,10 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
         pNalBs = pCurNal->sNalData.sVclNal.pNalPos;
         pParser->iNalLenInByte [pParser->iNalNum ++] = iNalLen;
         if (pDstBuf - pParser->pDstBuff + iNalLen >= MAX_ACCESS_UNIT_CAPACITY) {
-          WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
-                   "DecodeFrameConstruction(): composed output size (%ld) exceeds (%d). Failed to parse. \n",
-                   (long) (pDstBuf - pParser->pDstBuff + iNalLen), MAX_ACCESS_UNIT_CAPACITY);
+          WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR,
+                   "DecodeFrameConstruction(): composed output size (%ld) exceeds (%d). Failed to parse. current data pos %d out of %d:, previously accumulated num: %d, total num: %d, previously accumulated len: %d, current len: %d, current buf pos: %p, header buf pos: %p \n",
+                   (long) (pDstBuf - pParser->pDstBuff + iNalLen), MAX_ACCESS_UNIT_CAPACITY, iIdx, iEndIdx, iNum, pParser->iNalNum,
+                   iTotalNalLen, iNalLen, pDstBuf, pParser->pDstBuff);
           pCtx->iErrorCode |= dsOutOfMemory;
           pCtx->pParserBsInfo->iNalNum = 0;
           return ERR_INFO_OUT_OF_MEMORY;
@@ -517,8 +518,11 @@ int32_t ExpandBsBuffer (PWelsDecoderContext pCtx, const int kiSrcLen) {
 
   //Realloc sRawData
   uint8_t* pNewBsBuff = static_cast<uint8_t*> (pMa->WelsMallocz (iNewBuffLen, "pCtx->sRawData.pHead"));
-  if (pNewBsBuff == NULL)
+  if (pNewBsBuff == NULL) {
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "ExpandBsBuffer() Failed for malloc pNewBsBuff (%d)", iNewBuffLen);
+    pCtx->iErrorCode |= dsOutOfMemory;
     return ERR_INFO_OUT_OF_MEMORY;
+  }
 
   //Calculate and set the bs start and end position
   for (uint32_t i = 0; i <= pCtx->pAccessUnitList->uiActualUnitsNum; i++) {
@@ -539,8 +543,11 @@ int32_t ExpandBsBuffer (PWelsDecoderContext pCtx, const int kiSrcLen) {
   if (pCtx->pParam->bParseOnly) {
     //Realloc sSavedData
     uint8_t* pNewSavedBsBuff = static_cast<uint8_t*> (pMa->WelsMallocz (iNewBuffLen, "pCtx->sSavedData.pHead"));
-    if (pNewSavedBsBuff == NULL)
+    if (pNewSavedBsBuff == NULL) {
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "ExpandBsBuffer() Failed for malloc pNewSavedBsBuff (%d)", iNewBuffLen);
+      pCtx->iErrorCode |= dsOutOfMemory;
       return ERR_INFO_OUT_OF_MEMORY;
+    }
 
     //Copy current buffer status to new buffer
     memcpy (pNewSavedBsBuff, pCtx->sSavedData.pHead, pCtx->iMaxBsBufferSizeInByte);
@@ -2250,10 +2257,16 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
       pLayerInfo.pSubsetSps = pShExt->pSubsetSps;
 
       pCtx->pFmo = &pCtx->sFmoList[iPpsId];
-      if (!FmoParamUpdate (pCtx->pFmo, pLayerInfo.pSps, pLayerInfo.pPps, &pCtx->iActiveFmoNum, pCtx->pMemAlign)) {
-        pCtx->iErrorCode |= dsBitstreamError;
-        WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "DecodeCurrentAccessUnit(), FmoParamUpdate failed, eSliceType: %d.",
-                 pSh->eSliceType);
+      iRet = FmoParamUpdate (pCtx->pFmo, pLayerInfo.pSps, pLayerInfo.pPps, &pCtx->iActiveFmoNum, pCtx->pMemAlign);
+      if (ERR_NONE != iRet) {
+        if (iRet == ERR_INFO_OUT_OF_MEMORY) {
+          pCtx->iErrorCode |= dsOutOfMemory;
+          WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "DecodeCurrentAccessUnit(), Fmo param alloc failed");
+        } else {
+          pCtx->iErrorCode |= dsBitstreamError;
+          WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "DecodeCurrentAccessUnit(), FmoParamUpdate failed, eSliceType: %d.",
+                   pSh->eSliceType);
+        }
         return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_FMO_INIT_FAIL);
       }
 

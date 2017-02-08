@@ -146,7 +146,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
   ++ (*pConsumedBytes);
 
   if (! (IS_SEI_NAL (pNalUnitHeader->eNalUnitType) || IS_SPS_NAL (pNalUnitHeader->eNalUnitType)
-         || pCtx->bSpsExistAheadFlag)) {
+         || IS_AU_DELIMITER_NAL (pNalUnitHeader->eNalUnitType) || pCtx->bSpsExistAheadFlag)) {
     if (pCtx->bPrintFrameErrorTraceFlag && pCtx->iSpsErrorIgnored == 0) {
       WelsLog (pLogCtx, WELS_LOG_WARNING,
                "parse_nal(), no exist Sequence Parameter Sets ahead of sequence when try to decode NAL(type:%d).",
@@ -160,7 +160,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
   }
   pCtx->iSpsErrorIgnored = 0;
   if (! (IS_SEI_NAL (pNalUnitHeader->eNalUnitType) || IS_PARAM_SETS_NALS (pNalUnitHeader->eNalUnitType)
-         || pCtx->bPpsExistAheadFlag)) {
+         || IS_AU_DELIMITER_NAL (pNalUnitHeader->eNalUnitType) || pCtx->bPpsExistAheadFlag)) {
     if (pCtx->bPrintFrameErrorTraceFlag && pCtx->iPpsErrorIgnored == 0) {
       WelsLog (pLogCtx, WELS_LOG_WARNING,
                "parse_nal(), no exist Picture Parameter Sets ahead of sequence when try to decode NAL(type:%d).",
@@ -1148,7 +1148,9 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
 
   if (pCtx->pParam->bParseOnly) {
     if (kSrcNalLen >= SPS_PPS_BS_SIZE - 4) { //sps bs exceeds!
-      pCtx->iErrorCode |= dsOutOfMemory;
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "sps payload size (%d) too large for parse only (%d), not supported!",
+               kSrcNalLen, SPS_PPS_BS_SIZE - 4);
+      pCtx->iErrorCode |= dsBitstreamError;
       return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_OUT_OF_MEMORY);
     }
     if (!kbUseSubsetFlag) { //SPS
@@ -1181,6 +1183,7 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
       uint8_t* pBsBuf = static_cast<uint8_t*> (pMa->WelsMallocz (SPS_PPS_BS_SIZE + 4,
                         "Temp buffer for parse only usage.")); //to reserve 4 bytes for UVLC writing buffer
       if (NULL == pBsBuf) {
+        WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "sps buffer alloc failed for parse only!");
         pCtx->iErrorCode |= dsOutOfMemory;
         return pCtx->iErrorCode;
       }
@@ -1420,9 +1423,10 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
         WELS_READ_VERIFY (ParseScalingList (&pCtx->sSpsBuffer[pPps->iSpsId], pBsAux, 1, pPps->bTransform8x8ModeFlag,
                                             pPps->bPicScalingListPresentFlag, pPps->iScalingList4x4, pPps->iScalingList8x8));
       } else {
-        pCtx->bSpsLatePps = true;
-        WELS_READ_VERIFY (ParseScalingList (NULL, pBsAux, 1, pPps->bTransform8x8ModeFlag, pPps->bPicScalingListPresentFlag,
-                                            pPps->iScalingList4x4, pPps->iScalingList8x8));
+        WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
+                 "ParsePps(): sps_id (%d) does not exist for scaling_list. This PPS (%d) is marked as invalid.", pPps->iSpsId,
+                 pPps->iPpsId);
+        return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_SPS_ID);
       }
     }
     WELS_READ_VERIFY (BsGetSe (pBsAux, &iCode)); //second_chroma_qp_index_offset
@@ -1447,7 +1451,9 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
   }
   if (pCtx->pParam->bParseOnly) {
     if (kSrcNalLen >= SPS_PPS_BS_SIZE - 4) { //pps bs exceeds
-      pCtx->iErrorCode |= dsOutOfMemory;
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "pps payload size (%d) too large for parse only (%d), not supported!",
+               kSrcNalLen, SPS_PPS_BS_SIZE - 4);
+      pCtx->iErrorCode |= dsBitstreamError;
       return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_OUT_OF_MEMORY);
     }
     SPpsBsInfo* pPpsBs = &pCtx->sPpsBsInfo [uiPpsId];
@@ -1665,13 +1671,10 @@ int32_t ParseScalingList (PSps pSps, PBitStringAux pBs, bool bPPS, const bool kb
   const uint8_t* defaultScaling[4];
 
   if (!bPPS) { //sps scaling_list
-    if (pSps != NULL) {
-      uiScalingListNum = (pSps->uiChromaFormatIdc != 3) ? 8 : 12;
-      bInit = bPPS && pSps->bSeqScalingMatrixPresentFlag;
-    } else
-      uiScalingListNum = 12;
+    uiScalingListNum = (pSps->uiChromaFormatIdc != 3) ? 8 : 12;
   } else { //pps scaling_list
     uiScalingListNum = 6 + (int32_t) kbTrans8x8ModeFlag * ((pSps->uiChromaFormatIdc != 3) ? 2 : 6);
+    bInit = pSps->bSeqScalingMatrixPresentFlag;
   }
 
 //Init default_scaling_list value for sps or pps

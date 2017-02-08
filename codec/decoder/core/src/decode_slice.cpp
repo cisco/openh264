@@ -1112,25 +1112,6 @@ int32_t  WelsCalcDeqCoeffScalingList (PWelsDecoderContext pCtx) {
 
     if (!pCtx->bDequantCoeff4x4Init || (pCtx->iDequantCoeffPpsid != pCtx->pPps->iPpsId)) {
       int i, q, x, y;
-      // Rewrite pps scaling list for scalingList present flag=0
-      if (pCtx->bSpsLatePps) {
-        for (i = 0; i < 12; i++) {
-          //if (!pCtx->pSps->bSeqScalingListPresentFlag[i]) {
-          if (!pCtx->pPps->bPicScalingListPresentFlag[i]) {
-            if (i < 6) {
-              if (i == 0 || i == 3)
-                memcpy (pCtx->pPps->iScalingList4x4[i], pCtx->pSps->iScalingList4x4[i], 16 * sizeof (uint8_t));
-              else
-                memcpy (pCtx->pPps->iScalingList4x4[i], pCtx->pPps->iScalingList4x4[i - 1], 16 * sizeof (uint8_t));
-            } else {
-              if (i == 6 || i == 7)
-                memcpy (pCtx->pPps->iScalingList8x8[ i - 6 ], pCtx->pSps->iScalingList8x8[ i - 6 ], 64 * sizeof (uint8_t));
-              else
-                memcpy (pCtx->pPps->iScalingList8x8[ i - 6 ], pCtx->pPps->iScalingList8x8[i - 8], 64 * sizeof (uint8_t));
-            }
-          }
-        }
-      }
       //Init dequant coeff value for different QP
       for (i = 0; i < 6; i++) {
         pCtx->pDequant_coeff4x4[i] = pCtx->pDequant_coeff_buffer4x4[i];

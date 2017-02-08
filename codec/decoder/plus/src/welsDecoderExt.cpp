@@ -264,7 +264,8 @@ int32_t CWelsDecoder::InitDecoder (const SDecodingParam* pParam) {
   WELS_VERIFY_RETURN_IFNEQ (iRet, cmResultSuccess);
 
   //init decoder
-  WELS_VERIFY_RETURN_PROC_IF (cmMallocMemeError, WelsInitDecoder (m_pDecContext, &m_pWelsTrace->m_sLogCtx), UninitDecoder())
+  WELS_VERIFY_RETURN_PROC_IF (cmMallocMemeError, WelsInitDecoder (m_pDecContext, &m_pWelsTrace->m_sLogCtx),
+                              UninitDecoder())
 
   return cmResultSuccess;
 }
@@ -678,6 +679,12 @@ DECODING_STATE CWelsDecoder::DecodeParser (const unsigned char* kpSrc,
     m_pDecContext->uiTimeStamp = 0;
   }
   WelsDecodeBs (m_pDecContext, kpSrc, kiSrcLen, NULL, NULL, pDstInfo);
+  if (m_pDecContext->iErrorCode & dsOutOfMemory) {
+    if (ResetDecoder())
+      return dsOutOfMemory;
+    return dsErrorFree;
+  }
+
   if (!m_pDecContext->bFramePending && m_pDecContext->pParserBsInfo->iNalNum) {
     memcpy (pDstInfo, m_pDecContext->pParserBsInfo, sizeof (SParserBsInfo));
   }

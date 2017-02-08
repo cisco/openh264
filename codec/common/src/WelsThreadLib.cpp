@@ -44,7 +44,7 @@
 #define _GNU_SOURCE
 #endif
 #include <sched.h>
-#elif !defined(_WIN32)
+#elif !defined(_WIN32) && !defined(__CYGWIN__)
 #include <sys/types.h>
 #include <sys/sysctl.h>
 #include <sys/param.h>
@@ -67,7 +67,7 @@
 #include <stdlib.h>
 
 
-#ifdef  _WIN32
+#if defined(_WIN32) || defined(__CYGWIN__)
 
 #ifdef WINAPI_FAMILY
 #if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
@@ -129,7 +129,7 @@ WELS_THREAD_ERROR_CODE    WelsMutexDestroy (WELS_MUTEX* mutex) {
 
 #endif /* !_WIN32 */
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__CYGWIN__)
 
 WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT* event, const char* event_name) {
   WELS_EVENT   h = CreateEvent (NULL, FALSE, FALSE, NULL);
