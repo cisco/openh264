@@ -450,7 +450,7 @@ bool CheckCurMarkFrameNumUsed (sWelsEncCtx* pCtx) {
   return true;
 }
 
-static inline void WlesMarkMMCORefInfoWithBase(SSlice** ppSliceList,
+static inline void WelsMarkMMCORefInfoWithBase(SSlice** ppSliceList,
                                                SSlice* pBaseSlice,
                                                const int32_t kiCountSliceNum) {
   int32_t iSliceIdx = 0;
@@ -463,7 +463,7 @@ static inline void WlesMarkMMCORefInfoWithBase(SSlice** ppSliceList,
   }
 }
 
-void WlesMarkMMCORefInfo (sWelsEncCtx* pCtx, SLTRState* pLtr,
+void WelsMarkMMCORefInfo (sWelsEncCtx* pCtx, SLTRState* pLtr,
                           SSlice** ppSliceList, const int32_t kiCountSliceNum) {
   SSlice* pBaseSlice            = ppSliceList[0];
   SRefPicMarking* pRefPicMark   = &pBaseSlice->sSliceHeaderExt.sSliceHeader.sRefMarking;
@@ -488,7 +488,7 @@ void WlesMarkMMCORefInfo (sWelsEncCtx* pCtx, SLTRState* pLtr,
     }
   }
 
-  WlesMarkMMCORefInfoWithBase(ppSliceList, pBaseSlice, kiCountSliceNum);
+  WelsMarkMMCORefInfoWithBase(ppSliceList, pBaseSlice, kiCountSliceNum);
 }
 
 void WelsMarkPic (sWelsEncCtx* pCtx) {
@@ -511,7 +511,7 @@ void WelsMarkPic (sWelsEncCtx* pCtx) {
     }
   }
 
-  WlesMarkMMCORefInfo (pCtx, pLtr, pCtx->pCurDqLayer->ppSliceInLayer, kiCountSliceNum);
+  WelsMarkMMCORefInfo (pCtx, pLtr, pCtx->pCurDqLayer->ppSliceInLayer, kiCountSliceNum);
 }
 
 int32_t FilterLTRRecoveryRequest (sWelsEncCtx* pCtx, SLTRRecoverRequest* pLTRRecoverRequest) {
@@ -889,7 +889,7 @@ static inline bool IsValidFrameNum (const int32_t kiFrameNum) {
   return (kiFrameNum < (1 << 30)); // TODO: use the original judge first, may be improved
 }
 
-void WlesMarkMMCORefInfoScreen (sWelsEncCtx* pCtx, SLTRState* pLtr,
+void WelsMarkMMCORefInfoScreen (sWelsEncCtx* pCtx, SLTRState* pLtr,
                                 SSlice** ppSliceList, const int32_t kiCountSliceNum) {
   SSlice* pBaseSlice          = ppSliceList[0];
   SRefPicMarking* pRefPicMark = &pBaseSlice->sSliceHeaderExt.sSliceHeader.sRefMarking;
@@ -904,7 +904,7 @@ void WlesMarkMMCORefInfoScreen (sWelsEncCtx* pCtx, SLTRState* pLtr,
     pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount++].iMmcoType = MMCO_LONG;
   }
 
-  WlesMarkMMCORefInfoWithBase(ppSliceList, pBaseSlice, kiCountSliceNum);
+  WelsMarkMMCORefInfoWithBase(ppSliceList, pBaseSlice, kiCountSliceNum);
 }
 
 void WelsMarkPicScreen (sWelsEncCtx* pCtx) {
@@ -987,7 +987,7 @@ void WelsMarkPicScreen (sWelsEncCtx* pCtx) {
 
   const int32_t iSliceNum = pCtx->pCurDqLayer->iMaxSliceNum;
 
-  WlesMarkMMCORefInfoScreen (pCtx, pLtr, pCtx->pCurDqLayer->ppSliceInLayer, iSliceNum);
+  WelsMarkMMCORefInfoScreen (pCtx, pLtr, pCtx->pCurDqLayer->ppSliceInLayer, iSliceNum);
 
   return;
 }
