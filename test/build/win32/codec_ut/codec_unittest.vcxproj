@@ -1,0 +1,312 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>Codec_UT</ProjectName>
+    <ProjectGuid>{67483610-7B72-4069-AECE-E35445DCF6F2}</ProjectGuid>
+    <RootNamespace>codec_unittest</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>.\..\..\..\..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>.\..\..\..\..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>.\..\..\..\..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>.\..\..\..\..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\..\;..\..\..\..\codec\encoder\plus\inc;..\..\..\..\codec\encoder\core\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\codec\processing\src\common;..\..\..\..\codec\processing\interface;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;X86_ASM;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>$(OutDir)preprocessing_lib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\..\;..\..\..\..\codec\encoder\plus\inc;..\..\..\..\codec\encoder\core\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\codec\processing\src\common;..\..\..\..\codec\processing\interface;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>$(OutDir)preprocessing_lib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>..\..\..\;..\..\..\..\codec\encoder\plus\inc;..\..\..\..\codec\encoder\core\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\codec\processing\src\common;..\..\..\..\codec\processing\interface;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;X86_ASM;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>..\..\..\;..\..\..\..\codec\encoder\plus\inc;..\..\..\..\codec\encoder\core\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\codec\processing\src\common;..\..\..\..\codec\processing\interface;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\api\BaseDecoderTest.cpp" />
+    <ClCompile Include="..\..\..\api\BaseEncoderTest.cpp" />
+    <ClCompile Include="..\..\..\api\cpp_interface_test.cpp" />
+    <ClCompile Include="..\..\..\api\c_interface_test.c" />
+    <ClCompile Include="..\..\..\api\DataGenerator.cpp" />
+    <ClCompile Include="..\..\..\api\decoder_ec_test.cpp" />
+    <ClCompile Include="..\..\..\api\decoder_test.cpp" />
+    <ClCompile Include="..\..\..\api\decode_api_test.cpp" />
+    <ClCompile Include="..\..\..\api\decode_encode_test.cpp" />
+    <ClCompile Include="..\..\..\api\encoder_test.cpp" />
+    <ClCompile Include="..\..\..\api\encode_decode_api_test.cpp" />
+    <ClCompile Include="..\..\..\api\encode_options_test.cpp" />
+    <ClCompile Include="..\..\..\api\ltr_test.cpp" />
+    <ClCompile Include="..\..\..\api\sha1.c" />
+    <ClCompile Include="..\..\..\api\simple_test.cpp" />
+    <ClCompile Include="..\..\..\common\CWelsCircleQueue.cpp" />
+    <ClCompile Include="..\..\..\common\CWelsListTest.cpp" />
+    <ClCompile Include="..\..\..\common\ExpandPicture.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\codec\processing\src\common;..\..\..\..\codec\decoder\core\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\codec\processing\src\common;..\..\..\..\codec\decoder\core\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\codec\processing\src\common;..\..\..\..\codec\decoder\core\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\WelsThreadPoolTest.cpp" />
+    <ClCompile Include="..\..\..\decoder\DecUT_Deblock.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\..\..\decoder\DecUT_DeblockCommon.cpp" />
+    <ClCompile Include="..\..\..\decoder\DecUT_DecExt.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\..\..\decoder\DecUT_ErrorConcealment.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\..\..\decoder\DecUT_IdctResAddPred.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\..\..\decoder\DecUT_IntraPrediction.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\..\..\decoder\DecUT_ParseSyntax.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\..\..\decoder\DecUT_PredMv.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\..\..\encoder\EncUT_Cavlc.cpp" />
+    <ClCompile Include="..\..\..\encoder\EncUT_DecodeMbAux.cpp" />
+    <ClCompile Include="..\..\..\encoder\EncUT_EncoderExt.cpp" />
+    <ClCompile Include="..\..\..\encoder\EncUT_EncoderMb.cpp" />
+    <ClCompile Include="..\..\..\encoder\EncUT_EncoderMbAux.cpp" />
+    <ClCompile Include="..\..\..\encoder\EncUT_ExpGolomb.cpp" />
+    <ClCompile Include="..\..\..\encoder\EncUT_GetIntraPredictor.cpp" />
+    <ClCompile Include="..\..\..\encoder\EncUT_InterfaceTest.cpp" />
+    <ClCompile Include="..\..\..\encoder\EncUT_MBCopy.cpp" />
+    <ClCompile Include="..\..\..\encoder\EncUT_MemoryAlloc.cpp" />
+    <ClCompile Include="..\..\..\encoder\EncUT_MemoryZero.cpp" />
+    <ClCompile Include="..\..\..\encoder\EncUT_MotionCompensation.cpp" />
+    <ClCompile Include="..\..\..\encoder\EncUT_MotionEstimate.cpp" />
+    <ClCompile Include="..\..\..\encoder\EncUT_Reconstruct.cpp" />
+    <ClCompile Include="..\..\..\encoder\EncUT_Sample.cpp" />
+    <ClCompile Include="..\..\..\encoder\EncUT_SliceBufferReallocate.cpp" />
+    <ClCompile Include="..\..\..\encoder\EncUT_SVC_me.cpp" />
+    <ClCompile Include="..\..\..\processing\ProcessUT_AdaptiveQuantization.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\;..\..\..\..\codec\processing\src\adaptivequantization;..\..\..\..\codec\common\inc;..\..\..\..\gtest\include;..\..\..\..\codec\processing\src;..\..\..\..\codec\processing\interface;..\..\..\..\codec\processing\src\common</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\..\;..\..\..\..\codec\processing\src\adaptivequantization;..\..\..\..\codec\common\inc;..\..\..\..\gtest\include;..\..\..\..\codec\processing\src;..\..\..\..\codec\processing\interface;..\..\..\..\codec\processing\src\common</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\;..\..\..\..\codec\processing\src\adaptivequantization;..\..\..\..\codec\common\inc;..\..\..\..\gtest\include;..\..\..\..\codec\processing\src;..\..\..\..\codec\processing\interface;..\..\..\..\codec\processing\src\common</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\;..\..\..\..\codec\processing\src\adaptivequantization;..\..\..\..\codec\common\inc;..\..\..\..\gtest\include;..\..\..\..\codec\processing\src;..\..\..\..\codec\processing\interface;..\..\..\..\codec\processing\src\common</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\..\..\processing\ProcessUT_DownSample.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\;..\..\..\..\codec\processing\src\downsample;..\..\..\..\codec\common\inc;..\..\..\..\gtest\include;..\..\..\..\codec\processing\src;..\..\..\..\codec\processing\interface;..\..\..\..\codec\processing\src\common</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\;..\..\..\..\codec\processing\src\downsample;..\..\..\..\codec\common\inc;..\..\..\..\gtest\include;..\..\..\..\codec\processing\src;..\..\..\..\codec\processing\interface;..\..\..\..\codec\processing\src\common</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\;..\..\..\..\codec\processing\src\downsample;..\..\..\..\codec\common\inc;..\..\..\..\gtest\include;..\..\..\..\codec\processing\src;..\..\..\..\codec\processing\interface;..\..\..\..\codec\processing\src\common</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\..\..\processing\ProcessUT_ScrollDetection.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\;..\..\..\..\codec\processing\src\scrolldetection;..\..\..\..\codec\common\inc;..\..\..\..\gtest\include;..\..\..\..\codec\processing\src;..\..\..\..\codec\processing\interface;..\..\..\..\codec\processing\src\common</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\..\;..\..\..\..\codec\processing\src\scrolldetection;..\..\..\..\codec\common\inc;..\..\..\..\gtest\include;..\..\..\..\codec\processing\src;..\..\..\..\codec\processing\interface;..\..\..\..\codec\processing\src\common</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\;..\..\..\..\codec\processing\src\scrolldetection;..\..\..\..\codec\common\inc;..\..\..\..\gtest\include;..\..\..\..\codec\processing\src;..\..\..\..\codec\processing\interface;..\..\..\..\codec\processing\src\common</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\;..\..\..\..\codec\processing\src\scrolldetection;..\..\..\..\codec\common\inc;..\..\..\..\gtest\include;..\..\..\..\codec\processing\src;..\..\..\..\codec\processing\interface;..\..\..\..\codec\processing\src\common</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\..\..\processing\ProcessUT_VaaCalc.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\;..\..\..\..\codec\processing\src\vaacalc;..\..\..\..\codec\common\inc;..\..\..\..\gtest\include;..\..\..\..\codec\processing\src;..\..\..\..\codec\processing\interface;..\..\..\..\codec\processing\src\common</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\;..\..\..\..\codec\processing\src\vaacalc;..\..\..\..\codec\common\inc;..\..\..\..\gtest\include;..\..\..\..\codec\processing\src;..\..\..\..\codec\processing\interface;..\..\..\..\codec\processing\src\common</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\;..\..\..\..\codec\processing\src\vaacalc;..\..\..\..\codec\common\inc;..\..\..\..\gtest\include;..\..\..\..\codec\processing\src;..\..\..\..\codec\processing\interface;..\..\..\..\codec\processing\src\common</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\codec\build\win32\dec\WelsDecCore.vcxproj">
+      <Project>{01b4ae41-6ad6-4caf-aeb3-c42f7f9121d5}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\codec\build\win32\dec\WelsDecPlus.vcxproj">
+      <Project>{1131558a-9986-4f4b-a13f-8b7f4c8438bf}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\codec\build\win32\enc\WelsEncCore.vcxproj">
+      <Project>{59208004-1774-4816-ac24-31ff44c324b4}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\codec\build\win32\enc\WelsEncPlus.vcxproj">
+      <Project>{1e7b4e9a-986e-4167-8c70-6e4f60eaee7f}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\codec\processing\build\win32\WelsVP.vcxproj">
+      <Project>{e8dfafa1-8dac-4127-8d27-fbd5819ee562}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\gtest\msvc\gtest.vcxproj">
+      <Project>{c8f6c172-56f2-4e76-b5fa-c3b423b31be7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="preprocessing_lib.vcxproj">
+      <Project>{3da98dce-9199-4a85-bbc2-11f0b6fc8e1f}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

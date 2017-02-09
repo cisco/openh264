@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="api">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="encoder">
+      <UniqueIdentifier>{4a26946d-726c-4c24-a2f0-ef1c2a5e40ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="decoder">
+      <UniqueIdentifier>{e7e24463-6093-4679-a441-9d5e98d6fa8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="processing">
+      <UniqueIdentifier>{4ced8074-5767-472e-bde4-90a0e2d7cc02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{cde979ce-975c-493a-b51a-73117cda8cd0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\api\BaseDecoderTest.cpp">
+      <Filter>api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\api\BaseEncoderTest.cpp">
+      <Filter>api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\api\c_interface_test.c">
+      <Filter>api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\api\cpp_interface_test.cpp">
+      <Filter>api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\api\DataGenerator.cpp">
+      <Filter>api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\api\decode_api_test.cpp">
+      <Filter>api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\api\decode_encode_test.cpp">
+      <Filter>api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\api\decoder_ec_test.cpp">
+      <Filter>api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\api\decoder_test.cpp">
+      <Filter>api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\api\encode_decode_api_test.cpp">
+      <Filter>api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\api\encode_options_test.cpp">
+      <Filter>api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\api\encoder_test.cpp">
+      <Filter>api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\api\ltr_test.cpp">
+      <Filter>api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\api\sha1.c">
+      <Filter>api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\api\simple_test.cpp">
+      <Filter>api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\encoder\EncUT_Cavlc.cpp">
+      <Filter>encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\encoder\EncUT_DecodeMbAux.cpp">
+      <Filter>encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\encoder\EncUT_EncoderExt.cpp">
+      <Filter>encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\encoder\EncUT_EncoderMb.cpp">
+      <Filter>encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\encoder\EncUT_EncoderMbAux.cpp">
+      <Filter>encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\encoder\EncUT_ExpGolomb.cpp">
+      <Filter>encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\encoder\EncUT_GetIntraPredictor.cpp">
+      <Filter>encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\encoder\EncUT_InterfaceTest.cpp">
+      <Filter>encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\encoder\EncUT_MBCopy.cpp">
+      <Filter>encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\encoder\EncUT_MemoryAlloc.cpp">
+      <Filter>encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\encoder\EncUT_MemoryZero.cpp">
+      <Filter>encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\encoder\EncUT_MotionCompensation.cpp">
+      <Filter>encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\encoder\EncUT_MotionEstimate.cpp">
+      <Filter>encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\encoder\EncUT_Reconstruct.cpp">
+      <Filter>encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\encoder\EncUT_Sample.cpp">
+      <Filter>encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\encoder\EncUT_SVC_me.cpp">
+      <Filter>encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\decoder\DecUT_Deblock.cpp">
+      <Filter>decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\decoder\DecUT_DeblockCommon.cpp">
+      <Filter>decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\decoder\DecUT_DecExt.cpp">
+      <Filter>decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\decoder\DecUT_ErrorConcealment.cpp">
+      <Filter>decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\decoder\DecUT_IdctResAddPred.cpp">
+      <Filter>decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\decoder\DecUT_IntraPrediction.cpp">
+      <Filter>decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\decoder\DecUT_ParseSyntax.cpp">
+      <Filter>decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\decoder\DecUT_PredMv.cpp">
+      <Filter>decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\processing\ProcessUT_AdaptiveQuantization.cpp">
+      <Filter>processing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\processing\ProcessUT_DownSample.cpp">
+      <Filter>processing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\processing\ProcessUT_ScrollDetection.cpp">
+      <Filter>processing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\processing\ProcessUT_VaaCalc.cpp">
+      <Filter>processing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\CWelsCircleQueue.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\CWelsListTest.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\ExpandPicture.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\WelsThreadPoolTest.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\encoder\EncUT_SliceBufferReallocate.cpp">
+      <Filter>encoder</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
