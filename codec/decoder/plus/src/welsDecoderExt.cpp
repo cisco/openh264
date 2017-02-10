@@ -668,7 +668,7 @@ DECODING_STATE CWelsDecoder::DecodeParser (const unsigned char* kpSrc,
   m_pDecContext->pParam->eEcActiveIdc = ERROR_CON_DISABLE; //add protection to disable EC here.
   if (!m_pDecContext->bFramePending) { //frame complete
     m_pDecContext->pParserBsInfo->iNalNum = 0;
-    memset (m_pDecContext->pParserBsInfo->iNalLenInByte, 0, MAX_NAL_UNITS_IN_LAYER);
+    memset (m_pDecContext->pParserBsInfo->pNalLenInByte, 0, MAX_NAL_UNITS_IN_LAYER);
   }
   pDstInfo->iNalNum = 0;
   pDstInfo->iSpsWidthInPixel = pDstInfo->iSpsHeightInPixel = 0;
