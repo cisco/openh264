@@ -63,9 +63,6 @@ SFrameBSInfo*   pFrameBsInfo;
 int32_t         iSliceIndex;    // slice index, zero based
 int32_t         iThreadIndex;   // thread index, zero based
 
-// for dynamic slicing mode
-int32_t         iStartMbIndex;  // inclusive
-int32_t         iEndMbIndex;    // exclusive
 } SSliceThreadPrivateData;
 
 typedef struct TagSliceThreading {
@@ -90,6 +87,7 @@ uint8_t*                        pThreadBsBuffer[MAX_THREADS_NUM]; //actual memor
 bool                            bThreadBsBufferUsage[MAX_THREADS_NUM];
 WELS_MUTEX                      mutexThreadBsBufferUsage;
 WELS_MUTEX                      mutexEvent;
+WELS_MUTEX                      mutexThreadSlcBuffReallocate;
 } SSliceThreading;
 
 #endif//MULTIPLE_THREADING_DEFINES_H__

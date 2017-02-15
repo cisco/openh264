@@ -130,7 +130,7 @@ static const EncodeFileParam kFileParamArray[] = {
   },
   {
     "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
-    {"5f4580523b761bebfb02b7a780df2a696eaddd33"}, CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_SIZELIMITED_SLICE, false, 1, false, false, false
+    {"1980853714ac607a7527ef470dccd78b167032b2"}, CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_SIZELIMITED_SLICE, false, 1, false, false, false
   },
   {
     "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
@@ -139,6 +139,7 @@ static const EncodeFileParam kFileParamArray[] = {
     { "fe7c5fa35c5c8f1eac0408b93d356a6d0bb7e5bd", "91ba01ef0067b0d211a6fbe5e2f96e82ce319a41" },
     CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_SINGLE_SLICE, false, 4, false, false, false
   },
+
   // the following values may be adjusted for times since we start tuning the strategy
   {
     "res/CiscoVT2people_320x192_12fps.yuv",
@@ -154,25 +155,28 @@ static const EncodeFileParam kFileParamArray[] = {
   },
   {
     "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
-    {"c2c53f088acce547851d9adc81042376adb3a50f"}, SCREEN_CONTENT_REAL_TIME, 1280, 720, 30.0f, SM_SIZELIMITED_SLICE, false, 1, false, false, false
+    {"32d5f5ed27684d1da43cf53e8aa7647fabd356e0"}, SCREEN_CONTENT_REAL_TIME, 1280, 720, 30.0f, SM_SIZELIMITED_SLICE, false, 1, false, false, false
   },
   //for different strategy
   {
     "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
-    {"4398b0d99cdb06197441b42ee495a003aa1f25f0"}, SCREEN_CONTENT_REAL_TIME, 1280, 720, 30.0f, SM_SIZELIMITED_SLICE, false, 1, true, true, false
+    {"24f3fae260b484a6c2e1a80cc7af7cdb43835b4c"}, SCREEN_CONTENT_REAL_TIME, 1280, 720, 30.0f, SM_SIZELIMITED_SLICE, false, 1, true, true, false
   },
   {
     "res/CiscoVT2people_320x192_12fps.yuv",
     {"feecaa5dc8809b8802807230970edf5f77dfcaed"}, CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 1, false, false, true //turn on cabac
   },
+
   {
     "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
-    {"5c96676f6cd9bccd7333234d4311237fc134f0cd"}, CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_SIZELIMITED_SLICE, false, 1, false, false, true
+    {"2f398154e95c2a0efcd9eb8b4dbba582a9a763fe"}, CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_SIZELIMITED_SLICE, false, 1, false, false, true
   },
+
   {
     "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
     {"ac97d59745a2c41fb43e34c8d608abb30e227dea"}, CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_FIXEDSLCNUM_SLICE, false, 1, false, false, true
   },
+
 };
 
 INSTANTIATE_TEST_CASE_P (EncodeFile, EncoderOutputTest,

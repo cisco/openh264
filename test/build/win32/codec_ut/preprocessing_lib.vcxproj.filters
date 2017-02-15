@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="scrolldetection">
+      <UniqueIdentifier>{498e1e20-9c8f-4ff5-9a30-887a52c2f7be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AdaptiveQuantization">
+      <UniqueIdentifier>{8f71d3da-50c1-46ac-93eb-d53a6810a880}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="VAACalc">
+      <UniqueIdentifier>{e4a8f7ed-6283-41b0-bf58-4412cd352973}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ASM">
+      <UniqueIdentifier>{a7b18666-a4c6-47ad-a33d-b9cda6920ee1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BackgroundDetection">
+      <UniqueIdentifier>{50ab3690-b5d6-4317-aa34-546c3e87efa1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ComplexityAnalysis">
+      <UniqueIdentifier>{fe8665f3-c717-4a90-ac6d-e9ee5dde7ddf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Denoise">
+      <UniqueIdentifier>{96e8e4b1-8f7e-464b-a236-aa377f6c0422}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Downsample">
+      <UniqueIdentifier>{7c864051-cffd-42e8-9639-06849d6f495d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\codec\processing\src\scrolldetection\ScrollDetection.cpp">
+      <Filter>scrolldetection</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\codec\processing\src\scrolldetection\ScrollDetectionFuncs.cpp">
+      <Filter>scrolldetection</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\codec\processing\src\adaptivequantization\AdaptiveQuantization.cpp">
+      <Filter>AdaptiveQuantization</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\codec\processing\src\vaacalc\vaacalcfuncs.cpp">
+      <Filter>VAACalc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\codec\processing\src\vaacalc\vaacalculation.cpp">
+      <Filter>VAACalc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\codec\processing\src\backgrounddetection\BackgroundDetection.cpp">
+      <Filter>BackgroundDetection</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\codec\processing\src\complexityanalysis\ComplexityAnalysis.cpp">
+      <Filter>ComplexityAnalysis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\codec\processing\src\denoise\denoise.cpp">
+      <Filter>Denoise</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\codec\processing\src\denoise\denoise_filter.cpp">
+      <Filter>Denoise</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\codec\processing\src\downsample\downsample.cpp">
+      <Filter>Downsample</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\codec\processing\src\downsample\downsamplefuncs.cpp">
+      <Filter>Downsample</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\codec\processing\src\scrolldetection\ScrollDetection.h">
+      <Filter>scrolldetection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\codec\processing\src\scrolldetection\ScrollDetectionFuncs.h">
+      <Filter>scrolldetection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\codec\processing\src\adaptivequantization\AdaptiveQuantization.h">
+      <Filter>AdaptiveQuantization</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\codec\processing\src\vaacalc\vaacalculation.h">
+      <Filter>VAACalc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\codec\processing\src\backgrounddetection\BackgroundDetection.h">
+      <Filter>BackgroundDetection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\codec\processing\src\complexityanalysis\ComplexityAnalysis.h">
+      <Filter>ComplexityAnalysis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\codec\processing\src\denoise\denoise.h">
+      <Filter>Denoise</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\codec\processing\src\downsample\downsample.h">
+      <Filter>Downsample</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\..\codec\common\x86\cpuid.asm">
+      <Filter>ASM</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\..\codec\processing\src\x86\denoisefilter.asm">
+      <Filter>ASM</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\..\codec\processing\src\x86\downsample_bilinear.asm">
+      <Filter>ASM</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\..\codec\common\x86\satd_sad.asm">
+      <Filter>ASM</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\..\codec\processing\src\x86\vaa.asm">
+      <Filter>ASM</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>
