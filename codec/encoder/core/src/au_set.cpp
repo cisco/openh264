@@ -272,7 +272,14 @@ int32_t WelsWriteSpsSyntax (SWelsSPS* pSps, SBitStringAux* pBitStringAux, int32_
   BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet1Flag);        // bConstraintSet1Flag
   BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet2Flag);        // bConstraintSet2Flag
   BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet3Flag);        // bConstraintSet3Flag
-  BsWriteBits (pLocalBitStringAux, 4, 0);                               // reserved_zero_4bits, equal to 0
+  if (PRO_HIGH == pSps->uiProfileIdc || PRO_EXTENDED == pSps->uiProfileIdc ||
+      PRO_MAIN == pSps->uiProfileIdc) {
+    BsWriteOneBit (pLocalBitStringAux, 1);        // bConstraintSet4Flag: If profile_idc is equal to 77, 88, or 100, constraint_set4_flag equal to 1 indicates that the value of frame_mbs_only_flag is equal to 1. constraint_set4_flag equal to 0 indicates that the value of frame_mbs_only_flag may or may not be equal to 1.
+    BsWriteOneBit (pLocalBitStringAux, 1);        // bConstraintSet5Flag: If profile_idc is equal to 77, 88, or 100, constraint_set5_flag equal to 1 indicates that B slice types are not present in the coded video sequence. constraint_set5_flag equal to 0 indicates that B slice types may or may not be present in the coded video sequence.
+    BsWriteBits (pLocalBitStringAux, 2, 0);                               // reserved_zero_2bits, equal to 0
+  } else {
+    BsWriteBits (pLocalBitStringAux, 4, 0);                               // reserved_zero_4bits, equal to 0
+  }
   BsWriteBits (pLocalBitStringAux, 8, pSps->iLevelIdc);                 // iLevelIdc
   BsWriteUE (pLocalBitStringAux, pSps->uiSpsId + pSpsIdDelta[pSps->uiSpsId]);        // seq_parameter_set_id
 
