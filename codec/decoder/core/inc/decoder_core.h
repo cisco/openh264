@@ -66,6 +66,16 @@ int32_t InitBsBuffer (PWelsDecoderContext pCtx);
 int32_t ExpandBsBuffer (PWelsDecoderContext pCtx, const int32_t kiSrcLen);
 
 /*
+ * ExpandBsLenBuffer
+ * Expand current BS length buffer to double size or maximum, due to max slice number exceeding
+ * Parameter:
+ * kiCurrLen: current value of total nal number (including non-VCL nal)
+ * return:
+ *  0 - success; otherwise returned error_no defined in error_no.h.
+ */
+int32_t ExpandBsLenBuffer (PWelsDecoderContext pCtx, const int32_t kiCurrLen);
+
+/*
  * CheckBsBuffer
  * Check if current buffer size is enough
  */

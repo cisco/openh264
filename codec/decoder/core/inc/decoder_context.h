@@ -378,7 +378,7 @@ typedef struct TagWelsDecoderContext {
   bool bFramePending;
   bool bFrameFinish;
   int32_t iNalNum;
-  int32_t iNalLenInByte[MAX_NAL_UNITS_IN_LAYER];
+  int32_t iMaxNalNum; //permitted max NAL num stored in parser
   SSpsBsInfo sSpsBsInfo [MAX_SPS_COUNT];
   SSpsBsInfo sSubsetSpsBsInfo [MAX_PPS_COUNT];
   SPpsBsInfo sPpsBsInfo [MAX_PPS_COUNT];
