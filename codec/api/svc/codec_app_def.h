@@ -128,7 +128,7 @@ typedef enum {
 
   ENCODER_OPTION_ENABLE_SSEI,                ///< enable SSEI: true--enable ssei; false--disable ssei
   ENCODER_OPTION_ENABLE_PREFIX_NAL_ADDING,   ///< enable prefix: true--enable prefix; false--disable prefix
-  ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION, ///< enable pSps/pPps id addition: true--enable pSps/pPps id; false--disable pSps/pPps id addistion
+  ENCODER_OPTION_SPS_PPS_ID_STRATEGY, ///< different stategy in adjust ID in SPS/PPS: 0- constant ID, 1-additional ID, 6-mapping and additional
 
   ENCODER_OPTION_CURRENT_PATH,
   ENCODER_OPTION_DUMP_FILE,                  ///< dump layer reconstruct frame to a specified file
