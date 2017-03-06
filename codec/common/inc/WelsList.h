@@ -66,8 +66,15 @@ class CWelsList {
     m_pLast = NULL;
   };
   ~CWelsList() {
-    if (m_pCurrentList)
+    if (m_pCurrentList) {
       free (m_pCurrentList);
+      m_pCurrentList = NULL;
+    }
+
+    m_pCurrentList = NULL;
+    m_pFirst = NULL;
+    m_pCurrent = NULL;
+    m_pLast = NULL;
   };
 
   int32_t size() {
@@ -75,6 +82,10 @@ class CWelsList {
   }
 
   bool push_back (TNodeType* pNode) {
+    if (!pNode) {
+      return false;
+    }
+
     if (NULL == m_pCurrentList) {
       m_pCurrentList = static_cast<SNode<TNodeType>*> (malloc (m_iMaxNodeCount * sizeof (SNode<TNodeType>)));
       if (NULL == m_pCurrentList) {
@@ -160,6 +171,34 @@ class CWelsList {
     return false;
   }
 
+  bool findNode (TNodeType* pNodeTarget) {
+    if ((m_iCurrentNodeCount > 0) && pNodeTarget) {
+      SNode<TNodeType>* pNode = m_pFirst;
+      while (pNode) {
+        if (pNode->pPointer == pNodeTarget) {
+          return true;
+        }
+        pNode = pNode->pNextNode;
+      }
+    }
+    return false;
+  }
+
+  TNodeType* getNode (int iNodeIdx) {
+    if ((iNodeIdx > m_iCurrentNodeCount - 1) || (0 == m_iCurrentNodeCount)) {
+      return NULL;
+    }
+    SNode<TNodeType>* pNode = m_pFirst;
+    for (int i = 0; i < iNodeIdx; i++) {
+      if (pNode->pNextNode) {
+        pNode = pNode->pNextNode;
+      } else {
+        return NULL;
+      }
+    }
+    return pNode->pPointer;
+  }
+
  private:
   bool ExpandList() {
     SNode<TNodeType>* tmpCurrentList = static_cast<SNode<TNodeType>*> (malloc (m_iMaxNodeCount * 2 * sizeof (
@@ -213,6 +252,7 @@ class CWelsList {
     m_pLast = & (m_pCurrentList[m_iMaxNodeCount - 1]);
   }
 
+ private:
   int32_t m_iCurrentNodeCount;
   int32_t m_iMaxNodeCount;
   SNode<TNodeType>* m_pCurrentList;
@@ -220,6 +260,22 @@ class CWelsList {
   SNode<TNodeType>* m_pLast;
   SNode<TNodeType>* m_pCurrent;
 };
+
+template<typename TNodeType>
+class CWelsNonDuplicatedList : public CWelsList<TNodeType> {
+ public:
+  bool push_back (TNodeType* pNode) {
+    if (0 != this->size()) {
+      if ((NULL != pNode) && (this->findNode (pNode))) {      //not checking NULL for easier testing
+        return false;
+      }
+    }
+
+    return CWelsList<TNodeType>::push_back (pNode);
+  }
+
+};
+
 
 }
 

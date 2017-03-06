@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "WelsList.h"
+#include "WelsTaskThread.h"
 
 using namespace WelsCommon;
 
@@ -25,7 +26,7 @@ TEST (CWelsList, CWelsListTen) {
 
     for (int i = 0; i < 10; i++) {
       EXPECT_TRUE (i == cTestList.size()) << "before push size=" << cTestList.size() ;
-      cTestList.push_back (pPointer);
+      EXPECT_TRUE (cTestList.push_back (pPointer));
     }
     EXPECT_TRUE (10 == cTestList.size()) << "after push size=" << cTestList.size() ;
 
@@ -36,6 +37,25 @@ TEST (CWelsList, CWelsListTen) {
     }
   }
 }
+
+
+TEST (CWelsList, CWelsList_Null) {
+  CWelsList<int> cTestList;
+  int a = 0;
+  int* pPointer = &a;
+
+  EXPECT_TRUE (cTestList.push_back (pPointer));
+
+  pPointer = NULL;
+  EXPECT_FALSE (cTestList.push_back (pPointer));
+
+  EXPECT_FALSE (cTestList.findNode (pPointer));
+
+  pPointer = &a;
+  EXPECT_TRUE (cTestList.findNode (pPointer));
+  EXPECT_TRUE (cTestList.push_back (pPointer));
+}
+
 
 TEST (CWelsList, CWelsListExpand) {
   CWelsList<int> cTestList;
@@ -220,3 +240,162 @@ TEST (CWelsList, CWelsListEraseAndExpand) {
   EXPECT_TRUE (0 == cTestList.size());
 }
 
+TEST (CWelsNonDuplicatedList, CWelsNonDuplicatedList) {
+  int32_t a, b, c;
+  CWelsNonDuplicatedList<int32_t> cNonDuplicatedIntList;
+  int32_t* pObject1 = &a;
+  int32_t* pObject2 = &b;
+  int32_t* pObject3 = &c;
+
+  //initial adding
+  EXPECT_TRUE (cNonDuplicatedIntList.push_back (pObject1));
+  EXPECT_TRUE (cNonDuplicatedIntList.push_back (pObject2));
+  EXPECT_TRUE (cNonDuplicatedIntList.push_back (pObject3));
+  EXPECT_TRUE (3 == cNonDuplicatedIntList.size());
+
+  //try failed adding
+  EXPECT_FALSE (cNonDuplicatedIntList.push_back (pObject3));
+  EXPECT_TRUE (3 == cNonDuplicatedIntList.size());
+
+  //try pop
+  EXPECT_TRUE (pObject1 == cNonDuplicatedIntList.begin());
+  cNonDuplicatedIntList.pop_front();
+  EXPECT_TRUE (2 == cNonDuplicatedIntList.size());
+
+  //try what currently in
+  EXPECT_TRUE (cNonDuplicatedIntList.findNode (pObject2));
+  EXPECT_FALSE (cNonDuplicatedIntList.push_back (pObject2));
+  EXPECT_TRUE (cNonDuplicatedIntList.findNode (pObject3));
+  EXPECT_FALSE (cNonDuplicatedIntList.push_back (pObject3));
+  EXPECT_TRUE (2 == cNonDuplicatedIntList.size());
+
+  //add back
+  EXPECT_TRUE (cNonDuplicatedIntList.push_back (pObject1));
+  EXPECT_TRUE (3 == cNonDuplicatedIntList.size());
+
+  //another pop
+  EXPECT_TRUE (pObject2 == cNonDuplicatedIntList.begin());
+  cNonDuplicatedIntList.pop_front();
+  cNonDuplicatedIntList.pop_front();
+  EXPECT_TRUE (1 == cNonDuplicatedIntList.size());
+
+  EXPECT_FALSE (cNonDuplicatedIntList.push_back (pObject1));
+  EXPECT_TRUE (1 == cNonDuplicatedIntList.size());
+
+  EXPECT_TRUE (cNonDuplicatedIntList.push_back (pObject3));
+  EXPECT_TRUE (2 == cNonDuplicatedIntList.size());
+
+  //clean-up
+  while (NULL != cNonDuplicatedIntList.begin()) {
+    cNonDuplicatedIntList.pop_front();
+  }
+  EXPECT_TRUE (0 == cNonDuplicatedIntList.size());
+}
+
+#ifndef __APPLE__
+TEST (CWelsNonDuplicatedList, CWelsNonDuplicatedListOnThread) {
+  CWelsNonDuplicatedList<CWelsTaskThread> cThreadList;
+  CWelsTaskThread* pTaskThread1 = new CWelsTaskThread (NULL); //this initialization seemed making prob on osx?
+  EXPECT_TRUE (NULL != pTaskThread1);
+  CWelsTaskThread* pTaskThread2 = new CWelsTaskThread (NULL);
+  EXPECT_TRUE (NULL != pTaskThread2);
+  CWelsTaskThread* pTaskThread3 = new CWelsTaskThread (NULL);
+  EXPECT_TRUE (NULL != pTaskThread3);
+
+  //initial adding
+  EXPECT_TRUE (cThreadList.push_back (pTaskThread1));
+  EXPECT_TRUE (cThreadList.push_back (pTaskThread2));
+  EXPECT_TRUE (cThreadList.push_back (pTaskThread3));
+  EXPECT_TRUE (3 == cThreadList.size());
+
+  //try failed adding
+  EXPECT_FALSE (cThreadList.push_back (pTaskThread3));
+  EXPECT_TRUE (3 == cThreadList.size());
+
+  //try pop
+  EXPECT_TRUE (pTaskThread1 == cThreadList.begin());
+  cThreadList.pop_front();
+  EXPECT_TRUE (2 == cThreadList.size());
+
+  //try what currently in
+  EXPECT_TRUE (cThreadList.findNode (pTaskThread2));
+  EXPECT_FALSE (cThreadList.push_back (pTaskThread2));
+  EXPECT_TRUE (cThreadList.findNode (pTaskThread3));
+  EXPECT_FALSE (cThreadList.push_back (pTaskThread3));
+  EXPECT_TRUE (2 == cThreadList.size());
+
+  //add back
+  EXPECT_TRUE (cThreadList.push_back (pTaskThread1));
+  EXPECT_TRUE (3 == cThreadList.size());
+
+  //another pop
+  EXPECT_TRUE (pTaskThread2 == cThreadList.begin());
+  cThreadList.pop_front();
+  cThreadList.pop_front();
+  EXPECT_TRUE (1 == cThreadList.size());
+
+  EXPECT_FALSE (cThreadList.push_back (pTaskThread1));
+  EXPECT_TRUE (1 == cThreadList.size());
+
+  EXPECT_TRUE (cThreadList.push_back (pTaskThread3));
+  EXPECT_TRUE (2 == cThreadList.size());
+
+  //clean-up
+  while (NULL != cThreadList.begin()) {
+    cThreadList.pop_front();
+  }
+  EXPECT_TRUE (0 == cThreadList.size());
+
+  delete pTaskThread1;
+  delete pTaskThread2;
+  delete pTaskThread3;
+}
+#endif
+
+
+TEST (CWelsList, CWelsListReadWithIdx) {
+  CWelsList<int32_t> cThreadList;
+  const int kiIncreaseNum = (rand() % 1000) + 1;
+  const int kiDecreaseNum = rand() % kiIncreaseNum;
+
+  int32_t* pInput = static_cast<int32_t*> (malloc (kiIncreaseNum * 10 * sizeof (int32_t)));
+  if (!pInput) {
+    return;
+  }
+  for (int32_t i = 0; i < kiIncreaseNum * 10; i++) {
+    pInput[i] = i;
+  }
+
+  for (int j = 0; j < 10; j++) {
+    const int iBias = j * (kiIncreaseNum - kiDecreaseNum);
+    for (int i = 0; i < kiIncreaseNum; i++) {
+      cThreadList.push_back (&pInput[i + kiIncreaseNum * j]);
+    }
+    EXPECT_TRUE (kiIncreaseNum + iBias == cThreadList.size()) << "after push size=" <<
+        cThreadList.size() ;
+
+    EXPECT_TRUE ((kiDecreaseNum * j) == * (cThreadList.begin()));
+
+    for (int i = 0; i < kiIncreaseNum; i++) {
+      EXPECT_TRUE ((i + kiIncreaseNum * j) == * (cThreadList.getNode (i + iBias)));
+    }
+    for (int i = 0; i < cThreadList.size(); i++) {
+      EXPECT_TRUE ((i + kiDecreaseNum * j) == * (cThreadList.getNode (i)));
+    }
+
+    for (int i = kiDecreaseNum; i > 0; i--) {
+      cThreadList.pop_front();
+    }
+    EXPECT_TRUE ((j + 1) * (kiIncreaseNum - kiDecreaseNum) == cThreadList.size()) << "after pop size=" <<
+        cThreadList.size() ;
+
+    EXPECT_TRUE ((kiDecreaseNum * (j + 1)) == * (cThreadList.begin()));
+  }
+
+  //clean-up
+  while (NULL != cThreadList.begin()) {
+    cThreadList.pop_front();
+  }
+  EXPECT_TRUE (0 == cThreadList.size());
+  free (pInput);
+}
