@@ -910,7 +910,7 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_PPS_LISTING3) {
 
   // step#2: set strategy for success
   int32_t iNewStra = SPS_PPS_LISTING;
-  rv = encoder_->SetOption (ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION, &iNewStra);
+  rv = encoder_->SetOption (ENCODER_OPTION_SPS_PPS_ID_STRATEGY, &iNewStra);
   ASSERT_TRUE (rv == cmResultSuccess) << "rv = " << rv << " iNewStra=" << iNewStra;
 
   // step#3: setting new strategy, SHOULD encounter ERROR
@@ -918,7 +918,7 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_PPS_LISTING3) {
   rv = encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &TraceLevel);
   ASSERT_TRUE (rv == cmResultSuccess);
   iNewStra = CONSTANT_ID;
-  rv = encoder_->SetOption (ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION, &iNewStra);
+  rv = encoder_->SetOption (ENCODER_OPTION_SPS_PPS_ID_STRATEGY, &iNewStra);
   ASSERT_TRUE (rv != cmResultSuccess);
 
   EncDecOneFrame (sParam2.iPicWidth, sParam2.iPicHeight, iEncFrameNum++, fEnc);
@@ -1371,7 +1371,7 @@ TEST_P (EncodeTestAPI, SetEncOptionSize) {
 
 
     int32_t iSpsPpsIdAddition = 1;
-    encoder_->SetOption (ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION, &iSpsPpsIdAddition);
+    encoder_->SetOption (ENCODER_OPTION_SPS_PPS_ID_STRATEGY, &iSpsPpsIdAddition);
     int32_t iIDRPeriod = (int32_t) pow (2.0f, (param_.iTemporalLayerNum - 1)) * ((rand() % 5) + 1);
     encoder_->SetOption (ENCODER_OPTION_IDR_INTERVAL, &iIDRPeriod);
     int iIdx = 0;

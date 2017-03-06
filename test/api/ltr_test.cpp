@@ -24,7 +24,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionLTR_ALLIDR) {
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   int32_t iSpsPpsIdAddition = 1;
-  encoder_->SetOption (ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION, &iSpsPpsIdAddition);
+  encoder_->SetOption (ENCODER_OPTION_SPS_PPS_ID_STRATEGY, &iSpsPpsIdAddition);
   int32_t iIDRPeriod = (int32_t) pow (2.0f, (param_.iTemporalLayerNum - 1)) * ((rand() % 5) + 1);
   encoder_->SetOption (ENCODER_OPTION_IDR_INTERVAL, &iIDRPeriod);
   SLTRConfig sLtrConfigVal;
@@ -73,7 +73,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionLTR_ALLLTR) {
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   int32_t iSpsPpsIdAddition = 1;
-  encoder_->SetOption (ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION, &iSpsPpsIdAddition);
+  encoder_->SetOption (ENCODER_OPTION_SPS_PPS_ID_STRATEGY, &iSpsPpsIdAddition);
   int32_t iIDRPeriod = 60;
   encoder_->SetOption (ENCODER_OPTION_IDR_INTERVAL, &iIDRPeriod);
   SLTRConfig sLtrConfigVal;
@@ -122,7 +122,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionLTR_Engine) {
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   int32_t iSpsPpsIdAddition = 1;
-  encoder_->SetOption (ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION, &iSpsPpsIdAddition);
+  encoder_->SetOption (ENCODER_OPTION_SPS_PPS_ID_STRATEGY, &iSpsPpsIdAddition);
   int32_t iIDRPeriod = 60;
   encoder_->SetOption (ENCODER_OPTION_IDR_INTERVAL, &iIDRPeriod);
   SLTRConfig sLtrConfigVal;

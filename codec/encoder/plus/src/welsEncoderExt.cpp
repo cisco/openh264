@@ -1016,7 +1016,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
              m_pEncContext->pSvcParam->bPrefixNalAddingCtrl);
   }
   break;
-  case ENCODER_OPTION_ENABLE_SPS_PPS_ID_ADDITION: {
+  case ENCODER_OPTION_SPS_PPS_ID_STRATEGY: {
     int32_t iValue = * (static_cast<int32_t*> (pOption));
     EParameterSetStrategy eNewStrategy = CONSTANT_ID;
     switch (iValue) {
