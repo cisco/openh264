@@ -3591,7 +3591,9 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   SPicture* fsnr                = NULL;
 #endif//ENABLE_FRAME_DUMP || ENABLE_PSNR_CALC
   SPicture* pEncPic             = NULL; // to be decided later
+#if defined(MT_DEBUG)
   int32_t iDidList[MAX_DEPENDENCY_LAYER] = {0};
+#endif
   int32_t iLayerNum             = 0;
   int32_t iLayerSize            = 0;
   int32_t iSpatialNum           =
@@ -3699,17 +3701,22 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
     iCurWidth   = pParam->iVideoWidth;
     iCurHeight  = pParam->iVideoHeight;
-
+#if defined(MT_DEBUG)
     iDidList[iSpatialIdx]       = iCurDid;
-
+#endif
     // Encoding this picture might mulitiple sQualityStat layers potentially be encoded as followed
     switch (pParam->sSliceArgument.uiSliceMode) {
     case SM_FIXEDSLCNUM_SLICE: {
-      if ((iCurDid > 0) && (pSvcParam->iMultipleThreadIdc > 1) &&
+      if ((pSvcParam->iMultipleThreadIdc > 1) &&
           (pSvcParam->bUseLoadBalancing
            && pSvcParam->iMultipleThreadIdc >= pSvcParam->sSpatialLayers[iCurDid].sSliceArgument.uiSliceNum)
-         )
-        AdjustEnhanceLayer (pCtx, iCurDid);
+         ) {
+        if (iCurDid > 0)
+          AdjustEnhanceLayer (pCtx, iCurDid);
+        else
+          AdjustBaseLayer (pCtx);
+      }
+
       break;
     }
     case SM_SIZELIMITED_SLICE: {
@@ -4207,16 +4214,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 #if defined(MT_DEBUG)
   TrackSliceConsumeTime (pCtx, iDidList, iSpatialNum);
 #endif//MT_DEBUG
-
-  if (pSvcParam->iMultipleThreadIdc > 1 && iDidList[0] == BASE_DEPENDENCY_ID
-      && (pSvcParam->sSpatialLayers[0].sSliceArgument.uiSliceMode == SM_FIXEDSLCNUM_SLICE)
-      && pSvcParam->bUseLoadBalancing
-      && pSvcParam->iMultipleThreadIdc >= pSvcParam->sSpatialLayers[0].sSliceArgument.uiSliceNum
-      && ((pSvcParam->sSpatialLayers[iDidList[iSpatialNum - 1]].sSliceArgument.uiSliceMode == SM_FIXEDSLCNUM_SLICE))
-      && pSvcParam->iMultipleThreadIdc >= pSvcParam->sSpatialLayers[iDidList[iSpatialNum -
-          1]].sSliceArgument.uiSliceNum) {
-    AdjustBaseLayer (pCtx);
-  }
 
   // to check number of layers / nals / slices dependencies
   if (iLayerNum > MAX_LAYER_NUM_OF_FRAME) {
