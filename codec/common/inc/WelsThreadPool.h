@@ -45,7 +45,6 @@
 #include <stdio.h>
 #include "WelsTask.h"
 #include "WelsTaskThread.h"
-#include "WelsCircleQueue.h"
 #include "WelsList.h"
 
 namespace WelsCommon {
@@ -104,8 +103,8 @@ class  CWelsThreadPool : public CWelsThread, public IWelsTaskThreadSink {
   static CWelsLock m_cInitLock;
   static int32_t   m_iMaxThreadNum;
 
-  CWelsCircleQueue<IWelsTask>* m_cWaitedTasks;
-  CWelsCircleQueue<CWelsTaskThread>* m_cIdleThreads;
+  CWelsNonDuplicatedList<IWelsTask>* m_cWaitedTasks;
+  CWelsNonDuplicatedList<CWelsTaskThread>* m_cIdleThreads;
   CWelsList<CWelsTaskThread>* m_cBusyThreads;
 
   CWelsLock   m_cLockPool;

@@ -67,9 +67,9 @@ class IWelsTaskManage {
 
 class  CWelsTaskManageBase : public IWelsTaskManage, public WelsCommon::IWelsTaskSink {
  public:
-  typedef  CWelsCircleQueue<CWelsBaseTask>            TASKLIST_TYPE;
+  typedef  CWelsNonDuplicatedList<CWelsBaseTask>            TASKLIST_TYPE;
   //typedef  std::pair<int, int>                  SLICE_BOUNDARY_PAIR;
-  //typedef  CWelsCircleQueue<SLICE_BOUNDARY_PAIR>       SLICE_PAIR_LIST;
+  //typedef  CWelsList<SLICE_BOUNDARY_PAIR>       SLICE_PAIR_LIST;
 
   CWelsTaskManageBase();
   virtual ~ CWelsTaskManageBase();
