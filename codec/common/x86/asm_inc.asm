@@ -668,3 +668,53 @@ SECTION .note.GNU-stack noalloc noexec nowrite progbits ; Mark the stack as non-
     vpcmpeqw %1, %1, %1
     vpsrlw   %1, %1,  1
 %endmacro
+
+%macro INIT_X86_32_PIC_ 2
+%ifdef X86_32_PICASM
+    %xdefine pic_ptr %1
+    %xdefine pic_ptr_preserve %2
+  %if pic_ptr_preserve
+    %assign push_num push_num+1
+    push            pic_ptr
+  %endif
+    call            %%get_pc
+%%pic_refpoint:
+    jmp             %%pic_init_done
+%%get_pc:
+    mov             pic_ptr, [esp]
+    ret
+%%pic_init_done:
+    %define pic(data_addr) (pic_ptr+(data_addr)-%%pic_refpoint)
+%else
+    %define pic(data_addr) (data_addr)
+%endif
+%endmacro
+
+%macro INIT_X86_32_PIC 1
+    INIT_X86_32_PIC_ %1, 1
+%endmacro
+
+%macro INIT_X86_32_PIC_NOPRESERVE 1
+    INIT_X86_32_PIC_ %1, 0
+%endmacro
+
+%macro DEINIT_X86_32_PIC 0
+%ifdef X86_32_PICASM
+  %if pic_ptr_preserve
+    pop             pic_ptr
+    %assign push_num push_num-1
+  %endif
+    %undef pic_ptr
+    %undef pic_ptr_preserve
+%endif
+    %undef pic
+%endmacro
+
+%macro DEINIT_X86_32_PIC_KEEPDEF 0
+%ifdef X86_32_PICASM
+  %if pic_ptr_preserve
+    pop             pic_ptr
+    %assign push_num push_num-1
+  %endif
+%endif
+%endmacro
