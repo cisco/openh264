@@ -49,7 +49,11 @@
 ;***********************************************************************
 ; Local Data (Read Only)
 ;***********************************************************************
+%ifdef X86_32_PICASM
+SECTION .text align=16
+%else
 SECTION .rodata align=16
+%endif
 
 ;align 16
 ;se2_2 dw 2, 2, 2, 2, 2, 2, 2, 2
@@ -200,6 +204,7 @@ WELS_EXTERN WelsScan4x4DcAc_sse2
 ;***********************************************************************
 WELS_EXTERN WelsScan4x4DcAc_ssse3
     %assign push_num 0
+    INIT_X86_32_PIC r3
     LOAD_2_PARA
     movdqa     xmm0, [r1]
     movdqa     xmm1, [r1+16]
@@ -207,29 +212,12 @@ WELS_EXTERN WelsScan4x4DcAc_ssse3
     pextrw      r1d,  xmm1, 0           ; eax = [8]
     pinsrw      xmm0, r1d, 7            ; xmm0[7]   =   [8]
     pinsrw      xmm1, r2d, 0            ; xmm1[0]   =   [7]
-%ifdef X86_32_PICASM
-    push        r0
-    mov         r0, esp
-    and         esp, 0xfffffff0
-    push        0x0d0c0706              ;pb_scanacdc_maska
-    push        0x05040b0a
-    push        0x0f0e0908
-    push        0x03020100
-    push        0x0f0e0d0c              ;pb_scanacdc_maskb
-    push        0x07060100
-    push        0x05040b0a
-    push        0x09080302
-    pshufb      xmm1, [esp]
-    pshufb      xmm0, [esp+16]
-    mov         esp, r0
-    pop         r0
-%else
-    pshufb      xmm1, [pb_scanacdc_maskb]
-    pshufb      xmm0, [pb_scanacdc_maska]
-%endif
+    pshufb      xmm1, [pic(pb_scanacdc_maskb)]
+    pshufb      xmm0, [pic(pb_scanacdc_maska)]
 
     movdqa     [r0],xmm0
     movdqa     [r0+16], xmm1
+    DEINIT_X86_32_PIC
     ret
 ;***********************************************************************
 ;void WelsScan4x4Ac_sse2( int16_t* zig_value, int16_t* pDct )
@@ -268,7 +256,6 @@ WELS_EXTERN WelsScan4x4Ac_sse2
     ret
 
 
-%ifndef X86_32_PICASM
 ;***********************************************************************
 ;void int32_t WelsCalculateSingleCtr4x4_sse2( int16_t *pDct );
 ;***********************************************************************
@@ -279,6 +266,7 @@ WELS_EXTERN WelsCalculateSingleCtr4x4_sse2
     %else
     %assign push_num 0
     %endif
+    INIT_X86_32_PIC r4
     LOAD_1_PARA
     movdqa    xmm0, [r0]
     movdqa    xmm1, [r0+16]
@@ -309,31 +297,31 @@ WELS_EXTERN WelsCalculateSingleCtr4x4_sse2
 .find1end:
     sub       r1, r2
     sub       r1, 1
-    lea   r2,  [i_ds_table]
+    lea   r2,  [pic(i_ds_table)]
     add       r0b,  [r2+r1]
     mov       r1, r3
     and       r3, 0xff
     shr       r1, 8
     and       r1, 0xff
-    lea   r2 , [low_mask_table]
+    lea   r2 , [pic(low_mask_table)]
     add       r0b,  [r2 +r3]
-    lea   r2, [high_mask_table]
+    lea   r2, [pic(high_mask_table)]
     add       r0b,  [r2+r1]
+    DEINIT_X86_32_PIC
     %ifdef X86_32
     pop r3
     %else
     mov retrd, r0d
     %endif
     ret
-%endif ;ifndef X86_32_PICASM
 
 
-%ifndef X86_32_PICASM
 ;***********************************************************************
 ; int32_t WelsGetNoneZeroCount_sse2(int16_t* level);
 ;***********************************************************************
 WELS_EXTERN WelsGetNoneZeroCount_sse2
     %assign push_num 0
+    INIT_X86_32_PIC r3
     LOAD_1_PARA
     movdqa    xmm0, [r0]
     movdqa    xmm1, [r0+16]
@@ -350,14 +338,14 @@ WELS_EXTERN WelsGetNoneZeroCount_sse2
 ;   and       ecx,  0xff    ; we do not need this due to high 16bits equal to 0 yet
 ;   xor       retr,  retr
     ;add       al,  [nozero_count_table+r2]
-    lea       r0 , [nozero_count_table]
+    lea       r0 , [pic(nozero_count_table)]
     movzx     r2, byte [r0+r2]
     movzx     r1,   byte [r0+r1]
     mov   retrq, r2
     add   retrq, r1
     ;add       al,  [nozero_count_table+r1]
+    DEINIT_X86_32_PIC
     ret
-%endif ;%ifndef X86_32_PICASM
 
 ;***********************************************************************
 ; int32_t WelsGetNoneZeroCount_sse42(int16_t* level);
