@@ -44,7 +44,11 @@
 ;***********************************************************************
 ; Constant
 ;***********************************************************************
+%ifdef X86_32_PICASM
+SECTION .text align=16
+%else
 SECTION .rodata align=16
+%endif
 
 sse2_32 times 8 dw 32
 sse2_20 times 8 dw 20
@@ -147,20 +151,7 @@ SECTION .text
     movdqa      %2, %1
     psrldq      %2, 2
     punpcklbw   %2, %4
-%ifdef X86_32_PICASM
-    push        r0
-    mov         r0, esp
-    and         esp, 0xfffffff0
-    push        0x00140014
-    push        0x00140014
-    push        0x00140014
-    push        0x00140014
-    pmullw      %2, [esp]
-    mov         esp, r0
-    pop         r0
-%else
-    pmullw      %2, [sse2_20]
-%endif
+    pmullw      %2, [pic(sse2_20)]
     paddw       %3, %2
 
     movdqa      %2, %1
@@ -254,6 +245,7 @@ WELS_EXTERN WaverageChromaFilter8_sse2
 
     %assign push_num 1
 
+    INIT_X86_32_PIC r4
     LOAD_2_PARA
 
     mov     r3, r1
@@ -285,6 +277,7 @@ WELS_EXTERN WaverageChromaFilter8_sse2
     movq        [r0 + 2],       xmm3
 
 
+    DEINIT_X86_32_PIC
     pop r3
 
     %assign push_num 0
