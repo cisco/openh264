@@ -49,7 +49,11 @@
 ; Local Data (Read Only)
 ;*******************************************************************************
 
+%ifdef X86_32_PICASM
+SECTION .text align=16
+%else
 SECTION .rodata align=16
+%endif
 
 align 16
 sse2_plane_inc_minus dw -7, -6, -5, -4, -3, -2, -1, 0
@@ -132,40 +136,14 @@ sse2_wd_0x02: times 8 dw 0x02
 %macro COPY_16_TIMES 2
     movdqa      %2, [%1-16]
     psrldq      %2, 15
-%ifdef X86_32_PICASM
-    push        r5
-    mov         r5, esp
-    and         esp, 0xfffffff0
-    push        0x01010101    ;mmx_01bytes
-    push        0x01010101
-    push        0x01010101
-    push        0x01010101
-    pmuludq     %2, [esp]
-    mov         esp, r5
-    pop         r5
-%else
-    pmuludq     %2, [mmx_01bytes]
-%endif
+    pmuludq     %2, [pic(mmx_01bytes)]
     pshufd      %2, %2, 0
 %endmacro
 
 %macro COPY_16_TIMESS 3
     movdqa      %2, [%1+%3-16]
     psrldq      %2, 15
-%ifdef X86_32_PICASM
-    push        r5
-    mov         r5, esp
-    and         esp, 0xfffffff0
-    push        0x01010101    ;mmx_01bytes
-    push        0x01010101
-    push        0x01010101
-    push        0x01010101
-    pmuludq     %2, [esp]
-    mov         esp, r5
-    pop         r5
-%else
-    pmuludq     %2, [mmx_01bytes]
-%endif
+    pmuludq     %2, [pic(mmx_01bytes)]
     pshufd      %2, %2, 0
 %endmacro
 
@@ -203,52 +181,26 @@ SECTION .text
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderI4x4LumaPredH_sse2
     %assign push_num 0
+    INIT_X86_32_PIC r3
     LOAD_2_PARA
     SIGN_EXTENSION r1, r1d
-%ifdef X86_32_PICASM
-    push        r3
-    mov         r3, esp
-    and         esp, 0xfffffff0
-    push        0x01010101    ;mmx_01bytes
-    push        0x01010101
-    push        0x01010101
-    push        0x01010101
-%endif
 
     movzx       r2, byte [r0-1]
     movd        xmm0,   r2d
-%ifdef X86_32_PICASM
-    pmuludq     xmm0,   [esp]
-%else
-    pmuludq     xmm0,   [mmx_01bytes]
-%endif
+    pmuludq     xmm0,   [pic(mmx_01bytes)]
 
     movzx       r2, byte [r0+r1-1]
     movd        xmm1,   r2d
-%ifdef X86_32_PICASM
-    pmuludq     xmm1,   [esp]
-%else
-    pmuludq     xmm1,   [mmx_01bytes]
-%endif
+    pmuludq     xmm1,   [pic(mmx_01bytes)]
 
     lea         r0, [r0+r1]
     movzx       r2, byte [r0+r1-1]
     movd        xmm2,   r2d
-%ifdef X86_32_PICASM
-    pmuludq     xmm2,   [esp]
-%else
-    pmuludq     xmm2,   [mmx_01bytes]
-%endif
+    pmuludq     xmm2,   [pic(mmx_01bytes)]
 
     movzx       r2, byte [r0+2*r1-1]
     movd        xmm3,   r2d
-%ifdef X86_32_PICASM
-    pmuludq     xmm3,   [esp]
-    mov         esp, r3
-    pop         r3
-%else
-    pmuludq     xmm3,   [mmx_01bytes]
-%endif
+    pmuludq     xmm3,   [pic(mmx_01bytes)]
 
     sub         r0,    r1
     movd        [r0], xmm0
@@ -257,6 +209,7 @@ WELS_EXTERN WelsDecoderI4x4LumaPredH_sse2
     movd        [r0], xmm2
     movd        [r0+r1], xmm3
 
+    DEINIT_X86_32_PIC
     ret
 
 ;*******************************************************************************
@@ -266,6 +219,7 @@ WELS_EXTERN WelsDecoderI16x16LumaPredPlane_sse2
     push r3
     push r4
     %assign push_num 2
+    INIT_X86_32_PIC r5
     LOAD_2_PARA
     PUSH_XMM 8
     SIGN_EXTENSION r1, r1d
@@ -276,37 +230,11 @@ WELS_EXTERN WelsDecoderI16x16LumaPredPlane_sse2
     ;for H
     pxor    xmm7,   xmm7
     movq    xmm0,   [r0]
-%ifdef X86_32_PICASM
-    push    r0
-    mov     r0, esp
-    and     esp, 0xfffffff0
-    push    0x00010002
-    push    0x00030004
-    push    0x00050006
-    push    0x00070008
-    movdqa  xmm5,   [esp]
-    mov     esp, r0
-    pop     r0
-%else
-    movdqa  xmm5,   [sse2_plane_dec]
-%endif
+    movdqa  xmm5,   [pic(sse2_plane_dec)]
     punpcklbw xmm0, xmm7
     pmullw  xmm0,   xmm5
     movq    xmm1,   [r0 + 9]
-%ifdef X86_32_PICASM
-    push    r0
-    mov     r0, esp
-    and     esp, 0xfffffff0
-    push    0x00080007    ;sse2_plane_inc
-    push    0x00060005
-    push    0x00040003
-    push    0x00020001
-    movdqa  xmm6,   [esp]
-    mov     esp, r0
-    pop     r0
-%else
-    movdqa  xmm6,   [sse2_plane_inc]
-%endif
+    movdqa  xmm6,   [pic(sse2_plane_inc)]
     punpcklbw xmm1, xmm7
     pmullw  xmm1,   xmm6
     psubw   xmm1,   xmm0
@@ -361,19 +289,7 @@ WELS_EXTERN WelsDecoderI16x16LumaPredPlane_sse2
     SSE2_Copy8Times xmm0, r3d       ; xmm0 = s,s,s,s,s,s,s,s
 
     xor     r2, r2
-%ifdef X86_32_PICASM
-    mov     r2, esp
-    and     esp, 0xfffffff0
-    push    0x0000ffff    ;sse2_plane_inc_minus
-    push    0xfffefffd
-    push    0xfffcfffb
-    push    0xfffafff9
-    movdqa  xmm5,   [esp]
-    mov     esp, r2
-    xor     r2, r2
-%else
-    movdqa  xmm5,   [sse2_plane_inc_minus]
-%endif
+    movdqa  xmm5,   [pic(sse2_plane_inc_minus)]
 
 get_i16x16_luma_pred_plane_sse2_1:
     movdqa  xmm2,   xmm1
@@ -393,6 +309,7 @@ get_i16x16_luma_pred_plane_sse2_1:
     jnz get_i16x16_luma_pred_plane_sse2_1
 
     POP_XMM
+    DEINIT_X86_32_PIC
     pop r4
     pop r3
     ret
@@ -414,6 +331,7 @@ get_i16x16_luma_pred_plane_sse2_1:
 
 WELS_EXTERN WelsDecoderI16x16LumaPredH_sse2
     %assign push_num 0
+    INIT_X86_32_PIC_NOPRESERVE r2
     LOAD_2_PARA
     SIGN_EXTENSION r1, r1d
 
@@ -430,6 +348,7 @@ WELS_EXTERN WelsDecoderI16x16LumaPredH_sse2
     SSE2_PRED_H_16X16_TWO_LINE_DEC r0, r1
     SSE2_PRED_H_16X16_TWO_LINE_DEC r0, r1
 
+    DEINIT_X86_32_PIC
     ret
 
 ;*******************************************************************************
@@ -477,6 +396,7 @@ WELS_EXTERN WelsDecoderIChromaPredPlane_sse2
     push r3
     push r4
     %assign push_num 2
+    INIT_X86_32_PIC r5
     LOAD_2_PARA
     PUSH_XMM 8
     SIGN_EXTENSION r1, r1d
@@ -486,30 +406,11 @@ WELS_EXTERN WelsDecoderIChromaPredPlane_sse2
 
     pxor    mm7,    mm7
     movq    mm0,    [r0]
-%ifdef X86_32_PICASM
-    push    r5
-    mov     r5, esp
-    and     esp, 0xfffffff0
-    push    0x00010002    ;sse2_plane_dec_c
-    push    0x00030004
-    push    0x00040003    ;sse2_plane_inc_c
-    push    0x00020001
-    push    0x00040003    ;
-    push    0x00020001
-    push    0x0000ffff
-    push    0xfffefffd
-    movq    mm5,    [esp+24]
-%else
-    movq    mm5,    [sse2_plane_dec_c]
-%endif
+    movq    mm5,    [pic(sse2_plane_dec_c)]
     punpcklbw mm0,  mm7
     pmullw  mm0,    mm5
     movq    mm1,    [r0 + 5]
-%ifdef X86_32_PICASM
-    movq    mm6,    [esp+16]
-%else
-    movq    mm6,    [sse2_plane_inc_c]
-%endif
+    movq    mm6,    [pic(sse2_plane_inc_c)]
     punpcklbw mm1,  mm7
     pmullw  mm1,    mm6
     psubw   mm1,    mm0
@@ -561,13 +462,7 @@ WELS_EXTERN WelsDecoderIChromaPredPlane_sse2
     SSE2_Copy8Times xmm0, r3d       ; xmm0 = s,s,s,s,s,s,s,s
 
     xor     r2, r2
-%ifdef X86_32_PICASM
-    movdqa  xmm5,   [esp]
-    mov     esp, r5
-    pop     r5
-%else
-    movdqa  xmm5,   [sse2_plane_mul_b_c]
-%endif
+    movdqa  xmm5,   [pic(sse2_plane_mul_b_c)]
 
 get_i_chroma_pred_plane_sse2_1:
     movdqa  xmm2,   xmm1
@@ -583,6 +478,7 @@ get_i_chroma_pred_plane_sse2_1:
     jnz get_i_chroma_pred_plane_sse2_1
 
     POP_XMM
+    DEINIT_X86_32_PIC
     pop r4
     pop r3
     WELSEMMS
@@ -602,6 +498,7 @@ get_i_chroma_pred_plane_sse2_1:
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderI4x4LumaPredDDR_mmx
     %assign push_num 0
+    INIT_X86_32_PIC r3
     LOAD_2_PARA
     SIGN_EXTENSION r1, r1d
     mov r2, r0
@@ -629,20 +526,7 @@ WELS_EXTERN WelsDecoderI4x4LumaPredDDR_mmx
     movq        mm4,mm3             ;mm4[8]=[3],mm4[7]=[2],mm4[6]=[1],mm4[5]=[0],mm4[4]=[6],mm4[3]=[11],mm4[2]=[16],mm4[1]=[21]
     pavgb       mm3,mm1             ;mm3=([11]+[21]+1)/2
     pxor        mm1,mm4             ;find odd value in the lowest bit of each byte
-%ifdef X86_32_PICASM
-    push        r0
-    mov         r0, esp
-    and         esp, 0xfffffff0
-    push        0x01010101
-    push        0x01010101
-    push        0x01010101
-    push        0x01010101
-    pand        mm1,[esp]   ;set the odd bit
-    mov         esp, r0
-    pop         r0
-%else
-    pand        mm1,[mmx_01bytes]   ;set the odd bit
-%endif
+    pand        mm1,[pic(mmx_01bytes)]   ;set the odd bit
     psubusb     mm3,mm1             ;decrease 1 from odd bytes
     pavgb       mm2,mm3             ;mm2=(([11]+[21]+1)/2+1+[16])/2
 
@@ -655,6 +539,7 @@ WELS_EXTERN WelsDecoderI4x4LumaPredDDR_mmx
     movd        [r0+r1],mm2
     psrlq       mm2,8
     movd        [r0],mm2
+    DEINIT_X86_32_PIC
     WELSEMMS
     ret
 
@@ -667,20 +552,7 @@ WELS_EXTERN WelsDecoderI4x4LumaPredDDR_mmx
     movq        %1,     [%3-8]
     psrlq       %1,     38h
 
-%ifdef X86_32_PICASM
-    push        r0
-    mov         r0, esp
-    and         esp, 0xfffffff0
-    push        0x01010101
-    push        0x01010101
-    push        0x01010101
-    push        0x01010101
-    pmullw      %1,     [esp]
-    mov         esp, r0
-    pop         r0
-%else
-    pmullw      %1,     [mmx_01bytes]
-%endif
+    pmullw      %1,     [pic(mmx_01bytes)]
     pshufw      %1,     %1, 0
     movq        [%4],   %1
 %endmacro
@@ -689,26 +561,14 @@ WELS_EXTERN WelsDecoderI4x4LumaPredDDR_mmx
     movq        %1,     [%3+r1-8]
     psrlq       %1,     38h
 
-%ifdef X86_32_PICASM
-    push        r0
-    mov         r0, esp
-    and         esp, 0xfffffff0
-    push        0x01010101
-    push        0x01010101
-    push        0x01010101
-    push        0x01010101
-    pmullw      %1,     [esp]
-    mov         esp, r0
-    pop         r0
-%else
-    pmullw      %1,     [mmx_01bytes]
-%endif
+    pmullw      %1,     [pic(mmx_01bytes)]
     pshufw      %1,     %1, 0
     movq        [%4],   %1
 %endmacro
 
 WELS_EXTERN WelsDecoderIChromaPredH_mmx
     %assign push_num 0
+    INIT_X86_32_PIC r3
     LOAD_2_PARA
     SIGN_EXTENSION r1, r1d
     mov r2, r0
@@ -716,20 +576,7 @@ WELS_EXTERN WelsDecoderIChromaPredH_mmx
     movq        mm0,    [r2-8]
     psrlq       mm0,    38h
 
-%ifdef X86_32_PICASM
-    push        r0
-    mov         r0, esp
-    and         esp, 0xfffffff0
-    push        0x01010101
-    push        0x01010101
-    push        0x01010101
-    push        0x01010101
-    pmullw      mm0,        [esp]
-    mov         esp, r0
-    pop         r0
-%else
-    pmullw      mm0,        [mmx_01bytes]
-%endif
+    pmullw      mm0,        [pic(mmx_01bytes)]
     pshufw      mm0,    mm0,    0
     movq        [r0],   mm0
 
@@ -753,6 +600,7 @@ WELS_EXTERN WelsDecoderIChromaPredH_mmx
     lea         r0, [r0+2*r1]
     MMX_PRED_H_8X8_ONE_LINEE mm0, mm1, r2, r0+r1
 
+    DEINIT_X86_32_PIC
     WELSEMMS
     ret
 
@@ -816,6 +664,7 @@ WELS_EXTERN WelsDecoderIChromaPredV_mmx
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderI4x4LumaPredHD_mmx
     %assign push_num 0
+    INIT_X86_32_PIC r3
     LOAD_2_PARA
     SIGN_EXTENSION r1, r1d
     mov r2, r0
@@ -841,18 +690,7 @@ WELS_EXTERN WelsDecoderI4x4LumaPredHD_mmx
     pavgb       mm1, mm0
 
     pxor        mm4, mm0                ; find odd value in the lowest bit of each byte
-%ifdef X86_32_PICASM
-    push        r0
-    mov         r0, esp
-    and         esp, 0xfffffff0
-    push        0x01010101
-    push        0x01010101
-    pand        mm4, [esp]
-    mov         esp, r0
-    pop         r0
-%else
-    pand        mm4, [mmx_01bytes]      ; set the odd bit
-%endif
+    pand        mm4, [pic(mmx_01bytes)] ; set the odd bit
     psubusb     mm1, mm4                ; decrease 1 from odd bytes
 
     pavgb       mm2, mm1                ; mm2 = [xx xx d  c  b  f  h  j]
@@ -876,6 +714,7 @@ WELS_EXTERN WelsDecoderI4x4LumaPredHD_mmx
     movd        [r0+2*r1], mm3
     psrlq       mm3, 10h
     movd        [r0+r1], mm3
+    DEINIT_X86_32_PIC
     WELSEMMS
     ret
 
@@ -909,6 +748,7 @@ WELS_EXTERN WelsDecoderI4x4LumaPredHD_mmx
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderI4x4LumaPredHU_mmx
     %assign push_num 0
+    INIT_X86_32_PIC r3
     LOAD_2_PARA
     SIGN_EXTENSION r1, r1d
     mov r2, r0
@@ -937,18 +777,7 @@ WELS_EXTERN WelsDecoderI4x4LumaPredHU_mmx
     pavgb       mm2, mm0
 
     pxor        mm5, mm0                ; find odd value in the lowest bit of each byte
-%ifdef X86_32_PICASM
-    push        r0
-    mov         r0, esp
-    and         esp, 0xfffffff0
-    push        0x01010101
-    push        0x01010101
-    pand        mm5, [esp]      ; set the odd bit
-    mov         esp, r0
-    pop         r0
-%else
-    pand        mm5, [mmx_01bytes]      ; set the odd bit
-%endif
+    pand        mm5, [pic(mmx_01bytes)] ; set the odd bit
     psubusb     mm2, mm5                ; decrease 1 from odd bytes
 
     pavgb       mm2, mm3                ; mm2 = [f  d  b  xx xx xx xx xx]
@@ -970,6 +799,7 @@ WELS_EXTERN WelsDecoderI4x4LumaPredHU_mmx
     movd        [r0+r1], mm1
     psrlq       mm1, 10h
     movd        [r0+2*r1], mm1
+    DEINIT_X86_32_PIC
     WELSEMMS
     ret
 
@@ -1005,6 +835,7 @@ WELS_EXTERN WelsDecoderI4x4LumaPredHU_mmx
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderI4x4LumaPredVR_mmx
     %assign push_num 0
+    INIT_X86_32_PIC r3
     LOAD_2_PARA
     SIGN_EXTENSION r1, r1d
     mov r2, r0
@@ -1030,18 +861,7 @@ WELS_EXTERN WelsDecoderI4x4LumaPredVR_mmx
     pavgb       mm2, mm0
 
     pxor        mm3, mm0                ; find odd value in the lowest bit of each byte
-%ifdef X86_32_PICASM
-    push        r0
-    mov         r0, esp
-    and         esp, 0xfffffff0
-    push        0x01010101
-    push        0x01010101
-    pand        mm3, [esp]      ; set the odd bit
-    mov         esp, r0
-    pop         r0
-%else
-    pand        mm3, [mmx_01bytes]      ; set the odd bit
-%endif
+    pand        mm3, [pic(mmx_01bytes)] ; set the odd bit
     psubusb     mm2, mm3                ; decrease 1 from odd bytes
 
     movq        mm3, mm0
@@ -1071,6 +891,7 @@ WELS_EXTERN WelsDecoderI4x4LumaPredVR_mmx
     pxor        mm5, mm2                ; mm5 = [xx xx xx xx g  f  e  j]
     lea         r0, [r0+2*r1]
     movd        [r0+r1], mm5
+    DEINIT_X86_32_PIC
     WELSEMMS
     ret
 
@@ -1102,6 +923,7 @@ WELS_EXTERN WelsDecoderI4x4LumaPredVR_mmx
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderI4x4LumaPredDDL_mmx
     %assign push_num 0
+    INIT_X86_32_PIC r3
     LOAD_2_PARA
     SIGN_EXTENSION r1, r1d
     mov r2, r0
@@ -1121,18 +943,7 @@ WELS_EXTERN WelsDecoderI4x4LumaPredDDL_mmx
     movq        mm3, mm1
     pavgb       mm1, mm2
     pxor        mm3, mm2                ; find odd value in the lowest bit of each byte
-%ifdef X86_32_PICASM
-    push        r0
-    mov         r0, esp
-    and         esp, 0xfffffff0
-    push        0x01010101
-    push        0x01010101
-    pand        mm3, [esp]      ; set the odd bit
-    mov         esp, r0
-    pop         r0
-%else
-    pand        mm3, [mmx_01bytes]      ; set the odd bit
-%endif
+    pand        mm3, [pic(mmx_01bytes)] ; set the odd bit
     psubusb     mm1, mm3                ; decrease 1 from odd bytes
 
     pavgb       mm0, mm1                ; mm0 = [g f e d c b a xx]
@@ -1146,6 +957,7 @@ WELS_EXTERN WelsDecoderI4x4LumaPredDDL_mmx
     psrlq       mm0, 8h
     lea         r0, [r0+2*r1]
     movd        [r0+r1], mm0
+    DEINIT_X86_32_PIC
     WELSEMMS
     ret
 
@@ -1181,6 +993,7 @@ WELS_EXTERN WelsDecoderI4x4LumaPredDDL_mmx
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderI4x4LumaPredVL_mmx
     %assign push_num 0
+    INIT_X86_32_PIC r3
     LOAD_2_PARA
     SIGN_EXTENSION r1, r1d
     mov r2, r0
@@ -1199,18 +1012,7 @@ WELS_EXTERN WelsDecoderI4x4LumaPredVL_mmx
     movq        mm4, mm2
     pavgb       mm2, mm0
     pxor        mm4, mm0                ; find odd value in the lowest bit of each byte
-%ifdef X86_32_PICASM
-    push        r0
-    mov         r0, esp
-    and         esp, 0xfffffff0
-    push        0x01010101
-    push        0x01010101
-    pand        mm4, [esp]              ; set the odd bit
-    mov         esp, r0
-    pop         r0
-%else
-    pand        mm4, [mmx_01bytes]      ; set the odd bit
-%endif
+    pand        mm4, [pic(mmx_01bytes)] ; set the odd bit
     psubusb     mm2, mm4                ; decrease 1 from odd bytes
 
     pavgb       mm2, mm1                ; mm2 = [xx xx xx j  h  g  f  e]
@@ -1223,6 +1025,7 @@ WELS_EXTERN WelsDecoderI4x4LumaPredVL_mmx
     psrlq       mm2, 8h
     lea         r0, [r0+2*r1]
     movd        [r0+r1], mm2
+    DEINIT_X86_32_PIC
     WELSEMMS
     ret
 
@@ -1234,6 +1037,7 @@ WELS_EXTERN WelsDecoderIChromaPredDc_sse2
     push    r3
     push    r4
     %assign push_num 2
+    INIT_X86_32_PIC r5
     LOAD_2_PARA
     SIGN_EXTENSION r1, r1d
     mov r4, r0
@@ -1275,18 +1079,7 @@ WELS_EXTERN WelsDecoderIChromaPredDc_sse2
     movq        mm1, mm2
     paddq       mm1, mm0;                ; sum1 = mm3, sum2 = mm0, sum3 = mm2, sum4 = mm1
 
-%ifdef X86_32_PICASM
-    push        r0
-    mov         r0, esp
-    and         esp, 0xfffffff0
-    push        0x00000000
-    push        0x00000002
-    movq        mm4, [esp]
-    mov         esp, r0
-    pop         r0
-%else
-    movq        mm4, [mmx_0x02]
-%endif
+    movq        mm4, [pic(mmx_0x02)]
 
     paddq       mm0, mm4
     psrlq       mm0, 0x02
@@ -1302,30 +1095,13 @@ WELS_EXTERN WelsDecoderIChromaPredDc_sse2
     paddq       mm1, mm4
     psrlq       mm1, 0x03
 
-%ifdef X86_32_PICASM
-    push        r5
-    mov         r5, esp
-    and         esp, 0xfffffff0
-    push        0x01010101
-    push        0x01010101
-    pmuludq     mm0, [esp]
-    pmuludq     mm3, [esp]
-%else
-    pmuludq     mm0, [mmx_01bytes]
-    pmuludq     mm3, [mmx_01bytes]
-%endif
+    pmuludq     mm0, [pic(mmx_01bytes)]
+    pmuludq     mm3, [pic(mmx_01bytes)]
     psllq       mm0, 0x20
     pxor        mm0, mm3                 ; mm0 = m_up
 
-%ifdef X86_32_PICASM
-    pmuludq     mm2, [esp]
-    pmuludq     mm1, [esp]
-    mov         esp, r5
-    pop         r5
-%else
-    pmuludq     mm2, [mmx_01bytes]
-    pmuludq     mm1, [mmx_01bytes]
-%endif
+    pmuludq     mm2, [pic(mmx_01bytes)]
+    pmuludq     mm1, [pic(mmx_01bytes)]
     psllq       mm1, 0x20
     pxor        mm1, mm2                 ; mm2 = m_down
 
@@ -1342,6 +1118,7 @@ WELS_EXTERN WelsDecoderIChromaPredDc_sse2
     lea         r4, [r4+2*r1]
     movq        [r4+r1],   mm1
 
+    DEINIT_X86_32_PIC
     pop r4
     pop r3
     WELSEMMS
@@ -1357,6 +1134,7 @@ WELS_EXTERN WelsDecoderI16x16LumaPredDc_sse2
     push    r3
     push    r4
     %assign push_num 2
+    INIT_X86_32_PIC r5
     LOAD_2_PARA
     SIGN_EXTENSION r1, r1d
     mov r4, r0
@@ -1385,20 +1163,7 @@ WELS_EXTERN WelsDecoderI16x16LumaPredDc_sse2
     movd        xmm1, r2d
     paddw       xmm0, xmm1
     psrld       xmm0, 0x05
-%ifdef X86_32_PICASM
-    push        r0
-    mov         r0, esp
-    and         esp, 0xfffffff0
-    push        0x01010101
-    push        0x01010101
-    push        0x01010101
-    push        0x01010101
-    pmuludq     xmm0, [esp]
-    mov         esp, r0
-    pop         r0
-%else
-    pmuludq     xmm0, [mmx_01bytes]
-%endif
+    pmuludq     xmm0, [pic(mmx_01bytes)]
     pshufd      xmm0, xmm0, 0
 
     movdqa      [r4],       xmm0
@@ -1432,6 +1197,7 @@ WELS_EXTERN WelsDecoderI16x16LumaPredDc_sse2
 
     movdqa      [r4+r1],   xmm0
 
+    DEINIT_X86_32_PIC
     pop r4
     pop r3
 
@@ -1518,24 +1284,12 @@ WELS_EXTERN WelsDecoderI16x16LumaPredDcTop_sse2
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderI16x16LumaPredDcNA_sse2
     %assign push_num 0
+    INIT_X86_32_PIC r3
     LOAD_2_PARA
     SIGN_EXTENSION r1, r1d
     lea r2, [2*r1+r1]       ; 3*kiStride
 
-%ifdef X86_32_PICASM
-    push    r0
-    mov     r0, esp
-    and     esp, 0xfffffff0
-    push    0x80808080
-    push    0x80808080
-    push    0x80808080
-    push    0x80808080
-    movdqa xmm0, [esp]
-    mov     esp, r0
-    pop     r0
-%else
-    movdqa xmm0, [sse2_dc_0x80]
-%endif
+    movdqa xmm0, [pic(sse2_dc_0x80)]
     movdqa xmm1, xmm0
     movdqa [r0], xmm0
     movdqa [r0+r1], xmm1
@@ -1557,6 +1311,7 @@ WELS_EXTERN WelsDecoderI16x16LumaPredDcNA_sse2
     movdqa [r0+2*r1], xmm0
     movdqa [r0+r2], xmm1
 
+    DEINIT_X86_32_PIC
     ret
 
 ;*******************************************************************************
@@ -1680,21 +1435,11 @@ WELS_EXTERN WelsDecoderIChromaPredDcTop_sse2
 ;*******************************************************************************
 WELS_EXTERN WelsDecoderIChromaPredDcNA_mmx
     %assign push_num 0
+    INIT_X86_32_PIC r3
     LOAD_2_PARA
     SIGN_EXTENSION r1, r1d
     lea r2, [2*r1+r1]
-%ifdef X86_32_PICASM
-    push r0
-    mov  r0, esp
-    and  esp, 0xfffffff0
-    push 0x80808080
-    push 0x80808080
-    movq mm0, [esp]
-    mov  esp, r0
-    pop  r0
-%else
-    movq mm0, [sse2_dc_0x80]
-%endif
+    movq mm0, [pic(sse2_dc_0x80)]
     movq mm1, mm0
     movq [r0], mm0
     movq [r0+r1], mm1
@@ -1705,6 +1450,7 @@ WELS_EXTERN WelsDecoderIChromaPredDcNA_mmx
     movq [r0+r1], mm1
     movq [r0+2*r1], mm0
     movq [r0+r2], mm1
+    DEINIT_X86_32_PIC
     emms
     ret
 
