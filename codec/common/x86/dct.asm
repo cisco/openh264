@@ -60,7 +60,11 @@
     %define prefixed(a) a
 %endif
 
+%ifdef X86_32_PICASM
+SECTION .text align=32
+%else
 SECTION .rodata align=32
+%endif
 
 ;***********************************************************************
 ; Constant
@@ -392,40 +396,14 @@ WELS_EXTERN WelsIDctT4Rec_mmx
 ; Do 2 horizontal 4-pt DCTs in parallel packed as 8 words in an xmm register.
 ; out=%1 in=%1 clobber=%2
 %macro SSE2_DCT_HORIZONTAL 2
-    pshuflw       %2, %1, 1bh               ; [x[3],x[2],x[1],x[0]] low qw
-%ifdef X86_32_PICASM
-    push          r0
-    mov           r0, esp
-    and           esp, 0xfffffff0
-    push          0xffff0001    ;wels_p1m1p1m1w_128
-    push          0xffff0001
-    push          0xffff0001
-    push          0xffff0001
-    push          0x0001ffff    ;wels_p1m1m1p1w_128
-    push          0xffff0001
-    push          0x0001ffff
-    push          0xffff0001
-    push          0x00020001    ;wels_p1p2p1p2w_128
-    push          0x00020001
-    push          0x00020001
-    push          0x00020001
-    pmullw        %1, [esp+32]  ; [x[0],-x[1],x[2],-x[3], ...]
-%else
-    pmullw        %1, [wels_p1m1p1m1w_128]  ; [x[0],-x[1],x[2],-x[3], ...]
-%endif
-    pshufhw       %2, %2, 1bh               ; [x[3],x[2],x[1],x[0]] high qw
-    paddw         %1, %2                    ; s = [x[0]+x[3],-x[1]+x[2],x[2]+x[1],-x[3]+x[0], ...]
-    pshufd        %2, %1, 0b1h              ; [s[2],s[3],s[0],s[1], ...]
-%ifdef X86_32_PICASM
-    pmullw        %1, [esp+16]  ; [s[0],-s[1],-s[2],s[3], ...]
-    pmullw        %2, [esp]  ; [s[2],2*s[3],s[0],2*s[1], ...]]
-    mov           esp, r0
-    pop           r0
-%else
-    pmullw        %1, [wels_p1m1m1p1w_128]  ; [s[0],-s[1],-s[2],s[3], ...]
-    pmullw        %2, [wels_p1p2p1p2w_128]  ; [s[2],2*s[3],s[0],2*s[1], ...]]
-%endif
-    paddw         %1, %2                    ; y = [s[0]+s[2],-s[1]+2*s[3],-s[2]+s[0],s[3]+2*s[1], ...]
+    pshuflw       %2, %1, 1bh                    ; [x[3],x[2],x[1],x[0]] low qw
+    pmullw        %1, [pic(wels_p1m1p1m1w_128)]  ; [x[0],-x[1],x[2],-x[3], ...]
+    pshufhw       %2, %2, 1bh                    ; [x[3],x[2],x[1],x[0]] high qw
+    paddw         %1, %2                         ; s = [x[0]+x[3],-x[1]+x[2],x[2]+x[1],-x[3]+x[0], ...]
+    pshufd        %2, %1, 0b1h                   ; [s[2],s[3],s[0],s[1], ...]
+    pmullw        %1, [pic(wels_p1m1m1p1w_128)]  ; [s[0],-s[1],-s[2],s[3], ...]
+    pmullw        %2, [pic(wels_p1p2p1p2w_128)]  ; [s[2],2*s[3],s[0],2*s[1], ...]]
+    paddw         %1, %2                         ; y = [s[0]+s[2],-s[1]+2*s[3],-s[2]+s[0],s[3]+2*s[1], ...]
 %endmacro
 
 ; Do 2 horizontal 4-pt IDCTs in parallel packed as 8 words in an xmm register.
@@ -436,35 +414,14 @@ WELS_EXTERN WelsIDctT4Rec_mmx
 ;
 ; out=%1 in=%1 wels_p1m1m1p1w_128=%2 clobber=%3,%4
 %macro SSE2_IDCT_HORIZONTAL 4
-%ifdef X86_32_PICASM
-    push          r0
-    mov           r0, esp
-    and           esp, 0xfffffff0
-    push          0x80000000    ;wels_p0m8000p0m8000w_128
-    push          0x80000000
-    push          0x80000000
-    push          0x80000000
-    push          0xffffffff    ;wels_p1p1m1m1w_128
-    push          0x00010001
-    push          0xffffffff
-    push          0x00010001
-    movdqa        %3, [esp+16]
-%else
-    movdqa        %3, [wels_p0m8000p0m8000w_128]
-%endif
+    movdqa        %3, [pic(wels_p0m8000p0m8000w_128)]
     pmulhw        %3, %1                    ; x[0:7] * [0,-8000h,0,-8000h, ...] >> 16
     pshufd        %4, %1, 0b1h              ; [x[2],x[3],x[0],x[1], ...]
     pmullw        %4, %2                    ; [x[2],-x[3],-x[0],x[1], ...]
     paddw         %1, %3                    ; [x[0]+0,x[1]+(-x[1]>>1),x[2]+0,x[3]+(-x[3]>>1), ...]
     paddw         %1, %4                    ; s = [x[0]+x[2],(x[1]>>1)-x[3],x[2]-x[0],(x[3]>>1)+x[1], ...]
     pshuflw       %3, %1, 1bh               ; [s[3],s[2],s[1],s[0]] low qw
-%ifdef X86_32_PICASM
-    pmullw        %1, [esp]  ; [s[0],s[1],-s[2],-s[3], ...]
-    mov           esp, r0
-    pop           r0
-%else
-    pmullw        %1, [wels_p1p1m1m1w_128]  ; [s[0],s[1],-s[2],-s[3], ...]
-%endif
+    pmullw        %1, [pic(wels_p1p1m1m1w_128)]  ; [s[0],s[1],-s[2],-s[3], ...]
     pshufhw       %3, %3, 1bh               ; [s[3],s[2],s[1],s[0]] high qw
     pmullw        %3, %2                    ; [s[3],-s[2],-s[1],s[0], ...]
     paddw         %1, %3                    ; y = [s[0]+s[3],s[1]-s[2],-s[2]-s[1],-s[3]+s[0], ...]
@@ -481,24 +438,9 @@ WELS_EXTERN WelsIDctT4Rec_mmx
     punpckhqdq    %2, %1                    ; s03 = [x0+x3,x0-x3]
     punpcklqdq    %3, %1                    ; s12 = [x1+x2,x1-x2]
     movdqa        %1, %2
-%ifdef X86_32_PICASM
-    push          r0
-    mov           r0, esp
-    and           esp, 0xfffffff0
-    push          0x00020002    ;wels_4xp1w_4xp2w
-    push          0x00020002
-    push          0x00010001
-    push          0x00010001
-    pmullw        %1, [esp]    ; [s03[0],2*s03[1]]
-    paddw         %1, %3                    ; [y0,y1] = [s03[0]+s12[0],2*s03[1]+s12[1]]
-    pmullw        %3, [esp]    ; [s12[0],2*s12[1]]
-    mov           esp, r0
-    pop           r0
-%else
-    pmullw        %1, [wels_4xp1w_4xp2w]    ; [s03[0],2*s03[1]]
-    paddw         %1, %3                    ; [y0,y1] = [s03[0]+s12[0],2*s03[1]+s12[1]]
-    pmullw        %3, [wels_4xp1w_4xp2w]    ; [s12[0],2*s12[1]]
-%endif
+    pmullw        %1, [pic(wels_4xp1w_4xp2w)] ; [s03[0],2*s03[1]]
+    paddw         %1, %3                      ; [y0,y1] = [s03[0]+s12[0],2*s03[1]+s12[1]]
+    pmullw        %3, [pic(wels_4xp1w_4xp2w)] ; [s12[0],2*s12[1]]
     psubw         %2, %3                    ; [y2,y3] = [s03[0]-s12[0],s03[1]-2*s12[1]]
 %endmacro
 
@@ -506,20 +448,7 @@ WELS_EXTERN WelsIDctT4Rec_mmx
 ; Output is scrambled to save a negation.
 ; [y1,y0]=%1 [y2,y3]=%2 [x0,x1]=%1 [x2,x3]=%2 clobber=%3,%4
 %macro SSE2_IDCT_4x4P 4
-%ifdef X86_32_PICASM
-    push          r0
-    mov           r0, esp
-    and           esp, 0xfffffff0
-    push          0x80008000    ;wels_4xp0w_4xm8000w
-    push          0x80008000
-    push          0x00000000
-    push          0x00000000
-    movdqa        %4, [esp]
-    mov           esp, r0
-    pop           r0
-%else
-    movdqa        %4, [wels_4xp0w_4xm8000w]
-%endif
+    movdqa        %4, [pic(wels_4xp0w_4xm8000w)]
     movdqa        %3, %1
     pmulhw        %3, %4                    ; x[0:1] * [0,-8000h] >> 16
     pmulhw        %4, %2                    ; x[2:3] * [0,-8000h] >> 16
@@ -540,6 +469,7 @@ WELS_EXTERN WelsIDctT4Rec_mmx
 ;***********************************************************************
 WELS_EXTERN WelsDctFourT4_sse2
     %assign push_num 0
+    INIT_X86_32_PIC r5
     LOAD_5_PARA
     PUSH_XMM 8
     SIGN_EXTENSION r2, r2d
@@ -582,6 +512,7 @@ WELS_EXTERN WelsDctFourT4_sse2
 
     POP_XMM
     LOAD_5_PARA_POP
+    DEINIT_X86_32_PIC
     ret
 
 ;***********************************************************************
@@ -589,6 +520,7 @@ WELS_EXTERN WelsDctFourT4_sse2
 ;***********************************************************************
 WELS_EXTERN WelsIDctFourT4Rec_sse2
     %assign push_num 0
+    INIT_X86_32_PIC r5
     LOAD_5_PARA
     PUSH_XMM 8
     SIGN_EXTENSION r1, r1d
@@ -596,18 +528,7 @@ WELS_EXTERN WelsIDctFourT4Rec_sse2
     ;Load 4x8
     SSE2_Load4x8p  r4, xmm0, xmm1, xmm4, xmm2, xmm5
 
-%ifdef X86_32_PICASM
-    push          r5
-    mov           r5, esp
-    and           esp, 0xffffffe0
-    push          0x0001ffff    ;wels_p1m1m1p1w_128
-    push          0xffff0001
-    push          0x0001ffff
-    push          0xffff0001
-    movdqa xmm7, [esp]
-%else
-    movdqa xmm7, [wels_p1m1m1p1w_128]
-%endif
+    movdqa xmm7, [pic(wels_p1m1m1p1w_128)]
     SSE2_IDCT_HORIZONTAL xmm0, xmm7, xmm5, xmm6
     SSE2_IDCT_HORIZONTAL xmm1, xmm7, xmm5, xmm6
     SSE2_IDCT_HORIZONTAL xmm4, xmm7, xmm5, xmm6
@@ -626,13 +547,7 @@ WELS_EXTERN WelsIDctFourT4Rec_sse2
     lea     r2, [r2 + 2 * r3]
     SSE2_Load4x8p  r4+64, xmm0, xmm1, xmm4, xmm2, xmm5
 
-%ifdef X86_32_PICASM
-    movdqa xmm7, [esp]
-    mov    esp, r5
-    pop    r5
-%else
-    movdqa xmm7, [wels_p1m1m1p1w_128]
-%endif
+    movdqa xmm7, [pic(wels_p1m1m1p1w_128)]
     SSE2_IDCT_HORIZONTAL xmm0, xmm7, xmm5, xmm6
     SSE2_IDCT_HORIZONTAL xmm1, xmm7, xmm5, xmm6
     SSE2_IDCT_HORIZONTAL xmm4, xmm7, xmm5, xmm6
@@ -648,6 +563,7 @@ WELS_EXTERN WelsIDctFourT4Rec_sse2
     SSE2_StoreDiff16p xmm0, xmm4, xmm5, xmm6, xmm7, [r0], [r2], [r0 + r1], [r2 + r3]
     POP_XMM
     LOAD_5_PARA_POP
+    DEINIT_X86_32_PIC
     ret
 
 ;***********************************************************************
@@ -655,6 +571,7 @@ WELS_EXTERN WelsIDctFourT4Rec_sse2
 ;***********************************************************************
 WELS_EXTERN WelsDctT4_sse2
     %assign push_num 0
+    INIT_X86_32_PIC r5
     LOAD_5_PARA
     PUSH_XMM 5
     SIGN_EXTENSION r2, r2d
@@ -673,6 +590,7 @@ WELS_EXTERN WelsDctT4_sse2
 
     POP_XMM
     LOAD_5_PARA_POP
+    DEINIT_X86_32_PIC
     ret
 
 ;***********************************************************************
@@ -690,26 +608,14 @@ WELS_EXTERN WelsIDctT4Rec_sse2
     %assign push_num 0
     LOAD_5_PARA
 .begin:
+    INIT_X86_32_PIC r5
     PUSH_XMM 6
     SIGN_EXTENSION r1, r1d
     SIGN_EXTENSION r3, r3d
 
     SSE2_Load2x4P xmm0, r4
     SSE2_Load2x4P xmm1, r4+16
-%ifdef X86_32_PICASM
-    push          r5
-    mov           r5, esp
-    and           esp, 0xfffffff0
-    push          0x0001ffff    ;wels_p1m1m1p1w_128
-    push          0xffff0001
-    push          0x0001ffff
-    push          0xffff0001
-    movdqa xmm4, [esp]
-    mov           esp, r5
-    pop           r5
-%else
-    movdqa xmm4, [wels_p1m1m1p1w_128]
-%endif
+    movdqa xmm4, [pic(wels_p1m1m1p1w_128)]
     SSE2_IDCT_HORIZONTAL xmm0, xmm4, xmm2, xmm3
     SSE2_IDCT_HORIZONTAL xmm1, xmm4, xmm2, xmm3
     SSE2_IDCT_4x4P xmm0, xmm1, xmm2, xmm3
@@ -721,6 +627,7 @@ WELS_EXTERN WelsIDctT4Rec_sse2
     SSE2_StoreDiff2x4P r0+r1, r0+2*r1, xmm1, r2+r3, r2+2*r3, xmm5, xmm4, xmm2, xmm3
 
     POP_XMM
+    DEINIT_X86_32_PIC
     LOAD_5_PARA_POP
     ret
 
@@ -815,20 +722,7 @@ WELS_EXTERN WelsIDctRecI16x16Dc_sse2
     vpshufb       y%9, y%9, y%8
     vpaddsw       y%4, y%4, y%9
     vpackuswb     y%3, y%3, y%4
-%ifdef X86_32_PICASM
-    push          r0
-    mov           r0, esp
-    and           esp, 0xffffffe0
-    push          0x0d0f0e0c    ;wels_shufb0231_128
-    push          0x090b0a08
-    push          0x05070604
-    push          0x01030200
-    vbroadcasti128 y%4, [esp]
-    mov           esp, r0
-    pop           r0
-%else
-    vbroadcasti128 y%4, [wels_shufb0231_128]
-%endif
+    vbroadcasti128 y%4, [pic(wels_shufb0231_128)]
     vpshufb       y%3, y%3, y%4
     vextracti128  x%4, y%3, 1
     vmovlps       [%1         ], x%3
@@ -906,20 +800,7 @@ WELS_EXTERN WelsIDctRecI16x16Dc_sse2
     AVX2_Loadzx4x4P %8, %4, %5, y%7, %9, %10
     vpaddsw        y%3, y%3, y%8
     vpackuswb      y%3, y%3, y%3
-%ifdef X86_32_PICASM
-    push          r0
-    mov           r0, esp
-    and           esp, 0xffffffe0
-    push          0x0d0f0e0c    ;wels_shufb0231_128
-    push          0x090b0a08
-    push          0x05070604
-    push          0x01030200
-    vbroadcasti128 y%8, [esp]
-    mov           esp, r0
-    pop           r0
-%else
-    vbroadcasti128 y%8, [wels_shufb0231_128]
-%endif
+    vbroadcasti128 y%8, [pic(wels_shufb0231_128)]
     vpshufb        y%3, y%3, y%8
     vextracti128   x%8, y%3, 1
     vmovd          [%1         ], x%3
@@ -965,39 +846,10 @@ WELS_EXTERN WelsIDctRecI16x16Dc_sse2
 ; Uses scrambled input to save a negation.
 ; [y0,y1,y2,y3]=%1 [x0,x3,x1,x2]=%1 wels_shufb2301=%2 clobber=%3
 %macro AVX2_DCT_HORIZONTAL 3
-%ifdef X86_32_PICASM
-    push          r0
-    mov           r0, esp
-    and           esp, 0xffffffe0
-    push          0xffff0001    ;wels_p1m1p1m1w_256
-    push          0xffff0001
-    push          0xffff0001
-    push          0xffff0001
-    push          0xffff0001
-    push          0xffff0001
-    push          0xffff0001
-    push          0xffff0001
-    push          0xfffeffff    ;wels_p1m2m1m2w_256
-    push          0x00020001
-    push          0xfffeffff
-    push          0x00020001
-    push          0xfffeffff
-    push          0x00020001
-    push          0xfffeffff
-    push          0x00020001
-    vpsignw       %3, %1, [esp+32]  ; [x0,-x3,x1,-x2]
-%else
-    vpsignw       %3, %1, [wels_p1m1p1m1w_256]  ; [x0,-x3,x1,-x2]
-%endif
+    vpsignw       %3, %1, [pic(wels_p1m1p1m1w_256)]  ; [x0,-x3,x1,-x2]
     vpshufb       %1, %1, %2                    ; [x3,x0,x2,x1]
     vpaddw        %1, %1, %3                    ; s = [x0+x3,-x3+x0,x1+x2,-x2+x1]
-%ifdef X86_32_PICASM
-    vpmullw       %3, %1, [esp]  ; [s[0],2*s[1],-s[2],-2*s[3], ...]
-    mov           esp, r0
-    pop           r0
-%else
-    vpmullw       %3, %1, [wels_p1p2m1m2w_256]  ; [s[0],2*s[1],-s[2],-2*s[3], ...]
-%endif
+    vpmullw       %3, %1, [pic(wels_p1p2m1m2w_256)]  ; [s[0],2*s[1],-s[2],-2*s[3], ...]
     vpshufd       %1, %1, 0b1h                  ; [s[2],s[3],s[0],s[1], ...]
     vpaddw        %1, %1, %3                    ; [y0,y1,y2,y3] = [s[0]+s[2],2*s[1]+s[3],-s[2]+s[0],-2*s[3]+s[1], ...]
 %endmacro
@@ -1008,40 +860,11 @@ WELS_EXTERN WelsIDctRecI16x16Dc_sse2
 %macro AVX2_IDCT_HORIZONTAL 3
     vpsraw        %3, %1, 1                     ; [x0>>1,x1>>1,x2>>1,x3>>1]
     vpblendw      %3, %1, %3, 10101010b         ; [x0,x1>>1,x2,x3>>1]
-%ifdef X86_32_PICASM
-    push          r0
-    mov           r0, esp
-    and           esp, 0xffffffe0
-    push          0xffffffff    ;wels_p1p1m1m1w_256
-    push          0x00010001
-    push          0xffffffff
-    push          0x00010001
-    push          0xffffffff
-    push          0x00010001
-    push          0xffffffff
-    push          0x00010001
-    push          0xffff0001    ;wels_p1m1p1m1w_256
-    push          0xffff0001
-    push          0xffff0001
-    push          0xffff0001
-    push          0xffff0001
-    push          0xffff0001
-    push          0xffff0001
-    push          0xffff0001
-    vpsignw       %1, %1, [esp+32]  ; [x0,x1,-x2,-x3]
-%else
-    vpsignw       %1, %1, [wels_p1p1m1m1w_256]  ; [x0,x1,-x2,-x3]
-%endif
+    vpsignw       %1, %1, [pic(wels_p1p1m1m1w_256)]  ; [x0,x1,-x2,-x3]
     vpshufd       %3, %3, 0b1h                  ; [x2,x3>>1,x0,x1>>1]
     vpaddw        %1, %3, %1                    ; s = [x2+x0,(x3>>1)+x1,x0-x2,(x1>>1)-x3]
     vpshufb       %3, %1, %2                    ; [s[1],s[0],s[3],s[2], ...]
-%ifdef X86_32_PICASM
-    vpsignw       %1, %1, [esp]  ; [s[0],-s[1],s[2],-s[3], ...]
-    mov           esp, r0
-    pop           r0
-%else
-    vpsignw       %1, %1, [wels_p1m1p1m1w_256]  ; [s[0],-s[1],s[2],-s[3], ...]
-%endif
+    vpsignw       %1, %1, [pic(wels_p1m1p1m1w_256)]  ; [s[0],-s[1],s[2],-s[3], ...]
     vpaddw        %1, %1, %3                    ; [y0,y3,y1,y2] = [s[0]+s[1],-s[1]+s[0],s[2]+s[3],-s[3]+s[2], ...]
 %endmacro
 
@@ -1049,39 +872,10 @@ WELS_EXTERN WelsIDctRecI16x16Dc_sse2
 ; Uses scrambled input to save a negation.
 ; [y0,y1,y2,y3]=%1 [x0,x3,x1,x2]=%1 clobber=%2
 %macro AVX2_DCT_4x4P 2
-%ifdef X86_32_PICASM
-    push          r0
-    mov           r0, esp
-    and           esp, 0xffffffe0
-    push          0xffffffff    ;wels_4xp1w_4xm1w_256
-    push          0xffffffff
-    push          0x00010001
-    push          0x00010001
-    push          0xffffffff
-    push          0xffffffff
-    push          0x00010001
-    push          0x00010001
-    push          0xfffefffe    ;wels_4xp1w_4xp2w_4xm1w_4xm2w
-    push          0xfffefffe
-    push          0xffffffff
-    push          0xffffffff
-    push          0x00020002
-    push          0x00020002
-    push          0x00010001
-    push          0x00010001
-    vpsignw       %2, %1, [esp+32]         ; [x0,-x3,x1,-x2]
-%else
-    vpsignw       %2, %1, [wels_4xp1w_4xm1w_256]         ; [x0,-x3,x1,-x2]
-%endif
+    vpsignw       %2, %1, [pic(wels_4xp1w_4xm1w_256)]    ; [x0,-x3,x1,-x2]
     vpshufd       %1, %1, 4eh                            ; [x3,x0,x2,x1]
     vpaddw        %1, %1, %2                             ; s = [x0+x3,-x3+x0,x1+x2,-x2+x1]
-%ifdef X86_32_PICASM
-    vpmullw       %2, %1, [esp] ; [s[0],2*s[1],-s[2],-2*s[3]]
-    mov           esp, r0
-    pop           r0
-%else
-    vpmullw       %2, %1, [wels_4xp1w_4xp2w_4xm1w_4xm2w] ; [s[0],2*s[1],-s[2],-2*s[3]]
-%endif
+    vpmullw       %2, %1, [pic(wels_4xp1w_4xp2w_4xm1w_4xm2w)] ; [s[0],2*s[1],-s[2],-2*s[3]]
     vpermq        %1, %1, 4eh                            ; [s[2],s[3],s[0],s[1]]
     vpaddw        %1, %1, %2                             ; [y0,y1,y2,y3] = [s[0]+s[2],2*s[1]+s[3],-s[2]+s[0],-2*s[3]+s[1]]
 %endmacro
@@ -1092,40 +886,11 @@ WELS_EXTERN WelsIDctRecI16x16Dc_sse2
 %macro AVX2_IDCT_4x4P 2
     vpsraw        %2, %1, 1                              ; [x0>>1,x1>>1,x2>>1,x3>>1]
     vpblendw      %2, %1, %2, 11110000b                  ; [x0,x1>>1,x2,x3>>1]
-%ifdef X86_32_PICASM
-    push          r0
-    mov           r0, esp
-    and           esp, 0xffffffe0
-    push          0xffffffff    ;wels_8xp1w_8xm1w
-    push          0xffffffff
-    push          0xffffffff
-    push          0xffffffff
-    push          0x00010001
-    push          0x00010001
-    push          0x00010001
-    push          0x00010001
-    push          0xffffffff    ;wels_4xp1w_4xm1w_256
-    push          0xffffffff
-    push          0x00010001
-    push          0x00010001
-    push          0xffffffff
-    push          0xffffffff
-    push          0x00010001
-    push          0x00010001
-    vpsignw       %1, %1, [esp+32]             ; [x0,x1,-x2,-x3]
-%else
-    vpsignw       %1, %1, [wels_8xp1w_8xm1w]             ; [x0,x1,-x2,-x3]
-%endif
+    vpsignw       %1, %1, [pic(wels_8xp1w_8xm1w)]        ; [x0,x1,-x2,-x3]
     vpermq        %2, %2, 4eh                            ; [x2,x3>>1,x0,x1>>1]
     vpaddw        %1, %2, %1                             ; s = [x2+x0,(x3>>1)+x1,x0-x2,(x1>>1)-x3]
     vpshufd       %2, %1, 4eh                            ; [s[1],s[0],s[3],s[2]]
-%ifdef X86_32_PICASM
-    vpmullw       %1, %1, [esp]         ; [s[0],-s[1],s[2],-s[3], ...]
-    mov           esp, r0
-    pop           r0
-%else
-    vpmullw       %1, %1, [wels_4xp1w_4xm1w_256]         ; [s[0],-s[1],s[2],-s[3], ...]
-%endif
+    vpmullw       %1, %1, [pic(wels_4xp1w_4xm1w_256)]    ; [s[0],-s[1],s[2],-s[3], ...]
     vpaddw        %1, %1, %2                             ; [y0,y3,y1,y2] = [s[0]+s[1],-s[1]+s[0],s[2]+s[3],-s[3]+s[2]]
 %endmacro
 
@@ -1134,27 +899,13 @@ WELS_EXTERN WelsIDctRecI16x16Dc_sse2
 ;***********************************************************************
 WELS_EXTERN WelsDctFourT4_avx2
     %assign push_num 0
+    INIT_X86_32_PIC r5
     LOAD_5_PARA
     PUSH_XMM 7
     SIGN_EXTENSION r2, r2d
     SIGN_EXTENSION r4, r4d
 
-%ifdef X86_32_PICASM
-    push     r5
-    mov      r5, esp
-    and      esp, 0xffffffe0
-    push     0x80068005    ;wels_shufb0312_movzxw_128
-    push     0x80078004
-    push     0x80028001
-    push     0x80038000
-    push     0x0d0c0f0e   ;wels_shufb2301_128
-    push     0x09080b0a
-    push     0x05040706
-    push     0x01000302
-    vbroadcasti128 ymm6, [esp+16]
-%else
-    vbroadcasti128 ymm6, [wels_shufb0312_movzxw_128]
-%endif
+    vbroadcasti128 ymm6, [pic(wels_shufb0312_movzxw_128)]
 
     ;Load 4x16
     AVX2_LoadDiff16P mm0, r1, r2, r3, r4, mm6, mm4, mm5
@@ -1169,13 +920,7 @@ WELS_EXTERN WelsDctFourT4_avx2
     AVX2_LoadDiff16P mm3, r1, r2, r3, r4, mm6, mm4, mm5
 
     AVX2_DCT ymm0, ymm1, ymm2, ymm3, ymm5
-%ifdef X86_32_PICASM
-    vbroadcasti128 ymm6, [esp]
-    mov      esp, r5
-    pop      r5
-%else
-    vbroadcasti128 ymm6, [wels_shufb2301_128]
-%endif
+    vbroadcasti128 ymm6, [pic(wels_shufb2301_128)]
     AVX2_DCT_HORIZONTAL ymm0, ymm6, ymm5
     AVX2_DCT_HORIZONTAL ymm1, ymm6, ymm5
     AVX2_DCT_HORIZONTAL ymm2, ymm6, ymm5
@@ -1186,6 +931,7 @@ WELS_EXTERN WelsDctFourT4_avx2
 
     POP_XMM
     LOAD_5_PARA_POP
+    DEINIT_X86_32_PIC
     ret
 
 ;***********************************************************************
@@ -1203,46 +949,21 @@ WELS_EXTERN WelsIDctFourT4Rec_avx2
     %assign push_num 0
     LOAD_5_PARA
 .begin:
+    INIT_X86_32_PIC r5
     PUSH_XMM 8
     SIGN_EXTENSION r1, r1d
     SIGN_EXTENSION r3, r3d
 
     AVX2_Load4x16P mm0, mm1, mm2, mm3, r4, mm5
-%ifdef X86_32_PICASM
-    push     r5
-    mov      r5, esp
-    and      esp, 0xffffffe0
-    push     0x0d0c0f0e    ;wels_shufb2301_128
-    push     0x09080b0a
-    push     0x05040706
-    push     0x01000302
-    push     0x80068005    ;wels_shufb0312_movzxw_128
-    push     0x80078004
-    push     0x80028001
-    push     0x80038000
-    push     0x00200020    ;wels_dw32_128
-    push     0x00200020
-    push     0x00200020
-    push     0x00200020
-    vbroadcasti128 ymm6, [esp+32]
-%else
-    vbroadcasti128 ymm6, [wels_shufb2301_128]
-%endif
+    vbroadcasti128 ymm6, [pic(wels_shufb2301_128)]
     AVX2_IDCT_HORIZONTAL ymm0, ymm6, ymm5
     AVX2_IDCT_HORIZONTAL ymm1, ymm6, ymm5
     AVX2_IDCT_HORIZONTAL ymm2, ymm6, ymm5
     AVX2_IDCT_HORIZONTAL ymm3, ymm6, ymm5
     AVX2_IDCT ymm0, ymm1, ymm2, ymm3, ymm5
 
-%ifdef X86_32_PICASM
-    vbroadcasti128 ymm6, [esp+16]
-    vbroadcasti128 ymm7, [esp]
-    mov     esp, r5
-    pop     r5
-%else
-    vbroadcasti128 ymm6, [wels_shufb0312_movzxw_128]
-    vbroadcasti128 ymm7, [wels_dw32_128]
-%endif
+    vbroadcasti128 ymm6, [pic(wels_shufb0312_movzxw_128)]
+    vbroadcasti128 ymm7, [pic(wels_dw32_128)]
     AVX2_StoreDiff32P r0, r1, mm0, mm1, r2, r3, mm7, mm6, mm5, mm4
     add r2, r3
     add r0, r1
@@ -1250,6 +971,7 @@ WELS_EXTERN WelsIDctFourT4Rec_avx2
     vzeroupper
 
     POP_XMM
+    DEINIT_X86_32_PIC
     LOAD_5_PARA_POP
     ret
 
@@ -1258,42 +980,23 @@ WELS_EXTERN WelsIDctFourT4Rec_avx2
 ;***********************************************************************
 WELS_EXTERN WelsDctT4_avx2
     %assign push_num 0
+    INIT_X86_32_PIC r5
     LOAD_5_PARA
     PUSH_XMM 5
     SIGN_EXTENSION r2, r2d
     SIGN_EXTENSION r4, r4d
 
-%ifdef X86_32_PICASM
-    push     r5
-    mov      r5, esp
-    and      esp, 0xffffffe0
-    push     0x80068005    ;wels_shufb0312_movzxw_128
-    push     0x80078004
-    push     0x80028001
-    push     0x80038000
-    push     0x0d0c0f0e   ;wels_shufb2301_128
-    push     0x09080b0a
-    push     0x05040706
-    push     0x01000302
-    vbroadcasti128 ymm1, [esp+16]
-%else
-    vbroadcasti128 ymm1, [wels_shufb0312_movzxw_128]
-%endif
+    vbroadcasti128 ymm1, [pic(wels_shufb0312_movzxw_128)]
     AVX2_LoadDiff4x4P mm0, r1, r2, r3, r4, mm1, mm2, mm3, mm4
     AVX2_DCT_4x4P ymm0, ymm2
-%ifdef X86_32_PICASM
-    vbroadcasti128 ymm1, [esp]
-    mov     esp, r5
-    pop     r5
-%else
-    vbroadcasti128 ymm1, [wels_shufb2301_128]
-%endif
+    vbroadcasti128 ymm1, [pic(wels_shufb2301_128)]
     AVX2_DCT_HORIZONTAL ymm0, ymm1, ymm2
     AVX2_Store4x4P r0, mm0
     vzeroupper
 
     POP_XMM
     LOAD_5_PARA_POP
+    DEINIT_X86_32_PIC
     ret
 
 ;***********************************************************************
@@ -1311,46 +1014,22 @@ WELS_EXTERN WelsIDctT4Rec_avx2
     %assign push_num 0
     LOAD_5_PARA
 .begin:
+    INIT_X86_32_PIC r5
     PUSH_XMM 6
     SIGN_EXTENSION r1, r1d
     SIGN_EXTENSION r3, r3d
 
     AVX2_Load4x4P mm0, r4
-%ifdef X86_32_PICASM
-    push     r5
-    mov      r5, esp
-    and      esp, 0xffffffe0
-    push     0x0d0c0f0e   ;wels_shufb2301_128
-    push     0x09080b0a
-    push     0x05040706
-    push     0x01000302
-    push     0x80068005    ;wels_shufb0312_movzxw_128
-    push     0x80078004
-    push     0x80028001
-    push     0x80038000
-    push     0x00200020    ;wels_dw32_128
-    push     0x00200020
-    push     0x00200020
-    push     0x00200020
-    vbroadcasti128 ymm4, [esp+32]
-%else
-    vbroadcasti128 ymm4, [wels_shufb2301_128]
-%endif
+    vbroadcasti128 ymm4, [pic(wels_shufb2301_128)]
     AVX2_IDCT_HORIZONTAL ymm0, ymm4, ymm1
     AVX2_IDCT_4x4P ymm0, ymm1
-%ifdef X86_32_PICASM
-    vbroadcasti128 ymm4, [esp+16]
-    vbroadcasti128 ymm5, [esp]
-    mov     esp, r5
-    pop     r5
-%else
-    vbroadcasti128 ymm4, [wels_shufb0312_movzxw_128]
-    vbroadcasti128 ymm5, [wels_dw32_128]
-%endif
+    vbroadcasti128 ymm4, [pic(wels_shufb0312_movzxw_128)]
+    vbroadcasti128 ymm5, [pic(wels_dw32_128)]
     AVX2_StoreDiff4x4P r0, r1, mm0, r2, r3, mm5, mm4, mm1, mm2, mm3
     vzeroupper
 
     POP_XMM
+    DEINIT_X86_32_PIC
     LOAD_5_PARA_POP
     ret
 %endif
