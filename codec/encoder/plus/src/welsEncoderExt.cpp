@@ -1049,9 +1049,15 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
                m_pEncContext->pSvcParam->eSpsPpsIdStrategy, iValue);
       return cmInitParaError;
     }
-    m_pEncContext->pSvcParam->eSpsPpsIdStrategy = eNewStrategy;
+    SWelsSvcCodingParam sConfig;
+    memcpy (&sConfig, m_pEncContext->pSvcParam, sizeof (SWelsSvcCodingParam));
+    sConfig.eSpsPpsIdStrategy = eNewStrategy;
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, " CWelsH264SVCEncoder::SetOption eSpsPpsIdStrategy = %d ",
-             m_pEncContext->pSvcParam->eSpsPpsIdStrategy);
+             sConfig.eSpsPpsIdStrategy);
+
+    if (WelsEncoderParamAdjust (&m_pEncContext, &sConfig)) {
+      return cmInitParaError;
+    }
   }
   break;
   case ENCODER_OPTION_CURRENT_PATH: {

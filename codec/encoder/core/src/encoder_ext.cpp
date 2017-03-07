@@ -4404,7 +4404,7 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
     //if WelsInitEncoderExt succeed
     //for LTR or SPS,PPS ID update
     for (iIndexD = 0; iIndexD < pNewParam->iSpatialLayerNum; iIndexD++) {
-      pNewParam->sDependencyLayers[iIndexD].uiIdrPicId = uiMaxIdrPicId;
+      (*ppCtx)->pSvcParam->sDependencyLayers[iIndexD].uiIdrPicId = uiMaxIdrPicId;
     }
 
     //for sEncoderStatistics
