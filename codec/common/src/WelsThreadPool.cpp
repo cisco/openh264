@@ -75,7 +75,7 @@ WELS_THREAD_ERROR_CODE CWelsThreadPool::SetThreadNum (int32_t iMaxThreadNum) {
 }
 
 
-CWelsThreadPool& CWelsThreadPool::AddReference () {
+CWelsThreadPool& CWelsThreadPool::AddReference() {
   CWelsAutoLock  cLock (m_cInitLock);
   static CWelsThreadPool m_cThreadPoolSelf;
   if (m_iRefCount == 0) {
@@ -106,7 +106,7 @@ void CWelsThreadPool::RemoveInstance() {
 
 bool CWelsThreadPool::IsReferenced() {
   CWelsAutoLock  cLock (m_cInitLock);
-  return (m_iRefCount>0);
+  return (m_iRefCount > 0);
 }
 
 
@@ -137,7 +137,7 @@ WELS_THREAD_ERROR_CODE CWelsThreadPool::OnTaskStop (CWelsTaskThread* pThread, IW
   return WELS_THREAD_ERROR_OK;
 }
 
-WELS_THREAD_ERROR_CODE CWelsThreadPool::Init () {
+WELS_THREAD_ERROR_CODE CWelsThreadPool::Init() {
   //fprintf(stdout, "Enter WelsThreadPool Init\n");
 
   CWelsAutoLock  cLock (m_cLockPool);
@@ -197,9 +197,9 @@ WELS_THREAD_ERROR_CODE CWelsThreadPool::Uninit() {
 
   Kill();
 
-  WELS_DELETE_OP(m_cWaitedTasks);
-  WELS_DELETE_OP(m_cIdleThreads);
-  WELS_DELETE_OP(m_cBusyThreads);
+  WELS_DELETE_OP (m_cWaitedTasks);
+  WELS_DELETE_OP (m_cIdleThreads);
+  WELS_DELETE_OP (m_cBusyThreads);
 
   return iReturn;
 }
@@ -234,8 +234,8 @@ WELS_THREAD_ERROR_CODE CWelsThreadPool::QueueTask (IWelsTask* pTask) {
     }
   }
   //fprintf(stdout, "ThreadPool:  AddTaskToWaitedList: %x\n", pTask);
-  if (false == AddTaskToWaitedList (pTask)){
-      return WELS_THREAD_ERROR_GENERAL;
+  if (false == AddTaskToWaitedList (pTask)) {
+    return WELS_THREAD_ERROR_GENERAL;
   }
 
   //fprintf(stdout, "ThreadPool:  SignalThread: %x\n", pTask);
@@ -261,7 +261,7 @@ WELS_THREAD_ERROR_CODE CWelsThreadPool::CreateIdleThread() {
 
 void  CWelsThreadPool::DestroyThread (CWelsTaskThread* pThread) {
   pThread->Kill();
-  WELS_DELETE_OP(pThread);
+  WELS_DELETE_OP (pThread);
 
   return;
 }
@@ -292,7 +292,7 @@ bool  CWelsThreadPool::AddTaskToWaitedList (IWelsTask* pTask) {
 
   int32_t nRet = m_cWaitedTasks->push_back (pTask);
   //fprintf(stdout, "CWelsThreadPool::AddTaskToWaitedList=%d, pTask=%x\n", m_cWaitedTasks->size(), pTask);
-  return (0==nRet ? true : false);
+  return (0 == nRet ? true : false);
 }
 
 CWelsTaskThread*   CWelsThreadPool::GetIdleThread() {

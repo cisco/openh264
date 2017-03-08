@@ -96,7 +96,7 @@ class  CWelsThreadPool : public CWelsThread, public IWelsTaskThreadSink {
  private:
   CWelsThreadPool();
   virtual ~CWelsThreadPool();
-  
+
   WELS_THREAD_ERROR_CODE StopAllRunning();
 
   static int32_t   m_iRefCount;
