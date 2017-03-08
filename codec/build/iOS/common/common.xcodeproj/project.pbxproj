@@ -49,7 +49,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0DB71EF31BAB273500EABC51 /* WelsCircleQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WelsCircleQueue.h; sourceTree = "<group>"; };
 		0DD32A851B467902009181A1 /* WelsThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WelsThread.cpp; sourceTree = "<group>"; };
 		0DD32A871B467911009181A1 /* WelsTaskThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WelsTaskThread.cpp; sourceTree = "<group>"; };
 		0DD32A8E1B467B83009181A1 /* WelsLock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WelsLock.h; sourceTree = "<group>"; };
@@ -147,7 +146,6 @@
 				5BD896B81A7B837700D32B7D /* memory_align.h */,
 				4C3406C118D96EA600DFA14A /* typedefs.h */,
 				5BA8F2BE19603F3500011CE4 /* wels_common_defs.h */,
-				0DB71EF31BAB273500EABC51 /* WelsCircleQueue.h */,
 				0DEA477E1BB36FE100ADD134 /* WelsList.h */,
 				0DD32A8E1B467B83009181A1 /* WelsLock.h */,
 				0DD32A8F1B467C73009181A1 /* WelsTask.h */,

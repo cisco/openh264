@@ -142,8 +142,8 @@ WELS_THREAD_ERROR_CODE CWelsThreadPool::Init () {
 
   CWelsAutoLock  cLock (m_cLockPool);
 
-  m_cWaitedTasks = new CWelsCircleQueue<IWelsTask>();
-  m_cIdleThreads = new CWelsCircleQueue<CWelsTaskThread>();
+  m_cWaitedTasks = new CWelsNonDuplicatedList<IWelsTask>();
+  m_cIdleThreads = new CWelsNonDuplicatedList<CWelsTaskThread>();
   m_cBusyThreads = new CWelsList<CWelsTaskThread>();
   if (NULL == m_cWaitedTasks || NULL == m_cIdleThreads || NULL == m_cBusyThreads) {
     return WELS_THREAD_ERROR_GENERAL;
