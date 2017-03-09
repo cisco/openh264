@@ -220,7 +220,7 @@ TEST_F (EncoderInterfaceTest, EncoderOptionSetTest) {
   sInfo.iLayer = SPATIAL_LAYER_0;
   iResult = pPtrEnc->SetOption (eOptionId, &sInfo);
   pPtrEnc->GetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, pParamExt);
-  if (sInfo.iBitrate <= 0)
+  if (sInfo.iBitrate <= 0 || pParamExt->sSpatialLayers[sInfo.iLayer].iSpatialBitrate <= (int) (fFrameRate + 0.5f))
     EXPECT_EQ (iResult, static_cast<int> (cmInitParaError));
   else if (pParamExt->sSpatialLayers[sInfo.iLayer].iSpatialBitrate >
            pParamExt->sSpatialLayers[sInfo.iLayer].iMaxSpatialBitrate) {
