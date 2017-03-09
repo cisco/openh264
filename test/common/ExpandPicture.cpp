@@ -127,9 +127,11 @@ TEST (ExpandPicture, ExpandPictureLuma) {
       int32_t iBuffHeight = iPicHeight + H264_PADDING_LENGTH_LUMA * 2;
       int32_t iBuffSize =  iBuffHeight * iStride * sizeof (uint8_t);
       uint8_t* pAnchorDstBuff = static_cast<uint8_t*> (WelsMallocz (iBuffSize, "pAnchorDstBuff"));
+      ASSERT_TRUE (pAnchorDstBuff != NULL) << "pAnchorDstBuff alloc failed for size:" << iBuffSize;
       uint8_t* pAnchorDst = pAnchorDstBuff + H264_PADDING_LENGTH_LUMA * iStride + H264_PADDING_LENGTH_LUMA;
 
       uint8_t* pTestDstBuff = static_cast<uint8_t*> (WelsMallocz (iBuffSize, "pTestDstBuff"));
+      ASSERT_TRUE (pTestDstBuff != NULL) << "pTestDstBuff alloc failed for size:" << iBuffSize;
       uint8_t* pTestDst = pTestDstBuff + H264_PADDING_LENGTH_LUMA * iStride + H264_PADDING_LENGTH_LUMA;
 
       // Generate Src
@@ -173,9 +175,11 @@ TEST (ExpandPicture, ExpandPictureChroma) {
       int32_t iBuffHeight = iPicHeight + H264_PADDING_LENGTH_CHROMA * 2;
       int32_t iBuffSize =  iBuffHeight * iStride * sizeof (uint8_t);
       uint8_t* pAnchorDstBuff = static_cast<uint8_t*> (WelsMallocz (iBuffSize, "pAnchorDstBuff"));
+      ASSERT_TRUE (pAnchorDstBuff != NULL) << "pAnchorDstBuff alloc failed for size:" << iBuffSize;
       uint8_t* pAnchorDst = pAnchorDstBuff + H264_PADDING_LENGTH_CHROMA * iStride + H264_PADDING_LENGTH_CHROMA;
 
       uint8_t* pTestDstBuff = static_cast<uint8_t*> (WelsMallocz (iBuffSize, "pTestDstBuff"));
+      ASSERT_TRUE (pTestDstBuff != NULL) << "pTestDstBuff alloc failed for size:" << iBuffSize;
       uint8_t* pTestDst = pTestDstBuff + H264_PADDING_LENGTH_CHROMA * iStride + H264_PADDING_LENGTH_CHROMA;
 
       // Generate Src
@@ -218,8 +222,10 @@ TEST (ExpandPicture, ExpandPicForMotion) {
       if (uiCpuFlag & WELS_CPU_SSE2) {
         iPicWidth = WELS_ALIGN (iPicWidth, 32);
       }
-      iStride[0]                  = WELS_ALIGN (iPicWidth, MB_WIDTH_LUMA)   + (PADDING_LENGTH << 1);      // with width of horizon
-      int32_t iPicHeightExt       = WELS_ALIGN (iPicHeight, MB_HEIGHT_LUMA) + (PADDING_LENGTH << 1);      // with height of vertical
+      iStride[0]                  = WELS_ALIGN (iPicWidth,
+                                    MB_WIDTH_LUMA)   + (PADDING_LENGTH << 1);      // with width of horizon
+      int32_t iPicHeightExt       = WELS_ALIGN (iPicHeight,
+                                    MB_HEIGHT_LUMA) + (PADDING_LENGTH << 1);      // with height of vertical
       iStride[1]                  = iStride[0] >> 1;
       int32_t iPicChromaHeightExt = iPicHeightExt >> 1;
       iStride[2]                  = iStride[1];
@@ -227,11 +233,13 @@ TEST (ExpandPicture, ExpandPicForMotion) {
       int32_t iChromaSize         = iStride[1] * iPicChromaHeightExt;
 
       pPicAnchorBuffer = static_cast<uint8_t*> (WelsMallocz (iLumaSize + (iChromaSize << 1), "pPicAnchor"));
+      ASSERT_TRUE (pPicAnchorBuffer != NULL) << "pPicAnchorBuffer alloc failed for size:" << (iLumaSize + (iChromaSize << 1));
       pPicAnchor[0]     = pPicAnchorBuffer + (1 + iStride[0]) * PADDING_LENGTH;
       pPicAnchor[1]     = pPicAnchorBuffer + iLumaSize + (((1 + iStride[1]) * PADDING_LENGTH) >> 1);
       pPicAnchor[2]     = pPicAnchorBuffer + iLumaSize + iChromaSize + (((1 + iStride[2]) * PADDING_LENGTH) >> 1);
 
       pPicTestBuffer = static_cast<uint8_t*> (WelsMallocz (iLumaSize + (iChromaSize << 1), "pPicTest"));
+      ASSERT_TRUE (pPicTestBuffer != NULL) << "pPicTestBuffer alloc failed for size:" << (iLumaSize + (iChromaSize << 1));
       pPicTest[0]       = pPicTestBuffer + (1 + iStride[0]) * PADDING_LENGTH;
       pPicTest[1]       = pPicTestBuffer + iLumaSize + (((1 + iStride[1]) * PADDING_LENGTH) >> 1);
       pPicTest[2]       = pPicTestBuffer + iLumaSize + iChromaSize + (((1 + iStride[2]) * PADDING_LENGTH) >> 1);

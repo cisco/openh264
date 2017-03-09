@@ -27,7 +27,7 @@ TEST_P (EncodeDecodeTestAPI, DecoderVclNal) {
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
 
-  InitialEncDec (p.width, p.height);
+  ASSERT_TRUE (InitialEncDec (p.width, p.height));
 
   int iIdx = 0;
   while (iIdx <= p.numframes) {
@@ -63,7 +63,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionFramenum) {
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
 
-  InitialEncDec (p.width, p.height);
+  ASSERT_TRUE (InitialEncDec (p.width, p.height));
 
   int32_t iEncFrameNum = -1;
   int32_t iDecFrameNum;
@@ -102,7 +102,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionIDR) {
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
 
-  InitialEncDec (p.width, p.height);
+  ASSERT_TRUE (InitialEncDec (p.width, p.height));
 
   int32_t iEncCurIdrPicId = 0;
   int32_t iDecCurIdrPicId;
@@ -146,7 +146,7 @@ TEST_P (EncodeDecodeTestAPI, InOutTimeStamp) {
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
 
-  InitialEncDec (p.width, p.height);
+  ASSERT_TRUE (InitialEncDec (p.width, p.height));
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -200,7 +200,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_AVC_NOPREFIX) {
   int rv = encoder_->InitializeExt (&param_);
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
-  InitialEncDec (p.width, p.height);
+  ASSERT_TRUE (InitialEncDec (p.width, p.height));
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -273,7 +273,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_AVC_WITH_PREFIX_NOLOSS) {
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
 
-  InitialEncDec (p.width, p.height);
+  ASSERT_TRUE (InitialEncDec (p.width, p.height));
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -329,7 +329,7 @@ TEST_P (EncodeDecodeTestAPI, GetOptionTid_SVC_L1_NOLOSS) {
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
 
-  InitialEncDec (p.width, p.height);
+  ASSERT_TRUE (InitialEncDec (p.width, p.height));
   int32_t iTraceLevel = WELS_LOG_QUIET;
   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
@@ -386,7 +386,7 @@ TEST_P (EncodeDecodeTestAPI, SetOption_Trace) {
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
 
-  InitialEncDec (p.width, p.height);
+  ASSERT_TRUE (InitialEncDec (p.width, p.height));
   int32_t iTraceLevel = WELS_LOG_QUIET;
   pFunc = TestOutPutTrace;
   pTraceInfo = &sTrace;
@@ -451,7 +451,7 @@ TEST_P (EncodeDecodeTestAPI, SetOption_Trace_NULL) {
   ASSERT_TRUE (rv == cmResultSuccess);
   m_LTR_Recover_Request.uiFeedbackType = NO_RECOVERY_REQUSET;
 
-  InitialEncDec (p.width, p.height);
+  ASSERT_TRUE (InitialEncDec (p.width, p.height));
 
   int32_t iTraceLevel = WELS_LOG_QUIET;
   pFunc = NULL;
@@ -529,7 +529,6 @@ class DecodeCrashTestAPI : public ::testing::TestWithParam<EncodeDecodeFileParam
     EncodeDecodeTestBase::prepareParam (iLayerNum, iSliceNum,  width, height, framerate, pParam);
   }
 
-  void prepareEncDecParam (const EncodeDecodeFileParamBase EncDecFileParam);
   void EncodeOneFrame() {
     int frameSize = EncPic.iPicWidth * EncPic.iPicHeight * 3 / 2;
     memset (buf_.data(), iRandValue, (frameSize >> 2));
@@ -540,31 +539,6 @@ class DecodeCrashTestAPI : public ::testing::TestWithParam<EncodeDecodeFileParam
  protected:
   unsigned char* ucBuf_;
 };
-
-void DecodeCrashTestAPI::prepareEncDecParam (const EncodeDecodeFileParamBase EncDecFileParam) {
-  // for encoder
-  // I420: 1(Y) + 1/4(U) + 1/4(V)
-  int frameSize = EncDecFileParam.width * EncDecFileParam.height * 3 / 2;
-
-  buf_.SetLength (frameSize);
-  ASSERT_TRUE (buf_.Length() == (size_t)frameSize);
-
-  memset (&EncPic, 0, sizeof (SSourcePicture));
-  EncPic.iPicWidth = EncDecFileParam.width;
-  EncPic.iPicHeight = EncDecFileParam.height;
-  EncPic.iColorFormat = videoFormatI420;
-  EncPic.iStride[0] = EncPic.iPicWidth;
-  EncPic.iStride[1] = EncPic.iStride[2] = EncPic.iPicWidth >> 1;
-  EncPic.pData[0] = buf_.data();
-  EncPic.pData[1] = EncPic.pData[0] + EncDecFileParam.width * EncDecFileParam.height;
-  EncPic.pData[2] = EncPic.pData[1] + (EncDecFileParam.width * EncDecFileParam.height >> 2);
-
-  //for decoder
-  memset (&info, 0, sizeof (SFrameBSInfo));
-
-  //set a fixed random value
-  iRandValue = rand() % 256;
-}
 
 struct EncodeDecodeParamBase {
   int width;
@@ -668,7 +642,7 @@ TEST_F (DecodeCrashTestAPI, DecoderCrashTest) {
     pInput.width =  p.width;
     pInput.height = p.height;
     pInput.frameRate = p.frameRate;
-    prepareEncDecParam (pInput);
+    ASSERT_TRUE (prepareEncDecParam (pInput));
     while (iIdx++ < iTotalFrameNum) { // loop in frame
       EncodeOneFrame();
 #ifdef DEBUG_FILE_SAVE_CRA
@@ -819,11 +793,13 @@ class DecodeParseAPI : public ::testing::TestWithParam<EncodeDecodeFileParamBase
     }
   }
 
-  void prepareEncDecParam (const EncodeDecodeFileParamBase p) {
-    EncodeDecodeTestBase::prepareEncDecParam (p);
+  bool prepareEncDecParam (const EncodeDecodeFileParamBase p) {
+    if (!EncodeDecodeTestBase::prepareEncDecParam (p))
+      return false;
     unsigned char* pTmpPtr = BsInfo_.pDstBuff; //store for restore
     memset (&BsInfo_, 0, sizeof (SParserBsInfo));
     BsInfo_.pDstBuff = pTmpPtr;
+    return true;
   }
 
   void MockInputData (uint8_t* pData, int32_t iSize) {
@@ -886,7 +862,7 @@ TEST_F (DecodeParseAPI, ParseOnly_General) {
   if (uiTargetLayerId < kiTotalLayer) { //should always be true
     //Start for enc
     int iLen = 0;
-    prepareEncDecParam (p);
+    ASSERT_TRUE (prepareEncDecParam (p));
     int iFrame = 0;
 
     while (iFrame < p.numframes) {
@@ -959,7 +935,7 @@ TEST_F (DecodeParseAPI, ParseOnly_SpecSliceLoss) {
   //Start for enc
   int iLen = 0;
   uint32_t uiGet;
-  prepareEncDecParam (p);
+  ASSERT_TRUE (prepareEncDecParam (p));
   int iFrame = 0;
 
   while (iFrame < p.numframes) {

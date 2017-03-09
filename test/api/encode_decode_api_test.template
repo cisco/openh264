@@ -72,7 +72,7 @@ TEST_F (EncodeDecodeTestAPI, LogEncoding) {
 
     //FillParam
 
-    InitialEncDec (param_.iPicWidth, param_.iPicHeight);
+    ASSERT_TRUE (InitialEncDec (param_.iPicWidth, param_.iPicHeight));
     rv = encoder_->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, &param_);
     ASSERT_TRUE (rv == cmResultSuccess) << "SetOption Failed pParam: rv = " << rv;
     EncodeOneFrame (0);

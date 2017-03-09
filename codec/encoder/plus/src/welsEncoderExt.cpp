@@ -382,8 +382,6 @@ int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSIn
   const int32_t kiEncoderReturn = EncodeFrameInternal (kpSrcPic, pBsInfo);
 
   if (kiEncoderReturn != cmResultSuccess) {
-    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_DEBUG,
-             "CWelsH264SVCEncoder::EncodeFrame() not succeed, err=%d", kiEncoderReturn);
     return kiEncoderReturn;
   }
 
@@ -404,6 +402,8 @@ int CWelsH264SVCEncoder ::EncodeFrameInternal (const SSourcePicture*  pSrcPic, S
 
   if ((kiEncoderReturn == ENC_RETURN_MEMALLOCERR) || (kiEncoderReturn == ENC_RETURN_MEMOVERFLOWFOUND)
       || (kiEncoderReturn == ENC_RETURN_VLCOVERFLOWFOUND)) {
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_DEBUG, "CWelsH264SVCEncoder::EncodeFrame() not succeed, err=%d",
+             kiEncoderReturn);
     WelsUninitEncoderExt (&m_pEncContext);
     return cmMallocMemeError;
   } else if ((kiEncoderReturn != ENC_RETURN_SUCCESS) && (kiEncoderReturn == ENC_RETURN_CORRECTED)) {
