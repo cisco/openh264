@@ -1,6 +1,7 @@
 #ifndef __BUFFEREDDATA_H__
 #define __BUFFEREDDATA_H__
 
+#include <gtest/gtest.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include "../test_stdint.h"
@@ -46,6 +47,8 @@ class BufferedData {
   void SetLength (size_t newLen) {
     if (EnsureCapacity (newLen)) {
       length_ = newLen;
+    } else {
+      FAIL () << "unable to alloc memory in SetLength()";
     }
   }
 

@@ -65,9 +65,9 @@ IWelsTaskManage*   IWelsTaskManage::CreateTaskManage (sWelsEncCtx* pCtx, const i
   pTaskManage = WELS_NEW_OP (CWelsTaskManageBase(), CWelsTaskManageBase);
   WELS_VERIFY_RETURN_IF (NULL, NULL == pTaskManage)
 
-  if ( ENC_RETURN_SUCCESS != pTaskManage->Init (pCtx) ) {
+  if (ENC_RETURN_SUCCESS != pTaskManage->Init (pCtx)) {
     pTaskManage->Uninit();
-    WELS_DELETE_OP(pTaskManage);
+    WELS_DELETE_OP (pTaskManage);
   }
   return pTaskManage;
 }
@@ -85,7 +85,7 @@ CWelsTaskManageBase::CWelsTaskManageBase()
   }
 
   WelsEventOpen (&m_hTaskEvent);
-  WelsMutexInit(&m_hEventMutex);
+  WelsMutexInit (&m_hEventMutex);
 }
 
 CWelsTaskManageBase::~CWelsTaskManageBase() {
@@ -100,8 +100,8 @@ WelsErrorType CWelsTaskManageBase::Init (sWelsEncCtx* pEncCtx) {
   int32_t iReturn = ENC_RETURN_SUCCESS;
   //fprintf(stdout, "m_pThreadPool = &(CWelsThreadPool::GetInstance, this=%x\n", this);
   iReturn = CWelsThreadPool::SetThreadNum (m_iThreadNum);
-  m_pThreadPool = & (CWelsThreadPool::AddReference ());
-  if ( (iReturn != ENC_RETURN_SUCCESS) && pEncCtx ) {
+  m_pThreadPool = (CWelsThreadPool::AddReference());
+  if ((iReturn != ENC_RETURN_SUCCESS) && pEncCtx) {
     WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_WARNING, "Set Thread Num to %d did not succeed, current thread num in use: %d",
              m_iThreadNum, m_pThreadPool->GetThreadNum());
   }
@@ -122,17 +122,18 @@ WelsErrorType CWelsTaskManageBase::Init (sWelsEncCtx* pEncCtx) {
 void   CWelsTaskManageBase::Uninit() {
   DestroyTasks();
   //fprintf(stdout, "m_pThreadPool = m_pThreadPool->RemoveInstance\n");
-  m_pThreadPool->RemoveInstance();
+  if (m_pThreadPool)
+    m_pThreadPool->RemoveInstance();
   //WELS_DELETE_OP (m_pThreadPool);
 
   //fprintf(stdout, "m_pThreadPool = m_pThreadPool->RemoveInstance2\n");
 
   for (int32_t iDid = 0; iDid < MAX_DEPENDENCY_LAYER; iDid++) {
-    WELS_DELETE_OP(m_cEncodingTaskList[iDid]);
-    WELS_DELETE_OP(m_cPreEncodingTaskList[iDid]);
+    WELS_DELETE_OP (m_cEncodingTaskList[iDid]);
+    WELS_DELETE_OP (m_cPreEncodingTaskList[iDid]);
   }
   WelsEventClose (&m_hTaskEvent);
-  WelsMutexDestroy(&m_hEventMutex);
+  WelsMutexDestroy (&m_hEventMutex);
 }
 
 WelsErrorType CWelsTaskManageBase::CreateTasks (sWelsEncCtx* pEncCtx, const int32_t kiCurDid) {
@@ -164,7 +165,7 @@ WelsErrorType CWelsTaskManageBase::CreateTasks (sWelsEncCtx* pEncCtx, const int3
       }
     }
     WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == pTask)
-    WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, true != m_cEncodingTaskList[kiCurDid]->push_back (pTask) );
+    WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, true != m_cEncodingTaskList[kiCurDid]->push_back (pTask));
   }
 
   //fprintf(stdout, "CWelsTaskManageBase CreateTasks m_iThreadNum %d kiTaskCount=%d\n", m_iThreadNum, kiTaskCount);
@@ -227,7 +228,7 @@ WelsErrorType  CWelsTaskManageBase::ExecuteTaskList (TASKLIST_TYPE** pTaskList) 
     m_pThreadPool->QueueTask (pTargetTaskList->getNode (iIdx));
     iIdx ++;
   }
-  WelsEventWait (&m_hTaskEvent,&m_hEventMutex);
+  WelsEventWait (&m_hTaskEvent, &m_hEventMutex);
 
   return ENC_RETURN_SUCCESS;
 }

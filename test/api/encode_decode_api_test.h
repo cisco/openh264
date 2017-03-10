@@ -87,7 +87,7 @@ class EncodeDecodeTestBase : public BaseEncoderTest, public BaseDecoderTest {
 
   virtual void prepareParam (int iLayers, int iSlices, int width, int height, float framerate, SEncParamExt* pParam);
 
-  virtual void prepareEncDecParam (const EncodeDecodeFileParamBase EncDecFileParam);
+  virtual bool prepareEncDecParam (const EncodeDecodeFileParamBase EncDecFileParam);
 
   virtual void encToDecData (const SFrameBSInfo& info, int& len);
 
@@ -129,7 +129,7 @@ class EncodeDecodeTestAPIBase : public EncodeDecodeTestBase {
 
   void prepareParamDefault (int iLayers, int iSlices, int width, int height, float framerate, SEncParamExt* pParam);
 
-  void InitialEncDec (int iWidth, int iHeight);
+  bool InitialEncDec (int iWidth, int iHeight);
   void RandomParamExtCombination();
   void ValidateParamExtCombination();
   void SliceParamValidationForMode2 (int iSpatialIdx);
@@ -137,8 +137,8 @@ class EncodeDecodeTestAPIBase : public EncodeDecodeTestBase {
   void SliceParamValidationForMode4();
 
   void EncodeOneFrame (int iCheckTypeIndex);
-  void EncDecOneFrame (const int iWidth, const int iHeight, const int iFrame, FILE* pfEnc);
-  void TestOneSimulcastAVC (SEncParamExt* pParam, ISVCDecoder** decoder, unsigned char** pBsBuf, int iSpatialLayerNum,
+  bool EncDecOneFrame (const int iWidth, const int iHeight, const int iFrame, FILE* pfEnc);
+  bool TestOneSimulcastAVC (SEncParamExt* pParam, ISVCDecoder** decoder, unsigned char** pBsBuf, int iSpatialLayerNum,
                             int iEncFrameNum,
                             int iCallTimes);
 };
