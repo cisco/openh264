@@ -227,7 +227,9 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
   if (pCtx->bFreezeOutput) {
     pDstInfo->iBufferStatus = 0;
     if (pPic->bNewSeqBegin) {
-      WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "DecodeFrameConstruction():New sequence detected, but freezed.");
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO,
+               "DecodeFrameConstruction():New sequence detected, but freezed, correct MBs (%d) out of whole MBs (%d).",
+               kiTotalNumMbInCurLayer - pCtx->iMbEcedNum, kiTotalNumMbInCurLayer);
     }
   }
   pCtx->iMbEcedNum = pPic->iMbEcedNum;
@@ -730,8 +732,8 @@ void DecodeNalHeaderExt (PNalUnit pNal, uint8_t* pSrc) {
 }
 
 
-void UpdateDecoderStatisticsForActiveParaset(SDecoderStatistics* pDecoderStatistics,
-                                             PSps pSps, PPps pPps) {
+void UpdateDecoderStatisticsForActiveParaset (SDecoderStatistics* pDecoderStatistics,
+    PSps pSps, PPps pPps) {
   pDecoderStatistics->iCurrentActiveSpsId = pSps->iSpsId;
 
   pDecoderStatistics->iCurrentActivePpsId = pPps->iPpsId;
@@ -2172,8 +2174,8 @@ void WelsDqLayerDecodeStart (PWelsDecoderContext pCtx, PNalUnit pCurNal, PSps pS
 
   pCtx->iFrameNum    = pSh->iFrameNum;
 
-  UpdateDecoderStatisticsForActiveParaset(&(pCtx->sDecoderStatistics),
-                                          pSps, pPps);
+  UpdateDecoderStatisticsForActiveParaset (& (pCtx->sDecoderStatistics),
+      pSps, pPps);
 }
 
 int32_t InitRefPicList (PWelsDecoderContext pCtx, const uint8_t kuiNRi, int32_t iPoc) {
