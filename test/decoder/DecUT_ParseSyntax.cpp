@@ -132,9 +132,9 @@ class DecoderParseSyntaxTest : public ::testing::Test {
   //Uninit members
   void Uninit();
   //Decoder real bitstream
-  void DecodeBs (const char* sFileName);
+  bool DecodeBs (const char* sFileName);
   //Parse real bitstream
-  void ParseBs (const char* sFileName);
+  bool ParseBs (const char* sFileName);
   //Scalinglist
   void TestScalingList();
   //specific bitstream test
@@ -175,11 +175,16 @@ int32_t DecoderParseSyntaxTest::Init() {
   m_iBufLength = 4;
   //
   m_pCtx = (PWelsDecoderContext)malloc (sizeof (SWelsDecoderContext));
-
+  if (m_pCtx == NULL)
+    return ERR_MALLOC_FAILED;
   memset (m_pCtx, 0, sizeof (SWelsDecoderContext));
   m_pWelsTrace = new welsCodecTrace();
   if (m_pWelsTrace != NULL) {
     m_pWelsTrace->SetTraceLevel (WELS_LOG_ERROR);
+  } else {
+    free (m_pCtx);
+    m_pCtx = NULL;
+    return ERR_MALLOC_FAILED;
   }
   CM_RETURN eRet = (CM_RETURN)Initialize (&m_sDecParam, m_pCtx, &m_pWelsTrace->m_sLogCtx);
   return (int32_t)eRet;
@@ -199,7 +204,7 @@ void DecoderParseSyntaxTest::Uninit() {
   m_iBufLength = 0;
 }
 
-void DecoderParseSyntaxTest::DecodeBs (const char* sFileName) {
+bool DecoderParseSyntaxTest::DecodeBs (const char* sFileName) {
 
   uint8_t* pBuf = NULL;
   int32_t iBufPos = 0;
@@ -213,15 +218,28 @@ void DecoderParseSyntaxTest::DecodeBs (const char* sFileName) {
 
 #if defined(ANDROID_NDK)
   std::string filename = std::string ("/sdcard/") + sFileName;
-  ASSERT_TRUE ((pH264File = fopen (filename.c_str(), "rb")) != NULL);
+  if ((pH264File = fopen (filename.c_str(), "rb")) == NULL)
+    return false;
 #else
-  ASSERT_TRUE ((pH264File = fopen (sFileName, "rb")) != NULL);
+  if ((pH264File = fopen (sFileName, "rb")) == NULL)
+    return false;
 #endif
   fseek (pH264File, 0L, SEEK_END);
   iFileSize = (int32_t) ftell (pH264File);
   fseek (pH264File, 0L, SEEK_SET);
   pBuf = new uint8_t[iFileSize + 4];
-  ASSERT_EQ (fread (pBuf, 1, iFileSize, pH264File), (unsigned int) iFileSize);
+  if (pBuf == NULL) {
+    fclose (pH264File);
+    return false;
+  }
+  if ((fread (pBuf, 1, iFileSize, pH264File) != (unsigned int) iFileSize)) {
+    fclose (pH264File);
+    if (pBuf) {
+      delete[] pBuf;
+      pBuf = NULL;
+    }
+    return false;
+  }
   memcpy (pBuf + iFileSize, &uiStartCode[0], 4); //confirmed_safe_unsafe_usage
   while (true) {
     if (iBufPos >= iFileSize) {
@@ -250,9 +268,9 @@ void DecoderParseSyntaxTest::DecodeBs (const char* sFileName) {
     pBuf = NULL;
   }
 
-
+  return true;
 }
-void DecoderParseSyntaxTest::ParseBs (const char* sFileName) {
+bool DecoderParseSyntaxTest::ParseBs (const char* sFileName) {
 
   uint8_t* pBuf = NULL;
   int32_t iBufPos = 0;
@@ -267,15 +285,28 @@ void DecoderParseSyntaxTest::ParseBs (const char* sFileName) {
 
 #if defined(ANDROID_NDK)
   std::string filename = std::string ("/sdcard/") + sFileName;
-  ASSERT_TRUE ((pH264File = fopen (filename.c_str(), "rb")) != NULL);
+  if ((pH264File = fopen (filename.c_str(), "rb")) == NULL)
+    return false;
 #else
-  ASSERT_TRUE ((pH264File = fopen (sFileName, "rb")) != NULL);
+  if ((pH264File = fopen (sFileName, "rb")) == NULL)
+    return false;
 #endif
   fseek (pH264File, 0L, SEEK_END);
   iFileSize = (int32_t)ftell (pH264File);
   fseek (pH264File, 0L, SEEK_SET);
   pBuf = new uint8_t[iFileSize + 4];
-  ASSERT_EQ (fread (pBuf, 1, iFileSize, pH264File), (unsigned int)iFileSize);
+  if (pBuf == NULL) {
+    fclose (pH264File);
+    return false;
+  }
+  if (fread (pBuf, 1, iFileSize, pH264File) != (unsigned int)iFileSize) {
+    fclose (pH264File);
+    if (pBuf) {
+      delete[] pBuf;
+      pBuf = NULL;
+    }
+    return false;
+  }
   memcpy (pBuf + iFileSize, &uiStartCode[0], 4); //confirmed_safe_unsafe_usage
   while (true) {
     if (iBufPos >= iFileSize) {
@@ -308,7 +339,7 @@ void DecoderParseSyntaxTest::ParseBs (const char* sFileName) {
     pBuf = NULL;
   }
 
-
+  return true;
 }
 
 
@@ -335,7 +366,7 @@ void DecoderParseSyntaxTest::TestScalingList() {
   int32_t iRet = ERR_NONE;
   iRet = Init();
   ASSERT_EQ (iRet, ERR_NONE);
-  DecodeBs ("res/BA_MW_D.264");
+  ASSERT_TRUE (DecodeBs ("res/BA_MW_D.264"));
   ASSERT_TRUE (m_pCtx->sSpsBuffer[0].bSeqScalingMatrixPresentFlag == false);
   EXPECT_EQ (0, memcmp (iScalingListZero, m_pCtx->sSpsBuffer[0].iScalingList4x4, 6 * 16 * sizeof (uint8_t)));
   ASSERT_TRUE (m_pCtx->sPpsBuffer[0].bPicScalingMatrixPresentFlag == false);
@@ -344,7 +375,7 @@ void DecoderParseSyntaxTest::TestScalingList() {
   //Scalinglist value just written into sps and pps
   iRet = Init();
   ASSERT_EQ (iRet, ERR_NONE);
-  DecodeBs ("res/test_scalinglist_jm.264");
+  ASSERT_TRUE (DecodeBs ("res/test_scalinglist_jm.264"));
   ASSERT_TRUE (m_pCtx->sSpsBuffer[0].bSeqScalingMatrixPresentFlag);
   for (int i = 0; i < 6; i++) {
     EXPECT_EQ (0, memcmp (iScalingList[i], m_pCtx->sSpsBuffer[0].iScalingList4x4[i], 16 * sizeof (uint8_t)));
@@ -364,7 +395,7 @@ void DecoderParseSyntaxTest::TestSpecificBs() {
   m_sDecParam.eEcActiveIdc = ERROR_CON_DISABLE;
   iRet = m_pDec->Initialize (&m_sDecParam);
   ASSERT_EQ (iRet, ERR_NONE);
-  ParseBs ("res/jm_1080p_allslice.264");
+  ASSERT_TRUE (ParseBs ("res/jm_1080p_allslice.264"));
   m_pDec->Uninitialize();
   //Uninit();
 }
