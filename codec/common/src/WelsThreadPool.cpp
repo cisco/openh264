@@ -303,9 +303,7 @@ WELS_THREAD_ERROR_CODE CWelsThreadPool::RemoveThreadFromBusyList (CWelsTaskThrea
 bool  CWelsThreadPool::AddTaskToWaitedList (IWelsTask* pTask) {
   CWelsAutoLock  cLock (m_cLockWaitedTasks);
 
-  int32_t nRet = m_cWaitedTasks->push_back (pTask);
-  //fprintf(stdout, "CWelsThreadPool::AddTaskToWaitedList=%d, pTask=%x\n", m_cWaitedTasks->size(), pTask);
-  return (0 == nRet ? true : false);
+  return m_cWaitedTasks->push_back (pTask);
 }
 
 CWelsTaskThread*   CWelsThreadPool::GetIdleThread() {
