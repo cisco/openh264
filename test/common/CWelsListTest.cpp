@@ -9,7 +9,7 @@ TEST (CWelsList, CWelsListOne) {
   int a = 0;
 
   for (int i = 0; i < 60; i++) {
-    cTestList.push_back (&a);
+    ASSERT_TRUE (cTestList.push_back (&a));
     EXPECT_TRUE (1 == cTestList.size()) << "after push size=" << cTestList.size() ;
 
     cTestList.pop_front();
@@ -26,7 +26,7 @@ TEST (CWelsList, CWelsListTen) {
 
     for (int i = 0; i < 10; i++) {
       EXPECT_TRUE (i == cTestList.size()) << "before push size=" << cTestList.size() ;
-      EXPECT_TRUE (cTestList.push_back (pPointer));
+      ASSERT_TRUE (cTestList.push_back (pPointer));
     }
     EXPECT_TRUE (10 == cTestList.size()) << "after push size=" << cTestList.size() ;
 
@@ -44,7 +44,7 @@ TEST (CWelsList, CWelsList_Null) {
   int a = 0;
   int* pPointer = &a;
 
-  EXPECT_TRUE (cTestList.push_back (pPointer));
+  ASSERT_TRUE (cTestList.push_back (pPointer));
 
   pPointer = NULL;
   EXPECT_FALSE (cTestList.push_back (pPointer));
@@ -53,7 +53,7 @@ TEST (CWelsList, CWelsList_Null) {
 
   pPointer = &a;
   EXPECT_TRUE (cTestList.findNode (pPointer));
-  EXPECT_TRUE (cTestList.push_back (pPointer));
+  ASSERT_TRUE (cTestList.push_back (pPointer));
 }
 
 
@@ -68,7 +68,7 @@ TEST (CWelsList, CWelsListExpand) {
   for (int j = 0; j < 10; j++) {
 
     for (int i = 0; i < kiIncreaseNum; i++) {
-      EXPECT_TRUE (cTestList.push_back (pPointer));
+      ASSERT_TRUE (cTestList.push_back (pPointer));
     }
     EXPECT_TRUE (kiIncreaseNum + j * (kiIncreaseNum - kiDecreaseNum) == cTestList.size()) << "after push size=" <<
         cTestList.size() ;
@@ -93,7 +93,7 @@ TEST (CWelsList, CWelsListOverPop) {
   EXPECT_TRUE (0 == cTestList.size());
 
   for (int i = 0; i < kiIncreaseNum; i++) {
-    EXPECT_TRUE (cTestList.push_back (pPointer));
+    ASSERT_TRUE (cTestList.push_back (pPointer));
   }
 
   for (int i = kiDecreaseNum; i > 0; i--) {
@@ -118,7 +118,7 @@ TEST (CWelsList, CWelsListEraseOne) {
 
   for (int i = 0; i < TEST_LEN; i++) {
     a[i] = i;
-    cTestList.push_back (&a[i]);
+    ASSERT_TRUE (cTestList.push_back (&a[i]));
   }
 
   EXPECT_TRUE (cTestList.size() == TEST_LEN);
@@ -153,7 +153,7 @@ TEST (CWelsList, CWelsListEraseAll) {
 
   for (int i = 0; i < TEST_LEN; i++) {
     data[i] = i;
-    cTestList.push_back (&data[i]);
+    ASSERT_TRUE (cTestList.push_back (&data[i]));
   }
   EXPECT_TRUE (cTestList.size() == TEST_LEN);
 
@@ -191,7 +191,7 @@ TEST (CWelsList, CWelsListEraseAndExpand) {
 
   for (int i = 0; i < TEST_LEN_10; i++) {
     data[i] = i;
-    cTestList.push_back (&data[i]);
+    ASSERT_TRUE (cTestList.push_back (&data[i]));
   }
   EXPECT_TRUE (cTestList.size() == TEST_LEN_10);
 
@@ -223,7 +223,7 @@ TEST (CWelsList, CWelsListEraseAndExpand) {
   //expand
   int iAddLen = rand() % 65535;
   for (int i = 0; i < iAddLen; i++) {
-    EXPECT_TRUE (cTestList.push_back (&data[0]));
+    ASSERT_TRUE (cTestList.push_back (&data[0]));
   }
   EXPECT_TRUE ((iCurrentLen + iAddLen) == cTestList.size());
   EraseOneInList (cTestList, &data[0]);
@@ -248,9 +248,9 @@ TEST (CWelsNonDuplicatedList, CWelsNonDuplicatedList) {
   int32_t* pObject3 = &c;
 
   //initial adding
-  EXPECT_TRUE (cNonDuplicatedIntList.push_back (pObject1));
-  EXPECT_TRUE (cNonDuplicatedIntList.push_back (pObject2));
-  EXPECT_TRUE (cNonDuplicatedIntList.push_back (pObject3));
+  ASSERT_TRUE (cNonDuplicatedIntList.push_back (pObject1));
+  ASSERT_TRUE (cNonDuplicatedIntList.push_back (pObject2));
+  ASSERT_TRUE (cNonDuplicatedIntList.push_back (pObject3));
   EXPECT_TRUE (3 == cNonDuplicatedIntList.size());
 
   //try failed adding
@@ -270,7 +270,7 @@ TEST (CWelsNonDuplicatedList, CWelsNonDuplicatedList) {
   EXPECT_TRUE (2 == cNonDuplicatedIntList.size());
 
   //add back
-  EXPECT_TRUE (cNonDuplicatedIntList.push_back (pObject1));
+  ASSERT_TRUE (cNonDuplicatedIntList.push_back (pObject1));
   EXPECT_TRUE (3 == cNonDuplicatedIntList.size());
 
   //another pop
@@ -282,7 +282,7 @@ TEST (CWelsNonDuplicatedList, CWelsNonDuplicatedList) {
   EXPECT_FALSE (cNonDuplicatedIntList.push_back (pObject1));
   EXPECT_TRUE (1 == cNonDuplicatedIntList.size());
 
-  EXPECT_TRUE (cNonDuplicatedIntList.push_back (pObject3));
+  ASSERT_TRUE (cNonDuplicatedIntList.push_back (pObject3));
   EXPECT_TRUE (2 == cNonDuplicatedIntList.size());
 
   //clean-up
@@ -303,9 +303,9 @@ TEST (CWelsNonDuplicatedList, CWelsNonDuplicatedListOnThread) {
   EXPECT_TRUE (NULL != pTaskThread3);
 
   //initial adding
-  EXPECT_TRUE (cThreadList.push_back (pTaskThread1));
-  EXPECT_TRUE (cThreadList.push_back (pTaskThread2));
-  EXPECT_TRUE (cThreadList.push_back (pTaskThread3));
+  ASSERT_TRUE (cThreadList.push_back (pTaskThread1));
+  ASSERT_TRUE (cThreadList.push_back (pTaskThread2));
+  ASSERT_TRUE (cThreadList.push_back (pTaskThread3));
   EXPECT_TRUE (3 == cThreadList.size());
 
   //try failed adding
@@ -325,7 +325,7 @@ TEST (CWelsNonDuplicatedList, CWelsNonDuplicatedListOnThread) {
   EXPECT_TRUE (2 == cThreadList.size());
 
   //add back
-  EXPECT_TRUE (cThreadList.push_back (pTaskThread1));
+  ASSERT_TRUE (cThreadList.push_back (pTaskThread1));
   EXPECT_TRUE (3 == cThreadList.size());
 
   //another pop
@@ -337,7 +337,7 @@ TEST (CWelsNonDuplicatedList, CWelsNonDuplicatedListOnThread) {
   EXPECT_FALSE (cThreadList.push_back (pTaskThread1));
   EXPECT_TRUE (1 == cThreadList.size());
 
-  EXPECT_TRUE (cThreadList.push_back (pTaskThread3));
+  ASSERT_TRUE (cThreadList.push_back (pTaskThread3));
   EXPECT_TRUE (2 == cThreadList.size());
 
   //clean-up
@@ -369,7 +369,7 @@ TEST (CWelsList, CWelsListReadWithIdx) {
   for (int j = 0; j < 10; j++) {
     const int iBias = j * (kiIncreaseNum - kiDecreaseNum);
     for (int i = 0; i < kiIncreaseNum; i++) {
-      cThreadList.push_back (&pInput[i + kiIncreaseNum * j]);
+      ASSERT_TRUE (cThreadList.push_back (&pInput[i + kiIncreaseNum * j]));
     }
     EXPECT_TRUE (kiIncreaseNum + iBias == cThreadList.size()) << "after push size=" <<
         cThreadList.size() ;
