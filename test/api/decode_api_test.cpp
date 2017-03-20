@@ -529,6 +529,7 @@ class DecodeCrashTestAPI : public ::testing::TestWithParam<EncodeDecodeFileParam
     EncodeDecodeTestBase::prepareParam (iLayerNum, iSliceNum,  width, height, framerate, pParam);
   }
 
+  bool prepareEncDecParam (const EncodeDecodeFileParamBase EncDecFileParam);
   void EncodeOneFrame() {
     int frameSize = EncPic.iPicWidth * EncPic.iPicHeight * 3 / 2;
     memset (buf_.data(), iRandValue, (frameSize >> 2));
@@ -539,6 +540,32 @@ class DecodeCrashTestAPI : public ::testing::TestWithParam<EncodeDecodeFileParam
  protected:
   unsigned char* ucBuf_;
 };
+
+bool DecodeCrashTestAPI::prepareEncDecParam (const EncodeDecodeFileParamBase EncDecFileParam) {
+  // for encoder
+  // I420: 1(Y) + 1/4(U) + 1/4(V)
+  int frameSize = EncDecFileParam.width * EncDecFileParam.height * 3 / 2;
+
+  buf_.SetLength (frameSize);
+  EXPECT_TRUE (buf_.Length() == (size_t)frameSize);
+
+  memset (&EncPic, 0, sizeof (SSourcePicture));
+  EncPic.iPicWidth = EncDecFileParam.width;
+  EncPic.iPicHeight = EncDecFileParam.height;
+  EncPic.iColorFormat = videoFormatI420;
+  EncPic.iStride[0] = EncPic.iPicWidth;
+  EncPic.iStride[1] = EncPic.iStride[2] = EncPic.iPicWidth >> 1;
+  EncPic.pData[0] = buf_.data();
+  EncPic.pData[1] = EncPic.pData[0] + EncDecFileParam.width * EncDecFileParam.height;
+  EncPic.pData[2] = EncPic.pData[1] + (EncDecFileParam.width * EncDecFileParam.height >> 2);
+
+  //for decoder
+  memset (&info, 0, sizeof (SFrameBSInfo));
+
+  //set a fixed random value
+  iRandValue = rand() % 256;
+  return true;
+}
 
 struct EncodeDecodeParamBase {
   int width;
