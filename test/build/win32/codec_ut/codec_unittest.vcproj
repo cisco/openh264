@@ -851,10 +851,6 @@
 			Name="common"
 			>
 			<File
-				RelativePath="..\..\..\common\CWelsCircleQueue.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\common\CWelsListTest.cpp"
 				>
 			</File>
