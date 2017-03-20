@@ -43,6 +43,7 @@
 #define _WELS_LIST_H_
 
 #include "typedefs.h"
+#include <stdlib.h>
 
 namespace WelsCommon {
 
