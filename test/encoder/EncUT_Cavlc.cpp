@@ -77,18 +77,14 @@ TEST (CavlcTest, CavlcParamCal_c) {
 }
 
 #ifdef X86_32_ASM
-#ifndef X86_32_PICASM
 TEST (CavlcTest, CavlcParamCal_sse2) {
   TestCavlcParamCal (CavlcParamCal_sse2);
 }
 #endif
-#endif
 
 #ifdef X86_ASM
-#ifndef X86_32_PICASM
 TEST (CavlcTest, CavlcParamCal_sse42) {
   if (WelsCPUFeatureDetect (0) & WELS_CPU_SSE42)
     TestCavlcParamCal (CavlcParamCal_sse42);
 }
-#endif
 #endif

@@ -42,7 +42,11 @@
 
 %include "asm_inc.asm"
 
+%ifdef X86_32_PICASM
+SECTION .text align=16
+%else
 SECTION .rodata align=16
+%endif
 
 align 16
 
@@ -369,7 +373,6 @@ SECTION .text
 
 %ifdef X86_32
 
-%ifndef X86_32_PICASM
 ;***********************************************************************
 ;int32_t CavlcParamCal_sse2(int16_t*coffLevel, uint8_t* run, int16_t *Level, int32_t* total_coeffs , int32_t endIdx);
 ;***********************************************************************
@@ -377,10 +380,12 @@ WELS_EXTERN CavlcParamCal_sse2
     push ebx
     push edi
     push esi
+    %assign push_num 3
+    INIT_X86_32_PIC ebp
 
-    mov         eax,    [esp+16]    ;coffLevel
-    mov         edi,    [esp+24]    ;Level
-    mov         ebx,    [esp+32]    ;endIdx
+    mov         eax,    arg1    ;coffLevel
+    mov         edi,    arg3    ;Level
+    mov         ebx,    arg5    ;endIdx
     cmp         ebx,    3
     jne         .Level16
     pxor        xmm1,   xmm1
@@ -400,14 +405,14 @@ WELS_EXTERN CavlcParamCal_sse2
     pmovmskb    edx,    xmm0
     cmp         edx,    0
     je near   .return
-    movdqa      xmm6,   [sse2_b_1]
+    movdqa      xmm6,   [pic(sse2_b_1)]
     pcmpeqw     xmm7,   xmm7    ;generate -1
     mov         ebx,    0xff
     ;pinsrw     xmm6,   ebx,    3
 
     mov       bl,   dh
 
-    lea       ebx,  [byte_1pos_table+8*ebx]
+    lea       ebx,  [pic(byte_1pos_table+8*ebx)]
     movq      xmm0, [ebx]
     pextrw    ecx,  xmm0, 3
     shr       ecx,  8
@@ -438,7 +443,7 @@ WELS_EXTERN CavlcParamCal_sse2
     add       edi,   2
 .LowByteFind0:
     and       edx,  0xff
-    lea       ebx,  [byte_1pos_table+8*edx]
+    lea       ebx,  [pic(byte_1pos_table+8*edx)]
     movq      xmm1, [ebx]
     pextrw    esi,  xmm1, 3
     or        esi,  0xff
@@ -466,14 +471,14 @@ WELS_EXTERN CavlcParamCal_sse2
     mov       edx, [eax]
     mov       [edi], dx
 .getLevelEnd:
-    mov      edx, [esp+28]  ;total_coeffs
+    mov      edx, arg4  ;total_coeffs
     ;mov      ebx,   ecx
     ;and      ebx,   0xff
     movzx    ebx,   byte cl
     add      cl,    ch
     mov      [edx], cl
 ;getRun
-    movq     xmm5, [sse2_b8]
+    movq     xmm5, [pic(sse2_b8)]
     paddb    xmm0, xmm5
     pxor     xmm2, xmm2
     pxor     xmm3, xmm3
@@ -499,18 +504,17 @@ WELS_EXTERN CavlcParamCal_sse2
     paddb    xmm1,  xmm7
     psrldq   xmm0,  1
     psubb    xmm1,  xmm0
-    mov      ecx,   [esp+20] ;run
+    mov      ecx,   arg2 ;run
     movdqa   [ecx], xmm1
 ;getRunEnd
 .return:
+    DEINIT_X86_32_PIC
     pop esi
     pop edi
     pop ebx
     ret
-%endif ;%ifndef X86_32_PICASM
 %endif ;%ifdef X86_32
 
-%ifndef X86_32_PICASM
 ;***********************************************************************
 ;int32_t CavlcParamCal_sse42(int16_t*coffLevel, uint8_t* run, int16_t *Level, int32_t* total_coeffs , int32_t endIdx);
 ;***********************************************************************
@@ -524,17 +528,21 @@ WELS_EXTERN CavlcParamCal_sse42
     push            r5
     push            r6
     %assign push_num 4
+%ifdef X86_32_PICASM
+    %define p_total_coeffs r1
+%else
     %define p_total_coeffs r0
+%endif
     %define r_tmp r1
     %define r_tmpd r1d
     %define r_tmpb r1b
     %define p_level r2
     %define p_coeff_level r3
+    %define p_run r6
     %define r_mask  r5
     %define r_maskd r5d
-    %define p_run r6
-    %define p_shufb_lut wels_cavlc_param_cal_shufb_lut
-    %define p_run_lut   wels_cavlc_param_cal_run_lut
+    %define p_shufb_lut pic(wels_cavlc_param_cal_shufb_lut)
+    %define p_run_lut   pic(wels_cavlc_param_cal_run_lut)
     mov             p_coeff_level, arg1
     mov             p_run, arg2
     mov             p_level, arg3
@@ -571,6 +579,7 @@ WELS_EXTERN CavlcParamCal_sse42
     %define p_run_lut (p_shufb_lut + (wels_cavlc_param_cal_run_lut - wels_cavlc_param_cal_shufb_lut))
     lea             p_shufb_lut, [wels_cavlc_param_cal_shufb_lut]
 %endif
+    INIT_X86_32_PIC_NOPRESERVE r0
 
     ; Acquire a bitmask indicating which words are non-zero.
     ; Assume p_coeff_level is 16-byte-aligned and at least 32 bytes if endIdx > 3.
@@ -588,7 +597,7 @@ WELS_EXTERN CavlcParamCal_sse42
 .load_done:
     movdqa          [p_run], xmm1                           ; Zero-initialize because we may read back implied zeros.
     pcmpeqb         xmm0, xmm1
-    pshufb          xmm0, [wels_shufb_rev]
+    pshufb          xmm0, [pic(wels_shufb_rev)]
     pmovmskb        r_maskd, xmm0
     xor             r_maskd, 0FFFFh
 %undef i_endidxd
@@ -605,12 +614,18 @@ WELS_EXTERN CavlcParamCal_sse42
     %xdefine i_total_zeros p_total_coeffs
 %endif
 %undef p_total_coeffs
+%ifdef X86_32_PICASM
+    push            r_tmp2
+    %undef i_total_zeros
+    %define i_total_zeros dword [esp]
+%else
     mov             i_total_zeros, r_tmp2
+%endif
     jz              .done
-    mov             i_total_zeros, 16
-    sub             i_total_zeros, r_tmp2
     bsf             r_tmpd, r_maskd                         ; Find first set bit.
-    sub             i_total_zeros, r_tmp
+    lea             r_tmp2, [r_tmp2 + r_tmp - 16]
+    neg             r_tmp2
+    mov             i_total_zeros, r_tmp2
     ; Skip trailing zeros.
     ; Restrict to multiples of 4 to retain alignment and avoid out-of-bound stores.
     and             r_tmpd, -4
@@ -649,8 +664,13 @@ WELS_EXTERN CavlcParamCal_sse42
     jnz             .loop
 .done:
 %ifnidni retrq, i_total_zeros
+  %ifdef X86_32_PICASM
+    pop             retrq
+  %else
     mov             retrq, i_total_zeros
+  %endif
 %endif
+    DEINIT_X86_32_PIC
 %ifdef X86_32
     pop             r6
     pop             r5
@@ -673,5 +693,3 @@ WELS_EXTERN CavlcParamCal_sse42
 %undef r_tmp2d
 %undef p_shufb_lut
 %undef p_run_lut
-
-%endif  ;ifndef X86_32_PICASM

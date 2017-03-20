@@ -668,3 +668,68 @@ SECTION .note.GNU-stack noalloc noexec nowrite progbits ; Mark the stack as non-
     vpcmpeqw %1, %1, %1
     vpsrlw   %1, %1,  1
 %endmacro
+
+
+;***********************************************************************
+; Utility macros for X86_32 PIC support
+;***********************************************************************
+
+; Used internally by other macros.
+%macro INIT_X86_32_PIC_ 2
+%ifdef X86_32_PICASM
+    %xdefine pic_ptr %1
+    %xdefine pic_ptr_preserve %2
+  %if pic_ptr_preserve
+    %assign push_num push_num+1
+    push            pic_ptr
+  %endif
+    call            %%get_pc
+%%pic_refpoint:
+    jmp             %%pic_init_done
+%%get_pc:
+    mov             pic_ptr, [esp]
+    ret
+%%pic_init_done:
+    %define pic(data_addr) (pic_ptr+(data_addr)-%%pic_refpoint)
+%else
+    %define pic(data_addr) (data_addr)
+%endif
+%endmacro
+
+; Get program counter and define a helper macro "pic(addr)" to convert absolute
+; addresses to program counter-relative addresses if X86_32_PICASM is defined.
+; Otherwise define "pic(addr)" as an identity function.
+; %1=register to store PC/EIP in.
+%macro INIT_X86_32_PIC 1
+    INIT_X86_32_PIC_ %1, 1
+%endmacro
+
+; Equivalent as above, but without preserving the value of the register argument.
+%macro INIT_X86_32_PIC_NOPRESERVE 1
+    INIT_X86_32_PIC_ %1, 0
+%endmacro
+
+; Clean up after INIT_X86_32_PIC.
+; Restore the register used to hold PC/EIP if applicable, and undefine defines.
+%macro DEINIT_X86_32_PIC 0
+%ifdef X86_32_PICASM
+  %if pic_ptr_preserve
+    pop             pic_ptr
+    %assign push_num push_num-1
+  %endif
+    %undef pic_ptr
+    %undef pic_ptr_preserve
+%endif
+    %undef pic
+%endmacro
+
+; Equivalent as above, but without undefining. Useful for functions with
+; multiple epilogues.
+%macro DEINIT_X86_32_PIC_KEEPDEF 0
+%ifdef X86_32_PICASM
+  %if pic_ptr_preserve
+    pop             pic_ptr
+    %assign push_num push_num-1
+  %endif
+%endif
+%endmacro

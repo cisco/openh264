@@ -75,9 +75,7 @@ extern "C" {
 
 #ifdef X86_ASM
 
-#ifndef X86_32_PICASM
 int32_t WelsGetNoneZeroCount_sse2 (int16_t* pLevel);
-#endif
 int32_t WelsGetNoneZeroCount_sse42 (int16_t* pLevel);
 
 /****************************************************************************
@@ -86,9 +84,7 @@ int32_t WelsGetNoneZeroCount_sse42 (int16_t* pLevel);
 void WelsScan4x4Ac_sse2 (int16_t* zig_value, int16_t* pDct);
 void WelsScan4x4DcAc_ssse3 (int16_t* pLevel, int16_t* pDct);
 void WelsScan4x4DcAc_sse2 (int16_t* pLevel, int16_t* pDct);
-#ifndef X86_32_PICASM
 int32_t WelsCalculateSingleCtr4x4_sse2 (int16_t* pDct);
-#endif
 
 /****************************************************************************
  * DCT functions
