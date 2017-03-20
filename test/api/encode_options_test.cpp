@@ -552,7 +552,6 @@ TEST_F (EncodeDecodeTestAPI, ParameterSetStrategy_SPS_LISTING_AND_PPS_INCREASING
   //int TraceLevel = WELS_LOG_INFO;
   //encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &TraceLevel);
   int rv = encoder_->InitializeExt (&sParam1);
-  printf ("Start EncDecOneFrame()\n");
   ASSERT_TRUE (rv == cmResultSuccess) << "InitializeExt: rv = " << rv << " at " << sParam1.iPicWidth << "x" <<
                                       sParam1.iPicHeight;
   ASSERT_TRUE (EncDecOneFrame (sParam1.iPicWidth, sParam1.iPicHeight, iEncFrameNum++, fEnc));
