@@ -506,8 +506,6 @@ TEST_P (EncodeDecodeTestAPI, SetOption_Trace_NULL) {
 
 class DecodeCrashTestAPI : public ::testing::TestWithParam<EncodeDecodeFileParamBase>, public EncodeDecodeTestBase {
  public:
-  uint8_t iRandValue;
- public:
   void SetUp() {
     EncodeDecodeTestBase::SetUp();
     ucBuf_ = NULL;
