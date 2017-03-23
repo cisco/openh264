@@ -185,6 +185,7 @@ uint8_t         uiMvcNum;
 uint8_t         sScaleShift;
 
 uint32_t        uiSliceIdx;
+uint32_t        uiThreadIdx;
 bool            bSliceHeaderExtFlag; // Indicate which slice header is used, avc or ext?
 uint8_t         uiLastMbQp;             // stored qp for last mb coded, maybe more efficient for mb skip detection etc.
 
