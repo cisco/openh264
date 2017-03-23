@@ -1019,10 +1019,10 @@ static uint32_t CountFMECostDown (const SDqLayer* pCurLayer) {
   const int32_t kiSliceCount  = GetCurrentSliceNum (pCurLayer);
   if (kiSliceCount >= 1) {
     int32_t iSliceIndex  = 0;
-    SSlice* pSlice    = &pCurLayer->sLayerInfo.pSliceInLayer[iSliceIndex];
+    SSlice* pSlice    = pCurLayer->ppSliceInLayer[iSliceIndex];
     while (iSliceIndex < kiSliceCount) {
+      pSlice        = pCurLayer->ppSliceInLayer[iSliceIndex];
       uiCostDownSum += pSlice->uiSliceFMECostDown;
-      ++ pSlice;
       ++ iSliceIndex;
     }
   }

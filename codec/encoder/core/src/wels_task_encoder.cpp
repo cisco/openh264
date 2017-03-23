@@ -56,7 +56,7 @@
 namespace WelsEnc {
 
 CWelsSliceEncodingTask::CWelsSliceEncodingTask (WelsCommon::IWelsTaskSink* pSink, sWelsEncCtx* pCtx,
-    const int32_t iSliceIdx) : CWelsBaseTask(pSink), m_eTaskResult (ENC_RETURN_SUCCESS) {
+    const int32_t iSliceIdx) : CWelsBaseTask (pSink), m_eTaskResult (ENC_RETURN_SUCCESS) {
   m_pCtx = pCtx;
   m_iSliceIdx = iSliceIdx;
 }
@@ -111,9 +111,11 @@ WelsErrorType CWelsSliceEncodingTask::InitTask() {
              "[MT] CWelsSliceEncodingTask InitTask(), Cannot find available thread for m_iSliceIdx = %d", m_iSliceIdx);
     return ENC_RETURN_UNEXPECTED;
   }
+
+  //  InitOneSliceInThread();
   SetOneSliceBsBufferUnderMultithread (m_pCtx, m_iThreadIdx, m_iSliceIdx);
 
-  m_pSlice = &m_pCtx->pCurDqLayer->sLayerInfo.pSliceInLayer[m_iSliceIdx];
+  m_pSlice = m_pCtx->pCurDqLayer->ppSliceInLayer[m_iSliceIdx];
   m_pSliceBs = &m_pSlice->sSliceBs;
 
   m_pSliceBs->uiBsPos       = 0;
@@ -147,7 +149,7 @@ WelsErrorType CWelsSliceEncodingTask::ExecuteTask() {
 #if MT_DEBUG_BS_WR
   m_pSliceBs->bSliceCodedFlag = false;
 #endif//MT_DEBUG_BS_WR
-  SSpatialLayerInternal *pParamInternal = &m_pCtx->pSvcParam->sDependencyLayers[m_pCtx->uiDependencyId];
+  SSpatialLayerInternal* pParamInternal = &m_pCtx->pSvcParam->sDependencyLayers[m_pCtx->uiDependencyId];
   if (m_bNeedPrefix) {
     if (m_eNalRefIdc != NRI_PRI_LOWEST) {
       WelsLoadNalForSlice (m_pSliceBs, NAL_UNIT_PREFIX, m_eNalRefIdc);
@@ -211,15 +213,16 @@ WelsErrorType CWelsLoadBalancingSlicingEncodingTask::InitTask() {
 
 void CWelsLoadBalancingSlicingEncodingTask::FinishTask() {
   CWelsSliceEncodingTask::FinishTask();
-  SSpatialLayerInternal *pParamInternal = &m_pCtx->pSvcParam->sDependencyLayers[m_pCtx->uiDependencyId];
+  SSpatialLayerInternal* pParamInternal = &m_pCtx->pSvcParam->sDependencyLayers[m_pCtx->uiDependencyId];
   m_pSlice->uiSliceConsumeTime = (uint32_t) (WelsTime() - m_iSliceStart);
   WelsLog (&m_pCtx->sLogCtx, WELS_LOG_DEBUG,
-           "[MT] CWelsLoadBalancingSlicingEncodingTask()FinishTask, coding_idx %d, um_iSliceIdx %d, uiSliceConsumeTime %d, m_iSliceSize %d, iFirstMbInSlice %d, count_num_mb_in_slice %d at time=%" PRId64,
+           "[MT] CWelsLoadBalancingSlicingEncodingTask()FinishTask, coding_idx %d, um_iSliceIdx %d, uiSliceConsumeTime %d, m_iSliceSize %d, iFirstMbInSlice %d, count_num_mb_in_slice %d at time=%"
+           PRId64,
            pParamInternal->iCodingIndex,
            m_iSliceIdx,
            m_pSlice->uiSliceConsumeTime,
            m_iSliceSize,
-           m_pCtx->pCurDqLayer->sLayerInfo.pSliceInLayer[m_iSliceIdx].sSliceHeaderExt.sSliceHeader.iFirstMbInSlice,
+           m_pCtx->pCurDqLayer->ppSliceInLayer[m_iSliceIdx]->sSliceHeaderExt.sSliceHeader.iFirstMbInSlice,
            m_pSlice->iCountMbNumInSlice,
            (m_pSlice->uiSliceConsumeTime + m_iSliceStart));
 }
@@ -232,11 +235,11 @@ WelsErrorType CWelsConstrainedSizeSlicingEncodingTask::ExecuteTask() {
   SSliceCtx* pSliceCtx                    = &pCurDq->sSliceEncCtx;
   const int32_t kiSliceIdxStep            = m_pCtx->iActiveThreadsNum;
 
-  SSpatialLayerInternal *pParamInternal = &m_pCtx->pSvcParam->sDependencyLayers[m_pCtx->uiDependencyId];
-  SSliceHeaderExt* pStartSliceHeaderExt   = &pCurDq->sLayerInfo.pSliceInLayer[m_iSliceIdx].sSliceHeaderExt;
+  SSpatialLayerInternal* pParamInternal = &m_pCtx->pSvcParam->sDependencyLayers[m_pCtx->uiDependencyId];
+  SSliceHeaderExt* pStartSliceHeaderExt   = &pCurDq->ppSliceInLayer[m_iSliceIdx]->sSliceHeaderExt;
 
   //deal with partition: TODO: here SSliceThreadPrivateData is just for parition info and actually has little relationship with threadbuffer, and iThreadIndex is not used in threadpool model, need renaming after removing old logic to avoid confusion
-  const int32_t kiPartitionId             = m_iSliceIdx%kiSliceIdxStep;
+  const int32_t kiPartitionId             = m_iSliceIdx % kiSliceIdxStep;
   SSliceThreadPrivateData* pPrivateData = & (m_pCtx->pSliceThreading->pThreadPEncCtx[kiPartitionId]);
   const int32_t kiFirstMbInPartition      = pPrivateData->iStartMbIndex;  // inclusive
   const int32_t kiEndMbInPartition        = pPrivateData->iEndMbIndex;            // exclusive
@@ -260,7 +263,7 @@ WelsErrorType CWelsConstrainedSizeSlicingEncodingTask::ExecuteTask() {
     }
 
     SetOneSliceBsBufferUnderMultithread (m_pCtx, m_iThreadIdx, iLocalSliceIdx);
-    m_pSlice = &pCurDq->sLayerInfo.pSliceInLayer[iLocalSliceIdx];
+    m_pSlice = pCurDq->ppSliceInLayer[iLocalSliceIdx];
     m_pSliceBs = &m_pSlice->sSliceBs;
 
     m_pSliceBs->uiBsPos     = 0;
@@ -285,7 +288,7 @@ WelsErrorType CWelsConstrainedSizeSlicingEncodingTask::ExecuteTask() {
       return iReturn;
     }
     WelsUnloadNalForSlice (m_pSliceBs);
-    
+
     iReturn    = WriteSliceBs (m_pCtx, m_pSliceBs, iLocalSliceIdx, m_iSliceSize);
     if (ENC_RETURN_SUCCESS != iReturn) {
       WelsLog (&m_pCtx->sLogCtx, WELS_LOG_WARNING,
@@ -318,7 +321,8 @@ WelsErrorType CWelsConstrainedSizeSlicingEncodingTask::ExecuteTask() {
 }
 
 
-CWelsUpdateMbMapTask::CWelsUpdateMbMapTask (WelsCommon::IWelsTaskSink* pSink, sWelsEncCtx* pCtx, const int32_t iSliceIdx): CWelsBaseTask(pSink) {
+CWelsUpdateMbMapTask::CWelsUpdateMbMapTask (WelsCommon::IWelsTaskSink* pSink, sWelsEncCtx* pCtx,
+    const int32_t iSliceIdx): CWelsBaseTask (pSink) {
   m_pCtx = pCtx;
   m_iSliceIdx = iSliceIdx;
 }
