@@ -83,7 +83,7 @@ typedef void (*PChromaDeblockingEQ4Func) (uint8_t* iSampleCb, uint8_t* iSampleCr
     int32_t iBeta);
 typedef void (*PDeblockingBSCalc) (SWelsFuncPtrList* pFunc, SMB* pCurMb, uint8_t uiBS[2][4][4], Mb_Type uiCurMbType,
                                    int32_t iMbStride, int32_t iLeftFlag, int32_t iTopFlag);
-typedef void (*PDeblockingFilterSlice) (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc, const int32_t kiSliceIdx);
+typedef void (*PDeblockingFilterSlice) (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc, SSlice* pSlice);
 
 typedef struct tagDeblockingFunc {
   PLumaDeblockingLT4Func    pfLumaDeblockingLT4Ver;
