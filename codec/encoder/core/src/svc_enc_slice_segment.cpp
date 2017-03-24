@@ -537,7 +537,6 @@ int32_t WelsGetFirstMbOfSlice (SSlice** ppSliceInLayer, const int32_t kuiSliceId
     return -1;
   }
 
-
   return ppSliceInLayer[kuiSliceIdc]->sSliceHeaderExt.sSliceHeader.iFirstMbInSlice;
 }
 
@@ -609,28 +608,26 @@ int32_t WelsGetPrevMbOfSlice (SDqLayer* pCurDq, const int32_t kiMbXY) {
  * \brief   Get number of mb in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
  *
  * \param   pSliceCtx       SSlice context
+ * \param   pSlice          slice which request slice num
  * \param   kuiSliceIdc     slice/slice_group idc
  *
  * \return  count_num_of_mb - successful; -1 - failed;
  */
-int32_t WelsGetNumMbInSlice (SDqLayer* pCurDq, const int32_t kuiSliceIdc) {
+int32_t WelsGetNumMbInSlice  (SDqLayer* pCurDq, SSlice* pSlice, const int32_t kuiSliceIdc) {
   SSliceCtx* pSliceCtx = &pCurDq->sSliceEncCtx;
-  SSlice* pSlice       = pCurDq->ppSliceInLayer[kuiSliceIdc];
+  bool bInValidFlag    = false;
 
-  if (NULL == pSliceCtx || kuiSliceIdc < 0)
+  if (NULL == pSliceCtx || NULL == pSlice || kuiSliceIdc < 0) {
     return -1;
-  {
-    SSliceCtx* pSliceSeg = pSliceCtx;
-    if (SM_SINGLE_SLICE != pSliceSeg->uiSliceMode) {
-      if (kuiSliceIdc >= pSliceSeg->iSliceNumInFrame)
-        return -1;
-      return pSlice->iCountMbNumInSlice;
-    } else { /*if ( pSliceSeg->uiSliceMode == SM_SINGLE_SLICE )*/
-      if (kuiSliceIdc > 0)
-        return -1;
-      return pSlice->iCountMbNumInSlice;
-    }
   }
+
+  bInValidFlag = ((SM_SINGLE_SLICE != pSliceCtx->uiSliceMode) && (kuiSliceIdc >= pSliceCtx->iSliceNumInFrame))
+                 || ((SM_SINGLE_SLICE == pSliceCtx->uiSliceMode) && (kuiSliceIdc > 0));
+  if(bInValidFlag) {
+    return -1;
+  }
+
+  return pSlice->iCountMbNumInSlice;
 }
 
 int32_t GetCurrentSliceNum (const SDqLayer* pCurDq) {
