@@ -1094,6 +1094,10 @@ int32_t InitSliceInLayer (sWelsEncCtx* pCtx,
 }
 
 void InitSliceHeadWithBase (SSlice* pSlice, SSlice* pBaseSlice) {
+  if(NULL == pSlice || NULL == pBaseSlice) {
+    return;
+  }
+
   SSliceHeaderExt* pBaseSHExt  = &pBaseSlice->sSliceHeaderExt;
   SSliceHeaderExt* pSHExt      = &pSlice->sSliceHeaderExt;
 
@@ -1105,6 +1109,10 @@ void InitSliceHeadWithBase (SSlice* pSlice, SSlice* pBaseSlice) {
 }
 
 void InitSliceRefInfoWithBase (SSlice* pSlice, SSlice* pBaseSlice, const uint8_t kuiRefCount) {
+  if( NULL == pSlice || NULL == pBaseSlice) {
+    return;
+  }
+
   SSliceHeaderExt* pBaseSHExt  = &pBaseSlice->sSliceHeaderExt;
   SSliceHeaderExt* pSHExt      = &pSlice->sSliceHeaderExt;
 
@@ -1165,6 +1173,10 @@ int32_t ReallocateSliceList (sWelsEncCtx* pCtx,
   memcpy (pNewSliceList, pSliceList, sizeof (SSlice) * kiMaxSliceNumOld);
   iSliceIdx   = kiMaxSliceNumOld;
   pBaseSlice  = &pSliceList[0];
+  if (NULL == pBaseSlice) {
+    FreeSliceBuffer(pNewSliceList, kiMaxSliceNumNew, pMA, "ReallocateSliceList()::InitSliceBsBuffer()");
+    return ENC_RETURN_MEMALLOCERR;
+  }
 
   for (; iSliceIdx < kiMaxSliceNumNew; iSliceIdx++) {
     pSlice = pNewSliceList + iSliceIdx;
