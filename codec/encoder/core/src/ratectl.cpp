@@ -515,9 +515,7 @@ void RcCalculatePictureQp (sWelsEncCtx* pEncCtx) {
 void RCInitOneSliceInformation(sWelsEncCtx* pEncCtx, SSlice* pSlice) {
 
   bool bGomRC = (RC_OFF_MODE == pEncCtx->pSvcParam->iRCMode ||
-                 RC_BUFFERBASED_MODE == pEncCtx->pSvcParam->iRCMode ||
-                 (RC_TIMESTAMP_MODE == pEncCtx->pSvcParam->iRCMode &&
-                 pEncCtx->pSvcParam->iUsageType == SCREEN_CONTENT_REAL_TIME) ) ? false : true;
+                 RC_BUFFERBASED_MODE == pEncCtx->pSvcParam->iRCMode ) ? false : true;
   if(bGomRC) {
     SRCSlicing* pSOverRc        = &pSlice->sSlicingOverRc;
     const int32_t kiBitsPerMb   = pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId].iBitsPerMb;
