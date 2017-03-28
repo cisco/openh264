@@ -192,7 +192,7 @@ WelsErrorType CWelsSliceEncodingTask::ExecuteTask() {
 #if MT_DEBUG_BS_WR
   m_pSliceBs->bSliceCodedFlag = true;
 #endif//MT_DEBUG_BS_WR
-    m_pCtx->pCurDqLayer->sSliceThreadInfo[m_iThreadIdx].iCodedSliceNum ++;
+
   return ENC_RETURN_SUCCESS;
 }
 

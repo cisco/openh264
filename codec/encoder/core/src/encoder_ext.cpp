@@ -3717,28 +3717,12 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         pLayerBsInfo->eFrameType    = eFrameType;
         pLayerBsInfo->iSubSeqId = GetSubSequenceId (pCtx, eFrameType);
 
-        int32_t iRet = InitAllSlicesInThread(pCtx);
-        if (iRet) {
-          WelsLog (pLogCtx, WELS_LOG_ERROR,
-                "WelsEncoderEncodeExt(), multi-slice (mode %d) InitAllSlicesInThread() error!",
-                   pParam->sSliceArgument.uiSliceMode);
-          return ENC_RETURN_UNEXPECTED;
-        }
-
         pCtx->pTaskManage->ExecuteTasks();
         if (pCtx->iEncoderError) {
           WelsLog (pLogCtx, WELS_LOG_ERROR,
                    "WelsEncoderEncodeExt(), multi-slice (mode %d) encoding error!",
                    pParam->sSliceArgument.uiSliceMode);
           return pCtx->iEncoderError;
-        }
-
-        iRet = SliceLayerInfoUpdate (pCtx, pFbi, pLayerBsInfo, pParam->sSliceArgument.uiSliceMode);
-        if (iRet) {
-          WelsLog (pLogCtx, WELS_LOG_ERROR,
-                   "WelsEncoderEncodeExt(), multi-slice (mode %d) SliceLayerInfoUpdate() error!",
-                   pParam->sSliceArgument.uiSliceMode);
-          return ENC_RETURN_UNEXPECTED;
         }
 
         iLayerSize = AppendSliceToFrameBs (pCtx, pLayerBsInfo, iSliceCount);
