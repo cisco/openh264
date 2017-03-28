@@ -928,21 +928,16 @@ void FreeSliceBuffer (SSlice*& pSliceList, const int32_t kiMaxSliceNum, CMemoryA
   }
 }
 
-int32_t InitSliceList (sWelsEncCtx* pCtx,
-                       SSlice*& pSliceList,
+int32_t InitSliceList (SSlice*& pSliceList,
+                       SBitStringAux* pBsWrite,
                        const int32_t kiMaxSliceNum,
-                       const int32_t kiDlayerIndex,
+                       const int32_t kiMaxSliceBufferSize,
+                       const bool bIndependenceBsBuffer,
                        CMemoryAlign* pMa) {
-  SSliceArgument* pSliceArgument  = & pCtx->pSvcParam->sSpatialLayers[kiDlayerIndex].sSliceArgument;
-  int32_t iMaxSliceBufferSize     = (pCtx)->iSliceBufferSize[kiDlayerIndex];
   int32_t iSliceIdx               = 0;
   int32_t iRet                    = 0;
 
-  //SM_SINGLE_SLICE mode using single-thread bs writer pOut->sBsWrite
-  //even though multi-thread is on for other layers
-  bool bIndependenceBsBuffer   = (pCtx->pSvcParam->iMultipleThreadIdc > 1 &&
-                                  SM_SINGLE_SLICE != pSliceArgument->uiSliceMode) ? true : false;
-  if (iMaxSliceBufferSize <= 0) {
+  if (kiMaxSliceBufferSize <= 0) {
     return ENC_RETURN_UNEXPECTED;
   }
 
@@ -958,9 +953,9 @@ int32_t InitSliceList (sWelsEncCtx* pCtx,
     pSlice->sSliceHeaderExt.sSliceHeader.iFirstMbInSlice = 0;
 
     iRet = InitSliceBsBuffer (pSlice,
-                              &pCtx->pOut->sBsWrite,
+                              pBsWrite,
                               bIndependenceBsBuffer,
-                              iMaxSliceBufferSize,
+                              kiMaxSliceBufferSize,
                               pMa);
     if (ENC_RETURN_SUCCESS != iRet) {
       return iRet;
@@ -1043,10 +1038,11 @@ int32_t InitSliceThreadInfo (sWelsEncCtx* pCtx,
                "CWelsH264SVCEncoder::InitSliceThreadInfo: pSliceThreadInfo->pSliceInThread[iIdx] is NULL");
       return ENC_RETURN_MEMALLOCERR;
     }
-    iRet = InitSliceList (pCtx,
-                          pDqLayer->sSliceThreadInfo[iIdx].pSliceInThread,
+    iRet = InitSliceList (pDqLayer->sSliceThreadInfo[iIdx].pSliceInThread,
+                          &pCtx->pOut->sBsWrite,
                           iMaxSliceNum,
-                          kiDlayerIndex,
+                          pCtx->iSliceBufferSize[kiDlayerIndex],
+                          pDqLayer->bSliceBsBufferFlag,
                           pMa);
     if (ENC_RETURN_SUCCESS != iRet) {
       return iRet;
@@ -1071,6 +1067,15 @@ int32_t InitSliceInLayer (sWelsEncCtx* pCtx,
   int32_t iThreadIdx   = 0;
   int32_t iStartIdx    = 0;
   int32_t iMaxSliceNum = pDqLayer->iMaxSliceNum;
+  SSliceArgument* pSliceArgument  = & pCtx->pSvcParam->sSpatialLayers[kiDlayerIndex].sSliceArgument;
+
+  //SM_SINGLE_SLICE mode using single-thread bs writer pOut->sBsWrite
+  //even though multi-thread is on for other layers
+  pDqLayer->bSliceBsBufferFlag = (pCtx->pSvcParam->iMultipleThreadIdc > 1 &&
+                                 SM_SINGLE_SLICE != pSliceArgument->uiSliceMode) ? true : false;
+
+  pDqLayer->bThreadSlcBufferFlag = (pCtx->pSvcParam->iMultipleThreadIdc > 1 &&
+                                   SM_SIZELIMITED_SLICE == pSliceArgument->uiSliceMode) ? true : false;
 
   iRet = InitSliceThreadInfo (pCtx,
                         pDqLayer,

@@ -107,10 +107,11 @@ void InitSliceHeadWithBase (SSlice* pSlice, SSlice* pBaseSlice);
 
 void InitSliceRefInfoWithBase (SSlice* pSlice, SSlice* pBaseSlice, const uint8_t kuiRefCount);
 
-int32_t InitSliceList (sWelsEncCtx* pCtx,
-                       SSlice*& pSliceList,
+int32_t InitSliceList (SSlice*& pSliceList,
+                       SBitStringAux* pBsWrite,
                        const int32_t kiMaxSliceNum,
-                       const int32_t kiDlayerIndex,
+                       const int32_t kiMaxSliceBufferSize,
+                       const bool bIndependenceBsBuffer,
                        CMemoryAlign* pMa);
 
 int32_t InitAllSlicesInThread (sWelsEncCtx* pCtx);
