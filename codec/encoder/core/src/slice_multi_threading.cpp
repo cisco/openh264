@@ -594,6 +594,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
       const int32_t kiCurDid            = pEncPEncCtx->uiDependencyId;
       SWelsSvcCodingParam* pCodingParam = pEncPEncCtx->pSvcParam;
       SSpatialLayerConfig* pParamD      = &pCodingParam->sSpatialLayers[kiCurDid];
+      SSlice* pCurSlice                 = NULL;
 
       pCurDq            = pEncPEncCtx->pCurDqLayer;
       eNalType          = pEncPEncCtx->eNalType;
@@ -635,8 +636,9 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
         }
 
         WelsLoadNalForSlice (pSliceBs, eNalType, eNalRefIdc);
-
-        iReturn = WelsCodeOneSlice (pEncPEncCtx, iSliceIdx, eNalType);
+        pCurSlice = pEncPEncCtx->pCurDqLayer->ppSliceInLayer[iSliceIdx];
+        assert (iSliceIdx == (int) pCurSlice->uiSliceIdx);
+        iReturn = WelsCodeOneSlice (pEncPEncCtx, pCurSlice, eNalType);
         if (ENC_RETURN_SUCCESS != iReturn) {
           uiThrdRet = iReturn;
           WELS_THREAD_SIGNAL_AND_BREAK (pEncPEncCtx->pSliceThreading->pSliceCodedEvent,
@@ -686,7 +688,6 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
         WelsEventSignal (
           &pEncPEncCtx->pSliceThreading->pSliceCodedMasterEvent);
       } else { // for SM_SIZELIMITED_SLICE parallelization
-        SSliceCtx* pSliceCtx                    = &pCurDq->sSliceEncCtx;
         const int32_t kiPartitionId             = iThreadIdx;
         const int32_t kiSliceIdxStep            = pEncPEncCtx->iActiveThreadsNum;
         const int32_t kiFirstMbInPartition      = pCurDq->pFirstMbIdxOfPartition[kiPartitionId];
@@ -700,14 +701,14 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
         pCurDq->pLastCodedMbIdxOfPartition[kiPartitionId]       = 0;
 
         while (iAnyMbLeftInPartition > 0) {
-          if (iSliceIdx >= pSliceCtx->iMaxSliceNumConstraint) {
+          if (iSliceIdx >= pCurDq->iMaxSliceNum) {
             // TODO: need exception handler for not large enough of MAX_SLICES_NUM related memory usage
             // No idea about its solution due MAX_SLICES_NUM is fixed lenght in relevent pData structure
             uiThrdRet = 1;
             WelsLog (&pEncPEncCtx->sLogCtx, WELS_LOG_WARNING,
-                     "[MT] CodingSliceThreadProc Too many slices: coding_idx %d, iSliceIdx %d, pSliceCtx->iMaxSliceNumConstraint %d",
+                     "[MT] CodingSliceThreadProc Too many slices: coding_idx %d, iSliceIdx %d, pCurDq->iMaxSliceNum %d",
                      pParamInternal->iCodingIndex,
-                     iSliceIdx, pSliceCtx->iMaxSliceNumConstraint);
+                     iSliceIdx, pCurDq->iMaxSliceNum);
             WELS_THREAD_SIGNAL_AND_BREAK (pEncPEncCtx->pSliceThreading->pSliceCodedEvent,
                                           pEncPEncCtx->pSliceThreading->pSliceCodedMasterEvent,
                                           iEventIdx);
@@ -735,8 +736,9 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
 
 
           WelsLoadNalForSlice (pSliceBs, eNalType, eNalRefIdc);
-
-          iReturn = WelsCodeOneSlice (pEncPEncCtx, iSliceIdx, eNalType);
+          pCurSlice = pEncPEncCtx->pCurDqLayer->ppSliceInLayer[iSliceIdx];
+          assert (iSliceIdx == (int) pCurSlice->uiSliceIdx);
+          iReturn = WelsCodeOneSlice (pEncPEncCtx, pCurSlice, eNalType);
           if (ENC_RETURN_SUCCESS != iReturn) {
             uiThrdRet = iReturn;
             WELS_THREAD_SIGNAL_AND_BREAK (pEncPEncCtx->pSliceThreading->pSliceCodedEvent,

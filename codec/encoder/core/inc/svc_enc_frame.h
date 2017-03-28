@@ -118,6 +118,8 @@ int32_t*                pNumSliceCodedOfPartition;      // for dynamic slicing m
 int32_t*                pLastCodedMbIdxOfPartition;     // for dynamic slicing mode
 int32_t*                pFirstMbIdxOfPartition;         // for dynamic slicing mode
 int32_t*                pEndMbIdxOfPartition;           // for dynamic slicing mode
+int32_t*                pFirstMbIdxOfSlice;
+int32_t*                pCountMbNumInSlice;
 
 bool                    bNeedAdjustingSlicing;
 

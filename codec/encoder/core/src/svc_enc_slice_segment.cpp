@@ -455,8 +455,8 @@ void UninitSliceSegment (SDqLayer* pCurDq, CMemoryAlign* pMa) {
     pSliceSeg->iMbHeight        = 0;
     pSliceSeg->iSliceNumInFrame = 0;
     pSliceSeg->iMbNumInFrame    = 0;
-    pSliceSeg->uiSliceSizeConstraint = 0;
-    pSliceSeg->iMaxSliceNumConstraint    = 0;
+    pSliceSeg->uiSliceSizeConstraint   = 0;
+    pSliceSeg->iMaxSliceNumConstraint  = 0;
   }
 }
 
@@ -663,6 +663,8 @@ int32_t DynamicAdjustSlicePEncCtxAll (SDqLayer* pCurDq,
     SSliceHeaderExt* pSliceHeaderExt              = &ppSliceInLayer[iSliceIdx]->sSliceHeaderExt;
     pSliceHeaderExt->sSliceHeader.iFirstMbInSlice = iFirstMbIdx;
     ppSliceInLayer[iSliceIdx]->iCountMbNumInSlice = kiSliceRun;
+    pCurDq->pFirstMbIdxOfSlice[iSliceIdx]         = iFirstMbIdx;
+    pCurDq->pCountMbNumInSlice[iSliceIdx]         = kiSliceRun;
 
     WelsSetMemMultiplebytes_c(pSliceCtx->pOverallMbMap + iFirstMbIdx, iSliceIdx,
                               kiSliceRun, sizeof(uint16_t));
