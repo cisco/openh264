@@ -70,6 +70,7 @@ int32_t iHighFreMbCount;
 
 typedef struct TagSliceThreadInfo {
 SSlice*                 pSliceInThread[MAX_THREADS_NUM];// slice buffer for multi thread,
+                                                        // pSliceInThread[0] for single thread
                                                         // will not alloated when multi thread is off
 int32_t                 iMaxSliceNumInThread[MAX_THREADS_NUM];
 int32_t                 iEncodedSliceNumInThread[MAX_THREADS_NUM];
@@ -77,8 +78,6 @@ int32_t                 iEncodedSliceNumInThread[MAX_THREADS_NUM];
 
 typedef struct TagLayerInfo {
 SNalUnitHeaderExt       sNalHeaderExt;
-SSlice*                 pSliceInLayer;  // Here SSlice identify to Frame on concept, [iSliceIndex],
-                                        // may need extend list size for sliceMode=SM_SIZELIMITED_SLICE
 SSubsetSps*             pSubsetSpsP;    // current pSubsetSps used, memory alloc in external
 SWelsSPS*               pSpsP;          // current pSps based avc used, memory alloc in external
 SWelsPPS*               pPpsP;          // current pPps used
@@ -117,7 +116,9 @@ SPicture*               pRefOri[MAX_REF_PIC_COUNT];
 int32_t                 iMaxSliceNum;
 int32_t*                pNumSliceCodedOfPartition;      // for dynamic slicing mode
 int32_t*                pLastCodedMbIdxOfPartition;     // for dynamic slicing mode
-int32_t*                pLastMbIdxOfPartition;          // for dynamic slicing mode
+int32_t*                pFirstMbIdxOfPartition;         // for dynamic slicing mode
+int32_t*                pEndMbIdxOfPartition;           // for dynamic slicing mode
+
 bool                    bNeedAdjustingSlicing;
 
 SFeatureSearchPreparation* pFeatureSearchPreparation;
