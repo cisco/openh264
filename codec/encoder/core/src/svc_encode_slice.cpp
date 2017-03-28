@@ -1605,10 +1605,11 @@ int32_t SliceLayerInfoUpdate (sWelsEncCtx* pCtx,
 }
 
 int32_t WelsCodeOneSlice (sWelsEncCtx* pEncCtx, SSlice* pCurSlice, const int32_t kiNalType) {
-  SDqLayer* pCurLayer                   = pEncCtx->pCurDqLayer;
-  SNalUnitHeaderExt* pNalHeadExt        = &pCurLayer->sLayerInfo.sNalHeaderExt;
-  SBitStringAux* pBs                    = pCurSlice->pSliceBsa;
-  const int32_t kiDynamicSliceFlag      = (pEncCtx->pSvcParam->sSpatialLayers[pEncCtx->uiDependencyId].sSliceArgument.uiSliceMode
+  SDqLayer* pCurLayer              = pEncCtx->pCurDqLayer;
+  SWelsSvcRc* pWelsSvcRc           = &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
+  SNalUnitHeaderExt* pNalHeadExt   = &pCurLayer->sLayerInfo.sNalHeaderExt;
+  SBitStringAux* pBs               = pCurSlice->pSliceBsa;
+  const int32_t kiDynamicSliceFlag = (pEncCtx->pSvcParam->sSpatialLayers[pEncCtx->uiDependencyId].sSliceArgument.uiSliceMode
                                           == SM_SIZELIMITED_SLICE);
   if (I_SLICE == pEncCtx->eSliceType) {
     pNalHeadExt->bIdrFlag = 1;
@@ -1620,8 +1621,10 @@ int32_t WelsCodeOneSlice (sWelsEncCtx* pEncCtx, SSlice* pCurSlice, const int32_t
 
   WelsSliceHeaderExtInit (pEncCtx, pCurLayer, pCurSlice);
 
-  //init slice RC information
-  RCInitOneSliceInformation(pEncCtx, pCurSlice);
+  //RomRC init slice by slice
+  if (pWelsSvcRc->bGomRC) {
+    GomRCInitForOneSlice(pCurSlice, pWelsSvcRc->iBitsPerMb);
+  }
 
   g_pWelsWriteSliceHeader[pCurSlice->bSliceHeaderExtFlag] (pEncCtx, pBs, pCurLayer, pCurSlice,
       pEncCtx->pFuncList->pParametersetStrategy);
