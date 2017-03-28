@@ -510,18 +510,12 @@ void RcCalculatePictureQp (sWelsEncCtx* pEncCtx) {
   pEncCtx->iGlobalQp = iLumaQp;
 }
 
-void RCInitOneSliceInformation(sWelsEncCtx* pEncCtx, SSlice* pSlice) {
-
-  bool bGomRC = (RC_OFF_MODE == pEncCtx->pSvcParam->iRCMode ||
-                 RC_BUFFERBASED_MODE == pEncCtx->pSvcParam->iRCMode ) ? false : true;
-  if(bGomRC) {
-    SRCSlicing* pSOverRc        = &pSlice->sSlicingOverRc;
-    const int32_t kiBitsPerMb   = pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId].iBitsPerMb;
-    pSOverRc->iStartMbSlice     = pSlice->sSliceHeaderExt.sSliceHeader.iFirstMbInSlice;
-    pSOverRc->iEndMbSlice       = pSOverRc->iStartMbSlice + pSlice->iCountMbNumInSlice - 1;
-    pSOverRc->iTargetBitsSlice  = WELS_DIV_ROUND (static_cast<int64_t> (kiBitsPerMb) * pSlice->iCountMbNumInSlice,
-                                                  INT_MULTIPLY);
-  }
+void GomRCInitForOneSlice(SSlice* pSlice, const int32_t kiBitsPerMb) {
+  SRCSlicing* pSOverRc        = &pSlice->sSlicingOverRc;
+  pSOverRc->iStartMbSlice     = pSlice->sSliceHeaderExt.sSliceHeader.iFirstMbInSlice;
+  pSOverRc->iEndMbSlice       = pSOverRc->iStartMbSlice + pSlice->iCountMbNumInSlice - 1;
+  pSOverRc->iTargetBitsSlice  = WELS_DIV_ROUND (static_cast<int64_t> (kiBitsPerMb) * pSlice->iCountMbNumInSlice,
+                                                INT_MULTIPLY);
 }
 
 void RcInitSliceInformation (sWelsEncCtx* pEncCtx) {
@@ -530,6 +524,8 @@ void RcInitSliceInformation (sWelsEncCtx* pEncCtx) {
   const int32_t kiSliceNum  = pEncCtx->pCurDqLayer->iMaxSliceNum;
   pWelsSvcRc->iBitsPerMb    = WELS_DIV_ROUND (static_cast<int64_t> (pWelsSvcRc->iTargetBits) * INT_MULTIPLY,
                                               pWelsSvcRc->iNumberMbFrame);
+  pWelsSvcRc->bGomRC        = (RC_OFF_MODE == pEncCtx->pSvcParam->iRCMode ||
+                              RC_BUFFERBASED_MODE == pEncCtx->pSvcParam->iRCMode) ? false : true;
   for (int32_t i = 0; i < kiSliceNum; i++) {
       SRCSlicing* pSOverRc        = &ppSliceInLayer[i]->sSlicingOverRc;
       pSOverRc->iTotalQpSlice     = 0;
