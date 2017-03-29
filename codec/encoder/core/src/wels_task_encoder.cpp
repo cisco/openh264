@@ -238,7 +238,7 @@ WelsErrorType CWelsConstrainedSizeSlicingEncodingTask::ExecuteTask() {
   const int32_t kiFirstMbInPartition      = pCurDq->FirstMbIdxOfPartition[kiPartitionId];
   const int32_t kiEndMbIdxInPartition     = pCurDq->EndMbIdxOfPartition[kiPartitionId];
   const int32_t kiCodedSliceNumByThread   = pCurDq->sSliceThreadInfo[m_iThreadIdx].iCodedSliceNum;
-  m_pSlice                                = &pCurDq->sSliceThreadInfo[m_iThreadIdx].pSliceInThread[kiCodedSliceNumByThread];
+  m_pSlice                                = &pCurDq->sSliceThreadInfo[m_iThreadIdx].pSliceBuffer[kiCodedSliceNumByThread];
   m_pSlice->sSliceHeaderExt.sSliceHeader.iFirstMbInSlice  = kiFirstMbInPartition;
   int32_t iReturn      = 0;
   bool bNeedReallocate = false;

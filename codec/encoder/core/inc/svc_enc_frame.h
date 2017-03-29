@@ -69,8 +69,7 @@ int32_t iHighFreMbCount;
 } SFeatureSearchPreparation; //maintain only one
 
 typedef struct TagSliceThreadInfo {
-SSlice*                 pSliceInThread;// slice buffer for multi thread,
-                                       // pSliceInThread[0] for single thread
+SSlice*                 pSliceBuffer;  // slice buffer for multi thread,
 int32_t                 iMaxSliceNum;
 int32_t                 iCodedSliceNum;
 }SSliceThreadInfo;
