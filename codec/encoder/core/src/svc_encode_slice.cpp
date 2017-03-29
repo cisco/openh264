@@ -94,8 +94,6 @@ void WelsSliceHeaderExtInit (sWelsEncCtx* pEncCtx, SDqLayer* pCurLayer, SSlice* 
 
   pCurSliceExt->bStoreRefBasePicFlag = false;
 
-  pCurSliceHeader->iFirstMbInSlice = WelsGetFirstMbOfSlice (pCurLayer->ppSliceInLayer, pSlice->uiSliceIdx);
-
   pCurSliceHeader->iFrameNum      = pParamInternal->iFrameNum;
   pCurSliceHeader->uiIdrPicId     = pParamInternal->uiIdrPicId;
   pCurSliceHeader->iPicOrderCntLsb = pEncCtx->pEncPic->iFramePoc;      // 0
@@ -814,49 +812,64 @@ void FreeMbCache (SMbCache* pMbCache, CMemoryAlign* pMa) {
   }
 }
 
-//Initialize slice's MB info)
-int32_t InitSliceMBInfo (SSliceArgument* pSliceArgument,
-                         SSlice* pSlice,
-                         const int32_t kiMBWidth,
-                         const int32_t kiMBHeight) {
-  SSliceHeader* pSliceHeader          = &pSlice->sSliceHeaderExt.sSliceHeader;
+//Initialize slice's boundary info)
+int32_t InitSliceBoundaryInfo (SDqLayer* pCurLayer, SSliceArgument* pSliceArgument) {
+
   const int32_t* kpSlicesAssignList   = (int32_t*) & (pSliceArgument->uiSliceMbNum[0]);
+  const int32_t kiMBWidth             = pCurLayer->iMbWidth;
+  const int32_t kiMBHeight            = pCurLayer->iMbHeight;
   const int32_t kiCountNumMbInFrame   = kiMBWidth * kiMBHeight;
-  const int32_t kiSliceIdx            = pSlice->uiSliceIdx;
+  int32_t iSliceIdx                   = 0;
   int32_t iFirstMBInSlice             = 0;
   int32_t iMbNumInSlice               = 0;
 
-  if (SM_SINGLE_SLICE == pSliceArgument->uiSliceMode) {
-    iFirstMBInSlice = 0;
-    iMbNumInSlice   = kiCountNumMbInFrame;
+  for( ;iSliceIdx < pCurLayer->iMaxSliceNum; iSliceIdx++ ){
+    if (SM_SINGLE_SLICE == pSliceArgument->uiSliceMode) {
+      iFirstMBInSlice = 0;
+      iMbNumInSlice   = kiCountNumMbInFrame;
 
-  } else if ((SM_RASTER_SLICE == pSliceArgument->uiSliceMode) && (0 == pSliceArgument->uiSliceMbNum[0])) {
-    iFirstMBInSlice = kiSliceIdx * kiMBWidth;
-    iMbNumInSlice   = kiMBWidth;
-  } else if (SM_RASTER_SLICE  == pSliceArgument->uiSliceMode ||
+    } else if ((SM_RASTER_SLICE == pSliceArgument->uiSliceMode) && (0 == pSliceArgument->uiSliceMbNum[0])) {
+      iFirstMBInSlice = iSliceIdx * kiMBWidth;
+      iMbNumInSlice   = kiMBWidth;
+    } else if (SM_RASTER_SLICE  == pSliceArgument->uiSliceMode ||
              SM_FIXEDSLCNUM_SLICE == pSliceArgument->uiSliceMode) {
-    int32_t iMbIdx  = 0;
-    for (int i = 0; i < kiSliceIdx; i++) {
-      iMbIdx += kpSlicesAssignList[i];
+      int32_t iMbIdx  = 0;
+      for (int i = 0; i < iSliceIdx; i++) {
+        iMbIdx += kpSlicesAssignList[i];
+      }
+
+      if (iMbIdx >= kiCountNumMbInFrame) {
+        return ENC_RETURN_UNEXPECTED;
+      }
+
+      iFirstMBInSlice = iMbIdx;
+      iMbNumInSlice   = kpSlicesAssignList[iSliceIdx];
+
+    } else if (SM_SIZELIMITED_SLICE == pSliceArgument->uiSliceMode) {
+      iFirstMBInSlice  = 0;
+      iMbNumInSlice    = kiCountNumMbInFrame;
+
+    } else { // any else uiSliceMode?
+      assert (0);
     }
 
-    if (iMbIdx >= kiCountNumMbInFrame) {
-      return ENC_RETURN_UNEXPECTED;
-    }
-
-    iFirstMBInSlice = iMbIdx;
-    iMbNumInSlice   = kpSlicesAssignList[kiSliceIdx];
-
-  } else if (SM_SIZELIMITED_SLICE == pSliceArgument->uiSliceMode) {
-    iFirstMBInSlice  = 0;
-    iMbNumInSlice    = kiCountNumMbInFrame;
-
-  } else { // any else uiSliceMode?
-    assert (0);
+    pCurLayer->pCountMbNumInSlice[iSliceIdx] = iMbNumInSlice;
+    pCurLayer->pFirstMbIdxOfSlice[iSliceIdx] = iFirstMBInSlice;
   }
 
-  pSlice->iCountMbNumInSlice    = iMbNumInSlice;
-  pSliceHeader->iFirstMbInSlice = iFirstMBInSlice;
+  return ENC_RETURN_SUCCESS;
+}
+
+int32_t SetSliceBoundaryInfo(SDqLayer* pCurLayer, SSlice* pSlice, const int32_t kiSliceIdx) {
+  if(NULL == pCurLayer || NULL == pSlice  ||
+    NULL == pCurLayer->pFirstMbIdxOfSlice ||
+    NULL == pCurLayer->pCountMbNumInSlice) {
+
+    return ENC_RETURN_UNEXPECTED;
+  }
+
+  pSlice->sSliceHeaderExt.sSliceHeader.iFirstMbInSlice = pCurLayer->pFirstMbIdxOfSlice[kiSliceIdx];
+  pSlice->iCountMbNumInSlice  = pCurLayer->pCountMbNumInSlice[kiSliceIdx];
 
   return ENC_RETURN_SUCCESS;
 }
@@ -941,9 +954,12 @@ int32_t InitSliceList (sWelsEncCtx* pCtx,
     }
 
     pSlice->uiSliceIdx = iSliceIdx;
+    pSlice->uiThreadIdx = 0;
+    pSlice->iCountMbNumInSlice = 0;
+    pSlice->sSliceHeaderExt.sSliceHeader.iFirstMbInSlice = 0;
 
     iRet = InitSliceBsBuffer (pSlice,
-                              & pCtx->pOut->sBsWrite,
+                              &pCtx->pOut->sBsWrite,
                               bIndependenceBsBuffer,
                               iMaxSliceBufferSize,
                               pMa);
@@ -951,12 +967,6 @@ int32_t InitSliceList (sWelsEncCtx* pCtx,
       return iRet;
     }
 
-    iRet = InitSliceMBInfo (pSliceArgument, pSlice,
-                            kiMBWidth, kiMBHeight);
-
-    if (ENC_RETURN_SUCCESS != iRet) {
-      return iRet;
-    }
     iRet = AllocateSliceMBBuffer (pSlice, pMa);
 
     if (ENC_RETURN_SUCCESS != iRet) {
@@ -993,11 +1003,6 @@ int32_t InitOneSliceInThread (sWelsEncCtx* pCtx,
   pSlice->sSliceBs.iNalIndex = 0;
   pSlice->sSliceBs.pBsBuffer = pCtx->pSliceThreading->pThreadBsBuffer[kiThreadIdx];
 
-  // init slice MB info
-  iRet = InitSliceMBInfo (pSliceArgument, pSlice, kiMBWidth, kiMBHeight);
-  if (ENC_RETURN_SUCCESS != iRet) {
-    return iRet;
-  }
   return ENC_RETURN_SUCCESS;
 }
 */
@@ -1073,6 +1078,11 @@ int32_t InitSliceInLayer (sWelsEncCtx* pCtx,
     return ENC_RETURN_MEMALLOCERR;
   }
 
+  iRet = InitSliceBoundaryInfo (pDqLayer, &pCtx->pSvcParam->sSpatialLayers[kiDlayerIndex].sSliceArgument);
+  if (ENC_RETURN_SUCCESS != iRet) {
+    return iRet;
+  }
+
   InitSliceThreadInfo (pCtx,
                        pDqLayer,
                        kiDlayerIndex,
@@ -1118,18 +1128,16 @@ void InitSliceRefInfoWithBase (SSlice* pSlice, SSlice* pBaseSlice, const uint8_t
 
 }
 
-static inline int32_t InitSliceRC (SSlice* pSlice, const int32_t kiGlobalQp, const int32_t kiBitsPerMb) {
+static inline int32_t InitSliceRC (SSlice* pSlice, const int32_t kiGlobalQp) {
 
-  if (NULL == pSlice || kiGlobalQp < 0 ||  kiBitsPerMb < 0)
+  if (NULL == pSlice || kiGlobalQp < 0)
     return ENC_RETURN_INVALIDINPUT;
 
   pSlice->sSlicingOverRc.iComplexityIndexSlice = 0;
   pSlice->sSlicingOverRc.iCalculatedQpSlice    = kiGlobalQp;
   pSlice->sSlicingOverRc.iTotalQpSlice         = 0;
   pSlice->sSlicingOverRc.iTotalMbSlice         = 0;
-  pSlice->sSlicingOverRc.iTargetBitsSlice      = WELS_DIV_ROUND (kiBitsPerMb *
-      pSlice->iCountMbNumInSlice,
-      INT_MULTIPLY);
+  pSlice->sSlicingOverRc.iTargetBitsSlice      = 0;
   pSlice->sSlicingOverRc.iFrameBitsSlice       = 0;
   pSlice->sSlicingOverRc.iGomBitsSlice         = 0;
 
@@ -1142,7 +1150,6 @@ int32_t ReallocateSliceList (sWelsEncCtx* pCtx,
                              const int32_t kiMaxSliceNumOld,
                              const int32_t kiMaxSliceNumNew) {
   CMemoryAlign* pMA           = pCtx->pMemAlign;
-  SDqLayer* pCurLayer         = pCtx->pCurDqLayer;
   SSlice* pBaseSlice          = NULL;
   SSlice* pNewSliceList       = NULL;
   SSlice* pSlice              = NULL;
@@ -1150,8 +1157,6 @@ int32_t ReallocateSliceList (sWelsEncCtx* pCtx,
   int32_t iRet                = 0;
   const int32_t kiCurDid      = pCtx->uiDependencyId;
   int32_t iMaxSliceBufferSize = (pCtx)->iSliceBufferSize[kiCurDid];
-  int32_t iBitsPerMb          = WELS_DIV_ROUND (pCtx->pWelsSvcRc[kiCurDid].iTargetBits * INT_MULTIPLY,
-                                pCtx->pWelsSvcRc[kiCurDid].iNumberMbFrame);
   bool bIndependenceBsBuffer  = (pCtx->pSvcParam->iMultipleThreadIdc > 1 &&
                                  SM_SINGLE_SLICE != pSliceArgument->uiSliceMode) ? true : false;
 
@@ -1181,6 +1186,9 @@ int32_t ReallocateSliceList (sWelsEncCtx* pCtx,
     }
 
     pSlice->uiSliceIdx = iSliceIdx;
+    pSlice->uiThreadIdx = 0;
+    pSlice->iCountMbNumInSlice = 0;
+    pSlice->sSliceHeaderExt.sSliceHeader.iFirstMbInSlice = 0;
 
     iRet = InitSliceBsBuffer (pSlice,
                               & pCtx->pOut->sBsWrite,
@@ -1198,19 +1206,10 @@ int32_t ReallocateSliceList (sWelsEncCtx* pCtx,
       return iRet;
     }
 
-    iRet = InitSliceMBInfo (pSliceArgument,
-                            pSlice,
-                            pCurLayer->iMbWidth,
-                            pCurLayer->iMbHeight);
-    if (ENC_RETURN_SUCCESS != iRet) {
-      FreeSliceBuffer(pNewSliceList, kiMaxSliceNumNew, pMA, "ReallocateSliceList()::InitSliceBsBuffer()");
-      return iRet;
-    }
-
     InitSliceHeadWithBase (pSlice, pBaseSlice);
     InitSliceRefInfoWithBase (pSlice, pBaseSlice, pCtx->iNumRef0);
 
-    iRet = InitSliceRC (pSlice, pCtx->iGlobalQp, iBitsPerMb);
+    iRet = InitSliceRC (pSlice, pCtx->iGlobalQp);
     if (ENC_RETURN_SUCCESS != iRet) {
       FreeSliceBuffer(pNewSliceList, kiMaxSliceNumNew, pMA, "ReallocateSliceList()::InitSliceBsBuffer()");
       return iRet;
@@ -1344,6 +1343,7 @@ int32_t ReallocSliceBuffer (sWelsEncCtx* pCtx) {
   pMA->WelsFree (pCurLayer->pCountMbNumInSlice, "pCountMbNumInSlice");
   pCurLayer->pCountMbNumInSlice = pCountMbNumInSlice;
 
+
   for (iSliceIdx = 0; iSliceIdx < iMaxSliceNumNew; iSliceIdx++) {
     pCurLayer->ppSliceInLayer[iSliceIdx] = pCurLayer->sSliceThreadInfo.pSliceInThread[0] + iSliceIdx;
   }
@@ -1356,7 +1356,6 @@ int32_t ReallocSliceBuffer (sWelsEncCtx* pCtx) {
   pCurLayer->iMaxSliceNum = iMaxSliceNumNew;
   return ENC_RETURN_SUCCESS;
 }
-
 /*
 int32_t ReOrderSliceInLayer (SDqLayer* pCurLayer,
                              const int32_t kiThreadNum,
@@ -1477,6 +1476,9 @@ int32_t WelsCodeOneSlice (sWelsEncCtx* pEncCtx, SSlice* pCurSlice, const int32_t
 
   WelsSliceHeaderExtInit (pEncCtx, pCurLayer, pCurSlice);
 
+  //init slice RC information
+  RCInitOneSliceInformation(pEncCtx, pCurSlice);
+
   g_pWelsWriteSliceHeader[pCurSlice->bSliceHeaderExtFlag] (pEncCtx, pBs, pCurLayer, pCurSlice,
       pEncCtx->pFuncList->pParametersetStrategy);
 
@@ -1517,7 +1519,7 @@ void UpdateMbNeighbourInfoForNextSlice (SDqLayer* pCurDq,
 void AddSliceBoundary (sWelsEncCtx* pEncCtx, SSlice* pCurSlice, SSliceCtx* pSliceCtx, SMB* pCurMb,
                        int32_t iFirstMbIdxOfNextSlice, const int32_t kiLastMbIdxInPartition) {
   SDqLayer*     pCurLayer       = pEncCtx->pCurDqLayer;
-  SSlice**      ppSliceInLayer  = pCurLayer->ppSliceInLayer;
+  SSlice*       pSliceInThread  = pCurLayer->sSliceThreadInfo.pSliceInThread[0];
   int32_t       iCurMbIdx       = pCurMb->iMbXY;
   uint16_t      iCurSliceIdc    = pSliceCtx->pOverallMbMap[ iCurMbIdx ];
   const int32_t kiSliceIdxStep  = pEncCtx->iActiveThreadsNum;
@@ -1530,7 +1532,7 @@ void AddSliceBoundary (sWelsEncCtx* pEncCtx, SSlice* pCurSlice, SSliceCtx* pSlic
   pCurSlice->sSliceHeaderExt.uiNumMbsInSlice = 1 + iCurMbIdx - pCurSlice->sSliceHeaderExt.sSliceHeader.iFirstMbInSlice;
 
   //pNextSlice pointer/initialization
-  pNextSlice = pCurLayer->ppSliceInLayer[ iNextSliceIdc ];
+  pNextSlice = &pSliceInThread[ iNextSliceIdc ];
 
 #if _DEBUG
   assert (NULL != pNextSlice);
@@ -1541,7 +1543,7 @@ void AddSliceBoundary (sWelsEncCtx* pEncCtx, SSlice* pCurSlice, SSliceCtx* pSlic
     (NAL_UNIT_CODED_SLICE_EXT == pCurLayer->sLayerInfo.sNalHeaderExt.sNalUnitHeader.eNalUnitType);
   memcpy (&pNextSlice->sSliceHeaderExt, &pCurSlice->sSliceHeaderExt,
           sizeof (SSliceHeaderExt)); // confirmed_safe_unsafe_usage
-  ppSliceInLayer[iNextSliceIdc]->sSliceHeaderExt.sSliceHeader.iFirstMbInSlice = iFirstMbIdxOfNextSlice;
+  pNextSlice->sSliceHeaderExt.sSliceHeader.iFirstMbInSlice = iFirstMbIdxOfNextSlice;
   WelsSetMemMultiplebytes_c (pSliceCtx->pOverallMbMap + iFirstMbIdxOfNextSlice, iNextSliceIdc,
                              (kiLastMbIdxInPartition - iFirstMbIdxOfNextSlice + 1), sizeof (uint16_t));
 
