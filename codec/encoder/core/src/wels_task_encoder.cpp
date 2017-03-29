@@ -243,7 +243,6 @@ WelsErrorType CWelsConstrainedSizeSlicingEncodingTask::ExecuteTask() {
   int32_t iReturn      = 0;
   bool bNeedReallocate = false;
 
-  //deal with partition: TODO: here SSliceThreadPrivateData is just for parition info and actually has little relationship with threadbuffer, and iThreadIndex is not used in threadpool model, need renaming after removing old logic to avoid confusion
   int32_t iDiffMbIdx = kiEndMbIdxInPartition - kiFirstMbInPartition;
   if( 0 == iDiffMbIdx) {
     m_pSlice->iSliceIdx = -1;
