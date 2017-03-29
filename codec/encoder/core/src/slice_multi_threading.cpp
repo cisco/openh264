@@ -985,9 +985,9 @@ void TrackSliceConsumeTime (sWelsEncCtx* pCtx, int32_t* pDidList, const int32_t 
 }
 #endif//#if defined(MT_DEBUG)
 
-void SetOneSliceBsBufferUnderMultithread (sWelsEncCtx* pCtx, const int32_t kiThreadIdx, SSlice* pSlice) {
+void SetOneSliceBsBufferUnderMultithread (sWelsEncCtx* pCtx, const int32_t kiBuffIdx, SSlice* pSlice) {
   SWelsSliceBs* pSliceBs  = &pSlice->sSliceBs;
-  pSliceBs->pBsBuffer     = pCtx->pSliceThreading->pThreadBsBuffer[kiThreadIdx];
+  pSliceBs->pBsBuffer     = pCtx->pSliceThreading->pThreadBsBuffer[kiBuffIdx];
   pSliceBs->uiBsPos       = 0;
 }
 }
