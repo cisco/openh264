@@ -569,7 +569,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
         int64_t iSliceStart = 0;
         bool bDsaFlag = false;
         iSliceIdx     = pPrivateData->iSliceIndex;
-        pSlice        = &pCurDq->sSliceThreadInfo[iThreadIdx].pSliceInThread[iSliceIdx];
+        pSlice        = &pCurDq->sSliceThreadInfo[iThreadIdx].pSliceBuffer[iSliceIdx];
         pSliceBs      = &pSlice->sSliceBs;
 
         bDsaFlag = ((pParamD->sSliceArgument.uiSliceMode == SM_FIXEDSLCNUM_SLICE) &&
@@ -675,7 +675,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
         int32_t iAnyMbLeftInPartition           = kiEndMbIdxInPartition - kiFirstMbInPartition + 1;
         SSpatialLayerInternal *pParamInternal   = &pCodingParam->sDependencyLayers[kiCurDid];
         iSliceIdx                               = pPrivateData->iSliceIndex;
-        SSlice* pStartSlice                     = &pCurDq->sSliceThreadInfo[iThreadIdx].pSliceInThread[iSliceIdx];
+        SSlice* pStartSlice                     = &pCurDq->sSliceThreadInfo[iThreadIdx].pSliceBuffer[iSliceIdx];
         pStartSlice->sSliceHeaderExt.sSliceHeader.iFirstMbInSlice = kiFirstMbInPartition;
         while (iAnyMbLeftInPartition > 0) {
           if (iSliceIdx >= pCurDq->iMaxSliceNum) {
@@ -690,7 +690,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
                                           pEncPEncCtx->pSliceThreading->pSliceCodedMasterEvent,
                                           iEventIdx);
           }
-          pSlice                = &pCurDq->sSliceThreadInfo[iThreadIdx].pSliceInThread[iSliceIdx];
+          pSlice                = &pCurDq->sSliceThreadInfo[iThreadIdx].pSliceBuffer[iSliceIdx];
           pSliceBs              = &pSlice->sSliceBs;
           pSliceBs->uiBsPos     = 0;
           pSliceBs->iNalIndex   = 0;
