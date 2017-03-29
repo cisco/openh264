@@ -948,7 +948,7 @@ int32_t InitSliceList (SSlice*& pSliceList,
     }
 
     pSlice->iSliceIdx          = iSliceIdx;
-    pSlice->uiThreadIdx        = 0;
+    pSlice->uiBufferIdx        = 0;
     pSlice->iCountMbNumInSlice = 0;
     pSlice->sSliceHeaderExt.sSliceHeader.iFirstMbInSlice = 0;
 
@@ -1005,7 +1005,7 @@ int32_t InitOneSliceInThread (sWelsEncCtx* pCtx,
       pSlice = &pCtx->pCurDqLayer->sSliceBufferInfo [0].pSliceBuffer[kiSliceIdx];
   }
   pSlice->iSliceIdx   = kiSliceIdx;
-  pSlice->uiThreadIdx = kiSlcBuffIdx;
+  pSlice->uiBufferIdx = kiSlcBuffIdx;
 
   // Initialize slice bs buffer info
   pSlice->sSliceBs.uiBsPos   = 0;
@@ -1235,7 +1235,7 @@ int32_t ReallocateSliceList (sWelsEncCtx* pCtx,
     }
 
     pSlice->iSliceIdx = -1;
-    pSlice->uiThreadIdx = 0;
+    pSlice->uiBufferIdx = 0;
     pSlice->iCountMbNumInSlice = 0;
     pSlice->sSliceHeaderExt.sSliceHeader.iFirstMbInSlice = 0;
 
@@ -1678,8 +1678,8 @@ void UpdateMbNeighbourInfoForNextSlice (SDqLayer* pCurDq,
 void AddSliceBoundary (sWelsEncCtx* pEncCtx, SSlice* pCurSlice, SSliceCtx* pSliceCtx, SMB* pCurMb,
                        int32_t iFirstMbIdxOfNextSlice, const int32_t kiLastMbIdxInPartition) {
   SDqLayer*     pCurLayer       = pEncCtx->pCurDqLayer;
-  SSlice*       pSliceBuffer    = pCurLayer->sSliceBufferInfo[pCurSlice->uiThreadIdx].pSliceBuffer;
-  int32_t       iCodedSliceNum  = pCurLayer->sSliceBufferInfo[pCurSlice->uiThreadIdx].iCodedSliceNum;
+  SSlice*       pSliceBuffer    = pCurLayer->sSliceBufferInfo[pCurSlice->uiBufferIdx].pSliceBuffer;
+  int32_t       iCodedSliceNum  = pCurLayer->sSliceBufferInfo[pCurSlice->uiBufferIdx].iCodedSliceNum;
   int32_t       iCurMbIdx       = pCurMb->iMbXY;
   uint16_t      iCurSliceIdc    = pSliceCtx->pOverallMbMap[ iCurMbIdx ];
   const int32_t kiSliceIdxStep  = pEncCtx->iActiveThreadsNum;
