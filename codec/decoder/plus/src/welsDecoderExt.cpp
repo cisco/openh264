@@ -585,14 +585,6 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
       //TODO after dec status updated
       m_pDecContext->iErrorCode |= dsDataErrorConcealed;
 
-      //
-      if ((m_pDecContext->sDecoderStatistics.uiWidth != (unsigned int) pDstInfo->UsrData.sSystemBuffer.iWidth)
-          || (m_pDecContext->sDecoderStatistics.uiHeight != (unsigned int) pDstInfo->UsrData.sSystemBuffer.iHeight)) {
-        m_pDecContext->sDecoderStatistics.uiResolutionChangeTimes++;
-        m_pDecContext->sDecoderStatistics.uiWidth = pDstInfo->UsrData.sSystemBuffer.iWidth;
-        m_pDecContext->sDecoderStatistics.uiHeight = pDstInfo->UsrData.sSystemBuffer.iHeight;
-
-      }
       m_pDecContext->sDecoderStatistics.uiDecodedFrameCount++;
       if (m_pDecContext->sDecoderStatistics.uiDecodedFrameCount == 0) { //exceed max value of uint32_t
         ResetDecStatNums (&m_pDecContext->sDecoderStatistics);
@@ -626,24 +618,18 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
       ResetDecStatNums (&m_pDecContext->sDecoderStatistics);
       m_pDecContext->sDecoderStatistics.uiDecodedFrameCount++;
     }
-
-    if ((m_pDecContext->sDecoderStatistics.uiWidth != (unsigned int) pDstInfo->UsrData.sSystemBuffer.iWidth)
-        || (m_pDecContext->sDecoderStatistics.uiHeight != (unsigned int) pDstInfo->UsrData.sSystemBuffer.iHeight)) {
-      m_pDecContext->sDecoderStatistics.uiResolutionChangeTimes++;
-      m_pDecContext->sDecoderStatistics.uiWidth = pDstInfo->UsrData.sSystemBuffer.iWidth;
-      m_pDecContext->sDecoderStatistics.uiHeight = pDstInfo->UsrData.sSystemBuffer.iHeight;
-    }
   }
   iEnd = WelsTime();
   m_pDecContext->dDecTime += (iEnd - iStart) / 1e3;
 
-  OutputStatisticsLog(m_pDecContext->sDecoderStatistics);
+  OutputStatisticsLog (m_pDecContext->sDecoderStatistics);
 
   return dsErrorFree;
 }
 
-void CWelsDecoder::OutputStatisticsLog(SDecoderStatistics& sDecoderStatistics) {
-  if ((sDecoderStatistics.uiDecodedFrameCount > 0) && (sDecoderStatistics.iStatisticsLogInterval > 0) && ((sDecoderStatistics.uiDecodedFrameCount % sDecoderStatistics.iStatisticsLogInterval) == 0)) {
+void CWelsDecoder::OutputStatisticsLog (SDecoderStatistics& sDecoderStatistics) {
+  if ((sDecoderStatistics.uiDecodedFrameCount > 0) && (sDecoderStatistics.iStatisticsLogInterval > 0)
+      && ((sDecoderStatistics.uiDecodedFrameCount % sDecoderStatistics.iStatisticsLogInterval) == 0)) {
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
              "uiWidth=%d, uiHeight=%d, fAverageFrameSpeedInMs=%.1f, fActualAverageFrameSpeedInMs=%.1f, \
               uiDecodedFrameCount=%d, uiResolutionChangeTimes=%d, uiIDRCorrectNum=%d, \
@@ -652,37 +638,37 @@ void CWelsDecoder::OutputStatisticsLog(SDecoderStatistics& sDecoderStatistics) {
               iSpsReportErrorNum=%d, iSubSpsReportErrorNum=%d, iPpsReportErrorNum=%d, iSpsNoExistNalNum=%d, iSubSpsNoExistNalNum=%d, iPpsNoExistNalNum=%d, \
               uiProfile=%d, uiLevel=%d, \
               iCurrentActiveSpsId=%d, iCurrentActivePpsId=%d,",
-              sDecoderStatistics.uiWidth,
-              sDecoderStatistics.uiHeight,
-              sDecoderStatistics.fAverageFrameSpeedInMs,
-              sDecoderStatistics.fActualAverageFrameSpeedInMs,
+             sDecoderStatistics.uiWidth,
+             sDecoderStatistics.uiHeight,
+             sDecoderStatistics.fAverageFrameSpeedInMs,
+             sDecoderStatistics.fActualAverageFrameSpeedInMs,
 
-              sDecoderStatistics.uiDecodedFrameCount,
-              sDecoderStatistics.uiResolutionChangeTimes,
-              sDecoderStatistics.uiIDRCorrectNum,
+             sDecoderStatistics.uiDecodedFrameCount,
+             sDecoderStatistics.uiResolutionChangeTimes,
+             sDecoderStatistics.uiIDRCorrectNum,
 
-              sDecoderStatistics.uiAvgEcRatio,
-              sDecoderStatistics.uiAvgEcPropRatio,
-              sDecoderStatistics.uiEcIDRNum,
-              sDecoderStatistics.uiEcFrameNum,
+             sDecoderStatistics.uiAvgEcRatio,
+             sDecoderStatistics.uiAvgEcPropRatio,
+             sDecoderStatistics.uiEcIDRNum,
+             sDecoderStatistics.uiEcFrameNum,
 
-              sDecoderStatistics.uiIDRLostNum,
-              sDecoderStatistics.uiFreezingIDRNum,
-              sDecoderStatistics.uiFreezingNonIDRNum,
-              sDecoderStatistics.iAvgLumaQp,
+             sDecoderStatistics.uiIDRLostNum,
+             sDecoderStatistics.uiFreezingIDRNum,
+             sDecoderStatistics.uiFreezingNonIDRNum,
+             sDecoderStatistics.iAvgLumaQp,
 
-              sDecoderStatistics.iSpsReportErrorNum,
-              sDecoderStatistics.iSubSpsReportErrorNum,
-              sDecoderStatistics.iPpsReportErrorNum,
-              sDecoderStatistics.iSpsNoExistNalNum,
-              sDecoderStatistics.iSubSpsNoExistNalNum,
-              sDecoderStatistics.iPpsNoExistNalNum,
+             sDecoderStatistics.iSpsReportErrorNum,
+             sDecoderStatistics.iSubSpsReportErrorNum,
+             sDecoderStatistics.iPpsReportErrorNum,
+             sDecoderStatistics.iSpsNoExistNalNum,
+             sDecoderStatistics.iSubSpsNoExistNalNum,
+             sDecoderStatistics.iPpsNoExistNalNum,
 
-              sDecoderStatistics.uiProfile,
-              sDecoderStatistics.uiLevel,
+             sDecoderStatistics.uiProfile,
+             sDecoderStatistics.uiLevel,
 
-              sDecoderStatistics.iCurrentActiveSpsId,
-              sDecoderStatistics.iCurrentActivePpsId);
+             sDecoderStatistics.iCurrentActiveSpsId,
+             sDecoderStatistics.iCurrentActivePpsId);
   }
 }
 
@@ -701,6 +687,7 @@ DECODING_STATE CWelsDecoder::DecodeParser (const unsigned char* kpSrc,
     m_pDecContext->iErrorCode |= dsInvalidArgument;
     return dsInvalidArgument;
   }
+  int64_t iEnd, iStart = WelsTime();
   if (CheckBsBuffer (m_pDecContext, kiSrcLen)) {
     if (ResetDecoder())
       return dsOutOfMemory;
@@ -745,6 +732,14 @@ DECODING_STATE CWelsDecoder::DecodeParser (const unsigned char* kpSrc,
 
   if (!m_pDecContext->bFramePending && m_pDecContext->pParserBsInfo->iNalNum) {
     memcpy (pDstInfo, m_pDecContext->pParserBsInfo, sizeof (SParserBsInfo));
+
+    if (m_pDecContext->iErrorCode == ERR_NONE) { //update statistics: decoding frame count
+      m_pDecContext->sDecoderStatistics.uiDecodedFrameCount++;
+      if (m_pDecContext->sDecoderStatistics.uiDecodedFrameCount == 0) { //exceed max value of uint32_t
+        ResetDecStatNums (&m_pDecContext->sDecoderStatistics);
+        m_pDecContext->sDecoderStatistics.uiDecodedFrameCount++;
+      }
+    }
   }
 
   m_pDecContext->bInstantDecFlag = false; //reset no-delay flag
@@ -753,6 +748,8 @@ DECODING_STATE CWelsDecoder::DecodeParser (const unsigned char* kpSrc,
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "decode failed, failure type:%d \n", m_pDecContext->iErrorCode);
     m_pDecContext->bPrintFrameErrorTraceFlag = false;
   }
+  iEnd = WelsTime();
+  m_pDecContext->dDecTime += (iEnd - iStart) / 1e3;
 
   return (DECODING_STATE) m_pDecContext->iErrorCode;
 }
