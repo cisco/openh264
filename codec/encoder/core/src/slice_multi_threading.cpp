@@ -522,6 +522,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
   int32_t iSliceSize            = 0;
   int32_t iSliceIdx             = -1;
   int32_t iThreadIdx            = -1;
+  int32_t iSlcBuffIdx           = -1;
   int32_t iEventIdx             = -1;
   bool bNeedPrefix              = false;
   EWelsNalUnitType eNalType     = NAL_UNIT_UNSPEC_0;
@@ -532,8 +533,8 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
     WELS_THREAD_ROUTINE_RETURN (1);
 
   pEncPEncCtx   = (sWelsEncCtx*)pPrivateData->pWelsPEncCtx;
-
   iThreadIdx    = pPrivateData->iThreadIndex;
+  iSlcBuffIdx   = iThreadIdx;
   iEventIdx     = iThreadIdx;
 
   pEventsList[iEventCount++] = pEncPEncCtx->pSliceThreading->pReadySliceCodingEvent[iEventIdx];
@@ -569,7 +570,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
         int64_t iSliceStart = 0;
         bool bDsaFlag = false;
         iSliceIdx     = pPrivateData->iSliceIndex;
-        pSlice        = &pCurDq->sSliceThreadInfo[iThreadIdx].pSliceInThread[iSliceIdx];
+        pSlice        = &pCurDq->sSliceBufferInfo[iSlcBuffIdx].pSliceBuffer[iSliceIdx];
         pSliceBs      = &pSlice->sSliceBs;
 
         bDsaFlag = ((pParamD->sSliceArgument.uiSliceMode == SM_FIXEDSLCNUM_SLICE) &&
@@ -675,7 +676,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
         int32_t iAnyMbLeftInPartition           = kiEndMbIdxInPartition - kiFirstMbInPartition + 1;
         SSpatialLayerInternal *pParamInternal   = &pCodingParam->sDependencyLayers[kiCurDid];
         iSliceIdx                               = pPrivateData->iSliceIndex;
-        SSlice* pStartSlice                     = &pCurDq->sSliceThreadInfo[iThreadIdx].pSliceInThread[iSliceIdx];
+        SSlice* pStartSlice                     = &pCurDq->sSliceBufferInfo[iSlcBuffIdx].pSliceBuffer[iSliceIdx];
         pStartSlice->sSliceHeaderExt.sSliceHeader.iFirstMbInSlice = kiFirstMbInPartition;
         while (iAnyMbLeftInPartition > 0) {
           if (iSliceIdx >= pCurDq->iMaxSliceNum) {
@@ -690,7 +691,7 @@ WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg) {
                                           pEncPEncCtx->pSliceThreading->pSliceCodedMasterEvent,
                                           iEventIdx);
           }
-          pSlice                = &pCurDq->sSliceThreadInfo[iThreadIdx].pSliceInThread[iSliceIdx];
+          pSlice                = &pCurDq->sSliceBufferInfo[iSlcBuffIdx].pSliceBuffer[iSliceIdx];
           pSliceBs              = &pSlice->sSliceBs;
           pSliceBs->uiBsPos     = 0;
           pSliceBs->iNalIndex   = 0;
@@ -984,9 +985,9 @@ void TrackSliceConsumeTime (sWelsEncCtx* pCtx, int32_t* pDidList, const int32_t 
 }
 #endif//#if defined(MT_DEBUG)
 
-void SetOneSliceBsBufferUnderMultithread (sWelsEncCtx* pCtx, const int32_t kiThreadIdx, SSlice* pSlice) {
+void SetOneSliceBsBufferUnderMultithread (sWelsEncCtx* pCtx, const int32_t kiBuffIdx, SSlice* pSlice) {
   SWelsSliceBs* pSliceBs  = &pSlice->sSliceBs;
-  pSliceBs->pBsBuffer     = pCtx->pSliceThreading->pThreadBsBuffer[kiThreadIdx];
+  pSliceBs->pBsBuffer     = pCtx->pSliceThreading->pThreadBsBuffer[kiBuffIdx];
   pSliceBs->uiBsPos       = 0;
 }
 }

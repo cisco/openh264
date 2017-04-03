@@ -87,7 +87,7 @@ class CWelsSliceEncodingTask : public CWelsBaseTask {
   SWelsSliceBs* m_pSliceBs;
   int32_t m_iSliceIdx;
   int32_t m_iSliceSize;
-  int32_t m_iThreadIdx;
+  int32_t m_iBufferIdx;
 };
 
 class CWelsLoadBalancingSlicingEncodingTask : public CWelsSliceEncodingTask {

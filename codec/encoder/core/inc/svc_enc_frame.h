@@ -68,12 +68,11 @@ uint8_t uiFMEGoodFrameCount;
 int32_t iHighFreMbCount;
 } SFeatureSearchPreparation; //maintain only one
 
-typedef struct TagSliceThreadInfo {
-SSlice*                 pSliceInThread;// slice buffer for multi thread,
-                                       // pSliceInThread[0] for single thread
+typedef struct TagSliceBufferInfo {
+SSlice*                 pSliceBuffer;  // slice buffer for multi thread,
 int32_t                 iMaxSliceNum;
 int32_t                 iCodedSliceNum;
-}SSliceThreadInfo;
+}SSliceBufferInfo;
 
 typedef struct TagLayerInfo {
 SNalUnitHeaderExt       sNalHeaderExt;
@@ -84,7 +83,7 @@ SWelsPPS*               pPpsP;          // current pPps used
 /* Layer Representation */
 struct TagDqLayer {
 SLayerInfo              sLayerInfo;
-SSliceThreadInfo        sSliceThreadInfo[MAX_THREADS_NUM];
+SSliceBufferInfo        sSliceBufferInfo[MAX_THREADS_NUM];
 SSlice**                ppSliceInLayer;
 SSliceCtx               sSliceEncCtx;   // current slice context
 uint8_t*                pCsData[3];     // pointer to reconstructed picture pData
@@ -112,6 +111,8 @@ SPicture*               pRefPic;        // reference picture pointer
 SPicture*               pDecPic;        // reconstruction picture pointer for layer
 SPicture*               pRefOri[MAX_REF_PIC_COUNT];
 
+bool                    bThreadSlcBufferFlag;
+bool                    bSliceBsBufferFlag;
 int32_t                 iMaxSliceNum;
 int32_t                 NumSliceCodedOfPartition[MAX_THREADS_NUM];      // for dynamic slicing mode
 int32_t                 LastCodedMbIdxOfPartition[MAX_THREADS_NUM];     // for dynamic slicing mode

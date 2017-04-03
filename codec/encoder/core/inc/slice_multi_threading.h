@@ -96,7 +96,7 @@ void TrackSliceComplexities (sWelsEncCtx* pCtx, const int32_t kiCurDid);
 void TrackSliceConsumeTime (sWelsEncCtx* pCtx, int32_t* pDidList, const int32_t kiSpatialNum);
 #endif//defined(MT_DEBUG)
 
-void SetOneSliceBsBufferUnderMultithread(sWelsEncCtx* pCtx, const int32_t kiThreadIdx, SSlice* pSlice);
+void SetOneSliceBsBufferUnderMultithread(sWelsEncCtx* pCtx, const int32_t kiBuffIdx, SSlice* pSlice);
 int32_t WriteSliceBs (sWelsEncCtx* pCtx,SWelsSliceBs* pSliceBs,const int32_t iSliceIdx,int32_t& iSliceSize);
 }
 

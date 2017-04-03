@@ -107,18 +107,18 @@ void InitSliceHeadWithBase (SSlice* pSlice, SSlice* pBaseSlice);
 
 void InitSliceRefInfoWithBase (SSlice* pSlice, SSlice* pBaseSlice, const uint8_t kuiRefCount);
 
-int32_t InitSliceList (sWelsEncCtx* pCtx,
-                       SDqLayer* pDqLayer,
-                       SSlice*& pSliceList,
+int32_t InitSliceList (SSlice*& pSliceList,
+                       SBitStringAux* pBsWrite,
                        const int32_t kiMaxSliceNum,
-                       const int32_t kiDlayerIndex,
+                       const int32_t kiMaxSliceBufferSize,
+                       const bool bIndependenceBsBuffer,
                        CMemoryAlign* pMa);
 
 int32_t InitAllSlicesInThread (sWelsEncCtx* pCtx);
 
 int32_t InitOneSliceInThread (sWelsEncCtx* pCtx,
                               SSlice*& pSlice,
-                              const int32_t kiThreadIdx,
+                              const int32_t kiSlcBuffIdx,
                               const int32_t kiDlayerIdx,
                               const int32_t kiSliceIdx);
 
@@ -136,7 +136,7 @@ int32_t ReallocateSliceList (sWelsEncCtx* pCtx,
 int32_t ReallocateSliceInThread (sWelsEncCtx* pCtx,
                                  SDqLayer* pDqLayer,
                                  const int32_t kiDlayerIdx,
-                                 const int32_t kiThreadIndex);
+                                 const int32_t KiSlcBuffIdx);
 
 int32_t ReallocSliceBuffer (sWelsEncCtx* pCtx);
 
@@ -147,6 +147,10 @@ int32_t FrameBsRealloc (sWelsEncCtx* pCtx,
                         SFrameBSInfo* pFrameBsInfo,
                         SLayerBSInfo* pLayerBsInfo,
                         const int32_t kiMaxSliceNumOld);
+
+int32_t ReOrderSliceInLayer(sWelsEncCtx* pCtx,
+                            const SliceModeEnum kuiSliceMode,
+                            const int32_t kiThreadNum);
 
 int32_t SliceLayerInfoUpdate (sWelsEncCtx* pCtx,
                               SFrameBSInfo* pFrameBsInfo,
