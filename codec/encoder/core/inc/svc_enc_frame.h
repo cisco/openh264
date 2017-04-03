@@ -69,11 +69,10 @@ int32_t iHighFreMbCount;
 } SFeatureSearchPreparation; //maintain only one
 
 typedef struct TagSliceThreadInfo {
-SSlice*                 pSliceInThread[MAX_THREADS_NUM];// slice buffer for multi thread,
-                                                        // pSliceInThread[0] for single thread
-                                                        // will not alloated when multi thread is off
-int32_t                 iMaxSliceNumInThread[MAX_THREADS_NUM];
-int32_t                 iEncodedSliceNumInThread[MAX_THREADS_NUM];
+SSlice*                 pSliceInThread;// slice buffer for multi thread,
+                                       // pSliceInThread[0] for single thread
+int32_t                 iMaxSliceNum;
+int32_t                 iCodedSliceNum;
 }SSliceThreadInfo;
 
 typedef struct TagLayerInfo {
@@ -85,7 +84,7 @@ SWelsPPS*               pPpsP;          // current pPps used
 /* Layer Representation */
 struct TagDqLayer {
 SLayerInfo              sLayerInfo;
-SSliceThreadInfo        sSliceThreadInfo;
+SSliceThreadInfo        sSliceThreadInfo[MAX_THREADS_NUM];
 SSlice**                ppSliceInLayer;
 SSliceCtx               sSliceEncCtx;   // current slice context
 uint8_t*                pCsData[3];     // pointer to reconstructed picture pData
@@ -114,10 +113,10 @@ SPicture*               pDecPic;        // reconstruction picture pointer for la
 SPicture*               pRefOri[MAX_REF_PIC_COUNT];
 
 int32_t                 iMaxSliceNum;
-int32_t*                pNumSliceCodedOfPartition;      // for dynamic slicing mode
-int32_t*                pLastCodedMbIdxOfPartition;     // for dynamic slicing mode
-int32_t*                pFirstMbIdxOfPartition;         // for dynamic slicing mode
-int32_t*                pEndMbIdxOfPartition;           // for dynamic slicing mode
+int32_t                 NumSliceCodedOfPartition[MAX_THREADS_NUM];      // for dynamic slicing mode
+int32_t                 LastCodedMbIdxOfPartition[MAX_THREADS_NUM];     // for dynamic slicing mode
+int32_t                 FirstMbIdxOfPartition[MAX_THREADS_NUM];         // for dynamic slicing mode
+int32_t                 EndMbIdxOfPartition[MAX_THREADS_NUM];           // for dynamic slicing mode
 int32_t*                pFirstMbIdxOfSlice;
 int32_t*                pCountMbNumInSlice;
 
@@ -126,7 +125,6 @@ bool                    bNeedAdjustingSlicing;
 SFeatureSearchPreparation* pFeatureSearchPreparation;
 
 SDqLayer*               pRefLayer;              // pointer to referencing dq_layer of current layer to be decoded
-
 };
 
 ///////////////////////////////////////////////////////////////////////

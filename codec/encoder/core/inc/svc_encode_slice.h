@@ -84,7 +84,9 @@ int32_t WelsISliceMdEncDynamic (sWelsEncCtx* pEncCtx, SSlice* pSlice);  // for i
 int32_t AllocMbCacheAligned (SMbCache* pMbCache, CMemoryAlign* pMa);
 void FreeMbCache (SMbCache* pMbCache, CMemoryAlign* pMa);
 
-int32_t InitSliceBoundaryInfo (SDqLayer* pCurLayer, SSliceArgument* pSliceArgument);
+int32_t InitSliceBoundaryInfo (SDqLayer* pCurLayer,
+                               SSliceArgument* pSliceArgument,
+                               const int32_t kiSliceNumInFrame);
 
 int32_t SetSliceBoundaryInfo(SDqLayer* pCurLayer, SSlice* pSlice, const int32_t kiSliceIdx);
 
@@ -112,6 +114,8 @@ int32_t InitSliceList (sWelsEncCtx* pCtx,
                        const int32_t kiDlayerIndex,
                        CMemoryAlign* pMa);
 
+int32_t InitAllSlicesInThread (sWelsEncCtx* pCtx);
+
 int32_t InitOneSliceInThread (sWelsEncCtx* pCtx,
                               SSlice*& pSlice,
                               const int32_t kiThreadIdx,
@@ -136,7 +140,18 @@ int32_t ReallocateSliceInThread (sWelsEncCtx* pCtx,
 
 int32_t ReallocSliceBuffer (sWelsEncCtx* pCtx);
 
-int32_t SliceLayerInfoUpdate (sWelsEncCtx* pCtx);
+int32_t GetCurLayerNalCount(const SDqLayer* pCurDq, const int32_t kiCodedSliceNum);
+int32_t GetTotalCodedNalCount(SFrameBSInfo* pFbi);
+
+int32_t FrameBsRealloc (sWelsEncCtx* pCtx,
+                        SFrameBSInfo* pFrameBsInfo,
+                        SLayerBSInfo* pLayerBsInfo,
+                        const int32_t kiMaxSliceNumOld);
+
+int32_t SliceLayerInfoUpdate (sWelsEncCtx* pCtx,
+                              SFrameBSInfo* pFrameBsInfo,
+                              SLayerBSInfo* pLayerBsInfo,
+                              const SliceModeEnum kuiSliceMode);
 
 //slice encoding process
 int32_t WelsCodePSlice (sWelsEncCtx* pEncCtx, SSlice* pSlice);
