@@ -108,7 +108,6 @@ void InitSliceHeadWithBase (SSlice* pSlice, SSlice* pBaseSlice);
 void InitSliceRefInfoWithBase (SSlice* pSlice, SSlice* pBaseSlice, const uint8_t kuiRefCount);
 
 int32_t InitSliceList (sWelsEncCtx* pCtx,
-                       SDqLayer* pDqLayer,
                        SSlice*& pSliceList,
                        const int32_t kiMaxSliceNum,
                        const int32_t kiDlayerIndex,
@@ -147,6 +146,10 @@ int32_t FrameBsRealloc (sWelsEncCtx* pCtx,
                         SFrameBSInfo* pFrameBsInfo,
                         SLayerBSInfo* pLayerBsInfo,
                         const int32_t kiMaxSliceNumOld);
+
+int32_t ReOrderSliceInLayer(sWelsEncCtx* pCtx,
+                            const SliceModeEnum kuiSliceMode,
+                            const int32_t kiThreadNum);
 
 int32_t SliceLayerInfoUpdate (sWelsEncCtx* pCtx,
                               SFrameBSInfo* pFrameBsInfo,
