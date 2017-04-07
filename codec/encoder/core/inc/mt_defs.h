@@ -74,8 +74,6 @@ WELS_EVENT                      pSliceCodedMasterEvent; // events for signalling
 WELS_EVENT                      pReadySliceCodingEvent[MAX_THREADS_NUM];        // events for slice coding ready, [iThreadIdx]
 WELS_EVENT                      pUpdateMbListEvent[MAX_THREADS_NUM];            // signal to update mb list neighbor for various slices
 WELS_EVENT                      pFinUpdateMbListEvent[MAX_THREADS_NUM]; // signal to indicate finish updating mb list
-WELS_EVENT                      pExitEncodeEvent[MAX_THREADS_NUM];                      // event for exit encoding event
-WELS_EVENT                      pThreadMasterEvent[MAX_THREADS_NUM];    // event for indicating that some event has been signalled to the thread
 
 WELS_MUTEX                      mutexSliceNumUpdate;    // for dynamic slicing mode MT
 

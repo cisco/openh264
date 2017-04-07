@@ -74,13 +74,6 @@ int32_t AppendSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, const int32
 WELS_THREAD_ROUTINE_TYPE UpdateMbListThreadProc (void* arg);
 #endif//!_WIN32
 
-WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg);
-
-int32_t CreateSliceThreads (sWelsEncCtx* pCtx);
-
-int32_t FiredSliceThreads (sWelsEncCtx* pCtx, SSliceThreadPrivateData* pPriData, WELS_EVENT* pEventsList,
-                           WELS_EVENT* pMasterEventsList, SFrameBSInfo* pFrameBsInfo, const uint32_t kuiNumThreads);
-
 int32_t DynamicDetectCpuCores();
 
 
