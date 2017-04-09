@@ -2238,8 +2238,7 @@ void WelsUninitEncoderExt (sWelsEncCtx** ppCtx) {
     while (iThreadIdx < iThreadCount) {
       int res = 0;
       if ((*ppCtx)->pSliceThreading->pThreadHandles[iThreadIdx]) {
-        WelsEventSignal (& (*ppCtx)->pSliceThreading->pExitEncodeEvent[iThreadIdx]);
-        WelsEventSignal (& (*ppCtx)->pSliceThreading->pThreadMasterEvent[iThreadIdx]);
+
         res = WelsThreadJoin ((*ppCtx)->pSliceThreading->pThreadHandles[iThreadIdx]); // waiting thread exit
         WelsLog (& (*ppCtx)->sLogCtx, WELS_LOG_INFO, "WelsUninitEncoderExt(), pthread_join(pThreadHandles%d) return %d..",
                  iThreadIdx,
@@ -3749,24 +3748,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       else if ((SM_SIZELIMITED_SLICE == pParam->sSliceArgument.uiSliceMode) && (pSvcParam->iMultipleThreadIdc > 1)) {
         const int32_t kiPartitionCnt = pCtx->iActiveThreadsNum;
 
-#if 0 //TODO: temporarily use this to keep old codes for a while, will remove old codes later
-        int32_t iRet = 0;
-        // to fire slice coding threads
-        iRet = FiredSliceThreads (pCtx, &pCtx->pSliceThreading->pThreadPEncCtx[0],
-                                  &pCtx->pSliceThreading->pReadySliceCodingEvent[0],
-                                  &pCtx->pSliceThreading->pThreadMasterEvent[0],
-                                  pFbi, kiPartitionCnt);
-        if (iRet) {
-          WelsLog (pLogCtx, WELS_LOG_ERROR,
-                   "[MT] WelsEncoderEncodeExt(), FiredSliceThreads return(%d) failed and exit encoding frame, iSliceCount= %d, uiSliceMode= %d, iMultipleThreadIdc= %d!!",
-                   iRet, iSliceCount, pParam->sSliceArgument.uiSliceMode, pSvcParam->iMultipleThreadIdc);
-          return ENC_RETURN_UNEXPECTED;
-        }
-
-        WelsMultipleEventsWaitAllBlocking (kiPartitionCnt, &pCtx->pSliceThreading->pSliceCodedEvent[0],
-                                           &pCtx->pSliceThreading->pSliceCodedMasterEvent);
-        WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
-#else
         //TODO: use a function to remove duplicate code here and ln3994
         int32_t iLayerBsIdx       = pCtx->pOut->iLayerBsIndex;
         SLayerBSInfo* pLbi        = &pFbi->sLayerInfo[iLayerBsIdx];
@@ -3800,7 +3781,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
                    pParam->sSliceArgument.uiSliceMode, pCtx->iEncoderError);
           return pCtx->iEncoderError;
         }
-#endif
+
         iRet = SliceLayerInfoUpdate (pCtx, pFbi, pLayerBsInfo, pParam->sSliceArgument.uiSliceMode);
         if (iRet) {
           WelsLog (pLogCtx, WELS_LOG_ERROR,

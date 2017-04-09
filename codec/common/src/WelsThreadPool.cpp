@@ -94,7 +94,7 @@ CWelsThreadPool* CWelsThreadPool::AddReference() {
     }
   }
 
-  //fprintf(stdout, "m_iRefCount=%d, pSink=%x, iMaxThreadNum=%d\n", m_iRefCount, pSink, iMaxThreadNum);
+  //fprintf(stdout, "m_iRefCount=%d, iMaxThreadNum=%d\n", m_iRefCount, m_iMaxThreadNum);
 
   ++ m_iRefCount;
   //fprintf(stdout, "m_iRefCount2=%d\n", m_iRefCount);
@@ -134,10 +134,10 @@ WELS_THREAD_ERROR_CODE CWelsThreadPool::OnTaskStop (CWelsTaskThread* pThread, IW
 
   RemoveThreadFromBusyList (pThread);
   AddThreadToIdleQueue (pThread);
-  //fprintf(stdout, "CWelsThreadPool::OnTaskStop 1: Task %x at Thread %x Finished, m_pSink=%x\n", pTask, pThread, m_pSink);
 
   if (pTask->GetSink()) {
     pTask->GetSink()->OnTaskExecuted();
+    //fprintf(stdout, "CWelsThreadPool::OnTaskStop 1: Task %x at Thread %x Finished, m_pSink=%x\n", pTask, pThread, pTask->GetSink());
   }
   //if (m_pSink) {
   //  m_pSink->OnTaskExecuted (pTask);
@@ -328,7 +328,6 @@ int32_t  CWelsThreadPool::GetIdleThreadNum() {
 }
 
 int32_t  CWelsThreadPool::GetWaitedTaskNum() {
-  //fprintf(stdout, "CWelsThreadPool::m_cWaitedTasks=%d\n", m_cWaitedTasks->size());
   return m_cWaitedTasks->size();
 }
 
