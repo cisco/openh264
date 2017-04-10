@@ -1284,7 +1284,7 @@ int32_t CalculateNewSliceNum (sWelsEncCtx* pCtx,
     return ENC_RETURN_SUCCESS;
   }
 
-  int32_t iPartitionID     = pLastCodedSlice->iSliceIdx / pCtx->iActiveThreadsNum;
+  int32_t iPartitionID     = pLastCodedSlice->iSliceIdx % pCtx->iActiveThreadsNum;
   int32_t iMBNumInPatition = pCtx->pCurDqLayer->EndMbIdxOfPartition[iPartitionID]
                              - pCtx->pCurDqLayer->FirstMbIdxOfPartition[iPartitionID] + 1;
   int32_t iLeftMBNum       = pCtx->pCurDqLayer->EndMbIdxOfPartition[iPartitionID]
@@ -1292,6 +1292,7 @@ int32_t CalculateNewSliceNum (sWelsEncCtx* pCtx,
   int32_t iIncreaseSlicNum = (iLeftMBNum * INT_MULTIPLY / iMBNumInPatition) * iMaxSliceNumOld;
 
   iIncreaseSlicNum  = ( 0 == (iIncreaseSlicNum / INT_MULTIPLY) ) ? 1 : (iIncreaseSlicNum / INT_MULTIPLY);
+  iIncreaseSlicNum  = (iIncreaseSlicNum < iMaxSliceNumOld / 2) ? (iMaxSliceNumOld / 2) : iIncreaseSlicNum;
   iMaxSliceNumNew   = iMaxSliceNumOld + iIncreaseSlicNum;
 
   return ENC_RETURN_SUCCESS;
@@ -1302,9 +1303,10 @@ int32_t ReallocateSliceInThread (sWelsEncCtx* pCtx,
                                  const int32_t kiDlayerIdx,
                                  const int32_t KiSlcBuffIdx) {
   int32_t iMaxSliceNum    = pDqLayer->sSliceBufferInfo[KiSlcBuffIdx].iMaxSliceNum;
+  int32_t iCodedSliceNum  = pDqLayer->sSliceBufferInfo[KiSlcBuffIdx].iCodedSliceNum;
   int32_t iMaxSliceNumNew = 0;
   int32_t iRet            = 0;
-  SSlice* pLastCodedSlice = &pDqLayer->sSliceBufferInfo[KiSlcBuffIdx].pSliceBuffer [iMaxSliceNum - 1];
+  SSlice* pLastCodedSlice = &pDqLayer->sSliceBufferInfo[KiSlcBuffIdx].pSliceBuffer [iCodedSliceNum - 1];
   SSliceArgument* pSliceArgument = & pCtx->pSvcParam->sSpatialLayers[kiDlayerIdx].sSliceArgument;
 
   iRet = CalculateNewSliceNum (pCtx,
