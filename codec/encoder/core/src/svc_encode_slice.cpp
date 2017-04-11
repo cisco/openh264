@@ -1292,6 +1292,7 @@ int32_t CalculateNewSliceNum (sWelsEncCtx* pCtx,
   int32_t iIncreaseSlicNum = (iLeftMBNum * INT_MULTIPLY / iMBNumInPatition) * iMaxSliceNumOld;
 
   iIncreaseSlicNum  = ( 0 == (iIncreaseSlicNum / INT_MULTIPLY) ) ? 1 : (iIncreaseSlicNum / INT_MULTIPLY);
+  iIncreaseSlicNum  = (iIncreaseSlicNum < iMaxSliceNumOld / 2) ? (iMaxSliceNumOld / 2) : iIncreaseSlicNum;
   iMaxSliceNumNew   = iMaxSliceNumOld + iIncreaseSlicNum;
 
   return ENC_RETURN_SUCCESS;
