@@ -57,18 +57,10 @@ comp_ds_bilinear_loop0:
 
     vld1.8 {q0,q1}, [r2]!
     vld1.8 {q2,q3}, [r7]!
-    vpaddl.u8   q0, q0
-    vpaddl.u8   q1, q1
-    vpaddl.u8   q2, q2
-    vpaddl.u8   q3, q3
-    vrshr.u16   q0, #1
-    vrshr.u16   q1, #1
-    vrshr.u16   q2, #1
-    vrshr.u16   q3, #1
-    vrhadd.u16 q0, q2
-    vrhadd.u16 q1, q3
-    vmovn.u16   d0, q0
-    vmovn.u16   d1, q1
+    vrhadd.u8 q0, q0, q2
+    vrhadd.u8 q1, q1, q3
+    vuzp.8 q0, q1
+    vrhadd.u8 q0, q0, q1
     vst1.32 {q0},   [r0]!
     add lr, #32
 
@@ -196,19 +188,10 @@ comp_ds_bilinear_w_x32_loop1:
 
     vld1.8 {q0,q1}, [r2]!
     vld1.8 {q2,q3}, [r7]!
-    vpaddl.u8   q0, q0
-    vpaddl.u8   q1, q1
-    vpaddl.u8   q2, q2
-    vpaddl.u8   q3, q3
-    vrshr.u16   q0, #1
-    vrshr.u16   q1, #1
-    vrshr.u16   q2, #1
-    vrshr.u16   q3, #1
-    vrhadd.u16 q0, q2
-    vrhadd.u16 q1, q3
-
-    vmovn.u16   d0, q0
-    vmovn.u16   d1, q1
+    vrhadd.u8 q0, q0, q2
+    vrhadd.u8 q1, q1, q3
+    vuzp.8 q0, q1
+    vrhadd.u8 q0, q0, q1
     vst1.32 {q0},   [r0]!
     subs r6, #1
     bne comp_ds_bilinear_w_x32_loop1

@@ -51,19 +51,12 @@ comp_ds_bilinear_loop0:
 
     ld1     {v0.16b, v1.16b}, [x2], #32
     ld1     {v2.16b, v3.16b}, [x7], #32
-    uaddlp  v0.8h, v0.16b
-    uaddlp  v1.8h, v1.16b
-    uaddlp  v2.8h, v2.16b
-    uaddlp  v3.8h, v3.16b
-    urshr   v0.8h, v0.8h, #1
-    urshr   v1.8h, v1.8h, #1
-    urshr   v2.8h, v2.8h, #1
-    urshr   v3.8h, v3.8h, #1
-    urhadd  v0.8h, v0.8h, v2.8h
-    urhadd  v1.8h, v1.8h, v3.8h
-    xtn     v0.8b, v0.8h
-    xtn     v1.8b, v1.8h
-    st1     {v0.8b, v1.8b}, [x0], #16
+    urhadd  v0.16b, v0.16b, v2.16b
+    urhadd  v1.16b, v1.16b, v3.16b
+    uzp1    v2.16b, v0.16b, v1.16b
+    uzp2    v3.16b, v0.16b, v1.16b
+    urhadd  v2.16b, v2.16b, v3.16b
+    st1     {v2.16b}, [x0], #16
     add     w9, w9, #32
 
     cmp     w9, w4
@@ -99,19 +92,12 @@ comp_ds_bilinear_w_x32_loop1:
 
     ld1     {v0.16b, v1.16b}, [x2], #32
     ld1     {v2.16b, v3.16b}, [x7], #32
-    uaddlp  v0.8h, v0.16b
-    uaddlp  v1.8h, v1.16b
-    uaddlp  v2.8h, v2.16b
-    uaddlp  v3.8h, v3.16b
-    urshr   v0.8h, v0.8h, #1
-    urshr   v1.8h, v1.8h, #1
-    urshr   v2.8h, v2.8h, #1
-    urshr   v3.8h, v3.8h, #1
-    urhadd  v0.8h, v0.8h, v2.8h
-    urhadd  v1.8h, v1.8h, v3.8h
-    xtn     v0.8b, v0.8h
-    xtn     v1.8b, v1.8h
-    st1     {v0.8b, v1.8b}, [x0], #16
+    urhadd  v0.16b, v0.16b, v2.16b
+    urhadd  v1.16b, v1.16b, v3.16b
+    uzp1    v2.16b, v0.16b, v1.16b
+    uzp2    v3.16b, v0.16b, v1.16b
+    urhadd  v2.16b, v2.16b, v3.16b
+    st1     {v2.16b}, [x0], #16
 
     sub     w6, w6, #1
     cbnz    w6, comp_ds_bilinear_w_x32_loop1
