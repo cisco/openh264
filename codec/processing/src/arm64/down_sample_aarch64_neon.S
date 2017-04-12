@@ -51,11 +51,13 @@ comp_ds_bilinear_loop0:
 
     ld1     {v0.16b, v1.16b}, [x2], #32
     ld1     {v2.16b, v3.16b}, [x7], #32
-    urhadd  v0.16b, v0.16b, v2.16b
-    urhadd  v1.16b, v1.16b, v3.16b
-    uzp1    v2.16b, v0.16b, v1.16b
-    uzp2    v3.16b, v0.16b, v1.16b
-    urhadd  v2.16b, v2.16b, v3.16b
+    uzp1    v4.16b, v0.16b, v1.16b
+    uzp2    v5.16b, v0.16b, v1.16b
+    uzp1    v6.16b, v2.16b, v3.16b
+    uzp2    v7.16b, v2.16b, v3.16b
+    urhadd  v0.16b, v4.16b, v5.16b
+    urhadd  v1.16b, v6.16b, v7.16b
+    urhadd  v2.16b, v0.16b, v1.16b
     st1     {v2.16b}, [x0], #16
     add     w9, w9, #32
 
@@ -92,11 +94,13 @@ comp_ds_bilinear_w_x32_loop1:
 
     ld1     {v0.16b, v1.16b}, [x2], #32
     ld1     {v2.16b, v3.16b}, [x7], #32
-    urhadd  v0.16b, v0.16b, v2.16b
-    urhadd  v1.16b, v1.16b, v3.16b
-    uzp1    v2.16b, v0.16b, v1.16b
-    uzp2    v3.16b, v0.16b, v1.16b
-    urhadd  v2.16b, v2.16b, v3.16b
+    uzp1    v4.16b, v0.16b, v1.16b
+    uzp2    v5.16b, v0.16b, v1.16b
+    uzp1    v6.16b, v2.16b, v3.16b
+    uzp2    v7.16b, v2.16b, v3.16b
+    urhadd  v0.16b, v4.16b, v5.16b
+    urhadd  v1.16b, v6.16b, v7.16b
+    urhadd  v2.16b, v0.16b, v1.16b
     st1     {v2.16b}, [x0], #16
 
     sub     w6, w6, #1
