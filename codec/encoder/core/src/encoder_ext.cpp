@@ -4230,6 +4230,14 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
         bNeedReset = true;
         break;
       }
+      if (pOldParam->sSpatialLayers[iIndexD].uiProfileIdc !=
+          pNewParam->sSpatialLayers[iIndexD].uiProfileIdc
+          ||
+          pOldParam->sSpatialLayers[iIndexD].uiLevelIdc !=
+          pNewParam->sSpatialLayers[iIndexD].uiLevelIdc) {
+        bNeedReset = true;
+        break;
+      }
 
       // check frame rate
       // we can not check whether corresponding fFrameRate is equal or not,
