@@ -390,3 +390,63 @@ int SimulateNALLoss (const unsigned char* pSrc,  int& iSrcLen, std::vector<SLost
 }
 
 
+//This case is for one layer only, for incomplete frame input
+//First slice is loss for random one picture with 2 slices per pic
+TEST_F (DecodeParseAPI, ParseOnly_SpecSliceLoss) {
+  int32_t iLayerNum = 1;
+  int32_t iSliceNum = 2;
+  EncodeDecodeFileParamBase p;
+  p.width = iWidth_;
+  p.height = iHeight_;
+  p.frameRate = kiFrameRate;
+  p.numframes = 5;
+  prepareParam (iLayerNum, iSliceNum, p.width, p.height, p.frameRate);
+  param_.iSpatialLayerNum = iLayerNum;
+  encoder_->Uninitialize();
+  int rv = encoder_->InitializeExt (&param_);
+  ASSERT_TRUE (rv == 0);
+  int32_t iTraceLevel = WELS_LOG_QUIET;
+  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+
+  int32_t iMissedPicNum = rand() % (p.numframes - 1) + 1; //IDR no loss
+  //Start for enc
+  int iLen = 0;
+  uint32_t uiGet;
+  prepareEncDecParam (p);
+  int iFrame = 0;
+
+  while (iFrame < p.numframes) {
+    //encode
+    EncodeOneFrame (iFrame);
+    //parseonly
+    if (iFrame == iMissedPicNum) { //make current frame partly missing
+      //Frame: P, first slice loss
+      int32_t iTotalSliceSize = 0;
+      encToDecSliceData (0, 0, info, iTotalSliceSize); //slice 1 lost
+      encToDecSliceData (0, 1, info, iLen); //slice 2
+      decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
+      EXPECT_EQ (uiGet, (uint32_t) ERROR_CON_DISABLE);
+      rv = decoder_->DecodeParser (info.sLayerInfo[0].pBsBuf + iTotalSliceSize, iLen, &BsInfo_);
+      EXPECT_TRUE (rv == 0);
+      EXPECT_TRUE (BsInfo_.iNalNum == 0);
+      rv = decoder_->DecodeParser (NULL, 0, &BsInfo_);
+      EXPECT_TRUE (rv != 0);
+    } else { //normal frame, complete
+      encToDecData (info, iLen);
+      rv = decoder_->DecodeParser (info.sLayerInfo[0].pBsBuf, iLen, &BsInfo_);
+      EXPECT_TRUE (rv == 0); //parse correct
+      EXPECT_TRUE (BsInfo_.iNalNum == 0);
+      rv = decoder_->DecodeParser (NULL, 0, &BsInfo_);
+      if (iFrame < iMissedPicNum) { //correct frames, all OK with output
+        EXPECT_TRUE (rv == 0);
+        EXPECT_TRUE (BsInfo_.iNalNum != 0);
+      } else { //(iFrame > iMissedPicNum), should output nothing as error
+        EXPECT_TRUE (rv != 0);
+        EXPECT_TRUE (BsInfo_.iNalNum == 0);
+      }
+    }
+    iFrame++;
+  } //while
+}
+
