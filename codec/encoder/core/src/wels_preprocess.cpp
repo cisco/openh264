@@ -272,7 +272,7 @@ int32_t CWelsPreProcess::AnalyzeSpatialPic (sWelsEncCtx* pCtx, const int32_t kiD
   int32_t iRefTemporalIdx = (int32_t)g_kuiRefTemporalIdx[pSvcParam->iDecompStages][pParamInternal->iCodingIndex &
                             (pSvcParam->uiGopSize - 1)];
   if (pCtx->uiTemporalId == 0 && pCtx->pLtr[pCtx->uiDependencyId].bReceivedT0LostFlag)
-    iRefTemporalIdx = m_uiSpatialLayersInTemporal[kiDidx] + pCtx->pVaa->uiValidLongTermPicIdx;
+    iRefTemporalIdx = m_uiSpatialLayersInTemporal[kiDidx];
 
   SPicture* pCurPic = m_pSpatialPic[kiDidx][iCurTemporalIdx];
   bool bCalculateVar = (pSvcParam->iRCMode >= RC_BITRATE_MODE && pCtx->eSliceType == I_SLICE);
