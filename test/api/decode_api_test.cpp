@@ -1017,18 +1017,18 @@ TEST_F (DecodeParseAPI, ParseOnly_SpecStatistics) {
       rv = decoder_->GetOption (DECODER_OPTION_LEVEL, &uiLevel);
       ASSERT_TRUE (rv == 0);
 
-      ASSERT_EQ (sDecStat.uiWidth, p.width);
-      ASSERT_EQ (sDecStat.uiHeight, p.height);
-      ASSERT_EQ (sDecStat.uiResolutionChangeTimes, (i + 1));
+      ASSERT_EQ (sDecStat.uiWidth, (unsigned int) p.width);
+      ASSERT_EQ (sDecStat.uiHeight, (unsigned int) p.height);
+      ASSERT_EQ (sDecStat.uiResolutionChangeTimes, (unsigned int) (i + 1));
       EXPECT_EQ (sDecStat.iCurrentActiveSpsId, 0);
       EXPECT_EQ (sDecStat.iCurrentActivePpsId, 0);
-      ASSERT_EQ (sDecStat.uiDecodedFrameCount, iTotalFrmCnt);
+      ASSERT_EQ (sDecStat.uiDecodedFrameCount, (unsigned int) iTotalFrmCnt);
       ASSERT_EQ (sDecStat.uiProfile, uiProfile);
       ASSERT_EQ (sDecStat.uiLevel, uiLevel);
       EXPECT_TRUE (sDecStat.fActualAverageFrameSpeedInMs != 0.);
       EXPECT_TRUE (sDecStat.fAverageFrameSpeedInMs != 0.);
       EXPECT_TRUE (sDecStat.iAvgLumaQp != 0);
-      EXPECT_EQ (sDecStat.uiIDRCorrectNum, (i + 1));
+      EXPECT_EQ (sDecStat.uiIDRCorrectNum, (unsigned int) (i + 1));
     }
     //set next width & height
     p.width += 16;
