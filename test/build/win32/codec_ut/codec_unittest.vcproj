@@ -451,6 +451,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\encoder\EncUT_SliceBufferReallocate.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\encoder\EncUT_SVC_me.cpp"
 				>
 			</File>
