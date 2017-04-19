@@ -191,7 +191,7 @@ int32_t WelsGetNumMbInSlice (SDqLayer* pCurDq, SSlice* pSlice, const int32_t kui
  *  Get slice count for multiple slice segment
  *
  */
-int32_t GetInitialSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, SSliceArgument* pSliceArgument);
+int32_t GetInitialSliceNum (SSliceArgument* pSliceArgument);
 int32_t GetCurrentSliceNum (const SDqLayer* pCurDq);
 SSlice* GetSliceByIndex(sWelsEncCtx* pCtx, const int32_t kiSliceIdc);
 
