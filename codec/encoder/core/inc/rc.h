@@ -181,6 +181,7 @@ int8_t    iTlOfFrames[VGOP_SIZE];
 int32_t   iRemainingWeights;
 int32_t   iFrameDqBits;
 
+bool       bGomRC;
 double*    pGomComplexity;
 int32_t*   pGomForegroundBlockNum;
 int32_t*   pCurrentFrameGomSad;
@@ -261,7 +262,7 @@ PWelsUpdateMaxBrCheckWindowStatusFunc pfWelsUpdateMaxBrWindowStatus;
 PWelsRCPostFrameSkippingFunc    pfWelsRcPostFrameSkipping;
 } SWelsRcFunc;
 
-void RCInitOneSliceInformation(sWelsEncCtx* pEncCtx, SSlice* pSlice);
+void GomRCInitForOneSlice(SSlice* pSlice, const int32_t kiBitsPerMb);
 void CheckFrameSkipBasedMaxbr (sWelsEncCtx* pCtx,const long long uiTimeStamp, int32_t iDidIdx);
 void UpdateBufferWhenFrameSkipped(sWelsEncCtx* pCtx, int32_t iSpatialNum);
 void UpdateMaxBrCheckWindowStatus(sWelsEncCtx* pCtx, int32_t iSpatialNum, const long long uiTimeStamp);
