@@ -1022,11 +1022,15 @@ void ResetDecStatNums (SDecoderStatistics* pDecStat) {
   uint32_t uiHeight = pDecStat->uiHeight;
   int32_t iAvgLumaQp = pDecStat->iAvgLumaQp;
   uint32_t iLogInterval = pDecStat->iStatisticsLogInterval;
+  uint32_t uiProfile = pDecStat->uiProfile;
+  uint32_t uiLevel = pDecStat->uiLevel;
   memset (pDecStat, 0, sizeof (SDecoderStatistics));
   pDecStat->uiWidth = uiWidth;
   pDecStat->uiHeight = uiHeight;
   pDecStat->iAvgLumaQp = iAvgLumaQp;
   pDecStat->iStatisticsLogInterval = iLogInterval;
+  pDecStat->uiProfile = uiProfile;
+  pDecStat->uiLevel = uiLevel;
 }
 
 //update information when freezing occurs, including IDR/non-IDR number
@@ -1049,15 +1053,22 @@ void UpdateDecStatNoFreezingInfo (PWelsDecoderContext pCtx) {
   //update QP info
   int32_t iTotalQp = 0;
   const int32_t kiMbNum = pCurDq->iMbWidth * pCurDq->iMbHeight;
-  int32_t iCorrectMbNum = 0;
-  for (int32_t iMb = 0; iMb < kiMbNum; ++iMb) {
-    iCorrectMbNum += (int32_t) pCurDq->pMbCorrectlyDecodedFlag[iMb];
-    iTotalQp += pCurDq->pLumaQp[iMb] * pCurDq->pMbCorrectlyDecodedFlag[iMb];
+  if (pCtx->pParam->eEcActiveIdc == ERROR_CON_DISABLE) { //all correct
+    for (int32_t iMb = 0; iMb < kiMbNum; ++iMb) {
+      iTotalQp += pCurDq->pLumaQp[iMb];
+    }
+    iTotalQp /= kiMbNum;
+  } else {
+    int32_t iCorrectMbNum = 0;
+    for (int32_t iMb = 0; iMb < kiMbNum; ++iMb) {
+      iCorrectMbNum += (int32_t) pCurDq->pMbCorrectlyDecodedFlag[iMb];
+      iTotalQp += pCurDq->pLumaQp[iMb] * pCurDq->pMbCorrectlyDecodedFlag[iMb];
+    }
+    if (iCorrectMbNum == 0) //non MB is correct, should remain QP statistic info
+      iTotalQp = pDecStat->iAvgLumaQp;
+    else
+      iTotalQp /= iCorrectMbNum;
   }
-  if (iCorrectMbNum == 0) //non MB is correct, should remain QP statistic info
-    iTotalQp = pDecStat->iAvgLumaQp;
-  else
-    iTotalQp /= iCorrectMbNum;
   if (pDecStat->uiDecodedFrameCount + 1 == 0) { //maximum uint32_t reached
     ResetDecStatNums (pDecStat);
     pDecStat->iAvgLumaQp = iTotalQp;
@@ -1068,7 +1079,8 @@ void UpdateDecStatNoFreezingInfo (PWelsDecoderContext pCtx) {
   //update IDR number
   if (pCurDq->sLayerInfo.sNalHeaderExt.bIdrFlag) {
     pDecStat->uiIDRCorrectNum += (pPic->bIsComplete);
-    pDecStat->uiEcIDRNum += (!pPic->bIsComplete);
+    if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE)
+      pDecStat->uiEcIDRNum += (!pPic->bIsComplete);
   }
 }
 

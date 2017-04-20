@@ -72,6 +72,19 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
     }
   }
 
+  const int32_t kiActualWidth = kiWidth - (pCtx->sFrameCrop.iLeftOffset + pCtx->sFrameCrop.iRightOffset) * 2;
+  const int32_t kiActualHeight = kiHeight - (pCtx->sFrameCrop.iTopOffset + pCtx->sFrameCrop.iBottomOffset) * 2;
+
+
+  if (pCtx->pParam->eEcActiveIdc == ERROR_CON_DISABLE) {
+    if ((pCtx->sDecoderStatistics.uiWidth != (unsigned int) kiActualWidth) || (pCtx->sDecoderStatistics.uiHeight != (unsigned int) kiActualHeight)) {
+      pCtx->sDecoderStatistics.uiResolutionChangeTimes++;
+      pCtx->sDecoderStatistics.uiWidth = kiActualWidth;
+      pCtx->sDecoderStatistics.uiHeight = kiActualHeight;
+    }
+    UpdateDecStatNoFreezingInfo (pCtx);
+  }
+
   if (pCtx->pParam->bParseOnly) { //should exit for parse only to prevent access NULL pDstInfo
     PAccessUnit pCurAu = pCtx->pAccessUnitList;
     if (dsErrorFree == pCtx->iErrorCode) { //correct decoding, add to data buffer
@@ -198,8 +211,8 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
 
   pDstInfo->UsrData.sSystemBuffer.iFormat = videoFormatI420;
 
-  pDstInfo->UsrData.sSystemBuffer.iWidth = kiWidth - (pCtx->sFrameCrop.iLeftOffset + pCtx->sFrameCrop.iRightOffset) * 2;
-  pDstInfo->UsrData.sSystemBuffer.iHeight = kiHeight - (pCtx->sFrameCrop.iTopOffset + pCtx->sFrameCrop.iBottomOffset) * 2;
+  pDstInfo->UsrData.sSystemBuffer.iWidth = kiActualWidth;
+  pDstInfo->UsrData.sSystemBuffer.iHeight = kiActualHeight;
   pDstInfo->UsrData.sSystemBuffer.iStride[0] = pPic->iLinesize[0];
   pDstInfo->UsrData.sSystemBuffer.iStride[1] = pPic->iLinesize[1];
   ppDst[0] = ppDst[0] + pCtx->sFrameCrop.iTopOffset * 2 * pPic->iLinesize[0] + pCtx->sFrameCrop.iLeftOffset * 2;
@@ -235,8 +248,15 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
   pCtx->iMbEcedNum = pPic->iMbEcedNum;
   pCtx->iMbNum = pPic->iMbNum;
   pCtx->iMbEcedPropNum = pPic->iMbEcedPropNum;
-  UpdateDecStat (pCtx, pDstInfo->iBufferStatus != 0);
-
+  if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE) {
+    if (pDstInfo->iBufferStatus && ((pCtx->sDecoderStatistics.uiWidth != (unsigned int) kiActualWidth)
+                                    || (pCtx->sDecoderStatistics.uiHeight != (unsigned int) kiActualHeight))) {
+      pCtx->sDecoderStatistics.uiResolutionChangeTimes++;
+      pCtx->sDecoderStatistics.uiWidth = kiActualWidth;
+      pCtx->sDecoderStatistics.uiHeight = kiActualHeight;
+    }
+    UpdateDecStat (pCtx, pDstInfo->iBufferStatus != 0);
+  }
   return ERR_NONE;
 }
 

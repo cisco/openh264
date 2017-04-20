@@ -970,6 +970,79 @@ TEST_F (DecodeParseAPI, ParseOnly_SpecSliceLoss) {
   } //while
 }
 
+TEST_F (DecodeParseAPI, ParseOnly_SpecStatistics) {
+  //set params
+  int32_t iLayerNum = 1;
+  int32_t iSliceNum = 1;
+  EncodeDecodeFileParamBase p;
+  const int iLoopNum = 10;
+  p.frameRate = kiFrameRate;
+  p.numframes = 2;  //encode 2 frames in each test
+  p.width = iWidth_ = 16;
+  p.height = iHeight_ = 16; //default start width/height = 16, will be modified each time
+  int iTotalFrmCnt = 0;
+  for (int i = 0; i < iLoopNum; ++i) {
+    prepareParam (iLayerNum, iSliceNum, p.width, p.height, p.frameRate, &param_);
+    param_.iSpatialLayerNum = iLayerNum;
+    param_.sSpatialLayers[0].iDLayerQp = 40; //to revent size too limited to encoding fail
+    encoder_->Uninitialize();
+    int rv = encoder_->InitializeExt (&param_);
+    ASSERT_TRUE (rv == 0);
+    int32_t iTraceLevel = WELS_LOG_QUIET;
+    rv = encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+    ASSERT_TRUE (rv == 0);
+    rv = decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+    ASSERT_TRUE (rv == 0);
+    //Start for enc
+    int iLen = 0;
+    ASSERT_TRUE (prepareEncDecParam (p));
+    int iFrame = 0;
+    while (iFrame < p.numframes) {
+      EncodeOneFrame (0);
+      encToDecData (info, iLen);
+      iFrame++;
+      iTotalFrmCnt++;
+      rv = decoder_->DecodeParser (info.sLayerInfo[0].pBsBuf, iLen, &BsInfo_);
+      ASSERT_TRUE (rv == 0);
+      ASSERT_TRUE (BsInfo_.iNalNum == 0);
+      rv = decoder_->DecodeParser (NULL, 0, &BsInfo_);
+      ASSERT_TRUE (rv == 0);
+      ASSERT_TRUE (BsInfo_.iNalNum != 0);
+      SDecoderStatistics sDecStat;
+      rv = decoder_->GetOption (DECODER_OPTION_GET_STATISTICS, &sDecStat);
+      ASSERT_TRUE (rv == 0);
+      uint32_t uiProfile, uiLevel;
+      rv = decoder_->GetOption (DECODER_OPTION_PROFILE, &uiProfile);
+      ASSERT_TRUE (rv == 0);
+      rv = decoder_->GetOption (DECODER_OPTION_LEVEL, &uiLevel);
+      ASSERT_TRUE (rv == 0);
+
+      ASSERT_EQ (sDecStat.uiWidth, (unsigned int) p.width);
+      ASSERT_EQ (sDecStat.uiHeight, (unsigned int) p.height);
+      ASSERT_EQ (sDecStat.uiResolutionChangeTimes, (unsigned int) (i + 1));
+      EXPECT_EQ (sDecStat.iCurrentActiveSpsId, 0);
+      EXPECT_EQ (sDecStat.iCurrentActivePpsId, 0);
+      ASSERT_EQ (sDecStat.uiDecodedFrameCount, (unsigned int) iTotalFrmCnt);
+      ASSERT_EQ (sDecStat.uiProfile, uiProfile);
+      ASSERT_EQ (sDecStat.uiLevel, uiLevel);
+      EXPECT_TRUE (sDecStat.fActualAverageFrameSpeedInMs != 0.);
+      EXPECT_TRUE (sDecStat.fAverageFrameSpeedInMs != 0.);
+      EXPECT_TRUE (sDecStat.iAvgLumaQp != 0);
+      EXPECT_EQ (sDecStat.uiIDRCorrectNum, (unsigned int) (i + 1));
+    }
+    //set next width & height
+    p.width += 16;
+    p.height += 16;
+    if ((unsigned int) p.width > kiWidth) //exceeds max frame size
+      p.width = 16;
+    if ((unsigned int) p.height > kiHeight)
+      p.height = 16;
+    iWidth_ = p.width;
+    iHeight_ = p.height;
+  }
+}
+
+
 //Test parseonly crash cases
 class DecodeParseCrashAPI : public DecodeParseAPI {
  public:
@@ -1162,5 +1235,4 @@ TEST_F (DecodeParseCrashAPI, ParseOnlyCrash_General) {
 #endif
 
 }
-
 
