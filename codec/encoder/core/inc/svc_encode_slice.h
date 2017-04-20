@@ -118,7 +118,7 @@ int32_t InitAllSlicesInThread (sWelsEncCtx* pCtx);
 
 int32_t InitOneSliceInThread (sWelsEncCtx* pCtx,
                               SSlice*& pSlice,
-                              const int32_t kiThreadIdx,
+                              const int32_t kiSlcBuffIdx,
                               const int32_t kiDlayerIdx,
                               const int32_t kiSliceIdx);
 
@@ -136,7 +136,7 @@ int32_t ReallocateSliceList (sWelsEncCtx* pCtx,
 int32_t ReallocateSliceInThread (sWelsEncCtx* pCtx,
                                  SDqLayer* pDqLayer,
                                  const int32_t kiDlayerIdx,
-                                 const int32_t kiThreadIndex);
+                                 const int32_t KiSlcBuffIdx);
 
 int32_t ReallocSliceBuffer (sWelsEncCtx* pCtx);
 

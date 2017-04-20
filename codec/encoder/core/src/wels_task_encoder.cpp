@@ -237,13 +237,12 @@ WelsErrorType CWelsConstrainedSizeSlicingEncodingTask::ExecuteTask() {
   const int32_t kiPartitionId             = m_iSliceIdx % kiSliceIdxStep;
   const int32_t kiFirstMbInPartition      = pCurDq->FirstMbIdxOfPartition[kiPartitionId];
   const int32_t kiEndMbIdxInPartition     = pCurDq->EndMbIdxOfPartition[kiPartitionId];
-  const int32_t kiCodedSliceNumByThread   = pCurDq->sSliceThreadInfo[m_iThreadIdx].iCodedSliceNum;
-  m_pSlice                                = &pCurDq->sSliceThreadInfo[m_iThreadIdx].pSliceInThread[kiCodedSliceNumByThread];
+  const int32_t kiCodedSliceNumByThread   = pCurDq->sSliceBufferInfo[m_iThreadIdx].iCodedSliceNum;
+  m_pSlice                                = &pCurDq->sSliceBufferInfo[m_iThreadIdx].pSliceBuffer[kiCodedSliceNumByThread];
   m_pSlice->sSliceHeaderExt.sSliceHeader.iFirstMbInSlice  = kiFirstMbInPartition;
   int32_t iReturn      = 0;
   bool bNeedReallocate = false;
 
-  //deal with partition: TODO: here SSliceThreadPrivateData is just for parition info and actually has little relationship with threadbuffer, and iThreadIndex is not used in threadpool model, need renaming after removing old logic to avoid confusion
   int32_t iDiffMbIdx = kiEndMbIdxInPartition - kiFirstMbInPartition;
   if( 0 == iDiffMbIdx) {
     m_pSlice->iSliceIdx = -1;
@@ -253,8 +252,8 @@ WelsErrorType CWelsConstrainedSizeSlicingEncodingTask::ExecuteTask() {
   int32_t iAnyMbLeftInPartition = iDiffMbIdx + 1;
   int32_t iLocalSliceIdx = m_iSliceIdx;
   while (iAnyMbLeftInPartition > 0) {
-      bNeedReallocate = (pCurDq->sSliceThreadInfo[m_iThreadIdx].iCodedSliceNum
-                         >=  pCurDq->sSliceThreadInfo[m_iThreadIdx].iMaxSliceNum -1) ? true : false;
+      bNeedReallocate = (pCurDq->sSliceBufferInfo[m_iThreadIdx].iCodedSliceNum
+                         >=  pCurDq->sSliceBufferInfo[m_iThreadIdx].iMaxSliceNum -1) ? true : false;
       if (bNeedReallocate) {
           WelsMutexLock (&m_pCtx->pSliceThreading->mutexThreadSlcBuffReallocate);
           //for memory statistic variable
@@ -316,7 +315,7 @@ WelsErrorType CWelsConstrainedSizeSlicingEncodingTask::ExecuteTask() {
 
     iAnyMbLeftInPartition = kiEndMbIdxInPartition - pCurDq->LastCodedMbIdxOfPartition[kiPartitionId];
     iLocalSliceIdx += kiSliceIdxStep;
-    m_pCtx->pCurDqLayer->sSliceThreadInfo[m_iThreadIdx].iCodedSliceNum ++;
+    m_pCtx->pCurDqLayer->sSliceBufferInfo[m_iThreadIdx].iCodedSliceNum ++;
   }
 
   return ENC_RETURN_SUCCESS;
