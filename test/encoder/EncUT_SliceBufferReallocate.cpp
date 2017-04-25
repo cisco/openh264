@@ -211,7 +211,7 @@ void CSliceBufferReallocatTest::InitParam() {
     pCtx->pSvcParam->iMultipleThreadIdc = (pCtx->pSvcParam->iMultipleThreadIdc <= 1 )? 2 : pCtx->pSvcParam->iMultipleThreadIdc;
     pCtx->iActiveThreadsNum = pCtx->pSvcParam->iMultipleThreadIdc;
     pCtx->pSvcParam->iSpatialLayerNum = 1;
-    pCtx->pSvcParam->bSimulcastAVC = (bool)rand() % 2;
+    pCtx->pSvcParam->bSimulcastAVC = rand() % 2 == 1;
 
     pCtx->pSvcParam->iPicHeight = (((rand() % MAX_WIDTH ) >> 4 ) << 4) + 16;
     pCtx->pSvcParam->iPicWidth  = (((rand() % MAX_HEIGH ) >> 4) << 4) + 16;
@@ -321,7 +321,7 @@ void CSliceBufferReallocatTest::InitLayerSliceBuffer(const int32_t iLayerIdx) {
     int32_t iLayerBsSize = 0;
     int32_t iSliceBufferSize = 0;
     int32_t iRet = 0;
-    int32_t iMaxFrameRate = 0.0;
+    int32_t iMaxFrameRate = 0;
 
     pLayerCfg->iVideoWidth  = pCtx->pSvcParam->iPicWidth >> (pCtx->pSvcParam->iSpatialLayerNum -1 - iLayerIdx);
     pLayerCfg->iVideoHeight = pCtx->pSvcParam->iPicHeight >> (pCtx->pSvcParam->iSpatialLayerNum - 1 - iLayerIdx);
@@ -548,7 +548,7 @@ TEST_F(CSliceBufferReallocatTest, FrameBsReallocateTest) {
     pCtx->iPosBsBuffer = rand() % pCtx->iFrameBsSize + 1;
     pLayerBsInfo = &FrameBsInfo.sLayerInfo[iCurLayerIdx];
     pLayerBsInfo->pBsBuf = pCtx->pFrameBs + pCtx->iPosBsBuffer;
-    pCtx->bNeedPrefixNalFlag = rand() % 2;
+    pCtx->bNeedPrefixNalFlag = rand() % 2 == 1;
 
     int32_t iCodedNalCount = pCtx->pOut->iCountNals;
     iRet = FrameBsRealloc(pCtx, &FrameBsInfo, pLayerBsInfo, iCodedNalCount);
@@ -646,7 +646,7 @@ TEST_F(CSliceBufferReallocatTest, LayerInfoUpdateTest) {
     pCtx->iPosBsBuffer = rand() % pCtx->iFrameBsSize + 1;
     pLayerBsInfo = &FrameBsInfo.sLayerInfo[iCurLayerIdx];
     pLayerBsInfo->pBsBuf = pCtx->pFrameBs + pCtx->iPosBsBuffer;
-    pCtx->bNeedPrefixNalFlag = rand() % 2;
+    pCtx->bNeedPrefixNalFlag = rand() % 2 == 1;
 
     iRet = SliceLayerInfoUpdate(pCtx, &FrameBsInfo, pLayerBsInfo,	eSlcMode);
     EXPECT_TRUE(cmResultSuccess == iRet);
