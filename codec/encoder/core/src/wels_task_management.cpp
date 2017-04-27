@@ -195,12 +195,17 @@ void CWelsTaskManageBase::DestroyTasks() {
 }
 
 void  CWelsTaskManageBase::OnTaskMinusOne() {
+  //fprintf(stdout, "OnTaskMinusOne event %x m_iWaitTaskNum=%d\n", &m_hEventMutex, m_iWaitTaskNum);
   WelsCommon::CWelsAutoLock cAutoLock (m_cWaitTaskNumLock);
+  WelsEventSignal (&m_hTaskEvent,&m_hEventMutex, &m_iWaitTaskNum);
+  /*WelsMutexLock(&m_hEventMutex);
   m_iWaitTaskNum --;
+  WelsMutexUnlock(&m_hEventMutex);
+
   if (m_iWaitTaskNum <= 0) {
     WelsEventSignal (&m_hTaskEvent);
-    //fprintf(stdout, "OnTaskMinusOne WelsEventSignal m_iWaitTaskNum=%d\n", m_iWaitTaskNum);
-  }
+    fprintf(stdout, "OnTaskMinusOne WelsEventSignal m_iWaitTaskNum=%d\n", m_iWaitTaskNum);
+  }*/
   //fprintf(stdout, "OnTaskMinusOne m_iWaitTaskNum=%d\n", m_iWaitTaskNum);
 }
 
@@ -228,7 +233,8 @@ WelsErrorType  CWelsTaskManageBase::ExecuteTaskList (TASKLIST_TYPE** pTaskList) 
     m_pThreadPool->QueueTask (pTargetTaskList->getNode (iIdx));
     iIdx ++;
   }
-  WelsEventWait (&m_hTaskEvent, &m_hEventMutex);
+
+  WelsEventWait (&m_hTaskEvent,&m_hEventMutex, m_iWaitTaskNum);
 
   return ENC_RETURN_SUCCESS;
 }

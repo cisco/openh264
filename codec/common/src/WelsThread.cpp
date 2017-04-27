@@ -49,7 +49,7 @@ CWelsThread::CWelsThread() :
 
   WelsEventOpen (&m_hEvent);
   WelsMutexInit(&m_hMutex);
-
+  m_iConVar = 1;
 }
 
 CWelsThread::~CWelsThread() {
@@ -60,13 +60,14 @@ CWelsThread::~CWelsThread() {
 
 void CWelsThread::Thread() {
   while (true) {
-    WelsEventWait (&m_hEvent,&m_hMutex);
+    WelsEventWait (&m_hEvent,&m_hMutex,m_iConVar);
 
     if (GetEndFlag()) {
       break;
     }
 
-    ExecuteTask();
+    m_iConVar = 1;
+    ExecuteTask();//in ExecuteTask there will be OnTaskStop which opens the potential new Signaling of next run, so the setting of m_iConVar = 1 should be before ExecuteTask()
   }
 
   SetRunning (false);
@@ -105,7 +106,7 @@ void CWelsThread::Kill() {
 
   SetEndFlag (true);
 
-  WelsEventSignal (&m_hEvent);
+  WelsEventSignal (&m_hEvent,&m_hMutex,&m_iConVar);
   WelsThreadJoin (m_hThread);
   return;
 }
