@@ -143,7 +143,7 @@ void InitParamForRasterSlcMode (sWelsEncCtx* pCtx, const int32_t iLayerIdx) {
   }
 }
 
-void ParamSetForReallocateTest (sWelsEncCtx* pCtx, int32_t iLayerIdx,
+void SetParamForReallocateTest (sWelsEncCtx* pCtx, int32_t iLayerIdx,
                                 int32_t iThreadIndex, int32_t iPartitionNum) {
   SSpatialLayerConfig* pLayerCfg = &pCtx->pSvcParam->sSpatialLayers[iLayerIdx];
   int32_t iPartitionID = rand() % iPartitionNum;
@@ -457,7 +457,7 @@ TEST_F (CSliceBufferReallocatTest, Reallocate_in_one_partition) {
   int32_t iPartitionNum = rand() % pCtx->iActiveThreadsNum + 1; //include cases which part num less than thread num
   int32_t iSlcBufferNum = pCtx->pCurDqLayer->sSliceBufferInfo[iThreadIndex].iMaxSliceNum;
 
-  ParamSetForReallocateTest (pCtx, iLayerIdx, iThreadIndex, iPartitionNum);
+  SetParamForReallocateTest (pCtx, iLayerIdx, iThreadIndex, iPartitionNum);
   iRet = ReallocateSliceInThread (pCtx, pCtx->pCurDqLayer, iLayerIdx, iThreadIndex);
   EXPECT_TRUE (cmResultSuccess == iRet);
   EXPECT_TRUE (NULL != pCtx->pCurDqLayer->sSliceBufferInfo[iThreadIndex].pSliceBuffer);
@@ -486,7 +486,7 @@ TEST_F (CSliceBufferReallocatTest, Reallocate_in_one_thread) {
   int32_t iPartitionNum = pCtx->iActiveThreadsNum;
   int32_t iSlcBufferNum = 0;
 
-  ParamSetForReallocateTest (pCtx, iLayerIdx, iThreadIndex, iPartitionNum);
+  SetParamForReallocateTest (pCtx, iLayerIdx, iThreadIndex, iPartitionNum);
 
   for (int32_t iPartIdx = 0; iPartIdx < iPartitionNum; iPartIdx++) {
     iSlcBufferNum = pCtx->pCurDqLayer->sSliceBufferInfo[iThreadIndex].iMaxSliceNum;
