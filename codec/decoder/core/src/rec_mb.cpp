@@ -294,8 +294,8 @@ void WeightPrediction (PDqLayer pCurDqLayer, sMCRefMember* pMCRefMem, int32_t iR
 
 
   //UV
-  iBlkWidth = iBlkWidth >> 2;
-  iBlkHeight = iBlkHeight >> 2;
+  iBlkWidth = iBlkWidth >> 1;
+  iBlkHeight = iBlkHeight >> 1;
   iLog2denom = pCurDqLayer->pPredWeightTable->uiChromaLog2WeightDenom;
   iLineStride = pMCRefMem->iDstLineChroma;
 
