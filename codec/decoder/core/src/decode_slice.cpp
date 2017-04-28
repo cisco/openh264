@@ -155,9 +155,6 @@ int32_t WelsMbInterSampleConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLa
   int32_t iMbXy = pCurLayer->iMbXyIndex;
   int32_t i, iIndex, iOffset;
 
-  WelsChromaDcIdct (pCurLayer->pScaledTCoeff[iMbXy] + 256);     // 256 = 16*16
-  WelsChromaDcIdct (pCurLayer->pScaledTCoeff[iMbXy] + 320);     // 320 = 16*16 + 16*4
-
   if (pCurLayer->pTransformSize8x8Flag[iMbXy]) {
     for (i = 0; i < 4; i++) {
       iIndex = g_kuiMbCountScan4Idx[i << 2];
@@ -207,7 +204,7 @@ int32_t WelsMbInterConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLayer) {
 }
 
 void WelsLumaDcDequantIdct (int16_t* pBlock, int32_t iQp, PWelsDecoderContext pCtx) {
-  const int32_t kiQMul = pCtx->bUseScalingList ? pCtx->pDequant_coeff4x4[0][iQp][0] >> 4 : g_kuiDequantCoeff[iQp][0];
+  const int32_t kiQMul = pCtx->bUseScalingList ? pCtx->pDequant_coeff4x4[0][iQp][0] : (g_kuiDequantCoeff[iQp][0] << 4);
 #define STRIDE 16
   int32_t i;
   int32_t iTemp[16]; //FIXME check if this is a good idea
@@ -240,10 +237,10 @@ void WelsLumaDcDequantIdct (int16_t* pBlock, int32_t iQp, PWelsDecoderContext pC
     const int32_t kiZ2 = iTemp[kiI4] - iTemp[8 + kiI4];
     const int32_t kiZ3 = iTemp[kiI4] + iTemp[8 + kiI4];
 
-    pBlk[kiOffset] = ((kiZ0 + kiZ3) * kiQMul + 2) >> 2; //FIXME think about merging this into decode_resdual
-    pBlk[kiYOffset[1] + kiOffset] = ((kiZ1 + kiZ2) * kiQMul + 2) >> 2;
-    pBlk[kiYOffset[2] + kiOffset] = ((kiZ1 - kiZ2) * kiQMul + 2) >> 2;
-    pBlk[kiYOffset[3] + kiOffset] = ((kiZ0 - kiZ3) * kiQMul + 2) >> 2;
+    pBlk[kiOffset] = ((kiZ0 + kiZ3) * kiQMul + (1 << 5)) >> 6; //FIXME think about merging this into decode_resdual
+    pBlk[kiYOffset[1] + kiOffset] = ((kiZ1 + kiZ2) * kiQMul + (1 << 5)) >> 6;
+    pBlk[kiYOffset[2] + kiOffset] = ((kiZ1 - kiZ2) * kiQMul + (1 << 5)) >> 6;
+    pBlk[kiYOffset[3] + kiOffset] = ((kiZ0 - kiZ3) * kiQMul + (1 << 5)) >> 6;
   }
 #undef STRIDE
 }
@@ -255,19 +252,12 @@ int32_t WelsMbIntraPredictionConstruction (PWelsDecoderContext pCtx, PDqLayer pC
   WelsFillRecNeededMbInfo (pCtx, bOutput, pCurLayer);
 
   if (IS_INTRA16x16 (pCurLayer->pMbType[iMbXy])) {
-    WelsLumaDcDequantIdct (pCurLayer->pScaledTCoeff[iMbXy], pCurLayer->pLumaQp[iMbXy], pCtx);
     RecI16x16Mb (iMbXy, pCtx, pCurLayer->pScaledTCoeff[iMbXy], pCurLayer);
-
-    return ERR_NONE;
-  }
-
-  if (IS_INTRA8x8 (pCurLayer->pMbType[iMbXy])) {
+  } else if (IS_INTRA8x8 (pCurLayer->pMbType[iMbXy])) {
     RecI8x8Mb (iMbXy, pCtx, pCurLayer->pScaledTCoeff[iMbXy], pCurLayer);
-  }
-
-  if (IS_INTRA4x4 (pCurLayer->pMbType[iMbXy]))
+  } else if (IS_INTRA4x4 (pCurLayer->pMbType[iMbXy])) {
     RecI4x4Mb (iMbXy, pCtx, pCurLayer->pScaledTCoeff[iMbXy], pCurLayer);
-
+  }
   return ERR_NONE;
 }
 
@@ -327,10 +317,10 @@ void WelsChromaDcIdct (int16_t* pBlock) {
   iB = iC - iD;
   iC += iD;
 
-  pBlk[0] = (iA + iC) >> 1;
-  pBlk[iXStride] = (iE + iB) >> 1;
-  pBlk[iStride] = (iA - iC) >> 1;
-  pBlk[iStride1] = (iE - iB) >> 1;
+  pBlk[0] = (iA + iC);
+  pBlk[iXStride] = (iE + iB);
+  pBlk[iStride] = (iA - iC);
+  pBlk[iStride1] = (iE - iB);
 }
 
 void WelsMapNxNNeighToSampleNormal (PWelsNeighAvail pNeighAvail, int32_t* pSampleAvail) {

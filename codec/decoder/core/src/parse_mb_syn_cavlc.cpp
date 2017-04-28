@@ -40,6 +40,7 @@
 
 
 #include "parse_mb_syn_cavlc.h"
+#include "decode_slice.h"
 #include "error_code.h"
 #include "mv_pred.h"
 
@@ -880,7 +881,18 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable, uint8_t* pNonZeroCountCach
       int32_t j;
       iCoeffNum += iRun[i] + 1; //FIXME add 1 earlier ?
       j          = kpZigzagTable[ iCoeffNum ];
-      pTCoeff[j] = pCtx->bUseScalingList ? (iLevel[i] * kpDequantCoeff[0]) >> 4 : (iLevel[i] * kpDequantCoeff[0]);
+      pTCoeff[j] = iLevel[i];
+    }
+    WelsChromaDcIdct (pTCoeff);
+    //scaling
+    if (!pCtx->bUseScalingList) {
+      for (int j = 0; j < 4; ++j) {
+        pTCoeff[kpZigzagTable[j]] = (pTCoeff[kpZigzagTable[j]] * kpDequantCoeff[0]) >> 1;
+      }
+    } else {
+      for (int j = 0; j < 4; ++j) {
+        pTCoeff[kpZigzagTable[j]] = ((int64_t) pTCoeff[kpZigzagTable[j]] * (int64_t) kpDequantCoeff[0]) >> 5;
+      }
     }
   } else if (iResidualProperty == I16_LUMA_DC) { //DC coefficent, only call in Intra_16x16, base_mode_flag = 0
     for (i = uiTotalCoeff - 1; i >= 0; --i) { //FIXME merge into rundecode?
@@ -889,12 +901,17 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable, uint8_t* pNonZeroCountCach
       j          = kpZigzagTable[ iCoeffNum ];
       pTCoeff[j] = iLevel[i];
     }
+    WelsLumaDcDequantIdct (pTCoeff, uiQp, pCtx);
   } else {
     for (i = uiTotalCoeff - 1; i >= 0; --i) { //FIXME merge into  rundecode?
       int32_t j;
       iCoeffNum += iRun[i] + 1; //FIXME add 1 earlier ?
       j          = kpZigzagTable[ iCoeffNum ];
-      pTCoeff[j] = pCtx->bUseScalingList ? (iLevel[i] * kpDequantCoeff[j]) >> 4 : (iLevel[i] * kpDequantCoeff[j & 0x07]);
+      if (!pCtx->bUseScalingList) {
+        pTCoeff[j] = (iLevel[i] * kpDequantCoeff[j & 0x07]);
+      } else {
+        pTCoeff[j] = (iLevel[i] * kpDequantCoeff[j] + 8) >> 4;
+      }
     }
   }
 

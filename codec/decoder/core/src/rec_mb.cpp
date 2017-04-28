@@ -237,8 +237,10 @@ void BaseMC (sMCRefMember* pMCRefMem, int32_t iXOffset, int32_t iYOffset, SMcFun
              int32_t iBlkWidth, int32_t iBlkHeight, int16_t iMVs[2]) {
   int32_t iFullMVx = (iXOffset << 2) + iMVs[0]; //quarter pixel
   int32_t iFullMVy = (iYOffset << 2) + iMVs[1];
-  iFullMVx = WELS_CLIP3 (iFullMVx, ((-PADDING_LENGTH + 2) * (1 << 2)), ((pMCRefMem->iPicWidth + PADDING_LENGTH - 19) * (1 << 2)));
-  iFullMVy = WELS_CLIP3 (iFullMVy, ((-PADDING_LENGTH + 2) * (1 << 2)), ((pMCRefMem->iPicHeight + PADDING_LENGTH - 19) * (1 << 2)));
+  iFullMVx = WELS_CLIP3 (iFullMVx, ((-PADDING_LENGTH + 2) * (1 << 2)),
+                         ((pMCRefMem->iPicWidth + PADDING_LENGTH - 19) * (1 << 2)));
+  iFullMVy = WELS_CLIP3 (iFullMVy, ((-PADDING_LENGTH + 2) * (1 << 2)),
+                         ((pMCRefMem->iPicHeight + PADDING_LENGTH - 19) * (1 << 2)));
 
   int32_t iSrcPixOffsetLuma = (iFullMVx >> 2) + (iFullMVy >> 2) * pMCRefMem->iSrcLineLuma;
   int32_t iSrcPixOffsetChroma = (iFullMVx >> 3) + (iFullMVy >> 3) * pMCRefMem->iSrcLineChroma;
@@ -541,8 +543,6 @@ int32_t RecChroma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLeve
   uint8_t uiCbpC = pDqLayer->pCbp[iMBXY] >> 4;
 
   if (1 == uiCbpC || 2 == uiCbpC) {
-    WelsChromaDcIdct (pScoeffLevel + 256);      // 256 = 16*16
-    WelsChromaDcIdct (pScoeffLevel + 320);      // 256 = 16*16
     for (i = 0; i < 2; i++) {
       int16_t* pRS = pScoeffLevel + 256 + (i << 6);
       uint8_t* pPred = pDqLayer->pPred[i + 1];
