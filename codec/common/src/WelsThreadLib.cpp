@@ -141,8 +141,11 @@ WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT* event, const char* event_na
 }
 
 WELS_THREAD_ERROR_CODE    WelsEventSignal (WELS_EVENT* event, WELS_MUTEX *pMutex, int* iCondition) {
-  if (SetEvent (*event)) {
-    return WELS_THREAD_ERROR_OK;
+  (*iCondition) --;
+  if ((*iCondition) <= 0) {
+    if (SetEvent (*event)) {
+      return WELS_THREAD_ERROR_OK;
+    }
   }
   return WELS_THREAD_ERROR_GENERAL;
 }
