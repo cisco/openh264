@@ -76,6 +76,8 @@ enum {
   MAX_SCREEN_QP         = 35,
   DELTA_QP              = 2,
   DELTA_QP_BGD_THD      = 3,
+  QP_MIN_VALUE          = 0,
+  QP_MAX_VALUE          = 51,
 
 //frame skip constants
   SKIP_QP_90P           = 24,

@@ -173,8 +173,8 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     param.iSpatialLayerNum              = 1;            // number of dependency(Spatial/CGS) layers used to be encoded
     param.iTemporalLayerNum             = 1;            // number of temporal layer specified
 
-    param.iMaxQp = 51;
-    param.iMinQp = 0;
+    param.iMaxQp = QP_MAX_VALUE;
+    param.iMinQp = QP_MIN_VALUE;
     param.iUsageType = CAMERA_VIDEO_REAL_TIME;
     param.uiMaxNalSize = 0;
     param.bIsLosslessLink = false;

@@ -412,8 +412,8 @@ void PrintHelp() {
   printf ("  -rc          rate control mode: 0-quality mode; 1-bitrate mode; 2-bitrate limited mode; -1-rc off \n");
   printf ("  -tarb        Overall target bitrate\n");
   printf ("  -maxbrTotal  Overall max bitrate\n");
-  printf ("  -maxqp       Maximum Qp\n");
-  printf ("  -minqp       Minimum Qp\n");
+  printf ("  -maxqp       Maximum Qp (default: %d, or for screen content usage: %d)\n", QP_MAX_VALUE, MAX_SCREEN_QP);
+  printf ("  -minqp       Minimum Qp (default: %d, or for screen content usage: %d)\n", QP_MIN_VALUE, MIN_SCREEN_QP);
   printf ("  -numl        Number Of Layers: Must exist with layer_cfg file and the number of input layer_cfg file must equal to the value set by this command\n");
   printf ("  The options below are layer-based: (need to be set with layer id)\n");
   printf ("  -lconfig     (Layer) (spatial layer configure file)\n");
