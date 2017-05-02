@@ -325,7 +325,6 @@ bool JudgeStaticSkip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, SWe
   const int32_t kiMbY = pCurMb->iMbY;
 
   bool bTryStaticSkip = IsMbCollocatedStatic (pWelsMd->iBlock8x8StaticIdc);
-
   if (bTryStaticSkip) {
     int32_t iStrideUV, iOffsetUV;
     SWelsFuncPtrList* pFunc = pEncCtx->pFuncList;
@@ -341,6 +340,8 @@ bool JudgeStaticSkip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, SWe
                                            pRefOri->iLineSize[1]);
         bTryStaticSkip = (0 == iSadCostCr);
       } else bTryStaticSkip = false;
+    } else {
+      bTryStaticSkip = false;
     }
   }
   return bTryStaticSkip;

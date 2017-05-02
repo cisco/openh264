@@ -610,6 +610,7 @@ bool WelsBuildRefList (sWelsEncCtx* pCtx, const int32_t iPOC, int32_t iBestLtrRe
     if (pCtx->pSvcParam->bEnableLongTermReference && pLtr->bReceivedT0LostFlag && pCtx->uiTemporalId == 0) {
       for (i = 0; i < pRefList->uiLongRefCount; i++) {
         if (pRefList->pLongRefList[i]->uiRecieveConfirmed == RECIEVE_SUCCESS) {
+          pCtx->pCurDqLayer->pRefOri[pCtx->iNumRef0] = pRefList->pLongRefList[i];
           pCtx->pRefList0[pCtx->iNumRef0++] = pRefList->pLongRefList[i];
           pLtr->iLastRecoverFrameNum = pParamD->iFrameNum;
           WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO,
@@ -622,6 +623,7 @@ bool WelsBuildRefList (sWelsEncCtx* pCtx, const int32_t iPOC, int32_t iBestLtrRe
       for (i = 0; i < pRefList->uiShortRefCount; ++ i) {
         SPicture* pRef = pRefList->pShortRefList[i];
         if (pRef != NULL && pRef->bUsedAsRef && pRef->iFramePoc >= 0 && pRef->uiTemporalId <= kuiTid) {
+          pCtx->pCurDqLayer->pRefOri[pCtx->iNumRef0] = pRef;
           pCtx->pRefList0[pCtx->iNumRef0++] = pRef;
           WelsLog (& (pCtx->sLogCtx), WELS_LOG_DETAIL,
                    "WelsBuildRefList pCtx->uiTemporalId = %d,pRef->iFrameNum = %d,pRef->uiTemporalId = %d",
