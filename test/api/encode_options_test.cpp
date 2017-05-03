@@ -1973,9 +1973,6 @@ TEST_F (EncodeDecodeTestAPI, ProfileLevelSetting) {
   if ((iEncProfileIdc != PRO_BASELINE) && (iEncProfileIdc != PRO_MAIN) && (iEncProfileIdc != PRO_HIGH)) {
     iEncProfileIdc = PRO_BASELINE;
   }
-  if ((iEncProfileIdc == PRO_BASELINE) && (sParam.iEntropyCodingModeFlag == 1))
-    iEncProfileIdc = PRO_MAIN;
-
 
   ASSERT_TRUE (iDecProfileIdc == iEncProfileIdc) << "enc_profile = " << iEncProfileIdc << "  dec_profile = " <<
       iDecProfileIdc;
@@ -2036,9 +2033,6 @@ TEST_F (EncodeDecodeTestAPI, ProfileLevelSetting) {
   if ((iEncProfileIdc != PRO_BASELINE) && (iEncProfileIdc != PRO_MAIN) && (iEncProfileIdc != PRO_HIGH)) {
     iEncProfileIdc = PRO_BASELINE;
   }
-  if ((iEncProfileIdc == PRO_BASELINE) && (sParam.iEntropyCodingModeFlag == 1))
-    iEncProfileIdc = PRO_MAIN;
-
 
   ASSERT_TRUE (iDecProfileIdc == iEncProfileIdc) << "enc_profile = " << iEncProfileIdc << "  dec_profile = " <<
       iDecProfileIdc;
