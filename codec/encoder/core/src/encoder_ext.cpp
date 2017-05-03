@@ -132,10 +132,6 @@ void CheckProfileSetting (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, int
                uiProfileIdc);
       pLayerInfo->uiProfileIdc = PRO_BASELINE;
     }
-    if (pParam->iEntropyCodingModeFlag && pLayerInfo->uiProfileIdc == PRO_BASELINE) {
-      pLayerInfo->uiProfileIdc = PRO_MAIN;
-      WelsLog (pLogCtx, WELS_LOG_WARNING, "layerId(%d) change to main profile because cabac is enabled", iLayer);
-    }
   } else {
     if (iLayer == SPATIAL_LAYER_0) {
       if ((uiProfileIdc != PRO_BASELINE) && (uiProfileIdc != PRO_MAIN) && (uiProfileIdc != PRO_HIGH)) {
@@ -143,19 +139,11 @@ void CheckProfileSetting (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, int
                  uiProfileIdc);
         pLayerInfo->uiProfileIdc = PRO_BASELINE;
       }
-      if (pParam->iEntropyCodingModeFlag && (pLayerInfo->uiProfileIdc == PRO_BASELINE)) {
-        pLayerInfo->uiProfileIdc = PRO_MAIN;
-        WelsLog (pLogCtx, WELS_LOG_WARNING, "layerId(%d) change to main profile because cabac is enabled", iLayer);
-      }
     } else {
       if ((uiProfileIdc != PRO_SCALABLE_BASELINE) && (uiProfileIdc != PRO_SCALABLE_HIGH)) {
         pLayerInfo->uiProfileIdc = PRO_SCALABLE_BASELINE;
         WelsLog (pLogCtx, WELS_LOG_WARNING, "layerId(%d) doesn't support profile(%d), change to scalable baseline profile",
                  iLayer, uiProfileIdc);
-      }
-      if (pParam->iEntropyCodingModeFlag && (pLayerInfo->uiProfileIdc == PRO_SCALABLE_BASELINE)) {
-        pLayerInfo->uiProfileIdc = PRO_SCALABLE_HIGH;
-        WelsLog (pLogCtx, WELS_LOG_WARNING, "layerId(%d) change to scalable hight profile because cabac is enabled", iLayer);
       }
     }
   }
@@ -645,7 +633,15 @@ int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPa
     break;
     }
   }
-
+  for (i = 0; i < pCodingParam->iSpatialLayerNum; ++ i) {
+    SSpatialLayerConfig* pLayerInfo = &pCodingParam->sSpatialLayers[i];
+    if ((pLayerInfo->uiProfileIdc == PRO_BASELINE) || (pLayerInfo->uiProfileIdc == PRO_SCALABLE_BASELINE)) {
+      if (pCodingParam->iEntropyCodingModeFlag != 0) {
+        pCodingParam->iEntropyCodingModeFlag = 0;
+        WelsLog (pLogCtx, WELS_LOG_WARNING, "layerId(%d) Profile is baseline, Change CABAC to CAVLC",i);
+      }
+    }
+  }
   return ParamValidation (pLogCtx, pCodingParam);
 }
 
@@ -728,7 +724,7 @@ int32_t WelsEncoderApplyBitVaryRang (SLogContext* pLogCtx, SWelsSvcCodingParam* 
  * \return  0 - successful; otherwise failed
  */
 int32_t AcquireLayersNals (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pParam, int32_t* pCountLayers,
-    int32_t* pCountNals) {
+                           int32_t* pCountNals) {
   int32_t iCountNumLayers       = 0;
   int32_t iCountNumNals         = 0;
   int32_t iNumDependencyLayers  = 0;
@@ -2415,7 +2411,7 @@ void UpdateSlicepEncCtxWithPartition (SDqLayer* pCurDq, int32_t iPartitionNum) {
   else if (iPartitionNum > AVERSLICENUM_CONSTRAINT)
     iPartitionNum = AVERSLICENUM_CONSTRAINT; // AVERSLICENUM_CONSTRAINT might be variable, however not fixed by MACRO
   iCountMbNumPerPartition /= iPartitionNum;
-  if(iCountMbNumPerPartition == 0 || iCountMbNumPerPartition == 1) {
+  if (iCountMbNumPerPartition == 0 || iCountMbNumPerPartition == 1) {
     iCountMbNumPerPartition = kiMbNumInFrame;
     iPartitionNum           = 1;
   }
@@ -2444,7 +2440,7 @@ void UpdateSlicepEncCtxWithPartition (SDqLayer* pCurDq, int32_t iPartitionNum) {
     ++ i;
   }
 
-  while(i<MAX_THREADS_NUM) {
+  while (i < MAX_THREADS_NUM) {
     pCurDq->FirstMbIdxOfPartition[i]     = 0;
     pCurDq->EndMbIdxOfPartition[i]       = 0;
     pCurDq->LastCodedMbIdxOfPartition[i] = 0;
@@ -2489,7 +2485,7 @@ void WelsInitCurrentDlayerMltslc (sWelsEncCtx* pCtx, int32_t iPartitionNum) {
     //MINPACKETSIZE_CONSTRAINT
     //suppose 16 byte per mb at average
     uiMiniPacketSize = (uint32_t) (uiFrmByte / pSliceCtx->iMaxSliceNumConstraint);
-    if (pSliceCtx->uiSliceSizeConstraint < uiMiniPacketSize ) {
+    if (pSliceCtx->uiSliceSizeConstraint < uiMiniPacketSize) {
       WelsLog (& (pCtx->sLogCtx),
                WELS_LOG_WARNING,
                "Set-SliceConstraint(%d) too small for current resolution (MB# %d) under QP/BR!",
@@ -3655,7 +3651,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
       WelsLoadNal (pCtx->pOut, eNalType, eNalRefIdc);
       assert (0 == (int) pCurSlice->iSliceIdx);
-      pCtx->iEncoderError   = SetSliceBoundaryInfo(pCtx->pCurDqLayer, pCurSlice, 0);
+      pCtx->iEncoderError   = SetSliceBoundaryInfo (pCtx->pCurDqLayer, pCurSlice, 0);
       WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
 
       pCtx->iEncoderError   = WelsCodeOneSlice (pCtx, pCurSlice, eNalType);
@@ -3748,10 +3744,10 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
           ++ iIdx;
         }
 
-        int32_t iRet = InitAllSlicesInThread(pCtx);
+        int32_t iRet = InitAllSlicesInThread (pCtx);
         if (iRet) {
           WelsLog (pLogCtx, WELS_LOG_ERROR,
-                  "WelsEncoderEncodeExt(), multi-slice (mode %d) InitAllSlicesInThread() error!",
+                   "WelsEncoderEncodeExt(), multi-slice (mode %d) InitAllSlicesInThread() error!",
                    pParam->sSliceArgument.uiSliceMode);
           return ENC_RETURN_UNEXPECTED;
         }
@@ -3796,7 +3792,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
           pCurSlice = &pCtx->pCurDqLayer->sSliceBufferInfo[0].pSliceBuffer[iSliceIdx];
           assert (iSliceIdx == pCurSlice->iSliceIdx);
-          pCtx->iEncoderError   = SetSliceBoundaryInfo(pCtx->pCurDqLayer, pCurSlice, iSliceIdx);
+          pCtx->iEncoderError   = SetSliceBoundaryInfo (pCtx->pCurDqLayer, pCurSlice, iSliceIdx);
 
           pCtx->iEncoderError = WelsCodeOneSlice (pCtx, pCurSlice, eNalType);
           WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
@@ -4426,7 +4422,7 @@ int32_t DynSliceRealloc (sWelsEncCtx* pCtx,
   int32_t iRet = 0;
 
   iRet = FrameBsRealloc (pCtx, pFrameBsInfo, pLayerBsInfo, pCtx->pCurDqLayer->iMaxSliceNum);
-  if(ENC_RETURN_SUCCESS != iRet) {
+  if (ENC_RETURN_SUCCESS != iRet) {
     return iRet;
   }
 
@@ -4470,7 +4466,8 @@ int32_t WelsCodeOnePicPartition (sWelsEncCtx* pCtx,
     int32_t iPayloadSize    = 0;
     SSlice* pCurSlice = NULL;
 
-    if (iSliceIdx >= (pCurLayer->sSliceBufferInfo[uSlcBuffIdx].iMaxSliceNum - kiSliceIdxStep)) { // insufficient memory in pSliceInLayer[]
+    if (iSliceIdx >= (pCurLayer->sSliceBufferInfo[uSlcBuffIdx].iMaxSliceNum -
+                      kiSliceIdxStep)) { // insufficient memory in pSliceInLayer[]
       if (pCtx->iActiveThreadsNum == 1) {
         //only single thread support re-alloc now
         if (DynSliceRealloc (pCtx, pFrameBSInfo, pLayerBsInfo)) {

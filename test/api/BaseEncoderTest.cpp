@@ -20,7 +20,6 @@ static int InitWithParam (ISVCEncoder* encoder, SEncParamExt* pEncParamExt) {
     param.iPicWidth      = pEncParamExt->iPicWidth;
     param.iPicHeight     = pEncParamExt->iPicHeight;
     param.iTargetBitrate = 5000000;
-
     return encoder->Initialize (&param);
   } else {
     SEncParamExt param;
@@ -36,7 +35,8 @@ static int InitWithParam (ISVCEncoder* encoder, SEncParamExt* pEncParamExt) {
     param.bIsLosslessLink  = pEncParamExt->bIsLosslessLink;
     param.bEnableLongTermReference = pEncParamExt->bEnableLongTermReference;
     param.iEntropyCodingModeFlag   = pEncParamExt->iEntropyCodingModeFlag ? 1 : 0;
-    if (eSliceMode != SM_SINGLE_SLICE && eSliceMode != SM_SIZELIMITED_SLICE) //SM_SIZELIMITED_SLICE don't support multi-thread now
+    if (eSliceMode != SM_SINGLE_SLICE
+        && eSliceMode != SM_SIZELIMITED_SLICE) //SM_SIZELIMITED_SLICE don't support multi-thread now
       param.iMultipleThreadIdc = 2;
 
     for (int i = 0; i < param.iSpatialLayerNum; i++) {
@@ -57,9 +57,11 @@ static int InitWithParam (ISVCEncoder* encoder, SEncParamExt* pEncParamExt) {
         param.iMultipleThreadIdc = 4;
         param.bUseLoadBalancing = false;
       }
+      if (param.iEntropyCodingModeFlag) {
+        param.sSpatialLayers[i].uiProfileIdc = PRO_MAIN;
+      }
     }
     param.iTargetBitrate *= param.iSpatialLayerNum;
-
     return encoder->InitializeExt (&param);
   }
 }
