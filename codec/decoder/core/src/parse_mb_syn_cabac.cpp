@@ -31,6 +31,7 @@
  *      parse_mb_syn_cabac.cpp: cabac parse for syntax elements
  */
 #include "parse_mb_syn_cabac.h"
+#include "decode_slice.h"
 #include "mv_pred.h"
 #include "error_code.h"
 namespace WelsDec {
@@ -927,24 +928,36 @@ int32_t ParseResidualBlockCabac (PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroC
   int32_t j = 0;
   if (iResProperty == I16_LUMA_DC) {
     do {
-      if (pSignificantMap[j] != 0)
-        sTCoeff[pScanTable[j]] = pSignificantMap[j];
+      sTCoeff[pScanTable[j]] = pSignificantMap[j];
       ++j;
     } while (j < 16);
+    WelsLumaDcDequantIdct (sTCoeff, uiQp, pCtx);
   } else if (iResProperty == CHROMA_DC_U || iResProperty == CHROMA_DC_V) {
     do {
-      if (pSignificantMap[j] != 0)
-        sTCoeff[pScanTable[j]] = pCtx->bUseScalingList ? (int16_t) ((int64_t)pSignificantMap[j] *
-                                 (int64_t)pDeQuantMul[0] >> 4) :
-                                 (pSignificantMap[j] * pDeQuantMul[0]);
+      sTCoeff[pScanTable[j]] = pSignificantMap[j];
       ++j;
-    } while (j < 16);
+    } while (j < 4);
+    //iHadamard2x2
+    WelsChromaDcIdct (sTCoeff);
+    //scaling
+    if (!pCtx->bUseScalingList) {
+      for (j = 0; j < 4; ++j) {
+        sTCoeff[pScanTable[j]] = (int16_t) ((int64_t)sTCoeff[pScanTable[j]] * (int64_t)pDeQuantMul[0] >> 1);
+      }
+    } else { //with scaling list
+      for (j = 0; j < 4; ++j) {
+        sTCoeff[pScanTable[j]] = (int16_t) ((int64_t)sTCoeff[pScanTable[j]] * (int64_t)pDeQuantMul[0] >> 5);
+      }
+    }
   } else { //luma ac, chroma ac
     do {
-      if (pSignificantMap[j] != 0)
-        sTCoeff[pScanTable[j]] = pCtx->bUseScalingList ? (int16_t) ((int64_t)pSignificantMap[j] *
-                                 (int64_t)pDeQuantMul[pScanTable[j]] >> 4) :
-                                 pSignificantMap[j] * pDeQuantMul[pScanTable[j] & 0x07];
+      if (pSignificantMap[j] != 0) {
+        if (!pCtx->bUseScalingList) {
+          sTCoeff[pScanTable[j]] = pSignificantMap[j] * pDeQuantMul[pScanTable[j] & 0x07];
+        } else {
+          sTCoeff[pScanTable[j]] = (int16_t) (((int64_t)pSignificantMap[j] * (int64_t)pDeQuantMul[pScanTable[j]] + 8) >> 4);
+        }
+      }
       ++j;
     } while (j < 16);
   }
