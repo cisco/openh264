@@ -142,10 +142,10 @@ int32_t InitPic (const void* kpSrc, const int32_t kiColorspace, const int32_t ki
 void WelsInitBGDFunc (SWelsFuncPtrList* pFuncList, const bool kbEnableBackgroundDetection) {
   if (kbEnableBackgroundDetection) {
     pFuncList->pfInterMdBackgroundDecision = WelsMdInterJudgeBGDPskip;
-    pFuncList->pfInterMdBackgroundInfoUpdate = WelsMdInterUpdateBGDInfo;
+    pFuncList->pfMdBackgroundInfoUpdate = WelsMdUpdateBGDInfo;
   } else {
     pFuncList->pfInterMdBackgroundDecision = WelsMdInterJudgeBGDPskipFalse;
-    pFuncList->pfInterMdBackgroundInfoUpdate = WelsMdInterUpdateBGDInfoNULL;
+    pFuncList->pfMdBackgroundInfoUpdate = WelsMdUpdateBGDInfoNULL;
   }
 }
 
