@@ -164,8 +164,8 @@ void SetParamForReallocateTest (sWelsEncCtx* pCtx, int32_t iLayerIdx,
 
 void CSliceBufferReallocatTest::InitParamForTestCase (int32_t iLayerIdx) {
   InitParam();
-  InitLayerSliceBuffer (iLayerIdx);
   InitFrameBsBuffer();
+  InitLayerSliceBuffer (iLayerIdx);
 
   //param validation
   int32_t iRet = m_pEncoder->InitializeExt ((SEncParamExt*)m_EncContext.pSvcParam);
@@ -177,6 +177,7 @@ void CSliceBufferReallocatTest::InitParamForSizeLimitSlcModeCase (int32_t iLayer
   int32_t iRet = 0;
 
   InitParam();
+  InitFrameBsBuffer();
   InitLayerSliceBuffer (iLayerIdx);
 
   if (SM_SIZELIMITED_SLICE != pSliceArgument->uiSliceMode && NULL != m_EncContext.ppDqLayerList[iLayerIdx]) {
@@ -186,7 +187,6 @@ void CSliceBufferReallocatTest::InitParamForSizeLimitSlcModeCase (int32_t iLayer
     EXPECT_TRUE (ENC_RETURN_SUCCESS == iRet);
     EXPECT_TRUE (NULL != m_EncContext.ppDqLayerList[iLayerIdx]);
   }
-  InitFrameBsBuffer();
 
   //param validation
   iRet = m_pEncoder->InitializeExt ((SEncParamExt*)m_EncContext.pSvcParam);
