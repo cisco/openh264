@@ -370,18 +370,22 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
         WelsLog (pLogCtx, WELS_LOG_WARNING,
                  "bEnableFrameSkip = %d,bitrate can't be controlled for RC_QUALITY_MODE,RC_BITRATE_MODE and RC_TIMESTAMP_MODE without enabling skip frame.",
                  pCfg->bEnableFrameSkip);
-
-    if (pCfg->iUsageType == SCREEN_CONTENT_REAL_TIME) {
-      pCfg->iMinQp = MIN_SCREEN_QP;
-      pCfg->iMaxQp = MAX_SCREEN_QP;
-    } else {
-      pCfg->iMinQp = WELS_CLIP3 (pCfg->iMinQp , GOM_MIN_QP_MODE, 51);
-      pCfg->iMaxQp = WELS_CLIP3 (pCfg->iMaxQp , 0, 51);
-      if (pCfg->iMaxQp <= pCfg->iMinQp)
-        pCfg->iMaxQp = 51;
+    if ((pCfg->iMaxQp <= 0) || (pCfg->iMinQp <= 0)) {
+      if (pCfg->iUsageType == SCREEN_CONTENT_REAL_TIME) {
+        WelsLog (pLogCtx, WELS_LOG_WARNING, "Change QP Range from(%d,%d) to (%d,%d)", pCfg->iMinQp, pCfg->iMaxQp, MIN_SCREEN_QP,
+                 MAX_SCREEN_QP);
+        pCfg->iMinQp = MIN_SCREEN_QP;
+        pCfg->iMaxQp = MAX_SCREEN_QP;
+      } else {
+        WelsLog (pLogCtx, WELS_LOG_WARNING, "Change QP Range from(%d,%d) to (%d,%d)", pCfg->iMinQp, pCfg->iMaxQp,
+                 GOM_MIN_QP_MODE, MAX_LOW_BR_QP);
+        pCfg->iMinQp = GOM_MIN_QP_MODE;
+        pCfg->iMaxQp = MAX_LOW_BR_QP;
+      }
 
     }
-
+    pCfg->iMinQp = WELS_CLIP3 (pCfg->iMinQp , GOM_MIN_QP_MODE, 51);
+    pCfg->iMaxQp = WELS_CLIP3 (pCfg->iMaxQp , pCfg->iMinQp, 51);
   }
   // ref-frames validation
   if (((pCfg->iUsageType == CAMERA_VIDEO_REAL_TIME) || (pCfg->iUsageType == SCREEN_CONTENT_REAL_TIME))
@@ -638,7 +642,7 @@ int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPa
     if ((pLayerInfo->uiProfileIdc == PRO_BASELINE) || (pLayerInfo->uiProfileIdc == PRO_SCALABLE_BASELINE)) {
       if (pCodingParam->iEntropyCodingModeFlag != 0) {
         pCodingParam->iEntropyCodingModeFlag = 0;
-        WelsLog (pLogCtx, WELS_LOG_WARNING, "layerId(%d) Profile is baseline, Change CABAC to CAVLC",i);
+        WelsLog (pLogCtx, WELS_LOG_WARNING, "layerId(%d) Profile is baseline, Change CABAC to CAVLC", i);
       }
     }
   }
