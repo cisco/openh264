@@ -264,8 +264,8 @@ bool WelsMdInterJudgeBGDPskipFalse (sWelsEncCtx* pCtx, SWelsMD* pMd, SSlice* pSl
 //////
 //  update BGD related info
 //////
-void WelsMdInterUpdateBGDInfo (SDqLayer* pCurLayer,  SMB* pCurMb, const bool bCollocatedPredFlag,
-                               const int32_t iRefPictureType) {
+void WelsMdUpdateBGDInfo (SDqLayer* pCurLayer,  SMB* pCurMb, const bool bCollocatedPredFlag,
+                          const int32_t iRefPictureType) {
   uint8_t* pTargetRefMbQpList = (pCurLayer->pDecPic->pRefMbQp);
   const int32_t kiMbXY = pCurMb->iMbXY;
 
@@ -281,8 +281,9 @@ void WelsMdInterUpdateBGDInfo (SDqLayer* pCurLayer,  SMB* pCurMb, const bool bCo
   }
 }
 
-void WelsMdInterUpdateBGDInfoNULL (SDqLayer* pCurLayer, SMB* pCurMb, const bool bCollocatedPredFlag,
-                                   const int32_t iRefPictureType) {
+void WelsMdUpdateBGDInfoNULL (SDqLayer* pCurLayer, SMB* pCurMb, const bool bCollocatedPredFlag,
+                              const int32_t iRefPictureType) {
+  WelsMdUpdateBGDInfo (pCurLayer, pCurMb, bCollocatedPredFlag, iRefPictureType);
 }
 
 

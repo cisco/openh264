@@ -73,9 +73,9 @@ bool WelsMdInterJudgeBGDPskip (sWelsEncCtx* pEnc, SWelsMD* pMd, SSlice* pSlice, 
 bool WelsMdInterJudgeBGDPskipFalse (sWelsEncCtx* pEnc, SWelsMD* pMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pMbCache,
                                     bool* bKeepSkip);
 
-void WelsMdInterUpdateBGDInfo (SDqLayer* pCurLayer,  SMB* pCurMb, const bool kbCollocatedPredFlag,
+void WelsMdUpdateBGDInfo (SDqLayer* pCurLayer,  SMB* pCurMb, const bool kbCollocatedPredFlag,
                                const int32_t kiRefPictureType);
-void WelsMdInterUpdateBGDInfoNULL (SDqLayer* pCurLayer,  SMB* pCurMb, const bool kbCollocatedPredFlag,
+void WelsMdUpdateBGDInfoNULL (SDqLayer* pCurLayer,  SMB* pCurMb, const bool kbCollocatedPredFlag,
                                    const int32_t kiRefPictureType);
 
 //////////////

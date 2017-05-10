@@ -570,6 +570,7 @@ TRY_REENCODING:
     WelsCountMbType (pEncCtx->sPerInfo.iMbCount, I_SLICE, pCurMb);
 #endif//MB_TYPES_CHECK
 
+    pEncCtx->pFuncList->pfMdBackgroundInfoUpdate (pCurLayer, pCurMb, pMbCache->bCollocatedPredFlag, I_SLICE);
     pEncCtx->pFuncList->pfRc.pfWelsRcMbInfoUpdate (pEncCtx, pCurMb, sMd.iCostLuma, pSlice);
 
     ++iNumMbCoded;
@@ -1829,7 +1830,7 @@ TRY_REENCODING:
     //step (4): save from the MD process from future use
     WelsMdInterSaveSadAndRefMbType ((pCurLayer->pDecPic->uiRefMbType), pMbCache, pCurMb, pMd);
 
-    pEncCtx->pFuncList->pfInterMdBackgroundInfoUpdate (pCurLayer, pCurMb, pMbCache->bCollocatedPredFlag,
+    pEncCtx->pFuncList->pfMdBackgroundInfoUpdate (pCurLayer, pCurMb, pMbCache->bCollocatedPredFlag,
         pEncCtx->pRefPic->iPictureType);
 
     //step (5): update cache
@@ -1938,7 +1939,7 @@ TRY_REENCODING:
     //step (4): save from the MD process from future use
     WelsMdInterSaveSadAndRefMbType ((pCurLayer->pDecPic->uiRefMbType), pMbCache, pCurMb, pMd);
 
-    pEncCtx->pFuncList->pfInterMdBackgroundInfoUpdate (pCurLayer, pCurMb, pMbCache->bCollocatedPredFlag,
+    pEncCtx->pFuncList->pfMdBackgroundInfoUpdate (pCurLayer, pCurMb, pMbCache->bCollocatedPredFlag,
         pEncCtx->pRefPic->iPictureType);
 
     //step (5): update cache

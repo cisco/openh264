@@ -115,7 +115,7 @@ typedef bool (*PDynamicSlicingStepBackFunc) (sWelsEncCtx* pEncCtx, SSlice* pSlic
 
 typedef bool (*PInterMdBackgroundDecisionFunc) (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* slice, SMB* pCurMb,
     SMbCache* pMbCache, bool* pKeepPskip);
-typedef void (*PInterMdBackgroundInfoUpdateFunc) (SDqLayer* pCurLayer,  SMB* pCurMb, const bool bFlag,
+typedef void (*PMdBackgroundInfoUpdateFunc) (SDqLayer* pCurLayer,  SMB* pCurMb, const bool bFlag,
     const int32_t kiRefPictureType);
 
 typedef bool (*PInterMdScrollingPSkipDecisionFunc) (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* slice, SMB* pCurMb,
@@ -209,7 +209,7 @@ struct TagWelsFuncPointerList {
   PInterMdFunc                           pfInterMd;
 
   PInterMdBackgroundDecisionFunc          pfInterMdBackgroundDecision;
-  PInterMdBackgroundInfoUpdateFunc      pfInterMdBackgroundInfoUpdate;
+  PMdBackgroundInfoUpdateFunc      pfMdBackgroundInfoUpdate;
 
   PInterMdScrollingPSkipDecisionFunc pfSCDPSkipDecision;
   PSetScrollingMv pfSetScrollingMv;
