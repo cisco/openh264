@@ -16,16 +16,16 @@ class CSliceBufferReallocatTest : public ::testing::Test { //WithParamInterface<
     m_pEncoder   = NULL;
     int32_t iRet = WelsCreateSVCEncoder (&m_pEncoder);
     ASSERT_EQ (0, iRet);
-    EXPECT_TRUE (m_pEncoder != NULL);
+    ASSERT_TRUE (m_pEncoder != NULL);
 
     int32_t iCacheLineSize = 16;
     m_EncContext.pMemAlign = new CMemoryAlign (iCacheLineSize);
-    EXPECT_TRUE (NULL != m_EncContext.pMemAlign);
+    ASSERT_TRUE (NULL != m_EncContext.pMemAlign);
 
     SWelsSvcCodingParam* pCodingParam = (SWelsSvcCodingParam*)m_EncContext.pMemAlign->WelsMalloc (sizeof (
                                           SWelsSvcCodingParam),
                                         "SWelsSvcCodingParam");
-    EXPECT_TRUE (NULL != pCodingParam);
+    ASSERT_TRUE (NULL != pCodingParam);
     m_EncContext.pSvcParam = pCodingParam;
 
     iRet = m_pEncoder->GetDefaultParams (m_EncContext.pSvcParam);
