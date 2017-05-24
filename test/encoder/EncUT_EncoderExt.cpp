@@ -480,7 +480,7 @@ void GetValidEncParamBase (SEncParamBase* pEncParamBase) {
   pEncParamBase->iTargetBitrate = rand() + 1; //!=0
   // Force a bitrate of at least w*h/50, otherwise we will only get skipped frames
   pEncParamBase->iTargetBitrate = WELS_CLIP3 (pEncParamBase->iTargetBitrate,
-                                  pEncParamBase->iPicWidth * pEncParamBase->iPicHeight / 50, 100000000);
+                                  pEncParamBase->iPicWidth * pEncParamBase->iPicHeight / 50, 60000000);
   int32_t iLevelMaxBitrate = WelsCommon::g_ksLevelLimits[LEVEL_NUMBER - 1].uiMaxBR * CpbBrNalFactor;
   if (pEncParamBase->iTargetBitrate > iLevelMaxBitrate)
     pEncParamBase->iTargetBitrate = iLevelMaxBitrate;
@@ -733,7 +733,7 @@ TEST_F (EncoderInterfaceTest, ForceIntraFrameWithTemporal) {
   sEncParamExt.iTargetBitrate = rand() + 1; //!=0
   // Force a bitrate of at least w*h/50, otherwise we will only get skipped frames
   sEncParamExt.iTargetBitrate = WELS_CLIP3 (sEncParamExt.iTargetBitrate,
-                                sEncParamExt.iPicWidth * sEncParamExt.iPicHeight / 50, 100000000);
+                                sEncParamExt.iPicWidth * sEncParamExt.iPicHeight / 50, 60000000);
   int32_t iLevelMaxBitrate = WelsCommon::g_ksLevelLimits[LEVEL_NUMBER - 1].uiMaxBR * CpbBrNalFactor;
   if (sEncParamExt.iTargetBitrate > iLevelMaxBitrate)
     sEncParamExt.iTargetBitrate = iLevelMaxBitrate;
