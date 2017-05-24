@@ -177,7 +177,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     param.bIsLosslessLink = false;
     for (int32_t iLayer = 0; iLayer < MAX_SPATIAL_LAYER_NUM; iLayer++) {
       param.sSpatialLayers[iLayer].uiProfileIdc = PRO_BASELINE;
-      param.sSpatialLayers[iLayer].uiLevelIdc = LEVEL_UNKNOWN;
+      param.sSpatialLayers[iLayer].uiLevelIdc = LEVEL_4_1;
       param.sSpatialLayers[iLayer].iDLayerQp = SVC_QUALITY_BASE_QP;
       param.sSpatialLayers[iLayer].fFrameRate = param.fMaxFrameRate;
 
@@ -249,7 +249,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     while (iIdxSpatial < iSpatialLayerNum) {
 
       sSpatialLayers->uiProfileIdc              = uiProfileIdc;
-      sSpatialLayers->uiLevelIdc                = LEVEL_UNKNOWN;
+      sSpatialLayers->uiLevelIdc                = LEVEL_4_1;
       sSpatialLayers[iIdxSpatial].fFrameRate    = WELS_CLIP3 (pCodingParam.fMaxFrameRate,
           MIN_FRAME_RATE, MAX_FRAME_RATE);
       pDlp->fInputFrameRate =
