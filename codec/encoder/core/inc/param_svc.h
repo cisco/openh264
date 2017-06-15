@@ -63,6 +63,9 @@ extern const uint8_t   g_kuiTemporalIdListTable[MAX_TEMPORAL_LEVEL][MAX_GOP_SIZE
 * \return   2 based scaling factor
 */
 static inline uint32_t GetLogFactor (float base, float upper) {
+#if defined(_M_X64)
+  _set_FMA3_enable(0);
+#endif
   const double dLog2factor      = log10 (1.0 * upper / base) / log10 (2.0);
   const double dEpsilon         = 0.0001;
   const double dRound           = floor (dLog2factor + 0.5);
