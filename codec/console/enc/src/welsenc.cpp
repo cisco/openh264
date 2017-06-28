@@ -418,6 +418,7 @@ void PrintHelp() {
   printf ("  The options below are layer-based: (need to be set with layer id)\n");
   printf ("  -lconfig     (Layer) (spatial layer configure file)\n");
   printf ("  -drec        (Layer) (reconstruction file);example: -drec 0 rec.yuv.  Setting the reconstruction file, this will only functioning when dumping reconstruction is enabled\n");
+  printf ("  -dprofile    (Layer) (layer profile);example: -dprofile 0 66.  Setting the layer profile, this should be the same for all layers\n");
   printf ("  -dw          (Layer) (output width)\n");
   printf ("  -dh          (Layer) (output height)\n");
   printf ("  -frout       (Layer) (output frame rate)\n");
@@ -559,6 +560,10 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
       if (-1 == ParseLayerConfig (cRdLayerCfg, iLayer, pSvcParam, sFileSet)) {
         return 1;
       }
+    } else if (!strcmp (pCommand, "-dprofile") && (n + 1 < argc)) {
+      unsigned int iLayer = atoi (argv[n++]);
+      SSpatialLayerConfig* pDLayer = &pSvcParam.sSpatialLayers[iLayer];
+      pDLayer->uiProfileIdc = (EProfileIdc) atoi (argv[n++]);
     } else if (!strcmp (pCommand, "-drec") && (n + 1 < argc)) {
       unsigned int iLayer = atoi (argv[n++]);
       const unsigned int iLen = (int) strlen (argv[n]);
