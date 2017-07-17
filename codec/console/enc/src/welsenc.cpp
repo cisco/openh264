@@ -396,7 +396,7 @@ void PrintHelp() {
   printf ("  -numtl       Temporal layer number (default: 1)\n");
   printf ("  -iper        Intra period (default: -1) : must be a power of 2 of GOP size (or -1)\n");
   printf ("  -nalsize     the Maximum NAL size. which should be larger than the each layer slicesize when slice mode equals to SM_SIZELIMITED_SLICE\n");
-  printf ("  -spsid       Enable id adding in SPS/PPS per IDR \n");
+  printf ("  -spsid       SPS/PPS id strategy: 0:const, 1: increase, 2: sps list, 3: sps list and pps increase, 4: sps/pps list\n");
   printf ("  -cabac       Entropy coding mode(0:cavlc 1:cabac \n");
   printf ("  -denois      Control denoising  (default: 0)\n");
   printf ("  -scene       Control scene change detection (default: 0)\n");
