@@ -339,7 +339,7 @@ int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPara
   int32_t iThreadBufferNum = WELS_MIN ((*ppCtx)->pTaskManage->GetThreadPoolThreadNum(), MAX_THREADS_NUM);
 
   for (iIdx = 0; iIdx < iThreadBufferNum; iIdx++) {
-    pSmt->pThreadBsBuffer[iIdx] = (uint8_t*)pMa->WelsMalloc (iCountBsLen, "pSmt->pThreadBsBuffer");
+    pSmt->pThreadBsBuffer[iIdx] = (uint8_t*)pMa->WelsMallocz (iCountBsLen, "pSmt->pThreadBsBuffer");
     WELS_VERIFY_RETURN_IF (1, (NULL == pSmt->pThreadBsBuffer[iIdx]))
   }
   iReturn = WelsMutexInit (&pSmt->mutexThreadBsBufferUsage);

@@ -384,8 +384,8 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
       }
 
     }
-    pCfg->iMinQp = WELS_CLIP3 (pCfg->iMinQp , GOM_MIN_QP_MODE, 51);
-    pCfg->iMaxQp = WELS_CLIP3 (pCfg->iMaxQp , pCfg->iMinQp, 51);
+    pCfg->iMinQp = WELS_CLIP3 (pCfg->iMinQp, GOM_MIN_QP_MODE, 51);
+    pCfg->iMaxQp = WELS_CLIP3 (pCfg->iMaxQp, pCfg->iMinQp, 51);
   }
   // ref-frames validation
   if (((pCfg->iUsageType == CAMERA_VIDEO_REAL_TIME) || (pCfg->iUsageType == SCREEN_CONTENT_REAL_TIME))
@@ -1439,7 +1439,7 @@ int32_t AllocStrideTables (sWelsEncCtx** ppCtx, const int32_t kiNumSpatialLayers
       break;
 
     t32 = i | (i << 16);
-    ST32 (t  , t32);
+    ST32 (t, t32);
     ST32 (t + 2, t32);
 
     p = pRowY;
@@ -2357,7 +2357,7 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
   pCtx->bDeliveryFlag = true;
   *ppCtx = pCtx;
 
-  WelsLog (pLogCtx, WELS_LOG_DEBUG, "WelsInitEncoderExt(), pCtx= 0x%p.", (void*)pCtx);
+  WelsLog (pLogCtx, WELS_LOG_INFO, "WelsInitEncoderExt(), pCtx= 0x%p.", (void*)pCtx);
 
   return 0;
 }
@@ -3360,7 +3360,7 @@ void ClearFrameBsInfo (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi) {
   pFbi->iLayerNum = 0;
   pFbi->iFrameSizeInBytes = 0;
 }
-EVideoFrameType PrepareEncodeFrame (sWelsEncCtx* pCtx, SLayerBSInfo*& pLayerBsInfo, int32_t iSpatialNum ,
+EVideoFrameType PrepareEncodeFrame (sWelsEncCtx* pCtx, SLayerBSInfo*& pLayerBsInfo, int32_t iSpatialNum,
                                     int8_t& iCurDid, int32_t& iCurTid,
                                     int32_t& iLayerNum, int32_t& iFrameSize, long long uiTimeStamp) {
   SWelsSvcCodingParam* pSvcParam        = pCtx->pSvcParam;
@@ -3500,7 +3500,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
   pCtx->pCurDqLayer             = pCtx->ppDqLayerList[iCurDid];
   pCtx->pCurDqLayer->pRefLayer  = NULL;
   if (!pSvcParam->bSimulcastAVC) {
-    eFrameType = PrepareEncodeFrame (pCtx, pLayerBsInfo, iSpatialNum , iCurDid, iCurTid, iLayerNum, iFrameSize,
+    eFrameType = PrepareEncodeFrame (pCtx, pLayerBsInfo, iSpatialNum, iCurDid, iCurTid, iLayerNum, iFrameSize,
                                      pFbi->uiTimeStamp);
     if (eFrameType == videoFrameTypeSkip) {
       pFbi->eFrameType = videoFrameTypeSkip;
@@ -3526,7 +3526,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     pCtx->uiDependencyId        =  iCurDid;
 
     if (pSvcParam->bSimulcastAVC) {
-      eFrameType = PrepareEncodeFrame (pCtx, pLayerBsInfo, iSpatialNum , iCurDid, iCurTid, iLayerNum, iFrameSize,
+      eFrameType = PrepareEncodeFrame (pCtx, pLayerBsInfo, iSpatialNum, iCurDid, iCurTid, iLayerNum, iFrameSize,
                                        pFbi->uiTimeStamp);
       if (eFrameType == videoFrameTypeSkip) {
         pLayerBsInfo->eFrameType = videoFrameTypeSkip;
@@ -4184,7 +4184,21 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
   if (pNewParam->iMaxNumRefFrame > pOldParam->iMaxNumRefFrame) {
     bNeedReset = true;
   }
+  if (bNeedReset) {
+    WelsLog (& (*ppCtx)->sLogCtx, WELS_LOG_INFO,
+             "WelsEncoderParamAdjust(),bSimulcastAVC(%d,%d),iSpatialLayerNum(%d,%d),iPicWidth(%d,%d),iPicHeight(%d,%d),Rect.iWidth(%d,%d),Rect.iHeight(%d,%d)",
+             pOldParam->bSimulcastAVC, pNewParam->bSimulcastAVC, pOldParam->iSpatialLayerNum, pNewParam->iSpatialLayerNum,
+             pOldParam->iPicWidth, pNewParam->iPicWidth, pOldParam->iPicHeight, pNewParam->iPicHeight,
+             pOldParam->SUsedPicRect.iWidth, pNewParam->SUsedPicRect.iWidth, pOldParam->SUsedPicRect.iHeight,
+             pNewParam->SUsedPicRect.iHeight);
 
+    WelsLog (& (*ppCtx)->sLogCtx, WELS_LOG_INFO,
+             "WelsEncoderParamAdjust(),bEnableLongTermReference(%d,%d),iLTRRefNum(%d,%d),iMultipleThreadIdc(%d,%d),bEnableBackgroundDetection(%d,%d),bEnableAdaptiveQuant(%d,%d),eSpsPpsIdStrategy(%d,%d),iMaxNumRefFrame(%d,%d)",
+             pOldParam->bEnableLongTermReference, pNewParam->bEnableLongTermReference, pOldParam->iLTRRefNum, pNewParam->iLTRRefNum,
+             pOldParam->iMultipleThreadIdc, pNewParam->iMultipleThreadIdc, pOldParam->bEnableBackgroundDetection,
+             pNewParam->bEnableBackgroundDetection, pOldParam->bEnableAdaptiveQuant, pNewParam->bEnableAdaptiveQuant,
+             pOldParam->eSpsPpsIdStrategy, pNewParam->eSpsPpsIdStrategy, pNewParam->iMaxNumRefFrame, pOldParam->iMaxNumRefFrame);
+  }
   if (!bNeedReset) { // Check its picture resolutions/quality settings respectively in each dependency layer
     iIndexD = 0;
     assert (pOldParam->iSpatialLayerNum == pNewParam->iSpatialLayerNum);
@@ -4200,6 +4214,11 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
           kpOldDlp->iActualWidth != kpNewDlp->iActualWidth ||
           kpOldDlp->iActualHeight != kpNewDlp->iActualHeight) {
         bNeedReset = true;
+        WelsLog (& (*ppCtx)->sLogCtx, WELS_LOG_INFO,
+                 "WelsEncoderParamAdjust(),iIndexD = %d,sSpatialLayers.wxh_old(%d,%d),sSpatialLayers.wxh_new(%d,%d),iActualwxh_old(%d,%d),iActualwxh_new(%d,%d)",
+                 iIndexD, pOldParam->sSpatialLayers[iIndexD].iVideoWidth, pOldParam->sSpatialLayers[iIndexD].iVideoHeight,
+                 pNewParam->sSpatialLayers[iIndexD].iVideoWidth, pNewParam->sSpatialLayers[iIndexD].iVideoHeight, kpOldDlp->iActualWidth,
+                 kpOldDlp->iActualHeight, kpNewDlp->iActualWidth, kpNewDlp->iActualHeight);
         break;
       }
 
@@ -4208,7 +4227,15 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
           ||
           pOldParam->sSpatialLayers[iIndexD].sSliceArgument.uiSliceNum !=
           pNewParam->sSpatialLayers[iIndexD].sSliceArgument.uiSliceNum) {
+
         bNeedReset = true;
+        WelsLog (& (*ppCtx)->sLogCtx, WELS_LOG_INFO,
+                 "WelsEncoderParamAdjust(),iIndexD = %d,uiSliceMode (%d,%d),uiSliceNum(%d,%d)", iIndexD,
+                 pOldParam->sSpatialLayers[iIndexD].sSliceArgument.uiSliceMode,
+                 pNewParam->sSpatialLayers[iIndexD].sSliceArgument.uiSliceMode,
+                 pOldParam->sSpatialLayers[iIndexD].sSliceArgument.uiSliceNum,
+                 pNewParam->sSpatialLayers[iIndexD].sSliceArgument.uiSliceNum);
+
         break;
       }
       if (pOldParam->sSpatialLayers[iIndexD].uiProfileIdc !=
@@ -4217,6 +4244,11 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
           pOldParam->sSpatialLayers[iIndexD].uiLevelIdc !=
           pNewParam->sSpatialLayers[iIndexD].uiLevelIdc) {
         bNeedReset = true;
+        WelsLog (& (*ppCtx)->sLogCtx, WELS_LOG_INFO,
+                 "WelsEncoderParamAdjust(),iIndexD = %d,uiProfileIdc(%d,%d),uiLevelIdc(%d,%d)", iIndexD,
+                 pOldParam->sSpatialLayers[iIndexD].uiProfileIdc, pNewParam->sSpatialLayers[iIndexD].uiProfileIdc,
+                 pOldParam->sSpatialLayers[iIndexD].uiLevelIdc, pNewParam->sSpatialLayers[iIndexD].uiLevelIdc);
+
         break;
       }
 
@@ -4229,6 +4261,10 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
         fT2 = pNewParam->fMaxFrameRate / kpNewDlp->fOutputFrameRate - pOldParam->fMaxFrameRate / kpOldDlp->fOutputFrameRate;
       if (fT1 > EPSN || fT1 < -EPSN || fT2 > EPSN || fT2 < -EPSN) {
         bNeedReset = true;
+        WelsLog (& (*ppCtx)->sLogCtx, WELS_LOG_INFO,
+                 "WelsEncoderParamAdjust() iIndexD = %d,fInputFrameRate(%f,%f),fOutputFrameRate(%f,%f),fMaxFrameRate(%f,%f)", iIndexD,
+                 kpOldDlp->fInputFrameRate, kpNewDlp->fInputFrameRate, kpOldDlp->fOutputFrameRate, kpNewDlp->fOutputFrameRate,
+                 pOldParam->fMaxFrameRate, pNewParam->fMaxFrameRate);
         break;
       }
       ++ iIndexD;

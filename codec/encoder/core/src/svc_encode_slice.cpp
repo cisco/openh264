@@ -898,7 +898,7 @@ int32_t InitSliceBsBuffer (SSlice* pSlice,
 
   if (bIndependenceBsBuffer) {
     pSlice->pSliceBsa      = &pSlice->sSliceBs.sBsWrite;
-    pSlice->sSliceBs.pBs   = (uint8_t*)pMa->WelsMalloc (iMaxSliceBufferSize, "sSliceBs.pBs");
+    pSlice->sSliceBs.pBs   = (uint8_t*)pMa->WelsMallocz (iMaxSliceBufferSize, "sSliceBs.pBs");
     if (NULL == pSlice->sSliceBs.pBs) {
       return ENC_RETURN_MEMALLOCERR;
     }

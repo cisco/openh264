@@ -541,7 +541,7 @@ static inline int32_t AllocCodingParam (SWelsSvcCodingParam** pParam, CMemoryAli
   if (*pParam != NULL) {
     FreeCodingParam (pParam, pMa);
   }
-  SWelsSvcCodingParam* pCodingParam = (SWelsSvcCodingParam*)pMa->WelsMalloc (sizeof (SWelsSvcCodingParam),
+  SWelsSvcCodingParam* pCodingParam = (SWelsSvcCodingParam*)pMa->WelsMallocz (sizeof (SWelsSvcCodingParam),
                                       "SWelsSvcCodingParam");
   if (NULL == pCodingParam)
     return 1;
