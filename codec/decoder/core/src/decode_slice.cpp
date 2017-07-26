@@ -614,6 +614,7 @@ int32_t WelsDecodeMbCabacISliceBaseMode0 (PWelsDecoderContext pCtx, uint32_t& ui
              && uiMbType <= 24))) {
     return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_MB_TYPE);
   } else if (25 == uiMbType) {   //I_PCM
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "I_PCM mode exists in I slice!");
     WELS_READ_VERIFY (ParseIPCMInfoCabac (pCtx));
     pSlice->iLastDeltaQp = 0;
     WELS_READ_VERIFY (ParseEndOfSliceCabac (pCtx, uiEosFlag));
@@ -833,6 +834,7 @@ int32_t WelsDecodeMbCabacPSliceBaseMode0 (PWelsDecoderContext pCtx, PWelsNeighAv
       return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_MB_TYPE);
 
     if (25 == uiMbType) {   //I_PCM
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "I_PCM mode exists in P slice!");
       WELS_READ_VERIFY (ParseIPCMInfoCabac (pCtx));
       pSlice->iLastDeltaQp = 0;
       WELS_READ_VERIFY (ParseEndOfSliceCabac (pCtx, uiEosFlag));
@@ -1265,6 +1267,7 @@ int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
     return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_MB_TYPE);
 
   if (25 == uiMbType) {
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "I_PCM mode exists in I slice!");
     int32_t iDecStrideL = pCurLayer->pDec->iLinesize[0];
     int32_t iDecStrideC = pCurLayer->pDec->iLinesize[1];
 
@@ -1291,20 +1294,22 @@ int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
 
     //step 2: copy pixel from bit-stream into fdec [reconstruction]
     pTmpBsBuf = pBs->pCurBuf;
-    for (i = 0; i < 16; i++) { //luma
-      memcpy (pDecY , pTmpBsBuf, iCopySizeY);
-      pDecY += iDecStrideL;
-      pTmpBsBuf += 16;
-    }
-    for (i = 0; i < 8; i++) { //cb
-      memcpy (pDecU, pTmpBsBuf, iCopySizeUV);
-      pDecU += iDecStrideC;
-      pTmpBsBuf += 8;
-    }
-    for (i = 0; i < 8; i++) { //cr
-      memcpy (pDecV, pTmpBsBuf, iCopySizeUV);
-      pDecV += iDecStrideC;
-      pTmpBsBuf += 8;
+    if (!pCtx->pParam->bParseOnly) {
+      for (i = 0; i < 16; i++) { //luma
+        memcpy (pDecY , pTmpBsBuf, iCopySizeY);
+        pDecY += iDecStrideL;
+        pTmpBsBuf += 16;
+      }
+      for (i = 0; i < 8; i++) { //cb
+        memcpy (pDecU, pTmpBsBuf, iCopySizeUV);
+        pDecU += iDecStrideC;
+        pTmpBsBuf += 8;
+      }
+      for (i = 0; i < 8; i++) { //cr
+        memcpy (pDecV, pTmpBsBuf, iCopySizeUV);
+        pDecV += iDecStrideC;
+        pTmpBsBuf += 8;
+      }
     }
 
     pBs->pCurBuf += 384;
@@ -1603,6 +1608,7 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
       return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_MB_TYPE);
 
     if (25 == uiMbType) {
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "I_PCM mode exists in P slice!");
       int32_t iDecStrideL = pCurLayer->pDec->iLinesize[0];
       int32_t iDecStrideC = pCurLayer->pDec->iLinesize[1];
 
@@ -1628,21 +1634,23 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
 
       //step 2: copy pixel from bit-stream into fdec [reconstruction]
       pTmpBsBuf = pBs->pCurBuf;
-      for (i = 0; i < 16; i++) { //luma
-        memcpy (pDecY , pTmpBsBuf, iCopySizeY);
-        pDecY += iDecStrideL;
-        pTmpBsBuf += 16;
-      }
+      if (!pCtx->pParam->bParseOnly) {
+        for (i = 0; i < 16; i++) { //luma
+          memcpy (pDecY, pTmpBsBuf, iCopySizeY);
+          pDecY += iDecStrideL;
+          pTmpBsBuf += 16;
+        }
 
-      for (i = 0; i < 8; i++) { //cb
-        memcpy (pDecU, pTmpBsBuf, iCopySizeUV);
-        pDecU += iDecStrideC;
-        pTmpBsBuf += 8;
-      }
-      for (i = 0; i < 8; i++) { //cr
-        memcpy (pDecV, pTmpBsBuf, iCopySizeUV);
-        pDecV += iDecStrideC;
-        pTmpBsBuf += 8;
+        for (i = 0; i < 8; i++) { //cb
+          memcpy (pDecU, pTmpBsBuf, iCopySizeUV);
+          pDecU += iDecStrideC;
+          pTmpBsBuf += 8;
+        }
+        for (i = 0; i < 8; i++) { //cr
+          memcpy (pDecV, pTmpBsBuf, iCopySizeUV);
+          pDecV += iDecStrideC;
+          pTmpBsBuf += 8;
+        }
       }
 
       pBs->pCurBuf += 384;
