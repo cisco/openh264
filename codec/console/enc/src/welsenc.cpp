@@ -223,9 +223,9 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
 
       if (strTag[0].compare ("UsageType") == 0) {
         pSvcParam.iUsageType = (EUsageType)atoi (strTag[1].c_str());
-      }else if (strTag[0].compare ("SimulcastAVC") == 0) {
+      } else if (strTag[0].compare ("SimulcastAVC") == 0) {
         pSvcParam.bSimulcastAVC = atoi (strTag[1].c_str()) ? true : false;
-      }else if (strTag[0].compare ("SourceWidth") == 0) {
+      } else if (strTag[0].compare ("SourceWidth") == 0) {
         pSrcPic->iPicWidth = atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("SourceHeight") == 0) {
         pSrcPic->iPicHeight = atoi (strTag[1].c_str());
@@ -315,9 +315,9 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
           return 1;
         }
       } else if (strTag[0].compare ("MaxQp") == 0) {
-          pSvcParam.iMaxQp = atoi (strTag[1].c_str());
+        pSvcParam.iMaxQp = atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("MinQp") == 0) {
-          pSvcParam.iMinQp = atoi (strTag[1].c_str());
+        pSvcParam.iMinQp = atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("EnableDenoise") == 0) {
         pSvcParam.bEnableDenoise = atoi (strTag[1].c_str()) ? true : false;
       } else if (strTag[0].compare ("EnableSceneChangeDetection") == 0) {
@@ -444,7 +444,7 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
       pSvcParam.iUsageType = (EUsageType)atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-savc") && (n < argc))
-        pSvcParam.bSimulcastAVC =  atoi (argv[n++]) ? true : false;
+      pSvcParam.bSimulcastAVC =  atoi (argv[n++]) ? true : false;
 
     else if (!strcmp (pCommand, "-org") && (n < argc))
       sFileSet.strSeqFile.assign (argv[n++]);
@@ -545,10 +545,10 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
       pSvcParam.iMaxBitrate = 1000 * atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-maxqp") && (n < argc))
-        pSvcParam.iMaxQp = atoi (argv[n++]);
+      pSvcParam.iMaxQp = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-minqp") && (n < argc))
-        pSvcParam.iMinQp = atoi (argv[n++]);
+      pSvcParam.iMinQp = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-numl") && (n < argc)) {
       pSvcParam.iSpatialLayerNum = atoi (argv[n++]);
@@ -735,8 +735,13 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
   uint8_t* pYUV = NULL;
   SSourcePicture* pSrcPic = NULL;
   uint32_t iSourceWidth, iSourceHeight, kiPicResSize;
+  string filename_layer;
+  string add_info[4] = { "_layer0", "_layer1", "_layer2", "_layer3" };
   // Inactive with sink with output file handler
-  FILE* pFpBs = NULL;
+  FILE* pFpBs[4];
+  for (int i = 0; i < 4; i++) {
+    pFpBs[i] = NULL;
+  }
 #if defined(COMPARE_DATA)
   //For getting the golden file handle
   FILE* fpGolden = NULL;
@@ -838,8 +843,19 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
   }
   // Inactive with sink with output file handler
   if (fs.strBsFile.length() > 0) {
-    pFpBs = fopen (fs.strBsFile.c_str(), "wb");
-    if (pFpBs == NULL) {
+    int found = 0;
+    found = fs.strBsFile.find_first_of ('.', 0);
+    if (sSvcParam.iSpatialLayerNum == 1) {
+      filename_layer = fs.strBsFile;
+      pFpBs[0] = fopen (filename_layer.c_str(), "wb");
+    } else {
+      for (int i = 0; i < sSvcParam.iSpatialLayerNum; i++) {
+        filename_layer = fs.strBsFile.insert (found, add_info[i]);
+        pFpBs[i] = fopen (filename_layer.c_str(), "wb");
+        fs.strBsFile = filename_layer.erase (found, 7);
+      }
+    }
+    if ((pFpBs[0] == NULL) && (pFpBs[1] == NULL) && (pFpBs[2] == NULL) && (pFpBs[3] == NULL)) {
       fprintf (stderr, "Can not open file (%s) to write bitstream!\n", fs.strBsFile.c_str());
       iRet = 1;
       goto INSIDE_MEM_FREE;
@@ -941,7 +957,19 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
             delete [] pUCArry;
           }
 #endif
-          fwrite (pLayerBsInfo->pBsBuf, 1, iLayerSize, pFpBs); // write pure bit stream into file
+          //fwrite(pLayerBsInfo->pBsBuf, 1, iLayerSize, pFpBs[iLayer]);
+          if (pLayerBsInfo->uiSpatialId == 0) {
+            unsigned char five_bits;
+            five_bits = pLayerBsInfo->pBsBuf[4] & 0x1f;
+            if ((five_bits == 0x07) || (five_bits == 0x08)) {
+              for (int i = 0; i < sSvcParam.iSpatialLayerNum; i++) {
+                fwrite (pLayerBsInfo->pBsBuf, 1, iLayerSize, pFpBs[i]);
+              }
+            } else
+              fwrite (pLayerBsInfo->pBsBuf, 1, iLayerSize, pFpBs[0]);
+          } else {
+            fwrite (pLayerBsInfo->pBsBuf, 1, iLayerSize, pFpBs[pLayerBsInfo->uiSpatialId]);
+          }
           iFrameSize += iLayerSize;
         }
         ++ iLayer;
@@ -970,9 +998,11 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
 #endif
   }
 INSIDE_MEM_FREE:
-  if (pFpBs) {
-    fclose (pFpBs);
-    pFpBs = NULL;
+  for (int i = 0; i < 4; i++) {
+    if (pFpBs[i]) {
+      fclose (pFpBs[i]);
+      pFpBs[i] = NULL;
+    }
   }
 #if defined (STICK_STREAM_SIZE)
   if (fTrackStream) {
