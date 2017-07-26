@@ -991,20 +991,22 @@ int32_t ParseIPCMInfoCabac (PWelsDecoderContext pCtx) {
     return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_CABAC_NO_BS_TO_READ);
   }
   pPtrSrc = pBsAux->pCurBuf;
-  for (i = 0; i < 16; i++) {   //luma
-    memcpy (pMbDstY , pPtrSrc, 16);
-    pMbDstY += iDstStrideLuma;
-    pPtrSrc += 16;
-  }
-  for (i = 0; i < 8; i++) {   //cb
-    memcpy (pMbDstU, pPtrSrc, 8);
-    pMbDstU += iDstStrideChroma;
-    pPtrSrc += 8;
-  }
-  for (i = 0; i < 8; i++) {   //cr
-    memcpy (pMbDstV, pPtrSrc, 8);
-    pMbDstV += iDstStrideChroma;
-    pPtrSrc += 8;
+  if (!pCtx->pParam->bParseOnly) {
+    for (i = 0; i < 16; i++) {   //luma
+      memcpy (pMbDstY , pPtrSrc, 16);
+      pMbDstY += iDstStrideLuma;
+      pPtrSrc += 16;
+    }
+    for (i = 0; i < 8; i++) {   //cb
+      memcpy (pMbDstU, pPtrSrc, 8);
+      pMbDstU += iDstStrideChroma;
+      pPtrSrc += 8;
+    }
+    for (i = 0; i < 8; i++) {   //cr
+      memcpy (pMbDstV, pPtrSrc, 8);
+      pMbDstV += iDstStrideChroma;
+      pPtrSrc += 8;
+    }
   }
 
   pBsAux->pCurBuf += 384;
