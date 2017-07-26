@@ -651,7 +651,7 @@ int32_t RequestFeatureSearchPreparation (CMemoryAlign* pMa, const int32_t kiFram
                             (kiFrameWidth - kiMarginSize) * sizeof (uint32_t) + kiFrameWidth * 8 * sizeof (uint8_t);
   }
   pFeatureSearchPreparation->pFeatureOfBlock =
-    (uint16_t*)pMa->WelsMalloc (iListOfFeatureOfBlock, "pFeatureOfBlock");
+    (uint16_t*)pMa->WelsMallocz (iListOfFeatureOfBlock, "pFeatureOfBlock");
   WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == (pFeatureSearchPreparation->pFeatureOfBlock))
 
   pFeatureSearchPreparation->uiFeatureStrategyIndex = kiFeatureStrategyIndex;
@@ -688,19 +688,19 @@ int32_t RequestScreenBlockFeatureStorage (CMemoryAlign* pMa, const int32_t kiFra
   const int32_t kiListSize  = (0 == kiFeatureStrategyIndex) ? (bIsBlock8x8 ? LIST_SIZE_SUM_8x8 : LIST_SIZE_SUM_16x16) :
                               256;
 
-  pScreenBlockFeatureStorage->pTimesOfFeatureValue = (uint32_t*)pMa->WelsMalloc (kiListSize * sizeof (uint32_t),
+  pScreenBlockFeatureStorage->pTimesOfFeatureValue = (uint32_t*)pMa->WelsMallocz (kiListSize * sizeof (uint32_t),
       "pScreenBlockFeatureStorage->pTimesOfFeatureValue");
   WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == pScreenBlockFeatureStorage->pTimesOfFeatureValue)
 
-  pScreenBlockFeatureStorage->pLocationOfFeature = (uint16_t**)pMa->WelsMalloc (kiListSize * sizeof (uint16_t*),
+  pScreenBlockFeatureStorage->pLocationOfFeature = (uint16_t**)pMa->WelsMallocz (kiListSize * sizeof (uint16_t*),
       "pScreenBlockFeatureStorage->pLocationOfFeature");
   WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == pScreenBlockFeatureStorage->pLocationOfFeature)
 
-  pScreenBlockFeatureStorage->pLocationPointer = (uint16_t*)pMa->WelsMalloc (2 * kiFrameSize * sizeof (uint16_t),
+  pScreenBlockFeatureStorage->pLocationPointer = (uint16_t*)pMa->WelsMallocz (2 * kiFrameSize * sizeof (uint16_t),
       "pScreenBlockFeatureStorage->pLocationPointer");
   WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == pScreenBlockFeatureStorage->pLocationPointer)
   //  uint16_t* pFeatureValuePointerList[WELS_MAX (LIST_SIZE_SUM_16x16, LIST_SIZE_MSE_16x16)] = {0};
-  pScreenBlockFeatureStorage->pFeatureValuePointerList = (uint16_t**)pMa->WelsMalloc (WELS_MAX (LIST_SIZE_SUM_16x16,
+  pScreenBlockFeatureStorage->pFeatureValuePointerList = (uint16_t**)pMa->WelsMallocz (WELS_MAX (LIST_SIZE_SUM_16x16,
       LIST_SIZE_MSE_16x16) * sizeof (uint16_t*),
       "pScreenBlockFeatureStorage->pFeatureValuePointerList");
   WELS_VERIFY_RETURN_IF (ENC_RETURN_MEMALLOCERR, NULL == pScreenBlockFeatureStorage->pFeatureValuePointerList)

@@ -382,7 +382,7 @@ int32_t InitSliceSegment (SDqLayer* pCurDq,
   }
 
   if (SM_SINGLE_SLICE == uiSliceMode) {
-    pSliceSeg->pOverallMbMap = (uint16_t*)pMa->WelsMalloc (kiCountMbNum * sizeof (uint16_t), "pSliceSeg->pOverallMbMap");
+    pSliceSeg->pOverallMbMap = (uint16_t*)pMa->WelsMallocz (kiCountMbNum * sizeof (uint16_t), "pSliceSeg->pOverallMbMap");
 
     WELS_VERIFY_RETURN_IF (1, NULL == pSliceSeg->pOverallMbMap)
     pSliceSeg->iSliceNumInFrame = 1;
@@ -398,7 +398,7 @@ int32_t InitSliceSegment (SDqLayer* pCurDq,
         && uiSliceMode != SM_SIZELIMITED_SLICE )
       return 1;
 
-    pSliceSeg->pOverallMbMap = (uint16_t*)pMa->WelsMalloc (kiCountMbNum * sizeof (uint16_t), "pSliceSeg->pOverallMbMap");
+    pSliceSeg->pOverallMbMap = (uint16_t*)pMa->WelsMallocz (kiCountMbNum * sizeof (uint16_t), "pSliceSeg->pOverallMbMap");
     WELS_VERIFY_RETURN_IF (1, NULL == pSliceSeg->pOverallMbMap)
 
     WelsSetMemMultiplebytes_c(pSliceSeg->pOverallMbMap, 0, kiCountMbNum, sizeof(uint16_t));
