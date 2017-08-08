@@ -1,6 +1,39 @@
 
 Releases
 -----------
+
+v1.7.0
+------
+- Changed SPS/PPS strategy option name,See enum ENCODER_OPTION
+- Changed NAL size length parameter from static array to pointer to support more NALs.See struct SParserBsInfo
+- Changed semaphores to condition variables on apple platform
+- Changed version update mechanism as Major.Minor.patch,like 1.7.0
+- Supported to force IDR independently for each layer in simulcast AVC case.See API ForceIntraFrame()
+- Supported LTR request independently for each layer in simulcast AVC case.See struct SLTRRecoverRequest and SLTRMarkingFeedback
+- Supported to set sample aspect ratio in VUI on encoder side. See struct SSpatialLayerConfig
+- Supported to set profile and level, changed the default level as 4.1 if the user doesn’t set it. See enum ELevelIdc
+- Supported to get profile and level info on decoder side.See enum DECODER_OPTION
+- Supported for enable/disable AVX2 build option. Build option: HAVE_AVX2
+- Supported to set decoder statistics log interval, Add DECODER_OPTION_STATISTICS_LOG_INTERVAL.See DECODER_OPTION.
+- Supported for AU delimiter NAL on decoder side. AU delimiter refers to section 7.3.2.4
+- Supported for x86 PIC assembly and build option. Build option: ENABLEPIC. git issues:#2263 #2534
+- Supported for Cygwin x86_64 build
+- Supported to get sample aspect ratio by GetOption on decoder. Add option: DECODER_OPTION_GET_SAR_INFO
+- Set constraint_set4_flag constraint_set5_flag to align to CHP definition in latest H264 standard
+- Improved VUI support on decoder side
+- Improved decoder statistics info output
+- Refined the return value when failed in memory allocation
+- Added SSSE3 motion compensation routines
+- Added AVX2 motion compensation routines
+- Optimization on some of SSE2/MMX functions
+- Refactor rate control for RC_BUFFERBASED_MODE and RC_QUALITY_MODE mode
+- Added more unit tests for random resolution input,slice mode switch,profile/level setting
+- Refined logs
+- Bug fixes for 4:0:0 format support on decoder
+- Bug fixes for complexity calculation for screen content mode
+- Bug fixes for loadbalancing turn on, git issue:#2618
+- Bug fixes for parser subsps, scalling list, parser longer bitstream
+
 v1.6.0
 ------
 - Adjusted the encoder API structures
@@ -124,6 +157,21 @@ Binaries
 These binary releases are distributed under this license:
 http://www.openh264.org/BINARY_LICENSE.txt
 
+v1.7.0
+------
+http://ciscobinary.openh264.org/libopenh264-1.7.0-android19.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.7.0-android19.so.sig.bz2
+http://ciscobinary.openh264.org/libopenh264-1.7.0-ios.a.bz2
+http://ciscobinary.openh264.org/libopenh264-1.7.0-ios.a.sig.bz2
+http://ciscobinary.openh264.org/libopenh264-1.7.0-linux32.4.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.7.0-linux32.4.so.sig.bz2
+http://ciscobinary.openh264.org/libopenh264-1.7.0-linux64.4.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.7.0-linux64.4.so.sig.bz2
+http://ciscobinary.openh264.org/libopenh264-1.7.0-osx32.4.dylib.bz2
+http://ciscobinary.openh264.org/libopenh264-1.7.0-osx64.4.dylib.bz2
+http://ciscobinary.openh264.org/openh264-1.7.0-win32.dll.bz2
+http://ciscobinary.openh264.org/openh264-1.7.0-win64.dll.bz2
+
 v1.6.0
 ------
 http://ciscobinary.openh264.org/libopenh264-1.6.0-android19.so.bz2
@@ -199,12 +247,12 @@ http://ciscobinary.openh264.org/openh264-1.1.0-win64msvc.dll.bz2
 v1.0.0
 ------
 
-http://ciscobinary.openh264.org/download/libopenh264-1.0.0-android19.so.bz2
-http://ciscobinary.openh264.org/download/libopenh264-1.0.0-linux32.so.bz2
-http://ciscobinary.openh264.org/download/libopenh264-1.0.0-linux64.so.bz2
-http://ciscobinary.openh264.org/download/libopenh264-1.0.0-osx64.dylib.bz2
-http://ciscobinary.openh264.org/download/openh264-1.0.0-win32msvc.dll.bz2
-http://ciscobinary.openh264.org/download/openh264-1.0.0-win64msvc.dll.bz2
+http://ciscobinary.openh264.org/libopenh264-1.0.0-android19.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.0.0-linux32.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.0.0-linux64.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.0.0-osx64.dylib.bz2
+http://ciscobinary.openh264.org/openh264-1.0.0-win32msvc.dll.bz2
+http://ciscobinary.openh264.org/openh264-1.0.0-win64msvc.dll.bz2
 
 
 
