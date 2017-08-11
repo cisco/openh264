@@ -404,6 +404,7 @@ void PrintHelp() {
   printf ("  -aq          Control adaptive quantization (default: 0)\n");
   printf ("  -ltr         Control long term reference (default: 0)\n");
   printf ("  -ltrnum      Control the number of long term reference((1-4):screen LTR,(1-2):video LTR \n");
+  printf ("  -ltrper      Control the long term reference marking period \n");
   printf ("  -threadIdc   0: auto(dynamic imp. internal encoder); 1: multiple threads imp. disabled; > 1: count number of threads \n");
   printf ("  -loadbalancing   0: turn off loadbalancing between slices when multi-threading available; 1: (default value) turn on loadbalancing between slices when multi-threading available\n");
   printf ("  -deblockIdc  Loop filter idc (0: on, 1: off, \n");
