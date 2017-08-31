@@ -168,8 +168,8 @@ void WelsFillCacheConstrain1IntraNxN (PWelsNeighAvail pNeighAvail, uint8_t* pNon
     iLeftXy = iCurXy - 1;
   }
 
-  //intra4x4_pred_mode
-  if (pNeighAvail->iTopAvail && IS_INTRA4x4 (pNeighAvail->iTopType)) { //top
+  //intraNxN_pred_mode
+  if (pNeighAvail->iTopAvail && IS_INTRANxN (pNeighAvail->iTopType)) { //top
     ST32 (pIntraPredMode + 1, LD32 (&pCurLayer->pIntraPredMode[iTopXy][0]));
   } else {
     int32_t iPred;
@@ -180,7 +180,7 @@ void WelsFillCacheConstrain1IntraNxN (PWelsNeighAvail pNeighAvail, uint8_t* pNon
     ST32 (pIntraPredMode + 1, iPred);
   }
 
-  if (pNeighAvail->iLeftAvail && IS_INTRA4x4 (pNeighAvail->iLeftType)) { //left
+  if (pNeighAvail->iLeftAvail && IS_INTRANxN (pNeighAvail->iLeftType)) { //left
     pIntraPredMode[ 0 + 8    ] = pCurLayer->pIntraPredMode[iLeftXy][4];
     pIntraPredMode[ 0 + 8 * 2] = pCurLayer->pIntraPredMode[iLeftXy][5];
     pIntraPredMode[ 0 + 8 * 3] = pCurLayer->pIntraPredMode[iLeftXy][6];
