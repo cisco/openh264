@@ -1284,13 +1284,11 @@ void WelRcPictureInitBufferBasedQp (sWelsEncCtx* pEncCtx, long long uiTimeStamp)
   SVAAFrameInfo* pVaa = static_cast<SVAAFrameInfo*> (pEncCtx->pVaa);
   SWelsSvcRc* pWelsSvcRc =  &pEncCtx->pWelsSvcRc[pEncCtx->uiDependencyId];
 
-  int32_t iMinQp = MIN_SCREEN_QP;
+  int32_t iMinQp = pEncCtx->pSvcParam->iMinQp;
   if (pVaa->eSceneChangeIdc == LARGE_CHANGED_SCENE)
-    iMinQp = MIN_SCREEN_QP + 2;
+    iMinQp += 2;
   else if (pVaa->eSceneChangeIdc == MEDIUM_CHANGED_SCENE)
-    iMinQp = MIN_SCREEN_QP + 1;
-  else
-    iMinQp = MIN_SCREEN_QP;
+    iMinQp += 1;
   if (pEncCtx->bDeliveryFlag)
     pEncCtx->iGlobalQp -= 1;
   else
