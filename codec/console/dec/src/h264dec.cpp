@@ -181,13 +181,18 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
         return;
       iSliceSize = static_cast<int32_t> (pInfo[2]);
     } else {
-      for (i = 0; i < iFileSize; i++) {
-        if ((pBuf[iBufPos + i] == 0 && pBuf[iBufPos + i + 1] == 0 && pBuf[iBufPos + i + 2] == 0 && pBuf[iBufPos + i + 3] == 1
-             && i > 0) || (pBuf[iBufPos + i] == 0 && pBuf[iBufPos + i + 1] == 0 && pBuf[iBufPos + i + 2] == 1 && i > 0)) {
+      for (i = iBufPos+1; i < iFileSize; i++) {
+        int room = iFileSize - i;
+        if (room >= 4 && pBuf[i] == 0 && pBuf[i + 1] == 0 && pBuf[i + 2] == 0 && pBuf[i+3] == 1) {
+          break;
+        } else if (room >= 3 && pBuf[i] == 0 && pBuf[i + 1] == 0 && pBuf[i + 2] == 1) {
+          break;
+        } else if (room <= 3) {
+          i = iFileSize;
           break;
         }
       }
-      iSliceSize = i;
+      iSliceSize = i - iBufPos;
     }
     if (iSliceSize < 4) { //too small size, no effective data, ignore
       iBufPos += iSliceSize;
