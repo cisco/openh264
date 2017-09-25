@@ -3925,8 +3925,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 #if defined(LAYER_INFO_OUTPUT)
     fprintf (stderr, "%2s %5d: %-5d %2s   T%1d D%1d Q%-2d  QP%3d   Y%2.2f  U%2.2f  V%2.2f  %8d bits\n",
              (iSpatialIdx == 0) ? "#AU" : "   ",
-             pCtx->iPOC,
-             pCtx->iFrameNum,
+             pParamInternal->iPOC,
+             pParamInternal->iFrameNum,
              (eFrameType == videoFrameTypeI || eFrameType == videoFrameTypeIDR) ? "I" : "P",
              iCurTid,
              iCurDid,
