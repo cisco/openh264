@@ -409,7 +409,7 @@ void PrintHelp() {
   printf ("  -deblockIdc  Loop filter idc (0: on, 1: off, \n");
   printf ("  -alphaOffset AlphaOffset(-6..+6): valid range \n");
   printf ("  -betaOffset  BetaOffset (-6..+6): valid range\n");
-  printf ("  -rc          rate control mode: 0-quality mode; 1-bitrate mode; 2-bitrate limited mode; -1-rc off \n");
+  printf ("  -rc          rate control mode: -1-rc off; 0-quality mode; 1-bitrate mode; 2: buffer based mode,can't control bitrate; 3: bitrate mode based on timestamp input;\n");
   printf ("  -tarb        Overall target bitrate\n");
   printf ("  -maxbrTotal  Overall max bitrate\n");
   printf ("  -maxqp       Maximum Qp (default: %d, or for screen content usage: %d)\n", QP_MAX_VALUE, MAX_SCREEN_QP);
