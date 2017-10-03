@@ -742,6 +742,10 @@ typedef struct TagVideoEncoderStatistics {
   unsigned int uiLTRSentNum;                   ///< number of LTR sent/marked
 
   long long    iStatisticsTs;                  ///< Timestamp of updating the statistics
+  
+  unsigned long long             iTotalEncodedBytes;
+  unsigned long long             iLastStatisticsBytes;
+  unsigned long long             iLastStatisticsFrameCount;
 } SEncoderStatistics; // in building, coming soon
 
 /**
