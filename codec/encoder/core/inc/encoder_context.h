@@ -225,9 +225,6 @@ typedef struct TagWelsEncCtx {
   SEncoderStatistics sEncoderStatistics[MAX_DEPENDENCY_LAYER];
   int32_t            iStatisticsLogInterval;
   int64_t            iLastStatisticsLogTs;
-  int64_t            iTotalEncodedBytes[MAX_DEPENDENCY_LAYER];
-  int64_t            iLastStatisticsBytes[MAX_DEPENDENCY_LAYER];
-  int64_t            iLastStatisticsFrameCount[MAX_DEPENDENCY_LAYER];
 
   int32_t iEncoderError;
   WELS_MUTEX mutexEncoderError;
