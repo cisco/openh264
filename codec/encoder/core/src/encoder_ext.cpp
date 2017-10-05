@@ -159,10 +159,6 @@ void CheckLevelSetting (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, int32
     }
     iLevelIdx--;
   } while (iLevelIdx >= 0);
-  if (pLayerInfo->uiLevelIdc == LEVEL_UNKNOWN) {
-    WelsLog (pLogCtx, WELS_LOG_INFO, "change unexpected levelidc(%d) setting to LEVEL_5_2", pLayerInfo->uiLevelIdc);
-    pLayerInfo->uiLevelIdc = LEVEL_5_2;
-  }
 }
 void CheckReferenceNumSetting (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, int32_t iNumRef) {
   int32_t iRefUpperBound = (pParam->iUsageType == CAMERA_VIDEO_REAL_TIME) ?
