@@ -573,7 +573,7 @@ void CWelsH264SVCEncoder::UpdateStatistics (SFrameBSInfo* pBsInfo,
 
   int32_t iMaxDid = m_pEncContext->pSvcParam->iSpatialLayerNum - 1;
   SLayerBSInfo*  pLayerInfo = &pBsInfo->sLayerInfo[0];
-  int32_t iMaxInputFrame = 0;
+  uint32_t iMaxInputFrame = 0;
   float iMaxFrameRate = 0;
   for (int32_t iDid = 0; iDid <= iMaxDid; iDid++) {
     EVideoFrameType eFrameType = videoFrameTypeSkip;
