@@ -4238,19 +4238,6 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
 
         break;
       }
-      if (pOldParam->sSpatialLayers[iIndexD].uiProfileIdc !=
-          pNewParam->sSpatialLayers[iIndexD].uiProfileIdc
-          ||
-          pOldParam->sSpatialLayers[iIndexD].uiLevelIdc !=
-          pNewParam->sSpatialLayers[iIndexD].uiLevelIdc) {
-        bNeedReset = true;
-        WelsLog (& (*ppCtx)->sLogCtx, WELS_LOG_INFO,
-                 "WelsEncoderParamAdjust(),iIndexD = %d,uiProfileIdc(%d,%d),uiLevelIdc(%d,%d)", iIndexD,
-                 pOldParam->sSpatialLayers[iIndexD].uiProfileIdc, pNewParam->sSpatialLayers[iIndexD].uiProfileIdc,
-                 pOldParam->sSpatialLayers[iIndexD].uiLevelIdc, pNewParam->sSpatialLayers[iIndexD].uiLevelIdc);
-
-        break;
-      }
 
       // check frame rate
       // we can not check whether corresponding fFrameRate is equal or not,
@@ -4265,6 +4252,22 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
                  "WelsEncoderParamAdjust() iIndexD = %d,fInputFrameRate(%f,%f),fOutputFrameRate(%f,%f),fMaxFrameRate(%f,%f)", iIndexD,
                  kpOldDlp->fInputFrameRate, kpNewDlp->fInputFrameRate, kpOldDlp->fOutputFrameRate, kpNewDlp->fOutputFrameRate,
                  pOldParam->fMaxFrameRate, pNewParam->fMaxFrameRate);
+        break;
+      }
+      if (pOldParam->sSpatialLayers[iIndexD].uiProfileIdc != pNewParam->sSpatialLayers[iIndexD].uiProfileIdc) {
+        bNeedReset = true;
+        WelsLog (& (*ppCtx)->sLogCtx, WELS_LOG_INFO,
+                 "WelsEncoderParamAdjust(),iIndexD = %d,uiProfileIdc(%d,%d)", iIndexD,
+                 pOldParam->sSpatialLayers[iIndexD].uiProfileIdc, pNewParam->sSpatialLayers[iIndexD].uiProfileIdc);
+        break;
+      }
+      //check level change,if new level is smaller than old level,don't reset encoder. still use old level.
+
+      if (pNewParam->sSpatialLayers[iIndexD].uiLevelIdc > pOldParam->sSpatialLayers[iIndexD].uiLevelIdc) {
+        bNeedReset = true;
+        WelsLog (& (*ppCtx)->sLogCtx, WELS_LOG_INFO,
+                 "WelsEncoderParamAdjust(),iIndexD = %d,uiLevelIdc(%d,%d)", iIndexD,
+                 pOldParam->sSpatialLayers[iIndexD].uiLevelIdc, pNewParam->sSpatialLayers[iIndexD].uiLevelIdc);
         break;
       }
       ++ iIndexD;
