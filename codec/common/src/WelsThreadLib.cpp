@@ -46,9 +46,11 @@
 #include <sched.h>
 #elif !defined(_WIN32) && !defined(__CYGWIN__)
 #include <sys/types.h>
-#include <sys/sysctl.h>
 #include <sys/param.h>
 #include <unistd.h>
+#ifndef __Fuchsia__
+#include <sys/sysctl.h>
+#endif
 #ifdef __APPLE__
 #define HW_NCPU_NAME "hw.logicalcpu"
 #else
@@ -536,6 +538,10 @@ WELS_THREAD_ERROR_CODE    WelsQueryLogicalProcessInfo (WelsLogicalProcessInfo* p
   pInfo->ProcessorCount = 1;
   return WELS_THREAD_ERROR_OK;
 
+#elif defined(__Fuchsia__)
+
+  pInfo->ProcessorCount = sysconf(_SC_NPROCESSORS_ONLN);
+  return WELS_THREAD_ERROR_OK;
 #else
 
   size_t len = sizeof (pInfo->ProcessorCount);
