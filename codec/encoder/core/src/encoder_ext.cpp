@@ -4291,7 +4291,7 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
     int32_t            iStatisticsLogInterval = (*ppCtx)->iStatisticsLogInterval;
     int64_t            iLastStatisticsLogTs = (*ppCtx)->iLastStatisticsLogTs;
     //for sEncoderStatistics
-    
+
     SExistingParasetList sExistingParasetList;
     SExistingParasetList* pExistingParasetList = NULL;
 
@@ -4322,7 +4322,7 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
     (*ppCtx)->iStatisticsLogInterval = iStatisticsLogInterval;
     (*ppCtx)->iLastStatisticsLogTs = iLastStatisticsLogTs;
     //for sEncoderStatistics
-    
+
     //load back the needed structure for eSpsPpsIdStrategy
     if (((CONSTANT_ID != iOldSpsPpsIdStrategy) && (CONSTANT_ID != pNewParam->eSpsPpsIdStrategy))
         || ((SPS_PPS_LISTING == iOldSpsPpsIdStrategy)
