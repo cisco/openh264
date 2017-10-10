@@ -4287,8 +4287,13 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
         uiMaxIdrPicId = pOldParam->sDependencyLayers[iIndexD].uiIdrPicId;
     }
 
+    //for sEncoderStatistics
     SEncoderStatistics sTempEncoderStatistics[MAX_DEPENDENCY_LAYER];
     memcpy (sTempEncoderStatistics, (*ppCtx)->sEncoderStatistics, sizeof (sTempEncoderStatistics));
+    int64_t            uiStartTimestamp = (*ppCtx)->uiStartTimestamp;
+    int32_t            iStatisticsLogInterval = (*ppCtx)->iStatisticsLogInterval;
+    int64_t            iLastStatisticsLogTs = (*ppCtx)->iLastStatisticsLogTs;
+    //for sEncoderStatistics
 
     SExistingParasetList sExistingParasetList;
     SExistingParasetList* pExistingParasetList = NULL;
@@ -4316,6 +4321,11 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
 
     //for sEncoderStatistics
     memcpy ((*ppCtx)->sEncoderStatistics, sTempEncoderStatistics, sizeof (sTempEncoderStatistics));
+    (*ppCtx)->uiStartTimestamp = uiStartTimestamp;
+    (*ppCtx)->iStatisticsLogInterval = iStatisticsLogInterval;
+    (*ppCtx)->iLastStatisticsLogTs = iLastStatisticsLogTs;
+    //for sEncoderStatistics
+
     //load back the needed structure for eSpsPpsIdStrategy
     if (((CONSTANT_ID != iOldSpsPpsIdStrategy) && (CONSTANT_ID != pNewParam->eSpsPpsIdStrategy))
         || ((SPS_PPS_LISTING == iOldSpsPpsIdStrategy)
