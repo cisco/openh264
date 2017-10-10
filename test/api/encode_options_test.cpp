@@ -2058,3 +2058,61 @@ TEST_F (EncodeDecodeTestAPI, ProfileLevelSetting) {
   rv = encoder_->Uninitialize();
   ASSERT_TRUE (rv == cmResultSuccess) << "rv = " << rv;
 }
+
+TEST_F (EncodeDecodeTestAPI, AVCSVCExtensionCheck) {
+  int iWidth       = 640;
+  int iHeight      = 360;
+  float fFrameRate = rand() % 30 + 0.5f;
+  int iTotalFrame  = 10; //total test enc frame num
+  int iSliceNum    = 1;
+
+  int iRet;
+  int iSpatialLayerNumList[] = {1, 3};
+  int iLoopNum = 5;
+  for (int i = 0; i < iLoopNum; ++i) {
+    // prepare params
+    SEncParamExt sParam;
+    encoder_->GetDefaultParams (&sParam);
+    int iCurrSpatialLayerNum = iSpatialLayerNumList[rand() % 2];
+    prepareParamDefault (iCurrSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate, &sParam);
+    sParam.bSimulcastAVC = rand() & 1; //0 or 1
+    sParam.iRCMode = RC_TIMESTAMP_MODE;
+    sParam.iNumRefFrame = 1;
+    sParam.fMaxFrameRate = fFrameRate;
+    sParam.sSpatialLayers[0].iSpatialBitrate = sParam.iTargetBitrate = 500;
+    sParam.sSpatialLayers[1].iSpatialBitrate = sParam.iTargetBitrate = 1000;
+    sParam.sSpatialLayers[2].iSpatialBitrate = sParam.iTargetBitrate = 2200;
+    sParam.iTargetBitrate = 4000;
+    //int TraceLevel = WELS_LOG_DEBUG;
+    //encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &TraceLevel);
+    //decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &TraceLevel);
+    iRet = encoder_->InitializeExt (&sParam);
+    ASSERT_TRUE (iRet == cmResultSuccess) << "InitializeExt: iRet = " << iRet << " at " << sParam.iPicWidth << "x" <<
+                                          sParam.iPicHeight;
+    ASSERT_TRUE (InitialEncDec (iWidth, iHeight));
+    int iLen = 0;
+    for (int j = 0; j < iTotalFrame; ++j) {
+      EncodeOneFrame (0);
+      encToDecData (info, iLen);
+      uint8_t cTypeByte;
+      for (int iLayer = 0; iLayer < info.iLayerNum; ++iLayer) {
+        SLayerBSInfo* pLayerBsInfo = &info.sLayerInfo[iLayer];
+        for (int iPacketNum = 0; iPacketNum < pLayerBsInfo->iNalCount; ++iPacketNum) {
+          cTypeByte = (* (pLayerBsInfo->pBsBuf + 4)) & 0x1f;
+          if (sParam.bSimulcastAVC) {
+            EXPECT_TRUE (cTypeByte <= 8) << "simulcastAVC, spatial_id = " << pLayerBsInfo->uiSpatialId << ", typeByte = " <<
+                                         cTypeByte;
+          } else {
+            if (pLayerBsInfo->uiSpatialId == 0)
+              EXPECT_TRUE (cTypeByte <= 8 || cTypeByte == 14) << "simulcastSVC, spatial_id = 0, typeByte = " << cTypeByte;
+            else
+              EXPECT_TRUE (cTypeByte >= 14) << "simulcastSVC, spatial_id = " << pLayerBsInfo->uiSpatialId << ", typeByte = " <<
+                                            cTypeByte;;
+          }
+        }
+      }
+    }
+    iRet = encoder_->Uninitialize();
+    ASSERT_TRUE (iRet == cmResultSuccess) << "rv = " << iRet;
+  }
+}
