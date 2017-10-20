@@ -68,7 +68,7 @@ SPicture* AllocPicture (CMemoryAlign* pMa, const int32_t kiWidth , const int32_t
   iPicChromaWidth   = iPicWidth >> 1;
   iPicChromaHeight  = iPicHeight >> 1;
   iPicWidth         = WELS_ALIGN (iPicWidth,
-                          32);  // 32(or 16 for chroma below) to match original imp. here instead of cache_line_size
+                                  32);  // 32(or 16 for chroma below) to match original imp. here instead of cache_line_size
   iPicChromaWidth   = WELS_ALIGN (iPicChromaWidth, 16);
   iLumaSize         = iPicWidth * iPicHeight;
   iChromaSize       = iPicChromaWidth * iPicChromaHeight;

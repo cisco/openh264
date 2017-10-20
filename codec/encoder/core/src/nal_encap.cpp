@@ -143,21 +143,21 @@ int32_t WelsEncodeNal (SWelsNalRaw* pRawNal, void* pNalHeaderExt, const int32_t 
 
   /* NAL Unit Header */
   *pDstPointer++ = (pRawNal->sNalExt.sNalUnitHeader.uiNalRefIdc << 5) | (pRawNal->sNalExt.sNalUnitHeader.eNalUnitType &
-                    0x1f);
+                   0x1f);
 
   if (kbNALExt) {
     SNalUnitHeaderExt* sNalExt = (SNalUnitHeaderExt*)pNalHeaderExt;
 
     /* NAL UNIT Extension Header */
     *pDstPointer++ = (0x80) |
-                      (sNalExt->bIdrFlag << 6);
+                     (sNalExt->bIdrFlag << 6);
 
     *pDstPointer++ = (0x80) |
-                      (sNalExt->uiDependencyId << 4);
+                     (sNalExt->uiDependencyId << 4);
 
     *pDstPointer++ = (sNalExt->uiTemporalId << 5) |
-                      (sNalExt->bDiscardableFlag << 3) |
-                      (0x07);
+                     (sNalExt->bDiscardableFlag << 3) |
+                     (0x07);
   }
 
   while (pSrcPointer < pSrcEnd) {

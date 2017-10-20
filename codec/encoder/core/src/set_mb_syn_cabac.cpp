@@ -53,7 +53,7 @@ const int8_t g_kiClz5Table[32] = {
 
 void PropagateCarry (uint8_t* pBufCur, uint8_t* pBufStart) {
   for (; pBufCur > pBufStart; --pBufCur)
-    if (++*(pBufCur - 1))
+    if (++ * (pBufCur - 1))
       break;
 }
 
@@ -133,7 +133,7 @@ void WelsCabacEncodeUpdateLowNontrivial_ (SCabacCtx* pCbCtx) {
 void WelsCabacEncodeDecisionLps_ (SCabacCtx* pCbCtx, int32_t iCtx) {
   const int32_t kiState = pCbCtx->m_sStateCtx[iCtx].State();
   uint32_t uiRange = pCbCtx->m_uiRange;
-  uint32_t uiRangeLps = g_kuiCabacRangeLps[kiState][(uiRange & 0xff) >> 6];
+  uint32_t uiRangeLps = g_kuiCabacRangeLps[kiState][ (uiRange & 0xff) >> 6];
   uiRange -= uiRangeLps;
   pCbCtx->m_sStateCtx[iCtx].Set (g_kuiStateTransTable[kiState][0],
                                  pCbCtx->m_sStateCtx[iCtx].Mps() ^ (kiState == 0));
@@ -193,7 +193,7 @@ void WelsCabacEncodeFlush (SCabacCtx* pCbCtx) {
   if (uiLow & cabac_low_t (1) << (CABAC_LOW_WIDTH - 1))
     PropagateCarry (pBufCur, pCbCtx->m_pBufStart);
   for (; (iLowBitCnt -= 8) >= 0; uiLow <<= 8)
-    *pBufCur++ = (uint8_t) (uiLow >> (CABAC_LOW_WIDTH - 9));
+    * pBufCur++ = (uint8_t) (uiLow >> (CABAC_LOW_WIDTH - 9));
 
   pCbCtx->m_pBufCur = pBufCur;
 }

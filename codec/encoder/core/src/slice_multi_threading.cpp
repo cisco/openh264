@@ -93,7 +93,7 @@ void CalcSliceComplexRatio (SDqLayer* pCurDq) {
   int32_t iSliceIdx             = 0;
   int32_t iAvI[MAX_SLICES_NUM];
 
-  assert(kiSliceCount <= MAX_SLICES_NUM);
+  assert (kiSliceCount <= MAX_SLICES_NUM);
   WelsEmms();
 
   while (iSliceIdx < kiSliceCount) {
@@ -112,7 +112,7 @@ void CalcSliceComplexRatio (SDqLayer* pCurDq) {
 }
 
 int32_t NeedDynamicAdjust (SSlice** ppSliceInLayer, const int32_t iSliceNum) {
-  if ( NULL == ppSliceInLayer ) {
+  if (NULL == ppSliceInLayer) {
     return false;
   }
 
@@ -123,7 +123,7 @@ int32_t NeedDynamicAdjust (SSlice** ppSliceInLayer, const int32_t iSliceNum) {
   WelsEmms();
 
   while (iSliceIdx < iSliceNum) {
-    if ( NULL == ppSliceInLayer[iSliceIdx] ) {
+    if (NULL == ppSliceInLayer[iSliceIdx]) {
       return false;
     }
 
@@ -232,7 +232,7 @@ void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
       return;
     }
     iRunLen[iSliceIdx] = iNumMbAssigning;
-    MT_TRACE_LOG (&(pCtx->sLogCtx), WELS_LOG_DEBUG,
+    MT_TRACE_LOG (& (pCtx->sLogCtx), WELS_LOG_DEBUG,
                   "[MT] DynamicAdjustSlicing(), iSliceIdx= %d, iSliceComplexRatio= %.2f, slice_run_org= %d, slice_run_adj= %d",
                   iSliceIdx, ppSliceInLayer[iSliceIdx]->iSliceComplexRatio * 1.0f / INT_MULTIPLY,
                   ppSliceInLayer[iSliceIdx]->iCountMbNumInSlice,
@@ -437,24 +437,24 @@ int32_t AppendSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, const int32
   while (iSliceIdx < iSliceCount) {
     pSliceBs    = &ppSliceInlayer[iSliceIdx]->sSliceBs;
     if (pSliceBs != NULL && pSliceBs->uiBsPos > 0) {
-    int32_t iNalIdx = 0;
-    const int32_t iCountNal = pSliceBs->iNalIndex;
+      int32_t iNalIdx = 0;
+      const int32_t iCountNal = pSliceBs->iNalIndex;
 
 #if MT_DEBUG_BS_WR
-    assert (pSliceBs->bSliceCodedFlag);
+      assert (pSliceBs->bSliceCodedFlag);
 #endif//MT_DEBUG_BS_WR
 
-    memmove (pCtx->pFrameBs + pCtx->iPosBsBuffer, pSliceBs->pBs, pSliceBs->uiBsPos); // confirmed_safe_unsafe_usage
-    pCtx->iPosBsBuffer += pSliceBs->uiBsPos;
+      memmove (pCtx->pFrameBs + pCtx->iPosBsBuffer, pSliceBs->pBs, pSliceBs->uiBsPos); // confirmed_safe_unsafe_usage
+      pCtx->iPosBsBuffer += pSliceBs->uiBsPos;
 
-    iLayerSize += pSliceBs->uiBsPos;
+      iLayerSize += pSliceBs->uiBsPos;
 
-    while (iNalIdx < iCountNal) {
+      while (iNalIdx < iCountNal) {
         pLbi->pNalLengthInByte[iNalIdxBase + iNalIdx] = pSliceBs->iNalLen[iNalIdx];
         ++ iNalIdx;
-    }
-    pLbi->iNalCount += iCountNal;
-    iNalIdxBase     += iCountNal;
+      }
+      pLbi->iNalCount += iCountNal;
+      iNalIdxBase     += iCountNal;
     }
     ++ iSliceIdx;
   }
@@ -615,7 +615,7 @@ void TrackSliceConsumeTime (sWelsEncCtx* pCtx, int32_t* pDidList, const int32_t 
         int32_t iMaxI = 0;
         while (i < kuiCountSliceNum) {
           fprintf (pCtx->pSliceThreading->pFSliceDiff, "%6d us consume_time coding_idx %d iDid %d pSlice %d\n",
-                     ppSliceInLayer[i]->uiSliceConsumeTime, pCtx->iCodingIndex, kiDid, i /*/ 1000*/);
+                   ppSliceInLayer[i]->uiSliceConsumeTime, pCtx->iCodingIndex, kiDid, i /*/ 1000*/);
           if (ppSliceInLayer[i]->uiSliceConsumeTime > uiMaxT) {
             uiMaxT = ppSliceInLayer[i]->uiSliceConsumeTime;
             iMaxI = i;

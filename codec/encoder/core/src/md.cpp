@@ -446,10 +446,14 @@ int32_t AnalysisVaaInfoIntra_c (uint8_t* pDataY, const int32_t kiLineSize) {
   for (; j < 16; j += 4) {
     num = 0;
     for (i = 0; i < 16; i += 4, num ++) {
-      pBlock[num] =  pEncData[i              ] + pEncData[i + 1              ] + pEncData[i + 2              ] + pEncData[i + 3              ];
-      pBlock[num] += pEncData[i + kiLineSize ] + pEncData[i + kiLineSize  + 1] + pEncData[i + kiLineSize  + 2] + pEncData[i + kiLineSize  + 3];
-      pBlock[num] += pEncData[i + kiLineSize2] + pEncData[i + kiLineSize2 + 1] + pEncData[i + kiLineSize2 + 2] + pEncData[i + kiLineSize2 + 3];
-      pBlock[num] += pEncData[i + kiLineSize3] + pEncData[i + kiLineSize3 + 1] + pEncData[i + kiLineSize3 + 2] + pEncData[i + kiLineSize3 + 3];
+      pBlock[num] =  pEncData[i              ] + pEncData[i + 1              ] + pEncData[i + 2              ] + pEncData[i +
+                     3              ];
+      pBlock[num] += pEncData[i + kiLineSize ] + pEncData[i + kiLineSize  + 1] + pEncData[i + kiLineSize  + 2] + pEncData[i +
+                     kiLineSize  + 3];
+      pBlock[num] += pEncData[i + kiLineSize2] + pEncData[i + kiLineSize2 + 1] + pEncData[i + kiLineSize2 + 2] + pEncData[i +
+                     kiLineSize2 + 3];
+      pBlock[num] += pEncData[i + kiLineSize3] + pEncData[i + kiLineSize3 + 1] + pEncData[i + kiLineSize3 + 2] + pEncData[i +
+                     kiLineSize3 + 3];
       pBlock[num] >>=  4;
     }
     pBlock += 4;
