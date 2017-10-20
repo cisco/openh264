@@ -820,7 +820,7 @@ WELS_ASM_AARCH64_FUNC_BEGIN DeblockChromaEq4H_AArch64_neon //uint8_t* pPixCb, ui
     STORE_CHROMA_DATA_2 v6, v7, x1, 13
     STORE_CHROMA_DATA_2 v6, v7, x1, 14
     STORE_CHROMA_DATA_2 v6, v7, x1, 15
-    DeblockChromaEq4H_AArch64_neon_end:
+DeblockChromaEq4H_AArch64_neon_end:
 WELS_ASM_AARCH64_FUNC_END
 
 
