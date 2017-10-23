@@ -523,9 +523,9 @@ void  WelsWriteBlockResidualCabac (SMbCache* pMbCache, SMB* pCurMb, uint32_t iMb
 }
 int32_t WelsCalNonZeroCount2x2Block (int16_t* pBlock) {
   return (pBlock[0] != 0)
-       + (pBlock[1] != 0)
-       + (pBlock[2] != 0)
-       + (pBlock[3] != 0);
+         + (pBlock[1] != 0)
+         + (pBlock[2] != 0)
+         + (pBlock[3] != 0);
 }
 int32_t WelsWriteMbResidualCabac (SWelsFuncPtrList* pFuncList, SSlice* pSlice, SMbCache* sMbCacheInfo, SMB* pCurMb,
                                   SCabacCtx* pCabacCtx,

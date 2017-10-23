@@ -116,7 +116,7 @@ WelsErrorType CWelsSliceEncodingTask::InitTask() {
   WELS_VERIFY_RETURN_IFNEQ (iReturn, ENC_RETURN_SUCCESS)
   m_pSliceBs = &m_pSlice->sSliceBs;
 
-  iReturn   = SetSliceBoundaryInfo(m_pCtx->pCurDqLayer, m_pSlice, m_iSliceIdx);
+  iReturn   = SetSliceBoundaryInfo (m_pCtx->pCurDqLayer, m_pSlice, m_iSliceIdx);
   WELS_VERIFY_RETURN_IFNEQ (iReturn, ENC_RETURN_SUCCESS)
 
   SetOneSliceBsBufferUnderMultithread (m_pCtx, m_iThreadIdx, m_pSlice);
@@ -244,7 +244,7 @@ WelsErrorType CWelsConstrainedSizeSlicingEncodingTask::ExecuteTask() {
   bool bNeedReallocate = false;
 
   int32_t iDiffMbIdx = kiEndMbIdxInPartition - kiFirstMbInPartition;
-  if( 0 == iDiffMbIdx) {
+  if (0 == iDiffMbIdx) {
     m_pSlice->iSliceIdx = -1;
     return ENC_RETURN_SUCCESS;
   }
@@ -252,17 +252,17 @@ WelsErrorType CWelsConstrainedSizeSlicingEncodingTask::ExecuteTask() {
   int32_t iAnyMbLeftInPartition = iDiffMbIdx + 1;
   int32_t iLocalSliceIdx = m_iSliceIdx;
   while (iAnyMbLeftInPartition > 0) {
-      bNeedReallocate = (pCurDq->sSliceBufferInfo[m_iThreadIdx].iCodedSliceNum
-                         >=  pCurDq->sSliceBufferInfo[m_iThreadIdx].iMaxSliceNum -1) ? true : false;
-      if (bNeedReallocate) {
-          WelsMutexLock (&m_pCtx->pSliceThreading->mutexThreadSlcBuffReallocate);
-          //for memory statistic variable
-          iReturn = ReallocateSliceInThread(m_pCtx, pCurDq, m_pCtx->uiDependencyId, m_iThreadIdx);
-          WelsMutexUnlock (&m_pCtx->pSliceThreading->mutexThreadSlcBuffReallocate);
-          if (ENC_RETURN_SUCCESS != iReturn) {
-              return iReturn;
-          }
+    bNeedReallocate = (pCurDq->sSliceBufferInfo[m_iThreadIdx].iCodedSliceNum
+                       >=  pCurDq->sSliceBufferInfo[m_iThreadIdx].iMaxSliceNum - 1) ? true : false;
+    if (bNeedReallocate) {
+      WelsMutexLock (&m_pCtx->pSliceThreading->mutexThreadSlcBuffReallocate);
+      //for memory statistic variable
+      iReturn = ReallocateSliceInThread (m_pCtx, pCurDq, m_pCtx->uiDependencyId, m_iThreadIdx);
+      WelsMutexUnlock (&m_pCtx->pSliceThreading->mutexThreadSlcBuffReallocate);
+      if (ENC_RETURN_SUCCESS != iReturn) {
+        return iReturn;
       }
+    }
 
     iReturn = InitOneSliceInThread (m_pCtx, m_pSlice, m_iThreadIdx, m_pCtx->uiDependencyId, iLocalSliceIdx);
     WELS_VERIFY_RETURN_IFNEQ (iReturn, ENC_RETURN_SUCCESS)

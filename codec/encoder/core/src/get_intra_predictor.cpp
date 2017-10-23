@@ -104,15 +104,16 @@ void WelsI4x4LumaPredH_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride)
   WelsFillingPred8x2to16 (pPred, uiSrc);
 }
 void WelsI4x4LumaPredDc_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
-  const uint8_t kuiDcValue = (pRef[-1] + pRef[kiStride - 1] + pRef[ (kiStride << 1) - 1] + pRef[ (kiStride << 1) + kiStride - 1] +
-                               pRef[-kiStride] + pRef[1 - kiStride] + pRef[2 - kiStride] + pRef[3 - kiStride] + 4) >> 3;
+  const uint8_t kuiDcValue = (pRef[-1] + pRef[kiStride - 1] + pRef[ (kiStride << 1) - 1] + pRef[ (kiStride << 1) +
+                              kiStride - 1] +
+                              pRef[-kiStride] + pRef[1 - kiStride] + pRef[2 - kiStride] + pRef[3 - kiStride] + 4) >> 3;
 
   WelsFillingPred1to16 (pPred, kuiDcValue);
 }
 
 void WelsI4x4LumaPredDcLeft_c (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride) {
   const uint8_t kuiDcValue = (pRef[-1] + pRef[kiStride - 1] + pRef[ (kiStride << 1) - 1] + pRef[ (kiStride << 1) +
-                               kiStride - 1] + 2) >> 2;
+                              kiStride - 1] + 2) >> 2;
 
   WelsFillingPred1to16 (pPred, kuiDcValue);
 }

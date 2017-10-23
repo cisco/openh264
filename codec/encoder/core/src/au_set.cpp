@@ -76,7 +76,7 @@ static inline int32_t WelsCheckLevelLimitation (const SWelsSPS* kpSps, const SLe
 int32_t WelsAdjustLevel (SSpatialLayerConfig* pSpatialLayer, const SLevelLimits* pCurLevel) {
   int32_t iMaxBitrate = pSpatialLayer->iMaxSpatialBitrate;
   do {
-    if (iMaxBitrate <= (int32_t)(pCurLevel->uiMaxBR * CpbBrNalFactor)) {
+    if (iMaxBitrate <= (int32_t) (pCurLevel->uiMaxBR * CpbBrNalFactor)) {
       pSpatialLayer->uiLevelIdc = pCurLevel->uiLevelIdc;
       return 0;
     }
@@ -198,12 +198,12 @@ int32_t WelsWriteVUI (SWelsSPS* pSps, SBitStringAux* pBitStringAux) {
   SBitStringAux* pLocalBitStringAux = pBitStringAux;
   assert (pSps != NULL && pBitStringAux != NULL);
 
-  BsWriteOneBit(pLocalBitStringAux, pSps->bAspectRatioPresent); //aspect_ratio_info_present_flag
+  BsWriteOneBit (pLocalBitStringAux, pSps->bAspectRatioPresent); //aspect_ratio_info_present_flag
   if (pSps->bAspectRatioPresent) {
-    BsWriteBits(pLocalBitStringAux, 8, pSps->eAspectRatio); // aspect_ratio_idc
+    BsWriteBits (pLocalBitStringAux, 8, pSps->eAspectRatio); // aspect_ratio_idc
     if (pSps->eAspectRatio == ASP_EXT_SAR) {
-      BsWriteBits(pLocalBitStringAux, 16, pSps->sAspectRatioExtWidth); // sar_width
-      BsWriteBits(pLocalBitStringAux, 16, pSps->sAspectRatioExtHeight); // sar_height
+      BsWriteBits (pLocalBitStringAux, 16, pSps->sAspectRatioExtWidth); // sar_width
+      BsWriteBits (pLocalBitStringAux, 16, pSps->sAspectRatioExtHeight); // sar_height
     }
   }
   BsWriteOneBit (pLocalBitStringAux, false); //overscan_info_present_flag

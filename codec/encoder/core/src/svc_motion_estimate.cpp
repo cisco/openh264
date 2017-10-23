@@ -173,7 +173,8 @@ void WelsMotionEstimateSearch (SWelsFuncPtrList* pFuncList, SDqLayer* pCurDqLaye
                               kiStrideRef);
 }
 
-void WelsMotionEstimateSearchStatic (SWelsFuncPtrList* pFuncList, SDqLayer* pCurDqLayer, SWelsME* pMe, SSlice* pLpslice) {
+void WelsMotionEstimateSearchStatic (SWelsFuncPtrList* pFuncList, SDqLayer* pCurDqLayer, SWelsME* pMe,
+                                     SSlice* pLpslice) {
   const int32_t kiStrideEnc = pCurDqLayer->iEncStride[0];
   const int32_t kiStrideRef = pCurDqLayer->pRefPic->iLineSize[0];
 
@@ -186,7 +187,8 @@ void WelsMotionEstimateSearchStatic (SWelsFuncPtrList* pFuncList, SDqLayer* pCur
                               kiStrideRef);
 }
 
-void WelsMotionEstimateSearchScrolled (SWelsFuncPtrList* pFuncList, SDqLayer* pCurDqLayer, SWelsME* pMe, SSlice* pSlice) {
+void WelsMotionEstimateSearchScrolled (SWelsFuncPtrList* pFuncList, SDqLayer* pCurDqLayer, SWelsME* pMe,
+                                       SSlice* pSlice) {
   const int32_t kiStrideEnc = pCurDqLayer->iEncStride[0];
   const int32_t kiStrideRef = pCurDqLayer->pRefPic->iLineSize[0];
 
@@ -709,7 +711,7 @@ int32_t RequestScreenBlockFeatureStorage (CMemoryAlign* pMa, const int32_t kiFra
   pScreenBlockFeatureStorage->iIs16x16 = !bIsBlock8x8;
   pScreenBlockFeatureStorage->uiFeatureStrategyIndex = kiFeatureStrategyIndex;
   pScreenBlockFeatureStorage->iActualListSize = kiListSize;
-  WelsSetMemMultiplebytes_c (pScreenBlockFeatureStorage->uiSadCostThreshold, UINT_MAX, BLOCK_SIZE_ALL, sizeof(uint32_t));
+  WelsSetMemMultiplebytes_c (pScreenBlockFeatureStorage->uiSadCostThreshold, UINT_MAX, BLOCK_SIZE_ALL, sizeof (uint32_t));
   pScreenBlockFeatureStorage->bRefBlockFeatureCalculated = false;
 
   return ENC_RETURN_SUCCESS;

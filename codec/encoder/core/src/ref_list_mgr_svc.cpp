@@ -450,9 +450,9 @@ bool CheckCurMarkFrameNumUsed (sWelsEncCtx* pCtx) {
   return true;
 }
 
-static inline void WelsMarkMMCORefInfoWithBase(SSlice** ppSliceList,
-                                               SSlice* pBaseSlice,
-                                               const int32_t kiCountSliceNum) {
+static inline void WelsMarkMMCORefInfoWithBase (SSlice** ppSliceList,
+    SSlice* pBaseSlice,
+    const int32_t kiCountSliceNum) {
   int32_t iSliceIdx = 0;
   SSliceHeaderExt* pSliceHdrExt = NULL;
   SSliceHeaderExt* pBaseSHExt   = &pBaseSlice->sSliceHeaderExt;
@@ -488,7 +488,7 @@ void WelsMarkMMCORefInfo (sWelsEncCtx* pCtx, SLTRState* pLtr,
     }
   }
 
-  WelsMarkMMCORefInfoWithBase(ppSliceList, pBaseSlice, kiCountSliceNum);
+  WelsMarkMMCORefInfoWithBase (ppSliceList, pBaseSlice, kiCountSliceNum);
 }
 
 void WelsMarkPic (sWelsEncCtx* pCtx) {
@@ -906,7 +906,7 @@ void WelsMarkMMCORefInfoScreen (sWelsEncCtx* pCtx, SLTRState* pLtr,
     pRefPicMark->SMmcoRef[pRefPicMark->uiMmcoCount++].iMmcoType = MMCO_LONG;
   }
 
-  WelsMarkMMCORefInfoWithBase(ppSliceList, pBaseSlice, kiCountSliceNum);
+  WelsMarkMMCORefInfoWithBase (ppSliceList, pBaseSlice, kiCountSliceNum);
 }
 
 void WelsMarkPicScreen (sWelsEncCtx* pCtx) {
