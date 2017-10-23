@@ -272,7 +272,9 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
         pSvcParam.bEnableFrameCroppingFlag = (atoi (strTag[1].c_str()) != 0);
       } else if (strTag[0].compare ("EntropyCodingModeFlag") == 0) {
         pSvcParam.iEntropyCodingModeFlag = (atoi (strTag[1].c_str()) != 0);
-      } else if (strTag[0].compare ("LoopFilterDisableIDC") == 0) {
+      } else if (strTag[0].compare ("ComplexityMode") == 0) {
+        pSvcParam.iComplexityMode = (ECOMPLEXITY_MODE)(atoi (strTag[1].c_str()));
+      }else if (strTag[0].compare ("LoopFilterDisableIDC") == 0) {
         pSvcParam.iLoopFilterDisableIdc = (int8_t)atoi (strTag[1].c_str());
         if (pSvcParam.iLoopFilterDisableIdc > 6 || pSvcParam.iLoopFilterDisableIdc < 0) {
           fprintf (stderr, "Invalid parameter in iLoopFilterDisableIdc: %d.\n", pSvcParam.iLoopFilterDisableIdc);
@@ -398,6 +400,7 @@ void PrintHelp() {
   printf ("  -nalsize     the Maximum NAL size. which should be larger than the each layer slicesize when slice mode equals to SM_SIZELIMITED_SLICE\n");
   printf ("  -spsid       SPS/PPS id strategy: 0:const, 1: increase, 2: sps list, 3: sps list and pps increase, 4: sps/pps list\n");
   printf ("  -cabac       Entropy coding mode(0:cavlc 1:cabac \n");
+  printf ("  -complexity  Complexity mode (default: 0),0: low complexity, 1: medium complexity, 2: high complexity\n");
   printf ("  -denois      Control denoising  (default: 0)\n");
   printf ("  -scene       Control scene change detection (default: 0)\n");
   printf ("  -bgd         Control background detection (default: 0)\n");
@@ -495,6 +498,9 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
       }
     } else if (!strcmp (pCommand, "-cabac") && (n < argc))
       pSvcParam.iEntropyCodingModeFlag = atoi (argv[n++]);
+
+    else if (!strcmp (pCommand, "-complexity") && (n < argc))
+      pSvcParam.iComplexityMode = (ECOMPLEXITY_MODE)atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-denois") && (n < argc))
       pSvcParam.bEnableDenoise = atoi (argv[n++]) ? true : false;

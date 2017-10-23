@@ -491,7 +491,7 @@ typedef enum {
 * @brief Enumulate the complexity mode
 */
 typedef enum {
-  LOW_COMPLEXITY,             ///< the lowest compleixty,the fastest speed,
+  LOW_COMPLEXITY = 0 ,             ///< the lowest compleixty,the fastest speed,
   MEDIUM_COMPLEXITY,          ///< medium complexity, medium speed,medium quality
   HIGH_COMPLEXITY             ///< high complexity, lowest speed, high quality
 } ECOMPLEXITY_MODE;
