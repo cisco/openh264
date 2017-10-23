@@ -787,7 +787,7 @@ void FilteringEdgeChromaHV (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, in
     GET_ALPHA_BETA_FROM_QP (pFilter->iChromaQP[0], pFilter->iSliceAlphaC0Offset, pFilter->iSliceBetaOffset, iIndexA, iAlpha,
                             iBeta);
     if (iAlpha | iBeta) {
-      TC0_TBL_LOOKUP(iTc, iIndexA, uiBSx4, 1);
+      TC0_TBL_LOOKUP (iTc, iIndexA, uiBSx4, 1);
       pFilter->pLoopf->pfChromaDeblockingLT4Ver (&pDestCb[ (2 << 1)*iLineSize], &pDestCr[ (2 << 1)*iLineSize], iLineSize,
           iAlpha, iBeta, iTc);
     }
@@ -797,7 +797,7 @@ void FilteringEdgeChromaHV (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, in
       GET_ALPHA_BETA_FROM_QP (pFilter->iChromaQP[i], pFilter->iSliceAlphaC0Offset, pFilter->iSliceBetaOffset, iIndexA, iAlpha,
                               iBeta);
       if (iAlpha | iBeta) {
-        TC0_TBL_LOOKUP(iTc, iIndexA, uiBSx4, 1);
+        TC0_TBL_LOOKUP (iTc, iIndexA, uiBSx4, 1);
         uint8_t* pDestCbCr = (i == 0) ? &pDestCb[ (2 << 1) * iLineSize] : &pDestCr[ (2 << 1) * iLineSize];
         pFilter->pLoopf->pfChromaDeblockingLT4Ver2 (pDestCbCr, iLineSize,
             iAlpha, iBeta, iTc);
