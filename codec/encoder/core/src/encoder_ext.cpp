@@ -271,7 +271,7 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
 
   assert (pCfg != NULL);
 
-  if ((pCfg->iUsageType != CAMERA_VIDEO_REAL_TIME) && (pCfg->iUsageType != SCREEN_CONTENT_REAL_TIME)) {
+  if (!(pCfg->iUsageType < INPUT_CONTENT_TYPE_ALL)) {
     WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidation(),Invalid usage type = %d", pCfg->iUsageType);
     return ENC_RETURN_UNSUPPORTED_PARA;
   }

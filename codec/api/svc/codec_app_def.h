@@ -484,7 +484,9 @@ typedef struct {
 typedef enum {
   CAMERA_VIDEO_REAL_TIME,      ///< camera video for real-time communication
   SCREEN_CONTENT_REAL_TIME,    ///< screen content signal
-  CAMERA_VIDEO_NON_REAL_TIME
+  CAMERA_VIDEO_NON_REAL_TIME,
+  SCREEN_CONTENT_NON_REAL_TIME,
+  INPUT_CONTENT_TYPE_ALL,
 } EUsageType;
 
 /**
