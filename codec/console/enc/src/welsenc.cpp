@@ -223,9 +223,9 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
 
       if (strTag[0].compare ("UsageType") == 0) {
         pSvcParam.iUsageType = (EUsageType)atoi (strTag[1].c_str());
-      }else if (strTag[0].compare ("SimulcastAVC") == 0) {
+      } else if (strTag[0].compare ("SimulcastAVC") == 0) {
         pSvcParam.bSimulcastAVC = atoi (strTag[1].c_str()) ? true : false;
-      }else if (strTag[0].compare ("SourceWidth") == 0) {
+      } else if (strTag[0].compare ("SourceWidth") == 0) {
         pSrcPic->iPicWidth = atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("SourceHeight") == 0) {
         pSrcPic->iPicHeight = atoi (strTag[1].c_str());
@@ -273,8 +273,8 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
       } else if (strTag[0].compare ("EntropyCodingModeFlag") == 0) {
         pSvcParam.iEntropyCodingModeFlag = (atoi (strTag[1].c_str()) != 0);
       } else if (strTag[0].compare ("ComplexityMode") == 0) {
-        pSvcParam.iComplexityMode = (ECOMPLEXITY_MODE)(atoi (strTag[1].c_str()));
-      }else if (strTag[0].compare ("LoopFilterDisableIDC") == 0) {
+        pSvcParam.iComplexityMode = (ECOMPLEXITY_MODE) (atoi (strTag[1].c_str()));
+      } else if (strTag[0].compare ("LoopFilterDisableIDC") == 0) {
         pSvcParam.iLoopFilterDisableIdc = (int8_t)atoi (strTag[1].c_str());
         if (pSvcParam.iLoopFilterDisableIdc > 6 || pSvcParam.iLoopFilterDisableIdc < 0) {
           fprintf (stderr, "Invalid parameter in iLoopFilterDisableIdc: %d.\n", pSvcParam.iLoopFilterDisableIdc);
@@ -317,9 +317,9 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
           return 1;
         }
       } else if (strTag[0].compare ("MaxQp") == 0) {
-          pSvcParam.iMaxQp = atoi (strTag[1].c_str());
+        pSvcParam.iMaxQp = atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("MinQp") == 0) {
-          pSvcParam.iMinQp = atoi (strTag[1].c_str());
+        pSvcParam.iMinQp = atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("EnableDenoise") == 0) {
         pSvcParam.bEnableDenoise = atoi (strTag[1].c_str()) ? true : false;
       } else if (strTag[0].compare ("EnableSceneChangeDetection") == 0) {
@@ -448,7 +448,7 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
       pSvcParam.iUsageType = (EUsageType)atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-savc") && (n < argc))
-        pSvcParam.bSimulcastAVC =  atoi (argv[n++]) ? true : false;
+      pSvcParam.bSimulcastAVC =  atoi (argv[n++]) ? true : false;
 
     else if (!strcmp (pCommand, "-org") && (n < argc))
       sFileSet.strSeqFile.assign (argv[n++]);
@@ -552,10 +552,10 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
       pSvcParam.iMaxBitrate = 1000 * atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-maxqp") && (n < argc))
-        pSvcParam.iMaxQp = atoi (argv[n++]);
+      pSvcParam.iMaxQp = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-minqp") && (n < argc))
-        pSvcParam.iMinQp = atoi (argv[n++]);
+      pSvcParam.iMinQp = atoi (argv[n++]);
 
     else if (!strcmp (pCommand, "-numl") && (n < argc)) {
       pSvcParam.iSpatialLayerNum = atoi (argv[n++]);

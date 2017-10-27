@@ -336,7 +336,7 @@ HRESULT CD3D9ExUtils::Render (void* pDst[3], SBufferInfo* pInfo) {
       || m_nHeight != pInfo->UsrData.sSystemBuffer.iHeight) {
     m_nWidth = pInfo->UsrData.sSystemBuffer.iWidth;
     m_nHeight = pInfo->UsrData.sSystemBuffer.iHeight;
-    MoveWindow(m_hWnd,0,0,pInfo->UsrData.sSystemBuffer.iWidth,pInfo->UsrData.sSystemBuffer.iHeight,true);
+    MoveWindow (m_hWnd, 0, 0, pInfo->UsrData.sSystemBuffer.iWidth, pInfo->UsrData.sSystemBuffer.iHeight, true);
     SAFE_RELEASE (m_lpD3D9RawSurfaceShare);
     SAFE_RELEASE (m_lpD3D9Device);
   }
