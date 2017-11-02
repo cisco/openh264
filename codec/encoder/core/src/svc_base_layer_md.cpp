@@ -1390,7 +1390,7 @@ void WelsMdBackgroundMbEnc (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb,
 
     pCurMb->uiLumaQp   = pSlice->uiLastMbQp;
     pCurMb->uiChromaQp = g_kuiChromaQpTable[CLIP3_QP_0_51 (pCurMb->uiLumaQp +
-                                            pCurDqLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset)];
+                                                          pCurDqLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset)];
 
     WelsRecPskip (pCurDqLayer, pEncCtx->pFuncList, pCurMb, pMbCache);
     VaaBackgroundMbDataUpdate (pEncCtx->pFuncList, pEncCtx->pVaa, pCurMb);
@@ -1490,14 +1490,12 @@ bool WelsMdPSkipEnc (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCac
     ST32 (pCurMb->pRefIndex, 0);
     pFunc->pfUpdateMbMv (pCurMb->sMv, sMvp);
 
-    pCurMb->pSadCost[0] = pFunc->sSampleDealingFuncs.pfSampleSad[BLOCK_16x16] (pMbCache->SPicData.pEncMb[0],
-                          pCurLayer->iEncStride[0], pRefLuma, iLineSizeY);
-
-    if (pWelsMd->bMdUsingSad)
+    if (pWelsMd->bMdUsingSad) {
+      pCurMb->pSadCost[0] = iSadCostLuma;
       pWelsMd->iCostLuma = pCurMb->pSadCost[0];
-    else
+    } else
       pWelsMd->iCostLuma = pFunc->sSampleDealingFuncs.pfSampleSatd[BLOCK_16x16] (pMbCache->SPicData.pEncMb[0],
-                           pCurLayer->iEncStride[0], pRefLuma, iLineSizeY);
+                           pCurLayer->iEncStride[0], pDstLuma, 16);
 
     pWelsMd->iCostSkipMb = iSadCostMb;
 
@@ -1523,14 +1521,12 @@ bool WelsMdPSkipEnc (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCac
         ST32 (pCurMb->pRefIndex, 0);
         pFunc->pfUpdateMbMv (pCurMb->sMv, sMvp);
 
-        pCurMb->pSadCost[0] = pFunc->sSampleDealingFuncs.pfSampleSad[BLOCK_16x16] (pMbCache->SPicData.pEncMb[0],
-                              pCurLayer->iEncStride[0], pRefLuma, iLineSizeY);
-
-        if (pWelsMd->bMdUsingSad)
+        if (pWelsMd->bMdUsingSad) {
+          pCurMb->pSadCost[0] = iSadCostLuma;
           pWelsMd->iCostLuma = pCurMb->pSadCost[0];
-        else
+        } else
           pWelsMd->iCostLuma = pFunc->sSampleDealingFuncs.pfSampleSatd[BLOCK_16x16] (pMbCache->SPicData.pEncMb[0],
-                               pCurLayer->iEncStride[0], pRefLuma, iLineSizeY);
+                               pCurLayer->iEncStride[0], pDstLuma, 16);
 
         pWelsMd->iCostSkipMb = iSadCostMb;
 
@@ -1930,7 +1926,7 @@ void WelsMdInterUpdatePskip (SDqLayer* pCurDqLayer, SSlice* pSlice, SMB* pCurMb,
   pCurMb->uiCbp = 0;
   pCurMb->uiLumaQp   = pSlice->uiLastMbQp;
   pCurMb->uiChromaQp = g_kuiChromaQpTable[CLIP3_QP_0_51 (pCurMb->uiLumaQp +
-                                          pCurDqLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset)];
+                                                        pCurDqLayer->sLayerInfo.pPpsP->uiChromaQpIndexOffset)];
   pMbCache->bCollocatedPredFlag = (LD32 (&pCurMb->sMv[0]) == 0);
 }
 
