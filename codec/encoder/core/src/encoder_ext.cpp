@@ -271,7 +271,7 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
 
   assert (pCfg != NULL);
 
-  if (!(pCfg->iUsageType < INPUT_CONTENT_TYPE_ALL)) {
+  if (! (pCfg->iUsageType < INPUT_CONTENT_TYPE_ALL)) {
     WelsLog (pLogCtx, WELS_LOG_ERROR, "ParamValidation(),Invalid usage type = %d", pCfg->iUsageType);
     return ENC_RETURN_UNSUPPORTED_PARA;
   }
@@ -2639,9 +2639,7 @@ bool SetMeMethod (const uint8_t uiMethod, PSearchMethodFunc& pSearchMethodFunc) 
 void PreprocessSliceCoding (sWelsEncCtx* pCtx) {
   SDqLayer* pCurLayer           = pCtx->pCurDqLayer;
   //const bool kbBaseAvail      = pCurLayer->bBaseLayerAvailableFlag;
-  const bool kbHighestSpatialLayer =
-    (pCtx->pSvcParam->iSpatialLayerNum == (pCurLayer->sLayerInfo.sNalHeaderExt.uiDependencyId + 1));
-  bool bFastMode = kbHighestSpatialLayer && (pCtx->pSvcParam->iComplexityMode == LOW_COMPLEXITY);
+  bool bFastMode = (pCtx->pSvcParam->iComplexityMode == LOW_COMPLEXITY);
   SWelsFuncPtrList* pFuncList = pCtx->pFuncList;
   SLogContext* pLogCtx = & (pCtx->sLogCtx);
   /* function pointers conditional assignment under sWelsEncCtx, layer_mb_enc_rec (in stack) is exclusive */
