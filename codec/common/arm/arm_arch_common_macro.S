@@ -60,13 +60,11 @@ mov pc, lr
 .arm
 .global \funcName
 .type \funcName, %function
-.func \funcName
 \funcName:
 .endm
 
 .macro WELS_ASM_FUNC_END
 mov pc, lr
-.endfunc
 .endm
 #endif
 
