@@ -258,13 +258,18 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
 
 /* Generic arm/linux cpu feature detection */
 uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
+  int flags = 0;
   FILE* f = fopen ("/proc/cpuinfo", "r");
 
-  if (!f)
-    return 0;
+#if defined(__chromeos__)
+  flags |= WELS_CPU_NEON;
+#endif
+
+  if (!f) {
+    return flags;
+  }
 
   char buf[200];
-  int flags = 0;
   while (fgets (buf, sizeof (buf), f)) {
     if (!strncmp (buf, "Features", strlen ("Features"))) {
       // The asimd and fp features are listed on 64 bit ARMv8 kernels
