@@ -128,16 +128,16 @@ void CheckProfileSetting (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, int
   pLayerInfo->uiProfileIdc = uiProfileIdc;
   if (pParam->bSimulcastAVC) {
     if ((uiProfileIdc != PRO_BASELINE) && (uiProfileIdc != PRO_MAIN) && (uiProfileIdc != PRO_HIGH)) {
-      WelsLog (pLogCtx, WELS_LOG_WARNING, "layerId(%d) doesn't support profile(%d), change to baseline profile", iLayer,
+      WelsLog (pLogCtx, WELS_LOG_WARNING, "layerId(%d) doesn't support profile(%d), change to UNSPECIFIC profile", iLayer,
                uiProfileIdc);
-      pLayerInfo->uiProfileIdc = PRO_BASELINE;
+      pLayerInfo->uiProfileIdc = PRO_UNKNOWN;
     }
   } else {
     if (iLayer == SPATIAL_LAYER_0) {
       if ((uiProfileIdc != PRO_BASELINE) && (uiProfileIdc != PRO_MAIN) && (uiProfileIdc != PRO_HIGH)) {
-        WelsLog (pLogCtx, WELS_LOG_WARNING, "layerId(%d) doesn't support profile(%d), change to baseline profile", iLayer,
+        WelsLog (pLogCtx, WELS_LOG_WARNING, "layerId(%d) doesn't support profile(%d), change to UNSPECIFIC profile", iLayer,
                  uiProfileIdc);
-        pLayerInfo->uiProfileIdc = PRO_BASELINE;
+        pLayerInfo->uiProfileIdc = PRO_UNKNOWN;
       }
     } else {
       if ((uiProfileIdc != PRO_SCALABLE_BASELINE) && (uiProfileIdc != PRO_SCALABLE_HIGH)) {
@@ -159,10 +159,6 @@ void CheckLevelSetting (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, int32
     }
     iLevelIdx--;
   } while (iLevelIdx >= 0);
-  if (pLayerInfo->uiLevelIdc == LEVEL_UNKNOWN) {
-    WelsLog (pLogCtx, WELS_LOG_INFO, "change unexpected levelidc(%d) setting to LEVEL_5_2", pLayerInfo->uiLevelIdc);
-    pLayerInfo->uiLevelIdc = LEVEL_5_2;
-  }
 }
 void CheckReferenceNumSetting (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, int32_t iNumRef) {
   int32_t iRefUpperBound = (pParam->iUsageType == CAMERA_VIDEO_REAL_TIME) ?
@@ -643,6 +639,12 @@ int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPa
       if (pCodingParam->iEntropyCodingModeFlag != 0) {
         pCodingParam->iEntropyCodingModeFlag = 0;
         WelsLog (pLogCtx, WELS_LOG_WARNING, "layerId(%d) Profile is baseline, Change CABAC to CAVLC", i);
+      }
+    } else if (pLayerInfo->uiProfileIdc == PRO_UNKNOWN) {
+      if ((i==0) || pCodingParam->bSimulcastAVC) {
+        pLayerInfo->uiProfileIdc = (pCodingParam->iEntropyCodingModeFlag)?PRO_HIGH:PRO_BASELINE;
+      } else {
+        pLayerInfo->uiProfileIdc = PRO_SCALABLE_BASELINE;
       }
     }
   }

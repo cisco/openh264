@@ -191,7 +191,7 @@ static inline ELevelIdc WelsGetLevelIdc (const SWelsSPS* kpSps, float fFrameRate
       return (g_ksLevelLimits[iOrder].uiLevelIdc);
     }
   }
-  return LEVEL_5_2; //final decision: select the biggest level
+  return LEVEL_5_1; //final decision: select the biggest level
 }
 
 int32_t WelsWriteVUI (SWelsSPS* pSps, SBitStringAux* pBitStringAux) {

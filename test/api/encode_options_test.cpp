@@ -1956,8 +1956,8 @@ TEST_F (EncodeDecodeTestAPI, ProfileLevelSetting) {
   sParam.iEntropyCodingModeFlag = rand() % 2;
   sParam.sSpatialLayers[0].iSpatialBitrate = sParam.iTargetBitrate = 3000;
 
-  //int TraceLevel = WELS_LOG_DEBUG;
-  //encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &TraceLevel);
+  int TraceLevel = WELS_LOG_DEBUG;
+  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &TraceLevel);
   //decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &TraceLevel);
   iEncProfileIdc = profileList[rand() % 11];
   iEncLevelIdc =  levelList[rand() % 18];
@@ -1971,11 +1971,15 @@ TEST_F (EncodeDecodeTestAPI, ProfileLevelSetting) {
   decoder_->GetOption (DECODER_OPTION_PROFILE, &iDecProfileIdc);
 
   if ((iEncProfileIdc != PRO_BASELINE) && (iEncProfileIdc != PRO_MAIN) && (iEncProfileIdc != PRO_HIGH)) {
-    iEncProfileIdc = PRO_BASELINE;
+    if (sParam.iEntropyCodingModeFlag) {
+      iEncProfileIdc = PRO_HIGH;
+    } else {
+      iEncProfileIdc = PRO_BASELINE;
+    }
   }
 
   ASSERT_TRUE (iDecProfileIdc == iEncProfileIdc) << "enc_profile = " << iEncProfileIdc << "  dec_profile = " <<
-      iDecProfileIdc;
+    iDecProfileIdc;
 
   //check whether the level is changed according to level limitation
   ELevelIdc uiLevel = LEVEL_UNKNOWN;
@@ -1992,7 +1996,7 @@ TEST_F (EncodeDecodeTestAPI, ProfileLevelSetting) {
   decoder_->GetOption (DECODER_OPTION_LEVEL, &iDecLevelIdc);
 
   if (iEncLevelIdc == LEVEL_UNKNOWN)
-    ASSERT_TRUE (iDecLevelIdc == LEVEL_5_2) << "enc_level = " << iEncLevelIdc << "  dec_level = " << iDecLevelIdc;
+    ASSERT_TRUE (iDecLevelIdc != LEVEL_UNKNOWN) << "enc_level = " << iEncLevelIdc << "  dec_level = " << iDecLevelIdc;
   else
     ASSERT_TRUE (iDecLevelIdc == iEncLevelIdc) << "enc_level = " << iEncLevelIdc << "  dec_level = " << iDecLevelIdc;
 
@@ -2031,7 +2035,11 @@ TEST_F (EncodeDecodeTestAPI, ProfileLevelSetting) {
   decoder_->GetOption (DECODER_OPTION_PROFILE, &iDecProfileIdc);
 
   if ((iEncProfileIdc != PRO_BASELINE) && (iEncProfileIdc != PRO_MAIN) && (iEncProfileIdc != PRO_HIGH)) {
-    iEncProfileIdc = PRO_BASELINE;
+    if (sParam.iEntropyCodingModeFlag) {
+      iEncProfileIdc = PRO_HIGH;
+    } else {
+      iEncProfileIdc = PRO_BASELINE;
+    }
   }
 
   ASSERT_TRUE (iDecProfileIdc == iEncProfileIdc) << "enc_profile = " << iEncProfileIdc << "  dec_profile = " <<
@@ -2051,7 +2059,7 @@ TEST_F (EncodeDecodeTestAPI, ProfileLevelSetting) {
   decoder_->GetOption (DECODER_OPTION_LEVEL, &iDecLevelIdc);
 
   if (iEncLevelIdc == LEVEL_UNKNOWN)
-    ASSERT_TRUE (iDecLevelIdc == LEVEL_5_2) << "enc_level = " << iEncLevelIdc << "  dec_level = " << iDecLevelIdc;
+    ASSERT_TRUE (iDecLevelIdc != LEVEL_5_2) << "enc_level = " << iEncLevelIdc << "  dec_level = " << iDecLevelIdc;
   else
     ASSERT_TRUE (iDecLevelIdc == iEncLevelIdc) << "enc_level = " << iEncLevelIdc << "  dec_level = " << iDecLevelIdc;
 
