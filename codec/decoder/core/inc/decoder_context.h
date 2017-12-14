@@ -415,6 +415,7 @@ typedef struct TagWelsDecoderContext {
 //feedback whether or not have VCL in current AU, and the temporal ID
   int32_t iFeedbackVclNalInAu;
   int32_t iFeedbackTidInAu;
+  int32_t iFeedbackNalRefIdc;
 
   bool bAuReadyFlag;   // true: one au is ready for decoding; false: default value
 

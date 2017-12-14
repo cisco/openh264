@@ -323,6 +323,8 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   pCtx->iSPSLastInvalidId = -1;
   pCtx->iSubSPSInvalidNum = 0;
   pCtx->iSubSPSLastInvalidId = -1;
+  pCtx->iFeedbackNalRefIdc = -1; //initialize
+
 }
 
 /*
@@ -596,6 +598,7 @@ void GetVclNalTemporalId (PWelsDecoderContext pCtx) {
 
   pCtx->iFeedbackVclNalInAu = FEEDBACK_VCL_NAL;
   pCtx->iFeedbackTidInAu    = pAccessUnit->pNalUnitsList[idx]->sNalHeaderExt.uiTemporalId;
+  pCtx->iFeedbackNalRefIdc  = pAccessUnit->pNalUnitsList[idx]->sNalHeaderExt.sNalUnitHeader.uiNalRefIdc;
 }
 
 /*!

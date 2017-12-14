@@ -403,6 +403,12 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
     iVal = m_pDecContext->iFeedbackTidInAu;
     * ((int*)pOption) = iVal;
     return cmResultSuccess;
+  } else if (DECODER_OPTION_IS_REF_PIC == eOptID) {
+    iVal = m_pDecContext->iFeedbackNalRefIdc;
+    if (iVal > 0)
+      iVal = 1;
+    * ((int*)pOption) = iVal;
+    return cmResultSuccess;
   } else if (DECODER_OPTION_ERROR_CON_IDC == eOptID) {
     iVal = (int) m_pDecContext->pParam->eEcActiveIdc;
     * ((int*)pOption) = iVal;
@@ -537,6 +543,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
 #endif
 
   m_pDecContext->iFeedbackTidInAu             = -1; //initialize
+  m_pDecContext->iFeedbackNalRefIdc           = -1; //initialize
   if (pDstInfo) {
     pDstInfo->uiOutYuvTimeStamp = 0;
     m_pDecContext->uiTimeStamp = pDstInfo->uiInBsTimeStamp;
@@ -716,6 +723,7 @@ DECODING_STATE CWelsDecoder::DecodeParser (const unsigned char* kpSrc,
 
   m_pDecContext->iErrorCode = dsErrorFree; //initialize at the starting of AU decoding.
   m_pDecContext->pParam->eEcActiveIdc = ERROR_CON_DISABLE; //add protection to disable EC here.
+  m_pDecContext->iFeedbackNalRefIdc = -1; //initialize
   if (!m_pDecContext->bFramePending) { //frame complete
     m_pDecContext->pParserBsInfo->iNalNum = 0;
     memset (m_pDecContext->pParserBsInfo->pNalLenInByte, 0, MAX_NAL_UNITS_IN_LAYER);
