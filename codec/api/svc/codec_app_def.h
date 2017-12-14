@@ -165,6 +165,7 @@ typedef enum {
   DECODER_OPTION_PROFILE,               ///< get current AU profile info, only is used in GetOption
   DECODER_OPTION_LEVEL,                 ///< get current AU level info,only is used in GetOption
   DECODER_OPTION_STATISTICS_LOG_INTERVAL,///< set log output interval
+  DECODER_OPTION_IS_REF_PIC,             ///< feedback current frame is ref pic or not
 
 } DECODER_OPTION;
 

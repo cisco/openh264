@@ -186,6 +186,44 @@ TEST_P (EncodeDecodeTestAPI, InOutTimeStamp) {
   (void) iSkipedBytes;
 }
 
+TEST_P(EncodeDecodeTestAPI, GetOptionIsRefPic) {
+  EncodeDecodeFileParamBase p = GetParam();
+  prepareParamDefault(1, p.slicenum, p.width, p.height, p.frameRate, &param_);
+  encoder_->Uninitialize();
+  int rv = encoder_->InitializeExt(&param_);
+  ASSERT_TRUE(rv == cmResultSuccess);
+
+  ASSERT_TRUE(InitialEncDec(p.width, p.height));
+  int32_t iTraceLevel = WELS_LOG_QUIET;
+  encoder_->SetOption(ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  decoder_->SetOption(DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  int iIdx = 0;
+  int iSkipedBytes;
+  int iIsRefPic;
+  decoder_->GetOption(DECODER_OPTION_IS_REF_PIC, &iIsRefPic);
+  ASSERT_EQ(iIsRefPic, -1);
+
+  while (iIdx <= p.numframes) {
+    EncodeOneFrame(1);
+    //decoding after each encoding frame
+    int len = 0;
+    encToDecData(info, len);
+    unsigned char* pData[3] = { NULL };
+    memset(&dstBufInfo_, 0, sizeof(SBufferInfo));
+    rv = decoder_->DecodeFrame2(info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo_);
+    memset(&dstBufInfo_, 0, sizeof(SBufferInfo));
+    decoder_->GetOption(DECODER_OPTION_IS_REF_PIC, &iIsRefPic);
+    ASSERT_EQ(iIsRefPic, -1);
+    rv = decoder_->DecodeFrame2(NULL, 0, pData, &dstBufInfo_); //reconstruction
+    if (dstBufInfo_.iBufferStatus == 1) {
+      decoder_->GetOption(DECODER_OPTION_IS_REF_PIC, &iIsRefPic);
+      ASSERT_TRUE(iIsRefPic >= 0);
+    }
+    iIdx++;
+  }
+  (void)iSkipedBytes;
+}
+
 TEST_P (EncodeDecodeTestAPI, GetOptionTid_AVC_NOPREFIX) {
   SLTRMarkingFeedback m_LTR_Marking_Feedback;
   SLTRRecoverRequest m_LTR_Recover_Request;
