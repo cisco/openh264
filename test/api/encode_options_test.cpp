@@ -1928,7 +1928,7 @@ TEST_F (EncodeDecodeTestAPI, ProfileLevelSetting) {
   int iSliceNum        = 1;
 
   EProfileIdc profileList[11] = {PRO_UNKNOWN, PRO_BASELINE, PRO_MAIN,
-                                 PRO_EXTENDED , PRO_HIGH , PRO_HIGH10,
+                                 PRO_EXTENDED, PRO_HIGH, PRO_HIGH10,
                                  PRO_HIGH422, PRO_HIGH444, PRO_CAVLC444,
                                  PRO_SCALABLE_BASELINE,
                                  PRO_SCALABLE_HIGH
@@ -2115,4 +2115,46 @@ TEST_F (EncodeDecodeTestAPI, AVCSVCExtensionCheck) {
     iRet = encoder_->Uninitialize();
     ASSERT_TRUE (iRet == cmResultSuccess) << "rv = " << iRet;
   }
+}
+
+TEST_F (EncodeDecodeTestAPI, UnsupportedVideoSizeInput) {
+  int iWidth       = 640;
+  int iHeight      = 360;
+  float fFrameRate = rand() % 30 + 0.5f;
+  int iSliceNum    = 1;
+  int iRet;
+
+  int iSrcWidth = rand() % 16;
+  int iSrcHeight = rand() % 16;
+
+  SEncParamExt sParam;
+  encoder_->GetDefaultParams (&sParam);
+  prepareParamDefault (1, iSliceNum, iWidth, iHeight, fFrameRate, &sParam);
+  sParam.bSimulcastAVC = rand() & 1; //0 or 1
+  sParam.iRCMode = RC_OFF_MODE;
+  sParam.iNumRefFrame = 1;
+  sParam.fMaxFrameRate = fFrameRate;
+  iRet = encoder_->InitializeExt (&sParam);
+  ASSERT_TRUE (iRet == cmResultSuccess) << "InitializeExt: iRet = " << iRet << " at " << sParam.iPicWidth << "x" <<
+                                        sParam.iPicHeight;
+
+//   int TraceLevel = WELS_LOG_DEBUG;
+//   encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &TraceLevel);
+  ASSERT_TRUE (InitialEncDec (iSrcWidth, iSrcHeight));
+
+  iRet = encoder_->EncodeFrame (&EncPic, &info);
+  ASSERT_TRUE (iRet == cmUnsupportedData) << "rv = " << iRet;
+
+  iSrcWidth = iWidth;
+  iSrcHeight = iHeight;
+
+  ASSERT_TRUE (InitialEncDec (iSrcWidth, iSrcHeight));
+
+  iRet = encoder_->EncodeFrame (&EncPic, &info);
+
+  ASSERT_TRUE (iRet == cmResultSuccess) << "rv = " << iRet;
+
+  iRet = encoder_->Uninitialize();
+  ASSERT_TRUE (iRet == cmResultSuccess) << "rv = " << iRet;
+
 }
