@@ -2158,3 +2158,34 @@ TEST_F (EncodeDecodeTestAPI, UnsupportedVideoSizeInput) {
   ASSERT_TRUE (iRet == cmResultSuccess) << "rv = " << iRet;
 
 }
+
+TEST_F (EncodeDecodeTestAPI,  ScreenContent_LosslessLink0_EnableLongTermReference) {
+  int iWidth       = 2882;
+  int iHeight      = 1808;
+  float fFrameRate = rand() % 30 + 0.5f;
+  int iSliceNum    = 1;
+  int iRet;
+
+  SEncParamExt sParam;
+  encoder_->GetDefaultParams (&sParam);
+  prepareParamDefault (1, iSliceNum, iWidth, iHeight, fFrameRate, &sParam);
+  sParam.iUsageType = SCREEN_CONTENT_REAL_TIME;
+  sParam.bEnableLongTermReference = 1;
+  sParam.bIsLosslessLink = 0;
+  //int TraceLevel = WELS_LOG_INFO;
+  //encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &TraceLevel);
+  iRet = encoder_->InitializeExt (&sParam);
+  ASSERT_TRUE (iRet == cmResultSuccess) << "InitializeExt: iRet = " << iRet << " at " << sParam.iPicWidth << "x" <<
+                                        sParam.iPicHeight;
+
+
+  ASSERT_TRUE (InitialEncDec (iWidth, iHeight));
+
+  iRet = encoder_->EncodeFrame (&EncPic, &info);
+
+  ASSERT_TRUE (iRet == cmResultSuccess) << "rv = " << iRet;
+
+  iRet = encoder_->Uninitialize();
+  ASSERT_TRUE (iRet == cmResultSuccess) << "rv = " << iRet;
+
+}
