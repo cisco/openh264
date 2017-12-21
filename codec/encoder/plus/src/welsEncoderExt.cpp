@@ -396,10 +396,16 @@ int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSIn
 
 
 int CWelsH264SVCEncoder ::EncodeFrameInternal (const SSourcePicture*  pSrcPic, SFrameBSInfo* pBsInfo) {
+
+  if ((pSrcPic->iPicWidth < 16) || ((pSrcPic->iPicHeight < 16))) {
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "Don't support width(%d) or height(%d) which is less than 16!",
+             pSrcPic->iPicWidth, pSrcPic->iPicHeight);
+    return cmUnsupportedData;
+  }
+
   const int64_t kiBeforeFrameUs = WelsTime();
   const int32_t kiEncoderReturn = WelsEncoderEncodeExt (m_pEncContext, pBsInfo, pSrcPic);
   const int64_t kiCurrentFrameMs = (WelsTime() - kiBeforeFrameUs) / 1000;
-
   if ((kiEncoderReturn == ENC_RETURN_MEMALLOCERR) || (kiEncoderReturn == ENC_RETURN_MEMOVERFLOWFOUND)
       || (kiEncoderReturn == ENC_RETURN_VLCOVERFLOWFOUND)) {
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_DEBUG, "CWelsH264SVCEncoder::EncodeFrame() not succeed, err=%d",
@@ -735,7 +741,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     if ((sEncodingParam.iPicWidth  != m_pEncContext->pSvcParam->sDependencyLayers[m_pEncContext->pSvcParam->iSpatialLayerNum
          - 1].iActualWidth) ||
         (sEncodingParam.iPicHeight != m_pEncContext->pSvcParam->sDependencyLayers[m_pEncContext->pSvcParam->iSpatialLayerNum -
-            1].iActualHeight)) {
+                                                       1].iActualHeight)) {
       ++m_iSwitchTimes;
       m_bSwitch = true;
     }
