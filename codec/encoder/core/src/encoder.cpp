@@ -344,7 +344,7 @@ EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum
       bSceneChangeFlag = pEncCtx->pVaa->bSceneChangeFlag;
     }
     if (pEncCtx->pVaa->bIdrPeriodFlag || pParamInternal->bEncCurFrmAsIdrFlag || (!pSvcParam->bEnableLongTermReference
-        && bSceneChangeFlag)) {
+        && bSceneChangeFlag && !bSkipFrameFlag)) {
       iFrameType = videoFrameTypeIDR;
     } else if (pSvcParam->bEnableLongTermReference && (bSceneChangeFlag
                || pEncCtx->pVaa->eSceneChangeIdc == LARGE_CHANGED_SCENE)) {
