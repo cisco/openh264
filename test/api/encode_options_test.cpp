@@ -2150,6 +2150,11 @@ TEST_F (EncodeDecodeTestAPI, UnsupportedVideoSizeInput) {
 
   ASSERT_TRUE (InitialEncDec (iSrcWidth, iSrcHeight));
 
+  int frameSize = EncPic.iPicWidth * EncPic.iPicHeight * 3 / 2;
+  int lumaSize = EncPic.iPicWidth * EncPic.iPicHeight;
+  memset (buf_.data(), iRandValue, lumaSize);
+  memset (buf_.data() + lumaSize, rand() % 256, (frameSize - lumaSize));
+
   iRet = encoder_->EncodeFrame (&EncPic, &info);
 
   ASSERT_TRUE (iRet == cmResultSuccess) << "rv = " << iRet;
