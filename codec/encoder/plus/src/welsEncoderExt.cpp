@@ -638,7 +638,7 @@ void CWelsH264SVCEncoder::UpdateStatistics (SFrameBSInfo* pBsInfo,
     const int32_t kiDeltaFrames = static_cast<int32_t> (pStatistics->uiInputFrameCount -
                                   pStatistics->iLastStatisticsFrameCount);
     if (kiDeltaFrames > (m_pEncContext->pSvcParam->fMaxFrameRate * 2)) {
-      if (kiTimeDiff > m_pEncContext->iStatisticsLogInterval) {
+      if (kiTimeDiff >= m_pEncContext->iStatisticsLogInterval) {
         pStatistics->fLatestFrameRate = static_cast<float> ((pStatistics->uiInputFrameCount -
                                         pStatistics->iLastStatisticsFrameCount) * 1000 /
                                         kiTimeDiff);
@@ -661,17 +661,17 @@ void CWelsH264SVCEncoder::UpdateStatistics (SFrameBSInfo* pBsInfo,
                      pStatistics->fLatestFrameRate, m_pEncContext->pSvcParam->fMaxFrameRate);
           }
         }
+        // update variables
+        pStatistics->iLastStatisticsBytes = pStatistics->iTotalEncodedBytes;
+        pStatistics->iLastStatisticsFrameCount = pStatistics->uiInputFrameCount;
+
+        //TODO: the following statistics will be calculated and added later
+        //pStatistics->uiLTRSentNum
+
       }
-
-      // update variables
-      pStatistics->iLastStatisticsBytes = pStatistics->iTotalEncodedBytes;
-      pStatistics->iLastStatisticsFrameCount = pStatistics->uiInputFrameCount;
-
-      //TODO: the following statistics will be calculated and added later
-      //pStatistics->uiLTRSentNum
     }
   }
-  if (((m_pEncContext->iStatisticsLogInterval > 0) && (kiTimeDiff > m_pEncContext->iStatisticsLogInterval))
+  if (((m_pEncContext->iStatisticsLogInterval > 0) && (kiTimeDiff >= m_pEncContext->iStatisticsLogInterval))
       || (0 == iMaxInputFrame % 300)) {
 
     if ((iMaxFrameRate > 0) && WELS_ABS (iMaxFrameRate - m_pEncContext->pSvcParam->fMaxFrameRate) > 30) {
