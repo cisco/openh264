@@ -482,7 +482,7 @@ void RcCalculatePictureQp (sWelsEncCtx* pEncCtx) {
     pWelsSvcRc->iQStep = WELS_DIV_ROUND ((pTOverRc->iLinearCmplx * iCmplxRatio), (pWelsSvcRc->iTargetBits * INT_MULTIPLY));
     iLumaQp = RcConvertQStep2Qp (pWelsSvcRc->iQStep);
     WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG,
-             "iCmplxRatio = %d,frameComplexity = %lld,iFrameCmplxMean = %" PRId64 ",iQStep = %d,iLumaQp = %d", (int)iCmplxRatio,
+             "iCmplxRatio = %d,frameComplexity = %" PRId64 ",iFrameCmplxMean = %" PRId64 ",iQStep = %d,iLumaQp = %d", (int)iCmplxRatio,
              iFrameComplexity, pTOverRc->iFrameCmplxMean, pWelsSvcRc->iQStep, iLumaQp);
 //limit QP
     int32_t iLastIdxCodecInVGop = pWelsSvcRc->iFrameCodedInVGop - 1;
