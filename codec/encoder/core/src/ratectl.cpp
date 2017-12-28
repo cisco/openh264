@@ -482,8 +482,8 @@ void RcCalculatePictureQp (sWelsEncCtx* pEncCtx) {
     pWelsSvcRc->iQStep = WELS_DIV_ROUND ((pTOverRc->iLinearCmplx * iCmplxRatio), (pWelsSvcRc->iTargetBits * INT_MULTIPLY));
     iLumaQp = RcConvertQStep2Qp (pWelsSvcRc->iQStep);
     WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG,
-             "iCmplxRatio = %d,frameComplexity = %lld,iFrameCmplxMean = %" PRId64 ",iQStep = %d,iLumaQp = %d", (int)iCmplxRatio,
-             pEncCtx->pVaa->sComplexityAnalysisParam.iFrameComplexity, pTOverRc->iFrameCmplxMean, pWelsSvcRc->iQStep, iLumaQp);
+             "iCmplxRatio = %d,frameComplexity = %" PRId64 ",iFrameCmplxMean = %" PRId64 ",iQStep = %d,iLumaQp = %d", (int)iCmplxRatio,
+             iFrameComplexity, pTOverRc->iFrameCmplxMean, pWelsSvcRc->iQStep, iLumaQp);
 //limit QP
     int32_t iLastIdxCodecInVGop = pWelsSvcRc->iFrameCodedInVGop - 1;
     if (iLastIdxCodecInVGop < 0)
@@ -580,12 +580,17 @@ void RcDecideTargetBitsTimestamp (sWelsEncCtx* pEncCtx) {
       pWelsSvcRc->iTargetBits = pTOverRc->iMinBitsTl;
     } else {
       int32_t iMaxTh = iBufferTh * 3 / 4;
-      int32_t iMinTh = static_cast<int32_t> (iBufferTh * 2 / pDLayerParam->fFrameRate);
-      pWelsSvcRc->iTargetBits = static_cast<int32_t> (((double) (pDLayerParam->iSpatialBitrate) / (double) (
-                                  pDLayerParam->fFrameRate) * IDR_BITRATE_RATIO));
+      int32_t iMinTh = (pDLayerParam->fFrameRate < 8) ? iBufferTh * 1.0 / 4 : static_cast<int32_t>
+                       (iBufferTh * 2 / pDLayerParam->fFrameRate);
+      if (pDLayerParam->fFrameRate < (IDR_BITRATE_RATIO + 1))
+        pWelsSvcRc->iTargetBits = static_cast<int32_t> (((double) (pDLayerParam->iSpatialBitrate) / (double) (
+                                    pDLayerParam->fFrameRate)));
+      else
+        pWelsSvcRc->iTargetBits = static_cast<int32_t> (((double) (pDLayerParam->iSpatialBitrate) / (double) (
+                                    pDLayerParam->fFrameRate) * IDR_BITRATE_RATIO));
       WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG,
                "iMaxTh = %d,iMinTh = %d,pWelsSvcRc->iTargetBits = %d,pWelsSvcRc->iBufferSizeSkip = %d, pWelsSvcRc->iBufferFullnessSkip= %"
-               PRId64 ,
+               PRId64,
                iMaxTh, iMinTh, pWelsSvcRc->iTargetBits, pWelsSvcRc->iBufferSizeSkip, pWelsSvcRc->iBufferFullnessSkip);
       pWelsSvcRc->iTargetBits = WELS_CLIP3 (pWelsSvcRc->iTargetBits, iMinTh, iMaxTh);
     }
@@ -607,7 +612,8 @@ void RcDecideTargetBitsTimestamp (sWelsEncCtx* pEncCtx) {
       pWelsSvcRc->iTargetBits = WELS_DIV_ROUND (pTOverRc->iTlayerWeight * kiGopBits, INT_MULTIPLY * 10 * 2);
 
       int32_t iMaxTh = iBufferTh / 2;
-      int32_t iMinTh = (int32_t) (iBufferTh * 2 / pDLayerParam->fFrameRate);
+      int32_t iMinTh = (pDLayerParam->fFrameRate < 8) ? iBufferTh * 1.0 / 4 : static_cast<int32_t>
+                       (iBufferTh * 2 / pDLayerParam->fFrameRate);
       WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG,
                "iMaxTh = %d,iMinTh = %d,pWelsSvcRc->iTargetBits = %d,pWelsSvcRc->iBufferSizeSkip = %d, pWelsSvcRc->iBufferFullnessSkip= % "
                PRId64,
@@ -1117,7 +1123,7 @@ void RcUpdateFrameComplexity (sWelsEncCtx* pEncCtx) {
            "RcUpdateFrameComplexity iFrameDqBits = %d,iQStep= %d,pWelsSvcRc->iQStep= %d,pTOverRc->iLinearCmplx = %" PRId64,
            pWelsSvcRc->iFrameDqBits,
            iQStep, pWelsSvcRc->iQStep, pTOverRc->iLinearCmplx);
-  WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG, "iFrameCmplxMean = %" PRId64 ",iFrameComplexity = %" PRId64 ,
+  WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG, "iFrameCmplxMean = %" PRId64 ",iFrameComplexity = %" PRId64,
            pTOverRc->iFrameCmplxMean, iFrameComplexity);
 }
 
