@@ -126,8 +126,6 @@ static inline int32_t FmoGenerateSliceGroup (PFmo pFmo, const PPps kpPps, const 
   // the cases we would not like
   WELS_VERIFY_RETURN_IF (ERR_INFO_INVALID_PARAM, (NULL == pFmo || NULL == kpPps))
 
-  iNumMb        = pFmo->iCountMbNum;
-
   iNumMb = kiMbWidth * kiMbHeight;
 
   if (0 == iNumMb)
