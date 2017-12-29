@@ -78,6 +78,8 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
   FILE* pOptionFile = NULL;
 // Lenght input mode support
   FILE* fpTrack = NULL;
+  if (pDecoder == NULL) return;
+
   if (pLengthFileName != NULL) {
     fpTrack = fopen (pLengthFileName, "rb");
     if (fpTrack == NULL)
@@ -109,7 +111,6 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
   CUtils cOutputModule;
   double dElapsed = 0;
 
-  if (pDecoder == NULL) return;
   if (kpH264FileName) {
     pH264File = fopen (kpH264FileName, "rb");
     if (pH264File == NULL) {
