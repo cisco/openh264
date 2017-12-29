@@ -78,15 +78,10 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
   FILE* pOptionFile = NULL;
 // Lenght input mode support
   FILE* fpTrack = NULL;
+
   if (pDecoder == NULL) return;
 
-  if (pLengthFileName != NULL) {
-    fpTrack = fopen (pLengthFileName, "rb");
-    if (fpTrack == NULL)
-      printf ("Length file open ERROR!\n");
-  }
   int32_t pInfo[4];
-
   unsigned long long uiTimeStamp = 0;
   int64_t iStart = 0, iEnd = 0, iTotal = 0;
   int32_t iSliceSize;
@@ -145,6 +140,12 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
       fprintf (stderr, "Extra optional file: %s..\n", pOptionFileName);
   }
 
+  if (pLengthFileName != NULL) {
+    fpTrack = fopen (pLengthFileName, "rb");
+    if (fpTrack == NULL)
+      printf ("Length file open ERROR!\n");
+  }
+
   printf ("------------------------------------------------------\n");
 
   fseek (pH264File, 0L, SEEK_END);
@@ -179,7 +180,7 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
 // Read length from file if needed
     if (fpTrack) {
       if (fread (pInfo, 4, sizeof (int32_t), fpTrack) < 4)
-        return;
+        goto label_exit;
       iSliceSize = static_cast<int32_t> (pInfo[2]);
     } else {
       for (i = 0; i < iFileSize; i++) {
@@ -285,11 +286,6 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
     ++ iSliceIndex;
   }
 
-  if (fpTrack) {
-    fclose (fpTrack);
-    fpTrack = NULL;
-  }
-
   dElapsed = iTotal / 1e6;
   fprintf (stderr, "-------------------------------------------------------\n");
   fprintf (stderr, "iWidth:\t\t%d\nheight:\t\t%d\nFrames:\t\t%d\ndecode time:\t%f sec\nFPS:\t\t%f fps\n",
@@ -320,6 +316,11 @@ label_exit:
     fclose (pOptionFile);
     pOptionFile = NULL;
   }
+  if (fpTrack) {
+    fclose (fpTrack);
+    fpTrack = NULL;
+  }
+
 }
 
 #if (defined(ANDROID_NDK)||defined(APPLE_IOS) || defined (WINDOWS_PHONE))
