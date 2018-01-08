@@ -856,6 +856,10 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
       iRet = 1;
       goto INSIDE_MEM_FREE;
     }
+  } else {
+    fprintf (stderr, "Don't set the proper bitstream filename!\n");
+    iRet = 1;
+    goto INSIDE_MEM_FREE;
   }
 
 #if defined(COMPARE_DATA)
