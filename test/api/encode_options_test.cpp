@@ -2202,3 +2202,66 @@ TEST_F (EncodeDecodeTestAPI,  ScreenContent_LosslessLink0_EnableLongTermReferenc
   ASSERT_TRUE (iRet == cmResultSuccess) << "rv = " << iRet;
 
 }
+
+
+TEST_F (EncodeDecodeTestAPI,  TemporalLayerChangeDuringEncoding) {
+  int iWidth       = 320;
+  int iHeight      = 192;
+  float fFrameRate = 15;
+  int iSliceNum    = 1;
+  int iRet = 0;
+  int iTotalFrame  = 20; //total test enc frame num
+  int iFrameNum = 0;
+  SEncParamExt sParam;
+  encoder_->GetDefaultParams (&sParam);
+  prepareParamDefault (1, iSliceNum, iWidth, iHeight, fFrameRate, &sParam);
+  sParam.iTemporalLayerNum = 2;
+
+  //int TraceLevel = WELS_LOG_DEBUG;
+  //encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &TraceLevel);
+  iRet = encoder_->InitializeExt (&sParam);
+  ASSERT_TRUE (iRet == cmResultSuccess) << "InitializeExt: iRet = " << iRet << " at " << sParam.iPicWidth << "x" <<
+                                        sParam.iPicHeight;
+
+  ASSERT_TRUE (InitialEncDec (iWidth, iHeight));
+
+  int frameSize = EncPic.iPicWidth * EncPic.iPicHeight * 3 / 2;
+  do {
+    FileInputStream fileStream;
+    ASSERT_TRUE (fileStream.Open ("res/CiscoVT2people_320x192_12fps.yuv"));
+
+    while (fileStream.read (buf_.data(), frameSize) == frameSize) {
+      iRet = encoder_->EncodeFrame (&EncPic, &info);
+      ASSERT_TRUE (iRet == cmResultSuccess) << "rv = " << iRet;
+      if (iFrameNum == 5) {
+        sParam.iTemporalLayerNum = 3;
+        sParam.iTargetBitrate = 1500000;
+        sParam.sSpatialLayers[0].iSpatialBitrate = 1500000;
+        sParam.fMaxFrameRate = 30;
+        //sSvcParam.sSpatialLayers[0].fFrameRate = 30;
+        encoder_->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, &sParam);
+      } else if (iFrameNum == 10) {
+        sParam.iTemporalLayerNum = 1;
+        sParam.iTargetBitrate = 500000;
+        sParam.sSpatialLayers[0].iSpatialBitrate = 500000;
+        sParam.fMaxFrameRate = 7.5;
+        //sSvcParam.sSpatialLayers[0].fFrameRate = 7.5;
+        encoder_->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, &sParam);
+      } else if (iFrameNum == 15) {
+        sParam.iTemporalLayerNum = 2;
+        sParam.iTargetBitrate = 1000000;
+        sParam.sSpatialLayers[0].iSpatialBitrate = 1000000;
+        sParam.fMaxFrameRate = 15;
+        //sSvcParam.sSpatialLayers[0].fFrameRate = 15;
+        encoder_->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, &sParam);
+      }
+
+
+    }
+    iFrameNum++;
+  } while (iFrameNum < iTotalFrame);
+
+  iRet = encoder_->Uninitialize();
+  ASSERT_TRUE (iRet == cmResultSuccess) << "rv = " << iRet;
+
+}
