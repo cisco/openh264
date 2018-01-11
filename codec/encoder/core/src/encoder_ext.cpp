@@ -4179,7 +4179,8 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
                (pOldParam->bEnableBackgroundDetection != pNewParam->bEnableBackgroundDetection) ||
                (pOldParam->bEnableAdaptiveQuant != pNewParam->bEnableAdaptiveQuant) ||
                (pOldParam->eSpsPpsIdStrategy != pNewParam->eSpsPpsIdStrategy);
-  if (pNewParam->iMaxNumRefFrame > pOldParam->iMaxNumRefFrame) {
+  if ((pNewParam->iMaxNumRefFrame > pOldParam->iMaxNumRefFrame) ||
+      ((pOldParam->iMaxNumRefFrame == 1) && (pOldParam->iTemporalLayerNum == 1) && (pNewParam->iTemporalLayerNum == 2))) {
     bNeedReset = true;
   }
   if (bNeedReset) {
