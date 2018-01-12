@@ -1957,8 +1957,8 @@ TEST_F (EncodeDecodeTestAPI, ProfileLevelSetting) {
   sParam.iEntropyCodingModeFlag = rand() % 2;
   sParam.sSpatialLayers[0].iSpatialBitrate = sParam.iTargetBitrate = 3000;
 
-  int TraceLevel = WELS_LOG_DEBUG;
-  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &TraceLevel);
+//  int TraceLevel = WELS_LOG_DEBUG;
+//  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &TraceLevel);
   //decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &TraceLevel);
   iEncProfileIdc = profileList[rand() % 11];
   iEncLevelIdc =  levelList[rand() % 18];
@@ -1980,7 +1980,7 @@ TEST_F (EncodeDecodeTestAPI, ProfileLevelSetting) {
   }
 
   ASSERT_TRUE (iDecProfileIdc == iEncProfileIdc) << "enc_profile = " << iEncProfileIdc << "  dec_profile = " <<
-    iDecProfileIdc;
+      iDecProfileIdc;
 
   //check whether the level is changed according to level limitation
   ELevelIdc uiLevel = LEVEL_UNKNOWN;
@@ -2213,8 +2213,8 @@ TEST_F (EncodeDecodeTestAPI,  TemporalLayerChangeDuringEncoding) {
   prepareParamDefault (1, iSliceNum, iWidth, iHeight, fFrameRate, &sParam);
   sParam.iTemporalLayerNum = 2;
 
-  //int TraceLevel = WELS_LOG_DEBUG;
-  //encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &TraceLevel);
+//  int TraceLevel = WELS_LOG_DEBUG;
+//  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &TraceLevel);
   iRet = encoder_->InitializeExt (&sParam);
   ASSERT_TRUE (iRet == cmResultSuccess) << "InitializeExt: iRet = " << iRet << " at " << sParam.iPicWidth << "x" <<
                                         sParam.iPicHeight;
@@ -2261,3 +2261,74 @@ TEST_F (EncodeDecodeTestAPI,  TemporalLayerChangeDuringEncoding) {
   ASSERT_TRUE (iRet == cmResultSuccess) << "rv = " << iRet;
 
 }
+
+TEST_F (EncodeDecodeTestAPI,  TemporalLayerChangeDuringEncoding_Specific) {
+  int iWidth       = 320;
+  int iHeight      = 192;
+  float fFrameRate = 15;
+  int iSliceNum    = 1;
+  int iRet = 0;
+  int iTotalFrame  = (rand() % 20) + 3;
+  int iFrameNum = 0;
+  SEncParamExt sParam;
+  encoder_->GetDefaultParams (&sParam);
+  prepareParamDefault (1, iSliceNum, iWidth, iHeight, fFrameRate, &sParam);
+
+  int originalTemporalLayerNum = 1;
+  int originalBR = 500000;
+  float originalFR = 7.5;
+  int iSteps[3] = {2, 1, 3};
+  int iStepIdx = 0;
+  bool bSetOption = false;
+
+  sParam.iTemporalLayerNum = originalTemporalLayerNum;
+  sParam.iNumRefFrame = 1;
+
+// int TraceLevel = WELS_LOG_INFO;
+//  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &TraceLevel);
+  iRet = encoder_->InitializeExt (&sParam);
+  ASSERT_TRUE (iRet == cmResultSuccess) << "InitializeExt: iRet = " << iRet << " at " << sParam.iPicWidth << "x" <<
+                                        sParam.iPicHeight;
+
+  ASSERT_TRUE (InitialEncDec (iWidth, iHeight));
+
+  int frameSize = EncPic.iPicWidth * EncPic.iPicHeight * 3 / 2;
+  do {
+    FileInputStream fileStream;
+    ASSERT_TRUE (fileStream.Open ("res/CiscoVT2people_320x192_12fps.yuv"));
+
+    while (fileStream.read (buf_.data(), frameSize) == frameSize) {
+
+      if (iFrameNum == ((iTotalFrame / 3) * (iStepIdx + 1))) {
+        sParam.iTemporalLayerNum = originalTemporalLayerNum * iSteps[iStepIdx];
+        sParam.iTargetBitrate = sParam.sSpatialLayers[0].iSpatialBitrate = originalBR * iSteps[iStepIdx];
+        sParam.fMaxFrameRate = sParam.sSpatialLayers[0].fFrameRate = originalFR * pow (2, iSteps[iStepIdx]);
+        encoder_->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, &sParam);
+
+        bSetOption = true;
+        iStepIdx += 1;
+      }
+
+      iRet = encoder_->EncodeFrame (&EncPic, &info);
+      EXPECT_TRUE (iRet == cmResultSuccess) << "rv = " << iRet;
+
+      if (bSetOption) {
+        if ((iStepIdx == 1) || (iStepIdx == 3)) {
+          EXPECT_TRUE (info.eFrameType == videoFrameTypeIDR) << "iStepIdx=" << iStepIdx;
+        } else {
+          EXPECT_TRUE (info.eFrameType != videoFrameTypeIDR) << "iStepIdx=" << iStepIdx;
+        }
+
+        bSetOption = false;
+      }
+
+
+    }
+    iFrameNum++;
+  } while (iFrameNum < iTotalFrame);
+
+  iRet = encoder_->Uninitialize();
+  ASSERT_TRUE (iRet == cmResultSuccess) << "rv = " << iRet;
+
+}
+
