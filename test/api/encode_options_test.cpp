@@ -36,6 +36,7 @@ bool EncodeDecodeTestAPIBase::InitialEncDec (int iWidth, int iHeight) {
 
   //set a fixed random value
   iRandValue = rand() % 256;
+  memset (buf_.data(), iRandValue, frameSize);
   return true;
 }
 
@@ -2157,11 +2158,6 @@ TEST_F (EncodeDecodeTestAPI, UnsupportedVideoSizeInput) {
   iSrcHeight = iHeight;
 
   ASSERT_TRUE (InitialEncDec (iSrcWidth, iSrcHeight));
-
-  int frameSize = EncPic.iPicWidth * EncPic.iPicHeight * 3 / 2;
-  int lumaSize = EncPic.iPicWidth * EncPic.iPicHeight;
-  memset (buf_.data(), iRandValue, lumaSize);
-  memset (buf_.data() + lumaSize, rand() % 256, (frameSize - lumaSize));
 
   iRet = encoder_->EncodeFrame (&EncPic, &info);
 
