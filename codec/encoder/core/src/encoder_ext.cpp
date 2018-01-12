@@ -4194,11 +4194,13 @@ int32_t WelsEncoderParamAdjust (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pNewPa
              pNewParam->SUsedPicRect.iHeight);
 
     WelsLog (& (*ppCtx)->sLogCtx, WELS_LOG_INFO,
-             "WelsEncoderParamAdjust(),bEnableLongTermReference(%d,%d),iLTRRefNum(%d,%d),iMultipleThreadIdc(%d,%d),bEnableBackgroundDetection(%d,%d),bEnableAdaptiveQuant(%d,%d),eSpsPpsIdStrategy(%d,%d),iMaxNumRefFrame(%d,%d)",
+             "WelsEncoderParamAdjust(),bEnableLongTermReference(%d,%d),iLTRRefNum(%d,%d),iMultipleThreadIdc(%d,%d),bEnableBackgroundDetection(%d,%d),bEnableAdaptiveQuant(%d,%d),eSpsPpsIdStrategy(%d,%d),iMaxNumRefFrame(%d,%d),iTemporalLayerNum(%d,%d)",
              pOldParam->bEnableLongTermReference, pNewParam->bEnableLongTermReference, pOldParam->iLTRRefNum, pNewParam->iLTRRefNum,
              pOldParam->iMultipleThreadIdc, pNewParam->iMultipleThreadIdc, pOldParam->bEnableBackgroundDetection,
              pNewParam->bEnableBackgroundDetection, pOldParam->bEnableAdaptiveQuant, pNewParam->bEnableAdaptiveQuant,
-             pOldParam->eSpsPpsIdStrategy, pNewParam->eSpsPpsIdStrategy, pNewParam->iMaxNumRefFrame, pOldParam->iMaxNumRefFrame);
+             pOldParam->eSpsPpsIdStrategy, pNewParam->eSpsPpsIdStrategy,
+             pNewParam->iMaxNumRefFrame, pOldParam->iMaxNumRefFrame,
+             pNewParam->iTemporalLayerNum, pOldParam->iTemporalLayerNum);
   }
   if (!bNeedReset) { // Check its picture resolutions/quality settings respectively in each dependency layer
     iIndexD = 0;
