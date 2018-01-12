@@ -2272,7 +2272,7 @@ TEST_F (EncodeDecodeTestAPI,  TemporalLayerChangeDuringEncoding_Specific) {
   float fFrameRate = 15;
   int iSliceNum    = 1;
   int iRet = 0;
-  int iTotalFrame  = rand() % 20;
+  int iTotalFrame  = (rand() % 20) + 3;
   int iFrameNum = 0;
   SEncParamExt sParam;
   encoder_->GetDefaultParams (&sParam);
@@ -2303,7 +2303,7 @@ TEST_F (EncodeDecodeTestAPI,  TemporalLayerChangeDuringEncoding_Specific) {
 
     while (fileStream.read (buf_.data(), frameSize) == frameSize) {
 
-      if (iFrameNum == (iTotalFrame / 3) * (iStepIdx + 1)) {
+      if (iFrameNum == ((iTotalFrame / 3) * (iStepIdx + 1))) {
         sParam.iTemporalLayerNum = originalTemporalLayerNum * iSteps[iStepIdx];
         sParam.iTargetBitrate = sParam.sSpatialLayers[0].iSpatialBitrate = originalBR * iSteps[iStepIdx];
         sParam.fMaxFrameRate = sParam.sSpatialLayers[0].fFrameRate = originalFR * pow (2, iSteps[iStepIdx]);
@@ -2318,9 +2318,9 @@ TEST_F (EncodeDecodeTestAPI,  TemporalLayerChangeDuringEncoding_Specific) {
 
       if (bSetOption) {
         if ((iStepIdx == 1) || (iStepIdx == 3)) {
-          EXPECT_TRUE (info.eFrameType == videoFrameTypeIDR);
+          EXPECT_TRUE (info.eFrameType == videoFrameTypeIDR) << "iStepIdx=" << iStepIdx;
         } else {
-          EXPECT_TRUE (info.eFrameType != videoFrameTypeIDR);
+          EXPECT_TRUE (info.eFrameType != videoFrameTypeIDR) << "iStepIdx=" << iStepIdx;
         }
 
         bSetOption = false;
