@@ -2284,8 +2284,8 @@ TEST_F (EncodeDecodeTestAPI,  TemporalLayerChangeDuringEncoding_Specific) {
   sParam.iTemporalLayerNum = originalTemporalLayerNum;
   sParam.iNumRefFrame = 1;
 
-// int TraceLevel = WELS_LOG_INFO;
-//  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &TraceLevel);
+ int TraceLevel = WELS_LOG_INFO;
+  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &TraceLevel);
   iRet = encoder_->InitializeExt (&sParam);
   ASSERT_TRUE (iRet == cmResultSuccess) << "InitializeExt: iRet = " << iRet << " at " << sParam.iPicWidth << "x" <<
                                         sParam.iPicHeight;
@@ -2314,9 +2314,9 @@ TEST_F (EncodeDecodeTestAPI,  TemporalLayerChangeDuringEncoding_Specific) {
 
       if (bSetOption) {
         if ((iStepIdx == 1) || (iStepIdx == 3)) {
-          EXPECT_TRUE (info.eFrameType == videoFrameTypeIDR) << "iStepIdx=" << iStepIdx;
+          EXPECT_TRUE (info.eFrameType == videoFrameTypeIDR) << "iStepIdx=" << iStepIdx << "iFrameNum=" << iFrameNum << "iTotalFrame=" << iTotalFrame;
         } else {
-          EXPECT_TRUE (info.eFrameType != videoFrameTypeIDR) << "iStepIdx=" << iStepIdx;
+          EXPECT_TRUE (info.eFrameType != videoFrameTypeIDR) << "iStepIdx=" << iStepIdx << "iFrameNum=" << iFrameNum << "iTotalFrame=" << iTotalFrame;
         }
 
         bSetOption = false;
