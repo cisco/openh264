@@ -488,13 +488,24 @@ int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPa
 
   for (i = 0; i < pCodingParam->iSpatialLayerNum; ++ i) {
     SSpatialLayerConfig* pSpatialLayer = &pCodingParam->sSpatialLayers[i];
-    const int32_t kiPicWidth = pSpatialLayer->iVideoWidth;
-    const int32_t kiPicHeight = pSpatialLayer->iVideoHeight;
+    int32_t kiPicWidth = pSpatialLayer->iVideoWidth;
+    int32_t kiPicHeight = pSpatialLayer->iVideoHeight;
     uint32_t iMbWidth           = 0;
     uint32_t iMbHeight          = 0;
     int32_t iMbNumInFrame       = 0;
     uint32_t iMaxSliceNum       = MAX_SLICES_NUM;
     int32_t  iReturn            = 0;
+
+    if ((pCodingParam->iPicWidth > 0) && (pCodingParam->iPicHeight > 0)
+        && (kiPicWidth == 0) && (kiPicHeight == 0)
+        && (pCodingParam->iSpatialLayerNum == 1)) {
+      kiPicWidth = pSpatialLayer->iVideoWidth = pCodingParam->iPicWidth;
+      kiPicHeight = pSpatialLayer->iVideoHeight = pCodingParam->iPicHeight;
+      WelsLog (pLogCtx, WELS_LOG_DEBUG,
+               "ParamValidationExt(), layer resolution is not set, set to general resolution %d x %d",
+               pSpatialLayer->iVideoWidth, pSpatialLayer->iVideoHeight);
+    }
+
     if ((kiPicWidth <= 0) || (kiPicHeight <= 0) || (kiPicWidth * kiPicHeight > (MAX_MBS_PER_FRAME << 8))) {
       WelsLog (pLogCtx, WELS_LOG_ERROR,
                "ParamValidationExt(), width > 0, height > 0, width * height <= %d, invalid %d x %d in dependency layer settings!",
@@ -641,8 +652,8 @@ int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPa
         WelsLog (pLogCtx, WELS_LOG_WARNING, "layerId(%d) Profile is baseline, Change CABAC to CAVLC", i);
       }
     } else if (pLayerInfo->uiProfileIdc == PRO_UNKNOWN) {
-      if ((i==0) || pCodingParam->bSimulcastAVC) {
-        pLayerInfo->uiProfileIdc = (pCodingParam->iEntropyCodingModeFlag)?PRO_HIGH:PRO_BASELINE;
+      if ((i == 0) || pCodingParam->bSimulcastAVC) {
+        pLayerInfo->uiProfileIdc = (pCodingParam->iEntropyCodingModeFlag) ? PRO_HIGH : PRO_BASELINE;
       } else {
         pLayerInfo->uiProfileIdc = PRO_SCALABLE_BASELINE;
       }
