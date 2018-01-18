@@ -2284,8 +2284,8 @@ TEST_F (EncodeDecodeTestAPI,  TemporalLayerChangeDuringEncoding_Specific) {
   sParam.iTemporalLayerNum = originalTemporalLayerNum;
   sParam.iNumRefFrame = 1;
 
- int TraceLevel = WELS_LOG_INFO;
-  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &TraceLevel);
+// int TraceLevel = WELS_LOG_INFO;
+//  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &TraceLevel);
   iRet = encoder_->InitializeExt (&sParam);
   ASSERT_TRUE (iRet == cmResultSuccess) << "InitializeExt: iRet = " << iRet << " at " << sParam.iPicWidth << "x" <<
                                         sParam.iPicHeight;
