@@ -2302,7 +2302,7 @@ TEST_F (EncodeDecodeTestAPI,  TemporalLayerChangeDuringEncoding_Specific) {
       if ( (iStepIdx < 3) && (iFrameNum == ((iTotalFrame / 3) * (iStepIdx + 1)))) {
         sParam.iTemporalLayerNum = originalTemporalLayerNum * iSteps[iStepIdx];
         sParam.iTargetBitrate = sParam.sSpatialLayers[0].iSpatialBitrate = originalBR * iSteps[iStepIdx];
-        sParam.fMaxFrameRate = sParam.sSpatialLayers[0].fFrameRate = originalFR * pow (2, iSteps[iStepIdx]);
+        sParam.fMaxFrameRate = sParam.sSpatialLayers[0].fFrameRate = originalFR * pow (2.0f, iSteps[iStepIdx]);
         encoder_->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, &sParam);
 
         bSetOption = true;
