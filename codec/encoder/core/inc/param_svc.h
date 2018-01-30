@@ -417,6 +417,21 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
       pSpatialLayer->iMaxSpatialBitrate =
         pCodingParam.sSpatialLayers[iIdxSpatial].iMaxSpatialBitrate;
 
+      if ((iSpatialLayerNum==1) && (iIdxSpatial==0)) {
+        if (pSpatialLayer->iVideoWidth == 0) {
+          pSpatialLayer->iVideoWidth = iPicWidth;
+        }
+        if (pSpatialLayer->iVideoHeight == 0) {
+          pSpatialLayer->iVideoHeight = iPicHeight;
+        }
+        if (pSpatialLayer->iSpatialBitrate == 0) {
+          pSpatialLayer->iSpatialBitrate = iTargetBitrate;
+        }
+        if (pSpatialLayer->iMaxSpatialBitrate == 0) {
+          pSpatialLayer->iMaxSpatialBitrate = iMaxBitrate;
+        }
+      }
+
       //multi slice
       pSpatialLayer->sSliceArgument = pCodingParam.sSpatialLayers[iIdxSpatial].sSliceArgument;
 
