@@ -3878,7 +3878,8 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
     }
 
     pCtx->pFuncList->pfRc.pfWelsRcPictureInfoUpdate (pCtx, iLayerSize);
-    RcTraceFrameBits (pCtx, pFbi->uiTimeStamp);
+    iFrameSize += iLayerSize;
+    RcTraceFrameBits (pCtx, pFbi->uiTimeStamp, iFrameSize);
     pCtx->pDecPic->iFrameAverageQp = pCtx->pWelsSvcRc[iCurDid].iAverageFrameQp;
 
     //update scc related
@@ -3894,7 +3895,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       }
     }
 
-    iFrameSize += iLayerSize;
+
     //check MinCr
     {
       int32_t iMinCrFrameSize = (pParam->iVideoWidth * pParam->iVideoHeight * 3) >> 2; //MinCr = 2;
