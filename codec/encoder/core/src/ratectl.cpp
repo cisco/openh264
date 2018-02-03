@@ -1019,8 +1019,9 @@ void RcTraceFrameBits (sWelsEncCtx* pEncCtx, long long uiTimeStamp, int32_t iFra
            pEncCtx->uiDependencyId, uiTimeStamp, pEncCtx->eSliceType, pEncCtx->iGlobalQp, pWelsSvcRc->iAverageFrameQp,
            pWelsSvcRc->iMaxFrameQp,
            pWelsSvcRc->iMinFrameQp,
-           pParamInternal->iFrameIndex, pEncCtx->uiTemporalId, pWelsSvcRc->iFrameDqBits,
-           ( pWelsSvcRc->iBitsPerFrame>0 ) ? pWelsSvcRc->iBitsPerFrame : (iFrameSize<<3),
+           pParamInternal->iFrameIndex, pEncCtx->uiTemporalId,
+           ( pWelsSvcRc->iFrameDqBits > 0 ) ? pWelsSvcRc->iFrameDqBits : (iFrameSize<<3) ,
+           pWelsSvcRc->iBitsPerFrame,
            pWelsSvcRc->iTargetBits, pWelsSvcRc->iRemainingBits, pWelsSvcRc->iBufferSizeSkip);
 
 }
