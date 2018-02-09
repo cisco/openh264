@@ -257,7 +257,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
           MIN_FRAME_RATE, MAX_FRAME_RATE);
       pDlp->fInputFrameRate =
         pDlp->fOutputFrameRate = WELS_CLIP3 (sSpatialLayers[iIdxSpatial].fFrameRate, MIN_FRAME_RATE,
-                                              MAX_FRAME_RATE);
+                                             MAX_FRAME_RATE);
 #ifdef ENABLE_FRAME_DUMP
       pDlp->sRecFileName[0] = '\0'; // file to be constructed
 #endif//ENABLE_FRAME_DUMP
@@ -317,7 +317,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
 
     iTargetBitrate      = pCodingParam.iTargetBitrate;  // target bitrate
     iMaxBitrate         = pCodingParam.iMaxBitrate;
-    if (iMaxBitrate < iTargetBitrate) {
+    if ((iMaxBitrate != UNSPECIFIED_BIT_RATE) && (iMaxBitrate < iTargetBitrate)) {
       iMaxBitrate  = iTargetBitrate;
     }
     iMaxQp = pCodingParam.iMaxQp;
