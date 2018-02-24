@@ -516,7 +516,7 @@ typedef enum {
 */
 typedef struct TagEncParamBase {
   EUsageType
-  iUsageType;                 ///< application type;1.CAMERA_VIDEO_REAL_TIME:camera video signal; 2.SCREEN_CONTENT_REAL_TIME:screen content signal;
+  iUsageType;                 ///< application type; please refer to the definition of EUsageType
 
   int       iPicWidth;        ///< width of picture in luminance samples (the maximum of all layers if multiple spatial layers presents)
   int       iPicHeight;       ///< height of picture in luminance samples((the maximum of all layers if multiple spatial layers presents)
@@ -531,13 +531,13 @@ typedef struct TagEncParamBase {
 */
 typedef struct TagEncParamExt {
   EUsageType
-  iUsageType;                          ///< application type;1.CAMERA_VIDEO_REAL_TIME:camera video signal;2.SCREEN_CONTENT_REAL_TIME:screen content signal;
+  iUsageType;                          ///< same as in TagEncParamBase
 
-  int       iPicWidth;                 ///< width of picture in luminance samples (the maximum of all layers if multiple spatial layers presents)
-  int       iPicHeight;                ///< height of picture in luminance samples((the maximum of all layers if multiple spatial layers presents)
-  int       iTargetBitrate;            ///< target bitrate desired, in unit of bps
-  RC_MODES  iRCMode;                   ///< rate control mode
-  float     fMaxFrameRate;             ///< maximal input frame rate
+  int       iPicWidth;                 ///< same as in TagEncParamBase
+  int       iPicHeight;                ///< same as in TagEncParamBase
+  int       iTargetBitrate;            ///< same as in TagEncParamBase
+  RC_MODES  iRCMode;                   ///< same as in TagEncParamBase
+  float     fMaxFrameRate;             ///< same as in TagEncParamBase
 
   int       iTemporalLayerNum;         ///< temporal layer number, max temporal layer = 4
   int       iSpatialLayerNum;          ///< spatial layer number,1<= iSpatialLayerNum <= MAX_SPATIAL_LAYER_NUM, MAX_SPATIAL_LAYER_NUM = 4
