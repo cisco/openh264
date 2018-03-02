@@ -283,6 +283,12 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
                pCfg->bEnableAdaptiveQuant);
       pCfg->bEnableAdaptiveQuant = false;
     }
+    if (pCfg->bEnableBackgroundDetection) {
+      WelsLog (pLogCtx, WELS_LOG_WARNING,
+               "ParamValidation(), BackgroundDetection(%d) is not supported yet for screen content, auto turned off",
+               pCfg->bEnableBackgroundDetection);
+      pCfg->bEnableBackgroundDetection = false;
+    }
     if (pCfg->bEnableSceneChangeDetect == false) {
       pCfg->bEnableSceneChangeDetect = true;
       WelsLog (pLogCtx, WELS_LOG_WARNING,
