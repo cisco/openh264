@@ -374,14 +374,18 @@ int32_t CWelsH264SVCEncoder::Uninitialize() {
  */
 int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSInfo* pBsInfo) {
   if (! (kpSrcPic && m_bInitialFlag && pBsInfo)) {
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "CWelsH264SVCEncoder::EncodeFrame(), cmInitParaError.");
     return cmInitParaError;
   }
-  if (kpSrcPic->iColorFormat != videoFormatI420)
+  if (kpSrcPic->iColorFormat != videoFormatI420) {
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "CWelsH264SVCEncoder::EncodeFrame(), wrong iColorFormat %d", kpSrcPic->iColorFormat);
     return cmInitParaError;
+  }
 
   const int32_t kiEncoderReturn = EncodeFrameInternal (kpSrcPic, pBsInfo);
 
   if (kiEncoderReturn != cmResultSuccess) {
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "CWelsH264SVCEncoder::EncodeFrame(), kiEncoderReturn %d", kiEncoderReturn);
     return kiEncoderReturn;
   }
 
@@ -539,7 +543,7 @@ void CWelsH264SVCEncoder::TraceParamInfo (SEncParamExt* pParam) {
     SSpatialLayerConfig* pSpatialCfg = &pParam->sSpatialLayers[i];
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
              "sSpatialLayers[%d]: .iVideoWidth= %d; .iVideoHeight= %d; .fFrameRate= %.6ff; .iSpatialBitrate= %d; .iMaxSpatialBitrate= %d; .sSliceArgument.uiSliceMode= %d; .sSliceArgument.iSliceNum= %d; .sSliceArgument.uiSliceSizeConstraint= %d;"
-             "uiProfileIdc = %d;uiLevelIdc = %d",
+             "uiProfileIdc = %d;uiLevelIdc = %d;iDLayerQp = %d",
              i, pSpatialCfg->iVideoWidth,
              pSpatialCfg->iVideoHeight,
              pSpatialCfg->fFrameRate,
@@ -549,7 +553,8 @@ void CWelsH264SVCEncoder::TraceParamInfo (SEncParamExt* pParam) {
              pSpatialCfg->sSliceArgument.uiSliceNum,
              pSpatialCfg->sSliceArgument.uiSliceSizeConstraint,
              pSpatialCfg->uiProfileIdc,
-             pSpatialCfg->uiLevelIdc
+             pSpatialCfg->uiLevelIdc,
+             pSpatialCfg->iDLayerQp
             );
     ++ i;
   }
