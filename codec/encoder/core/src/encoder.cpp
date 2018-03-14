@@ -387,6 +387,13 @@ EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum
     //pEncCtx->bEncCurFrmAsIdrFlag: 1. first frame should be IDR; 2. idr pause; 3. idr request
     iFrameType = (pEncCtx->pVaa->bIdrPeriodFlag || bSceneChangeFlag
                   || pParamInternal->bEncCurFrmAsIdrFlag) ? videoFrameTypeIDR : videoFrameTypeP;
+    if ( videoFrameTypeIDR == iFrameType ) {
+      WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG,
+               "encoding videoFrameTypeIDR due to ( bIdrPeriodFlag %d, bSceneChangeFlag %d, bEncCurFrmAsIdrFlag %d )",
+               pEncCtx->pVaa->bIdrPeriodFlag,
+               bSceneChangeFlag,
+               pParamInternal->bEncCurFrmAsIdrFlag);
+    }
 
     if (videoFrameTypeP == iFrameType && bSkipFrameFlag) {  // for frame skip, 1/5/2010
       iFrameType = videoFrameTypeSkip;

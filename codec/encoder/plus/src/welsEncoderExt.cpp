@@ -715,19 +715,22 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
 
     m_iCspInternal = iColorspace;
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
-             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_DATAFORMAT, m_iCspInternal= 0x%x", m_iCspInternal);
+             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_DATAFORMAT, m_iCspInternal = 0x%x", m_iCspInternal);
   }
   break;
   case ENCODER_OPTION_IDR_INTERVAL: { // IDR Interval
     int32_t iValue = * ((int32_t*)pOption);
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
-             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_IDR_INTERVAL iValue= %d", iValue);
-    if (iValue < -1 || iValue == 0)
-      iValue = 1;
+             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_IDR_INTERVAL iValue = %d", iValue);
+    if (iValue <= -1 || iValue == 0) {
+      iValue = 0;
+    }
     if (iValue == (int32_t)m_pEncContext->pSvcParam->uiIntraPeriod) {
       return cmResultSuccess;
     }
     m_pEncContext->pSvcParam->uiIntraPeriod = (uint32_t)iValue;
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_IDR_INTERVAL uiIntraPeriod updated to %d", m_pEncContext->pSvcParam->uiIntraPeriod);
   }
   break;
   case ENCODER_OPTION_SVC_ENCODE_PARAM_BASE: { // SVC Encoding Parameter

@@ -366,9 +366,17 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
 
   iSrcWidth   = pSvcParam->SUsedPicRect.iWidth;
   iSrcHeight  = pSvcParam->SUsedPicRect.iHeight;
-  if (pSvcParam->uiIntraPeriod)
+  if (pSvcParam->uiIntraPeriod) {
     pCtx->pVaa->bIdrPeriodFlag = (1 + pDlayerParamInternal->iFrameIndex >= (int32_t)pSvcParam->uiIntraPeriod) ? true :
                                  false;
+    if (pCtx->pVaa->bIdrPeriodFlag) {
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG,
+           "pSvcParam->uiIntraPeriod=%d, pCtx->pVaa->bIdrPeriodFlag=%d",
+             pSvcParam->uiIntraPeriod,
+             pCtx->pVaa->bIdrPeriodFlag);
+    }
+  }
+
   pSrcPic = pScaledPicture->pScaledInputPicture ? pScaledPicture->pScaledInputPicture : GetCurrentOrigFrame (
               iDependencyId);
 
