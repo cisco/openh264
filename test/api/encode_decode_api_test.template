@@ -12,7 +12,21 @@
 using namespace WelsCommon;
 
 
-TEST_F (EncodeDecodeTestAPI, LogEncoding) {
+class EncodeDecodeFileTestAPI : public EncodeDecodeTestAPI {
+public:
+	int EncodeOneFrameFromFile (FILE* pFile);
+};
+
+int EncodeDecodeFileTestAPI::EncodeOneFrameFromFile (FILE* pFile) {
+    int frameSize = EncPic.iPicWidth * EncPic.iPicHeight;
+    fread (buf_.data(), 1, frameSize, pFile);
+    fread (buf_.data() + frameSize, 1, frameSize>>2, pFile);
+    fread (buf_.data() + frameSize + (frameSize>>2), 1, frameSize>>2, pFile);
+	//EncPic.uiTimeStamp = aTimestampArray[iFrame];
+    return encoder_->EncodeFrame (&EncPic, &info);
+}
+
+TEST_F (EncodeDecodeFileTestAPI, LogEncoding) {
 #define DEBUG_FILE_SAVE
   //FillInit
   //int iSpatialLayerNum = $SPATIAL_NUM;
@@ -21,7 +35,7 @@ TEST_F (EncodeDecodeTestAPI, LogEncoding) {
   //int iEncFrameNum = $TOTAL_FRMS;
 
   //FillFirstParam
-  int iTraceLevel = WELS_LOG_INFO;
+  //int iTraceLevel = WELS_LOG_DEBUG;
   int rv = encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
   rv = encoder_->InitializeExt (&param_);
   EXPECT_TRUE (rv == cmResultSuccess);
@@ -39,6 +53,9 @@ TEST_F (EncodeDecodeTestAPI, LogEncoding) {
 #endif
 
   int iIdx = 0;
+  
+  FILE * pInputFile = NULL;
+  //FillFileInput
 
   //create decoder
   for (iIdx = 0; iIdx < iSpatialLayerNum; iIdx++) {
@@ -75,8 +92,13 @@ TEST_F (EncodeDecodeTestAPI, LogEncoding) {
     ASSERT_TRUE (InitialEncDec (param_.iPicWidth, param_.iPicHeight));
     rv = encoder_->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, &param_);
     ASSERT_TRUE (rv == cmResultSuccess) << "SetOption Failed pParam: rv = " << rv;
-    EncodeOneFrame (0);
 
+    if (pInputFile) {
+    //FillTimestamp
+    EncodeOneFrameFromFile (pInputFile);
+    } else {
+    EncodeOneFrame (0);
+	}
     // init
     for (iIdx = 0; iIdx < iSpatialLayerNum; iIdx++) {
       aLen[iIdx] = 0;
@@ -146,4 +168,7 @@ TEST_F (EncodeDecodeTestAPI, LogEncoding) {
     fclose (fEnc[i]);
   }
 #endif
+  if (pInputFile) {
+    fclose(pInputFile);
+  }
 }
