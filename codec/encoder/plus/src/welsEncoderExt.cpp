@@ -727,7 +727,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     int32_t iValue = * ((int32_t*)pOption);
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
              "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_IDR_INTERVAL iValue = %d", iValue);
-    if (iValue <= -1 || iValue == 0) {
+    if ( iValue <= -1 ) {
       iValue = 0;
     }
     if (iValue == (int32_t)m_pEncContext->pSvcParam->uiIntraPeriod) {
