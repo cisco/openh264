@@ -374,14 +374,18 @@ int32_t CWelsH264SVCEncoder::Uninitialize() {
  */
 int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSInfo* pBsInfo) {
   if (! (kpSrcPic && m_bInitialFlag && pBsInfo)) {
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "CWelsH264SVCEncoder::EncodeFrame(), cmInitParaError.");
     return cmInitParaError;
   }
-  if (kpSrcPic->iColorFormat != videoFormatI420)
+  if (kpSrcPic->iColorFormat != videoFormatI420) {
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "CWelsH264SVCEncoder::EncodeFrame(), wrong iColorFormat %d", kpSrcPic->iColorFormat);
     return cmInitParaError;
+  }
 
   const int32_t kiEncoderReturn = EncodeFrameInternal (kpSrcPic, pBsInfo);
 
   if (kiEncoderReturn != cmResultSuccess) {
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "CWelsH264SVCEncoder::EncodeFrame(), kiEncoderReturn %d", kiEncoderReturn);
     return kiEncoderReturn;
   }
 
@@ -539,7 +543,7 @@ void CWelsH264SVCEncoder::TraceParamInfo (SEncParamExt* pParam) {
     SSpatialLayerConfig* pSpatialCfg = &pParam->sSpatialLayers[i];
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
              "sSpatialLayers[%d]: .iVideoWidth= %d; .iVideoHeight= %d; .fFrameRate= %.6ff; .iSpatialBitrate= %d; .iMaxSpatialBitrate= %d; .sSliceArgument.uiSliceMode= %d; .sSliceArgument.iSliceNum= %d; .sSliceArgument.uiSliceSizeConstraint= %d;"
-             "uiProfileIdc = %d;uiLevelIdc = %d",
+             "uiProfileIdc = %d;uiLevelIdc = %d;iDLayerQp = %d",
              i, pSpatialCfg->iVideoWidth,
              pSpatialCfg->iVideoHeight,
              pSpatialCfg->fFrameRate,
@@ -549,7 +553,8 @@ void CWelsH264SVCEncoder::TraceParamInfo (SEncParamExt* pParam) {
              pSpatialCfg->sSliceArgument.uiSliceNum,
              pSpatialCfg->sSliceArgument.uiSliceSizeConstraint,
              pSpatialCfg->uiProfileIdc,
-             pSpatialCfg->uiLevelIdc
+             pSpatialCfg->uiLevelIdc,
+             pSpatialCfg->iDLayerQp
             );
     ++ i;
   }
@@ -715,19 +720,22 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
 
     m_iCspInternal = iColorspace;
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
-             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_DATAFORMAT, m_iCspInternal= 0x%x", m_iCspInternal);
+             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_DATAFORMAT, m_iCspInternal = 0x%x", m_iCspInternal);
   }
   break;
   case ENCODER_OPTION_IDR_INTERVAL: { // IDR Interval
     int32_t iValue = * ((int32_t*)pOption);
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
-             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_IDR_INTERVAL iValue= %d", iValue);
-    if (iValue < -1 || iValue == 0)
-      iValue = 1;
+             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_IDR_INTERVAL iValue = %d", iValue);
+    if ( iValue <= -1 ) {
+      iValue = 0;
+    }
     if (iValue == (int32_t)m_pEncContext->pSvcParam->uiIntraPeriod) {
       return cmResultSuccess;
     }
     m_pEncContext->pSvcParam->uiIntraPeriod = (uint32_t)iValue;
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_IDR_INTERVAL uiIntraPeriod updated to %d", m_pEncContext->pSvcParam->uiIntraPeriod);
   }
   break;
   case ENCODER_OPTION_SVC_ENCODE_PARAM_BASE: { // SVC Encoding Parameter

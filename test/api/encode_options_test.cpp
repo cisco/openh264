@@ -2332,3 +2332,48 @@ TEST_F (EncodeDecodeTestAPI,  TemporalLayerChangeDuringEncoding_Specific) {
 
 }
 
+TEST_F (EncodeDecodeTestAPI, ENCODER_OPTION_IDR_INTERVAL) {
+  int iSpatialLayerNum = 1;
+  int iWidth       = WelsClip3 ((((rand() % MAX_WIDTH) >> 1)  + 1) << 1, 1 << iSpatialLayerNum, MAX_WIDTH);
+  int iHeight      = WelsClip3 ((((rand() % MAX_HEIGHT) >> 1)  + 1) << 1, 1 << iSpatialLayerNum, MAX_HEIGHT);
+  float fFrameRate = rand() + 0.5f;
+  int iSliceNum        = 1;
+  encoder_->GetDefaultParams (&param_);
+  prepareParamDefault (iSpatialLayerNum, iSliceNum, iWidth, iHeight, fFrameRate, &param_);
+  param_.iTemporalLayerNum = 1;
+
+  int iTraceLevel = WELS_LOG_QUIET;
+  int rv = encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iTraceLevel);
+  EXPECT_TRUE (rv == cmResultSuccess);
+
+  rv = encoder_->InitializeExt (&param_);
+  ASSERT_TRUE (rv == cmResultSuccess);
+
+  InitialEncDec (param_.iPicWidth, param_.iPicHeight);
+  EncodeOneFrame (0);
+  EXPECT_TRUE (info.eFrameType == videoFrameTypeIDR);
+
+  int iLastIdrIdx = 0;
+  int iFrame = 1;
+  int iTtlAttempt = (rand() % 5) + 2;
+  for (int iAtt = 0; iAtt < iTtlAttempt; iAtt++) {
+    int kiTargetIntraPeriod = WelsClip3 ((rand() % ENCODE_FRAME_NUM) - 1, -1, ENCODE_FRAME_NUM);
+    rv = encoder_->SetOption (ENCODER_OPTION_IDR_INTERVAL, &kiTargetIntraPeriod);
+    EXPECT_TRUE (rv == cmResultSuccess);
+
+    int iEncFrameNum = kiTargetIntraPeriod * 3;
+    for (int i = 0; i < iEncFrameNum; i++) {
+      EncodeOneFrame (0);
+
+      if ((kiTargetIntraPeriod <= 0) || (((iFrame - iLastIdrIdx) % kiTargetIntraPeriod) == 0)) {
+        EXPECT_TRUE (info.eFrameType == videoFrameTypeIDR) << "kiTargetIntraPeriod " << kiTargetIntraPeriod <<
+            " info.eFrameType " << info.eFrameType << " Frame " << i;
+        iLastIdrIdx = iFrame;
+      } else {
+        EXPECT_FALSE (info.eFrameType == videoFrameTypeIDR);
+      }
+
+      iFrame ++;
+    }
+  }
+}

@@ -95,7 +95,7 @@ void EncodeDecodeTestAPIBase::EncodeOneFrame (int iCheckTypeIndex) {
   memset (buf_.data() + lumaSize, rand() % 256, (frameSize - lumaSize));
   int rv = encoder_->EncodeFrame (&EncPic, &info);
   if (0 == iCheckTypeIndex)
-    ASSERT_TRUE (rv == cmResultSuccess);
+    ASSERT_TRUE (rv == cmResultSuccess) << rv;
   else if (1 == iCheckTypeIndex)
     ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnknownReason);
 }
