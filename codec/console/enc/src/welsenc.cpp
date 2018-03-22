@@ -110,6 +110,7 @@ typedef struct tagFilesSet {
   string strLayerCfgFile[MAX_DEPENDENCY_LAYER];
   char   sRecFileName[MAX_DEPENDENCY_LAYER][MAX_FNAME_LEN];
   uint32_t uiFrameToBeCoded;
+  bool     bEnableMultiBsFile;
 } SFilesSet;
 
 
@@ -266,6 +267,8 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
           pSvcParam.eSpsPpsIdStrategy  = CONSTANT_ID;
           break;
         }
+      } else if (strTag[0].compare ("EnableMultiBsFile") == 0) {
+        sFileSet.bEnableMultiBsFile = atoi (strTag[1].c_str()) ? true : false;
       } else if (strTag[0].compare ("EnableScalableSEI") == 0) {
         pSvcParam.bEnableSSEI = atoi (strTag[1].c_str()) ? true : false;
       } else if (strTag[0].compare ("EnableFrameCropping") == 0) {
@@ -468,6 +471,9 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
 
     else if (!strcmp (pCommand, "-numtl") && (n < argc))
       pSvcParam.iTemporalLayerNum = atoi (argv[n++]);
+
+    else if (!strcmp (pCommand, "-mfile") && (n < argc))
+      sFileSet.bEnableMultiBsFile = atoi (argv[n++]) ? true : false;
 
     else if (!strcmp (pCommand, "-iper") && (n < argc))
       pSvcParam.uiIntraPeriod = atoi (argv[n++]);
@@ -748,7 +754,8 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
   SSourcePicture* pSrcPic = NULL;
   uint32_t iSourceWidth, iSourceHeight, kiPicResSize;
   // Inactive with sink with output file handler
-  FILE* pFpBs = NULL;
+  FILE* pFpBs[4];
+  pFpBs[0] = pFpBs[1] = pFpBs[2] = pFpBs[3] = NULL;
 #if defined(COMPARE_DATA)
   //For getting the golden file handle
   FILE* fpGolden = NULL;
@@ -764,6 +771,7 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
   memset (&sFbi, 0, sizeof (SFrameBSInfo));
   pPtrEnc->GetDefaultParams (&sSvcParam);
   memset (&fs.sRecFileName[0][0], 0, sizeof (fs.sRecFileName));
+  fs.bEnableMultiBsFile = false;
 
   FillSpecificParameters (sSvcParam);
   pSrcPic = new SSourcePicture;
@@ -850,8 +858,22 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
   }
   // Inactive with sink with output file handler
   if (fs.strBsFile.length() > 0) {
-    pFpBs = fopen (fs.strBsFile.c_str(), "wb");
-    if (pFpBs == NULL) {
+    bool bFileOpenErr = false;
+    if (sSvcParam.iSpatialLayerNum == 1 || fs.bEnableMultiBsFile == false) {
+      pFpBs[0] = fopen (fs.strBsFile.c_str(), "wb");
+      bFileOpenErr = (pFpBs[0] == NULL);
+    } else { //enable multi bs file writing
+      string filename_layer;
+      string add_info[4] = {"_layer0", "_layer1", "_layer2", "_layer3"};
+      int found = fs.strBsFile.find_last_of ('.');
+      for (int i = 0; i < sSvcParam.iSpatialLayerNum; ++i) {
+        filename_layer = fs.strBsFile.insert (found, add_info[i]);
+        pFpBs[i] = fopen (filename_layer.c_str(), "wb");
+        fs.strBsFile = filename_layer.erase (found, 7);
+        bFileOpenErr |= (pFpBs[i] == NULL);
+      }
+    }
+    if (bFileOpenErr) {
       fprintf (stderr, "Can not open file (%s) to write bitstream!\n", fs.strBsFile.c_str());
       iRet = 1;
       goto INSIDE_MEM_FREE;
@@ -957,7 +979,22 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
             delete [] pUCArry;
           }
 #endif
-          fwrite (pLayerBsInfo->pBsBuf, 1, iLayerSize, pFpBs); // write pure bit stream into file
+          if (sSvcParam.iSpatialLayerNum == 1 || fs.bEnableMultiBsFile == false)
+            fwrite (pLayerBsInfo->pBsBuf, 1, iLayerSize, pFpBs[0]); // write pure bit stream into file
+          else { //multi bs file write
+            if (pLayerBsInfo->uiSpatialId == 0) {
+              unsigned char five_bits = pLayerBsInfo->pBsBuf[4] & 0x1f;
+              if ((five_bits == 0x07) || (five_bits == 0x08)) { //sps or pps
+                for (int i = 0; i < sSvcParam.iSpatialLayerNum; ++i) {
+                  fwrite (pLayerBsInfo->pBsBuf, 1, iLayerSize, pFpBs[i]);
+                }
+              } else {
+                fwrite (pLayerBsInfo->pBsBuf, 1, iLayerSize, pFpBs[0]);
+              }
+            } else {
+              fwrite (pLayerBsInfo->pBsBuf, 1, iLayerSize, pFpBs[pLayerBsInfo->uiSpatialId]);
+            }
+          }
           iFrameSize += iLayerSize;
         }
         ++ iLayer;
@@ -986,9 +1023,11 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
 #endif
   }
 INSIDE_MEM_FREE:
-  if (pFpBs) {
-    fclose (pFpBs);
-    pFpBs = NULL;
+  for (int i = 0; i < sSvcParam.iSpatialLayerNum; ++i) {
+    if (pFpBs[i]) {
+      fclose (pFpBs[i]);
+      pFpBs[i] = NULL;
+    }
   }
 #if defined (STICK_STREAM_SIZE)
   if (fTrackStream) {
