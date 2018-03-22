@@ -378,14 +378,16 @@ int CWelsH264SVCEncoder::EncodeFrame (const SSourcePicture* kpSrcPic, SFrameBSIn
     return cmInitParaError;
   }
   if (kpSrcPic->iColorFormat != videoFormatI420) {
-    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "CWelsH264SVCEncoder::EncodeFrame(), wrong iColorFormat %d", kpSrcPic->iColorFormat);
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "CWelsH264SVCEncoder::EncodeFrame(), wrong iColorFormat %d",
+             kpSrcPic->iColorFormat);
     return cmInitParaError;
   }
 
   const int32_t kiEncoderReturn = EncodeFrameInternal (kpSrcPic, pBsInfo);
 
   if (kiEncoderReturn != cmResultSuccess) {
-    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "CWelsH264SVCEncoder::EncodeFrame(), kiEncoderReturn %d", kiEncoderReturn);
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "CWelsH264SVCEncoder::EncodeFrame(), kiEncoderReturn %d",
+             kiEncoderReturn);
     return kiEncoderReturn;
   }
 
@@ -644,11 +646,10 @@ void CWelsH264SVCEncoder::UpdateStatistics (SFrameBSInfo* pBsInfo,
                                   pStatistics->iLastStatisticsFrameCount);
     if (kiDeltaFrames > (m_pEncContext->pSvcParam->fMaxFrameRate * 2)) {
       if (kiTimeDiff >= m_pEncContext->iStatisticsLogInterval) {
+        float fTimeDiffSec = kiTimeDiff / 1000.0;
         pStatistics->fLatestFrameRate = static_cast<float> ((pStatistics->uiInputFrameCount -
-                                        pStatistics->iLastStatisticsFrameCount) * 1000 /
-                                        kiTimeDiff);
-        pStatistics->uiBitRate = static_cast<unsigned int> ((pStatistics->iTotalEncodedBytes -
-                                 pStatistics->iLastStatisticsBytes) * 8 * 1000 / kiTimeDiff);
+                                        pStatistics->iLastStatisticsFrameCount) / fTimeDiffSec);
+        pStatistics->uiBitRate = static_cast<unsigned int> ((pStatistics->iTotalEncodedBytes) * 8  / fTimeDiffSec);
 
         if (WELS_ABS (pStatistics->fLatestFrameRate - m_pEncContext->pSvcParam->fMaxFrameRate) > 30) {
           WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_WARNING,
@@ -669,25 +670,14 @@ void CWelsH264SVCEncoder::UpdateStatistics (SFrameBSInfo* pBsInfo,
         // update variables
         pStatistics->iLastStatisticsBytes = pStatistics->iTotalEncodedBytes;
         pStatistics->iLastStatisticsFrameCount = pStatistics->uiInputFrameCount;
-
+        m_pEncContext->iLastStatisticsLogTs = kiCurrentFrameTs;
+        LogStatistics (kiCurrentFrameTs, iMaxDid);
+        pStatistics->iTotalEncodedBytes = 0;
         //TODO: the following statistics will be calculated and added later
         //pStatistics->uiLTRSentNum
 
       }
     }
-  }
-  if (((m_pEncContext->iStatisticsLogInterval > 0) && (kiTimeDiff >= m_pEncContext->iStatisticsLogInterval))
-      || (0 == iMaxInputFrame % 300)) {
-
-    if ((iMaxFrameRate > 0) && WELS_ABS (iMaxFrameRate - m_pEncContext->pSvcParam->fMaxFrameRate) > 30) {
-      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_WARNING,
-               "Actual input framerate fAverageFrameRate = %f is quite different from framerate in setting %f, please check setting or timestamp unit (ms), start_Ts = %"
-               PRId64,
-               iMaxFrameRate, m_pEncContext->pSvcParam->fMaxFrameRate, m_pEncContext->uiStartTimestamp);
-    }
-
-    LogStatistics (kiCurrentFrameTs, iMaxDid);
-    m_pEncContext->iLastStatisticsLogTs = kiCurrentFrameTs;
   }
 
 }
@@ -727,7 +717,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     int32_t iValue = * ((int32_t*)pOption);
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
              "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_IDR_INTERVAL iValue = %d", iValue);
-    if ( iValue <= -1 ) {
+    if (iValue <= -1) {
       iValue = 0;
     }
     if (iValue == (int32_t)m_pEncContext->pSvcParam->uiIntraPeriod) {
@@ -735,7 +725,8 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
     }
     m_pEncContext->pSvcParam->uiIntraPeriod = (uint32_t)iValue;
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
-             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_IDR_INTERVAL uiIntraPeriod updated to %d", m_pEncContext->pSvcParam->uiIntraPeriod);
+             "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_IDR_INTERVAL uiIntraPeriod updated to %d",
+             m_pEncContext->pSvcParam->uiIntraPeriod);
   }
   break;
   case ENCODER_OPTION_SVC_ENCODE_PARAM_BASE: { // SVC Encoding Parameter
