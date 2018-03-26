@@ -646,7 +646,7 @@ void CWelsH264SVCEncoder::UpdateStatistics (SFrameBSInfo* pBsInfo,
                                   pStatistics->iLastStatisticsFrameCount);
     if (kiDeltaFrames > (m_pEncContext->pSvcParam->fMaxFrameRate * 2)) {
       if (kiTimeDiff >= m_pEncContext->iStatisticsLogInterval) {
-        float fTimeDiffSec = kiTimeDiff / 1000.0;
+        float fTimeDiffSec = kiTimeDiff / 1000.0f;
         pStatistics->fLatestFrameRate = static_cast<float> ((pStatistics->uiInputFrameCount -
                                         pStatistics->iLastStatisticsFrameCount) / fTimeDiffSec);
         pStatistics->uiBitRate = static_cast<unsigned int> ((pStatistics->iTotalEncodedBytes) * 8  / fTimeDiffSec);
