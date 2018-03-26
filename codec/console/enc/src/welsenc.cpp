@@ -865,7 +865,7 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
     } else { //enable multi bs file writing
       string filename_layer;
       string add_info[4] = {"_layer0", "_layer1", "_layer2", "_layer3"};
-      int found = fs.strBsFile.find_last_of ('.');
+      string::size_type found = fs.strBsFile.find_last_of ('.');
       for (int i = 0; i < sSvcParam.iSpatialLayerNum; ++i) {
         filename_layer = fs.strBsFile.insert (found, add_info[i]);
         pFpBs[i] = fopen (filename_layer.c_str(), "wb");
