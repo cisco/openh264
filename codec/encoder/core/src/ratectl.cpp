@@ -95,6 +95,8 @@ static inline int32_t RcConvertQp2QStep (int32_t iQP) {
   return g_kiQpToQstepTable[iQP];
 }
 static inline int32_t RcConvertQStep2Qp (int32_t iQpStep) {
+  if (iQpStep <= g_kiQpToQstepTable[0]) //Qp step too small, return qp=0
+    return 0;
   return WELS_ROUND ((6 * log (iQpStep * 1.0f / INT_MULTIPLY) / log (2.0) + 4.0));
 }
 
