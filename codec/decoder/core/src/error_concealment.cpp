@@ -226,22 +226,22 @@ void DoMbECMvCopy (PWelsDecoderContext pCtx, PPicture pDec, PPicture pRef, int32
     }
     // further make sure no need to expand picture
     int32_t iMinLeftOffset = (iPicWidthLeftLimit + 2) * (1 << 2);
-    int32_t iMaxRightOffset = ((iPicWidthRightLimit - 19) * (1 << 2));
+    int32_t iMaxRightOffset = ((iPicWidthRightLimit - 18) * (1 << 2));
     int32_t iMinTopOffset = (iPicHeightTopLimit + 2) * (1 << 2);
-    int32_t iMaxBottomOffset = ((iPicHeightBottomLimit - 19) * (1 << 2));
+    int32_t iMaxBottomOffset = ((iPicHeightBottomLimit - 18) * (1 << 2));
     if (iFullMVx < iMinLeftOffset) {
       iFullMVx = (iFullMVx >> 2) * (1 << 2);
       iFullMVx = WELS_MAX (iPicWidthLeftLimit, iFullMVx);
     } else if (iFullMVx > iMaxRightOffset) {
       iFullMVx = (iFullMVx >> 2) * (1 << 2);
-      iFullMVx = WELS_MIN (((iPicWidthRightLimit - 17) * (1 << 2)), iFullMVx);
+      iFullMVx = WELS_MIN (((iPicWidthRightLimit - 16) * (1 << 2)), iFullMVx);
     }
     if (iFullMVy < iMinTopOffset) {
       iFullMVy = (iFullMVy >> 2) * (1 << 2);
       iFullMVy = WELS_MAX (iPicHeightTopLimit, iFullMVy);
     } else if (iFullMVy > iMaxBottomOffset) {
       iFullMVy = (iFullMVy >> 2) * (1 << 2);
-      iFullMVy = WELS_MIN (((iPicHeightBottomLimit - 17) * (1 << 2)), iFullMVy);
+      iFullMVy = WELS_MIN (((iPicHeightBottomLimit - 16) * (1 << 2)), iFullMVy);
     }
     iMVs[0] = iFullMVx - (iMbXInPix << 2);
     iMVs[1] = iFullMVy - (iMbYInPix << 2);
