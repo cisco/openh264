@@ -728,8 +728,8 @@ TEST_F (EncoderInterfaceTest, ForceIntraFrameWithTemporal) {
   SEncParamExt sEncParamExt;
   pPtrEnc->GetDefaultParams (&sEncParamExt);
   sEncParamExt.iUsageType = CAMERA_VIDEO_REAL_TIME;
-  sEncParamExt.iPicWidth = MB_SIZE + abs ((rand() * 2) % (MAX_WIDTH - MB_SIZE));
-  sEncParamExt.iPicHeight = MB_SIZE + abs ((rand() * 2) % (MAX_HEIGHT - MB_SIZE));
+  sEncParamExt.iPicWidth = MB_SIZE + abs ((rand() / 2 * 2) % (MAX_WIDTH - MB_SIZE));
+  sEncParamExt.iPicHeight = MB_SIZE + abs ((rand() / 2 * 2) % (MAX_HEIGHT - MB_SIZE));
   sEncParamExt.iTargetBitrate = rand() + 1; //!=0
   // Force a bitrate of at least w*h/50, otherwise we will only get skipped frames
   sEncParamExt.iTargetBitrate = WELS_CLIP3 (sEncParamExt.iTargetBitrate,
