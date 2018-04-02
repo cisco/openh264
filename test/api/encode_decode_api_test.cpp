@@ -84,7 +84,7 @@ void EncodeDecodeTestAPIBase::prepareParamDefault (int iLayers, int iSlices, int
     SEncParamExt* pParam) {
   memset (pParam, 0, sizeof (SEncParamExt));
   encoder_->GetDefaultParams (pParam);
-  EncodeDecodeTestBase::prepareParam (iLayers, iSlices, width, height, framerate, pParam);
+  EncodeDecodeTestBase::prepareParam (iLayers, iSlices, VALID_SIZE(width), VALID_SIZE(height), framerate, pParam);
 }
 
 
