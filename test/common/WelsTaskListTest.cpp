@@ -18,7 +18,7 @@ TEST (CThreadPoolTest, CThreadPoolTest_List) {
   
   CThreadPoolTest cThreadPoolTest;
   CThreadPoolTest cThreadPoolTest1;
-  CSimpleTask* aTasks[2];
+  CSimpleTask* aTasks[2] = NULL;
   IWelsTask* pCurTask;
   
   int32_t  i;
@@ -54,6 +54,7 @@ TEST (CThreadPoolTest, CThreadPoolTest_List) {
   EXPECT_TRUE(0 == pTaskList->size());
   for (i = 0; i < 2; i++) {
     delete aTasks[i];
+    aTasks[i] = NULL;
   }
   
   aTasks[0] = new CSimpleTask (&cThreadPoolTest1);
@@ -81,6 +82,10 @@ TEST (CThreadPoolTest, CThreadPoolTest_List) {
   EXPECT_TRUE(2 == cThreadPoolTest.GetTaskCount());
   EXPECT_TRUE(4 == cThreadPoolTest1.GetTaskCount());
   
+  for (i = 0; i < 2; i++) {
+    delete aTasks[i];
+    aTasks[i] = NULL;
+  }
   delete pTaskList;
 }
 
