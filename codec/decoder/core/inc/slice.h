@@ -107,6 +107,7 @@ int32_t         iPicOrderCntLsb;
 int32_t         iDeltaPicOrderCntBottom;
 int32_t         iDeltaPicOrderCnt[2];
 int32_t         iRedundantPicCnt;
+int32_t					iDirectSpatialMvPredFlag;
 int32_t         uiRefCount[LIST_A];
 int32_t         iSliceQpDelta;  //no use for iSliceQp is used directly
 int32_t         iSliceQp;

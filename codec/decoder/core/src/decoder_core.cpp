@@ -781,6 +781,7 @@ void UpdateDecoderStatisticsForActiveParaset (SDecoderStatistics* pDecoderStatis
 #define SLICE_HEADER_INTER_LAYER_ALPHAC0_BETA_OFFSET_MIN -12
 #define SLICE_HEADER_INTER_LAYER_ALPHAC0_BETA_OFFSET_MAX 12
 #define MAX_NUM_REF_IDX_L0_ACTIVE_MINUS1 15
+#define MAX_NUM_REF_IDX_L1_ACTIVE_MINUS1 15
 #define SLICE_HEADER_CABAC_INIT_IDC_MAX 2
 /*
  *  decode_slice_header_avc
@@ -845,8 +846,10 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     uiSliceType -= 5;
 
   if (B_SLICE == uiSliceType) {
-    WelsLog (pLogCtx, WELS_LOG_WARNING, "ParseSliceHeaderSyntaxs(): B slice not supported.");
+    WelsLog (pLogCtx, WELS_LOG_WARNING, "ParseSliceHeaderSyntaxs(): Working to support B slice and is not working yet.");
+#if 0
     return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_UNSUPPORTED_BIPRED);
+#endif
   }
   if ((NAL_UNIT_CODED_SLICE_IDR == eNalType) && (I_SLICE != uiSliceType)) {
     WelsLog (pLogCtx, WELS_LOG_WARNING, "Invalid slice type(%d) in IDR picture. ", uiSliceType);
@@ -1012,11 +1015,17 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     }
   }
 
+	if (B_SLICE == uiSliceType) {
+		//fix me: it needs to use the this flag somewhere for B-Sclice
+		WELS_READ_VERIFY(BsGetOneBit(pBs, &uiCode)); //direct_spatial_mv_pred_flag
+		pSliceHead->iDirectSpatialMvPredFlag = uiCode;
+	}
+
   //set defaults, might be overriden a few line later
   pSliceHead->uiRefCount[0] = pPps->uiNumRefIdxL0Active;
   pSliceHead->uiRefCount[1] = pPps->uiNumRefIdxL1Active;
 
-  bool bReadNumRefFlag = (P_SLICE == uiSliceType);
+	bool bReadNumRefFlag = (P_SLICE == uiSliceType || B_SLICE == uiSliceType);
   if (kbExtensionFlag) {
     bReadNumRefFlag &= (BASE_QUALITY_ID == pNalHeaderExt->uiQualityId);
   }
@@ -1028,6 +1037,12 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
       WELS_CHECK_SE_UPPER_ERROR (uiCode, MAX_NUM_REF_IDX_L0_ACTIVE_MINUS1, "num_ref_idx_l0_active_minus1",
                                  GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_NUM_REF_IDX_L0_ACTIVE_MINUS1));
       pSliceHead->uiRefCount[0] = 1 + uiCode;
+			if (B_SLICE == uiSliceType) {
+				WELS_READ_VERIFY(BsGetUe(pBs, &uiCode)); //num_ref_idx_l1_active_minus1
+				WELS_CHECK_SE_UPPER_ERROR(uiCode, MAX_NUM_REF_IDX_L1_ACTIVE_MINUS1, "num_ref_idx_l1_active_minus1",
+					GENERATE_ERROR_NO(ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_NUM_REF_IDX_L1_ACTIVE_MINUS1));
+				pSliceHead->uiRefCount[1] = 1 + uiCode;
+			}
     }
   }
 
@@ -1043,7 +1058,7 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
       return iRet;
     }
 
-    if (pPps->bWeightedPredFlag && (uiSliceType == P_SLICE)) {
+		if ( (pPps->bWeightedPredFlag && uiSliceType == P_SLICE) || (pPps->uiWeightedBipredIdc == 1 && uiSliceType == B_SLICE) ) {
       iRet = ParsePredWeightedTable (pBs, pSliceHead);
       if (iRet != ERR_NONE) {
         WelsLog (pLogCtx, WELS_LOG_WARNING, "invalid weighted prediction syntaxs!");
@@ -2213,7 +2228,10 @@ void WelsDqLayerDecodeStart (PWelsDecoderContext pCtx, PNalUnit pCurNal, PSps pS
 
 int32_t InitRefPicList (PWelsDecoderContext pCtx, const uint8_t kuiNRi, int32_t iPoc) {
   int32_t iRet = ERR_NONE;
-  iRet = WelsInitRefList (pCtx, iPoc);
+	if (pCtx->eSliceType == B_SLICE) 
+		iRet = WelsInitBSliceRefList(pCtx, iPoc);
+	else
+		iRet = WelsInitRefList (pCtx, iPoc);
   if ((pCtx->eSliceType != I_SLICE && pCtx->eSliceType != SI_SLICE)) {
     iRet = WelsReorderRefList (pCtx);
   }

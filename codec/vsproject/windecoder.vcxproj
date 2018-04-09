@@ -1,0 +1,339 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{155C0CE7-12D7-412D-8B26-1C52C7346B3A}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>windecoder</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;X86_ASM;X64;HAVE_AVX2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>Y:\p4\CodeProjects\Upwork\projects\openh264-1\codec\decoder\core\inc;Y:\p4\CodeProjects\Upwork\projects\openh264-1\codec\common\inc;Y:\p4\CodeProjects\Upwork\projects\openh264-1\codec\console\common\inc;Y:\p4\CodeProjects\Upwork\projects\openh264-1\codec\api\svc;Y:\p4\CodeProjects\Upwork\projects\openh264-1\codec\console\dec\inc;Y:\p4\CodeProjects\Upwork\projects\openh264-1\codec\decoder\plus\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>Y:\p4\CodeProjects\Upwork\openh264\codec\decoder\core\inc;Y:\p4\CodeProjects\Upwork\openh264\codec\common\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\common\inc\copy_mb.h" />
+    <ClInclude Include="..\common\inc\cpu.h" />
+    <ClInclude Include="..\common\inc\cpu_core.h" />
+    <ClInclude Include="..\common\inc\crt_util_safe_x.h" />
+    <ClInclude Include="..\common\inc\deblocking_common.h" />
+    <ClInclude Include="..\common\inc\expand_pic.h" />
+    <ClInclude Include="..\common\inc\golomb_common.h" />
+    <ClInclude Include="..\common\inc\intra_pred_common.h" />
+    <ClInclude Include="..\common\inc\ls_defines.h" />
+    <ClInclude Include="..\common\inc\macros.h" />
+    <ClInclude Include="..\common\inc\mc.h" />
+    <ClInclude Include="..\common\inc\measure_time.h" />
+    <ClInclude Include="..\common\inc\memory_align.h" />
+    <ClInclude Include="..\common\inc\sad_common.h" />
+    <ClInclude Include="..\common\inc\typedefs.h" />
+    <ClInclude Include="..\common\inc\utils.h" />
+    <ClInclude Include="..\common\inc\version.h" />
+    <ClInclude Include="..\common\inc\welsCodecTrace.h" />
+    <ClInclude Include="..\common\inc\WelsList.h" />
+    <ClInclude Include="..\common\inc\WelsLock.h" />
+    <ClInclude Include="..\common\inc\WelsTask.h" />
+    <ClInclude Include="..\common\inc\WelsTaskThread.h" />
+    <ClInclude Include="..\common\inc\WelsThread.h" />
+    <ClInclude Include="..\common\inc\WelsThreadLib.h" />
+    <ClInclude Include="..\common\inc\WelsThreadPool.h" />
+    <ClInclude Include="..\common\inc\wels_common_defs.h" />
+    <ClInclude Include="..\common\inc\wels_const_common.h" />
+    <ClInclude Include="..\console\common\inc\read_config.h" />
+    <ClInclude Include="..\console\dec\inc\d3d9_utils.h" />
+    <ClInclude Include="..\decoder\core\inc\au_parser.h" />
+    <ClInclude Include="..\decoder\core\inc\bit_stream.h" />
+    <ClInclude Include="..\decoder\core\inc\cabac_decoder.h" />
+    <ClInclude Include="..\decoder\core\inc\deblocking.h" />
+    <ClInclude Include="..\decoder\core\inc\decoder.h" />
+    <ClInclude Include="..\decoder\core\inc\decoder_context.h" />
+    <ClInclude Include="..\decoder\core\inc\decoder_core.h" />
+    <ClInclude Include="..\decoder\core\inc\decode_mb_aux.h" />
+    <ClInclude Include="..\decoder\core\inc\decode_slice.h" />
+    <ClInclude Include="..\decoder\core\inc\dec_frame.h" />
+    <ClInclude Include="..\decoder\core\inc\dec_golomb.h" />
+    <ClInclude Include="..\decoder\core\inc\error_code.h" />
+    <ClInclude Include="..\decoder\core\inc\error_concealment.h" />
+    <ClInclude Include="..\decoder\core\inc\fmo.h" />
+    <ClInclude Include="..\decoder\core\inc\get_intra_predictor.h" />
+    <ClInclude Include="..\decoder\core\inc\manage_dec_ref.h" />
+    <ClInclude Include="..\decoder\core\inc\mb_cache.h" />
+    <ClInclude Include="..\decoder\core\inc\memmgr_nal_unit.h" />
+    <ClInclude Include="..\decoder\core\inc\mv_pred.h" />
+    <ClInclude Include="..\decoder\core\inc\nalu.h" />
+    <ClInclude Include="..\decoder\core\inc\nal_prefix.h" />
+    <ClInclude Include="..\decoder\core\inc\parameter_sets.h" />
+    <ClInclude Include="..\decoder\core\inc\parse_mb_syn_cabac.h" />
+    <ClInclude Include="..\decoder\core\inc\parse_mb_syn_cavlc.h" />
+    <ClInclude Include="..\decoder\core\inc\picture.h" />
+    <ClInclude Include="..\decoder\core\inc\pic_queue.h" />
+    <ClInclude Include="..\decoder\core\inc\rec_mb.h" />
+    <ClInclude Include="..\decoder\core\inc\slice.h" />
+    <ClInclude Include="..\decoder\core\inc\vlc_decoder.h" />
+    <ClInclude Include="..\decoder\core\inc\wels_common_basis.h" />
+    <ClInclude Include="..\decoder\core\inc\wels_const.h" />
+    <ClInclude Include="..\decoder\plus\inc\welsDecoderExt.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\common\src\common_tables.cpp" />
+    <ClCompile Include="..\common\src\copy_mb.cpp" />
+    <ClCompile Include="..\common\src\cpu.cpp" />
+    <ClCompile Include="..\common\src\crt_util_safe_x.cpp" />
+    <ClCompile Include="..\common\src\deblocking_common.cpp" />
+    <ClCompile Include="..\common\src\expand_pic.cpp" />
+    <ClCompile Include="..\common\src\intra_pred_common.cpp" />
+    <ClCompile Include="..\common\src\mc.cpp" />
+    <ClCompile Include="..\common\src\memory_align.cpp" />
+    <ClCompile Include="..\common\src\sad_common.cpp" />
+    <ClCompile Include="..\common\src\utils.cpp" />
+    <ClCompile Include="..\common\src\welsCodecTrace.cpp" />
+    <ClCompile Include="..\common\src\WelsTaskThread.cpp" />
+    <ClCompile Include="..\common\src\WelsThread.cpp" />
+    <ClCompile Include="..\common\src\WelsThreadLib.cpp" />
+    <ClCompile Include="..\common\src\WelsThreadPool.cpp" />
+    <ClCompile Include="..\console\common\src\read_config.cpp" />
+    <ClCompile Include="..\console\dec\src\d3d9_utils.cpp" />
+    <ClCompile Include="..\console\dec\src\h264dec.cpp" />
+    <ClCompile Include="..\decoder\core\src\au_parser.cpp" />
+    <ClCompile Include="..\decoder\core\src\bit_stream.cpp" />
+    <ClCompile Include="..\decoder\core\src\cabac_decoder.cpp" />
+    <ClCompile Include="..\decoder\core\src\deblocking.cpp" />
+    <ClCompile Include="..\decoder\core\src\decoder.cpp" />
+    <ClCompile Include="..\decoder\core\src\decoder_core.cpp" />
+    <ClCompile Include="..\decoder\core\src\decoder_data_tables.cpp" />
+    <ClCompile Include="..\decoder\core\src\decode_mb_aux.cpp" />
+    <ClCompile Include="..\decoder\core\src\decode_slice.cpp" />
+    <ClCompile Include="..\decoder\core\src\error_concealment.cpp" />
+    <ClCompile Include="..\decoder\core\src\fmo.cpp" />
+    <ClCompile Include="..\decoder\core\src\get_intra_predictor.cpp" />
+    <ClCompile Include="..\decoder\core\src\manage_dec_ref.cpp" />
+    <ClCompile Include="..\decoder\core\src\memmgr_nal_unit.cpp" />
+    <ClCompile Include="..\decoder\core\src\mv_pred.cpp" />
+    <ClCompile Include="..\decoder\core\src\parse_mb_syn_cabac.cpp" />
+    <ClCompile Include="..\decoder\core\src\parse_mb_syn_cavlc.cpp" />
+    <ClCompile Include="..\decoder\core\src\pic_queue.cpp" />
+    <ClCompile Include="..\decoder\core\src\rec_mb.cpp" />
+    <ClCompile Include="..\decoder\plus\src\welsDecoderExt.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\common\x86\asm_inc.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -f win64 -DWIN64  -DHAVE_AVX2 -I../common/x86/ -o "$(OutDir)%(Filename).obj" "%(FullPath)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling by NASM - %(Filename)%(Extension)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\common\x86\cpuid.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -f win64 -DWIN64  -DHAVE_AVX2 -I../common/x86/ -o "$(OutDir)%(Filename).obj" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling by NASM - %(Filename)%(Extension)</Message>
+    </CustomBuild>
+    <CustomBuild Include="..\common\x86\dct.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -f win64 -DWIN64  -DHAVE_AVX2 -I../common/x86/ -o "$(OutDir)%(Filename).obj" "%(FullPath)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling by NASM - %(Filename)%(Extension)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\common\x86\deblock.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -f win64 -DWIN64  -DHAVE_AVX2 -I../common/x86/ -o "$(OutDir)%(Filename).obj" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling by NASM - %(Filename)%(Extension)</Message>
+    </CustomBuild>
+    <CustomBuild Include="..\common\x86\expand_picture.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -f win64 -DWIN64  -DHAVE_AVX2 -I../common/x86/ -o "$(OutDir)%(Filename).obj" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling by NASM - %(Filename)%(Extension)</Message>
+    </CustomBuild>
+    <CustomBuild Include="..\common\x86\intra_pred_com.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -f win64 -DWIN64  -DHAVE_AVX2 -I../common/x86/ -o "$(OutDir)%(Filename).obj" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling by NASM - %(Filename)%(Extension)</Message>
+    </CustomBuild>
+    <CustomBuild Include="..\common\x86\mb_copy.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -f win64 -DWIN64  -DHAVE_AVX2 -I../common/x86/ -o "$(OutDir)%(Filename).obj" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling by NASM - %(Filename)%(Extension)</Message>
+    </CustomBuild>
+    <CustomBuild Include="..\common\x86\mc_chroma.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -f win64 -DWIN64  -DHAVE_AVX2 -I../common/x86/ -o "$(OutDir)%(Filename).obj" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling by NASM - %(Filename)%(Extension)</Message>
+    </CustomBuild>
+    <CustomBuild Include="..\common\x86\mc_luma.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -f win64 -DWIN64  -DHAVE_AVX2 -I../common/x86/ -o "$(OutDir)%(Filename).obj" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling by NASM - %(Filename)%(Extension)</Message>
+    </CustomBuild>
+    <CustomBuild Include="..\common\x86\satd_sad.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -f win64 -DWIN64  -DHAVE_AVX2 -I../common/x86/ -o "$(OutDir)%(Filename).obj" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling by NASM - %(Filename)%(Extension)</Message>
+    </CustomBuild>
+    <CustomBuild Include="..\common\x86\vaa.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -f win64 -DWIN64  -DHAVE_AVX2 -I../common/x86/ -o "$(OutDir)%(Filename).obj" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling by NASM - %(Filename)%(Extension)</Message>
+    </CustomBuild>
+    <CustomBuild Include="..\decoder\core\x86\intra_pred.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -f win64 -DWIN64  -DHAVE_AVX2 -I../common/x86/  -I../hdecoder/incl -o "$(OutDir)%(Filename).obj" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling by NASM - %(Filename)%(Extension)</Message>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\decoder\core\x86\dct.asm">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nasm -f win64 -DWIN64  -DHAVE_AVX2 -I../common/x86/  -I../hdecoder/incl -o "$(OutDir)%(Filename)_dec.obj" "%(FullPath)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling by NASM - %(Filename)_dec%(Extension)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename)_dec.obj;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

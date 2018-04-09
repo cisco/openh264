@@ -174,8 +174,11 @@ int32_t ParseEndOfSliceCabac (PWelsDecoderContext pCtx, uint32_t& uiBinVal) {
 
 int32_t ParseSkipFlagCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail, uint32_t& uiSkip) {
   uiSkip = 0;
-  int32_t iCtxInc = (pNeighAvail->iLeftAvail && pNeighAvail->iLeftType != MB_TYPE_SKIP) + (pNeighAvail->iTopAvail
+	int32_t iCtxInc = NEW_CTX_OFFSET_SKIP;
+  iCtxInc += (pNeighAvail->iLeftAvail && pNeighAvail->iLeftType != MB_TYPE_SKIP) + (pNeighAvail->iTopAvail
                     && pNeighAvail->iTopType  != MB_TYPE_SKIP);
+	if (B_SLICE == pCtx->eSliceType)
+		iCtxInc += 13;
   PWelsCabacCtx pBinCtx = (pCtx->pCabacCtx + NEW_CTX_OFFSET_SKIP + iCtxInc);
   WELS_READ_VERIFY (DecodeBinCabac (pCtx->pCabacDecEngine, pBinCtx, uiSkip));
   return ERR_NONE;
@@ -276,6 +279,55 @@ int32_t ParseMBTypePSliceCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pNeigh
     }
   }
   return ERR_NONE;
+}
+
+int32_t ParseMBTypeBSliceCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail, uint32_t& uiMbType) {
+	uint32_t uiCode;
+	uiMbType = 0;
+	int32_t iIdxA = 0, iIdxB = 0;
+	int32_t iCtxInc;
+
+	PWelsCabacDecEngine pCabacDecEngine = pCtx->pCabacDecEngine;
+	PWelsCabacCtx pBinCtx = pCtx->pCabacCtx + 27; //B slice
+
+#pragma message("Fix me")
+	//iIdxA = (pNeighAvail->iLeftAvail) && (!is_direct(pNeighAvail->iLeftType));
+	//iIdxB = (pNeighAvail->iTopAvail) && (!is_direct(pNeighAvail->iTopType));
+
+	iCtxInc = iIdxA + iIdxB;
+	WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + iCtxInc, uiCode));
+	if (!uiCode)
+		uiMbType = 0; // Bi_Direct
+	else {
+		WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 3, uiCode));
+		if (!uiCode) {
+			WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 5, uiCode));
+			uiMbType = 1 + uiCode; // 16x16 L0L1
+		}
+		else {
+			WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 4, uiCode)); uiMbType = uiCode << 3;
+			WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 5, uiCode)); uiMbType += uiCode << 2;
+			WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 5, uiCode)); uiMbType += uiCode << 1;
+			WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 5, uiCode)); uiMbType += uiCode;
+			if (uiMbType < 8) {
+				uiMbType += 3;
+			}
+			else if (uiMbType == 13) {
+				//		return cabac_intra_mb_type(core, 32, 0) + 23;
+			}
+			else if (uiMbType == 14) {
+				uiMbType = 11; // Bi8x16
+			}
+			else if (uiMbType == 15) {
+				uiMbType = 22; // 8x8
+			}
+			uiMbType <<= 1;
+			WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 5, uiCode));
+			uiMbType += uiCode;
+			uiMbType -= 4;
+		}
+	}
+	return ERR_NONE;
 }
 
 int32_t ParseTransformSize8x8FlagCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail,
