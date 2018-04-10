@@ -1366,10 +1366,10 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 	pCurLayer->pTransformSize8x8Flag[iMbXy] = false;
 
 	GetNeighborAvailMbType(&uiNeighAvail, pCurLayer);
-	WELS_READ_VERIFY(ParseSkipFlagCabac(pCtx, &uiNeighAvail, uiCode));
+	WELS_READ_VERIFY(ParseSkipFlagCabac(pCtx, &uiNeighAvail, uiCode));	
 
 	if (uiCode) {
-		int16_t pMv[2] = { 0 };
+		int16_t pMv[LIST_A][2] = { 0 };
 		pCurLayer->pMbType[iMbXy] = MB_TYPE_SKIP;
 		ST32(&pCurLayer->pNzc[iMbXy][0], 0);
 		ST32(&pCurLayer->pNzc[iMbXy][4], 0);
@@ -1379,14 +1379,32 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 		ST32(&pCurLayer->pNzc[iMbXy][20], 0);
 
 		pCurLayer->pInterPredictionDoneFlag[iMbXy] = 0;
-		memset(pCurLayer->pRefIndex[0][iMbXy], 0, sizeof(int8_t) * 16);
+		memset(pCurLayer->pRefIndex[LIST_0][iMbXy], 0, sizeof(int8_t) * 16);
+		memset(pCurLayer->pRefIndex[LIST_1][iMbXy], 0, sizeof(int8_t) * 16);
 		pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || !(ppRefPicL0[0] && ppRefPicL0[0]->bIsComplete) || !(ppRefPicL1[0] && ppRefPicL1[0]->bIsComplete);
-		//predict mv
-		PredPSkipMvFromNeighbor(pCurLayer, pMv);
-		for (i = 0; i < 16; i++) {
-			ST32(pCurLayer->pMv[0][iMbXy][i], *(uint32_t*)pMv);
-			ST32(pCurLayer->pMvd[0][iMbXy][i], 0);
+		
+		//predict direct spatial mv
+		if (pSliceHeader->iDirectSpatialMvPredFlag) {
+			PredDirectSpatialMvFromNeighbor(pCurLayer, pMv);
 		}
+		else {
+			//direct mv with colocated MB
+		}
+		for (i = 0; i < 16; i++) {
+			ST32(pCurLayer->pMv[LIST_0][iMbXy][i], *(uint32_t*)pMv[LIST_0]);
+			ST32(pCurLayer->pMv[LIST_1][iMbXy][i], *(uint32_t*)pMv[LIST_1]);
+			ST32(pCurLayer->pMvd[LIST_0][iMbXy][i], 0);
+			ST32(pCurLayer->pMvd[LIST_1][iMbXy][i], 0);
+		}
+
+		// just for fill_caches. pred_direct_motion will set the real mb_type
+		//	mb_type |= MB_TYPE_L0L1 | MB_TYPE_DIRECT2 | MB_TYPE_SKIP;
+		//	if (sl->direct_spatial_mv_pred) {
+		//		fill_decode_neighbors(h, sl, mb_type);
+		//		fill_decode_caches(h, sl, mb_type); //FIXME check what is needed and what not ...
+		//	}
+		//	ff_h264_pred_direct_motion(h, sl, &mb_type);
+		//	mb_type |= MB_TYPE_SKIP;
 
 		//if (!pSlice->sSliceHeaderExt.bDefaultResidualPredFlag) {
 		//  memset (pCurLayer->pScaledTCoeff[iMbXy], 0, 384 * sizeof (int16_t));
@@ -2341,5 +2359,13 @@ void WelsBlockZero16x16_c (int16_t* pBlock, int32_t iStride) {
 void WelsBlockZero8x8_c (int16_t* pBlock, int32_t iStride) {
   WelsBlockInit (pBlock, 8, 8, iStride, 0);
 }
-
+bool ComputeColocated(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2]) {
+		PPicture* ppRefPic = pCtx->sRefPic.pRefList[LIST_1];
+		//Implement the following
+		//get Mv_colocated_L1
+		//and do calculation 
+		//iMvp[LIST_0] = Mv_colocated_L1 * (POC(cur) - POC(L0))/POC(L1) - POC(L0))
+		//iMvp[LIST_1] = Mv_colocated_L1 * (POC(cur) - POC(L1))/POC(L1) - POC(L0))
+		return true;
+}
 } // namespace WelsDec
