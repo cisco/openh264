@@ -52,6 +52,12 @@
 
 namespace WelsDec {
 
+static inline int32_t iAbs(int32_t x) {
+	static const int32_t INT_BITS = (sizeof(int) * CHAR_BIT) - 1;
+	int32_t y = x >> INT_BITS;
+	return (x ^ y) - y;
+}
+
 int32_t WelsTargetSliceConstruction (PWelsDecoderContext pCtx) {
   PDqLayer pCurLayer = pCtx->pCurDqLayer;
   PSlice pCurSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
@@ -1383,12 +1389,13 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 		memset(pCurLayer->pRefIndex[LIST_1][iMbXy], 0, sizeof(int8_t) * 16);
 		pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || !(ppRefPicL0[0] && ppRefPicL0[0]->bIsComplete) || !(ppRefPicL1[0] && ppRefPicL1[0]->bIsComplete);
 		
-		//predict direct spatial mv
 		if (pSliceHeader->iDirectSpatialMvPredFlag) {
+			//predict direct spatial mv
 			PredDirectSpatialMvFromNeighbor(pCurLayer, pMv);
 		}
 		else {
-			//direct mv with colocated MB
+			//temporal direct mode
+			ComputeColocated(pCtx);
 		}
 		for (i = 0; i < 16; i++) {
 			ST32(pCurLayer->pMv[LIST_0][iMbXy][i], *(uint32_t*)pMv[LIST_0]);
@@ -2359,13 +2366,32 @@ void WelsBlockZero16x16_c (int16_t* pBlock, int32_t iStride) {
 void WelsBlockZero8x8_c (int16_t* pBlock, int32_t iStride) {
   WelsBlockInit (pBlock, 8, 8, iStride, 0);
 }
-bool ComputeColocated(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2]) {
-		PPicture* ppRefPic = pCtx->sRefPic.pRefList[LIST_1];
-		//Implement the following
-		//get Mv_colocated_L1
-		//and do calculation 
-		//iMvp[LIST_0] = Mv_colocated_L1 * (POC(cur) - POC(L0))/POC(L1) - POC(L0))
-		//iMvp[LIST_1] = Mv_colocated_L1 * (POC(cur) - POC(L1))/POC(L1) - POC(L0))
-		return true;
+bool ComputeColocated(PWelsDecoderContext pCtx) {
+	PDqLayer pCurLayer = pCtx->pCurDqLayer;
+	PSlice pCurSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
+	PSliceHeader pSliceHeader = &pCurSlice->sSliceHeaderExt.sSliceHeader;
+	if (!pSliceHeader->iDirectSpatialMvPredFlag) {
+		PPicture* ppRefPicLIST0 = pCtx->sRefPic.pRefList[LIST_0];
+		PPicture* ppRefPicLIST1 = pCtx->sRefPic.pRefList[LIST_1];
+		uint32_t uiShortRefCount = pCtx->sRefPic.uiShortRefCount[LIST_0];
+		for (uint32_t i = 0; i < uiShortRefCount; ++i) {
+			int32_t iTRb = WELS_CLIP3(-128, 127, pSliceHeader->iPicOrderCntLsb - ppRefPicLIST0[i]->iFramePoc);
+			int32_t iTRp = WELS_CLIP3(-128, 127, ppRefPicLIST1[0]->iFramePoc - ppRefPicLIST0[i]->iFramePoc);
+			if (iTRp != 0) {
+				int32_t prescale = (16384 + iAbs(iTRp / 2)) / iTRp;
+				pCurSlice->iMvScale[i] = WELS_CLIP3(-1024, 1023, (iTRb * prescale + 32) >> 6);
+			}
+			else
+			{
+				pCurSlice->iMvScale[i] = 0x03FFF;
+			}
+		}
+	}
+	//Implement the following
+	//get Mv_colocated_L1
+	//and do calculation 
+	//iMvp[LIST_0] = Mv_colocated_L1 * (POC(cur) - POC(L0))/POC(L1) - POC(L0))
+	//iMvp[LIST_1] = Mv_colocated_L1 * (POC(cur) - POC(L1))/POC(L1) - POC(L0))
+	return true;
 }
 } // namespace WelsDec
