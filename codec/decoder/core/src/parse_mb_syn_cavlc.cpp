@@ -1161,9 +1161,9 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
       if (uiSubMbType >= 4) { //invalid uiSubMbType
         return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_SUB_MB_TYPE);
       }
-      pCurDqLayer->pSubMbType[iMbXy][i] = g_ksInterSubMbTypeInfo[uiSubMbType].iType;
-      iSubPartCount[i] = g_ksInterSubMbTypeInfo[uiSubMbType].iPartCount;
-      iPartWidth[i] = g_ksInterSubMbTypeInfo[uiSubMbType].iPartWidth;
+      pCurDqLayer->pSubMbType[iMbXy][i] = g_ksInterPSubMbTypeInfo[uiSubMbType].iType;
+      iSubPartCount[i] = g_ksInterPSubMbTypeInfo[uiSubMbType].iPartCount;
+      iPartWidth[i] = g_ksInterPSubMbTypeInfo[uiSubMbType].iPartWidth;
 
       // Need modification when B picture add in, reference to 7.3.5
       pCurDqLayer->pNoSubMbPartSizeLessThan8x8Flag[iMbXy] &= (uiSubMbType == 0);

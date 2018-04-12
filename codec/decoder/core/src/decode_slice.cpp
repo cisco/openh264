@@ -830,7 +830,7 @@ int32_t WelsDecodeMbCabacPSliceBaseMode0 (PWelsDecoderContext pCtx, PWelsNeighAv
     int8_t  pRefIndex[LIST_A][30];
     pCurLayer->pMbType[iMbXy] = g_ksInterPMbTypeInfo[uiMbType].iType;
     WelsFillCacheInterCabac (pNeighAvail, pNonZeroCount, pMotionVector, pMvdCache, pRefIndex, pCurLayer);
-    WELS_READ_VERIFY (ParseInterMotionInfoCabac (pCtx, pNeighAvail, pNonZeroCount, pMotionVector, pMvdCache, pRefIndex));
+    WELS_READ_VERIFY (ParseInterPMotionInfoCabac (pCtx, pNeighAvail, pNonZeroCount, pMotionVector, pMvdCache, pRefIndex));
     pCurLayer->pInterPredictionDoneFlag[iMbXy] = 0;
   } else { //Intra mode
     uiMbType -= 5;
@@ -1067,7 +1067,7 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAva
 		int8_t  pRefIndex[LIST_A][30];
 		pCurLayer->pMbType[iMbXy] = g_ksInterBMbTypeInfo[uiMbType].iType;
 		WelsFillCacheInterCabac(pNeighAvail, pNonZeroCount, pMotionVector, pMvdCache, pRefIndex, pCurLayer);
-		WELS_READ_VERIFY(ParseInterMotionInfoCabac(pCtx, pNeighAvail, pNonZeroCount, pMotionVector, pMvdCache, pRefIndex));
+		WELS_READ_VERIFY(ParseInterBMotionInfoCabac(pCtx, pNeighAvail, pNonZeroCount, pMotionVector, pMvdCache, pRefIndex));
 		pCurLayer->pInterPredictionDoneFlag[iMbXy] = 0;
 	}
 	else { //Intra mode

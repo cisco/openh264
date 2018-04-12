@@ -251,35 +251,53 @@ static const SPartMbInfo g_ksInterPMbTypeInfo[5] = {
 static const SPartMbInfo g_ksInterBMbTypeInfo[] = {
 	//						Part 0				Part 1
 	{ MB_TYPE_DIRECT, -1, 4 },	//B_Direct_16x16
-	{ MB_TYPE_16x16, 1, 4 },	//B_L0_16x16
-	{ MB_TYPE_16x16, 1, 4 },	//B_L1_16x16
-	{ MB_TYPE_16x16, 1, 4 },	//B_Bi_16x16
-	{ MB_TYPE_16x8, 2, 4 },		//B_L0_L0_16x8
-	{ MB_TYPE_8x16, 2, 2 },		//B_L0_L0_8x16
-	{ MB_TYPE_16x8, 2, 4 },		//B_L1_L1_16x8
-	{ MB_TYPE_8x16, 2, 2 },		//B_L1_L1_8x16
-	{ MB_TYPE_16x8, 2, 4 },		//B_L0_L1_16x8
-	{ MB_TYPE_8x16, 2, 2 },		//B_L0_L1_8x16
-	{ MB_TYPE_16x8, 2, 4 },		//B_L1_L0_16x8
-	{ MB_TYPE_8x16, 2, 2 },		//B_L1_L0_8x16
-	{ MB_TYPE_16x8, 2, 4 },		//B_L0_Bi_16x8
-	{ MB_TYPE_8x16, 2, 2 },		//B_L0_Bi_8x16
-	{ MB_TYPE_16x8, 2, 4 },		//B_L1_Bi_16x8
-	{ MB_TYPE_8x16, 2, 2 },		//B_L1_Bi_8x16
-	{ MB_TYPE_16x8, 2, 4 },		//B_Bi_L0_16x8
-	{ MB_TYPE_8x16, 2, 2 },		//B_Bi_L0_8x16
-	{ MB_TYPE_16x8, 2, 4 },		//B_Bi_L1_16x8
-	{ MB_TYPE_8x16, 2, 2 },		//B_Bi_L1_8x16
-	{ MB_TYPE_16x8, 2, 4 },		//B_Bi_Bi_16x8
-	{ MB_TYPE_8x16, 2, 2 },		//B_Bi_Bi_8x16
-	{ MB_TYPE_8x8,	4, 4 }		//B_8x8
+	{ MB_TYPE_16x16 | MB_TYPE_P0L0, 1, 4 },	//B_L0_16x16
+	{ MB_TYPE_16x16 | MB_TYPE_P0L1, 1, 4 },	//B_L1_16x16
+	{ MB_TYPE_16x16 | MB_TYPE_P0L0 | MB_TYPE_P0L1, 1, 4 },	//B_Bi_16x16
+	{ MB_TYPE_16x8  | MB_TYPE_P0L0 | MB_TYPE_P1L0, 2, 4 },		//B_L0_L0_16x8
+	{ MB_TYPE_8x16  | MB_TYPE_P0L0 | MB_TYPE_P1L0, 2, 2 },		//B_L0_L0_8x16
+	{ MB_TYPE_16x8  | MB_TYPE_P0L1 | MB_TYPE_P1L1, 2, 4 },		//B_L1_L1_16x8
+	{ MB_TYPE_8x16  | MB_TYPE_P0L1 | MB_TYPE_P1L1, 2, 2 },		//B_L1_L1_8x16
+	{ MB_TYPE_16x8  | MB_TYPE_P0L0 | MB_TYPE_P1L1, 2, 4 },		//B_L0_L1_16x8
+	{ MB_TYPE_8x16  | MB_TYPE_P0L0 | MB_TYPE_P1L1, 2, 2 },		//B_L0_L1_8x16
+	{ MB_TYPE_16x8  | MB_TYPE_P0L1 | MB_TYPE_P1L0, 2, 4 },		//B_L1_L0_16x8
+	{ MB_TYPE_8x16  | MB_TYPE_P0L1 | MB_TYPE_P1L0, 2, 2 },		//B_L1_L0_8x16
+	{ MB_TYPE_16x8  | MB_TYPE_P0L0 | MB_TYPE_P1L0 | MB_TYPE_P1L1, 2, 4 },		//B_L0_Bi_16x8
+	{ MB_TYPE_8x16  | MB_TYPE_P0L0 | MB_TYPE_P1L0 | MB_TYPE_P1L1, 2, 2 },		//B_L0_Bi_8x16
+	{ MB_TYPE_16x8  | MB_TYPE_P0L1 | MB_TYPE_P1L0 | MB_TYPE_P1L1, 2, 4 },		//B_L1_Bi_16x8
+	{ MB_TYPE_8x16  | MB_TYPE_P0L1 | MB_TYPE_P1L0 | MB_TYPE_P1L1, 2, 2 },		//B_L1_Bi_8x16
+	{ MB_TYPE_16x8  | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_P1L0, 2, 4 },		//B_Bi_L0_16x8
+	{ MB_TYPE_8x16  | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_P1L0, 2, 2 },		//B_Bi_L0_8x16
+	{ MB_TYPE_16x8  | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_P1L1, 2, 4 },		//B_Bi_L1_16x8
+	{ MB_TYPE_8x16  | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_P1L1, 2, 2 },		//B_Bi_L1_8x16
+	{ MB_TYPE_16x8  | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_P1L0 | MB_TYPE_P1L1, 2, 4 },		//B_Bi_Bi_16x8
+	{ MB_TYPE_8x16  | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_P1L0 | MB_TYPE_P1L1, 2, 2 },		//B_Bi_Bi_8x16
+	{ MB_TYPE_8x8   | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_P1L0 | MB_TYPE_P1L1,	4, 4 }		//B_8x8
 };
 
-static const SPartMbInfo g_ksInterSubMbTypeInfo[4] = {
+//Table 7.17 – Sub-macroblock types in B macroblocks.
+static const SPartMbInfo g_ksInterPSubMbTypeInfo[4] = {
     {SUB_MB_TYPE_8x8, 1, 2},
     {SUB_MB_TYPE_8x4, 2, 2},
     {SUB_MB_TYPE_4x8, 2, 1},
     {SUB_MB_TYPE_4x4, 4, 1},
+};
+
+//Table 7.18 – Sub-macroblock types in B macroblocks.
+static const SPartMbInfo g_ksInterBSubMbTypeInfo[] = {
+	{ MB_TYPE_DIRECT,																4, 2 },	//B_Direct_8x8
+	{ MB_TYPE_16x16 | MB_TYPE_P0L0,									1, 2 },	//B_L0_8x8
+	{ MB_TYPE_16x16 | MB_TYPE_P0L1,									1, 2 },	//B_L1_8x8
+	{ MB_TYPE_16x16 | MB_TYPE_P0L0 | MB_TYPE_P0L1,	1, 2 },	//B_Bi_8x8
+	{ MB_TYPE_16x8  | MB_TYPE_P0L0,									2, 2 },	//B_L0_8x4
+	{ MB_TYPE_8x16  | MB_TYPE_P0L0,									2, 1 },	//B_L0_4x8
+	{ MB_TYPE_16x8  | MB_TYPE_P0L1,									2, 2 },	//B_L1_8x4
+	{ MB_TYPE_8x16  | MB_TYPE_P0L1,									2, 1 },	//B_L1_4x8
+	{ MB_TYPE_16x8  | MB_TYPE_P0L0 | MB_TYPE_P0L1,	2, 2 },	//B_Bi_8x4
+	{ MB_TYPE_8x16  | MB_TYPE_P0L0 | MB_TYPE_P0L1,	2, 1 },	//B_Bi_4x8
+	{ MB_TYPE_8x8   | MB_TYPE_P0L0,									4, 1 },	//B_L0_4x4
+	{ MB_TYPE_8x8   | MB_TYPE_P0L1,									4, 1 },	//B_L1_4x4
+	{ MB_TYPE_8x8   | MB_TYPE_P0L0 | MB_TYPE_P0L1,	4, 1 }	//B_Bi_4x4
 };
 
 typedef struct TagSar {

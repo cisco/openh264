@@ -284,6 +284,12 @@ typedef struct TagNalUnitHeaderExt {
 #define MB_TYPE_INTRA_PCM   0x00000200
 #define MB_TYPE_INTRA_BL    0x00000400
 #define MB_TYPE_DIRECT      0x00000800
+#define	MB_TYPE_P0L0			  0x00001000
+#define	MB_TYPE_P1L0			  0x00002000
+#define	MB_TYPE_P0L1			  0x00004000
+#define	MB_TYPE_P1L1			  0x00008000
+#define	MB_TYPE_L0				(MB_TYPE_P0L0 | MB_TYPE_P1L0)
+#define	MB_TYPE_L1				(MB_TYPE_P0L1 | MB_TYPE_P1L1)
 
 #define SUB_MB_TYPE_8x8     0x00000001
 #define SUB_MB_TYPE_8x4     0x00000002
