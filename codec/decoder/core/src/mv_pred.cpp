@@ -192,7 +192,7 @@ void PredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]) {
   }
 }
 
-void PredDirectSpatialMvFromNeighbor(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2]) {
+void PredBDirectSpatialMvFromNeighbor(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2]) {
 	bool bTopAvail, bLeftTopAvail, bRightTopAvail, bLeftAvail;
 
 	int32_t iCurSliceIdc, iTopSliceIdc, iLeftTopSliceIdc, iRightTopSliceIdc, iLeftSliceIdc;
@@ -357,6 +357,79 @@ void PredDirectSpatialMvFromNeighbor(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2]
 			iMvp[listIdx][1] = WelsMedian(iMvA[listIdx][1], iMvB[listIdx][1], iMvC[listIdx][1]);
 		}
 	}
+}
+
+void PredBDirect8x8Spatial(PWelsDecoderContext pCtx) {
+	PDqLayer pCurLayer = pCtx->pCurDqLayer;
+	PSlice pSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
+	PSliceHeader pSliceHeader = &pSlice->sSliceHeaderExt.sSliceHeader;
+	int32_t iMbXy = pCurLayer->iMbXyIndex;
+	PPicture* ppRefPicL0 = pCtx->sRefPic.pRefList[LIST_0];
+	PPicture* ppRefPicL1 = pCtx->sRefPic.pRefList[LIST_1];
+	//SetChromaVectorAdjustment(); //for field coding mode
+	int8_t refFrame[LIST_A] = {-1};
+	int16_t pMv[LIST_A][2] = { 0 };
+	PrepareDirectParams(pCtx, pMv, refFrame);
+}
+
+void PredBDirect4x4Spatial(PWelsDecoderContext pCtx) {
+	PDqLayer pCurLayer = pCtx->pCurDqLayer;
+	PSlice pSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
+	PSliceHeader pSliceHeader = &pSlice->sSliceHeaderExt.sSliceHeader;
+	int32_t iMbXy = pCurLayer->iMbXyIndex;
+	PPicture* ppRefPicL0 = pCtx->sRefPic.pRefList[LIST_0];
+	PPicture* ppRefPicL1 = pCtx->sRefPic.pRefList[LIST_1];
+}
+
+void PrepareDirectParams(PWelsDecoderContext pCtx, int16_t pMv[LIST_A][2], int8_t refFrame[LIST_A]) {
+	PDqLayer pCurLayer = pCtx->pCurDqLayer;
+	PSlice pCurrSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
+
+/*	int8_t l0_refA, l0_refB, l0_refC;
+	int8_t l1_refA, l1_refB, l1_refC;
+	int16_t ** pMv = pCtx->pDec->pMv;
+
+	PixelPos mb[4];
+
+	get_neighbors(currMB, mb, 0, 0, 16);
+
+	if (!currSlice->mb_aff_frame_flag)
+	{
+		set_direct_references(&mb[0], &l0_refA, &l1_refA, mv_info);
+		set_direct_references(&mb[1], &l0_refB, &l1_refB, mv_info);
+		set_direct_references(&mb[2], &l0_refC, &l1_refC, mv_info);
+	}
+	else
+	{
+	}
+
+	*l0_rFrame = (char)imin(imin((unsigned char)l0_refA, (unsigned char)l0_refB), (unsigned char)l0_refC);
+	*l1_rFrame = (char)imin(imin((unsigned char)l1_refA, (unsigned char)l1_refB), (unsigned char)l1_refC);
+
+	if (*l0_rFrame >= 0)
+		currMB->GetMVPredictor(currMB, mb, pmvl0, *l0_rFrame, mv_info, LIST_0, 0, 0, 16, 16);
+
+	if (*l1_rFrame >= 0)
+		currMB->GetMVPredictor(currMB, mb, pmvl1, *l1_rFrame, mv_info, LIST_1, 0, 0, 16, 16);
+	*/
+}
+
+void PredBDirect8x8Temporal(PWelsDecoderContext pCtx) {
+	PDqLayer pCurLayer = pCtx->pCurDqLayer;
+	PSlice pSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
+	PSliceHeader pSliceHeader = &pSlice->sSliceHeaderExt.sSliceHeader;
+	int32_t iMbXy = pCurLayer->iMbXyIndex;
+	PPicture* ppRefPicL0 = pCtx->sRefPic.pRefList[LIST_0];
+	PPicture* ppRefPicL1 = pCtx->sRefPic.pRefList[LIST_1];
+}
+
+void PredBDirect4x4Temporal(PWelsDecoderContext pCtx) {
+	PDqLayer pCurLayer = pCtx->pCurDqLayer;
+	PSlice pSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
+	PSliceHeader pSliceHeader = &pSlice->sSliceHeaderExt.sSliceHeader;
+	int32_t iMbXy = pCurLayer->iMbXyIndex;
+	PPicture* ppRefPicL0 = pCtx->sRefPic.pRefList[LIST_0];
+	PPicture* ppRefPicL1 = pCtx->sRefPic.pRefList[LIST_1];
 }
 
 //basic iMVs prediction unit for iMVs partition width (4, 2, 1)

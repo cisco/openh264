@@ -237,13 +237,44 @@ typedef struct TagPartMbInfo {
     int8_t iPartCount; //P_16*16, P_16*8, P_8*16, P_8*8 based on 8*8 block; P_8*4, P_4*8, P_4*4 based on 4*4 block
     int8_t iPartWidth; //based on 4*4 block
 } SPartMbInfo;
-static const SPartMbInfo g_ksInterMbTypeInfo[5] = {
+
+//Table 7.13. Macroblock type values 0 to 4 for P slices.
+static const SPartMbInfo g_ksInterPMbTypeInfo[5] = {
     {MB_TYPE_16x16,    1, 4},
     {MB_TYPE_16x8,     2, 4},
     {MB_TYPE_8x16,     2, 2},
     {MB_TYPE_8x8,      4, 4},
     {MB_TYPE_8x8_REF0, 4, 4}, //ref0--ref_idx not present in bit-stream and default as 0
 };
+
+//Table 7.14. Macroblock type values 0 to 22 for B slices.
+static const SPartMbInfo g_ksInterBMbTypeInfo[] = {
+	//						Part 0				Part 1
+	{ MB_TYPE_DIRECT, -1, 4 },	//B_Direct_16x16
+	{ MB_TYPE_16x16, 1, 4 },	//B_L0_16x16
+	{ MB_TYPE_16x16, 1, 4 },	//B_L1_16x16
+	{ MB_TYPE_16x16, 1, 4 },	//B_Bi_16x16
+	{ MB_TYPE_16x8, 2, 4 },		//B_L0_L0_16x8
+	{ MB_TYPE_8x16, 2, 2 },		//B_L0_L0_8x16
+	{ MB_TYPE_16x8, 2, 4 },		//B_L1_L1_16x8
+	{ MB_TYPE_8x16, 2, 2 },		//B_L1_L1_8x16
+	{ MB_TYPE_16x8, 2, 4 },		//B_L0_L1_16x8
+	{ MB_TYPE_8x16, 2, 2 },		//B_L0_L1_8x16
+	{ MB_TYPE_16x8, 2, 4 },		//B_L1_L0_16x8
+	{ MB_TYPE_8x16, 2, 2 },		//B_L1_L0_8x16
+	{ MB_TYPE_16x8, 2, 4 },		//B_L0_Bi_16x8
+	{ MB_TYPE_8x16, 2, 2 },		//B_L0_Bi_8x16
+	{ MB_TYPE_16x8, 2, 4 },		//B_L1_Bi_16x8
+	{ MB_TYPE_8x16, 2, 2 },		//B_L1_Bi_8x16
+	{ MB_TYPE_16x8, 2, 4 },		//B_Bi_L0_16x8
+	{ MB_TYPE_8x16, 2, 2 },		//B_Bi_L0_8x16
+	{ MB_TYPE_16x8, 2, 4 },		//B_Bi_L1_16x8
+	{ MB_TYPE_8x16, 2, 2 },		//B_Bi_L1_8x16
+	{ MB_TYPE_16x8, 2, 4 },		//B_Bi_Bi_16x8
+	{ MB_TYPE_8x16, 2, 2 },		//B_Bi_Bi_8x16
+	{ MB_TYPE_8x8,	4, 4 }		//B_8x8
+};
+
 static const SPartMbInfo g_ksInterSubMbTypeInfo[4] = {
     {SUB_MB_TYPE_8x8, 1, 2},
     {SUB_MB_TYPE_8x4, 2, 2},

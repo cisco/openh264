@@ -283,8 +283,7 @@ typedef struct TagNalUnitHeaderExt {
 #define MB_TYPE_SKIP        0x00000100
 #define MB_TYPE_INTRA_PCM   0x00000200
 #define MB_TYPE_INTRA_BL    0x00000400
-
-#define MB_TYPE_DIRECT2     0x00004000
+#define MB_TYPE_DIRECT      0x00000800
 
 #define SUB_MB_TYPE_8x8     0x00000001
 #define SUB_MB_TYPE_8x4     0x00000002
@@ -300,7 +299,8 @@ typedef struct TagNalUnitHeaderExt {
 #define IS_INTRA(type) ( (type)&MB_TYPE_INTRA )
 #define IS_INTER(type) ( (type)&MB_TYPE_INTER )
 
-#define IS_SKIP(type) ( (type) == MB_TYPE_SKIP )
+#define IS_SKIP(type) ( (type)&MB_TYPE_SKIP )
+#define IS_DIRECT(type) ( (type)&MB_TYPE_DIRECT )
 #define IS_SVC_INTER(type) IS_INTER(type)
 #define IS_I_BL(type) ( (type) == MB_TYPE_INTRA_BL )
 #define IS_SVC_INTRA(type) ( IS_I_BL(type) || IS_INTRA(type) )

@@ -42,6 +42,7 @@
 #define WELS_MV_PRED_H__
 
 #include "dec_frame.h"
+#include "decoder_context.h"
 
 namespace WelsDec {
 
@@ -83,7 +84,40 @@ void PredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]);
 * \param
 * \param   output iMvp[]
 */
-void PredDirectSpatialMvFromNeighbor(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2]);
+void PredBDirectSpatialMvFromNeighbor(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2]);
+
+/*!
+* \brief   get the motion predictor for B-slice spatial direct mode 8x8
+*/
+void PredBDirect8x8Spatial(PWelsDecoderContext pCtx);
+
+/*!
+* \brief   get the motion predictor for B-slice spatial direct mode 4x4
+*/
+void PredBDirect4x4Spatial(PWelsDecoderContext pCtx);
+
+/*!
+* \brief   get the motion params for B-slice spatial direct mode
+* \param
+* \param   output iMvp[]
+*/
+void PrepareDirectParams(PWelsDecoderContext pCtx, int16_t pMv[LIST_A][2], int8_t refFrame[LIST_A]);
+
+/*!
+* \brief   get the motion predictor for B-slice temporal direct mode 8x8
+*/
+void PredBDirect8x8Temporal(PWelsDecoderContext pCtx);
+
+/*!
+* \brief   get the motion predictor for B-slice temporal direct mode 4x4
+*/
+void PredBDirect4x4Temporal(PWelsDecoderContext pCtx);
+
+/*!
+* \brief   get the motion params for B-slice spatial direct mode
+* \param
+* \param   output iMvp[]
+*/
 
 /*!
  * \brief   get the motion predictor for 4*4 or 8*8 or 16*16 block

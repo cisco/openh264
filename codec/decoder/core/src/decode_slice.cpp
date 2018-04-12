@@ -828,7 +828,7 @@ int32_t WelsDecodeMbCabacPSliceBaseMode0 (PWelsDecoderContext pCtx, PWelsNeighAv
     int16_t pMotionVector[LIST_A][30][MV_A];
     int16_t pMvdCache[LIST_A][30][MV_A];
     int8_t  pRefIndex[LIST_A][30];
-    pCurLayer->pMbType[iMbXy] = g_ksInterMbTypeInfo[uiMbType].iType;
+    pCurLayer->pMbType[iMbXy] = g_ksInterPMbTypeInfo[uiMbType].iType;
     WelsFillCacheInterCabac (pNeighAvail, pNonZeroCount, pMotionVector, pMvdCache, pRefIndex, pCurLayer);
     WELS_READ_VERIFY (ParseInterMotionInfoCabac (pCtx, pNeighAvail, pNonZeroCount, pMotionVector, pMvdCache, pRefIndex));
     pCurLayer->pInterPredictionDoneFlag[iMbXy] = 0;
@@ -1065,7 +1065,7 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAva
 		int16_t pMotionVector[LIST_A][30][MV_A];
 		int16_t pMvdCache[LIST_A][30][MV_A];
 		int8_t  pRefIndex[LIST_A][30];
-		pCurLayer->pMbType[iMbXy] = g_ksInterMbTypeInfo[uiMbType].iType;
+		pCurLayer->pMbType[iMbXy] = g_ksInterBMbTypeInfo[uiMbType].iType;
 		WelsFillCacheInterCabac(pNeighAvail, pNonZeroCount, pMotionVector, pMvdCache, pRefIndex, pCurLayer);
 		WELS_READ_VERIFY(ParseInterMotionInfoCabac(pCtx, pNeighAvail, pNonZeroCount, pMotionVector, pMvdCache, pRefIndex));
 		pCurLayer->pInterPredictionDoneFlag[iMbXy] = 0;
@@ -1376,7 +1376,7 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 
 	if (uiCode) {
 		int16_t pMv[LIST_A][2] = { 0 };
-		pCurLayer->pMbType[iMbXy] = MB_TYPE_SKIP;
+		pCurLayer->pMbType[iMbXy] = MB_TYPE_SKIP | MB_TYPE_DIRECT;
 		ST32(&pCurLayer->pNzc[iMbXy][0], 0);
 		ST32(&pCurLayer->pNzc[iMbXy][4], 0);
 		ST32(&pCurLayer->pNzc[iMbXy][8], 0);
@@ -1391,11 +1391,27 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 		
 		if (pSliceHeader->iDirectSpatialMvPredFlag) {
 			//predict direct spatial mv
-			PredDirectSpatialMvFromNeighbor(pCurLayer, pMv);
+			PredBDirectSpatialMvFromNeighbor(pCurLayer, pMv);
+			/*if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
+			 //To be implemented
+				PredBDirect8x8Spatial(pCtx);
+			}
+			else {
+			  //To be implemented
+				PredBDirect4x4Spatial(pCtx);
+			}*/
 		}
 		else {
 			//temporal direct mode
 			ComputeColocated(pCtx);
+			if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
+				//To be implemented
+				PredBDirect8x8Temporal(pCtx);
+			}
+			else {
+				//To be implemented
+				PredBDirect4x4Temporal(pCtx);
+			}
 		}
 		for (i = 0; i < 16; i++) {
 			ST32(pCurLayer->pMv[LIST_0][iMbXy][i], *(uint32_t*)pMv[LIST_0]);
@@ -1405,7 +1421,7 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 		}
 
 		// just for fill_caches. pred_direct_motion will set the real mb_type
-		//	mb_type |= MB_TYPE_L0L1 | MB_TYPE_DIRECT2 | MB_TYPE_SKIP;
+		//	mb_type |= MB_TYPE_L0L1 | MB_TYPE_DIRECT | MB_TYPE_SKIP;
 		//	if (sl->direct_spatial_mv_pred) {
 		//		fill_decode_neighbors(h, sl, mb_type);
 		//		fill_decode_caches(h, sl, mb_type); //FIXME check what is needed and what not ...
@@ -1923,7 +1939,7 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
   if (uiMbType < 5) { //inter MB type
     int16_t iMotionVector[LIST_A][30][MV_A];
     int8_t  iRefIndex[LIST_A][30];
-    pCurLayer->pMbType[iMbXy] = g_ksInterMbTypeInfo[uiMbType].iType;
+    pCurLayer->pMbType[iMbXy] = g_ksInterPMbTypeInfo[uiMbType].iType;
     WelsFillCacheInter (&sNeighAvail, pNonZeroCount, iMotionVector, iRefIndex, pCurLayer);
 
     if ((iRet = ParseInterInfo (pCtx, iMotionVector, iRefIndex, pBs)) != ERR_NONE) {

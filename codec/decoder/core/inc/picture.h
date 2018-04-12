@@ -39,9 +39,10 @@
 namespace WelsDec {
 
 /*
- *  Reconstructed Picture definition
- *  It is used to express reference picture, also consequent reconstruction picture for output
- */
+*  Reconstructed Picture definition
+*  It is used to express reference picture, also consequent reconstruction picture for output
+*/
+struct	SPicMotionParams;
 typedef struct TagPicture {
 /************************************payload data*********************************/
 uint8_t*        pBuffer[4];             // pointer to the first allocated byte, basical offset of buffer, dimension:
@@ -82,8 +83,18 @@ bool bNewSeqBegin;
 int32_t iMbEcedNum;
 int32_t iMbEcedPropNum;
 int32_t iMbNum;
+
+SPicMotionParams **pMvInfo;
+
 } SPicture, *PPicture; // "Picture" declaration is comflict with Mac system
 
+//! definition of pic motion parameters
+typedef struct SPicMotionParams
+{
+	PPicture								 refPic[2];  //!< referrence picture pointer
+	int8_t                   refIdx[2];  //!< reference picture   [list][subblock_y][subblock_x]
+	int16_t									 Mv[2][2];      //!< motion vector  
+} SPicMotionParams, *PPicMotionParams;
 } // namespace WelsDec
 
 #endif//WELS_PICTURE_H__

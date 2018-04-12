@@ -175,11 +175,11 @@ int32_t ParseEndOfSliceCabac (PWelsDecoderContext pCtx, uint32_t& uiBinVal) {
 int32_t ParseSkipFlagCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail, uint32_t& uiSkip) {
   uiSkip = 0;
 	int32_t iCtxInc = NEW_CTX_OFFSET_SKIP;
-  iCtxInc += (pNeighAvail->iLeftAvail && pNeighAvail->iLeftType != MB_TYPE_SKIP) + (pNeighAvail->iTopAvail
-                    && pNeighAvail->iTopType  != MB_TYPE_SKIP);
+  iCtxInc += (pNeighAvail->iLeftAvail && !IS_SKIP(pNeighAvail->iLeftType)) + (pNeighAvail->iTopAvail
+                    && !IS_SKIP(pNeighAvail->iTopType));
 	if (B_SLICE == pCtx->eSliceType)
 		iCtxInc += 13;
-  PWelsCabacCtx pBinCtx = (pCtx->pCabacCtx + NEW_CTX_OFFSET_SKIP + iCtxInc);
+  PWelsCabacCtx pBinCtx = (pCtx->pCabacCtx + iCtxInc);
   WELS_READ_VERIFY (DecodeBinCabac (pCtx->pCabacDecEngine, pBinCtx, uiSkip));
   return ERR_NONE;
 }
@@ -290,9 +290,8 @@ int32_t ParseMBTypeBSliceCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNeighA
 	PWelsCabacDecEngine pCabacDecEngine = pCtx->pCabacDecEngine;
 	PWelsCabacCtx pBinCtx = pCtx->pCabacCtx + 27; //B slice
 
-#pragma message("Fix me")
-	//iIdxA = (pNeighAvail->iLeftAvail) && (!is_direct(pNeighAvail->iLeftType));
-	//iIdxB = (pNeighAvail->iTopAvail) && (!is_direct(pNeighAvail->iTopType));
+	iIdxA = (pNeighAvail->iLeftAvail) && !IS_DIRECT(pNeighAvail->iLeftType);
+	iIdxB = (pNeighAvail->iTopAvail) && !IS_DIRECT(pNeighAvail->iTopType);
 
 	iCtxInc = iIdxA + iIdxB;
 	WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + iCtxInc, uiCode));
