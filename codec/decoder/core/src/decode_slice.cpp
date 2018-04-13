@@ -1060,8 +1060,7 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAva
 	pCurLayer->pInterPredictionDoneFlag[iMbXy] = 0;
 
 	WELS_READ_VERIFY(ParseMBTypeBSliceCabac(pCtx, pNeighAvail, uiMbType));
-	// uiMbType = 4 is not allowded.
-	if (uiMbType < 4) { //Inter mode
+	if (uiMbType < 23) { //Inter B mode
 		int16_t pMotionVector[LIST_A][30][MV_A];
 		int16_t pMvdCache[LIST_A][30][MV_A];
 		int8_t  pRefIndex[LIST_A][30];
@@ -1071,7 +1070,7 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAva
 		pCurLayer->pInterPredictionDoneFlag[iMbXy] = 0;
 	}
 	else { //Intra mode
-		uiMbType -= 5;
+		uiMbType -= 23;
 		if (uiMbType > 25)
 			return GENERATE_ERROR_NO(ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_MB_TYPE);
 		if (!pCtx->pSps->uiChromaFormatIdc && ((uiMbType >= 5 && uiMbType <= 12) || (uiMbType >= 17 && uiMbType <= 24)))
