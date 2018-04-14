@@ -304,6 +304,7 @@ typedef struct TagNalUnitHeaderExt {
 #define IS_INTRA16x16(type) ( MB_TYPE_INTRA16x16 == (type) )
 #define IS_INTRA(type) ( (type)&MB_TYPE_INTRA )
 #define IS_INTER(type) ( (type)&MB_TYPE_INTER )
+#define IS_INTER_16x16(type) ( (type)&MB_TYPE_16x16 )
 
 #define IS_SKIP(type) ( (type)&MB_TYPE_SKIP )
 #define IS_DIRECT(type) ( (type)&MB_TYPE_DIRECT )
