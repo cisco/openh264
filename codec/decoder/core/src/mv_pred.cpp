@@ -433,17 +433,17 @@ void PredBDirect4x4Temporal(PWelsDecoderContext pCtx) {
 }
 
 //basic iMVs prediction unit for iMVs partition width (4, 2, 1)
-void PredMv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30],
-             int32_t iPartIdx, int32_t iPartWidth, int8_t iRef, int16_t iMVP[2]) {
+void PredMv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30], 
+	int32_t listIdx, int32_t iPartIdx, int32_t iPartWidth, int8_t iRef, int16_t iMVP[2]) {
   const uint8_t kuiLeftIdx      = g_kuiCache30ScanIdx[iPartIdx] - 1;
   const uint8_t kuiTopIdx       = g_kuiCache30ScanIdx[iPartIdx] - 6;
   const uint8_t kuiRightTopIdx  = kuiTopIdx + iPartWidth;
   const uint8_t kuiLeftTopIdx   = kuiTopIdx - 1;
 
-  const int8_t kiLeftRef      = iRefIndex[0][kuiLeftIdx];
-  const int8_t kiTopRef       = iRefIndex[0][ kuiTopIdx];
-  const int8_t kiRightTopRef  = iRefIndex[0][kuiRightTopIdx];
-  const int8_t kiLeftTopRef   = iRefIndex[0][ kuiLeftTopIdx];
+  const int8_t kiLeftRef      = iRefIndex[listIdx][kuiLeftIdx];
+  const int8_t kiTopRef       = iRefIndex[listIdx][ kuiTopIdx];
+  const int8_t kiRightTopRef  = iRefIndex[listIdx][kuiRightTopIdx];
+  const int8_t kiLeftTopRef   = iRefIndex[listIdx][ kuiLeftTopIdx];
   int8_t iDiagonalRef  = kiRightTopRef;
 
   int8_t iMatchRef = 0;
@@ -451,9 +451,9 @@ void PredMv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][3
 
   int16_t iAMV[2], iBMV[2], iCMV[2];
 
-  ST32 (iAMV, LD32 (iMotionVector[0][     kuiLeftIdx]));
-  ST32 (iBMV, LD32 (iMotionVector[0][      kuiTopIdx]));
-  ST32 (iCMV, LD32 (iMotionVector[0][kuiRightTopIdx]));
+  ST32 (iAMV, LD32 (iMotionVector[listIdx][     kuiLeftIdx]));
+  ST32 (iBMV, LD32 (iMotionVector[listIdx][      kuiTopIdx]));
+  ST32 (iCMV, LD32 (iMotionVector[listIdx][kuiRightTopIdx]));
 
   if (REF_NOT_AVAIL == iDiagonalRef) {
     iDiagonalRef = kiLeftTopRef;
@@ -481,50 +481,50 @@ void PredMv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][3
   }
 }
 void PredInter8x16Mv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30],
-                      int32_t iPartIdx, int8_t iRef, int16_t iMVP[2]) {
+											int32_t listIdx, int32_t iPartIdx, int8_t iRef, int16_t iMVP[2]) {
   if (0 == iPartIdx) {
-    const int8_t kiLeftRef = iRefIndex[0][6];
+    const int8_t kiLeftRef = iRefIndex[listIdx][6];
     if (iRef == kiLeftRef) {
-      ST32 (iMVP, LD32 (&iMotionVector[0][6][0]));
+      ST32 (iMVP, LD32 (&iMotionVector[listIdx][6][0]));
       return;
     }
   } else { // 1 == iPartIdx
-    int8_t iDiagonalRef = iRefIndex[0][5]; //top-right
+    int8_t iDiagonalRef = iRefIndex[listIdx][5]; //top-right
     int8_t index = 5;
     if (REF_NOT_AVAIL == iDiagonalRef) {
-      iDiagonalRef = iRefIndex[0][2]; //top-left for 8*8 block(index 1)
+      iDiagonalRef = iRefIndex[listIdx][2]; //top-left for 8*8 block(index 1)
       index = 2;
     }
     if (iRef == iDiagonalRef) {
-      ST32 (iMVP, LD32 (&iMotionVector[0][index][0]));
+      ST32 (iMVP, LD32 (&iMotionVector[listIdx][index][0]));
       return;
     }
   }
 
-  PredMv (iMotionVector, iRefIndex, iPartIdx, 2, iRef, iMVP);
+  PredMv (iMotionVector, iRefIndex, listIdx, iPartIdx, 2, iRef, iMVP);
 }
 void PredInter16x8Mv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30],
-                      int32_t iPartIdx, int8_t iRef, int16_t iMVP[2]) {
+											int32_t listIdx, int32_t iPartIdx, int8_t iRef, int16_t iMVP[2]) {
   if (0 == iPartIdx) {
-    const int8_t kiTopRef = iRefIndex[0][1];
+    const int8_t kiTopRef = iRefIndex[listIdx][1];
     if (iRef == kiTopRef) {
-      ST32 (iMVP, LD32 (&iMotionVector[0][1][0]));
+      ST32 (iMVP, LD32 (&iMotionVector[listIdx][1][0]));
       return;
     }
   } else { // 8 == iPartIdx
-    const int8_t kiLeftRef = iRefIndex[0][18];
+    const int8_t kiLeftRef = iRefIndex[listIdx][18];
     if (iRef == kiLeftRef) {
-      ST32 (iMVP, LD32 (&iMotionVector[0][18][0]));
+      ST32 (iMVP, LD32 (&iMotionVector[listIdx][18][0]));
       return;
     }
   }
 
-  PredMv (iMotionVector, iRefIndex, iPartIdx, 4, iRef, iMVP);
+  PredMv (iMotionVector, iRefIndex, listIdx, iPartIdx, 4, iRef, iMVP);
 }
 
 //update iMVs and iRefIndex cache for current MB, only for P_16*16 (SKIP inclusive)
 /* can be further optimized */
-void UpdateP16x16MotionInfo (PDqLayer pCurDqLayer, int8_t iRef, int16_t iMVs[2]) {
+void UpdateP16x16MotionInfo (PDqLayer pCurDqLayer, int32_t listIdx, int8_t iRef, int16_t iMVs[2]) {
   const int16_t kiRef2 = (iRef << 8) | iRef;
   const int32_t kiMV32 = LD32 (iMVs);
   int32_t i;
@@ -535,21 +535,21 @@ void UpdateP16x16MotionInfo (PDqLayer pCurDqLayer, int8_t iRef, int16_t iMVs[2])
     const uint8_t kuiScan4Idx = g_kuiScan4[i];
     const uint8_t kuiScan4IdxPlus4 = 4 + kuiScan4Idx;
 
-    ST16 (&pCurDqLayer->pRefIndex[0][iMbXy][kuiScan4Idx ], kiRef2);
-    ST16 (&pCurDqLayer->pRefIndex[0][iMbXy][kuiScan4IdxPlus4], kiRef2);
+    ST16 (&pCurDqLayer->pRefIndex[listIdx][iMbXy][kuiScan4Idx ], kiRef2);
+    ST16 (&pCurDqLayer->pRefIndex[listIdx][iMbXy][kuiScan4IdxPlus4], kiRef2);
 
-    ST32 (pCurDqLayer->pMv[0][iMbXy][  kuiScan4Idx ], kiMV32);
-    ST32 (pCurDqLayer->pMv[0][iMbXy][1 + kuiScan4Idx ], kiMV32);
-    ST32 (pCurDqLayer->pMv[0][iMbXy][  kuiScan4IdxPlus4], kiMV32);
-    ST32 (pCurDqLayer->pMv[0][iMbXy][1 + kuiScan4IdxPlus4], kiMV32);
+    ST32 (pCurDqLayer->pMv[listIdx][iMbXy][  kuiScan4Idx ], kiMV32);
+    ST32 (pCurDqLayer->pMv[listIdx][iMbXy][1 + kuiScan4Idx ], kiMV32);
+    ST32 (pCurDqLayer->pMv[listIdx][iMbXy][  kuiScan4IdxPlus4], kiMV32);
+    ST32 (pCurDqLayer->pMv[listIdx][iMbXy][1 + kuiScan4IdxPlus4], kiMV32);
   }
 }
 
 //update iRefIndex and iMVs of Mb, only for P16x8
 /*need further optimization, mb_cache not work */
-void UpdateP16x8MotionInfo (PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A][30][MV_A],
-                            int8_t iRefIndex[LIST_A][30],
-                            int32_t iPartIdx, int8_t iRef, int16_t iMVs[2]) {
+void UpdateP16x8MotionInfo (PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A][30][MV_A], 
+														int8_t iRefIndex[LIST_A][30],
+														int32_t listIdx, int32_t iPartIdx, int8_t iRef, int16_t iMVs[2]) {
   const int16_t kiRef2 = (iRef << 8) | iRef;
   const int32_t kiMV32 = LD32 (iMVs);
   int32_t i;
@@ -561,25 +561,25 @@ void UpdateP16x8MotionInfo (PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A][
     const uint8_t kuiCacheIdxPlus6 = 6 + kuiCacheIdx;
 
     //mb
-    ST16 (&pCurDqLayer->pRefIndex[0][iMbXy][kuiScan4Idx ], kiRef2);
-    ST16 (&pCurDqLayer->pRefIndex[0][iMbXy][kuiScan4IdxPlus4], kiRef2);
-    ST32 (pCurDqLayer->pMv[0][iMbXy][  kuiScan4Idx ], kiMV32);
-    ST32 (pCurDqLayer->pMv[0][iMbXy][1 + kuiScan4Idx ], kiMV32);
-    ST32 (pCurDqLayer->pMv[0][iMbXy][  kuiScan4IdxPlus4], kiMV32);
-    ST32 (pCurDqLayer->pMv[0][iMbXy][1 + kuiScan4IdxPlus4], kiMV32);
+    ST16 (&pCurDqLayer->pRefIndex[listIdx][iMbXy][kuiScan4Idx ], kiRef2);
+    ST16 (&pCurDqLayer->pRefIndex[listIdx][iMbXy][kuiScan4IdxPlus4], kiRef2);
+    ST32 (pCurDqLayer->pMv[listIdx][iMbXy][  kuiScan4Idx ], kiMV32);
+    ST32 (pCurDqLayer->pMv[listIdx][iMbXy][1 + kuiScan4Idx ], kiMV32);
+    ST32 (pCurDqLayer->pMv[listIdx][iMbXy][  kuiScan4IdxPlus4], kiMV32);
+    ST32 (pCurDqLayer->pMv[listIdx][iMbXy][1 + kuiScan4IdxPlus4], kiMV32);
     //cache
     ST16 (&iRefIndex[0][kuiCacheIdx ], kiRef2);
     ST16 (&iRefIndex[0][kuiCacheIdxPlus6], kiRef2);
-    ST32 (iMotionVector[0][  kuiCacheIdx ], kiMV32);
-    ST32 (iMotionVector[0][1 + kuiCacheIdx ], kiMV32);
-    ST32 (iMotionVector[0][  kuiCacheIdxPlus6], kiMV32);
-    ST32 (iMotionVector[0][1 + kuiCacheIdxPlus6], kiMV32);
+    ST32 (iMotionVector[listIdx][  kuiCacheIdx ], kiMV32);
+    ST32 (iMotionVector[listIdx][1 + kuiCacheIdx ], kiMV32);
+    ST32 (iMotionVector[listIdx][  kuiCacheIdxPlus6], kiMV32);
+    ST32 (iMotionVector[listIdx][1 + kuiCacheIdxPlus6], kiMV32);
   }
 }
 //update iRefIndex and iMVs of both Mb and Mb_cache, only for P8x16
-void UpdateP8x16MotionInfo (PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A][30][MV_A],
-                            int8_t iRefIndex[LIST_A][30],
-                            int32_t iPartIdx, int8_t iRef, int16_t iMVs[2]) {
+void UpdateP8x16MotionInfo (PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A][30][MV_A], 
+														int8_t iRefIndex[LIST_A][30], 
+														int32_t listIdx, int32_t iPartIdx, int8_t iRef, int16_t iMVs[2]) {
   const int16_t kiRef2 = (iRef << 8) | iRef;
   const int32_t kiMV32 = LD32 (iMVs);
   int32_t i;
@@ -592,19 +592,19 @@ void UpdateP8x16MotionInfo (PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A][
     const uint8_t kuiCacheIdxPlus6 = 6 + kuiCacheIdx;
 
     //mb
-    ST16 (&pCurDqLayer->pRefIndex[0][iMbXy][kuiScan4Idx ], kiRef2);
-    ST16 (&pCurDqLayer->pRefIndex[0][iMbXy][kuiScan4IdxPlus4], kiRef2);
-    ST32 (pCurDqLayer->pMv[0][iMbXy][  kuiScan4Idx ], kiMV32);
-    ST32 (pCurDqLayer->pMv[0][iMbXy][1 + kuiScan4Idx ], kiMV32);
-    ST32 (pCurDqLayer->pMv[0][iMbXy][  kuiScan4IdxPlus4], kiMV32);
-    ST32 (pCurDqLayer->pMv[0][iMbXy][1 + kuiScan4IdxPlus4], kiMV32);
+    ST16 (&pCurDqLayer->pRefIndex[listIdx][iMbXy][kuiScan4Idx ], kiRef2);
+    ST16 (&pCurDqLayer->pRefIndex[listIdx][iMbXy][kuiScan4IdxPlus4], kiRef2);
+    ST32 (pCurDqLayer->pMv[listIdx][iMbXy][  kuiScan4Idx ], kiMV32);
+    ST32 (pCurDqLayer->pMv[listIdx][iMbXy][1 + kuiScan4Idx ], kiMV32);
+    ST32 (pCurDqLayer->pMv[listIdx][iMbXy][  kuiScan4IdxPlus4], kiMV32);
+    ST32 (pCurDqLayer->pMv[listIdx][iMbXy][1 + kuiScan4IdxPlus4], kiMV32);
     //cache
-    ST16 (&iRefIndex[0][kuiCacheIdx ], kiRef2);
-    ST16 (&iRefIndex[0][kuiCacheIdxPlus6], kiRef2);
-    ST32 (iMotionVector[0][  kuiCacheIdx ], kiMV32);
-    ST32 (iMotionVector[0][1 + kuiCacheIdx ], kiMV32);
-    ST32 (iMotionVector[0][  kuiCacheIdxPlus6], kiMV32);
-    ST32 (iMotionVector[0][1 + kuiCacheIdxPlus6], kiMV32);
+    ST16 (&iRefIndex[listIdx][kuiCacheIdx ], kiRef2);
+    ST16 (&iRefIndex[listIdx][kuiCacheIdxPlus6], kiRef2);
+    ST32 (iMotionVector[listIdx][  kuiCacheIdx ], kiMV32);
+    ST32 (iMotionVector[listIdx][1 + kuiCacheIdx ], kiMV32);
+    ST32 (iMotionVector[listIdx][  kuiCacheIdxPlus6], kiMV32);
+    ST32 (iMotionVector[listIdx][1 + kuiCacheIdxPlus6], kiMV32);
   }
 }
 
