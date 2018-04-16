@@ -778,8 +778,8 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 		}
 		else if (type == (MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_P1L0 | MB_TYPE_P1L1)) {
 			list[0][0] = LIST_0;
-			list[1][0] = LIST_1;
-			list[0][1] = LIST_0;
+			list[0][1] = LIST_1;
+			list[1][0] = LIST_0;
 			list[1][1] = LIST_1;
 		}
 		for (int32_t i = 0; i < 2; i++) {
