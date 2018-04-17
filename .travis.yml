@@ -7,11 +7,17 @@ compiler:
 
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq nasm g++-multilib gcc-multilib libc6-dev-i386
+  - sudo apt-get install -qq nasm g++-multilib gcc-multilib libc6-dev-i386 python3-pip unzip
+  - sudo python3 -m pip install meson==0.44.1
+  - wget https://github.com/ninja-build/ninja/releases/download/v1.8.2/ninja-linux.zip
+  - unzip ninja-linux.zip
+  - export PATH=$PATH:$PWD
 
 install:
   - make gmp-bootstrap
   - make gtest-bootstrap
+  - meson builddir
+  - ninja -C builddir -v
 
 before_script:
   - WorkingDir=`pwd`
@@ -36,3 +42,4 @@ script:
   -  echo "currrent test is for ${TASK}"
   -  echo "test parameter is ${TestParameter}"
   -  ./run_Test.sh ${TASK}  ${TestParameter}
+  -  if [ ${TASK} == "UnitTest" ]; then echo "Running meson test suite"; meson test -C builddir -v; fi
