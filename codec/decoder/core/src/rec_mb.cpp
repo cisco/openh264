@@ -331,6 +331,57 @@ void WeightPrediction (PDqLayer pCurDqLayer, sMCRefMember* pMCRefMem, int32_t iR
   }
 }
 
+void BiWeightPrediction(PDqLayer pCurDqLayer, sMCRefMember* pMCRefMem, sMCRefMember* pMCRefMem1, sMCRefMember* pMCRefMem2, int32_t iRefIdx1, int32_t iRefIdx2, int32_t iBlkWidth,
+	int32_t iBlkHeight) {
+	int32_t iLog2denom, iWoc1, iOoc1, iWoc2, iOoc2;
+	int32_t iPredTemp, iLineStride;
+	int32_t iPixel = 0;
+	//luma
+	iLog2denom = pCurDqLayer->pPredWeightTable->uiLumaLog2WeightDenom;
+	iWoc1 = pCurDqLayer->pPredWeightTable->sPredList[LIST_0].iLumaWeight[iRefIdx1];
+	iOoc1 = pCurDqLayer->pPredWeightTable->sPredList[LIST_0].iLumaOffset[iRefIdx1];
+	iWoc2 = pCurDqLayer->pPredWeightTable->sPredList[LIST_1].iLumaWeight[iRefIdx2];
+	iOoc2 = pCurDqLayer->pPredWeightTable->sPredList[LIST_1].iLumaOffset[iRefIdx2];
+	iLineStride = pMCRefMem->iDstLineLuma;
+
+	for (int i = 0; i < iBlkHeight; i++) {
+		for (int j = 0; j < iBlkWidth; j++) {
+			iPixel = j + i * (iLineStride);
+				iPredTemp = ((pMCRefMem1->pDstY[iPixel] * iWoc1 + pMCRefMem2->pDstY[iPixel] * iWoc2 + (1 << iLog2denom)) >> (iLog2denom+1)) + ((iOoc1 + iOoc2+1) >> 1);
+				pMCRefMem->pDstY[iPixel] = WELS_CLIP3(iPredTemp, 0, 255);
+		}
+	}
+
+	//UV
+	iBlkWidth = iBlkWidth >> 1;
+	iBlkHeight = iBlkHeight >> 1;
+	iLog2denom = pCurDqLayer->pPredWeightTable->uiChromaLog2WeightDenom;
+	iLineStride = pMCRefMem1->iDstLineChroma;
+
+	uint8_t* pDst;
+	uint8_t* pDst1;
+	uint8_t* pDst2;
+	for (int i = 0; i < 2; i++) {
+		//iLog2denom = pCurDqLayer->pPredWeightTable->uiChromaLog2WeightDenom;
+		iWoc1 = pCurDqLayer->pPredWeightTable->sPredList[LIST_0].iChromaWeight[iRefIdx1][i];
+		iOoc1 = pCurDqLayer->pPredWeightTable->sPredList[LIST_0].iChromaOffset[iRefIdx1][i];
+		iWoc2 = pCurDqLayer->pPredWeightTable->sPredList[LIST_1].iChromaWeight[iRefIdx2][i];
+		iOoc2 = pCurDqLayer->pPredWeightTable->sPredList[LIST_1].iChromaOffset[iRefIdx2][i];
+		pDst  = i ? pMCRefMem->pDstV : pMCRefMem->pDstU;
+		pDst1 = i ? pMCRefMem1->pDstV : pMCRefMem1->pDstU;
+		pDst2 = i ? pMCRefMem2->pDstV : pMCRefMem2->pDstU;
+		//iLineStride = pMCRefMem->iDstLineChroma;
+
+		for (int i = 0; i < iBlkHeight; i++) {
+			for (int j = 0; j < iBlkWidth; j++) {
+				iPixel = j + i * (iLineStride);
+				iPredTemp = ((pMCRefMem1->pDstY[iPixel] * iWoc1 + pMCRefMem2->pDstY[iPixel] * iWoc2 + (1 << iLog2denom)) >> (iLog2denom + 1)) + ((iOoc1 + iOoc2 + 1) >> 1);
+				pMCRefMem->pDstY[iPixel] = WELS_CLIP3(iPredTemp, 0, 255);
+			}
+		}
+	}
+}
+
 
 void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDecoderContext pCtx) {
   sMCRefMember pMCRefMem;
@@ -585,7 +636,7 @@ void GetInterBPred(uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDec
 			if (pCurDqLayer->sLayerInfo.pPps->uiWeightedBipredIdc) {
 				iRefIndex1 = pCurDqLayer->pRefIndex[LIST_0][iMBXY][0];
 				iRefIndex2 = pCurDqLayer->pRefIndex[LIST_0][iMBXY][0];
-//				BiWeightPrediction(pCurDqLayer, &pMCRefMem, &pMCRefMem1, &pMCRefMem2, iRefIndex1, iRefIndex2, 16, 16);
+				BiWeightPrediction(pCurDqLayer, &pMCRefMem, &pMCRefMem1, &pMCRefMem2, iRefIndex1, iRefIndex2, 16, 16);
 			}
 		}
 		else if ((iMBType & MB_TYPE_P0L0) || (iMBType & MB_TYPE_P0L1)) {

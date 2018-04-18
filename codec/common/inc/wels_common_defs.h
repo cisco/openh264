@@ -297,7 +297,7 @@ typedef struct TagNalUnitHeaderExt {
 #define SUB_MB_TYPE_4x4     0x00000008
 
 #define MB_TYPE_INTRA     (MB_TYPE_INTRA4x4 | MB_TYPE_INTRA16x16 | MB_TYPE_INTRA8x8 | MB_TYPE_INTRA_PCM)
-#define MB_TYPE_INTER     (MB_TYPE_16x16 | MB_TYPE_16x8 | MB_TYPE_8x16 | MB_TYPE_8x8 | MB_TYPE_8x8_REF0 | MB_TYPE_SKIP)
+#define MB_TYPE_INTER     (MB_TYPE_16x16 | MB_TYPE_16x8 | MB_TYPE_8x16 | MB_TYPE_8x8 | MB_TYPE_8x8_REF0 | MB_TYPE_SKIP | MB_TYPE_DIRECT)
 #define IS_INTRA4x4(type) ( MB_TYPE_INTRA4x4 == (type) )
 #define IS_INTRA8x8(type) ( MB_TYPE_INTRA8x8 == (type) )
 #define IS_INTRANxN(type) ( MB_TYPE_INTRA4x4 == (type) || MB_TYPE_INTRA8x8 == (type) )
