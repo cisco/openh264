@@ -1060,7 +1060,35 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAva
 	pCurLayer->pInterPredictionDoneFlag[iMbXy] = 0;
 
 	WELS_READ_VERIFY(ParseMBTypeBSliceCabac(pCtx, pNeighAvail, uiMbType));
-	if (uiMbType < 23) { //Inter B mode
+	if (uiMbType == 0) { //B_Direct_16x16
+		if (pSliceHeader->iDirectSpatialMvPredFlag) {
+			//predict direct spatial mv
+			int16_t pMv[LIST_A][2] = { 0 };
+			PredBDirectSpatialMvFromNeighbor(pCurLayer, pMv);
+			/*if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
+			//To be implemented
+			PredBDirect8x8Spatial(pCtx);
+			}
+			else {
+			//To be implemented
+			PredBDirect4x4Spatial(pCtx);
+			}*/
+		}
+		else {
+			//temporal direct mode
+			ComputeColocated(pCtx);
+			if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
+				//To be implemented
+				PredBDirect8x8Temporal(pCtx);
+			}
+			else {
+				//To be implemented
+				PredBDirect4x4Temporal(pCtx);
+			}
+		}
+		//...
+	}
+	else if (uiMbType < 23) { //Inter B mode
 		int16_t pMotionVector[LIST_A][30][MV_A];
 		int16_t pMvdCache[LIST_A][30][MV_A];
 		int8_t  pRefIndex[LIST_A][30];
@@ -1138,7 +1166,7 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAva
 		if (MB_TYPE_INTRA16x16 != pCurLayer->pMbType[iMbXy]) {
 			// Need modification when B picutre add in
 			bool bNeedParseTransformSize8x8Flag =
-				(((pCurLayer->pMbType[iMbXy] >= MB_TYPE_16x16 && pCurLayer->pMbType[iMbXy] <= MB_TYPE_8x16)
+				(((IS_INTER_16x16(pCurLayer->pMbType[iMbXy]) || IS_INTER_16x8(pCurLayer->pMbType[iMbXy]) || IS_INTER_8x16(pCurLayer->pMbType[iMbXy]))
 					|| pCurLayer->pNoSubMbPartSizeLessThan8x8Flag[iMbXy])
 					&& (pCurLayer->pMbType[iMbXy] != MB_TYPE_INTRA8x8)
 					&& (pCurLayer->pMbType[iMbXy] != MB_TYPE_INTRA4x4)

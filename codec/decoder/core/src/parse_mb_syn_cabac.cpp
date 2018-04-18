@@ -899,7 +899,6 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 	else if (mbType == MB_TYPE_8x8) {
 		int8_t pRefIdx[4] = { 0 }, pSubPartCount[4], pPartW[4];
 		uint32_t uiSubMbType;
-		pCurDqLayer->pNoSubMbPartSizeLessThan8x8Flag[iMbXy] = true;
 		//sub_mb_type, partition
 		for (int32_t i = 0; i < 4; i++) {
 			WELS_READ_VERIFY(ParseBSubMBTypeCabac(pCtx, pNeighAvail, uiSubMbType));
@@ -911,7 +910,8 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 			pPartW[i] = g_ksInterBSubMbTypeInfo[uiSubMbType].iPartWidth;
 
 			// Need modification when B picture add in, reference to 7.3.5
-			pCurDqLayer->pNoSubMbPartSizeLessThan8x8Flag[iMbXy] &= (uiSubMbType >= 1 && uiSubMbType <= 3);
+			if (pSubPartCount[i] > 1)
+				pCurDqLayer->pNoSubMbPartSizeLessThan8x8Flag[iMbXy] = false;
 		}
 
 		for (int32_t i = 0; i < 4; i++) {
@@ -919,7 +919,32 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 			int32_t subMbType = pCurDqLayer->pSubMbType[iMbXy][i];
 			int32_t list[2] = { -1 };
 			if (pCurDqLayer->pSubMbType[iMbXy][i] == MB_TYPE_DIRECT) {
-				//Add processing for DIRECT 
+				if (pSliceHeader->iDirectSpatialMvPredFlag) {
+					//predict direct spatial mv
+					int16_t pMv[LIST_A][2] = { 0 };
+					PredBDirectSpatialMvFromNeighbor(pCurDqLayer, pMv);
+					/*if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
+					//To be implemented
+					PredBDirect8x8Spatial(pCtx);
+					}
+					else {
+					//To be implemented
+					PredBDirect4x4Spatial(pCtx);
+					}*/
+				}
+				else {
+					//temporal direct mode
+					ComputeColocated(pCtx);
+					if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
+						//To be implemented
+						PredBDirect8x8Temporal(pCtx);
+					}
+					else {
+						//To be implemented
+						PredBDirect4x4Temporal(pCtx);
+					}
+				}
+				//... 
 				continue;
 			}
 			if (IS_INTER_16x16(pCurDqLayer->pSubMbType[iMbXy][i]))
