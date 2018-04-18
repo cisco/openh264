@@ -285,7 +285,7 @@ static const SPartMbInfo g_ksInterPSubMbTypeInfo[4] = {
 
 //Table 7.18 – Sub-macroblock types in B macroblocks.
 static const SPartMbInfo g_ksInterBSubMbTypeInfo[] = {
-	{ MB_TYPE_DIRECT,																4, 2 },	//B_Direct_8x8
+	{ MB_TYPE_DIRECT,																1, 2 },	//B_Direct_8x8
 	{ MB_TYPE_16x16 | MB_TYPE_P0L0,									1, 2 },	//B_L0_8x8
 	{ MB_TYPE_16x16 | MB_TYPE_P0L1,									1, 2 },	//B_L1_8x8
 	{ MB_TYPE_16x16 | MB_TYPE_P0L0 | MB_TYPE_P0L1,	1, 2 },	//B_Bi_8x8

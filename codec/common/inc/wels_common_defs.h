@@ -314,7 +314,7 @@ typedef struct TagNalUnitHeaderExt {
 #define IS_SVC_INTER(type) IS_INTER(type)
 #define IS_I_BL(type) ( (type) == MB_TYPE_INTRA_BL )
 #define IS_SVC_INTRA(type) ( IS_I_BL(type) || IS_INTRA(type) )
-#define IS_Inter_8x8(type) ( (type) == MB_TYPE_8x8)
+#define IS_Inter_8x8(type) ( (type)&MB_TYPE_8x8)
 
 #define REF_NOT_AVAIL   -2
 #define REF_NOT_IN_LIST -1  //intra
