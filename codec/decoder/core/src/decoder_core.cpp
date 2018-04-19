@@ -2205,19 +2205,19 @@ static inline void InitDqLayerInfo (PDqLayer pDqLayer, PLayerInfo pLayerInfo, PN
   pDqLayer->uiRefLayerDqId                              = pShExt->uiRefLayerDqId;
   pDqLayer->uiRefLayerChromaPhaseXPlus1Flag             = pShExt->uiRefLayerChromaPhaseXPlus1Flag;
   pDqLayer->uiRefLayerChromaPhaseYPlus1                 = pShExt->uiRefLayerChromaPhaseYPlus1;
+	pDqLayer->bUseWeightPredictionFlag										= false;
+	pDqLayer->bUseWeightedBiPredIdc = false;
   //memcpy(&pDqLayer->sScaledRefLayer, &pShExt->sScaledRefLayer, sizeof(SPosOffset));//confirmed_safe_unsafe_usage
 
-  if (kuiQualityId == BASE_QUALITY_ID) {
-    pDqLayer->pRefPicListReordering     = &pSh->pRefPicListReordering;
-    pDqLayer->pRefPicMarking            = &pSh->sRefMarking;
+	if (kuiQualityId == BASE_QUALITY_ID) {
+		pDqLayer->pRefPicListReordering = &pSh->pRefPicListReordering;
+		pDqLayer->pRefPicMarking = &pSh->sRefMarking;
 
-    if (pSh->pPps->bWeightedPredFlag) {
-      pDqLayer->bUseWeightPredictionFlag = true;
-      pDqLayer->pPredWeightTable    = &pSh->sPredWeightTable;
-
-    } else
-      pDqLayer->bUseWeightPredictionFlag = false;
-
+		pDqLayer->bUseWeightPredictionFlag = pSh->pPps->bWeightedPredFlag;
+		pDqLayer->bUseWeightedBiPredIdc = pSh->pPps->uiWeightedBipredIdc;
+		if (pSh->pPps->bWeightedPredFlag || pSh->pPps->uiWeightedBipredIdc) {
+			pDqLayer->pPredWeightTable = &pSh->sPredWeightTable;
+		}
     pDqLayer->pRefPicBaseMarking        = &pShExt->sRefBasePicMarking;
   }
 

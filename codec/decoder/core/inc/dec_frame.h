@@ -115,7 +115,8 @@ struct TagDqLayer {
   PPicture                  pDec;                   // reconstruction picture pointer for layer
 
   bool                      bUseWeightPredictionFlag;
-  bool                      bStoreRefBasePicFlag;                           // iCurTid == 0 && iCurQid = 0 && bEncodeKeyPic = 1
+	bool                      bUseWeightedBiPredIdc;
+	bool                      bStoreRefBasePicFlag;                           // iCurTid == 0 && iCurQid = 0 && bEncodeKeyPic = 1
   bool                      bTCoeffLevelPredFlag;
   bool                      bConstrainedIntraResamplingFlag;
   uint8_t                   uiRefLayerDqId;
