@@ -651,6 +651,66 @@ void GetInterBPred(uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDec
 			}
 		}
 	}
+	else if (IS_INTER_16x8(iMBType) || IS_INTER_8x16(iMBType)) {
+		int32_t type = iMBType & 0xFFFFFFC0;
+		if (type < (MB_TYPE_P0L0 | MB_TYPE_P1L0 | MB_TYPE_P1L1) ) {
+			int32_t listIdx[2];
+			if (type == (MB_TYPE_P0L0 | MB_TYPE_P1L0)) {
+				listIdx[0] = LIST_0;
+				listIdx[1] = LIST_0;
+			}
+			else if (type == (MB_TYPE_P0L1 | MB_TYPE_P1L1)) {
+				listIdx[0] = LIST_1;
+				listIdx[1] = LIST_1;
+			}
+			else if (type == (MB_TYPE_P0L0 | MB_TYPE_P1L1)) {
+				listIdx[0] = LIST_0;
+				listIdx[1] = LIST_1;
+			}
+			else {
+				listIdx[0] = LIST_1;
+				listIdx[1] = LIST_0;
+			}
+			if (IS_INTER_16x8(iMBType)) {
+				int32_t start_col = 0;
+				for (int32_t i = 0; i < 2; ++i) {
+					iMVs1[0] = pCurDqLayer->pMv[listIdx[i]][iMBXY][start_col][0];
+					iMVs1[1] = pCurDqLayer->pMv[listIdx[i]][iMBXY][start_col][1];
+					GetRefPic(&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[listIdx[i]][iMBXY], 0, listIdx[i]);
+					if (i) {
+						pMCRefMem.pDstY += (iDstLineLuma << 3);
+						pMCRefMem.pDstU += (iDstLineChroma << 2);
+						pMCRefMem.pDstV += (iDstLineChroma << 2);
+					}
+					BaseMC(&pMCRefMem, iMBOffsetX, iMBOffsetY, pMCFunc, 16, 8, iMVs1);
+					if (pCurDqLayer->bUseWeightPredictionFlag) {
+						iRefIndex1 = pCurDqLayer->pRefIndex[listIdx[i]][iMBXY][start_col];
+						WeightPrediction(pCurDqLayer, &pMCRefMem, iRefIndex1, 16, 8);
+					}
+					start_col += 8;
+				}
+			}
+			else { //8x16
+				int32_t start_col = 0;
+				for (int32_t i = 0; i < 2; ++i) {
+					iMVs1[0] = pCurDqLayer->pMv[listIdx[i]][iMBXY][start_col][0];
+					iMVs1[1] = pCurDqLayer->pMv[listIdx[i]][iMBXY][start_col][1];
+					GetRefPic(&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[listIdx[i]][iMBXY], start_col, listIdx[i]);
+					if (i) {
+						pMCRefMem.pDstY += 8;
+						pMCRefMem.pDstU += 4;
+						pMCRefMem.pDstV += 4;
+					}
+					BaseMC(&pMCRefMem, iMBOffsetX + (i ? 8 : 0), iMBOffsetY, pMCFunc, 8, 16, iMVs1);
+					if (pCurDqLayer->bUseWeightPredictionFlag) {
+						iRefIndex1 = pCurDqLayer->pRefIndex[0][iMBXY][start_col];
+						WeightPrediction(pCurDqLayer, &pMCRefMem, iRefIndex1, 8, 16);
+					}
+					start_col += 2;
+				}
+			}
+		}
+	}
 }
 
 int32_t RecChroma (int32_t iMBXY, PWelsDecoderContext pCtx, int16_t* pScoeffLevel, PDqLayer pDqLayer) {
