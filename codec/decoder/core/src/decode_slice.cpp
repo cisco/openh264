@@ -209,7 +209,15 @@ int32_t WelsMbInterConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLayer) {
 	else {
 		if (pCtx->pTempDec == NULL)
 			pCtx->pTempDec = AllocPicture(pCtx, pCtx->pSps->iMbWidth << 4, pCtx->pSps->iMbHeight << 4);
-		GetInterBPred(pDstY, pDstCb, pDstCr, pCtx);
+		uint8_t *  pTempDstYCbCr[3];
+		uint8_t *  pDstYCbCr[3];
+		pTempDstYCbCr[0] = pCtx->pTempDec->pData[0] + ((iMbY * iLumaStride + iMbX) << 4);
+		pTempDstYCbCr[1] = pCtx->pTempDec->pData[1] + ((iMbY * iChromaStride + iMbX) << 3);
+		pTempDstYCbCr[2] = pCtx->pTempDec->pData[2] + ((iMbY * iChromaStride + iMbX) << 3);
+		pDstYCbCr[0] = pDstY;
+		pDstYCbCr[1] = pDstCb;
+		pDstYCbCr[2] = pDstCr;
+		GetInterBPred(pDstYCbCr, pTempDstYCbCr, pCtx);
 	}
   WelsMbInterSampleConstruction (pCtx, pCurLayer, pDstY, pDstCb, pDstCr, iLumaStride, iChromaStride);
 
@@ -294,7 +302,15 @@ int32_t WelsMbInterPrediction (PWelsDecoderContext pCtx, PDqLayer pCurLayer) {
 	else {
 		if (pCtx->pTempDec == NULL)
 			pCtx->pTempDec = AllocPicture(pCtx, pCtx->pSps->iMbWidth << 4, pCtx->pSps->iMbHeight << 4);
-		GetInterBPred(pDstY, pDstCb, pDstCr, pCtx);
+		uint8_t *  pTempDstYCbCr[3];
+		uint8_t *  pDstYCbCr[3];
+		pTempDstYCbCr[0] = pCtx->pTempDec->pData[0] + ((iMbY * iLumaStride + iMbX) << 4);
+		pTempDstYCbCr[1] = pCtx->pTempDec->pData[1] + ((iMbY * iChromaStride + iMbX) << 3);
+		pTempDstYCbCr[2] = pCtx->pTempDec->pData[2] + ((iMbY * iChromaStride + iMbX) << 3);
+		pDstYCbCr[0] = pDstY;
+		pDstYCbCr[1] = pDstCb;
+		pDstYCbCr[2] = pDstCr;
+		GetInterBPred(pDstYCbCr, pTempDstYCbCr, pCtx);
 	}
   return ERR_NONE;
 }
