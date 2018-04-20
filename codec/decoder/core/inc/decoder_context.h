@@ -301,6 +301,8 @@ typedef struct TagWelsDecoderContext {
 // reconstruction picture
   PPicture                      pDec;                   //pointer to current picture being reconstructed
 
+	PPicture											pTempDec;								//pointer to temp decoder picture to be used only for Bi Prediction.
+
 // reference pictures
   SRefPic                       sRefPic;
 

@@ -302,6 +302,8 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
 
   pCtx->pDec                      = NULL;
 
+	pCtx->pTempDec									= NULL;
+
   WelsResetRefPic (pCtx);
 
   pCtx->iActiveFmoNum             = 0;
@@ -461,6 +463,11 @@ void WelsFreeDynamicMemory (PWelsDecoderContext pCtx) {
       DestroyPicBuff (pPicBuff, pMa);
     }
   }
+
+	if (pCtx->pTempDec) {
+		FreePicture(pCtx->pTempDec, pCtx->pMemAlign);
+		pCtx->pTempDec = NULL;
+	}
 
   // added for safe memory
   pCtx->iImgWidthInPixel  = 0;

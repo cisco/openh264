@@ -2214,7 +2214,7 @@ static inline void InitDqLayerInfo (PDqLayer pDqLayer, PLayerInfo pLayerInfo, PN
 		pDqLayer->pRefPicMarking = &pSh->sRefMarking;
 
 		pDqLayer->bUseWeightPredictionFlag = pSh->pPps->bWeightedPredFlag;
-		pDqLayer->bUseWeightedBiPredIdc = pSh->pPps->uiWeightedBipredIdc;
+		pDqLayer->bUseWeightedBiPredIdc = pSh->pPps->uiWeightedBipredIdc != 0;
 		if (pSh->pPps->bWeightedPredFlag || pSh->pPps->uiWeightedBipredIdc) {
 			pDqLayer->pPredWeightTable = &pSh->sPredWeightTable;
 		}

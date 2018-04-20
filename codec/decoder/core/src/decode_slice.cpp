@@ -58,6 +58,8 @@ static inline int32_t iAbs(int32_t x) {
 	return (x ^ y) - y;
 }
 
+extern PPicture AllocPicture(PWelsDecoderContext pCtx, const int32_t kiPicWidth, const int32_t kiPicHeight);
+
 int32_t WelsTargetSliceConstruction (PWelsDecoderContext pCtx) {
   PDqLayer pCurLayer = pCtx->pCurDqLayer;
   PSlice pCurSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
@@ -200,8 +202,15 @@ int32_t WelsMbInterConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLayer) {
   pDstY  = pCurLayer->pDec->pData[0] + ((iMbY * iLumaStride + iMbX) << 4);
   pDstCb = pCurLayer->pDec->pData[1] + ((iMbY * iChromaStride + iMbX) << 3);
   pDstCr = pCurLayer->pDec->pData[2] + ((iMbY * iChromaStride + iMbX) << 3);
-
-  GetInterPred (pDstY, pDstCb, pDstCr, pCtx);
+	
+	if (pCtx->eSliceType == P_SLICE) {
+		GetInterPred(pDstY, pDstCb, pDstCr, pCtx);
+	}
+	else {
+		if (pCtx->pTempDec == NULL)
+			pCtx->pTempDec = AllocPicture(pCtx, pCtx->pSps->iMbWidth << 4, pCtx->pSps->iMbHeight << 4);
+		GetInterBPred(pDstY, pDstCb, pDstCr, pCtx);
+	}
   WelsMbInterSampleConstruction (pCtx, pCurLayer, pDstY, pDstCb, pDstCr, iLumaStride, iChromaStride);
 
   pCtx->sBlockFunc.pWelsSetNonZeroCountFunc (
@@ -279,8 +288,14 @@ int32_t WelsMbInterPrediction (PWelsDecoderContext pCtx, PDqLayer pCurLayer) {
   pDstCb = pCurLayer->pDec->pData[1] + ((iMbY * iChromaStride + iMbX) << 3);
   pDstCr = pCurLayer->pDec->pData[2] + ((iMbY * iChromaStride + iMbX) << 3);
 
-  GetInterPred (pDstY, pDstCb, pDstCr, pCtx);
-
+	if (pCtx->eSliceType == P_SLICE) {
+		GetInterPred(pDstY, pDstCb, pDstCr, pCtx);
+	}
+	else {
+		if (pCtx->pTempDec == NULL)
+			pCtx->pTempDec = AllocPicture(pCtx, pCtx->pSps->iMbWidth << 4, pCtx->pSps->iMbHeight << 4);
+		GetInterBPred(pDstY, pDstCb, pDstCr, pCtx);
+	}
   return ERR_NONE;
 }
 
