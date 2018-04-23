@@ -104,6 +104,11 @@ void PredBDirect4x4Spatial(PWelsDecoderContext pCtx);
 void PrepareDirectParams(PWelsDecoderContext pCtx, int16_t pMv[LIST_A][2], int8_t refFrame[LIST_A]);
 
 /*!
+* \brief   get the motion predictor for B-slice temporal direct mode 16x16
+*/
+void PredBDirect16x16Temporal(PWelsDecoderContext pCtx);
+
+/*!
 * \brief   get the motion predictor for B-slice temporal direct mode 8x8
 */
 void PredBDirect8x8Temporal(PWelsDecoderContext pCtx);

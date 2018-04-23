@@ -199,7 +199,7 @@ bool            bSliceHeaderExtFlag; // Indicate which slice header is used, avc
 uint8_t         eSliceType;
 uint8_t         uiPadding[2];
 int32_t         iLastDeltaQp;
-int16_t         iMvScale[MAX_DPB_COUNT]; //Moton vector scale For Temporal Direct Mode Type
+int16_t         iMvScale[LIST_A][MAX_DPB_COUNT]; //Moton vector scale For Temporal Direct Mode Type
 } SSlice, *PSlice;
 
 } // namespace WelsDec

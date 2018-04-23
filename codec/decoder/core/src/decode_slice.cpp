@@ -1106,16 +1106,9 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAva
 			}*/
 		}
 		else {
-			//temporal direct mode
+			//temporal direct 16x16 mode
 			ComputeColocated(pCtx);
-			if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
-				//To be implemented
-				PredBDirect8x8Temporal(pCtx);
-			}
-			else {
-				//To be implemented
-				PredBDirect4x4Temporal(pCtx);
-			}
+			PredBDirect16x16Temporal(pCtx);
 		}
 		//...
 	}
@@ -2445,19 +2438,19 @@ bool ComputeColocated(PWelsDecoderContext pCtx) {
 	PSlice pCurSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
 	PSliceHeader pSliceHeader = &pCurSlice->sSliceHeaderExt.sSliceHeader;
 	if (!pSliceHeader->iDirectSpatialMvPredFlag) {
-		PPicture* ppRefPicLIST0 = pCtx->sRefPic.pRefList[LIST_0];
-		PPicture* ppRefPicLIST1 = pCtx->sRefPic.pRefList[LIST_1];
 		uint32_t uiShortRefCount = pCtx->sRefPic.uiShortRefCount[LIST_0];
-		for (uint32_t i = 0; i < uiShortRefCount; ++i) {
-			int32_t iTRb = WELS_CLIP3(-128, 127, pSliceHeader->iPicOrderCntLsb - ppRefPicLIST0[i]->iFramePoc);
-			int32_t iTRp = WELS_CLIP3(-128, 127, ppRefPicLIST1[0]->iFramePoc - ppRefPicLIST0[i]->iFramePoc);
-			if (iTRp != 0) {
-				int32_t prescale = (16384 + iAbs(iTRp / 2)) / iTRp;
-				pCurSlice->iMvScale[i] = WELS_CLIP3(-1024, 1023, (iTRb * prescale + 32) >> 6);
-			}
-			else
-			{
-				pCurSlice->iMvScale[i] = 0x03FFF;
+		for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+			for (uint32_t i = 0; i < uiShortRefCount; ++i) {
+				int32_t iTRb = WELS_CLIP3(-128, 127, pSliceHeader->iPicOrderCntLsb - pCtx->sRefPic.pRefList[listIdx][i]->iFramePoc);
+				int32_t iTRp = WELS_CLIP3(-128, 127, pCtx->sRefPic.pRefList[LIST_1][i]->iFramePoc - pCtx->sRefPic.pRefList[LIST_0][i]->iFramePoc);
+				if (iTRp != 0) {
+					int32_t prescale = (16384 + iAbs(iTRp / 2)) / iTRp;
+					pCurSlice->iMvScale[listIdx][i] = WELS_CLIP3(-1024, 1023, (iTRb * prescale + 32) >> 6);
+				}
+				else
+				{
+					pCurSlice->iMvScale[listIdx][i] = 0x03FFF;
+				}
 			}
 		}
 	}
