@@ -108,6 +108,20 @@ PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const
   pPic->iFrameNum      = -1;
   pPic->bAvailableFlag = true;
 
+	pPic->pMbType = (int16_t*)pMa->WelsMallocz(pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof(int16_t),
+		"pPic->pMbType");
+	pPic->pMv[LIST_0] = (int16_t(*)[16][2])pMa->WelsMallocz(pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof(
+		int16_t) * MV_A * MB_BLOCK4x4_NUM, "pPic->pMv[]");
+	pPic->pMv[LIST_1] = (int16_t(*)[16][2])pMa->WelsMallocz(pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof(
+		int16_t) * MV_A * MB_BLOCK4x4_NUM, "pPic->pMv[]");
+
+	pPic->pRefIndex[LIST_0] = (int8_t(*)[MB_BLOCK4x4_NUM])pMa->WelsMallocz(pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight *
+		sizeof(
+			int8_t) * MB_BLOCK4x4_NUM, "pPic->pRefIndex[]");
+	pPic->pRefIndex[LIST_1] = (int8_t(*)[MB_BLOCK4x4_NUM])pMa->WelsMallocz(pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight *
+		sizeof(
+			int8_t) * MB_BLOCK4x4_NUM, "pPic->sMb.pRefIndex[]");
+
   return pPic;
 }
 
@@ -117,6 +131,21 @@ void FreePicture (PPicture pPic, CMemoryAlign* pMa) {
     if (pPic->pBuffer[0]) {
       pMa->WelsFree (pPic->pBuffer[0], "pPic->pBuffer[0]");
     }
+
+		if (pPic->pMbType) {
+			pMa->WelsFree(pPic->pMbType, "pPic->pMbType");
+		}
+		pPic->pMbType = NULL;
+		for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+			if (pPic->pMv[listIdx]) {
+				pMa->WelsFree(pPic->pMv[listIdx], "pPic->pMv[]");
+			}
+			pPic->pMv[listIdx] = NULL;
+			if (pPic->pRefIndex[listIdx]) {
+				pMa->WelsFree(pPic->pRefIndex[listIdx], "pPic->pRefIndex[]");
+			}
+			pPic->pRefIndex[listIdx] = NULL;
+		}
 
     pMa->WelsFree (pPic, "pPic");
 
