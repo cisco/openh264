@@ -1092,6 +1092,7 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAva
 
 	WELS_READ_VERIFY(ParseMBTypeBSliceCabac(pCtx, pNeighAvail, uiMbType));
 	if (uiMbType == 0) { //B_Direct_16x16
+		pCurLayer->pMbType[iMbXy] = MB_TYPE_DIRECT;
 		if (pSliceHeader->iDirectSpatialMvPredFlag) {
 			//predict direct spatial mv
 			int16_t pMv[LIST_A][2] = { 0 };
