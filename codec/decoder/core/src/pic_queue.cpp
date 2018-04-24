@@ -111,7 +111,7 @@ PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const
 	uint32_t uiMbWidth = (kiPicWidth + 15) >> 4;
 	uint32_t uiMbHeight = (kiPicHeight + 15) >> 4;
 	uint32_t uiMbCount = uiMbWidth * uiMbHeight;
-	pPic->pMbType = (int16_t*)pMa->WelsMallocz(uiMbCount * sizeof(int16_t),
+	pPic->pMbType = (uint32_t*)pMa->WelsMallocz(uiMbCount * sizeof(uint32_t),
 		"pPic->pMbType");
 	pPic->pMv[LIST_0] = (int16_t(*)[16][2])pMa->WelsMallocz(uiMbCount * sizeof(
 		int16_t) * MV_A * MB_BLOCK4x4_NUM, "pPic->pMv[]");

@@ -88,7 +88,7 @@ int32_t iMbEcedNum;
 int32_t iMbEcedPropNum;
 int32_t iMbNum;
 
-int16_t*  pMbType; /* mb type */
+uint32_t*  pMbType; /* mb type */
 int16_t(*pMv[LIST_A])[MB_BLOCK4x4_NUM][MV_A];//  MB_BLOCK4x4_NUM*]
 int8_t(*pRefIndex[LIST_A])[MB_BLOCK4x4_NUM];
 

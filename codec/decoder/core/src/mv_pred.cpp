@@ -419,8 +419,6 @@ void PredBDirect16x16Temporal(PWelsDecoderContext pCtx) {
 	PSlice pSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
 	PSliceHeader pSliceHeader = &pSlice->sSliceHeaderExt.sSliceHeader;
 	int32_t iMbXy = pCurLayer->iMbXyIndex;
-	PPicture* ppRefPicL0 = pCtx->sRefPic.pRefList[LIST_0];
-	PPicture* ppRefPicL1 = pCtx->sRefPic.pRefList[LIST_1];
 	uint32_t uiShortRefCount = pCtx->sRefPic.uiShortRefCount[LIST_0];
 	for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
 		for (uint32_t refIdx = 0; refIdx < uiShortRefCount; ++refIdx) {

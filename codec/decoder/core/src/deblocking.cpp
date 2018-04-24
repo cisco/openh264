@@ -818,7 +818,7 @@ void WelsDeblockingMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t
   uint8_t nBS[2][4][4] = {{{ 0 }}};
 
   int32_t iMbXyIndex  = pCurDqLayer->iMbXyIndex;
-  int32_t iCurMbType  = pCurDqLayer->pMbType[iMbXyIndex];
+  uint32_t iCurMbType  = pCurDqLayer->pMbType[iMbXyIndex];
   int32_t iMbNb;
 
   switch (iCurMbType) {

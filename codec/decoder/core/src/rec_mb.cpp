@@ -426,7 +426,7 @@ void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDec
 
   int16_t iMVs[2] = {0};
 
-  int32_t iMBType = pCurDqLayer->pMbType[iMBXY];
+  uint32_t iMBType = pCurDqLayer->pMbType[iMBXY];
 
   int32_t iMBOffsetX = pCurDqLayer->iMbX << 4;
   int32_t iMBOffsetY = pCurDqLayer->iMbY << 4;
@@ -631,7 +631,7 @@ void GetInterBPred(uint8_t* pPredYCbCr[3], uint8_t* pTempPredYCbCr[3], PWelsDeco
 
 	int16_t iMVs[2] = { 0 };
 
-	int32_t iMBType = pCurDqLayer->pMbType[iMBXY];
+	uint32_t iMBType = pCurDqLayer->pMbType[iMBXY];
 
 	int32_t iMBOffsetX = pCurDqLayer->iMbX << 4;
 	int32_t iMBOffsetY = pCurDqLayer->iMbY << 4;
@@ -660,7 +660,7 @@ void GetInterBPred(uint8_t* pPredYCbCr[3], uint8_t* pTempPredYCbCr[3], PWelsDeco
 	int32_t iRefIndex2 = 0;
 
 	if (IS_INTER_16x16(iMBType)) {
-		if ((iMBType & MB_TYPE_P0L0) && (iMBType & MB_TYPE_P0L1)) {
+		if ( ((iMBType & MB_TYPE_P0L0) && (iMBType & MB_TYPE_P0L1)) || IS_SKIP(iMBType)) {
 			iMVs[0] = pCurDqLayer->pMv[LIST_0][iMBXY][0][0];
 			iMVs[1] = pCurDqLayer->pMv[LIST_0][iMBXY][0][1];
 			GetRefPic(&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[LIST_0][iMBXY], 0, LIST_0);

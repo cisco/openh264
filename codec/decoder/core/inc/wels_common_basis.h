@@ -64,8 +64,8 @@ int32_t iBottomOffset;
 } SPosOffset;
 
 /* MB Type & Sub-MB Type */
-typedef int32_t MbType;
-typedef int32_t SubMbType;
+typedef uint32_t MbType;
+typedef uint32_t SubMbType;
 
 #define I16_LUMA_DC  1
 #define I16_LUMA_AC  2

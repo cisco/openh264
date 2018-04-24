@@ -50,7 +50,7 @@ typedef struct TagMB {
 /*************************mb_layer() syntax and generated********************************/
 /*mb_layer():*/
 Mb_Type         uiMbType;       // including MB detailed partition type, number and type of reference list
-uint8_t         uiSubMbType[4]; // sub MB types
+uint32_t         uiSubMbType[4]; // sub MB types
 int32_t         iMbXY;          // offset position of MB top left point based
 int16_t         iMbX;           // position of MB in horizontal axis [0..32767]
 int16_t         iMbY;           // position of MB in vertical axis [0..32767]

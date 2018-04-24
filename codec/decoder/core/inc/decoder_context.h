@@ -270,7 +270,7 @@ typedef struct TagWelsDecoderContext {
   iDecBlockOffsetArray[24];     // address talbe for sub 4x4 block in intra4x4_mb, so no need to caculta the address every time.
 
   struct {
-    int16_t*  pMbType[LAYER_NUM_EXCHANGEABLE];                      /* mb type */
+    uint32_t*  pMbType[LAYER_NUM_EXCHANGEABLE];                      /* mb type */
     int16_t (*pMv[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_BLOCK4x4_NUM][MV_A]; //[LAYER_NUM_EXCHANGEABLE   MB_BLOCK4x4_NUM*]
     int8_t (*pRefIndex[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_BLOCK4x4_NUM];
     bool*   pNoSubMbPartSizeLessThan8x8Flag[LAYER_NUM_EXCHANGEABLE];
@@ -288,7 +288,7 @@ typedef struct TagWelsDecoderContext {
     int8_t*  pChromaPredMode[LAYER_NUM_EXCHANGEABLE];
     int8_t*  pCbp[LAYER_NUM_EXCHANGEABLE];
     uint8_t (*pMotionPredFlag[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_PARTITION_SIZE]; // 8x8
-    int8_t (*pSubMbType[LAYER_NUM_EXCHANGEABLE])[MB_SUB_PARTITION_SIZE];
+		uint32_t (*pSubMbType[LAYER_NUM_EXCHANGEABLE])[MB_SUB_PARTITION_SIZE];
     int32_t* pSliceIdc[LAYER_NUM_EXCHANGEABLE];         // using int32_t for slice_idc
     int8_t*  pResidualPredFlag[LAYER_NUM_EXCHANGEABLE];
     int8_t*  pInterPredictionDoneFlag[LAYER_NUM_EXCHANGEABLE];
