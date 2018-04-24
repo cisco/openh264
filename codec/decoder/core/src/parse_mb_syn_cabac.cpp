@@ -923,14 +923,14 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 					//predict direct spatial mv
 					int16_t pMv[LIST_A][2] = { 0 };
 					PredBDirectSpatialMvFromNeighbor(pCurDqLayer, pMv);
-					/*if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
+					if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
 					//To be implemented
 					PredBDirect8x8Spatial(pCtx);
 					}
 					else {
 					//To be implemented
 					PredBDirect4x4Spatial(pCtx);
-					}*/
+					}
 				}
 				else {
 					//temporal direct mode

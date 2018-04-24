@@ -1096,14 +1096,14 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAva
 			//predict direct spatial mv
 			int16_t pMv[LIST_A][2] = { 0 };
 			PredBDirectSpatialMvFromNeighbor(pCurLayer, pMv);
-			/*if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
+			if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
 			//To be implemented
 			PredBDirect8x8Spatial(pCtx);
 			}
 			else {
 			//To be implemented
 			PredBDirect4x4Spatial(pCtx);
-			}*/
+			}
 		}
 		else {
 			//temporal direct 16x16 mode
@@ -1443,14 +1443,14 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 		if (pSliceHeader->iDirectSpatialMvPredFlag) {
 			//predict direct spatial mv
 			PredBDirectSpatialMvFromNeighbor(pCurLayer, pMv);
-			/*if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
+			if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
 			 //To be implemented
 				PredBDirect8x8Spatial(pCtx);
 			}
 			else {
 			  //To be implemented
 				PredBDirect4x4Spatial(pCtx);
-			}*/
+			}
 		}
 		else {
 			//temporal direct mode

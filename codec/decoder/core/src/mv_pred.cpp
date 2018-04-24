@@ -364,12 +364,23 @@ void PredBDirect8x8Spatial(PWelsDecoderContext pCtx) {
 	PSlice pSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
 	PSliceHeader pSliceHeader = &pSlice->sSliceHeaderExt.sSliceHeader;
 	int32_t iMbXy = pCurLayer->iMbXyIndex;
-	PPicture* ppRefPicL0 = pCtx->sRefPic.pRefList[LIST_0];
-	PPicture* ppRefPicL1 = pCtx->sRefPic.pRefList[LIST_1];
+	uint32_t uiShortRefCount = pCtx->sRefPic.uiShortRefCount[LIST_0];
+	for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+		for (uint32_t refIdx = 0; refIdx < uiShortRefCount; ++refIdx) {
+			for (int32_t i = 0; i < 4; i++) {
+				int32_t iIIdx = ((i >> 1) << 3) + ((i & 1) << 1);
+				//need to dereive Mv and RefIndex
+				pCtx->pCurDqLayer->pMv[listIdx][iMbXy][iIIdx][0] = 0;
+				pCtx->pCurDqLayer->pMv[listIdx][iMbXy][iIIdx][0] = 0;
+				pCtx->pCurDqLayer->pRefIndex[listIdx][iMbXy][iIIdx] = 0;
+			}
+			break;
+		}
+	}
 	//SetChromaVectorAdjustment(); //for field coding mode
-	int8_t refFrame[LIST_A] = {-1};
-	int16_t pMv[LIST_A][2] = { 0 };
-	PrepareDirectParams(pCtx, pMv, refFrame);
+	//int8_t refFrame[LIST_A] = {-1};
+	//int16_t pMv[LIST_A][2] = { 0 };
+	//PrepareDirectParams(pCtx, pMv, refFrame);
 }
 
 void PredBDirect4x4Spatial(PWelsDecoderContext pCtx) {
@@ -377,8 +388,22 @@ void PredBDirect4x4Spatial(PWelsDecoderContext pCtx) {
 	PSlice pSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
 	PSliceHeader pSliceHeader = &pSlice->sSliceHeaderExt.sSliceHeader;
 	int32_t iMbXy = pCurLayer->iMbXyIndex;
-	PPicture* ppRefPicL0 = pCtx->sRefPic.pRefList[LIST_0];
-	PPicture* ppRefPicL1 = pCtx->sRefPic.pRefList[LIST_1];
+	uint32_t uiShortRefCount = pCtx->sRefPic.uiShortRefCount[LIST_0];
+	for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+		for (uint32_t refIdx = 0; refIdx < uiShortRefCount; ++refIdx) {
+			for (int32_t i = 0; i < 4; i++) {
+				int32_t iIIdx = ((i >> 1) << 3) + ((i & 1) << 1);
+				for (int32_t j = 0; j < 4; j++) {
+					int32_t iJIdx = ((j >> 1) << 2) + (j & 1);
+					//need to dereive Mv and RefIndex
+					pCtx->pCurDqLayer->pMv[listIdx][iMbXy][iIIdx + iJIdx][0] = 0;
+					pCtx->pCurDqLayer->pMv[listIdx][iMbXy][iIIdx + iJIdx][1] = 0;
+					pCtx->pCurDqLayer->pRefIndex[listIdx][iMbXy][iIIdx + iJIdx] = 0;
+				}
+			}
+			break;
+		}
+	}
 }
 
 void PrepareDirectParams(PWelsDecoderContext pCtx, int16_t pMv[LIST_A][2], int8_t refFrame[LIST_A]) {

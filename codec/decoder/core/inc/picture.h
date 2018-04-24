@@ -90,7 +90,6 @@ int32_t iMbNum;
 
 uint32_t*  pMbType; /* mb type */
 int16_t(*pMv[LIST_A])[MB_BLOCK4x4_NUM][MV_A];//  MB_BLOCK4x4_NUM*]
-int8_t(*pRefIndex[LIST_A])[MB_BLOCK4x4_NUM];
 
 } SPicture, *PPicture; // "Picture" declaration is comflict with Mac system
 
