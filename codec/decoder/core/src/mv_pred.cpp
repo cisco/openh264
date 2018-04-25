@@ -206,6 +206,7 @@ void PredBDirectSpatialMvFromNeighbor(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2
 	int8_t iDiagonalRef[LIST_A];
 	int8_t iMatchRef[LIST_A];
 	int16_t iMvA[LIST_A][2], iMvB[LIST_A][2], iMvC[LIST_A][2], iMvD[LIST_A][2];
+	int8_t ref[LIST_A];
 
 	iCurXy = pCurLayer->iMbXyIndex;
 	iCurX = pCurLayer->iMbX;
@@ -328,6 +329,8 @@ void PredBDirectSpatialMvFromNeighbor(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2
 				iLeftTopRef[listIdx] = REF_NOT_IN_LIST;
 			}
 		}
+
+		ref[listIdx] = WELS_MIN_POSITIVE(iLeftRef[listIdx], WELS_MIN_POSITIVE(iTopRef[listIdx], iRightTopRef[listIdx]));
 
 		iDiagonalRef[listIdx] = iRightTopRef[listIdx];
 		if (REF_NOT_AVAIL == iDiagonalRef[listIdx]) {
