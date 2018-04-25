@@ -1093,10 +1093,10 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAva
 	WELS_READ_VERIFY(ParseMBTypeBSliceCabac(pCtx, pNeighAvail, uiMbType));
 	if (uiMbType == 0) { //B_Direct_16x16
 		pCurLayer->pMbType[iMbXy] = MB_TYPE_DIRECT;
+		int16_t pMv[LIST_A][2] = { 0 };
+		int8_t  ref[LIST_A] = { REF_NOT_AVAIL };
 		if (pSliceHeader->iDirectSpatialMvPredFlag) {
 			//predict direct spatial mv
-			int16_t pMv[LIST_A][2] = { 0 };
-			int8_t  ref[LIST_A] = { REF_NOT_AVAIL };
 			PredBDirectSpatialMvAndRefFromNeighbor(pCurLayer, pMv, ref);
 			if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
 			//To be implemented
@@ -1112,7 +1112,26 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAva
 			ComputeColocated(pCtx);
 			PredBDirect16x16Temporal(pCtx);
 		}
-		//...
+		for (i = 0; i < 16; i++) {
+			ST32(pCurLayer->pMv[LIST_0][iMbXy][i], *(uint32_t*)pMv[LIST_0]);
+			ST32(pCurLayer->pMv[LIST_1][iMbXy][i], *(uint32_t*)pMv[LIST_1]);
+			pCurLayer->pRefIndex[LIST_0][iMbXy][i] = ref[LIST_0];
+			pCurLayer->pRefIndex[LIST_1][iMbXy][i] = ref[LIST_1];
+			ST32(pCurLayer->pMvd[LIST_0][iMbXy][i], 0);
+			ST32(pCurLayer->pMvd[LIST_1][iMbXy][i], 0);
+		}
+
+		//reset rS
+		pCurLayer->pLumaQp[iMbXy] = pSlice->iLastMbQp; //??????????????? dqaunt of previous mb
+		for (i = 0; i < 2; i++) {
+			pCurLayer->pChromaQp[iMbXy][i] = g_kuiChromaQpTable[WELS_CLIP3(pCurLayer->pLumaQp[iMbXy] +
+				pSliceHeader->pPps->iChromaQpIndexOffset[i], 0, 51)];
+		}
+
+		//for neighboring CABAC usage
+		pSlice->iLastDeltaQp = 0;
+
+		WELS_READ_VERIFY(ParseEndOfSliceCabac(pCtx, uiEosFlag));
 	}
 	else if (uiMbType < 23) { //Inter B mode
 		int16_t pMotionVector[LIST_A][30][MV_A];

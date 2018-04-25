@@ -359,6 +359,9 @@ void PredBDirectSpatialMvAndRefFromNeighbor(PDqLayer pCurLayer, int16_t iMvp[LIS
 			iMvp[listIdx][1] = WelsMedian(iMvA[listIdx][1], iMvB[listIdx][1], iMvC[listIdx][1]);
 		}
 	}
+	if (ref[LIST_0] < 0 && ref[LIST_1] < 0) {
+		ref[LIST_0] = ref[LIST_1] = 0;
+	}
 }
 
 void PredBDirect8x8Spatial(PWelsDecoderContext pCtx) {
