@@ -922,7 +922,8 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 				if (pSliceHeader->iDirectSpatialMvPredFlag) {
 					//predict direct spatial mv
 					int16_t pMv[LIST_A][2] = { 0 };
-					PredBDirectSpatialMvFromNeighbor(pCurDqLayer, pMv);
+					int8_t  ref[LIST_A] = { REF_NOT_AVAIL };
+					PredBDirectSpatialMvAndRefFromNeighbor(pCurDqLayer, pMv, ref);
 					if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
 					//To be implemented
 					PredBDirect8x8Spatial(pCtx);

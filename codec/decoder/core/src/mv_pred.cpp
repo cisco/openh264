@@ -192,7 +192,7 @@ void PredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]) {
   }
 }
 
-void PredBDirectSpatialMvFromNeighbor(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2]) {
+void PredBDirectSpatialMvAndRefFromNeighbor(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2], int8_t ref[LIST_A]) {
 	bool bTopAvail, bLeftTopAvail, bRightTopAvail, bLeftAvail;
 
 	int32_t iCurSliceIdc, iTopSliceIdc, iLeftTopSliceIdc, iRightTopSliceIdc, iLeftSliceIdc;
@@ -204,9 +204,7 @@ void PredBDirectSpatialMvFromNeighbor(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2
 	int8_t iRightTopRef[LIST_A];
 	int8_t iLeftTopRef[LIST_A];
 	int8_t iDiagonalRef[LIST_A];
-	int8_t iMatchRef[LIST_A];
 	int16_t iMvA[LIST_A][2], iMvB[LIST_A][2], iMvC[LIST_A][2], iMvD[LIST_A][2];
-	int8_t ref[LIST_A];
 
 	iCurXy = pCurLayer->iMbXyIndex;
 	iCurX = pCurLayer->iMbX;
@@ -275,7 +273,8 @@ void PredBDirectSpatialMvFromNeighbor(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2
 		}
 
 		if (REF_NOT_AVAIL == iLeftRef[listIdx] ||
-			(0 == iLeftRef[listIdx] && 0 == *(int32_t*)iMvA[listIdx])) {
+			(iLeftRef[listIdx] >= 0 && 0 == *(int32_t*)iMvA[listIdx])) {
+			ref[listIdx] = iLeftRef[listIdx];
 			ST32(iMvp[listIdx], 0);
 			continue;
 		}
@@ -295,7 +294,8 @@ void PredBDirectSpatialMvFromNeighbor(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2
 			}
 		}
 		if (REF_NOT_AVAIL == iTopRef[listIdx] ||
-			(0 == iTopRef[listIdx] && 0 == *(int32_t*)iMvB[listIdx])) {
+			(iTopRef[listIdx] >= 0 && 0 == *(int32_t*)iMvB[listIdx])) {
+			ref[listIdx] = iTopRef[listIdx];
 			ST32(iMvp[listIdx], 0);
 			continue;
 		}
@@ -330,8 +330,6 @@ void PredBDirectSpatialMvFromNeighbor(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2
 			}
 		}
 
-		ref[listIdx] = WELS_MIN_POSITIVE(iLeftRef[listIdx], WELS_MIN_POSITIVE(iTopRef[listIdx], iRightTopRef[listIdx]));
-
 		iDiagonalRef[listIdx] = iRightTopRef[listIdx];
 		if (REF_NOT_AVAIL == iDiagonalRef[listIdx]) {
 			iDiagonalRef[listIdx] = iLeftTopRef[listIdx];
@@ -339,16 +337,17 @@ void PredBDirectSpatialMvFromNeighbor(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2
 		}
 
 		if (REF_NOT_AVAIL == iTopRef[listIdx] && REF_NOT_AVAIL == iDiagonalRef[listIdx] && iLeftRef[listIdx] >= REF_NOT_IN_LIST) {
+			ref[listIdx] = iLeftRef[listIdx];
 			ST32(iMvp[listIdx], LD32(iMvA[listIdx]));
 			continue;
 		}
-
-		iMatchRef[listIdx] = (0 == iLeftRef[listIdx]) + (0 == iTopRef[listIdx]) + (0 == iDiagonalRef[listIdx]);
-		if (1 == iMatchRef[listIdx]) {
-			if (0 == iLeftRef) {
+		ref[listIdx] = WELS_MIN_POSITIVE(iLeftRef[listIdx], WELS_MIN_POSITIVE(iTopRef[listIdx], iRightTopRef[listIdx]));
+		uint32_t match_count = (iLeftRef[listIdx] == ref[listIdx]) + (iTopRef[listIdx] == ref[listIdx]) + (iDiagonalRef[listIdx] == ref[listIdx]);
+		if (match_count == 1) {
+			if (iLeftRef[listIdx] == ref[listIdx]) {
 				ST32(iMvp[listIdx], LD32(iMvA[listIdx]));
 			}
-			else if (0 == iTopRef) {
+			else if (iTopRef[listIdx] == ref[listIdx]) {
 				ST32(iMvp[listIdx], LD32(iMvB[listIdx]));
 			}
 			else {
@@ -373,9 +372,9 @@ void PredBDirect8x8Spatial(PWelsDecoderContext pCtx) {
 			for (int32_t i = 0; i < 4; i++) {
 				int32_t iIIdx = ((i >> 1) << 3) + ((i & 1) << 1);
 				//need to dereive Mv and RefIndex
-				pCtx->pCurDqLayer->pMv[listIdx][iMbXy][iIIdx][0] = 0;
-				pCtx->pCurDqLayer->pMv[listIdx][iMbXy][iIIdx][0] = 0;
-				pCtx->pCurDqLayer->pRefIndex[listIdx][iMbXy][iIIdx] = 0;
+//				pCtx->pCurDqLayer->pMv[listIdx][iMbXy][iIIdx][0] = 0;
+//				pCtx->pCurDqLayer->pMv[listIdx][iMbXy][iIIdx][0] = 0;
+//				pCtx->pCurDqLayer->pRefIndex[listIdx][iMbXy][iIIdx] = 0;
 			}
 			break;
 		}
@@ -399,9 +398,9 @@ void PredBDirect4x4Spatial(PWelsDecoderContext pCtx) {
 				for (int32_t j = 0; j < 4; j++) {
 					int32_t iJIdx = ((j >> 1) << 2) + (j & 1);
 					//need to dereive Mv and RefIndex
-					pCtx->pCurDqLayer->pMv[listIdx][iMbXy][iIIdx + iJIdx][0] = 0;
-					pCtx->pCurDqLayer->pMv[listIdx][iMbXy][iIIdx + iJIdx][1] = 0;
-					pCtx->pCurDqLayer->pRefIndex[listIdx][iMbXy][iIIdx + iJIdx] = 0;
+//					pCtx->pCurDqLayer->pMv[listIdx][iMbXy][iIIdx + iJIdx][0] = 0;
+//					pCtx->pCurDqLayer->pMv[listIdx][iMbXy][iIIdx + iJIdx][1] = 0;
+//					pCtx->pCurDqLayer->pRefIndex[listIdx][iMbXy][iIIdx + iJIdx] = 0;
 				}
 			}
 			break;

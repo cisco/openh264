@@ -1096,7 +1096,8 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAva
 		if (pSliceHeader->iDirectSpatialMvPredFlag) {
 			//predict direct spatial mv
 			int16_t pMv[LIST_A][2] = { 0 };
-			PredBDirectSpatialMvFromNeighbor(pCurLayer, pMv);
+			int8_t  ref[LIST_A] = { REF_NOT_AVAIL };
+			PredBDirectSpatialMvAndRefFromNeighbor(pCurLayer, pMv, ref);
 			if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
 			//To be implemented
 			PredBDirect8x8Spatial(pCtx);
@@ -1428,6 +1429,7 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 
 	if (uiCode) {
 		int16_t pMv[LIST_A][2] = { 0 };
+		int8_t  ref[LIST_A] = { REF_NOT_AVAIL };
 		pCurLayer->pMbType[iMbXy] = MB_TYPE_SKIP | MB_TYPE_DIRECT;
 		ST32(&pCurLayer->pNzc[iMbXy][0], 0);
 		ST32(&pCurLayer->pNzc[iMbXy][4], 0);
@@ -1443,7 +1445,7 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 		
 		if (pSliceHeader->iDirectSpatialMvPredFlag) {
 			//predict direct spatial mv
-			PredBDirectSpatialMvFromNeighbor(pCurLayer, pMv);
+			PredBDirectSpatialMvAndRefFromNeighbor(pCurLayer, pMv, ref);
 			if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
 			 //To be implemented
 				PredBDirect8x8Spatial(pCtx);
@@ -1468,22 +1470,11 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 		for (i = 0; i < 16; i++) {
 			ST32(pCurLayer->pMv[LIST_0][iMbXy][i], *(uint32_t*)pMv[LIST_0]);
 			ST32(pCurLayer->pMv[LIST_1][iMbXy][i], *(uint32_t*)pMv[LIST_1]);
+			pCurLayer->pRefIndex[LIST_0][iMbXy][i] = ref[LIST_0];
+			pCurLayer->pRefIndex[LIST_1][iMbXy][i] = ref[LIST_1];
 			ST32(pCurLayer->pMvd[LIST_0][iMbXy][i], 0);
 			ST32(pCurLayer->pMvd[LIST_1][iMbXy][i], 0);
 		}
-
-		// just for fill_caches. pred_direct_motion will set the real mb_type
-		//	mb_type |= MB_TYPE_L0L1 | MB_TYPE_DIRECT | MB_TYPE_SKIP;
-		//	if (sl->direct_spatial_mv_pred) {
-		//		fill_decode_neighbors(h, sl, mb_type);
-		//		fill_decode_caches(h, sl, mb_type); //FIXME check what is needed and what not ...
-		//	}
-		//	ff_h264_pred_direct_motion(h, sl, &mb_type);
-		//	mb_type |= MB_TYPE_SKIP;
-
-		//if (!pSlice->sSliceHeaderExt.bDefaultResidualPredFlag) {
-		//  memset (pCurLayer->pScaledTCoeff[iMbXy], 0, 384 * sizeof (int16_t));
-		//}
 
 		//reset rS
 		pCurLayer->pLumaQp[iMbXy] = pSlice->iLastMbQp; //??????????????? dqaunt of previous mb
