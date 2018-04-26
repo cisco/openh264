@@ -67,7 +67,7 @@ const uint8_t g_kLeftBlkInsideMb[24] = { //for index with z-order 0~23
   // 18  19 | 22 23
 };
 
-static uint32_t DecodeCabacIntraMbType(PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail, int ctx_base, int intra_slice)
+static uint32_t DecodeCabacIntraMbType(PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail, int ctx_base)
 {
 	uint32_t uiCode;
 	uint32_t uiMbType = 0;
@@ -77,29 +77,13 @@ static uint32_t DecodeCabacIntraMbType(PWelsDecoderContext pCtx, PWelsNeighAvail
 	PWelsCabacDecEngine pCabacDecEngine = pCtx->pCabacDecEngine;
 	PWelsCabacCtx pBinCtx = pCtx->pCabacCtx + ctx_base;
 
-	if (intra_slice) {
-		if ((pNeighAvail->iLeftAvail) && (pNeighAvail->iLeftType & (MB_TYPE_INTRA16x16 | MB_TYPE_INTRA_PCM))) {
-			++iCtxInc;
-		}
-		if ((pNeighAvail->iTopAvail) && (pNeighAvail->iTopType & (MB_TYPE_INTRA16x16 | MB_TYPE_INTRA_PCM))) {
-			++iCtxInc;
-		}
-		iCtxInc += iIdxA + iIdxB;
-		WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + iCtxInc, uiCode));
-		if (!uiCode) {
-			return 0;
-		}
-		pBinCtx = pCtx->pCabacCtx + ctx_base + 2;
+	WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx, uiCode));
+	if (!uiCode) {
+		return 0; /* I4x4 */
 	}
-	else {
-		WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx, uiCode));
-		if (!uiCode) {
-			return 0; /* I4x4 */
-		}
-	}
-	uint32_t uiBinVal;
-	ParseEndOfSliceCabac(pCtx, uiBinVal);
-	if (uiBinVal) {
+	
+	DecodeTerminateCabac(pCabacDecEngine, uiCode);
+	if (uiCode) {
 		return 25; /* PCM */
 	}
 	uiMbType = 1; /* I16x16 */
@@ -108,12 +92,12 @@ static uint32_t DecodeCabacIntraMbType(PWelsDecoderContext pCtx, PWelsNeighAvail
 
 	WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 2, uiCode));
 	if (uiCode) {
-		WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 2 + intra_slice, uiCode));
+		WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 2, uiCode));
 		uiMbType += 4 + 4 * uiCode;
 	}
-	WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 3 + intra_slice, uiCode));
+	WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 3, uiCode));
 	uiMbType += 2 * uiCode;
-	WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 3 + 2 * intra_slice, uiCode));
+	WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 3, uiCode));
 	uiMbType += 1 * uiCode;
 	return uiMbType;
 }
@@ -363,7 +347,8 @@ int32_t ParseMBTypeBSliceCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNeighA
 				uiMbType += 3;
 			}
 			else if (uiMbType == 13) {
-						return DecodeCabacIntraMbType(pCtx, pNeighAvail, 32, 0) + 23;
+				uiMbType = DecodeCabacIntraMbType(pCtx, pNeighAvail, 32) + 23;
+				return ERR_NONE;
 			}
 			else if (uiMbType == 14) {
 				uiMbType = 11; // Bi8x16
