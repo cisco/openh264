@@ -67,6 +67,57 @@ const uint8_t g_kLeftBlkInsideMb[24] = { //for index with z-order 0~23
   // 18  19 | 22 23
 };
 
+static uint32_t DecodeCabacIntraMbType(PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail, int ctx_base, int intra_slice)
+{
+	uint32_t uiCode;
+	uint32_t uiMbType = 0;
+	int32_t iIdxA = 0, iIdxB = 0;
+	int32_t iCtxInc = 0;
+
+	PWelsCabacDecEngine pCabacDecEngine = pCtx->pCabacDecEngine;
+	PWelsCabacCtx pBinCtx = pCtx->pCabacCtx + ctx_base;
+
+	if (intra_slice) {
+		if ((pNeighAvail->iLeftAvail) && (pNeighAvail->iLeftType & (MB_TYPE_INTRA16x16 | MB_TYPE_INTRA_PCM))) {
+			++iCtxInc;
+		}
+		if ((pNeighAvail->iTopAvail) && (pNeighAvail->iTopType & (MB_TYPE_INTRA16x16 | MB_TYPE_INTRA_PCM))) {
+			++iCtxInc;
+		}
+		iCtxInc += iIdxA + iIdxB;
+		WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + iCtxInc, uiCode));
+		if (!uiCode) {
+			return 0;
+		}
+		pBinCtx = pCtx->pCabacCtx + ctx_base + 2;
+	}
+	else {
+		WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx, uiCode));
+		if (!uiCode) {
+			return 0; /* I4x4 */
+		}
+	}
+	uint32_t uiBinVal;
+	ParseEndOfSliceCabac(pCtx, uiBinVal);
+	if (uiBinVal) {
+		return 25; /* PCM */
+	}
+	uiMbType = 1; /* I16x16 */
+	WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 1, uiCode)); /* cbp_luma != 0 */
+	uiMbType += 12 * uiCode;
+
+	WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 2, uiCode));
+	if (uiCode) {
+		WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 2 + intra_slice, uiCode));
+		uiMbType += 4 + 4 * uiCode;
+	}
+	WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 3 + intra_slice, uiCode));
+	uiMbType += 2 * uiCode;
+	WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 3 + 2 * intra_slice, uiCode));
+	uiMbType += 1 * uiCode;
+	return uiMbType;
+}
+
 void UpdateP16x8RefIdxCabac (PDqLayer pCurDqLayer, int8_t pRefIndex[LIST_A][30], int32_t iPartIdx, const int8_t iRef,
                              const int8_t iListIdx) {
   int32_t iRef32Bit = (int32_t) iRef;
@@ -312,7 +363,7 @@ int32_t ParseMBTypeBSliceCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNeighA
 				uiMbType += 3;
 			}
 			else if (uiMbType == 13) {
-				//		return cabac_intra_mb_type(core, 32, 0) + 23;
+						return DecodeCabacIntraMbType(pCtx, pNeighAvail, 32, 0) + 23;
 			}
 			else if (uiMbType == 14) {
 				uiMbType = 11; // Bi8x16
@@ -896,7 +947,7 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 			}
 		}
 	}
-	else if (/*IS_Inter_8x8(mbType)*/ mbType == MB_TYPE_8x8) {
+	else if (IS_Inter_8x8(mbType)) {
 		int8_t pRefIdx[4] = { 0 }, pSubPartCount[4], pPartW[4];
 		uint32_t uiSubMbType;
 		//sub_mb_type, partition
