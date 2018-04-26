@@ -1132,6 +1132,8 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAva
 		pSlice->iLastDeltaQp = 0;
 
 		WELS_READ_VERIFY(ParseEndOfSliceCabac(pCtx, uiEosFlag));
+
+		return ERR_NONE;
 	}
 	else if (uiMbType < 23) { //Inter B mode
 		int16_t pMotionVector[LIST_A][30][MV_A];
