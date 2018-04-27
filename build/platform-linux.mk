@@ -18,6 +18,11 @@ ifeq ($(ASM_ARCH), arm)
 ASMFLAGS += -march=armv7-a -mfpu=neon
 endif
 
+ifeq ($(ASM_ARCH), arm64)
+CFLAGS += -march=armv8-a
+ASMFLAGS += -march=armv8-a
+endif
+
 ifeq ($(CXX), clang++)
 CXXFLAGS += -Wc++11-compat-reserved-user-defined-literal
 endif
