@@ -53,7 +53,6 @@ deps = [dependency('threads')]
 c_args = []
 cpp_args = []
 asm_args = []
-shared_lib_suffix = ''
 
 if system == 'linux'
   if cpu_family == 'x86'
@@ -68,8 +67,6 @@ if system == 'linux'
   endif
 
   deps += [cpp.find_library('libm')]
-
-  shared_lib_suffix = 'so.@0@'.format(meson.project_version())
 
   asm_args += ['-DHAVE_AVX2']
   add_project_arguments('-DHAVE_AVX2', language: 'cpp')
@@ -112,7 +109,8 @@ all_objects = [
 libopenh264_shared = shared_library('openh264',
   objects: all_objects,
   install: true,
-  name_suffix: shared_lib_suffix,
+  soversion: major_version,
+  version: meson.project_version(),
   dependencies: deps)
 
 libopenh264_static = static_library('openh264',
@@ -151,22 +149,4 @@ openh264_dep = declare_dependency(
   include_directories: include_directories('include'),
   dependencies: deps + api_header_deps)
 
-if system == 'linux'
-  filesymlinker = find_program('filesymlinker.py')
-  res = custom_target('libopenh264.so',
-    build_by_default: true,
-    input : libopenh264_shared,
-    output : 'libopenh264.so',
-    command : [filesymlinker, '@INPUT@', '@OUTPUT@'])
-
-  res = custom_target('libopenh264.so.@0@'.format(major_version),
-    build_by_default: true,
-    input : libopenh264_shared,
-    output : 'libopenh264.so.@0@'.format(major_version),
-    command : [filesymlinker, '@INPUT@', '@OUTPUT@'])
-
-  meson.add_install_script('post_install.py', get_option('libdir'), shared_lib_suffix, major_version)
-endif
-
-filecopier = find_program('filecopier.py')
 subdir ('include')

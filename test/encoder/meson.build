@@ -25,7 +25,7 @@ cpp_args = cpp.get_supported_arguments(['-Wno-dangling-else'])
 e = executable('test_encoder', test_sources + test_data_generator_sources + test_base_encoder_sources,
         dependencies : gtest_main_dep,
         include_directories: [inc, test_inc, encoder_inc, processing_inc],
-	cpp_args: cpp_args,
+        cpp_args: cpp_args,
         link_with: [libcommon, libencoder, libprocessing])
 
 test('encoder', e,
