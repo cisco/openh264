@@ -721,7 +721,7 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 			for (int32_t listIdx = 0; listIdx < LIST_A; ++listIdx) {
 				WELS_READ_VERIFY(ParseRefIdxCabac(pCtx, pNeighAvail, pNonZeroCount, pRefIndex, listIdx, iPartIdx, pRefCount[listIdx], 0,
 					iRef[listIdx]));
-				if ((iRef[listIdx] < 0) || (iRef[listIdx] >= pRefCount[listIdx]) || (ppRefPicL0[iRef[listIdx]] == NULL)) { //error ref_idx
+				if ((iRef[listIdx] < 0) || (iRef[listIdx] >= pRefCount[listIdx]) || (pCtx->sRefPic.pRefList[listIdx][iRef[listIdx]] == NULL)) { //error ref_idx
 					pCtx->bMbRefConcealed = true;
 					if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE) {
 						iRef[listIdx] = 0;
@@ -731,8 +731,8 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 						return GENERATE_ERROR_NO(ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_REF_INDEX);
 					}
 				}
-				pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || !(ppRefPicL0[iRef[LIST_0]]
-					&& ppRefPicL0[iRef[listIdx]]->bIsComplete);
+				pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || !(pCtx->sRefPic.pRefList[listIdx][iRef[listIdx]]
+					&& pCtx->sRefPic.pRefList[listIdx][iRef[listIdx]]->bIsComplete);
 				PredMv(pMotionVector, pRefIndex, listIdx, 0, 4, iRef[listIdx], pMv);
 				WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 0, pMvd[0]));
 				WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 1, pMvd[1]));
