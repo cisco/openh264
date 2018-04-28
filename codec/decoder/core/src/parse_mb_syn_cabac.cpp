@@ -716,7 +716,7 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 
 	MbType mbType = pCurDqLayer->pMbType[iMbXy];
 	if (IS_INTER_16x16(mbType)) {
-		if ((mbType & MB_TYPE_P0L0) && (mbType & MB_TYPE_P0L1)) {//B_Bi_16x16
+		if (IS_TYPE_L0(mbType) && IS_TYPE_L1(mbType)) {//B_Bi_16x16
 			iPartIdx = 0;
 			for (int32_t listIdx = 0; listIdx < LIST_A; ++listIdx) {
 				WELS_READ_VERIFY(ParseRefIdxCabac(pCtx, pNeighAvail, pNonZeroCount, pRefIndex, listIdx, iPartIdx, pRefCount[listIdx], 0,
@@ -743,7 +743,7 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 				UpdateP16x16MvdCabac(pCurDqLayer, pMvd, listIdx);
 			}
 		}
-		else if (mbType & MB_TYPE_P0L0) { //B_L0_16x16
+		else if (IS_TYPE_L0(mbType)) { //B_L0_16x16
 			iPartIdx = 0;
 			WELS_READ_VERIFY(ParseRefIdxCabac(pCtx, pNeighAvail, pNonZeroCount, pRefIndex, LIST_0, iPartIdx, pRefCount[LIST_0], 0,
 				iRef[LIST_0]));
@@ -767,6 +767,10 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 			WELS_CHECK_SE_BOTH_WARNING(pMv[1], iMinVmv, iMaxVmv, "vertical mv");
 			UpdateP16x16MotionInfo(pCurDqLayer, LIST_0, iRef[LIST_0], pMv);
 			UpdateP16x16MvdCabac(pCurDqLayer, pMvd, LIST_0);
+			//pMv[0] = pMvd[0] = 0;
+			//pMv[1] = pMvd[1] = 0;
+			//UpdateP16x16MotionInfo(pCurDqLayer, LIST_1, iRef[LIST_1], pMv);
+			//UpdateP16x16MvdCabac(pCurDqLayer, pMvd, LIST_1);
 		}
 		else { //B_L1_16x16
 			iPartIdx = 0;
@@ -792,6 +796,10 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 			WELS_CHECK_SE_BOTH_WARNING(pMv[1], iMinVmv, iMaxVmv, "vertical mv");
 			UpdateP16x16MotionInfo(pCurDqLayer, LIST_1, iRef[LIST_1], pMv);
 			UpdateP16x16MvdCabac(pCurDqLayer, pMvd, LIST_1);
+			//pMv[0] = pMvd[0] = 0;
+			//pMv[1] = pMvd[1] = 0;
+			//UpdateP16x16MotionInfo(pCurDqLayer, LIST_0, iRef[LIST_0], pMv);
+			//UpdateP16x16MvdCabac(pCurDqLayer, pMvd, LIST_0);
 		}
 	}
 	else if ( IS_INTER_16x8(mbType) || IS_INTER_8x16(mbType) ) {

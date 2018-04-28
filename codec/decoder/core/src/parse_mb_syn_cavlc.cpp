@@ -274,7 +274,7 @@ void WelsFillCacheInterCabac (PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroCoun
     iRightTopXy = iCurXy + 1 - pCurLayer->iMbWidth;
   }
 
-	for (int32_t listIdx = 0; listIdx < 2; ++listIdx) {
+	for (int32_t listIdx = 0; listIdx < listCount; ++listIdx) {
 		//stuff mv_cache and iRefIdxArray from left and top (inter)
 		if (pNeighAvail->iLeftAvail && IS_INTER(pNeighAvail->iLeftType)) {
 			ST32(iMvArray[listIdx][6], LD32(pCurLayer->pMv[listIdx][iLeftXy][3]));
