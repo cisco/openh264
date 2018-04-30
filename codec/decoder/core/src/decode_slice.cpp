@@ -1091,10 +1091,15 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAva
 	pCurLayer->pInterPredictionDoneFlag[iMbXy] = 0;
 
 	WELS_READ_VERIFY(ParseMBTypeBSliceCabac(pCtx, pNeighAvail, uiMbType));
+
+#if defined(_DEBUG)
+	WelsLog(&(pCtx->sLogCtx), WELS_LOG_WARNING, "mb_num and type = [%d %d]", iMbXy, uiMbType);
+#endif
+
 	if (uiMbType == 0) { //B_Direct_16x16
 		pCurLayer->pMbType[iMbXy] = MB_TYPE_DIRECT;
 		int16_t pMv[LIST_A][2] = { 0 };
-		int8_t  ref[LIST_A] = { REF_NOT_AVAIL };
+		int8_t  ref[LIST_A] = { -1 };
 		if (pSliceHeader->iDirectSpatialMvPredFlag) {
 			//predict direct spatial mv
 			PredBDirectSpatialMvAndRefFromNeighbor(pCurLayer, pMv, ref);
@@ -1130,10 +1135,6 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAva
 
 		//for neighboring CABAC usage
 		pSlice->iLastDeltaQp = 0;
-
-		WELS_READ_VERIFY(ParseEndOfSliceCabac(pCtx, uiEosFlag));
-
-		return ERR_NONE;
 	}
 	else if (uiMbType < 23) { //Inter B mode
 		int16_t pMotionVector[LIST_A][30][MV_A];
