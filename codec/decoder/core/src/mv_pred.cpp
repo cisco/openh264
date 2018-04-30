@@ -523,7 +523,7 @@ void PredMv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][3
 
   if (REF_NOT_AVAIL == iDiagonalRef) {
     iDiagonalRef = kiLeftTopRef;
-    ST32 (iCMV, LD32 (iMotionVector[0][kuiLeftTopIdx]));
+    ST32 (iCMV, LD32 (iMotionVector[listIdx][kuiLeftTopIdx]));
   }
 
   iMatchRef = (iRef == kiLeftRef) + (iRef == kiTopRef) + (iRef == iDiagonalRef);
@@ -634,8 +634,8 @@ void UpdateP16x8MotionInfo (PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A][
     ST32 (pCurDqLayer->pMv[listIdx][iMbXy][  kuiScan4IdxPlus4], kiMV32);
     ST32 (pCurDqLayer->pMv[listIdx][iMbXy][1 + kuiScan4IdxPlus4], kiMV32);
     //cache
-    ST16 (&iRefIndex[0][kuiCacheIdx ], kiRef2);
-    ST16 (&iRefIndex[0][kuiCacheIdxPlus6], kiRef2);
+    ST16 (&iRefIndex[listIdx][kuiCacheIdx ], kiRef2);
+    ST16 (&iRefIndex[listIdx][kuiCacheIdxPlus6], kiRef2);
     ST32 (iMotionVector[listIdx][  kuiCacheIdx ], kiMV32);
     ST32 (iMotionVector[listIdx][1 + kuiCacheIdx ], kiMV32);
     ST32 (iMotionVector[listIdx][  kuiCacheIdxPlus6], kiMV32);
