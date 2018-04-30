@@ -345,6 +345,7 @@ int32_t ParseMBTypeBSliceCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNeighA
 			WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 5, uiCode)); uiMbType += uiCode;
 			if (uiMbType < 8) {
 				uiMbType += 3;
+				return ERR_NONE;
 			}
 			else if (uiMbType == 13) {
 				uiMbType = DecodeCabacIntraMbType(pCtx, pNeighAvail, 32) + 23;
@@ -352,9 +353,11 @@ int32_t ParseMBTypeBSliceCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNeighA
 			}
 			else if (uiMbType == 14) {
 				uiMbType = 11; // Bi8x16
+				return ERR_NONE;
 			}
 			else if (uiMbType == 15) {
 				uiMbType = 22; // 8x8
+				return ERR_NONE;
 			}
 			uiMbType <<= 1;
 			WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 5, uiCode));
