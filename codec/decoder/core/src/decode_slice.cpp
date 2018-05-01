@@ -1117,6 +1117,14 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAva
 			ComputeColocated(pCtx);
 			PredBDirect16x16Temporal(pCtx);
 		}
+
+		int16_t pMotionVector[LIST_A][30][MV_A];
+		int16_t pMvdCache[LIST_A][30][MV_A];
+		int8_t  pRefIndex[LIST_A][30];
+		pCurLayer->pMbType[iMbXy] = g_ksInterBMbTypeInfo[uiMbType].iType;
+		WelsFillCacheInterCabac(pNeighAvail, pNonZeroCount, pMotionVector, pMvdCache, pRefIndex, pCurLayer);
+		pCurLayer->pInterPredictionDoneFlag[iMbXy] = 0;
+
 		for (i = 0; i < 16; i++) {
 			ST32(pCurLayer->pMv[LIST_0][iMbXy][i], *(uint32_t*)pMv[LIST_0]);
 			ST32(pCurLayer->pMv[LIST_1][iMbXy][i], *(uint32_t*)pMv[LIST_1]);
@@ -1445,7 +1453,7 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 
 	if (uiCode) {
 		int16_t pMv[LIST_A][2] = { 0 };
-		int8_t  ref[LIST_A] = { REF_NOT_AVAIL };
+		int8_t  ref[LIST_A] = { 0 };
 		pCurLayer->pMbType[iMbXy] = MB_TYPE_SKIP | MB_TYPE_DIRECT;
 		ST32(&pCurLayer->pNzc[iMbXy][0], 0);
 		ST32(&pCurLayer->pNzc[iMbXy][4], 0);
