@@ -286,18 +286,18 @@ static const SPartMbInfo g_ksInterPSubMbTypeInfo[4] = {
 //Table 7.18 – Sub-macroblock types in B macroblocks.
 static const SPartMbInfo g_ksInterBSubMbTypeInfo[] = {
 	{ MB_TYPE_DIRECT,																1, 2 },	//B_Direct_8x8
-	{ MB_TYPE_16x16 | MB_TYPE_P0L0,									1, 2 },	//B_L0_8x8
-	{ MB_TYPE_16x16 | MB_TYPE_P0L1,									1, 2 },	//B_L1_8x8
-	{ MB_TYPE_16x16 | MB_TYPE_P0L0 | MB_TYPE_P0L1,	1, 2 },	//B_Bi_8x8
-	{ MB_TYPE_16x8  | MB_TYPE_P0L0,									2, 2 },	//B_L0_8x4
-	{ MB_TYPE_8x16  | MB_TYPE_P0L0,									2, 1 },	//B_L0_4x8
-	{ MB_TYPE_16x8  | MB_TYPE_P0L1,									2, 2 },	//B_L1_8x4
-	{ MB_TYPE_8x16  | MB_TYPE_P0L1,									2, 1 },	//B_L1_4x8
-	{ MB_TYPE_16x8  | MB_TYPE_P0L0 | MB_TYPE_P0L1,	2, 2 },	//B_Bi_8x4
-	{ MB_TYPE_8x16  | MB_TYPE_P0L0 | MB_TYPE_P0L1,	2, 1 },	//B_Bi_4x8
-	{ MB_TYPE_8x8   | MB_TYPE_P0L0,									4, 1 },	//B_L0_4x4
-	{ MB_TYPE_8x8   | MB_TYPE_P0L1,									4, 1 },	//B_L1_4x4
-	{ MB_TYPE_8x8   | MB_TYPE_P0L0 | MB_TYPE_P0L1,	4, 1 }	//B_Bi_4x4
+	{ SUB_MB_TYPE_8x8 | MB_TYPE_P0L0,									1, 2 },	//B_L0_8x8
+	{ SUB_MB_TYPE_8x8 | MB_TYPE_P0L1,									1, 2 },	//B_L1_8x8
+	{ SUB_MB_TYPE_8x8 | MB_TYPE_P0L0 | MB_TYPE_P0L1,	1, 2 },	//B_Bi_8x8
+	{ SUB_MB_TYPE_8x4 | MB_TYPE_P0L0,									2, 2 },	//B_L0_8x4
+	{ SUB_MB_TYPE_4x8 | MB_TYPE_P0L0,									2, 1 },	//B_L0_4x8
+	{ SUB_MB_TYPE_8x4 | MB_TYPE_P0L1,									2, 2 },	//B_L1_8x4
+	{ SUB_MB_TYPE_4x8 | MB_TYPE_P0L1,									2, 1 },	//B_L1_4x8
+	{ SUB_MB_TYPE_8x4 | MB_TYPE_P0L0 | MB_TYPE_P0L1,	2, 2 },	//B_Bi_8x4
+	{ SUB_MB_TYPE_4x8 | MB_TYPE_P0L0 | MB_TYPE_P0L1,	2, 1 },	//B_Bi_4x8
+	{ SUB_MB_TYPE_4x4 | MB_TYPE_P0L0,									4, 1 },	//B_L0_4x4
+	{ SUB_MB_TYPE_4x4 | MB_TYPE_P0L1,									4, 1 },	//B_L1_4x4
+	{ SUB_MB_TYPE_4x4 | MB_TYPE_P0L0 | MB_TYPE_P0L1,	4, 1 }	//B_Bi_4x4
 };
 
 typedef struct TagSar {

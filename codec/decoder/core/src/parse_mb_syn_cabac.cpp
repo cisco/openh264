@@ -340,9 +340,9 @@ int32_t ParseMBTypeBSliceCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNeighA
 		}
 		else {
 			WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 4, uiCode)); uiMbType = uiCode << 3;
-			WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 5, uiCode)); uiMbType += uiCode << 2;
-			WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 5, uiCode)); uiMbType += uiCode << 1;
-			WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 5, uiCode)); uiMbType += uiCode;
+			WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 5, uiCode)); uiMbType |= uiCode << 2;
+			WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 5, uiCode)); uiMbType |= uiCode << 1;
+			WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 5, uiCode)); uiMbType |= uiCode;
 			if (uiMbType < 8) {
 				uiMbType += 3;
 				return ERR_NONE;
@@ -361,7 +361,7 @@ int32_t ParseMBTypeBSliceCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNeighA
 			}
 			uiMbType <<= 1;
 			WELS_READ_VERIFY(DecodeBinCabac(pCabacDecEngine, pBinCtx + 5, uiCode));
-			uiMbType += uiCode;
+			uiMbType |= uiCode;
 			uiMbType -= 4;
 		}
 	}
@@ -952,22 +952,16 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 				}
 				continue;
 			}
-			else if (IS_INTER_16x16(pCurDqLayer->pSubMbType[iMbXy][i]))
-				subMbType &= 0xFFFFFF00;
-			else if (IS_INTER_16x8(pCurDqLayer->pSubMbType[iMbXy][i]) || IS_INTER_8x16(pCurDqLayer->pSubMbType[iMbXy][i]))
-				subMbType &= 0xFFFFFFC0;
-			else if (IS_Inter_8x8(pCurDqLayer->pSubMbType[iMbXy][i]))
-				subMbType &= 0xFFFFFF80;
-			if (subMbType == MB_TYPE_P0L0) {
+			else if (IS_TYPE_L0(pCurDqLayer->pSubMbType[iMbXy][i]) && IS_TYPE_L1(pCurDqLayer->pSubMbType[iMbXy][i])) {
+				list[0] = LIST_0;
+				list[1] = LIST_1;
+			}
+			else if (IS_TYPE_L0(pCurDqLayer->pSubMbType[iMbXy][i])) {
 				list[0] = LIST_0;
 				list[1] = -1;
 			}
-			else if (subMbType == MB_TYPE_P0L1) {
-				list[0] = -1;
-				list[1] = LIST_1;
-			}
 			else {
-				list[0] = LIST_0;
+				list[0] = -1;
 				list[1] = LIST_1;
 			}
 			for (int32_t k = 0; k < 2; ++k) {
@@ -1002,22 +996,16 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 			if (pCurDqLayer->pSubMbType[iMbXy][i] == MB_TYPE_DIRECT) {
 				continue;
 			}
-			if (IS_INTER_16x16(pCurDqLayer->pSubMbType[iMbXy][i]))
-				subMbType &= 0xFFFFFF00;
-			else if (IS_INTER_16x8(pCurDqLayer->pSubMbType[iMbXy][i]) || IS_INTER_8x16(pCurDqLayer->pSubMbType[iMbXy][i]))
-				subMbType &= 0xFFFFFFC0;
-			else if (IS_Inter_8x8(pCurDqLayer->pSubMbType[iMbXy][i]))
-				subMbType &= 0xFFFFFF80;
-			if (subMbType == MB_TYPE_P0L0) {
+			if (IS_TYPE_L0(pCurDqLayer->pSubMbType[iMbXy][i]) && IS_TYPE_L1(pCurDqLayer->pSubMbType[iMbXy][i])) {
+				list[0] = LIST_0;
+				list[1] = LIST_1;
+			}
+			else if (IS_TYPE_L0(pCurDqLayer->pSubMbType[iMbXy][i])) {
 				list[0] = LIST_0;
 				list[1] = -1;
 			}
-			else if (subMbType == MB_TYPE_P0L1) {
-				list[0] = -1;
-				list[1] = LIST_1;
-			}
 			else {
-				list[0] = LIST_0;
+				list[0] = -1;
 				list[1] = LIST_1;
 			}
 

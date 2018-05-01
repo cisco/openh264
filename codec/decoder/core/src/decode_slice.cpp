@@ -1099,7 +1099,7 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAva
 	if (uiMbType == 0) { //B_Direct_16x16
 		pCurLayer->pMbType[iMbXy] = MB_TYPE_DIRECT;
 		int16_t pMv[LIST_A][2] = { 0 };
-		int8_t  ref[LIST_A] = { -1 };
+		int8_t  ref[LIST_A] = { 0 };
 		if (pSliceHeader->iDirectSpatialMvPredFlag) {
 			//predict direct spatial mv
 			PredBDirectSpatialMvAndRefFromNeighbor(pCurLayer, pMv, ref);
@@ -1125,16 +1125,6 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAva
 			ST32(pCurLayer->pMvd[LIST_0][iMbXy][i], 0);
 			ST32(pCurLayer->pMvd[LIST_1][iMbXy][i], 0);
 		}
-
-		//reset rS
-		pCurLayer->pLumaQp[iMbXy] = pSlice->iLastMbQp; //??????????????? dqaunt of previous mb
-		for (i = 0; i < 2; i++) {
-			pCurLayer->pChromaQp[iMbXy][i] = g_kuiChromaQpTable[WELS_CLIP3(pCurLayer->pLumaQp[iMbXy] +
-				pSliceHeader->pPps->iChromaQpIndexOffset[i], 0, 51)];
-		}
-
-		//for neighboring CABAC usage
-		pSlice->iLastDeltaQp = 0;
 	}
 	else if (uiMbType < 23) { //Inter B mode
 		int16_t pMotionVector[LIST_A][30][MV_A];
@@ -1214,7 +1204,7 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAva
 		if (MB_TYPE_INTRA16x16 != pCurLayer->pMbType[iMbXy]) {
 			// Need modification when B picutre add in
 			bool bNeedParseTransformSize8x8Flag =
-				(((IS_INTER_16x16(pCurLayer->pMbType[iMbXy]) || IS_INTER_16x8(pCurLayer->pMbType[iMbXy]) || IS_INTER_8x16(pCurLayer->pMbType[iMbXy]))
+				(((IS_INTER_16x16(pCurLayer->pMbType[iMbXy]) || IS_DIRECT(pCurLayer->pMbType[iMbXy]) || IS_INTER_16x8(pCurLayer->pMbType[iMbXy]) || IS_INTER_8x16(pCurLayer->pMbType[iMbXy]))
 					|| pCurLayer->pNoSubMbPartSizeLessThan8x8Flag[iMbXy])
 					&& (pCurLayer->pMbType[iMbXy] != MB_TYPE_INTRA8x8)
 					&& (pCurLayer->pMbType[iMbXy] != MB_TYPE_INTRA4x4)
@@ -1448,6 +1438,10 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 
 	GetNeighborAvailMbType(&uiNeighAvail, pCurLayer);
 	WELS_READ_VERIFY(ParseSkipFlagCabac(pCtx, &uiNeighAvail, uiCode));	
+
+	if (iMbXy == 0) {
+		iMbXy = 0;
+	}
 
 	if (uiCode) {
 		int16_t pMv[LIST_A][2] = { 0 };

@@ -291,10 +291,10 @@ typedef struct TagNalUnitHeaderExt {
 #define	MB_TYPE_L0				(MB_TYPE_P0L0 | MB_TYPE_P1L0)
 #define	MB_TYPE_L1				(MB_TYPE_P0L1 | MB_TYPE_P1L1)
 
-#define SUB_MB_TYPE_8x8     0x00000001
-#define SUB_MB_TYPE_8x4     0x00000002
-#define SUB_MB_TYPE_4x8     0x00000004
-#define SUB_MB_TYPE_4x4     0x00000008
+#define SUB_MB_TYPE_8x8     0x00010000
+#define SUB_MB_TYPE_8x4     0x00020000
+#define SUB_MB_TYPE_4x8     0x00040000
+#define SUB_MB_TYPE_4x4     0x00080000
 
 #define MB_TYPE_INTRA     (MB_TYPE_INTRA4x4 | MB_TYPE_INTRA16x16 | MB_TYPE_INTRA8x8 | MB_TYPE_INTRA_PCM)
 #define MB_TYPE_INTER     (MB_TYPE_16x16 | MB_TYPE_16x8 | MB_TYPE_8x16 | MB_TYPE_8x8 | MB_TYPE_8x8_REF0 | MB_TYPE_SKIP | MB_TYPE_DIRECT)
@@ -317,6 +317,10 @@ typedef struct TagNalUnitHeaderExt {
 #define IS_I_BL(type) ( (type) == MB_TYPE_INTRA_BL )
 #define IS_SVC_INTRA(type) ( IS_I_BL(type) || IS_INTRA(type) )
 #define IS_Inter_8x8(type) ( (type)&MB_TYPE_8x8)
+#define IS_SUB_8x8(sub_type) ((sub_type)&SUB_MB_TYPE_8x8)
+#define IS_SUB_8x4(sub_type) ((sub_type)&SUB_MB_TYPE_8x4)
+#define IS_SUB_4x8(sub_type) ((sub_type)&SUB_MB_TYPE_4x8)
+#define IS_SUB_4x4(sub_type) ((sub_type)&SUB_MB_TYPE_4x4)
 
 #define REF_NOT_AVAIL   -2
 #define REF_NOT_IN_LIST -1  //intra
