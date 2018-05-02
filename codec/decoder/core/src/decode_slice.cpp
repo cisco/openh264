@@ -1095,46 +1095,7 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAva
 #if defined(_DEBUG)
 	WelsLog(&(pCtx->sLogCtx), WELS_LOG_WARNING, "mb_num and type = [%d %d]", iMbXy, uiMbType);
 #endif
-
-	if (uiMbType == 0) { //B_Direct_16x16
-		pCurLayer->pMbType[iMbXy] = MB_TYPE_DIRECT;
-		int16_t pMv[LIST_A][2] = { 0 };
-		int8_t  ref[LIST_A] = { 0 };
-		if (pSliceHeader->iDirectSpatialMvPredFlag) {
-			//predict direct spatial mv
-			PredBDirectSpatialMvAndRefFromNeighbor(pCurLayer, pMv, ref);
-			if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
-			//To be implemented
-			PredBDirect8x8Spatial(pCtx);
-			}
-			else {
-			//To be implemented
-			PredBDirect4x4Spatial(pCtx);
-			}
-		}
-		else {
-			//temporal direct 16x16 mode
-			ComputeColocated(pCtx);
-			PredBDirect16x16Temporal(pCtx);
-		}
-
-		int16_t pMotionVector[LIST_A][30][MV_A];
-		int16_t pMvdCache[LIST_A][30][MV_A];
-		int8_t  pRefIndex[LIST_A][30];
-		pCurLayer->pMbType[iMbXy] = g_ksInterBMbTypeInfo[uiMbType].iType;
-		WelsFillCacheInterCabac(pNeighAvail, pNonZeroCount, pMotionVector, pMvdCache, pRefIndex, pCurLayer);
-		pCurLayer->pInterPredictionDoneFlag[iMbXy] = 0;
-
-		for (i = 0; i < 16; i++) {
-			ST32(pCurLayer->pMv[LIST_0][iMbXy][i], *(uint32_t*)pMv[LIST_0]);
-			ST32(pCurLayer->pMv[LIST_1][iMbXy][i], *(uint32_t*)pMv[LIST_1]);
-			pCurLayer->pRefIndex[LIST_0][iMbXy][i] = ref[LIST_0];
-			pCurLayer->pRefIndex[LIST_1][iMbXy][i] = ref[LIST_1];
-			ST32(pCurLayer->pMvd[LIST_0][iMbXy][i], 0);
-			ST32(pCurLayer->pMvd[LIST_1][iMbXy][i], 0);
-		}
-	}
-	else if (uiMbType < 23) { //Inter B mode
+	if (uiMbType < 23) { //Inter B mode
 		int16_t pMotionVector[LIST_A][30][MV_A];
 		int16_t pMvdCache[LIST_A][30][MV_A];
 		int8_t  pRefIndex[LIST_A][30];
@@ -1469,7 +1430,9 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 		
 		if (pSliceHeader->iDirectSpatialMvPredFlag) {
 			//predict direct spatial mv
-			PredBDirectSpatialMvAndRefFromNeighbor(pCurLayer, pMv, ref);
+			for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+				PredMvBDirectSpatial(pCurLayer, pMv[listIdx], ref[listIdx], listIdx);
+			}
 			if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
 			 //To be implemented
 				PredBDirect8x8Spatial(pCtx);

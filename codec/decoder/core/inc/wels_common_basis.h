@@ -250,7 +250,7 @@ static const SPartMbInfo g_ksInterPMbTypeInfo[5] = {
 //Table 7.14. Macroblock type values 0 to 22 for B slices.
 static const SPartMbInfo g_ksInterBMbTypeInfo[] = {
 	//						Part 0				Part 1
-	{ MB_TYPE_DIRECT, -1, 4 },	//B_Direct_16x16
+	{ MB_TYPE_DIRECT, 1, 4 },	//B_Direct_16x16
 	{ MB_TYPE_16x16 | MB_TYPE_P0L0, 1, 4 },	//B_L0_16x16
 	{ MB_TYPE_16x16 | MB_TYPE_P0L1, 1, 4 },	//B_L1_16x16
 	{ MB_TYPE_16x16 | MB_TYPE_P0L0 | MB_TYPE_P0L1, 1, 4 },	//B_Bi_16x16
