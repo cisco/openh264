@@ -101,9 +101,9 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;X86_ASM;X64;HAVE_AVX2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;X64;HAVE_AVX2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>Y:\p4\CodeProjects\Upwork\projects\openh264-1\codec\decoder\core\inc;Y:\p4\CodeProjects\Upwork\projects\openh264-1\codec\common\inc;Y:\p4\CodeProjects\Upwork\projects\openh264-1\codec\console\common\inc;Y:\p4\CodeProjects\Upwork\projects\openh264-1\codec\api\svc;Y:\p4\CodeProjects\Upwork\projects\openh264-1\codec\console\dec\inc;Y:\p4\CodeProjects\Upwork\projects\openh264-1\codec\decoder\plus\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\decoder\core\inc;..\common\inc;..\console\common\inc;..\api\svc;..\console\dec\inc;..\decoder\plus\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
