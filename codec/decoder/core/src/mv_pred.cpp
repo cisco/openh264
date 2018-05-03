@@ -192,18 +192,18 @@ void PredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]) {
   }
 }
 
-void PredMvBDirectSpatial(PDqLayer pCurLayer, int16_t iMvp[2], int8_t& ref, int32_t listIdx) {
+void PredMvBDirectSpatial(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2], int8_t ref[LIST_A]) {
 	bool bTopAvail, bLeftTopAvail, bRightTopAvail, bLeftAvail;
 
 	int32_t iCurSliceIdc, iTopSliceIdc, iLeftTopSliceIdc, iRightTopSliceIdc, iLeftSliceIdc;
 	int32_t iCurX, iCurY, iCurXy, iLeftXy, iTopXy = 0, iLeftTopXy = 0, iRightTopXy = 0;
 
-	int8_t iLeftRef;
-	int8_t iTopRef;
-	int8_t iRightTopRef;
-	int8_t iLeftTopRef;
-	int8_t iDiagonalRef;
-	int16_t iMvA[2], iMvB[2], iMvC[2], iMvD[2];
+	int8_t iLeftRef[LIST_A];
+	int8_t iTopRef[LIST_A];
+	int8_t iRightTopRef[LIST_A];
+	int8_t iLeftTopRef[LIST_A];
+	int8_t iDiagonalRef[LIST_A];
+	int16_t iMvA[LIST_A][2], iMvB[LIST_A][2], iMvC[LIST_A][2], iMvD[LIST_A][2];
 
 	iCurXy = pCurLayer->iMbXyIndex;
 	iCurX = pCurLayer->iMbX;
@@ -248,106 +248,111 @@ void PredMvBDirectSpatial(PDqLayer pCurLayer, int16_t iMvp[2], int8_t& ref, int3
 	}
 
 	/*get neb mv&iRefIdxArray*/
+	for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
 	/*left*/
-	if (bLeftAvail) {
-		ST32(iMvA, LD32(pCurLayer->pMv[listIdx][iLeftXy][3]));
-		iLeftRef = pCurLayer->pRefIndex[listIdx][iLeftXy][3];
-	}
-	else {
-		ST32(iMvA, 0);
-		if (0 == bLeftAvail) { //not available
-			iLeftRef = REF_NOT_AVAIL;
-		}
-		else { //available but is intra mb type
-			iLeftRef = REF_NOT_IN_LIST;
-		}
-	}
-
-	if (REF_NOT_AVAIL == iLeftRef ||
-		(iLeftRef >= REF_NOT_IN_LIST && 0 == *(int32_t*)iMvA)) {
-		ref = iLeftRef;
-		ST32(iMvp, 0);
-		return;
-	}
-
-	/*top*/
-	if (bTopAvail) {
-		ST32(iMvB, LD32(pCurLayer->pMv[listIdx][iTopXy][12]));
-		iTopRef = pCurLayer->pRefIndex[listIdx][iTopXy][12];
-	}
-	else {
-		ST32(iMvB, 0);
-		if (0 == bTopAvail) { //not available
-			iTopRef = REF_NOT_AVAIL;
-		}
-		else { //available but is intra mb type
-			iTopRef = REF_NOT_IN_LIST;
-		}
-	}
-	if (REF_NOT_AVAIL == iTopRef ||
-		(iTopRef >= REF_NOT_IN_LIST && 0 == *(int32_t*)iMvB)) {
-		ref = iTopRef;
-		ST32(iMvp, 0);
-		return;
-	}
-
-	/*right_top*/
-	if (bRightTopAvail) {
-		ST32(iMvC, LD32(pCurLayer->pMv[listIdx][iRightTopXy][12]));
-		iRightTopRef = pCurLayer->pRefIndex[listIdx][iRightTopXy][12];
-	}
-	else {
-		ST32(iMvC, 0);
-		if (0 == bRightTopAvail) { //not available
-			iRightTopRef = REF_NOT_AVAIL;
-		}
-		else { //available but is intra mb type
-			iRightTopRef = REF_NOT_IN_LIST;
-		}
-	}
-
-	/*left_top*/
-	if (bLeftTopAvail) {
-		ST32(iMvD, LD32(pCurLayer->pMv[listIdx][iLeftTopXy][15]));
-		iLeftTopRef = pCurLayer->pRefIndex[listIdx][iLeftTopXy][15];
-	}
-	else {
-		ST32(iMvD, 0);
-		if (0 == bLeftTopAvail) { //not available
-			iLeftTopRef = REF_NOT_AVAIL;
-		}
-		else { //available but is intra mb type
-			iLeftTopRef = REF_NOT_IN_LIST;
-		}
-	}
-
-	iDiagonalRef = iRightTopRef;
-	if (REF_NOT_AVAIL == iDiagonalRef) {
-		iDiagonalRef = iLeftTopRef;
-		*(int32_t*)iMvC = *(int32_t*)iMvD;
-	}
-
-	if (REF_NOT_AVAIL == iTopRef && REF_NOT_AVAIL == iDiagonalRef && iLeftRef >= REF_NOT_IN_LIST) {
-		ref = iLeftRef;
-		ST32(iMvp, LD32(iMvA));
-		return;
-	}
-	ref = WELS_MIN_POSITIVE(iLeftRef, WELS_MIN_POSITIVE(iTopRef, iRightTopRef));
-	uint32_t match_count = (iLeftRef == ref) + (iTopRef == ref) + (iDiagonalRef == ref);
-	if (match_count == 1) {
-		if (iLeftRef == ref) {
-			ST32(iMvp, LD32(iMvA));
-		}
-		else if (iTopRef == ref) {
-			ST32(iMvp, LD32(iMvB));
+		if (bLeftAvail) {
+			ST32(iMvA[listIdx], LD32(pCurLayer->pMv[listIdx][iLeftXy][3]));
+			iLeftRef[listIdx] = pCurLayer->pRefIndex[listIdx][iLeftXy][3];
 		}
 		else {
-			ST32(iMvp, LD32(iMvC));
+			ST32(iMvA[listIdx], 0);
+			if (0 == bLeftAvail) { //not available
+				iLeftRef[listIdx] = REF_NOT_AVAIL;
+			}
+			else { //available but is intra mb type
+				iLeftRef[listIdx] = REF_NOT_IN_LIST;
+			}
+		}
+
+		if (REF_NOT_AVAIL == iLeftRef[listIdx] ||
+			(iLeftRef[listIdx] >= REF_NOT_IN_LIST && 0 == *(int32_t*)iMvA[listIdx])) {
+			ref[listIdx] = iLeftRef[listIdx];
+			ST32(iMvp[listIdx], 0);
+			continue;
+		}
+
+		/*top*/
+		if (bTopAvail) {
+			ST32(iMvB[listIdx], LD32(pCurLayer->pMv[listIdx][iTopXy][12]));
+			iTopRef[listIdx] = pCurLayer->pRefIndex[listIdx][iTopXy][12];
+		}
+		else {
+			ST32(iMvB[listIdx], 0);
+			if (0 == bTopAvail) { //not available
+				iTopRef[listIdx] = REF_NOT_AVAIL;
+			}
+			else { //available but is intra mb type
+				iTopRef[listIdx] = REF_NOT_IN_LIST;
+			}
+		}
+		if (REF_NOT_AVAIL == iTopRef[listIdx] ||
+			(iTopRef[listIdx] >= REF_NOT_IN_LIST && 0 == *(int32_t*)iMvB[listIdx])) {
+			ref[listIdx] = iTopRef[listIdx];
+			ST32(iMvp[listIdx], 0);
+			continue;
+		}
+
+		/*right_top*/
+		if (bRightTopAvail) {
+			ST32(iMvC[listIdx], LD32(pCurLayer->pMv[listIdx][iRightTopXy][12]));
+			iRightTopRef[listIdx] = pCurLayer->pRefIndex[listIdx][iRightTopXy][12];
+		}
+		else {
+			ST32(iMvC[listIdx], 0);
+			if (0 == bRightTopAvail) { //not available
+				iRightTopRef[listIdx] = REF_NOT_AVAIL;
+			}
+			else { //available but is intra mb type
+				iRightTopRef[listIdx] = REF_NOT_IN_LIST;
+			}
+		}
+		/*left_top*/
+		if (bLeftTopAvail) {
+			ST32(iMvD[listIdx], LD32(pCurLayer->pMv[listIdx][iLeftTopXy][15]));
+			iLeftTopRef[listIdx] = pCurLayer->pRefIndex[listIdx][iLeftTopXy][15];
+		}
+		else {
+			ST32(iMvD[listIdx], 0);
+			if (0 == bLeftTopAvail) { //not available
+				iLeftTopRef[listIdx] = REF_NOT_AVAIL;
+			}
+			else { //available but is intra mb type
+				iLeftTopRef[listIdx] = REF_NOT_IN_LIST;
+			}
+		}
+
+		iDiagonalRef[listIdx] = iRightTopRef[listIdx];
+		if (REF_NOT_AVAIL == iDiagonalRef[listIdx]) {
+			iDiagonalRef[listIdx] = iLeftTopRef[listIdx];
+			*(int32_t*)iMvC[listIdx] = *(int32_t*)iMvD[listIdx];
+		}
+
+		if (REF_NOT_AVAIL == iTopRef[listIdx] && REF_NOT_AVAIL == iDiagonalRef[listIdx] && iLeftRef[listIdx] >= REF_NOT_IN_LIST) {
+			ref[listIdx] = iLeftRef[listIdx];
+			ST32(iMvp[listIdx], LD32(iMvA[listIdx]));
+			continue;
+		}
+
+		ref[listIdx] = WELS_MIN_POSITIVE(iLeftRef[listIdx], WELS_MIN_POSITIVE(iTopRef[listIdx], iRightTopRef[listIdx]));
+		uint32_t match_count = (iLeftRef[listIdx] == ref[listIdx]) + (iTopRef[listIdx] == ref[listIdx]) + (iDiagonalRef[listIdx] == ref[listIdx]);
+		if (match_count == 1) {
+			if (iLeftRef[listIdx] == ref[listIdx]) {
+				ST32(iMvp[listIdx], LD32(iMvA[listIdx]));
+			}
+			else if (iTopRef[listIdx] == ref[listIdx]) {
+				ST32(iMvp[listIdx], LD32(iMvB[listIdx]));
+			}
+			else {
+				ST32(iMvp[listIdx], LD32(iMvC[listIdx]));
+			}
+		}
+		else {
+			iMvp[listIdx][0] = WelsMedian(iMvA[listIdx][0], iMvB[listIdx][0], iMvC[listIdx][0]);
+			iMvp[listIdx][1] = WelsMedian(iMvA[listIdx][1], iMvB[listIdx][1], iMvC[listIdx][1]);
 		}
 	}
-	else {
-		iMvp[0] = WelsMedian(iMvA[0], iMvB[0], iMvC[0]);
-		iMvp[1] = WelsMedian(iMvA[1], iMvB[1], iMvC[1]);
+	if (ref[LIST_0] < 0 && ref[LIST_1] < 0) {
+		ref[LIST_0] = ref[LIST_1] = 0;
 	}
 }
 

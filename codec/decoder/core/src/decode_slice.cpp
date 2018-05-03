@@ -1426,12 +1426,8 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 		
 		if (pSliceHeader->iDirectSpatialMvPredFlag) {
 			//predict direct spatial mv
-			for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
-				PredMvBDirectSpatial(pCurLayer, pMv[listIdx], ref[listIdx], listIdx);
-			}
-			if (ref[LIST_0] == REF_NOT_AVAIL && ref[LIST_1] == REF_NOT_AVAIL) {
-				ref[LIST_0] = ref[LIST_1] = 0;
-			}
+			PredMvBDirectSpatial(pCurLayer, pMv, ref);
+		
 			if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
 			 //To be implemented
 				PredBDirect8x8Spatial(pCtx);

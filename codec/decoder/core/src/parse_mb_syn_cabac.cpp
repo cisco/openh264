@@ -724,13 +724,7 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 		if (pSliceHeader->iDirectSpatialMvPredFlag) {
 			//predict direct spatial mv
 			int16_t pMvDirect[LIST_A][2] = { 0 };
-			for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
-				PredMvBDirectSpatial(pCurDqLayer, pMvDirect[listIdx], iRef[listIdx], listIdx);
-				WELS_CHECK_SE_BOTH_WARNING(pMv[1], iMinVmv, iMaxVmv, "vertical mv");
-			}
-			if (iRef[LIST_0] == REF_NOT_AVAIL && iRef[LIST_1] == REF_NOT_AVAIL) {
-				iRef[LIST_0] = iRef[LIST_1] = 0;
-			}
+			PredMvBDirectSpatial(pCurDqLayer, pMvDirect, iRef);
 			for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
 				UpdateP16x16MotionInfo(pCurDqLayer, listIdx, iRef[listIdx], pMvDirect[listIdx]);
 				UpdateP16x16MvdCabac(pCurDqLayer, pMvd, listIdx);
@@ -886,6 +880,33 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 			if (!IS_DIRECT(subMbType)) {
 				continue;
 			}
+
+			int16_t pMvDirect[LIST_A][2] = { 0 };
+			if (pSliceHeader->iDirectSpatialMvPredFlag) {
+				PredMvBDirectSpatial(pCurDqLayer, pMvDirect, iRef);
+				*(uint32_t*)pMv = *(uint32_t*)pMvDirect[LIST_0];
+				*(uint32_t*)(pMv+2) = *(uint32_t*)pMvDirect[LIST_1];
+				if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
+					//To be implemented
+					PredBDirect8x8Spatial(pCtx);
+				}
+				else {
+					//To be implemented
+					PredBDirect4x4Spatial(pCtx);
+				}
+			}
+			else {
+				//temporal direct mode
+				ComputeColocated(pCtx);
+				if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
+					//To be implemented
+					PredBDirect8x8Temporal(pCtx);
+				}
+				else {
+					//To be implemented
+					PredBDirect4x4Temporal(pCtx);
+				}
+			}
 			int8_t iPartCount = pSubPartCount[i];
 			int16_t iPartIdx, iBlockW = pPartW[i];
 			uint8_t iScan4Idx, iCacheIdx;
@@ -894,38 +915,10 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 			int32_t list[2] = { LIST_0, LIST_1 };
 			for (int32_t k = 0; k < 2; ++k) {
 				int32_t listIdx = list[k];
-				if (pSliceHeader->iDirectSpatialMvPredFlag) {
-					PredMvBDirectSpatial(pCurDqLayer, pMv, pRefIdx[i], listIdx);
-					if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
-						//To be implemented
-						PredBDirect8x8Spatial(pCtx);
-					}
-					else {
-						//To be implemented
-						PredBDirect4x4Spatial(pCtx);
-					}
-				}
-				else {
-					//temporal direct mode
-					ComputeColocated(pCtx);
-					if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
-						//To be implemented
-						PredBDirect8x8Temporal(pCtx);
-					}
-					else {
-						//To be implemented
-						PredBDirect4x4Temporal(pCtx);
-					}
-				}
-				if (pRefIdx[i] < 0) {
-					pRefIdx[i] = 0;
-				}
-				pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || !(pCtx->sRefPic.pRefList[listIdx][pRefIdx[i]]
-					&& pCtx->sRefPic.pRefList[listIdx][pRefIdx[i]]->bIsComplete);
-				UpdateP8x8RefIdxCabac(pCurDqLayer, pRefIndex, iIdx8, pRefIdx[i], listIdx);
+				UpdateP8x8RefIdxCabac(pCurDqLayer, pRefIndex, iIdx8, iRef[k], listIdx);
 
 				pRefIndex[listIdx][iCacheIdx] = pRefIndex[listIdx][iCacheIdx + 1]
-					= pRefIndex[listIdx][iCacheIdx + 6] = pRefIndex[listIdx][iCacheIdx + 7] = pRefIdx[i];
+					= pRefIndex[listIdx][iCacheIdx + 6] = pRefIndex[listIdx][iCacheIdx + 7] = iRef[k];
 
 				for (int32_t j = 0; j < iPartCount; j++) {
 					iPartIdx = (i << 2) + j * iBlockW;
