@@ -723,10 +723,16 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 	
 		if (pSliceHeader->iDirectSpatialMvPredFlag) {
 			//predict direct spatial mv
+			int16_t pMvDirect[LIST_A][2] = { 0 };
 			for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
-				PredMvBDirectSpatial(pCurDqLayer, pMv, iRef[listIdx], listIdx);
+				PredMvBDirectSpatial(pCurDqLayer, pMvDirect[listIdx], iRef[listIdx], listIdx);
 				WELS_CHECK_SE_BOTH_WARNING(pMv[1], iMinVmv, iMaxVmv, "vertical mv");
-				UpdateP16x16MotionInfo(pCurDqLayer, listIdx, iRef[listIdx], pMv);
+			}
+			if (iRef[LIST_0] == REF_NOT_AVAIL && iRef[LIST_1] == REF_NOT_AVAIL) {
+				iRef[LIST_0] = iRef[LIST_1] = 0;
+			}
+			for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+				UpdateP16x16MotionInfo(pCurDqLayer, listIdx, iRef[listIdx], pMvDirect[listIdx]);
 				UpdateP16x16MvdCabac(pCurDqLayer, pMvd, listIdx);
 			}
 		}
@@ -741,29 +747,36 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 		if (IS_TYPE_L0(mbType)) list[0] = LIST_0;
 		if (IS_TYPE_L1(mbType)) list[1] = LIST_1;
 		iPartIdx = 0;
-		for (int32_t i = 0; i < 2; ++i) {
+		for (int32_t i = LIST_0; i < LIST_A; ++i) {
 			int32_t listIdx = list[i];
-			if (listIdx < 0) continue;
-			WELS_READ_VERIFY(ParseRefIdxCabac(pCtx, pNeighAvail, pNonZeroCount, pRefIndex, listIdx, iPartIdx, pRefCount[listIdx], 0,
-				iRef[listIdx]));
-			if ((iRef[listIdx] < 0) || (iRef[listIdx] >= pRefCount[listIdx]) || (pCtx->sRefPic.pRefList[listIdx][iRef[listIdx]] == NULL)) { //error ref_idx
-				pCtx->bMbRefConcealed = true;
-				if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE) {
-					iRef[listIdx] = 0;
-					pCtx->iErrorCode |= dsBitstreamError;
+			if (listIdx >= LIST_0) {
+				WELS_READ_VERIFY(ParseRefIdxCabac(pCtx, pNeighAvail, pNonZeroCount, pRefIndex, listIdx, iPartIdx, pRefCount[listIdx], 0,
+					iRef[listIdx]));
+				if ((iRef[listIdx] < 0) || (iRef[listIdx] >= pRefCount[listIdx]) || (pCtx->sRefPic.pRefList[listIdx][iRef[listIdx]] == NULL)) { //error ref_idx
+					pCtx->bMbRefConcealed = true;
+					if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE) {
+						iRef[listIdx] = 0;
+						pCtx->iErrorCode |= dsBitstreamError;
+					}
+					else {
+						return GENERATE_ERROR_NO(ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_REF_INDEX);
+					}
 				}
-				else {
-					return GENERATE_ERROR_NO(ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_REF_INDEX);
-				}
+				pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || !(pCtx->sRefPic.pRefList[listIdx][iRef[listIdx]]
+					&& pCtx->sRefPic.pRefList[listIdx][iRef[listIdx]]->bIsComplete);
+				PredMv(pMotionVector, pRefIndex, listIdx, 0, 4, iRef[listIdx], pMv);
+				WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 0, pMvd[0]));
+				WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 1, pMvd[1]));
+				pMv[0] += pMvd[0];
+				pMv[1] += pMvd[1];
+				WELS_CHECK_SE_BOTH_WARNING(pMv[1], iMinVmv, iMaxVmv, "vertical mv");
 			}
-			pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || !(pCtx->sRefPic.pRefList[listIdx][iRef[listIdx]]
-				&& pCtx->sRefPic.pRefList[listIdx][iRef[listIdx]]->bIsComplete);
-			PredMv(pMotionVector, pRefIndex, listIdx, 0, 4, iRef[listIdx], pMv);
-			WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 0, pMvd[0]));
-			WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 1, pMvd[1]));
-			pMv[0] += pMvd[0];
-			pMv[1] += pMvd[1];
-			WELS_CHECK_SE_BOTH_WARNING(pMv[1], iMinVmv, iMaxVmv, "vertical mv");
+			else {
+				listIdx = i;
+				*(int32_t*)pMv = 0;
+				*(int32_t*)pMvd = 0;
+				iRef[listIdx] = REF_NOT_IN_LIST;
+			}
 			UpdateP16x16MotionInfo(pCurDqLayer, listIdx, iRef[listIdx], pMv);
 			UpdateP16x16MvdCabac(pCurDqLayer, pMvd, listIdx);
 		}

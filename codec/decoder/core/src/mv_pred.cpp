@@ -196,7 +196,6 @@ void PredMvBDirectSpatial(PDqLayer pCurLayer, int16_t iMvp[2], int8_t& ref, int3
 	bool bTopAvail, bLeftTopAvail, bRightTopAvail, bLeftAvail;
 
 	int32_t iCurSliceIdc, iTopSliceIdc, iLeftTopSliceIdc, iRightTopSliceIdc, iLeftSliceIdc;
-	int32_t iLeftTopType, iRightTopType, iTopType, iLeftType;
 	int32_t iCurX, iCurY, iCurXy, iLeftXy, iTopXy = 0, iLeftTopXy = 0, iRightTopXy = 0;
 
 	int8_t iLeftRef;
@@ -248,16 +247,9 @@ void PredMvBDirectSpatial(PDqLayer pCurLayer, int16_t iMvp[2], int8_t& ref, int3
 		bRightTopAvail = 0;
 	}
 
-	iLeftType = ((iCurX != 0 && bLeftAvail) ? pCurLayer->pMbType[iLeftXy] : 0);
-	iTopType = ((iCurY != 0 && bTopAvail) ? pCurLayer->pMbType[iTopXy] : 0);
-	iLeftTopType = ((iCurX != 0 && iCurY != 0 && bLeftTopAvail)
-		? pCurLayer->pMbType[iLeftTopXy] : 0);
-	iRightTopType = ((iCurX != pCurLayer->iMbWidth - 1 && iCurY != 0 && bRightTopAvail)
-		? pCurLayer->pMbType[iRightTopXy] : 0);
-
 	/*get neb mv&iRefIdxArray*/
 	/*left*/
-	if (bLeftAvail && IS_INTER(iLeftType)) {
+	if (bLeftAvail) {
 		ST32(iMvA, LD32(pCurLayer->pMv[listIdx][iLeftXy][3]));
 		iLeftRef = pCurLayer->pRefIndex[listIdx][iLeftXy][3];
 	}
@@ -272,14 +264,14 @@ void PredMvBDirectSpatial(PDqLayer pCurLayer, int16_t iMvp[2], int8_t& ref, int3
 	}
 
 	if (REF_NOT_AVAIL == iLeftRef ||
-		(iLeftRef >= 0 && 0 == *(int32_t*)iMvA)) {
+		(iLeftRef >= REF_NOT_IN_LIST && 0 == *(int32_t*)iMvA)) {
 		ref = iLeftRef;
 		ST32(iMvp, 0);
 		return;
 	}
 
 	/*top*/
-	if (bTopAvail && IS_INTER(iTopType)) {
+	if (bTopAvail) {
 		ST32(iMvB, LD32(pCurLayer->pMv[listIdx][iTopXy][12]));
 		iTopRef = pCurLayer->pRefIndex[listIdx][iTopXy][12];
 	}
@@ -293,14 +285,14 @@ void PredMvBDirectSpatial(PDqLayer pCurLayer, int16_t iMvp[2], int8_t& ref, int3
 		}
 	}
 	if (REF_NOT_AVAIL == iTopRef ||
-		(iTopRef >= 0 && 0 == *(int32_t*)iMvB)) {
+		(iTopRef >= REF_NOT_IN_LIST && 0 == *(int32_t*)iMvB)) {
 		ref = iTopRef;
 		ST32(iMvp, 0);
 		return;
 	}
 
 	/*right_top*/
-	if (bRightTopAvail && IS_INTER(iRightTopType)) {
+	if (bRightTopAvail) {
 		ST32(iMvC, LD32(pCurLayer->pMv[listIdx][iRightTopXy][12]));
 		iRightTopRef = pCurLayer->pRefIndex[listIdx][iRightTopXy][12];
 	}
@@ -315,7 +307,7 @@ void PredMvBDirectSpatial(PDqLayer pCurLayer, int16_t iMvp[2], int8_t& ref, int3
 	}
 
 	/*left_top*/
-	if (bLeftTopAvail && IS_INTER(iLeftTopType)) {
+	if (bLeftTopAvail) {
 		ST32(iMvD, LD32(pCurLayer->pMv[listIdx][iLeftTopXy][15]));
 		iLeftTopRef = pCurLayer->pRefIndex[listIdx][iLeftTopXy][15];
 	}

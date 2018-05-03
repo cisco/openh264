@@ -1408,10 +1408,6 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 	GetNeighborAvailMbType(&uiNeighAvail, pCurLayer);
 	WELS_READ_VERIFY(ParseSkipFlagCabac(pCtx, &uiNeighAvail, uiCode));	
 
-	if (iMbXy == 0) {
-		iMbXy = 0;
-	}
-
 	if (uiCode) {
 		int16_t pMv[LIST_A][2] = { 0 };
 		int8_t  ref[LIST_A] = { 0 };
@@ -1432,6 +1428,9 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 			//predict direct spatial mv
 			for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
 				PredMvBDirectSpatial(pCurLayer, pMv[listIdx], ref[listIdx], listIdx);
+			}
+			if (ref[LIST_0] == REF_NOT_AVAIL && ref[LIST_1] == REF_NOT_AVAIL) {
+				ref[LIST_0] = ref[LIST_1] = 0;
 			}
 			if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
 			 //To be implemented
