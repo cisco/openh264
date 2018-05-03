@@ -309,6 +309,7 @@ typedef struct TagNalUnitHeaderExt {
 #define IS_INTER_8x16(type) ( (type)&MB_TYPE_8x16 )
 #define IS_TYPE_L0(type) ( (type)&MB_TYPE_L0 )
 #define IS_TYPE_L1(type) ( (type)&MB_TYPE_L1 )
+#define IS_DIR(a, part, list)	((a) & (MB_TYPE_P0L0<<((part)+2*(list))))
 
 
 #define IS_SKIP(type) ( (type)&MB_TYPE_SKIP )
