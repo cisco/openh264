@@ -659,8 +659,37 @@ void GetInterBPred(uint8_t* pPredYCbCr[3], uint8_t* pTempPredYCbCr[3], PWelsDeco
 	int32_t iRefIndex1 = 0;
 	int32_t iRefIndex2 = 0;
 
-	if (IS_INTER_16x16(iMBType)) {
-		if ( ((iMBType & MB_TYPE_P0L0) && (iMBType & MB_TYPE_P0L1)) || IS_SKIP(iMBType)) {
+	if (IS_DIRECT(iMBType)) {
+		iRefIndex1 = pCurDqLayer->pRefIndex[LIST_0][iMBXY][0];
+		iRefIndex2 = pCurDqLayer->pRefIndex[LIST_1][iMBXY][0];
+		if (iRefIndex1 > REF_NOT_IN_LIST && iRefIndex2 > REF_NOT_IN_LIST) {
+			iMVs[0] = pCurDqLayer->pMv[LIST_0][iMBXY][0][0];
+			iMVs[1] = pCurDqLayer->pMv[LIST_0][iMBXY][0][1];
+			GetRefPic(&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[LIST_0][iMBXY], 0, LIST_0);
+			BaseMC(&pMCRefMem, iMBOffsetX, iMBOffsetY, pMCFunc, 16, 16, iMVs);
+
+			iMVs[0] = pCurDqLayer->pMv[LIST_1][iMBXY][0][0];
+			iMVs[1] = pCurDqLayer->pMv[LIST_1][iMBXY][0][1];
+			GetRefPic(&pTempMCRefMem, pCtx, pCurDqLayer->pRefIndex[LIST_1][iMBXY], 0, LIST_1);
+			BaseMC(&pTempMCRefMem, iMBOffsetX, iMBOffsetY, pMCFunc, 16, 16, iMVs);
+
+			if (pCurDqLayer->sLayerInfo.pPps->uiWeightedBipredIdc) {
+				BiWeightPrediction(pCurDqLayer, &pMCRefMem, &pTempMCRefMem, iRefIndex1, iRefIndex2, 16, 16);
+			}
+			else {
+				BiPrediction(pCurDqLayer, &pMCRefMem, &pTempMCRefMem, iRefIndex1, iRefIndex2, 16, 16);
+			}
+		}
+		else {
+			int32_t listIdx = iRefIndex1 > REF_NOT_IN_LIST ? LIST_0 : LIST_1;
+			iMVs[0] = pCurDqLayer->pMv[listIdx][iMBXY][0][0];
+			iMVs[1] = pCurDqLayer->pMv[listIdx][iMBXY][0][1];
+			GetRefPic(&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[listIdx][iMBXY], 0, listIdx);
+			BaseMC(&pMCRefMem, iMBOffsetX, iMBOffsetY, pMCFunc, 16, 16, iMVs);
+		}
+	}
+	else if (IS_INTER_16x16(iMBType)) {
+		if ( IS_TYPE_L0(iMBType) && IS_TYPE_L1(iMBType)) {
 			iMVs[0] = pCurDqLayer->pMv[LIST_0][iMBXY][0][0];
 			iMVs[1] = pCurDqLayer->pMv[LIST_0][iMBXY][0][1];
 			GetRefPic(&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[LIST_0][iMBXY], 0, LIST_0);
@@ -679,7 +708,7 @@ void GetInterBPred(uint8_t* pPredYCbCr[3], uint8_t* pTempPredYCbCr[3], PWelsDeco
 				BiPrediction(pCurDqLayer, &pMCRefMem, &pTempMCRefMem, iRefIndex1, iRefIndex2, 16, 16);
 			}
 		}
-		else if ((iMBType & MB_TYPE_P0L0) || (iMBType & MB_TYPE_P0L1)) {
+		else {
 			int32_t listIdx = (iMBType & MB_TYPE_P0L0) ? LIST_0 : LIST_1;
 			iMVs[0] = pCurDqLayer->pMv[listIdx][iMBXY][0][0];
 			iMVs[1] = pCurDqLayer->pMv[listIdx][iMBXY][0][1];
@@ -961,13 +990,13 @@ void GetInterBPred(uint8_t* pPredYCbCr[3], uint8_t* pTempPredYCbCr[3], PWelsDeco
 			pMCRefMem.pDstU = pDstU;
 			pMCRefMem.pDstV = pDstV;
 
-			if ( (IS_TYPE_L0(iSubMBType) && IS_TYPE_L1(iSubMBType)) || IS_DIRECT(iSubMBType)) {
-				GetRefPic(&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[LIST_0][iMBXY], iIIdx, LIST_0);
+			if ( (IS_TYPE_L0(iSubMBType) && IS_TYPE_L1(iSubMBType))) {
 				iRefIndex1 = pCurDqLayer->pRefIndex[LIST_0][iMBXY][iIIdx];
-
-				GetRefPic(&pTempMCRefMem, pCtx, pCurDqLayer->pRefIndex[LIST_1][iMBXY], iIIdx, LIST_1);
+				GetRefPic(&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[LIST_0][iMBXY], iIIdx, LIST_0);
+				
 				iRefIndex2 = pCurDqLayer->pRefIndex[LIST_1][iMBXY][iIIdx];
-
+				GetRefPic(&pTempMCRefMem, pCtx, pCurDqLayer->pRefIndex[LIST_1][iMBXY], iIIdx, LIST_1);
+				
 				pTempMCRefMem = pMCRefMem;
 				pDstY2 = pTempPredYCbCr[0] + iBlk8X + iBlk8Y * iDstLineLuma;
 				pDstU2 = pTempPredYCbCr[1] + (iBlk8X >> 1) + (iBlk8Y >> 1) * iDstLineChroma;
@@ -977,10 +1006,49 @@ void GetInterBPred(uint8_t* pPredYCbCr[3], uint8_t* pTempPredYCbCr[3], PWelsDeco
 				pTempMCRefMem.pDstU = pDstU2;
 				pTempMCRefMem.pDstV = pDstV2;
 			}
+			else if (IS_DIRECT(iSubMBType)) {
+				iRefIndex1 = pCurDqLayer->pRefIndex[LIST_0][iMBXY][iIIdx];
+				iRefIndex2 = pCurDqLayer->pRefIndex[LIST_1][iMBXY][iIIdx];
+				if (iRefIndex1 > REF_NOT_IN_LIST && iRefIndex2 > REF_NOT_IN_LIST) {
+					GetRefPic(&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[LIST_0][iMBXY], iIIdx, LIST_0);
+					GetRefPic(&pTempMCRefMem, pCtx, pCurDqLayer->pRefIndex[LIST_1][iMBXY], iIIdx, LIST_1);
+					pTempMCRefMem = pMCRefMem;
+					pDstY2 = pTempPredYCbCr[0] + iBlk8X + iBlk8Y * iDstLineLuma;
+					pDstU2 = pTempPredYCbCr[1] + (iBlk8X >> 1) + (iBlk8Y >> 1) * iDstLineChroma;
+					pDstV2 = pTempPredYCbCr[2] + (iBlk8X >> 1) + (iBlk8Y >> 1) * iDstLineChroma;
+
+					pTempMCRefMem.pDstY = pDstY2;
+					pTempMCRefMem.pDstU = pDstU2;
+					pTempMCRefMem.pDstV = pDstV2;
+
+					iMVs[0] = pCurDqLayer->pMv[LIST_0][iMBXY][iIIdx][0];
+					iMVs[1] = pCurDqLayer->pMv[LIST_0][iMBXY][iIIdx][1];
+					BaseMC(&pMCRefMem, iXOffset, iYOffset, pMCFunc, 8, 8, iMVs);
+
+					iMVs[0] = pCurDqLayer->pMv[LIST_1][iMBXY][iIIdx][0];
+					iMVs[1] = pCurDqLayer->pMv[LIST_1][iMBXY][iIIdx][1];
+					BaseMC(&pTempMCRefMem, iXOffset, iYOffset, pMCFunc, 8, 8, iMVs);
+
+					if (pCurDqLayer->bUseWeightedBiPredIdc) {
+						BiWeightPrediction(pCurDqLayer, &pMCRefMem, &pTempMCRefMem, iRefIndex1, iRefIndex2, 8, 8);
+					}
+					else {
+						BiPrediction(pCurDqLayer, &pMCRefMem, &pTempMCRefMem, iRefIndex1, iRefIndex2, 8, 8);
+					}
+				}
+				else {
+					int32_t listIdx = iRefIndex1 > REF_NOT_IN_LIST ? LIST_0 : LIST_1;
+					iRefIndex1 = pCurDqLayer->pRefIndex[listIdx][iMBXY][iIIdx];
+					GetRefPic(&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[listIdx][iMBXY], iIIdx, listIdx);
+					iMVs[0] = pCurDqLayer->pMv[listIdx][iMBXY][iIIdx][0];
+					iMVs[1] = pCurDqLayer->pMv[listIdx][iMBXY][iIIdx][1];
+					BaseMC(&pMCRefMem, iXOffset, iYOffset, pMCFunc, 8, 8, iMVs);
+				}
+			}
 			else {
 				int32_t listIdx = IS_TYPE_L0(iSubMBType) ? LIST_0 : LIST_1;
-				GetRefPic(&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[listIdx][iMBXY], iIIdx, listIdx);
 				iRefIndex1 = pCurDqLayer->pRefIndex[listIdx][iMBXY][iIIdx];
+				GetRefPic(&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[listIdx][iMBXY], iIIdx, listIdx);
 			}
 
 			if (IS_SUB_8x8(iSubMBType)) {
