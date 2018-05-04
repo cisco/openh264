@@ -841,7 +841,7 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 				iPartIdx = i << 2;
 				int8_t ref_idx = ref_idx_list[listIdx][i];
 				if (IS_DIR(mbType, i, listIdx)) {
-					PredInter16x8Mv(pMotionVector, pRefIndex, listIdx, iPartIdx, ref_idx, pMv);
+					PredInter8x16Mv(pMotionVector, pRefIndex, listIdx, iPartIdx, ref_idx, pMv);
 					WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 0, pMvd[0]));
 					WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 1, pMvd[1]));
 					pMv[0] += pMvd[0];
