@@ -872,12 +872,12 @@ void GetInterBPred(uint8_t* pPredYCbCr[3], uint8_t* pTempPredYCbCr[3], PWelsDeco
 				iMVs[0] = pCurDqLayer->pMv[LIST_0][iMBXY][0][0];
 				iMVs[1] = pCurDqLayer->pMv[LIST_0][iMBXY][0][1];
 				GetRefPic(&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[LIST_0][iMBXY], 0, LIST_0);
-				BaseMC(&pMCRefMem, iMBOffsetX + 8, iMBOffsetY, pMCFunc, 8, 16, iMVs);
+				BaseMC(&pMCRefMem, iMBOffsetX, iMBOffsetY, pMCFunc, 8, 16, iMVs);
 
 				iMVs[0] = pCurDqLayer->pMv[LIST_1][iMBXY][0][0];
 				iMVs[1] = pCurDqLayer->pMv[LIST_1][iMBXY][0][1];
 				GetRefPic(&pTempMCRefMem, pCtx, pCurDqLayer->pRefIndex[LIST_1][iMBXY], 0, LIST_1);
-				BaseMC(&pTempMCRefMem, iMBOffsetX + 8, iMBOffsetY, pMCFunc, 8, 16, iMVs);
+				BaseMC(&pTempMCRefMem, iMBOffsetX, iMBOffsetY, pMCFunc, 8, 16, iMVs);
 
 				iRefIndex1 = pCurDqLayer->pRefIndex[LIST_0][iMBXY][0];
 				iRefIndex2 = pCurDqLayer->pRefIndex[LIST_1][iMBXY][0];
