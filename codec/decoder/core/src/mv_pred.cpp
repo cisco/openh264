@@ -194,7 +194,7 @@ void PredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]) {
 
 void PredMvBDirectSpatial(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2], int8_t ref[LIST_A]) {
 	bool bTopAvail, bLeftTopAvail, bRightTopAvail, bLeftAvail;
-
+	int32_t iLeftTopType, iRightTopType, iTopType, iLeftType;
 	int32_t iCurSliceIdc, iTopSliceIdc, iLeftTopSliceIdc, iRightTopSliceIdc, iLeftSliceIdc;
 	int32_t iCurX, iCurY, iCurXy, iLeftXy, iTopXy = 0, iLeftTopXy = 0, iRightTopXy = 0;
 
@@ -247,10 +247,17 @@ void PredMvBDirectSpatial(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2], int8_t re
 		bRightTopAvail = 0;
 	}
 
+	iLeftType = ((iCurX != 0 && bLeftAvail) ? pCurLayer->pMbType[iLeftXy] : 0);
+	iTopType = ((iCurY != 0 && bTopAvail) ? pCurLayer->pMbType[iTopXy] : 0);
+	iLeftTopType = ((iCurX != 0 && iCurY != 0 && bLeftTopAvail)
+		? pCurLayer->pMbType[iLeftTopXy] : 0);
+	iRightTopType = ((iCurX != pCurLayer->iMbWidth - 1 && iCurY != 0 && bRightTopAvail)
+		? pCurLayer->pMbType[iRightTopXy] : 0);
+
 	/*get neb mv&iRefIdxArray*/
 	for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
 	/*left*/
-		if (bLeftAvail) {
+		if (bLeftAvail && IS_INTER(iLeftType)) {
 			ST32(iMvA[listIdx], LD32(pCurLayer->pMv[listIdx][iLeftXy][3]));
 			iLeftRef[listIdx] = pCurLayer->pRefIndex[listIdx][iLeftXy][3];
 		}
@@ -264,8 +271,15 @@ void PredMvBDirectSpatial(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2], int8_t re
 			}
 		}
 
+		if (REF_NOT_AVAIL == iLeftRef[listIdx] ||
+			(iLeftRef[listIdx] >= REF_NOT_IN_LIST && 0 == *(int32_t*)iMvA[listIdx])) {
+			ref[listIdx] = iLeftRef[listIdx];
+			ST32(iMvp[listIdx], 0);
+			continue;
+		}
+
 		/*top*/
-		if (bTopAvail) {
+		if (bTopAvail && IS_INTER(iTopType)) {
 			ST32(iMvB[listIdx], LD32(pCurLayer->pMv[listIdx][iTopXy][12]));
 			iTopRef[listIdx] = pCurLayer->pRefIndex[listIdx][iTopXy][12];
 		}
@@ -279,8 +293,15 @@ void PredMvBDirectSpatial(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2], int8_t re
 			}
 		}
 
+		if (REF_NOT_AVAIL == iTopRef[listIdx] ||
+			(iTopRef[listIdx] >= REF_NOT_IN_LIST && 0 == *(int32_t*)iMvB[listIdx])) {
+			ref[listIdx] = iTopRef[listIdx];
+			ST32(iMvp[listIdx], 0);
+			continue;
+		}
+
 		/*right_top*/
-		if (bRightTopAvail) {
+		if (bRightTopAvail && IS_INTER(iRightTopType)) {
 			ST32(iMvC[listIdx], LD32(pCurLayer->pMv[listIdx][iRightTopXy][12]));
 			iRightTopRef[listIdx] = pCurLayer->pRefIndex[listIdx][iRightTopXy][12];
 		}
@@ -294,7 +315,7 @@ void PredMvBDirectSpatial(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2], int8_t re
 			}
 		}
 		/*left_top*/
-		if (bLeftTopAvail) {
+		if (bLeftTopAvail&& IS_INTER(iLeftTopType)) {
 			ST32(iMvD[listIdx], LD32(pCurLayer->pMv[listIdx][iLeftTopXy][15]));
 			iLeftTopRef[listIdx] = pCurLayer->pRefIndex[listIdx][iLeftTopXy][15];
 		}
@@ -312,6 +333,12 @@ void PredMvBDirectSpatial(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2], int8_t re
 		if (REF_NOT_AVAIL == iDiagonalRef[listIdx]) {
 			iDiagonalRef[listIdx] = iLeftTopRef[listIdx];
 			*(int32_t*)iMvC[listIdx] = *(int32_t*)iMvD[listIdx];
+		}
+
+		if (REF_NOT_AVAIL == iTopRef[listIdx] && REF_NOT_AVAIL == iDiagonalRef[listIdx] && iLeftRef[listIdx] >= REF_NOT_IN_LIST) {
+			ref[listIdx] = iLeftRef[listIdx];
+			ST32(iMvp[listIdx], LD32(iMvA[listIdx]));
+			continue;
 		}
 
 		ref[listIdx] = WELS_MIN_POSITIVE(iLeftRef[listIdx], WELS_MIN_POSITIVE(iTopRef[listIdx], iRightTopRef[listIdx]));
