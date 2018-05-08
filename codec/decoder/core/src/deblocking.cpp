@@ -277,6 +277,316 @@ void static inline DeblockingBSInsideMBNormal (PDqLayer pCurDqLayer, uint8_t nBS
   }
 }
 
+void static inline DeblockingBSliceBSInsideMBNormal(PDqLayer pCurDqLayer, uint8_t nBS[2][4][4], int8_t* pNnzTab,
+	int32_t iMbXy) {
+	uint32_t uiNnz32b0, uiNnz32b1, uiNnz32b2, uiNnz32b3;
+	int8_t* iRefIndex0 = pCurDqLayer->pRefIndex[LIST_0][iMbXy];
+	int8_t* iRefIndex1 = pCurDqLayer->pRefIndex[LIST_1][iMbXy];
+	ENFORCE_STACK_ALIGN_1D(uint8_t, uiBsx4, 4, 4);
+
+	int8_t i8x8NnzTab[4];
+	uint8_t bSTemp[2];
+
+	if (pCurDqLayer->pTransformSize8x8Flag[iMbXy]) {
+		for (int32_t i = 0; i < 4; i++) {
+			int32_t iBlkIdx = i << 2;
+			i8x8NnzTab[i] = (pNnzTab[g_kuiMbCountScan4Idx[iBlkIdx]] | pNnzTab[g_kuiMbCountScan4Idx[iBlkIdx + 1]] |
+				pNnzTab[g_kuiMbCountScan4Idx[iBlkIdx + 2]] | pNnzTab[g_kuiMbCountScan4Idx[iBlkIdx + 3]]);
+		}
+		//vertical
+		int8_t iIndex = g_kuiMbCountScan4Idx[1 << 2];
+		int8_t iNeigborIndex = g_kuiMbCountScan4Idx[0];
+		
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[iIndex] > REF_NOT_IN_LIST && iRefIndex0[iNeigborIndex] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE((i8x8NnzTab[0] | i8x8NnzTab[1]), iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy],
+				iIndex, iNeigborIndex);
+		}
+		if (iRefIndex1[iIndex] > REF_NOT_IN_LIST && iRefIndex1[iNeigborIndex] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE((i8x8NnzTab[0] | i8x8NnzTab[1]), iRefIndex1, pCurDqLayer->pMv[LIST_1][iMbXy],
+				iIndex, iNeigborIndex);
+		}
+		nBS[0][2][0] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+
+		iIndex = g_kuiMbCountScan4Idx[3 << 2];
+		iNeigborIndex = g_kuiMbCountScan4Idx[2 << 2];
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[iIndex] > REF_NOT_IN_LIST && iRefIndex0[iNeigborIndex] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE((i8x8NnzTab[2] | i8x8NnzTab[3]), iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy],
+				iIndex, iNeigborIndex);
+		}
+		if (iRefIndex1[iIndex] > REF_NOT_IN_LIST && iRefIndex1[iNeigborIndex] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE((i8x8NnzTab[2] | i8x8NnzTab[3]), iRefIndex1, pCurDqLayer->pMv[LIST_1][iMbXy],
+				iIndex, iNeigborIndex);
+		}
+		nBS[0][2][2] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+
+		iIndex = g_kuiMbCountScan4Idx[2 << 2];
+		iNeigborIndex = g_kuiMbCountScan4Idx[0];
+		
+		//horizontal
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[iIndex] > REF_NOT_IN_LIST && iRefIndex0[iNeigborIndex] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE((i8x8NnzTab[0] | i8x8NnzTab[2]), iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy],
+				iIndex, iNeigborIndex);
+		}
+		if (iRefIndex1[iIndex] > REF_NOT_IN_LIST && iRefIndex1[iNeigborIndex] > REF_NOT_IN_LIST) {
+			bSTemp[1] = nBS[1][2][1] = BS_EDGE((i8x8NnzTab[0] | i8x8NnzTab[2]), iRefIndex1, pCurDqLayer->pMv[LIST_1][iMbXy],
+				iIndex, iNeigborIndex);
+		}
+		nBS[1][2][0] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+
+		iIndex = g_kuiMbCountScan4Idx[3 << 2];
+		iNeigborIndex = g_kuiMbCountScan4Idx[1 << 2];
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[iIndex] > REF_NOT_IN_LIST && iRefIndex0[iNeigborIndex] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE((i8x8NnzTab[1] | i8x8NnzTab[3]), iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy],
+				iIndex, iNeigborIndex);
+		}
+		if (iRefIndex1[iIndex] > REF_NOT_IN_LIST && iRefIndex1[iNeigborIndex] > REF_NOT_IN_LIST) {
+			bSTemp[0] = nBS[1][2][3] = BS_EDGE((i8x8NnzTab[1] | i8x8NnzTab[3]), iRefIndex1, pCurDqLayer->pMv[LIST_1][iMbXy],
+				iIndex, iNeigborIndex);
+		}
+		nBS[1][2][2] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+	}
+	else {
+		uiNnz32b0 = *(uint32_t*)(pNnzTab + 0);
+		uiNnz32b1 = *(uint32_t*)(pNnzTab + 4);
+		uiNnz32b2 = *(uint32_t*)(pNnzTab + 8);
+		uiNnz32b3 = *(uint32_t*)(pNnzTab + 12);
+
+		for (int i = 0; i < 3; i++)
+			uiBsx4[i] = pNnzTab[i] | pNnzTab[i + 1];
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[1] > REF_NOT_IN_LIST && iRefIndex0[0] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE(uiBsx4[0], iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy], 1, 0);
+		}
+		if (iRefIndex1[1] > REF_NOT_IN_LIST && iRefIndex1[0] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE(uiBsx4[0], iRefIndex1, pCurDqLayer->pMv[LIST_1][iMbXy], 1, 0);
+		}
+		nBS[0][1][0] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[1] > REF_NOT_IN_LIST && iRefIndex0[0] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE(uiBsx4[1], iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy], 2, 1);
+		}
+		if (iRefIndex1[1] > REF_NOT_IN_LIST && iRefIndex1[0] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE(uiBsx4[1], iRefIndex1, pCurDqLayer->pMv[LIST_1][iMbXy], 2, 1);
+		}
+		nBS[0][2][0] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[1] > REF_NOT_IN_LIST && iRefIndex0[0] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE(uiBsx4[2], iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy], 3, 2);
+		}
+		if (iRefIndex1[1] > REF_NOT_IN_LIST && iRefIndex1[0] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE(uiBsx4[2], iRefIndex1, pCurDqLayer->pMv[LIST_0][iMbXy], 3, 2);
+		}
+		nBS[0][3][0] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+	
+		for (int i = 0; i < 3; i++)
+			uiBsx4[i] = pNnzTab[4 + i] | pNnzTab[4 + i + 1];
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[1] > REF_NOT_IN_LIST && iRefIndex0[0] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE(uiBsx4[0], iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy], 5, 4);
+		}
+		if (iRefIndex1[1] > REF_NOT_IN_LIST && iRefIndex1[0] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE(uiBsx4[0], iRefIndex1, pCurDqLayer->pMv[LIST_0][iMbXy], 5, 4);
+		}
+		nBS[0][1][1] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[1] > REF_NOT_IN_LIST && iRefIndex0[0] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE(uiBsx4[1], iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy], 6, 5);
+		}
+		if (iRefIndex1[1] > REF_NOT_IN_LIST && iRefIndex1[0] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE(uiBsx4[1], iRefIndex1, pCurDqLayer->pMv[LIST_0][iMbXy], 6, 5);
+		}
+		nBS[0][2][1] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[1] > REF_NOT_IN_LIST && iRefIndex0[0] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE(uiBsx4[2], iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy], 7, 6);
+		}
+		if (iRefIndex1[1] > REF_NOT_IN_LIST && iRefIndex1[0] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE(uiBsx4[2], iRefIndex1, pCurDqLayer->pMv[LIST_0][iMbXy], 7, 6);
+		}
+		nBS[0][3][1] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+
+		for (int i = 0; i < 3; i++)
+			uiBsx4[i] = pNnzTab[8 + i] | pNnzTab[8 + i + 1];
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[1] > REF_NOT_IN_LIST && iRefIndex0[0] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE(uiBsx4[0], iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy], 9, 8);
+		}
+		if (iRefIndex1[1] > REF_NOT_IN_LIST && iRefIndex1[0] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE(uiBsx4[0], iRefIndex1, pCurDqLayer->pMv[LIST_0][iMbXy], 9, 8);
+		}
+		nBS[0][1][2] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[1] > REF_NOT_IN_LIST && iRefIndex0[0] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE(uiBsx4[1], iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy], 10, 9);
+		}
+		if (iRefIndex1[1] > REF_NOT_IN_LIST && iRefIndex1[0] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE(uiBsx4[1], iRefIndex1, pCurDqLayer->pMv[LIST_0][iMbXy], 10, 9);
+		}
+		nBS[0][2][2] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[1] > REF_NOT_IN_LIST && iRefIndex0[0] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE(uiBsx4[2], iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy], 11, 10);
+		}
+		if (iRefIndex1[1] > REF_NOT_IN_LIST && iRefIndex1[0] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE(uiBsx4[2], iRefIndex1, pCurDqLayer->pMv[LIST_0][iMbXy], 11, 10);
+		}
+		nBS[0][3][2] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+
+		for (int i = 0; i < 3; i++)
+			uiBsx4[i] = pNnzTab[12 + i] | pNnzTab[12 + i + 1];
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[1] > REF_NOT_IN_LIST && iRefIndex0[0] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE(uiBsx4[0], iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy], 13, 12);
+		}
+		if (iRefIndex1[1] > REF_NOT_IN_LIST && iRefIndex1[0] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE(uiBsx4[0], iRefIndex1, pCurDqLayer->pMv[LIST_0][iMbXy], 13, 12);
+		}
+		nBS[0][1][3] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[1] > REF_NOT_IN_LIST && iRefIndex0[0] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE(uiBsx4[1], iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy], 14, 13);
+		}
+		if (iRefIndex1[1] > REF_NOT_IN_LIST && iRefIndex1[0] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE(uiBsx4[1], iRefIndex1, pCurDqLayer->pMv[LIST_0][iMbXy], 14, 13);
+		}
+		nBS[0][2][3] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[1] > REF_NOT_IN_LIST && iRefIndex0[0] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE(uiBsx4[2], iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy], 15, 14);
+		}
+		if (iRefIndex1[1] > REF_NOT_IN_LIST && iRefIndex1[0] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE(uiBsx4[2], iRefIndex1, pCurDqLayer->pMv[LIST_0][iMbXy], 15, 14);
+		}
+		nBS[0][3][3] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+
+
+		// horizontal
+		*(uint32_t*)uiBsx4 = (uiNnz32b0 | uiNnz32b1);
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[1] > REF_NOT_IN_LIST && iRefIndex0[0] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE(uiBsx4[0], iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy], 4, 0);
+		}
+		if (iRefIndex1[1] > REF_NOT_IN_LIST && iRefIndex1[0] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE(uiBsx4[0], iRefIndex1, pCurDqLayer->pMv[LIST_0][iMbXy], 4, 0);
+		}
+		nBS[1][1][0] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[1] > REF_NOT_IN_LIST && iRefIndex0[0] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE(uiBsx4[1], iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy], 5, 1);
+		}
+		if (iRefIndex1[1] > REF_NOT_IN_LIST && iRefIndex1[0] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE(uiBsx4[1], iRefIndex1, pCurDqLayer->pMv[LIST_0][iMbXy], 5, 1);
+		}
+		nBS[1][1][1] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[1] > REF_NOT_IN_LIST && iRefIndex0[0] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE(uiBsx4[2], iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy], 6, 2);
+		}
+		if (iRefIndex1[1] > REF_NOT_IN_LIST && iRefIndex1[0] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE(uiBsx4[2], iRefIndex1, pCurDqLayer->pMv[LIST_0][iMbXy], 6, 2);
+		}
+		nBS[1][1][2] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[1] > REF_NOT_IN_LIST && iRefIndex0[0] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE(uiBsx4[3], iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy], 7, 3);
+		}
+		if (iRefIndex1[1] > REF_NOT_IN_LIST && iRefIndex1[0] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE(uiBsx4[3], iRefIndex1, pCurDqLayer->pMv[LIST_0][iMbXy], 7, 3);
+		}
+		nBS[1][1][3] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+
+		*(uint32_t*)uiBsx4 = (uiNnz32b1 | uiNnz32b2);
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[1] > REF_NOT_IN_LIST && iRefIndex0[0] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE(uiBsx4[0], iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy], 8, 4);
+		}
+		if (iRefIndex1[1] > REF_NOT_IN_LIST && iRefIndex1[0] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE(uiBsx4[0], iRefIndex1, pCurDqLayer->pMv[LIST_0][iMbXy], 8, 4);
+		}
+		nBS[1][2][0] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[1] > REF_NOT_IN_LIST && iRefIndex0[0] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE(uiBsx4[1], iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy], 9, 5);
+		}
+		if (iRefIndex1[1] > REF_NOT_IN_LIST && iRefIndex1[0] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE(uiBsx4[1], iRefIndex1, pCurDqLayer->pMv[LIST_0][iMbXy], 9, 5);
+		}
+		nBS[1][2][1] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[1] > REF_NOT_IN_LIST && iRefIndex0[0] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE(uiBsx4[2], iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy], 10, 6);
+		}
+		if (iRefIndex1[1] > REF_NOT_IN_LIST && iRefIndex1[0] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE(uiBsx4[2], iRefIndex1, pCurDqLayer->pMv[LIST_0][iMbXy], 10, 6);
+		}
+		nBS[1][2][2] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[1] > REF_NOT_IN_LIST && iRefIndex0[0] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE(uiBsx4[3], iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy], 11, 7);
+		}
+		if (iRefIndex1[1] > REF_NOT_IN_LIST && iRefIndex1[0] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE(uiBsx4[3], iRefIndex1, pCurDqLayer->pMv[LIST_0][iMbXy], 11, 7);
+		}
+		nBS[1][2][3] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+
+		*(uint32_t*)uiBsx4 = (uiNnz32b2 | uiNnz32b3);
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[1] > REF_NOT_IN_LIST && iRefIndex0[0] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE(uiBsx4[0], iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy], 12, 8);
+		}
+		if (iRefIndex1[1] > REF_NOT_IN_LIST && iRefIndex1[0] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE(uiBsx4[0], iRefIndex1, pCurDqLayer->pMv[LIST_0][iMbXy], 12, 8);
+		}
+		nBS[1][3][0] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[1] > REF_NOT_IN_LIST && iRefIndex0[0] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE(uiBsx4[1], iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy], 13, 9);
+		}
+		if (iRefIndex1[1] > REF_NOT_IN_LIST && iRefIndex1[0] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE(uiBsx4[1], iRefIndex1, pCurDqLayer->pMv[LIST_0][iMbXy], 13, 9);
+		}
+		nBS[1][3][1] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[1] > REF_NOT_IN_LIST && iRefIndex0[0] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE(uiBsx4[2], iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy], 14, 10);
+		}
+		if (iRefIndex1[1] > REF_NOT_IN_LIST && iRefIndex1[0] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE(uiBsx4[2], iRefIndex1, pCurDqLayer->pMv[LIST_0][iMbXy], 14, 10);
+		}
+		nBS[1][3][2] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+
+		bSTemp[0] = bSTemp[1] = 255;
+		if (iRefIndex0[1] > REF_NOT_IN_LIST && iRefIndex0[0] > REF_NOT_IN_LIST) {
+			bSTemp[0] = BS_EDGE(uiBsx4[3], iRefIndex0, pCurDqLayer->pMv[LIST_0][iMbXy], 15, 11);
+		}
+		if (iRefIndex1[1] > REF_NOT_IN_LIST && iRefIndex1[0] > REF_NOT_IN_LIST) {
+			bSTemp[1] = BS_EDGE(uiBsx4[3], iRefIndex1, pCurDqLayer->pMv[LIST_0][iMbXy], 15, 11);
+		}
+		nBS[1][3][3] = (bSTemp[0] < 255 && bSTemp[1] < 255) ? WELS_MAX(bSTemp[0], bSTemp[1]) : (bSTemp[0] < 255 ? bSTemp[0] : bSTemp[1]);
+	}
+}
+
+
 uint32_t DeblockingBsMarginalMBAvcbase (PDqLayer pCurDqLayer, int32_t iEdge, int32_t iNeighMb, int32_t iMbXy) {
   int32_t i, j;
   uint32_t uiBSx4;
@@ -845,8 +1155,8 @@ void WelsDeblockingMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t
       * (uint32_t*)nBS[1][0] = 0;
     }
     //SKIP MB_16x16 or others
-    if (iCurMbType != MB_TYPE_SKIP) {
-      if (iCurMbType == MB_TYPE_16x16) {
+    if (!IS_SKIP(iCurMbType)) {
+      if (IS_INTER_16x16(iCurMbType)) {
         if (!pCurDqLayer->pTransformSize8x8Flag[pCurDqLayer->iMbXyIndex]) {
           DeblockingBSInsideMBAvsbase (pCurDqLayer->pNzc[iMbXyIndex], nBS, 1);
         } else {
