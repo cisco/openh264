@@ -50,6 +50,10 @@
 
 #include "cpu_core.h"
 
+#if defined(_DEBUG)
+static uint32_t uiTotalFrameCount = 0;
+#endif
+
 namespace WelsDec {
 
 static inline int32_t iAbs(int32_t x) {
@@ -1093,7 +1097,7 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAva
 	WELS_READ_VERIFY(ParseMBTypeBSliceCabac(pCtx, pNeighAvail, uiMbType));
 
 #if defined(_DEBUG)
-	WelsLog(&(pCtx->sLogCtx), WELS_LOG_WARNING, "mb_num and type = [%d %d]", iMbXy, uiMbType);
+		WelsLog(&(pCtx->sLogCtx), WELS_LOG_WARNING, "mb_num and type = [%d %d]", iMbXy, uiMbType);
 #endif
 	if (uiMbType < 23) { //Inter B mode
 		int16_t pMotionVector[LIST_A][30][MV_A];
@@ -1425,16 +1429,28 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 		pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || !(ppRefPicL0[0] && ppRefPicL0[0]->bIsComplete) || !(ppRefPicL1[0] && ppRefPicL1[0]->bIsComplete);
 		
 		if (pSliceHeader->iDirectSpatialMvPredFlag) {
+
 			//predict direct spatial mv
 			PredMvBDirectSpatial(pCurLayer, pMv, ref);
-		
-			if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
-			 //To be implemented
-				PredBDirect8x8Spatial(pCtx);
+
+			MbType refMBType = pCtx->sRefPic.pRefList[LIST_1][0]->pMbType[iMbXy];
+			if (refMBType == MB_TYPE_8x8 && !pSliceHeader->pSps->bDirect8x8InferenceFlag) {
+				//B_Bi_4x4
+				pCurLayer->pMbType[iMbXy] |= MB_TYPE_8x8 | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_P1L0 | MB_TYPE_P1L1;
+				for (i = 0; i < 4; i++) {
+					pCurLayer->pSubMbType[iMbXy][i] = SUB_MB_TYPE_4x4 | MB_TYPE_P0L0 | MB_TYPE_P0L1;
+				}
+			}
+			else if (refMBType == MB_TYPE_16x16 || IS_INTRA(refMBType)) {
+				//B_Direct_16x16
+				pCurLayer->pMbType[iMbXy] |= MB_TYPE_16x16 | MB_TYPE_P0L0 | MB_TYPE_P0L1;
 			}
 			else {
-			  //To be implemented
-				PredBDirect4x4Spatial(pCtx);
+				//B_Direct_8x8
+				pCurLayer->pMbType[iMbXy] |= MB_TYPE_8x8 | MB_TYPE_L0 | MB_TYPE_L1;
+				for (i = 0; i < 4; i++) {
+					pCurLayer->pSubMbType[iMbXy][i] = MB_TYPE_DIRECT;
+				}
 			}
 		}
 		else {
@@ -1609,6 +1625,9 @@ int32_t WelsDecodeSlice (PWelsDecoderContext pCtx, bool bFirstSliceInLayer, PNal
     pCurLayer->iMbXyIndex = iNextMbXyIndex;
   } while (1);
 
+#if defined(_DEBUG)
+	++uiTotalFrameCount;
+#endif
   return ERR_NONE;
 }
 
