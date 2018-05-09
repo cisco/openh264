@@ -1432,11 +1432,16 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 
 			//predict direct spatial mv
 			PredMvBDirectSpatial(pCurLayer, pMv, ref);
+		}
+		else {
+			//temporal direct mode
+			ComputeColocated(pCtx);
 
 			MbType refMBType = pCtx->sRefPic.pRefList[LIST_1][0]->pMbType[iMbXy];
 			if (refMBType == MB_TYPE_8x8 && !pSliceHeader->pSps->bDirect8x8InferenceFlag) {
-				//B_Bi_4x4
+				////B_8x8
 				pCurLayer->pMbType[iMbXy] |= MB_TYPE_8x8 | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_P1L0 | MB_TYPE_P1L1;
+				///with subMbtype B_Bi_4x4
 				for (i = 0; i < 4; i++) {
 					pCurLayer->pSubMbType[iMbXy][i] = SUB_MB_TYPE_4x4 | MB_TYPE_P0L0 | MB_TYPE_P0L1;
 				}
@@ -1446,16 +1451,14 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 				pCurLayer->pMbType[iMbXy] |= MB_TYPE_16x16 | MB_TYPE_P0L0 | MB_TYPE_P0L1;
 			}
 			else {
-				//B_Direct_8x8
-				pCurLayer->pMbType[iMbXy] |= MB_TYPE_8x8 | MB_TYPE_L0 | MB_TYPE_L1;
+				////B_8x8
+				pCurLayer->pMbType[iMbXy] |= MB_TYPE_8x8 | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_P1L0 | MB_TYPE_P1L1;
+				//with subMbtype MB_TYPE_DIRECT
 				for (i = 0; i < 4; i++) {
 					pCurLayer->pSubMbType[iMbXy][i] = MB_TYPE_DIRECT;
 				}
 			}
-		}
-		else {
-			//temporal direct mode
-			ComputeColocated(pCtx);
+
 			if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
 				//To be implemented
 				PredBDirect8x8Temporal(pCtx);

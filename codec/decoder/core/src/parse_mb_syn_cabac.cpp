@@ -879,14 +879,6 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 				has_direct_called = true;
 				if (pSliceHeader->iDirectSpatialMvPredFlag) {
 					PredMvBDirectSpatial(pCurDqLayer, pMvDirect, iRef);
-					if (pSliceHeader->pSps->bDirect8x8InferenceFlag) {
-						//To be implemented
-						PredBDirect8x8Spatial(pCtx);
-					}
-					else {
-						//To be implemented
-						PredBDirect4x4Spatial(pCtx);
-					}
 				}
 				else {
 					//temporal direct mode
