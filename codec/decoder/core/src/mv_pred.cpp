@@ -371,7 +371,7 @@ void PredMvBDirectSpatial(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2], int8_t re
 	}
 }
 
-void PredBDirect16x16Temporal(PWelsDecoderContext pCtx) {
+void PredBDirect16x16Temporal(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], int8_t ref[LIST_A]) {
 	PDqLayer pCurLayer = pCtx->pCurDqLayer;
 	PSlice pSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
 	PSliceHeader pSliceHeader = &pSlice->sSliceHeaderExt.sSliceHeader;
@@ -379,8 +379,9 @@ void PredBDirect16x16Temporal(PWelsDecoderContext pCtx) {
 	uint32_t uiShortRefCount = pCtx->sRefPic.uiShortRefCount[LIST_0];
 	for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
 		for (uint32_t refIdx = 0; refIdx < uiShortRefCount; ++refIdx) {
-			pCtx->pCurDqLayer->pMv[listIdx][iMbXy][0][0] = pCtx->sRefPic.pRefList[LIST_1][0]->pMv[LIST_1][iMbXy][0][0] * pSlice->iMvScale[listIdx][refIdx];
-			pCtx->pCurDqLayer->pMv[listIdx][iMbXy][0][1] = pCtx->sRefPic.pRefList[LIST_1][0]->pMv[LIST_1][iMbXy][0][1] * pSlice->iMvScale[listIdx][refIdx];
+			ref[listIdx] = refIdx;
+			iMvp[listIdx][0] = pCtx->sRefPic.pRefList[LIST_1][0]->pMv[LIST_1][iMbXy][0][0] * pSlice->iMvScale[listIdx][refIdx];
+			iMvp[listIdx][1] = pCtx->sRefPic.pRefList[LIST_1][0]->pMv[LIST_1][iMbXy][0][1] * pSlice->iMvScale[listIdx][refIdx];
 			break;
 		}
 	}

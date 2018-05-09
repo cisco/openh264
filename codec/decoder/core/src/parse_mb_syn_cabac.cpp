@@ -721,9 +721,9 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 
 	if (IS_DIRECT(mbType)) {
 	
+		int16_t pMvDirect[LIST_A][2] = { 0 };
 		if (pSliceHeader->iDirectSpatialMvPredFlag) {
 			//predict direct spatial mv
-			int16_t pMvDirect[LIST_A][2] = { 0 };
 			PredMvBDirectSpatial(pCurDqLayer, pMvDirect, iRef);
 			for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
 				UpdateP16x16MotionInfo(pCurDqLayer, listIdx, iRef[listIdx], pMvDirect[listIdx]);
@@ -733,7 +733,15 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 		else {
 			//temporal direct 16x16 mode
 			ComputeColocated(pCtx);
-			PredBDirect16x16Temporal(pCtx);
+			MbType refMBType = pCtx->sRefPic.pRefList[LIST_1][0]->pMbType[iMbXy];
+			if (refMBType == MB_TYPE_16x16 || IS_INTRA(refMBType)) {
+				//B_Direct_16x16
+				PredBDirect16x16Temporal(pCtx, pMvDirect, iRef);
+				for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+					UpdateP16x16MotionInfo(pCurDqLayer, listIdx, iRef[listIdx], pMvDirect[listIdx]);
+					UpdateP16x16MvdCabac(pCurDqLayer, pMvd, listIdx);
+				}
+			}
 		}
 	}
 	else if (IS_INTER_16x16(mbType)) {

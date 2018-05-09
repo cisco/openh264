@@ -1432,6 +1432,14 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 
 			//predict direct spatial mv
 			PredMvBDirectSpatial(pCurLayer, pMv, ref);
+			for (i = 0; i < 16; i++) {
+				ST32(pCurLayer->pMv[LIST_0][iMbXy][i], *(uint32_t*)pMv[LIST_0]);
+				ST32(pCurLayer->pMv[LIST_1][iMbXy][i], *(uint32_t*)pMv[LIST_1]);
+				pCurLayer->pRefIndex[LIST_0][iMbXy][i] = ref[LIST_0];
+				pCurLayer->pRefIndex[LIST_1][iMbXy][i] = ref[LIST_1];
+				ST32(pCurLayer->pMvd[LIST_0][iMbXy][i], 0);
+				ST32(pCurLayer->pMvd[LIST_1][iMbXy][i], 0);
+			}
 		}
 		else {
 			//temporal direct mode
@@ -1448,7 +1456,12 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 			}
 			else if (refMBType == MB_TYPE_16x16 || IS_INTRA(refMBType)) {
 				//B_Direct_16x16
-				pCurLayer->pMbType[iMbXy] |= MB_TYPE_16x16 | MB_TYPE_P0L0 | MB_TYPE_P0L1;
+				PredBDirect16x16Temporal(pCtx, pMv, ref);
+				int16_t pMvd[LIST_A][2] = { 0 };
+				for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+					UpdateP16x16MotionInfo(pCurLayer, listIdx, ref[listIdx], pMv[listIdx]);
+					UpdateP16x16MvdCabac(pCurLayer, pMvd[listIdx], listIdx);
+				}
 			}
 			else {
 				////B_8x8
@@ -1467,14 +1480,6 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 				//To be implemented
 				PredBDirect4x4Temporal(pCtx);
 			}
-		}
-		for (i = 0; i < 16; i++) {
-			ST32(pCurLayer->pMv[LIST_0][iMbXy][i], *(uint32_t*)pMv[LIST_0]);
-			ST32(pCurLayer->pMv[LIST_1][iMbXy][i], *(uint32_t*)pMv[LIST_1]);
-			pCurLayer->pRefIndex[LIST_0][iMbXy][i] = ref[LIST_0];
-			pCurLayer->pRefIndex[LIST_1][iMbXy][i] = ref[LIST_1];
-			ST32(pCurLayer->pMvd[LIST_0][iMbXy][i], 0);
-			ST32(pCurLayer->pMvd[LIST_1][iMbXy][i], 0);
 		}
 
 		//reset rS

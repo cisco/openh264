@@ -89,7 +89,7 @@ void PredMvBDirectSpatial(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2], int8_t re
 /*!
 * \brief   get the motion predictor for B-slice temporal direct mode 16x16
 */
-void PredBDirect16x16Temporal(PWelsDecoderContext pCtx);
+void PredBDirect16x16Temporal(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], int8_t ref[LIST_A]);
 
 /*!
 * \brief   get the motion predictor for B-slice temporal direct mode 8x8
