@@ -76,6 +76,7 @@ int32_t ParseResidualBlockCabac8x8 (PWelsNeighAvail pNeighAvail, uint8_t* pNonZe
                                  PWelsDecoderContext pCtx);
 int32_t ParseIPCMInfoCabac (PWelsDecoderContext pCtx);
 void		UpdateP16x16MvdCabac(SDqLayer* pCurDqLayer, int16_t pMvd[2], const int8_t iListIdx);
+void		UpdateP8x8RefIdxCabac(PDqLayer pCurDqLayer, int8_t pRefIndex[LIST_A][30], int32_t iPartIdx, const int8_t iRef, const int8_t iListIdx);
 }
 //#pragma pack()
 #endif

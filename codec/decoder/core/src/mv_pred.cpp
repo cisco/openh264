@@ -371,7 +371,7 @@ void PredMvBDirectSpatial(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2], int8_t re
 	}
 }
 
-void PredBDirect16x16Temporal(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], int8_t ref[LIST_A]) {
+void PredBDirectTemporal(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], int8_t ref[LIST_A]) {
 	PDqLayer pCurLayer = pCtx->pCurDqLayer;
 	PSlice pSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
 	PSliceHeader pSliceHeader = &pSlice->sSliceHeaderExt.sSliceHeader;
@@ -382,45 +382,6 @@ void PredBDirect16x16Temporal(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2],
 			ref[listIdx] = refIdx;
 			iMvp[listIdx][0] = pCtx->sRefPic.pRefList[LIST_1][0]->pMv[LIST_1][iMbXy][0][0] * pSlice->iMvScale[listIdx][refIdx];
 			iMvp[listIdx][1] = pCtx->sRefPic.pRefList[LIST_1][0]->pMv[LIST_1][iMbXy][0][1] * pSlice->iMvScale[listIdx][refIdx];
-			break;
-		}
-	}
-}
-
-void PredBDirect8x8Temporal(PWelsDecoderContext pCtx) {
-	PDqLayer pCurLayer = pCtx->pCurDqLayer;
-	PSlice pSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
-	PSliceHeader pSliceHeader = &pSlice->sSliceHeaderExt.sSliceHeader;
-	int32_t iMbXy = pCurLayer->iMbXyIndex;
-	uint32_t uiShortRefCount = pCtx->sRefPic.uiShortRefCount[LIST_0];
-	for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
-		for (uint32_t refIdx = 0; refIdx < uiShortRefCount; ++refIdx) {
-			for (int32_t i = 0; i < 4; i++) {
-				int32_t iIIdx = ((i >> 1) << 3) + ((i & 1) << 1);
-				pCtx->pCurDqLayer->pMv[listIdx][iMbXy][iIIdx][0] = pCtx->sRefPic.pRefList[LIST_1][0]->pMv[listIdx][iMbXy][iIIdx][0] * pSlice->iMvScale[listIdx][refIdx];
-				pCtx->pCurDqLayer->pMv[listIdx][iMbXy][iIIdx][0] = pCtx->sRefPic.pRefList[LIST_1][0]->pMv[listIdx][iMbXy][iIIdx][1] * pSlice->iMvScale[listIdx][refIdx];
-			}
-			break;
-		}
-	}
-}
-
-void PredBDirect4x4Temporal(PWelsDecoderContext pCtx) {
-	PDqLayer pCurLayer = pCtx->pCurDqLayer;
-	PSlice pSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
-	PSliceHeader pSliceHeader = &pSlice->sSliceHeaderExt.sSliceHeader;
-	int32_t iMbXy = pCurLayer->iMbXyIndex;
-	uint32_t uiShortRefCount = pCtx->sRefPic.uiShortRefCount[LIST_0];
-	for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
-		for (uint32_t refIdx = 0; refIdx < uiShortRefCount; ++refIdx) {
-			for (int32_t i = 0; i < 4; i++) {
-				int32_t iIIdx = ((i >> 1) << 3) + ((i & 1) << 1);
-				for (int32_t j = 0; j < 4; j++) {
-					int32_t iJIdx = ((j >> 1) << 2) + (j & 1);
-					pCtx->pCurDqLayer->pMv[listIdx][iMbXy][iIIdx + iJIdx][0] = pCtx->sRefPic.pRefList[LIST_1][0]->pMv[0][iMbXy][iIIdx + iJIdx][0] * pSlice->iMvScale[listIdx][refIdx];
-					pCtx->pCurDqLayer->pMv[listIdx][iMbXy][iIIdx + iJIdx][1] = pCtx->sRefPic.pRefList[LIST_1][0]->pMv[0][iMbXy][iIIdx + iJIdx][1] * pSlice->iMvScale[listIdx][refIdx];
-				}
-			}
 			break;
 		}
 	}
