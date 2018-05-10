@@ -89,9 +89,12 @@ namespace WelsDec {
 CWelsDecoder::CWelsDecoder (void)
   : m_pDecContext (NULL),
     m_pWelsTrace (NULL),
-		m_pForwardPredFrameBufferInfo(NULL),
+		m_sForwardPredFrameBufferInfo(),
 		m_ppForwardPredFrameDst(NULL),
-		m_iForwardPredFramePOC(-1) {
+		m_iForwardPredFramePOC(-1),
+		m_sNextForwardPredFrameBufferInfo(),
+		m_ppNextForwardPredFrameDst(NULL),
+		m_iNextForwardPredFramePOC(-1) {
 #ifdef OUTPUT_BIT_STREAM
   char chFileName[1024] = { 0 };  //for .264
   int iBufUsed = 0;
@@ -236,11 +239,6 @@ void CWelsDecoder::UninitDecoder (void) {
 
     m_pDecContext = NULL;
   }
-
-	if (NULL != m_pForwardPredFrameBufferInfo) {
-		delete m_pForwardPredFrameBufferInfo;
-		m_pForwardPredFrameBufferInfo = NULL;
-	}
 }
 
 // the return value of this function is not suitable, it need report failure info to upper layer.
@@ -489,24 +487,35 @@ DECODING_STATE CWelsDecoder::DecodeFrameNoDelay (const unsigned char* kpSrc,
   //ppDst[1] = ppTmpDst[1];
   //ppDst[2] = ppTmpDst[2];
   //}
-#if 0
+#if 1
 	if (m_pDecContext->bSliceHeaderFinish) {
-		if (m_pDecContext->eSliceType != B_SLICE && m_iForwardPredFramePOC >= 0 && m_iForwardPredFramePOC < m_pDecContext->pSliceHeader->iPicOrderCntLsb) {
-			memcpy(pDstInfo, m_pForwardPredFrameBufferInfo, sizeof(SBufferInfo));
-			ppDst = m_ppForwardPredFrameDst;
-			m_iForwardPredFramePOC = -1;
-			return (DECODING_STATE)iRet;
+		if (m_pDecContext->eSliceType != B_SLICE) {
+			if (pDstInfo->iBufferStatus == 1 && m_iForwardPredFramePOC >= 0 && (m_pDecContext->pSliceHeader->iPicOrderCntLsb > m_pDecContext->pSliceHeader->iFrameNum || (!m_pDecContext->pSliceHeader->iPicOrderCntLsb && !m_pDecContext->pSliceHeader->iFrameNum)) ) {
+				memcpy(&m_sNextForwardPredFrameBufferInfo, pDstInfo, sizeof(SBufferInfo));
+				m_ppNextForwardPredFrameDst = ppDst;
+				m_iNextForwardPredFramePOC = m_pDecContext->pSliceHeader->iPicOrderCntLsb;
+				m_pDecContext->bSliceHeaderFinish = false;
+			}
+			if (m_iForwardPredFramePOC >= 0 && (m_iForwardPredFramePOC < m_pDecContext->pSliceHeader->iPicOrderCntLsb || (!m_pDecContext->pSliceHeader->iPicOrderCntLsb && !m_pDecContext->pSliceHeader->iFrameNum)) ) {
+				memcpy(pDstInfo, &m_sForwardPredFrameBufferInfo, sizeof(SBufferInfo));
+				ppDst = m_ppForwardPredFrameDst;
+				m_iForwardPredFramePOC = -1;
+				if (m_iNextForwardPredFramePOC >= 0) {
+					memcpy(&m_sForwardPredFrameBufferInfo, &m_sNextForwardPredFrameBufferInfo, sizeof(SBufferInfo));
+					m_ppForwardPredFrameDst = m_ppNextForwardPredFrameDst;
+					m_iForwardPredFramePOC = m_iNextForwardPredFramePOC;
+					m_iNextForwardPredFramePOC = -1;
+				}
+				return (DECODING_STATE)iRet;
+			}
 		}
 	}
 
 	if (pDstInfo->iBufferStatus == 1) {
-		m_pDecContext->bSliceHeaderFinish = false; //reset for indicating for next slice header
+		m_pDecContext->bSliceHeaderFinish = false;
 		if (m_pDecContext->eSliceType != B_SLICE) {
 			if (m_pDecContext->pSliceHeader->iPicOrderCntLsb > m_pDecContext->pSliceHeader->iFrameNum) {
-				if (m_pForwardPredFrameBufferInfo == NULL) {
-					m_pForwardPredFrameBufferInfo = new SBufferInfo;
-				}
-				memcpy(m_pForwardPredFrameBufferInfo, pDstInfo, sizeof(SBufferInfo));
+				memcpy(&m_sForwardPredFrameBufferInfo, pDstInfo, sizeof(SBufferInfo));
 				m_ppForwardPredFrameDst = ppDst;
 				m_iForwardPredFramePOC = m_pDecContext->pSliceHeader->iPicOrderCntLsb;
 				pDstInfo->iBufferStatus = 0;
