@@ -108,6 +108,9 @@ virtual long EXTAPI GetOption (DECODER_OPTION eOptID, void* pOption);
  private:
 PWelsDecoderContext     m_pDecContext;
 welsCodecTrace*         m_pWelsTrace;
+SBufferInfo *						m_pForwardPredFrameBufferInfo;
+unsigned char**					m_ppForwardPredFrameDst;
+int32_t									m_iForwardPredFramePOC;
 
 int32_t InitDecoder (const SDecodingParam* pParam);
 void UninitDecoder (void);

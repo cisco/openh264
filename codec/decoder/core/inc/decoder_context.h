@@ -380,6 +380,7 @@ typedef struct TagWelsDecoderContext {
 //for Parse only
   bool bFramePending;
   bool bFrameFinish;
+	bool bSliceHeaderFinish;
   int32_t iNalNum;
   int32_t iMaxNalNum; //permitted max NAL num stored in parser
   SSpsBsInfo sSpsBsInfo [MAX_SPS_COUNT];

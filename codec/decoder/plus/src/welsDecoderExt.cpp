@@ -88,7 +88,10 @@ namespace WelsDec {
 ***************************************************************************/
 CWelsDecoder::CWelsDecoder (void)
   : m_pDecContext (NULL),
-    m_pWelsTrace (NULL) {
+    m_pWelsTrace (NULL),
+		m_pForwardPredFrameBufferInfo(NULL),
+		m_ppForwardPredFrameDst(NULL),
+		m_iForwardPredFramePOC(-1) {
 #ifdef OUTPUT_BIT_STREAM
   char chFileName[1024] = { 0 };  //for .264
   int iBufUsed = 0;
@@ -234,6 +237,10 @@ void CWelsDecoder::UninitDecoder (void) {
     m_pDecContext = NULL;
   }
 
+	if (NULL != m_pForwardPredFrameBufferInfo) {
+		delete m_pForwardPredFrameBufferInfo;
+		m_pForwardPredFrameBufferInfo = NULL;
+	}
 }
 
 // the return value of this function is not suitable, it need report failure info to upper layer.
@@ -482,7 +489,31 @@ DECODING_STATE CWelsDecoder::DecodeFrameNoDelay (const unsigned char* kpSrc,
   //ppDst[1] = ppTmpDst[1];
   //ppDst[2] = ppTmpDst[2];
   //}
+#if 0
+	if (m_pDecContext->bSliceHeaderFinish) {
+		if (m_pDecContext->eSliceType != B_SLICE && m_iForwardPredFramePOC >= 0 && m_iForwardPredFramePOC < m_pDecContext->pSliceHeader->iPicOrderCntLsb) {
+			memcpy(pDstInfo, m_pForwardPredFrameBufferInfo, sizeof(SBufferInfo));
+			ppDst = m_ppForwardPredFrameDst;
+			m_iForwardPredFramePOC = -1;
+			return (DECODING_STATE)iRet;
+		}
+	}
 
+	if (pDstInfo->iBufferStatus == 1) {
+		m_pDecContext->bSliceHeaderFinish = false; //reset for indicating for next slice header
+		if (m_pDecContext->eSliceType != B_SLICE) {
+			if (m_pDecContext->pSliceHeader->iPicOrderCntLsb > m_pDecContext->pSliceHeader->iFrameNum) {
+				if (m_pForwardPredFrameBufferInfo == NULL) {
+					m_pForwardPredFrameBufferInfo = new SBufferInfo;
+				}
+				memcpy(m_pForwardPredFrameBufferInfo, pDstInfo, sizeof(SBufferInfo));
+				m_ppForwardPredFrameDst = ppDst;
+				m_iForwardPredFramePOC = m_pDecContext->pSliceHeader->iPicOrderCntLsb;
+				pDstInfo->iBufferStatus = 0;
+			}
+		}
+	}
+#endif
   return (DECODING_STATE) iRet;
 }
 

@@ -509,6 +509,7 @@ int32_t WelsOpenDecoder (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   pCtx->bPrintFrameErrorTraceFlag = true;
   pCtx->iIgnoredErrorInfoPacketCount = 0;
   pCtx->bFrameFinish = true;
+	pCtx->bSliceHeaderFinish = false;
   return iRet;
 }
 
