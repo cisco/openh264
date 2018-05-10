@@ -319,7 +319,7 @@ typedef struct TagWelsDecoderContext {
   SPps                          sPpsBuffer[MAX_PPS_COUNT + 1];
   PSliceHeader                  pSliceHeader;
 
-  PPicBuff                      pPicBuff[LIST_A];       // Initially allocated memory for pictures which are used in decoding.
+  PPicBuff                      pPicBuff;       // Initially allocated memory for pictures which are used in decoding.
   int32_t                       iPicQueueNumber;
 
   SSubsetSps                    sSubsetSpsBuffer[MAX_SPS_COUNT + 1];
