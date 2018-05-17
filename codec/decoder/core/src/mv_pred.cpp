@@ -371,6 +371,174 @@ void PredMvBDirectSpatial(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2], int8_t re
 	}
 }
 
+void PredMvBDirectSpatial2(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2], int8_t ref[LIST_A]) {
+	bool bTopAvail, bLeftTopAvail, bRightTopAvail, bLeftAvail;
+	int32_t iLeftTopType, iRightTopType, iTopType, iLeftType;
+	int32_t iCurSliceIdc, iTopSliceIdc, iLeftTopSliceIdc, iRightTopSliceIdc, iLeftSliceIdc;
+	int32_t iCurX, iCurY, iCurXy, iLeftXy, iTopXy = 0, iLeftTopXy = 0, iRightTopXy = 0;
+
+	int8_t iLeftRef[LIST_A];
+	int8_t iTopRef[LIST_A];
+	int8_t iRightTopRef[LIST_A];
+	int8_t iLeftTopRef[LIST_A];
+	int8_t iDiagonalRef[LIST_A];
+	int16_t iMvA[LIST_A][2], iMvB[LIST_A][2], iMvC[LIST_A][2], iMvD[LIST_A][2];
+
+	int32_t iMbXy = pCurLayer->iMbXyIndex;
+	uint32_t is8x8 = IS_Inter_8x8(pCurLayer->pMbType[iMbXy]);
+
+	iCurXy = pCurLayer->iMbXyIndex;
+	iCurX = pCurLayer->iMbX;
+	iCurY = pCurLayer->iMbY;
+	iCurSliceIdc = pCurLayer->pSliceIdc[iCurXy];
+
+	if (iCurX != 0) {
+		iLeftXy = iCurXy - 1;
+		iLeftSliceIdc = pCurLayer->pSliceIdc[iLeftXy];
+		bLeftAvail = (iLeftSliceIdc == iCurSliceIdc);
+	}
+	else {
+		bLeftAvail = 0;
+		bLeftTopAvail = 0;
+	}
+
+	if (iCurY != 0) {
+		iTopXy = iCurXy - pCurLayer->iMbWidth;
+		iTopSliceIdc = pCurLayer->pSliceIdc[iTopXy];
+		bTopAvail = (iTopSliceIdc == iCurSliceIdc);
+		if (iCurX != 0) {
+			iLeftTopXy = iTopXy - 1;
+			iLeftTopSliceIdc = pCurLayer->pSliceIdc[iLeftTopXy];
+			bLeftTopAvail = (iLeftTopSliceIdc == iCurSliceIdc);
+		}
+		else {
+			bLeftTopAvail = 0;
+		}
+		if (iCurX != (pCurLayer->iMbWidth - 1)) {
+			iRightTopXy = iTopXy + 1;
+			iRightTopSliceIdc = pCurLayer->pSliceIdc[iRightTopXy];
+			bRightTopAvail = (iRightTopSliceIdc == iCurSliceIdc);
+		}
+		else {
+			bRightTopAvail = 0;
+		}
+	}
+	else {
+		bTopAvail = 0;
+		bLeftTopAvail = 0;
+		bRightTopAvail = 0;
+	}
+
+	iLeftType = ((iCurX != 0 && bLeftAvail) ? pCurLayer->pMbType[iLeftXy] : 0);
+	iTopType = ((iCurY != 0 && bTopAvail) ? pCurLayer->pMbType[iTopXy] : 0);
+	iLeftTopType = ((iCurX != 0 && iCurY != 0 && bLeftTopAvail)
+		? pCurLayer->pMbType[iLeftTopXy] : 0);
+	iRightTopType = ((iCurX != pCurLayer->iMbWidth - 1 && iCurY != 0 && bRightTopAvail)
+		? pCurLayer->pMbType[iRightTopXy] : 0);
+
+	/*get neb mv&iRefIdxArray*/
+	for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+		/*left*/
+		if (bLeftAvail && IS_INTER(iLeftType)) {
+			ST32(iMvA[listIdx], LD32(pCurLayer->pMv[listIdx][iLeftXy][3]));
+			iLeftRef[listIdx] = pCurLayer->pRefIndex[listIdx][iLeftXy][3];
+		}
+		else {
+			ST32(iMvA[listIdx], 0);
+			if (0 == bLeftAvail) { //not available
+				iLeftRef[listIdx] = REF_NOT_AVAIL;
+			}
+			else { //available but is intra mb type
+				iLeftRef[listIdx] = REF_NOT_IN_LIST;
+			}
+		}
+
+		/*top*/
+		if (bTopAvail && IS_INTER(iTopType)) {
+			ST32(iMvB[listIdx], LD32(pCurLayer->pMv[listIdx][iTopXy][12]));
+			iTopRef[listIdx] = pCurLayer->pRefIndex[listIdx][iTopXy][12];
+		}
+		else {
+			ST32(iMvB[listIdx], 0);
+			if (0 == bTopAvail) { //not available
+				iTopRef[listIdx] = REF_NOT_AVAIL;
+			}
+			else { //available but is intra mb type
+				iTopRef[listIdx] = REF_NOT_IN_LIST;
+			}
+		}
+
+		/*right_top*/
+		if (bRightTopAvail && IS_INTER(iRightTopType)) {
+			ST32(iMvC[listIdx], LD32(pCurLayer->pMv[listIdx][iRightTopXy][12]));
+			iRightTopRef[listIdx] = pCurLayer->pRefIndex[listIdx][iRightTopXy][12];
+		}
+		else {
+			ST32(iMvC[listIdx], 0);
+			if (0 == bRightTopAvail) { //not available
+				iRightTopRef[listIdx] = REF_NOT_AVAIL;
+			}
+			else { //available but is intra mb type
+				iRightTopRef[listIdx] = REF_NOT_IN_LIST;
+			}
+		}
+		/*left_top*/
+		if (bLeftTopAvail&& IS_INTER(iLeftTopType)) {
+			ST32(iMvD[listIdx], LD32(pCurLayer->pMv[listIdx][iLeftTopXy][15]));
+			iLeftTopRef[listIdx] = pCurLayer->pRefIndex[listIdx][iLeftTopXy][15];
+		}
+		else {
+			ST32(iMvD[listIdx], 0);
+			if (0 == bLeftTopAvail) { //not available
+				iLeftTopRef[listIdx] = REF_NOT_AVAIL;
+			}
+			else { //available but is intra mb type
+				iLeftTopRef[listIdx] = REF_NOT_IN_LIST;
+			}
+		}
+
+		iDiagonalRef[listIdx] = iRightTopRef[listIdx];
+		if (REF_NOT_AVAIL == iDiagonalRef[listIdx]) {
+			iDiagonalRef[listIdx] = iLeftTopRef[listIdx];
+			*(int32_t*)iMvC[listIdx] = *(int32_t*)iMvD[listIdx];
+		}
+
+		ref[listIdx] = WELS_MIN_POSITIVE(iLeftRef[listIdx], WELS_MIN_POSITIVE(iTopRef[listIdx], iRightTopRef[listIdx]));
+		if (ref[listIdx] >= 0) {
+			uint32_t match_count = (iLeftRef[listIdx] == ref[listIdx]) + (iTopRef[listIdx] == ref[listIdx]) + (iDiagonalRef[listIdx] == ref[listIdx]);
+			if (match_count == 1) {
+				if (iLeftRef[listIdx] == ref[listIdx]) {
+					ST32(iMvp[listIdx], LD32(iMvA[listIdx]));
+				}
+				else if (iTopRef[listIdx] == ref[listIdx]) {
+					ST32(iMvp[listIdx], LD32(iMvB[listIdx]));
+				}
+				else {
+					ST32(iMvp[listIdx], LD32(iMvC[listIdx]));
+				}
+			}
+			else {
+				iMvp[listIdx][0] = WelsMedian(iMvA[listIdx][0], iMvB[listIdx][0], iMvC[listIdx][0]);
+				iMvp[listIdx][1] = WelsMedian(iMvA[listIdx][1], iMvB[listIdx][1], iMvC[listIdx][1]);
+			}
+		}
+		else {
+			iMvp[listIdx][0] = 0;
+			iMvp[listIdx][1] = 0;
+			ref[listIdx] = REF_NOT_IN_LIST;
+		}
+	}
+	if (ref[LIST_0] <= REF_NOT_IN_LIST && ref[LIST_1] <= REF_NOT_IN_LIST) {
+		ref[LIST_0] = ref[LIST_1] = 0;
+	}
+	if (ref[1] <= REF_NOT_IN_LIST) {
+		pCurLayer->pMbType[iMbXy] &= ~MB_TYPE_L1;
+	}
+	else if (ref[0] <= REF_NOT_IN_LIST) {
+		pCurLayer->pMbType[iMbXy] &= ~MB_TYPE_L0;
+	}
+}
+
 void PredBDirectTemporal(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], int8_t ref[LIST_A]) {
 	PDqLayer pCurLayer = pCtx->pCurDqLayer;
 	PSlice pSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
