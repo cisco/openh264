@@ -813,7 +813,7 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 	else if (IS_INTER_16x16(mbType)) {
 		iPartIdx = 0;
 		for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
-			iRef[listIdx] = REF_NOT_IN_LIST;
+			iRef[listIdx] = 0;
 			if (IS_DIR(mbType, 0, listIdx)) {
 				WELS_READ_VERIFY(ParseRefIdxCabac(pCtx, pNeighAvail, pNonZeroCount, pRefIndex, listIdx, iPartIdx, pRefCount[listIdx], 0,
 					iRef[listIdx]));
@@ -836,16 +836,19 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 				pMv[1] += pMvd[1];
 				WELS_CHECK_SE_BOTH_WARNING(pMv[1], iMinVmv, iMaxVmv, "vertical mv");
 			}
+			else {
+				*(uint32_t*)pMv = *(uint32_t*)pMvd = 0;
+			}
 			UpdateP16x16MotionInfo(pCurDqLayer, listIdx, iRef[listIdx], pMv);
 			UpdateP16x16MvdCabac(pCurDqLayer, pMvd, listIdx);
 		}
 	}
 	else if (IS_INTER_16x8(mbType)) {
-		int8_t ref_idx_list[LIST_A][2] = { REF_NOT_IN_LIST };
+		int8_t ref_idx_list[LIST_A][2] = { 0 };
 		for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
 			for (int32_t i = 0; i < 2; ++i) {
 				iPartIdx = i << 3;
-				int8_t ref_idx = REF_NOT_IN_LIST;
+				int8_t ref_idx = 0;
 				if (IS_DIR(mbType, i, listIdx)) {
 					WELS_READ_VERIFY(ParseRefIdxCabac(pCtx, pNeighAvail, pNonZeroCount, pRefIndex, listIdx, iPartIdx, pRefCount[listIdx], 0, ref_idx));
 					if ((ref_idx < 0) || (ref_idx >= pRefCount[listIdx]) || (pCtx->sRefPic.pRefList[listIdx][ref_idx] == NULL)) { //error ref_idx
@@ -886,11 +889,11 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 		}
 	}
 	else if (IS_INTER_8x16(mbType)) {
-		int8_t ref_idx_list[LIST_A][2] = { REF_NOT_IN_LIST };
+		int8_t ref_idx_list[LIST_A][2] = { 0 };
 		for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
 			for (int32_t i = 0; i < 2; ++i) {
 				iPartIdx = i << 2;
-				int8_t ref_idx = REF_NOT_IN_LIST;
+				int8_t ref_idx = 0;
 				if (IS_DIR(mbType, i, listIdx)) {
 					WELS_READ_VERIFY(ParseRefIdxCabac(pCtx, pNeighAvail, pNonZeroCount, pRefIndex, listIdx, iPartIdx, pRefCount[listIdx], 0, ref_idx));
 					if ((ref_idx < 0) || (ref_idx >= pRefCount[listIdx]) || (pCtx->sRefPic.pRefList[listIdx][ref_idx] == NULL)) { //error ref_idx
@@ -1001,7 +1004,7 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 			}
 		}
 		//ref no-direct
-		int8_t ref_idx_list[LIST_A][4] = { REF_NOT_IN_LIST };
+		int8_t ref_idx_list[LIST_A][4] = { 0 };
 		for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
 			for (int32_t i = 0; i < 4; i++) {
 				int16_t iIdx8 = i << 2;
@@ -1009,7 +1012,7 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 				if (IS_DIRECT(subMbType)) {
 					continue;
 				}
-				int8_t iref = REF_NOT_IN_LIST;
+				int8_t iref = 0;
 				if (IS_DIR(subMbType, 0, listIdx)) {
 					WELS_READ_VERIFY(ParseRefIdxCabac(pCtx, pNeighAvail, pNonZeroCount, pRefIndex, listIdx, iIdx8, pRefCount[listIdx], 1,
 						iref));
