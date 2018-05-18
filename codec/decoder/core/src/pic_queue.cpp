@@ -117,7 +117,10 @@ PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const
 		int16_t) * MV_A * MB_BLOCK4x4_NUM, "pPic->pMv[]");
 	pPic->pMv[LIST_1] = (int16_t(*)[16][2])pMa->WelsMallocz(uiMbCount * sizeof(
 		int16_t) * MV_A * MB_BLOCK4x4_NUM, "pPic->pMv[]");
-
+	pPic->pRefIndex[LIST_0] = (int8_t(*)[16])pMa->WelsMallocz(uiMbCount * sizeof(
+		int8_t) * MB_BLOCK4x4_NUM, "pCtx->sMb.pRefIndex[]");
+	pPic->pRefIndex[LIST_1] = (int8_t(*)[16])pMa->WelsMallocz(uiMbCount * sizeof(
+		int8_t) * MB_BLOCK4x4_NUM, "pCtx->sMb.pRefIndex[]");
   return pPic;
 }
 
@@ -137,6 +140,10 @@ void FreePicture (PPicture pPic, CMemoryAlign* pMa) {
 				pMa->WelsFree(pPic->pMv[listIdx], "pPic->pMv[]");
 			}
 			pPic->pMv[listIdx] = NULL;
+			if (pPic->pRefIndex[listIdx]) {
+				pMa->WelsFree(pPic->pRefIndex[listIdx], "pPic->pRefIndex[]");
+			}
+			pPic->pRefIndex[listIdx] = NULL;
 		}
 
     pMa->WelsFree (pPic, "pPic");

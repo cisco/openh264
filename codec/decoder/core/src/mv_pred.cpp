@@ -391,7 +391,10 @@ void PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], in
 	uint32_t is8x8 = IS_Inter_8x8(pCurLayer->pMbType[iMbXy]);
 	MbType mbType = pCurLayer->pMbType[iMbXy];
 	iCurXy = pCurLayer->iMbXyIndex;
+
+	uint32_t uiDirectZeroPredictionFlag = 0;
 	PPicture colocPic = pCtx->sRefPic.pRefList[LIST_1][0];
+
 	MbType coloc_mbType = colocPic->pMbType[iMbXy];
 	SubMbType sub_mb_type;
 	if (IS_Inter_8x8(coloc_mbType) && !pCtx->pSps->bDirect8x8InferenceFlag) {
@@ -549,6 +552,7 @@ void PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], in
 	}
 	if (ref[LIST_0] <= REF_NOT_IN_LIST && ref[LIST_1] <= REF_NOT_IN_LIST) {
 		ref[LIST_0] = ref[LIST_1] = 0;
+		uiDirectZeroPredictionFlag = 1;
 	}
 	else if (ref[1] <= REF_NOT_IN_LIST) {
 		mbType &= ~MB_TYPE_L1;
@@ -576,11 +580,12 @@ void PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], in
 
 				int8_t iPartCount = pSubPartCount[i];
 				int16_t iPartIdx, iBlockW = pPartW[i];
-				uint8_t iScan4Idx, iCacheIdx;
-				iCacheIdx = g_kuiCache30ScanIdx[i << 2];
+				uint8_t iScan4Idx, iCacheIdx, iColocIdx;
+				iCacheIdx = g_kuiCache30ScanIdx[iIdx8];
 
 				for (int32_t j = 0; j < iPartCount; j++) {
-					iPartIdx = (i << 2) + j * iBlockW;
+					iPartIdx = iIdx8 + j * iBlockW;
+					iColocIdx = g_kuiScan4[iPartIdx];
 					iScan4Idx = g_kuiScan4[iPartIdx];
 					iCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
 
@@ -588,32 +593,53 @@ void PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], in
 					ST32(pCurLayer->pMvd[listIdx][iMbXy][iScan4Idx], LD32(pMvd));
 					//					ST32(pMotionVector[listIdx][iCacheIdx], LD32(iMvp));
 					//					ST32(pMvdCache[listIdx][iCacheIdx], LD32(pMvd));
-				}
-			}
-			// the motion vectors equal to '0' if ref_idx==0 && coloc_zero_flag is true
-/*			if (0 == sHDecCtx->coloc_intra_cache[coloc_index] && 0 == l1_long_term_reference_flag
-				&& (sHDecCtx->coloc_refidx_cache[0][coloc_index] == 0 || (sHDecCtx->coloc_refidx_cache[0][coloc_index] < 0 && sHDecCtx->coloc_refidx_cache[1][coloc_index] == 0))) {
-					const int16_t(*mv_coloc)[2] = 0 == sHDecCtx->coloc_refidx_cache[0][coloc_index] ? sHDecCtx->coloc_motion_cache[0] : sHDecCtx->coloc_motion_cache[1];
-			{	
-				if (IS_SUB_8x8(sub_mb_type)) {
-						const int16_t *mv = mv_coloc[coloc_index];
-						if ((unsigned)(mv[0] + 1) <= 2 && (unsigned)(mv[1] + 1) <= 2) {
-							if (0 == ref[0])	SetRectBlock(&sHDecCtx->motion_cache[0][2 + scan_index], 2, 2, MB_CACHE_STRIDE * 4, 0, 4);
-							if (0 == ref[1])	SetRectBlock(&sHDecCtx->motion_cache[1][2 + scan_index], 2, 2, MB_CACHE_STRIDE * 4, 0, 4);
-						}
-					}
-					else {
-						for (b4 = 0; b4<4; b4++) {
-							const int32_t scan_index = scan_cache[b8 * 4 + b4];
-							const int16_t *mv = mv_coloc[scan_block[b8 * 4 + b4]];
-							if ((unsigned)(mv[0] + 1) <= 2 && (unsigned)(mv[1] + 1) <= 2) {
-								if (0 == ref[0])	*(uint32_t*)sHDecCtx->motion_cache[0][2 + scan_index] = 0;
-								if (0 == ref[1])	*(uint32_t*)sHDecCtx->motion_cache[1][2 + scan_index] = 0;
+
+					uint32_t uiColZeroFlag = !colocPic->bIsLongRef && colocPic->pRefIndex[0][iColocIdx] == 0 || 
+						(colocPic->pRefIndex[0][iColocIdx] < 0 && colocPic->pRefIndex[1][iColocIdx] == 0);
+					if (uiColZeroFlag) {
+						if (IS_SUB_8x8(sub_mb_type)) {
+							int16_t iMv[2] = { 0 };
+							if (colocPic->pRefIndex[0][iColocIdx] == 0) {
+								if (colocPic->pMv[0][iMbXy][iColocIdx][0] + 1 <= 2 && colocPic->pMv[0][iMbXy][iColocIdx][1] + 1 <= 2) {
+									if (ref[0] == 0) ST32(pCurLayer->pMv[0][iMbXy][iScan4Idx], LD32(iMv));
+									if (ref[0] == 1) ST32(pCurLayer->pMv[1][iMbXy][iScan4Idx], LD32(iMv));
+								}
+							}
+							else {
+								if (colocPic->pMv[1][iMbXy][iColocIdx][0] + 1 <= 2 && colocPic->pMv[1][iMbXy][iColocIdx][1] + 1 <= 2) {
+									int16_t iMv[2] = { 0 };
+									if (ref[0] == 0) ST32(pCurLayer->pMv[0][iMbXy][iScan4Idx], LD32(iMv));
+									if (ref[0] == 1) ST32(pCurLayer->pMv[1][iMbXy][iScan4Idx], LD32(iMv));
+								}
 							}
 						}
 					}
+					// the motion vectors equal to '0' if ref_idx==0 && coloc_zero_flag is true
+		/*			if (0 == sHDecCtx->coloc_intra_cache[coloc_index] && 0 == l1_long_term_reference_flag
+						&& (sHDecCtx->coloc_refidx_cache[0][coloc_index] == 0 || (sHDecCtx->coloc_refidx_cache[0][coloc_index] < 0 && sHDecCtx->coloc_refidx_cache[1][coloc_index] == 0))) {
+							const int16_t(*mv_coloc)[2] = 0 == sHDecCtx->coloc_refidx_cache[0][coloc_index] ? sHDecCtx->coloc_motion_cache[0] : sHDecCtx->coloc_motion_cache[1];
+					{
+						if (IS_SUB_8x8(sub_mb_type)) {
+								const int16_t *mv = mv_coloc[coloc_index];
+								if ((unsigned)(mv[0] + 1) <= 2 && (unsigned)(mv[1] + 1) <= 2) {
+									if (0 == ref[0])	SetRectBlock(&sHDecCtx->motion_cache[0][2 + scan_index], 2, 2, MB_CACHE_STRIDE * 4, 0, 4);
+									if (0 == ref[1])	SetRectBlock(&sHDecCtx->motion_cache[1][2 + scan_index], 2, 2, MB_CACHE_STRIDE * 4, 0, 4);
+								}
+							}
+							else {
+								for (b4 = 0; b4<4; b4++) {
+									const int32_t scan_index = scan_cache[b8 * 4 + b4];
+									const int16_t *mv = mv_coloc[scan_block[b8 * 4 + b4]];
+									if ((unsigned)(mv[0] + 1) <= 2 && (unsigned)(mv[1] + 1) <= 2) {
+										if (0 == ref[0])	*(uint32_t*)sHDecCtx->motion_cache[0][2 + scan_index] = 0;
+										if (0 == ref[1])	*(uint32_t*)sHDecCtx->motion_cache[1][2 + scan_index] = 0;
+									}
+								}
+							}
+						}
+					}*/
 				}
-			}*/
+			}
 		}
 	}
 }
