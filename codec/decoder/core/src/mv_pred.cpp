@@ -41,6 +41,7 @@
 #include "mv_pred.h"
 #include "ls_defines.h"
 #include "mb_cache.h"
+#include "parse_mb_syn_cabac.h"
 
 namespace WelsDec {
 void PredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]) {
@@ -386,9 +387,26 @@ void PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], in
 	int16_t iMvA[LIST_A][2], iMvB[LIST_A][2], iMvC[LIST_A][2], iMvD[LIST_A][2];
 
 	int32_t iMbXy = pCurLayer->iMbXyIndex;
-	uint32_t is8x8 = IS_Inter_8x8(pCurLayer->pMbType[iMbXy]);
 
+	uint32_t is8x8 = IS_Inter_8x8(pCurLayer->pMbType[iMbXy]);
+	MbType mbType = pCurLayer->pMbType[iMbXy];
 	iCurXy = pCurLayer->iMbXyIndex;
+	PPicture colocPic = pCtx->sRefPic.pRefList[LIST_1][0];
+	MbType coloc_mbType = colocPic->pMbType[iMbXy];
+	SubMbType sub_mb_type;
+	if (IS_Inter_8x8(coloc_mbType) && !pCtx->pSps->bDirect8x8InferenceFlag) {
+		sub_mb_type = SUB_MB_TYPE_4x4 | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_DIRECT;
+		mbType |= MB_TYPE_8x8 | MB_TYPE_L0 | MB_TYPE_L1;
+	}
+	else if (!is8x8 && (IS_INTER_16x16(coloc_mbType) || IS_INTRA(coloc_mbType))) {
+		sub_mb_type = SUB_MB_TYPE_8x8 | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_DIRECT;
+		mbType |= MB_TYPE_16x16 | MB_TYPE_L0 | MB_TYPE_L1;
+	}
+	else {
+		sub_mb_type = SUB_MB_TYPE_8x8 | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_DIRECT;
+		mbType |= MB_TYPE_8x8 | MB_TYPE_L0 | MB_TYPE_L1;
+	}
+
 	iCurX = pCurLayer->iMbX;
 	iCurY = pCurLayer->iMbY;
 	iCurSliceIdc = pCurLayer->pSliceIdc[iCurXy];
@@ -533,26 +551,70 @@ void PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], in
 		ref[LIST_0] = ref[LIST_1] = 0;
 	}
 	else if (ref[1] <= REF_NOT_IN_LIST) {
-		pCurLayer->pMbType[iMbXy] &= ~MB_TYPE_L1;
+		mbType &= ~MB_TYPE_L1;
 	}
 	else if (ref[0] <= REF_NOT_IN_LIST) {
-		pCurLayer->pMbType[iMbXy] &= ~MB_TYPE_L0;
+		mbType &= ~MB_TYPE_L0;
 	}
+	pCurLayer->pMbType[iMbXy] = mbType;
 
-	PPicture colocPic = pCtx->sRefPic.pRefList[LIST_1][0];
-	MbType coloc_mbType = colocPic->pMbType[iMbXy];
-	SubMbType sub_mb_type;
-	if (IS_Inter_8x8(coloc_mbType) && !pCtx->pSps->bDirect8x8InferenceFlag) {
-		sub_mb_type = SUB_MB_TYPE_4x4 | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_DIRECT;
-		pCurLayer->pMbType[iMbXy] |= MB_TYPE_8x8 | MB_TYPE_L0 | MB_TYPE_L1;
-	}
-	else if (!is8x8 && (IS_INTER_16x16(coloc_mbType) || IS_INTRA(coloc_mbType))) {
-		sub_mb_type = SUB_MB_TYPE_8x8 | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_DIRECT;
-		pCurLayer->pMbType[iMbXy] |= MB_TYPE_16x16 | MB_TYPE_L0 | MB_TYPE_L1;
+	if (IS_INTER_16x16(mbType)) {
 	}
 	else {
-		sub_mb_type = SUB_MB_TYPE_8x8 | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_DIRECT;
-		pCurLayer->pMbType[iMbXy] |= MB_TYPE_8x8 | MB_TYPE_L0 | MB_TYPE_L1;
+		int8_t pSubPartCount[4], pPartW[4];
+		for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+			for (int32_t i = 0; i < 4; i++) { //Direct 8x8 Ref and mv
+				pCurLayer->pSubMbType[iMbXy][i] = sub_mb_type;
+				int16_t iIdx8 = i << 2;
+
+				int8_t pRefIndex[LIST_A][30];
+				int16_t pMvd[4] = { 0 };
+				UpdateP8x8RefIdxCabac(pCurLayer, pRefIndex, iIdx8, ref[listIdx], listIdx);
+
+				pSubPartCount[i] = g_ksInterBSubMbTypeInfo[12].iPartCount;
+				pPartW[i] = g_ksInterBSubMbTypeInfo[12].iPartWidth;
+
+				int8_t iPartCount = pSubPartCount[i];
+				int16_t iPartIdx, iBlockW = pPartW[i];
+				uint8_t iScan4Idx, iCacheIdx;
+				iCacheIdx = g_kuiCache30ScanIdx[i << 2];
+
+				for (int32_t j = 0; j < iPartCount; j++) {
+					iPartIdx = (i << 2) + j * iBlockW;
+					iScan4Idx = g_kuiScan4[iPartIdx];
+					iCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
+
+					ST32(pCurLayer->pMv[listIdx][iMbXy][iScan4Idx], LD32(iMvp));
+					ST32(pCurLayer->pMvd[listIdx][iMbXy][iScan4Idx], LD32(pMvd));
+					//					ST32(pMotionVector[listIdx][iCacheIdx], LD32(iMvp));
+					//					ST32(pMvdCache[listIdx][iCacheIdx], LD32(pMvd));
+				}
+			}
+			// the motion vectors equal to '0' if ref_idx==0 && coloc_zero_flag is true
+/*			if (0 == sHDecCtx->coloc_intra_cache[coloc_index] && 0 == l1_long_term_reference_flag
+				&& (sHDecCtx->coloc_refidx_cache[0][coloc_index] == 0 || (sHDecCtx->coloc_refidx_cache[0][coloc_index] < 0 && sHDecCtx->coloc_refidx_cache[1][coloc_index] == 0))) {
+					const int16_t(*mv_coloc)[2] = 0 == sHDecCtx->coloc_refidx_cache[0][coloc_index] ? sHDecCtx->coloc_motion_cache[0] : sHDecCtx->coloc_motion_cache[1];
+			{	
+				if (IS_SUB_8x8(sub_mb_type)) {
+						const int16_t *mv = mv_coloc[coloc_index];
+						if ((unsigned)(mv[0] + 1) <= 2 && (unsigned)(mv[1] + 1) <= 2) {
+							if (0 == ref[0])	SetRectBlock(&sHDecCtx->motion_cache[0][2 + scan_index], 2, 2, MB_CACHE_STRIDE * 4, 0, 4);
+							if (0 == ref[1])	SetRectBlock(&sHDecCtx->motion_cache[1][2 + scan_index], 2, 2, MB_CACHE_STRIDE * 4, 0, 4);
+						}
+					}
+					else {
+						for (b4 = 0; b4<4; b4++) {
+							const int32_t scan_index = scan_cache[b8 * 4 + b4];
+							const int16_t *mv = mv_coloc[scan_block[b8 * 4 + b4]];
+							if ((unsigned)(mv[0] + 1) <= 2 && (unsigned)(mv[1] + 1) <= 2) {
+								if (0 == ref[0])	*(uint32_t*)sHDecCtx->motion_cache[0][2 + scan_index] = 0;
+								if (0 == ref[1])	*(uint32_t*)sHDecCtx->motion_cache[1][2 + scan_index] = 0;
+							}
+						}
+					}
+				}
+			}*/
+		}
 	}
 }
 
