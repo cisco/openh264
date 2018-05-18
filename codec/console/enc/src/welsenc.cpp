@@ -763,7 +763,7 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
 #if defined ( STICK_STREAM_SIZE )
   FILE* fTrackStream = fopen ("coding_size.stream", "wb");
 #endif
-  SFilesSet fs;
+  SFilesSet fs = {};
   // for configuration file
   CReadConfig cRdCfg;
   int iParsedNum = 1;
