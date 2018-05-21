@@ -582,52 +582,70 @@ void PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], in
 	}
 	pCurLayer->pMbType[iMbXy] = mbType;
 
-	if (!IS_INTER_16x16(mbType)) {
-		int8_t pSubPartCount[4], pPartW[4];
-		for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
-			for (int32_t i = 0; i < 4; i++) { //Direct 8x8 Ref and mv
-				pCurLayer->pSubMbType[iMbXy][i] = sub_mb_type;
-				int16_t iIdx8 = i << 2;
-
-				int8_t pRefIndex[LIST_A][30];
+	if (IS_SKIP(mbType)) {
+		if (!(is8x8 | *(int32_t*)iMvp[LIST_0] | *(int32_t*)iMvp[LIST_1])) {
+			int16_t pMvd[4] = { 0 };
+			for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+				UpdateP16x16MotionInfo(pCurLayer, listIdx, ref[listIdx], iMvp[listIdx]);
+				UpdateP16x16MvdCabac(pCurLayer, pMvd, listIdx);
+			}
+		}
+		else {
+			if (IS_INTER_16x16(mbType)) {
 				int16_t pMvd[4] = { 0 };
-				UpdateP8x8RefIdxCabac(pCurLayer, pRefIndex, iIdx8, ref[listIdx], listIdx);
+				for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+					UpdateP16x16MotionInfo(pCurLayer, listIdx, ref[listIdx], iMvp[listIdx]);
+					UpdateP16x16MvdCabac(pCurLayer, pMvd, listIdx);
+				}
+			}
+			else {
+				int8_t pSubPartCount[4], pPartW[4];
+				for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+					for (int32_t i = 0; i < 4; i++) { //Direct 8x8 Ref and mv
+						pCurLayer->pSubMbType[iMbXy][i] = sub_mb_type;
+						int16_t iIdx8 = i << 2;
 
-				pSubPartCount[i] = g_ksInterBSubMbTypeInfo[12].iPartCount;
-				pPartW[i] = g_ksInterBSubMbTypeInfo[12].iPartWidth;
+						int8_t pRefIndex[LIST_A][30];
+						int16_t pMvd[4] = { 0 };
+						UpdateP8x8RefIdxCabac(pCurLayer, pRefIndex, iIdx8, ref[listIdx], listIdx);
 
-				int8_t iPartCount = pSubPartCount[i];
-				int16_t iPartIdx, iBlockW = pPartW[i];
-				uint8_t iScan4Idx, iCacheIdx, iColocIdx;
-				iCacheIdx = g_kuiCache30ScanIdx[iIdx8];
+						pSubPartCount[i] = g_ksInterBSubMbTypeInfo[12].iPartCount;
+						pPartW[i] = g_ksInterBSubMbTypeInfo[12].iPartWidth;
 
-				for (int32_t j = 0; j < iPartCount; j++) {
-					iPartIdx = iIdx8 + j * iBlockW;
-					iColocIdx = g_kuiScan4[iPartIdx];
-					iScan4Idx = g_kuiScan4[iPartIdx];
-					iCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
+						int8_t iPartCount = pSubPartCount[i];
+						int16_t iPartIdx, iBlockW = pPartW[i];
+						uint8_t iScan4Idx, iCacheIdx, iColocIdx;
+						iCacheIdx = g_kuiCache30ScanIdx[iIdx8];
 
-					ST32(pCurLayer->pMv[listIdx][iMbXy][iScan4Idx], LD32(iMvp));
-					ST32(pCurLayer->pMvd[listIdx][iMbXy][iScan4Idx], LD32(pMvd));
-					//					ST32(pMotionVector[listIdx][iCacheIdx], LD32(iMvp));
-					//					ST32(pMvdCache[listIdx][iCacheIdx], LD32(pMvd));
+						for (int32_t j = 0; j < iPartCount; j++) {
+							iPartIdx = iIdx8 + j * iBlockW;
+							iColocIdx = g_kuiScan4[iPartIdx];
+							iScan4Idx = g_kuiScan4[iPartIdx];
+							iCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
 
-					uint32_t uiColZeroFlag = !colocPic->bIsLongRef && colocPic->pRefIndex[0][iMbXy][iColocIdx] == 0 &&
-						(colocPic->pRefIndex[0][iMbXy][iColocIdx] < 0 && colocPic->pRefIndex[1][iMbXy][iColocIdx] == 0);
-					if (uiColZeroFlag) {
-						if (IS_SUB_8x8(sub_mb_type)) {
-							int16_t iMv[2] = { 0 };
-							if (colocPic->pRefIndex[0][iMbXy][iColocIdx] == 0) {
-								if (colocPic->pMv[0][iMbXy][iColocIdx][0] + 1 <= 2 && colocPic->pMv[0][iMbXy][iColocIdx][1] + 1 <= 2) {
-									if (ref[0] == 0) ST32(pCurLayer->pMv[0][iMbXy][iScan4Idx], LD32(iMv));
-									if (ref[0] == 1) ST32(pCurLayer->pMv[1][iMbXy][iScan4Idx], LD32(iMv));
-								}
-							}
-							else {
-								if (colocPic->pMv[1][iMbXy][iColocIdx][0] + 1 <= 2 && colocPic->pMv[1][iMbXy][iColocIdx][1] + 1 <= 2) {
+							ST32(pCurLayer->pMv[listIdx][iMbXy][iScan4Idx], LD32(iMvp));
+							ST32(pCurLayer->pMvd[listIdx][iMbXy][iScan4Idx], LD32(pMvd));
+							//					ST32(pMotionVector[listIdx][iCacheIdx], LD32(iMvp));
+							//					ST32(pMvdCache[listIdx][iCacheIdx], LD32(pMvd));
+
+							uint32_t uiColZeroFlag = !colocPic->bIsLongRef && colocPic->pRefIndex[0][iMbXy][iColocIdx] == 0 &&
+								(colocPic->pRefIndex[0][iMbXy][iColocIdx] < 0 && colocPic->pRefIndex[1][iMbXy][iColocIdx] == 0);
+							if (uiColZeroFlag) {
+								if (IS_SUB_8x8(sub_mb_type)) {
 									int16_t iMv[2] = { 0 };
-									if (ref[0] == 0) ST32(pCurLayer->pMv[0][iMbXy][iScan4Idx], LD32(iMv));
-									if (ref[0] == 1) ST32(pCurLayer->pMv[1][iMbXy][iScan4Idx], LD32(iMv));
+									if (colocPic->pRefIndex[0][iMbXy][iColocIdx] == 0) {
+										if (colocPic->pMv[0][iMbXy][iColocIdx][0] + 1 <= 2 && colocPic->pMv[0][iMbXy][iColocIdx][1] + 1 <= 2) {
+											if (ref[0] == 0) ST32(pCurLayer->pMv[0][iMbXy][iScan4Idx], LD32(iMv));
+											if (ref[0] == 1) ST32(pCurLayer->pMv[1][iMbXy][iScan4Idx], LD32(iMv));
+										}
+									}
+									else {
+										if (colocPic->pMv[1][iMbXy][iColocIdx][0] + 1 <= 2 && colocPic->pMv[1][iMbXy][iColocIdx][1] + 1 <= 2) {
+											int16_t iMv[2] = { 0 };
+											if (ref[0] == 0) ST32(pCurLayer->pMv[0][iMbXy][iScan4Idx], LD32(iMv));
+											if (ref[0] == 1) ST32(pCurLayer->pMv[1][iMbXy][iScan4Idx], LD32(iMv));
+										}
+									}
 								}
 							}
 						}
