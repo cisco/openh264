@@ -47,7 +47,7 @@ namespace WelsDec {
 *  It is used to express reference picture, also consequent reconstruction picture for output
 */
 
-typedef struct TagPicture {
+struct SPicture {
 /************************************payload data*********************************/
 uint8_t*        pBuffer[4];             // pointer to the first allocated byte, basical offset of buffer, dimension:
 uint8_t*        pData[4];               // pointer to picture planes respectively
@@ -88,11 +88,14 @@ int32_t iMbEcedNum;
 int32_t iMbEcedPropNum;
 int32_t iMbNum;
 
-uint32_t*  pMbType; /* mb type */
-int16_t(*pMv[LIST_A])[MB_BLOCK4x4_NUM][MV_A];//  MB_BLOCK4x4_NUM*]
-int8_t(*pRefIndex[LIST_A])[MB_BLOCK4x4_NUM]; //
+uint32_t*  pMbType; // mb type used for direct mode
+int16_t(*pMv[LIST_A])[MB_BLOCK4x4_NUM][MV_A];// used for direct mode
+int8_t(*pRefIndex[LIST_A])[MB_BLOCK4x4_NUM]; //used for direct mode
+struct SPicture * pRefPic[LIST_A][17]; //ref pictures used for direct mode
 
-} SPicture, *PPicture; // "Picture" declaration is comflict with Mac system
+};// "Picture" declaration is comflict with Mac system
+
+typedef struct SPicture *PPicture;
 
 } // namespace WelsDec
 

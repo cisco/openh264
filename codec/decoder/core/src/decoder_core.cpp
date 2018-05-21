@@ -2549,6 +2549,9 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
 				memcpy(pCtx->pDec->pMv[LIST_1], pCtx->pCurDqLayer->pMv[LIST_1], pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof(int16_t) * MV_A * MB_BLOCK4x4_NUM);
 				memcpy(pCtx->pDec->pRefIndex[LIST_0], pCtx->pCurDqLayer->pRefIndex[LIST_0], pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof(int8_t) * MB_BLOCK4x4_NUM);
 				memcpy(pCtx->pDec->pRefIndex[LIST_1], pCtx->pCurDqLayer->pRefIndex[LIST_1], pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof(int8_t) * MB_BLOCK4x4_NUM);
+				for (uint32_t i = 0; i < MAX_DPB_COUNT + 1; ++i) {
+					pCtx->pDec->pRefPic[LIST_0][i] = pCtx->sRefPic.pRefList[LIST_0][i];
+				}
 				iRet = WelsMarkAsRef (pCtx);
         if (iRet != ERR_NONE) {
           if (iRet == ERR_INFO_DUPLICATE_FRAME_NUM)
