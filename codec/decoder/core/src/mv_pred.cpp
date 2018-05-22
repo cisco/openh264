@@ -491,7 +491,6 @@ void PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], in
 	MbType mbType = pCurLayer->pMbType[iMbXy];
 	iCurXy = pCurLayer->iMbXyIndex;
 
-	uint32_t uiDirectZeroPredictionFlag = 0;
 	PPicture colocPic = pCtx->sRefPic.pRefList[LIST_1][0];
 
 	MbType coloc_mbType = colocPic->pMbType[iMbXy];
@@ -671,7 +670,6 @@ void PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], in
 	}
 	if (ref[LIST_0] <= REF_NOT_IN_LIST && ref[LIST_1] <= REF_NOT_IN_LIST) {
 		ref[LIST_0] = ref[LIST_1] = 0;
-		uiDirectZeroPredictionFlag = 1;
 	}
 	else if (ref[1] <= REF_NOT_IN_LIST) {
 		mbType &= ~MB_TYPE_L1;
@@ -681,136 +679,140 @@ void PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], in
 	}
 	pCurLayer->pMbType[iMbXy] = mbType;
 
-	if (IS_SKIP(mbType)) {
 
-		if (IS_INTRA(coloc_mbType)) {
-			SetRectBlock(pCurLayer->iColocIntra, 4, 4, 4 * sizeof(int8_t), 1, sizeof(int8_t));
+	if (IS_INTRA(coloc_mbType)) {
+		SetRectBlock(pCurLayer->iColocIntra, 4, 4, 4 * sizeof(int8_t), 1, sizeof(int8_t));
+	}
+	else {
+		SetRectBlock(pCurLayer->iColocIntra, 4, 4, 4 * sizeof(int8_t), 0, sizeof(int8_t));
+	}
+	int16_t pMvd[4] = { 0 };
+	/*if (!(is8x8 | *(int32_t*)iMvp[LIST_0] | *(int32_t*)iMvp[LIST_1])) {
+		for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+			UpdateP16x16MotionInfo(pCurLayer, listIdx, ref[listIdx], iMvp[listIdx]);
+			UpdateP16x16MvdCabac(pCurLayer, pMvd, listIdx);
 		}
-		else {
-			SetRectBlock(pCurLayer->iColocIntra, 4, 4, 4 * sizeof(int8_t), 0, sizeof(int8_t));
-		}
-		int16_t pMvd[4] = { 0 };
-		if (!(is8x8 | *(int32_t*)iMvp[LIST_0] | *(int32_t*)iMvp[LIST_1])) {
+	}
+	*/
+	{
+		if (IS_INTER_16x16(mbType)) {
+			int16_t iMVZero[2] = { 0 };
+			int16_t * pMv = IS_TYPE_L1(coloc_mbType) ? colocPic->pMv[LIST_1][iMbXy][0] : iMVZero;
+			ST32(pCurLayer->iColocMv[LIST_0][0], LD32(colocPic->pMv[LIST_0][iMbXy][0]));
+			ST32(pCurLayer->iColocMv[LIST_1][0], LD32(pMv));
+			pCurLayer->iColocRefIndex[LIST_0][0] = colocPic->pRefIndex[LIST_0][iMbXy][0];
+			pCurLayer->iColocRefIndex[LIST_1][0] = IS_TYPE_L1(coloc_mbType) ? colocPic->pRefIndex[LIST_1][iMbXy][0] : 0;
+			if (0 == pCurLayer->iColocIntra[0] && !colocPic->bIsLongRef
+				&& ((pCurLayer->iColocRefIndex[LIST_0][0] == 0 && (unsigned)(pCurLayer->iColocMv[LIST_0][0][0] + 1) <= 2 && (unsigned)(pCurLayer->iColocMv[LIST_0][0][1] + 1) <= 2)
+					|| (pCurLayer->iColocRefIndex[LIST_0][0] <0 && pCurLayer->iColocRefIndex[LIST_1][0] == 0 && (unsigned)(pCurLayer->iColocMv[LIST_0][0][0] + 1) <= 2 && (unsigned)(pCurLayer->iColocMv[LIST_0][0][1] + 1) <= 2))) {
+				if (0 >= ref[0])	*(uint32_t*)iMvp[LIST_0] = 0;
+				if (0 >= ref[1])	*(uint32_t*)iMvp[LIST_1] = 0;
+			}
 			for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
 				UpdateP16x16MotionInfo(pCurLayer, listIdx, ref[listIdx], iMvp[listIdx]);
 				UpdateP16x16MvdCabac(pCurLayer, pMvd, listIdx);
 			}
 		}
 		else {
-			if (IS_INTER_16x16(mbType)) {
-				int16_t iMVZero[2] = { 0 };
-				int16_t * pMv = IS_TYPE_L1(coloc_mbType) ? colocPic->pMv[LIST_1][iMbXy][0] : iMVZero;
-				ST32(pCurLayer->iColocMv[LIST_0][0], LD32(colocPic->pMv[LIST_0][iMbXy][0]));
-				ST32(pCurLayer->iColocMv[LIST_1][0], LD32(pMv));
-				pCurLayer->iColocRefIndex[LIST_0][0] = colocPic->pRefIndex[LIST_0][iMbXy][0];
-				pCurLayer->iColocRefIndex[LIST_1][0] = IS_TYPE_L1(coloc_mbType) ? colocPic->pRefIndex[LIST_1][iMbXy][0] : 0;
-				if (0 == pCurLayer->iColocIntra[0] && !colocPic->bIsLongRef
-					&& ((pCurLayer->iColocRefIndex[LIST_0][0] == 0 && (unsigned)(pCurLayer->iColocMv[LIST_0][0][0] + 1) <= 2 && (unsigned)(pCurLayer->iColocMv[LIST_0][0][1] + 1) <= 2)
-						|| (pCurLayer->iColocRefIndex[LIST_0][0] <0 && pCurLayer->iColocRefIndex[LIST_1][0] == 0 && (unsigned)(pCurLayer->iColocMv[LIST_0][0][0] + 1) <= 2 && (unsigned)(pCurLayer->iColocMv[LIST_0][0][1] + 1) <= 2))) {
-					if (0 >= ref[0])	*(uint32_t*)iMvp[LIST_0] = 0;
-					if (0 >= ref[1])	*(uint32_t*)iMvp[LIST_1] = 0;
-				}
-				for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
-					UpdateP16x16MotionInfo(pCurLayer, listIdx, ref[listIdx], iMvp[listIdx]);
-					UpdateP16x16MvdCabac(pCurLayer, pMvd, listIdx);
-				}
+			for (int32_t listIdx = 0; listIdx < 1 + !!IS_TYPE_L1(coloc_mbType); listIdx++) {
+				SetRectBlock(&pCurLayer->iColocRefIndex[listIdx][0], 2, 2, 4, colocPic->pRefIndex[listIdx][iMbXy][0], 1);
+				SetRectBlock(&pCurLayer->iColocRefIndex[listIdx][2], 2, 2, 4, colocPic->pRefIndex[listIdx][iMbXy][3], 1);
+				SetRectBlock(&pCurLayer->iColocRefIndex[listIdx][8], 2, 2, 4, colocPic->pRefIndex[listIdx][iMbXy][12], 1);
+				SetRectBlock(&pCurLayer->iColocRefIndex[listIdx][10], 2, 2, 4, colocPic->pRefIndex[listIdx][iMbXy][15], 1);
+
+				SetRectBlock(pCurLayer->iColocMv[listIdx][0], 2, 2, 16, LD32(colocPic->pMv[listIdx][iMbXy][0]), 4);
+				SetRectBlock(pCurLayer->iColocMv[listIdx][2], 2, 2, 16, LD32(colocPic->pMv[listIdx][iMbXy][3]), 4);
+				SetRectBlock(pCurLayer->iColocMv[listIdx][8], 2, 2, 16, LD32(colocPic->pMv[listIdx][iMbXy][12]), 4);
+				SetRectBlock(pCurLayer->iColocMv[listIdx][10], 2, 2, 16, LD32(colocPic->pMv[listIdx][iMbXy][15]), 4);
 			}
-			else {
-				for (int32_t listIdx = 0; listIdx < 1 + !!IS_TYPE_L1(coloc_mbType); listIdx++) {
-					SetRectBlock(&pCurLayer->iColocRefIndex[listIdx][0], 2, 2, 4, colocPic->pRefIndex[listIdx][iMbXy][0], 1);
-					SetRectBlock(&pCurLayer->iColocRefIndex[listIdx][2], 2, 2, 4, colocPic->pRefIndex[listIdx][iMbXy][3], 1);
-					SetRectBlock(&pCurLayer->iColocRefIndex[listIdx][8], 2, 2, 4, colocPic->pRefIndex[listIdx][iMbXy][12], 1);
-					SetRectBlock(&pCurLayer->iColocRefIndex[listIdx][10], 2, 2, 4, colocPic->pRefIndex[listIdx][iMbXy][15], 1);
+			if (!IS_TYPE_L1(coloc_mbType))// only forward prediction
+				SetRectBlock(&pCurLayer->iColocRefIndex[1][0], 4, 4, 4, (uint8_t)-1, 1);
 
-					SetRectBlock(pCurLayer->iColocMv[listIdx][0], 2, 2, 16, LD32(colocPic->pMv[listIdx][iMbXy][0]), 4);
-					SetRectBlock(pCurLayer->iColocMv[listIdx][2], 2, 2, 16, LD32(colocPic->pMv[listIdx][iMbXy][3]), 4);
-					SetRectBlock(pCurLayer->iColocMv[listIdx][8], 2, 2, 16, LD32(colocPic->pMv[listIdx][iMbXy][12]), 4);
-					SetRectBlock(pCurLayer->iColocMv[listIdx][10], 2, 2, 16, LD32(colocPic->pMv[listIdx][iMbXy][15]), 4);
-				}
-				if (!IS_TYPE_L1(coloc_mbType))// only forward prediction
-					SetRectBlock(&pCurLayer->iColocRefIndex[1][0], 4, 4, 4, (uint8_t)-1, 1);
+			int8_t pSubPartCount[4], pPartW[4];
+			for (int32_t i = 0; i < 4; i++) { //Direct 8x8 Ref and mv
 
-				int8_t pSubPartCount[4], pPartW[4];
-					for (int32_t i = 0; i < 4; i++) { //Direct 8x8 Ref and mv
-					pCurLayer->pSubMbType[iMbXy][i] = sub_mb_type;
-					int16_t iIdx8 = i << 2;
+		//		if (!IS_DIRECT(pCurLayer->pSubMbType[iMbXy][i])) {
+		//			continue;
+		//		}
 
-					int8_t pRefIndex[LIST_A][30];
-					UpdateP8x8RefIdxCabac(pCurLayer, pRefIndex, iIdx8, ref[LIST_0], LIST_0);
-					UpdateP8x8RefIdxCabac(pCurLayer, pRefIndex, iIdx8, ref[LIST_1], LIST_1);
+				pCurLayer->pSubMbType[iMbXy][i] = sub_mb_type;
+				int16_t iIdx8 = i << 2;
 
-					pSubPartCount[i] = g_ksInterBSubMbTypeInfo[12].iPartCount;
-					pPartW[i] = g_ksInterBSubMbTypeInfo[12].iPartWidth;
+				int8_t pRefIndex[LIST_A][30];
+				UpdateP8x8RefIdxCabac(pCurLayer, pRefIndex, iIdx8, ref[LIST_0], LIST_0);
+				UpdateP8x8RefIdxCabac(pCurLayer, pRefIndex, iIdx8, ref[LIST_1], LIST_1);
 
-					int8_t iPartCount = pSubPartCount[i];
-					int16_t iPartIdx, iBlockW = pPartW[i];
-					uint8_t iScan4Idx, iCacheIdx, iColocIdx;
-					iCacheIdx = g_kuiCache30ScanIdx[iIdx8];
+				pSubPartCount[i] = g_ksInterBSubMbTypeInfo[12].iPartCount;
+				pPartW[i] = g_ksInterBSubMbTypeInfo[12].iPartWidth;
 
-					for (int32_t j = 0; j < iPartCount; j++) {
-						iPartIdx = iIdx8 + j * iBlockW;
-						iColocIdx = g_kuiScan4[iPartIdx];
-						iScan4Idx = g_kuiScan4[iPartIdx];
-						iCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
+				int8_t iPartCount = pSubPartCount[i];
+				int16_t iPartIdx, iBlockW = pPartW[i];
+				uint8_t iScan4Idx, iCacheIdx, iColocIdx;
+				iCacheIdx = g_kuiCache30ScanIdx[iIdx8];
 
-						int16_t pMV[4] = { 0 };
-						if (IS_SUB_8x8(sub_mb_type)) {
-							*(uint32_t*)pMV = *(uint32_t*)iMvp[LIST_0];
-							ST32((pMV + 2), LD32(pMV));
-							ST32((pMvd + 2), LD32(pMvd));
-							ST64(pCurLayer->pMv[LIST_0][iMbXy][iScan4Idx], LD64(pMV));
-							ST64(pCurLayer->pMv[LIST_0][iMbXy][iScan4Idx + 4], LD64(pMV));
-							ST64(pCurLayer->pMvd[LIST_0][iMbXy][iScan4Idx], LD64(pMvd));
-							ST64(pCurLayer->pMvd[LIST_0][iMbXy][iScan4Idx + 4], LD64(pMvd));
-							*(uint32_t*)pMV = *(uint32_t*)iMvp[LIST_1];
-							ST64(pCurLayer->pMv[LIST_1][iMbXy][iScan4Idx], LD64(pMV));
-							ST64(pCurLayer->pMv[LIST_1][iMbXy][iScan4Idx + 4], LD64(pMV));
-							ST64(pCurLayer->pMvd[LIST_1][iMbXy][iScan4Idx], LD64(pMvd));
-							ST64(pCurLayer->pMvd[LIST_1][iMbXy][iScan4Idx + 4], LD64(pMvd));
+				for (int32_t j = 0; j < iPartCount; j++) {
+					iPartIdx = iIdx8 + j * iBlockW;
+					iColocIdx = g_kuiScan4[iPartIdx];
+					iScan4Idx = g_kuiScan4[iPartIdx];
+					iCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
+
+					int16_t pMV[4] = { 0 };
+					if (IS_SUB_8x8(sub_mb_type)) {
+						*(uint32_t*)pMV = *(uint32_t*)iMvp[LIST_0];
+						ST32((pMV + 2), LD32(pMV));
+						ST32((pMvd + 2), LD32(pMvd));
+						ST64(pCurLayer->pMv[LIST_0][iMbXy][iScan4Idx], LD64(pMV));
+						ST64(pCurLayer->pMv[LIST_0][iMbXy][iScan4Idx + 4], LD64(pMV));
+						ST64(pCurLayer->pMvd[LIST_0][iMbXy][iScan4Idx], LD64(pMvd));
+						ST64(pCurLayer->pMvd[LIST_0][iMbXy][iScan4Idx + 4], LD64(pMvd));
+						*(uint32_t*)pMV = *(uint32_t*)iMvp[LIST_1];
+						ST64(pCurLayer->pMv[LIST_1][iMbXy][iScan4Idx], LD64(pMV));
+						ST64(pCurLayer->pMv[LIST_1][iMbXy][iScan4Idx + 4], LD64(pMV));
+						ST64(pCurLayer->pMvd[LIST_1][iMbXy][iScan4Idx], LD64(pMvd));
+						ST64(pCurLayer->pMvd[LIST_1][iMbXy][iScan4Idx + 4], LD64(pMvd));
+					}
+					else { //SUB_4x4
+						*(uint32_t*)pMV = *(uint32_t*)iMvp[LIST_0];
+						ST32(pCurLayer->pMv[LIST_0][iMbXy][iScan4Idx], LD32(pMV));
+						ST32(pCurLayer->pMvd[LIST_0][iMbXy][iScan4Idx], LD32(pMvd));
+						*(uint32_t*)pMV = *(uint32_t*)iMvp[LIST_1];
+						ST32(pCurLayer->pMv[LIST_1][iMbXy][iScan4Idx], LD32(pMV));
+						ST32(pCurLayer->pMvd[LIST_1][iMbXy][iScan4Idx], LD32(pMvd));
+					}
+					uint32_t uiColZeroFlag = (0 == pCurLayer->iColocIntra[iIdx8]) && !colocPic->bIsLongRef && 
+					(pCurLayer->iColocRefIndex[LIST_0][iIdx8] == 0 || (pCurLayer->iColocRefIndex[LIST_0][iIdx8] < 0 && pCurLayer->iColocRefIndex[LIST_1][iIdx8] == 0));
+					const int16_t(*mvColoc)[2] = 0 == pCurLayer->iColocMv[LIST_0][0][iIdx8] ? pCurLayer->iColocMv[LIST_0] : pCurLayer->iColocMv[LIST_1];
+					const int16_t *mv = mvColoc[iIdx8];
+					if (IS_SUB_8x8(sub_mb_type)) {
+						if (uiColZeroFlag && ((unsigned)(mv[0] + 1) <= 2 && (unsigned)(mv[1] + 1) <= 2)) {
+							*(uint32_t*)pMV = 0;
+							if (ref[LIST_0] == 0) {
+								ST32((pMV + 2), LD32(pMV));
+								ST32((pMvd + 2), LD32(pMvd));
+								ST64(pCurLayer->pMv[LIST_0][iMbXy][iScan4Idx], LD64(pMV));
+								ST64(pCurLayer->pMv[LIST_0][iMbXy][iScan4Idx + 4], LD64(pMV));
+								ST64(pCurLayer->pMvd[LIST_0][iMbXy][iScan4Idx], LD64(pMvd));
+								ST64(pCurLayer->pMvd[LIST_0][iMbXy][iScan4Idx + 4], LD64(pMvd));
+							}
+							
+							if (ref[LIST_1] == 0) {
+								*(uint32_t*)pMV = 0;
+								ST32((pMV + 2), LD32(pMV));
+								ST32((pMvd + 2), LD32(pMvd));
+								ST64(pCurLayer->pMv[LIST_1][iMbXy][iScan4Idx], LD64(pMV));
+								ST64(pCurLayer->pMv[LIST_1][iMbXy][iScan4Idx + 4], LD64(pMV));
+								ST64(pCurLayer->pMvd[LIST_1][iMbXy][iScan4Idx], LD64(pMvd));
+								ST64(pCurLayer->pMvd[LIST_1][iMbXy][iScan4Idx + 4], LD64(pMvd));
+							}
 						}
-						else { //SUB_4x4
-							*(uint32_t*)pMV = *(uint32_t*)iMvp[LIST_0];
+					}
+					else {
+						if (uiColZeroFlag && ((unsigned)(mv[0] + 1) <= 2 && (unsigned)(mv[1] + 1) <= 2)) {
+							*(uint32_t*)pMV = 0;
 							ST32(pCurLayer->pMv[LIST_0][iMbXy][iScan4Idx], LD32(pMV));
 							ST32(pCurLayer->pMvd[LIST_0][iMbXy][iScan4Idx], LD32(pMvd));
-							*(uint32_t*)pMV = *(uint32_t*)iMvp[LIST_1];
 							ST32(pCurLayer->pMv[LIST_1][iMbXy][iScan4Idx], LD32(pMV));
 							ST32(pCurLayer->pMvd[LIST_1][iMbXy][iScan4Idx], LD32(pMvd));
-						}
-						uint32_t uiColZeroFlag = (0 == pCurLayer->iColocIntra[iIdx8]) && !colocPic->bIsLongRef && 
-						(pCurLayer->iColocRefIndex[LIST_0][iIdx8] == 0 || (pCurLayer->iColocRefIndex[LIST_0][iIdx8] < 0 && pCurLayer->iColocRefIndex[LIST_1][iIdx8] == 0));
-						const int16_t(*mvColoc)[2] = 0 == pCurLayer->iColocMv[LIST_0][0][iIdx8] ? pCurLayer->iColocMv[LIST_0] : pCurLayer->iColocMv[LIST_1];
-						const int16_t *mv = mvColoc[iIdx8];
-						if (IS_SUB_8x8(sub_mb_type)) {
-							if (uiColZeroFlag && ((unsigned)(mv[0] + 1) <= 2 && (unsigned)(mv[1] + 1) <= 2)) {
-								*(uint32_t*)pMV = 0;
-								if (ref[LIST_0] == 0) {
-									ST32((pMV + 2), LD32(pMV));
-									ST32((pMvd + 2), LD32(pMvd));
-									ST64(pCurLayer->pMv[LIST_0][iMbXy][iScan4Idx], LD64(pMV));
-									ST64(pCurLayer->pMv[LIST_0][iMbXy][iScan4Idx + 4], LD64(pMV));
-									ST64(pCurLayer->pMvd[LIST_0][iMbXy][iScan4Idx], LD64(pMvd));
-									ST64(pCurLayer->pMvd[LIST_0][iMbXy][iScan4Idx + 4], LD64(pMvd));
-								}
-							
-								if (ref[LIST_1] == 0) {
-									*(uint32_t*)pMV = 0;
-									ST32((pMV + 2), LD32(pMV));
-									ST32((pMvd + 2), LD32(pMvd));
-									ST64(pCurLayer->pMv[LIST_1][iMbXy][iScan4Idx], LD64(pMV));
-									ST64(pCurLayer->pMv[LIST_1][iMbXy][iScan4Idx + 4], LD64(pMV));
-									ST64(pCurLayer->pMvd[LIST_1][iMbXy][iScan4Idx], LD64(pMvd));
-									ST64(pCurLayer->pMvd[LIST_1][iMbXy][iScan4Idx + 4], LD64(pMvd));
-								}
-							}
-						}
-						else {
-							if (uiColZeroFlag && ((unsigned)(mv[0] + 1) <= 2 && (unsigned)(mv[1] + 1) <= 2)) {
-								*(uint32_t*)pMV = 0;
-								ST32(pCurLayer->pMv[LIST_0][iMbXy][iScan4Idx], LD32(pMV));
-								ST32(pCurLayer->pMvd[LIST_0][iMbXy][iScan4Idx], LD32(pMvd));
-								ST32(pCurLayer->pMv[LIST_1][iMbXy][iScan4Idx], LD32(pMV));
-								ST32(pCurLayer->pMvd[LIST_1][iMbXy][iScan4Idx], LD32(pMvd));
-							}
 						}
 					}
 				}
