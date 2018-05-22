@@ -592,11 +592,12 @@ void PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], in
 		}
 		else {
 			if (IS_INTER_16x16(mbType)) {
-				int16_t pMvd[4] = { 0 };
-				for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
-					UpdateP16x16MotionInfo(pCurLayer, listIdx, ref[listIdx], iMvp[listIdx]);
-					UpdateP16x16MvdCabac(pCurLayer, pMvd, listIdx);
-				}
+				int16_t iMVZero[2] = { 0 };
+				int16_t * pMv = IS_TYPE_L1(coloc_mbType) ? colocPic->pMv[LIST_1][iMbXy][0] : iMVZero;
+				ST32(pCurLayer->iColocMv[LIST_0][0], LD32(colocPic->pMv[LIST_0][iMbXy][0]));
+				ST32(pCurLayer->iColocMv[LIST_1][0], LD32(pMv));
+				pCurLayer->iColocRefIndex[LIST_0][0] = colocPic->pRefIndex[LIST_0][iMbXy][0];
+				pCurLayer->iColocRefIndex[LIST_1][0] = IS_TYPE_L1(coloc_mbType) ? colocPic->pRefIndex[LIST_1][iMbXy][0] : 0;
 			}
 			else {
 				int8_t pSubPartCount[4], pPartW[4];

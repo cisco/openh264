@@ -114,6 +114,10 @@ struct TagDqLayer {
   PPicture                  pRef;                   // reference picture pointer
   PPicture                  pDec;                   // reconstruction picture pointer for layer
 
+	int16_t										iColocMv[2][16][2];     //Colocated MV cache
+	int8_t										iColocRefIndex[2][16];  //Colocated RefIndex cache
+	int8_t										iColocIntra[16];			  //Colocated Intra cache
+
   bool                      bUseWeightPredictionFlag;
 	bool                      bUseWeightedBiPredIdc;
 	bool                      bStoreRefBasePicFlag;                           // iCurTid == 0 && iCurQid = 0 && bEncodeKeyPic = 1
