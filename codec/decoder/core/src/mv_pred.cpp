@@ -47,10 +47,7 @@ namespace WelsDec {
 
 	static inline  void SetRectBlock(void *vp, int32_t w, const int32_t h, int32_t stride, const uint32_t val, const int32_t size) {
 		uint8_t *p = (uint8_t*)vp;
-//		WELS_HDEC_ASSERT(size == 1 || size == 4);
 		w *= size;
-//		WELS_HDEC_ASSERT((((long)vp)&(min(w, 8) - 1)) == 0);
-//		WELS_HDEC_ASSERT((stride&(w - 1)) == 0);
 		if (w == 1 && h == 4) {
 			*(uint8_t*)(p + 0 * stride) =
 				*(uint8_t*)(p + 1 * stride) =
@@ -139,9 +136,35 @@ namespace WelsDec {
 				*(uint32_t*)(p + 3 * stride + 8) =
 				*(uint32_t*)(p + 3 * stride + 12) = size == 4 ? val : (uint32_t)(val * 0x01010101UL);
 		}
-//		else {
-//			WELS_HDEC_ASSERT(0);
-//		}
+	}
+	void CopyRectBlock4Cols(void *vdst, void *vsrc, const int32_t stride_dst, const int32_t stride_src, int32_t w, const int32_t size) {
+		uint8_t *dst = (uint8_t*)vdst;
+		uint8_t *src = (uint8_t*)vsrc;
+		w *= size;
+		if (w == 1) {
+			dst[stride_dst * 0] = src[stride_src * 0];
+			dst[stride_dst * 1] = src[stride_src * 1];
+			dst[stride_dst * 2] = src[stride_src * 2];
+			dst[stride_dst * 3] = src[stride_src * 3];
+		}
+		else if (w == 2) {
+			*(uint16_t*)(&dst[stride_dst * 0]) = *(uint16_t*)(&src[stride_src * 0]);
+			*(uint16_t*)(&dst[stride_dst * 1]) = *(uint16_t*)(&src[stride_src * 1]);
+			*(uint16_t*)(&dst[stride_dst * 2]) = *(uint16_t*)(&src[stride_src * 2]);
+			*(uint16_t*)(&dst[stride_dst * 3]) = *(uint16_t*)(&src[stride_src * 3]);
+		}
+		else if (w == 4) {
+			*(uint32_t*)(&dst[stride_dst * 0]) = *(uint32_t*)(&src[stride_src * 0]);
+			*(uint32_t*)(&dst[stride_dst * 1]) = *(uint32_t*)(&src[stride_src * 1]);
+			*(uint32_t*)(&dst[stride_dst * 2]) = *(uint32_t*)(&src[stride_src * 2]);
+			*(uint32_t*)(&dst[stride_dst * 3]) = *(uint32_t*)(&src[stride_src * 3]);
+		}
+		else if (w == 16) {
+			memcpy(&dst[stride_dst * 0], &src[stride_src * 0], 16);
+			memcpy(&dst[stride_dst * 1], &src[stride_src * 1], 16);
+			memcpy(&dst[stride_dst * 2], &src[stride_src * 2], 16);
+			memcpy(&dst[stride_dst * 3], &src[stride_src * 3], 16);
+		}
 	}
 void PredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]) {
   bool bTopAvail, bLeftTopAvail, bRightTopAvail, bLeftAvail;
@@ -701,7 +724,7 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 			ST32(pCurLayer->iColocMv[LIST_0][0], LD32(colocPic->pMv[LIST_0][iMbXy][0]));
 			ST32(pCurLayer->iColocMv[LIST_1][0], LD32(pMv));
 			pCurLayer->iColocRefIndex[LIST_0][0] = colocPic->pRefIndex[LIST_0][iMbXy][0];
-			pCurLayer->iColocRefIndex[LIST_1][0] = IS_TYPE_L1(coloc_mbType) ? colocPic->pRefIndex[LIST_1][iMbXy][0] : -2;
+			pCurLayer->iColocRefIndex[LIST_1][0] = IS_TYPE_L1(coloc_mbType) ? colocPic->pRefIndex[LIST_1][iMbXy][0] : REF_NOT_IN_LIST;
 			if (0 == pCurLayer->iColocIntra[0] && !colocPic->bIsLongRef
 				&& ((pCurLayer->iColocRefIndex[LIST_0][0] == 0 && (unsigned)(pCurLayer->iColocMv[LIST_0][0][0] + 1) <= 2 && (unsigned)(pCurLayer->iColocMv[LIST_0][0][1] + 1) <= 2)
 					|| (pCurLayer->iColocRefIndex[LIST_0][0] <0 && pCurLayer->iColocRefIndex[LIST_1][0] == 0 && (unsigned)(pCurLayer->iColocMv[LIST_0][0][0] + 1) <= 2 && (unsigned)(pCurLayer->iColocMv[LIST_0][0][1] + 1) <= 2))) {
@@ -714,20 +737,32 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 			}
 		}
 		else {
-			for (int32_t listIdx = 0; listIdx < 1 + !!IS_TYPE_L1(coloc_mbType); listIdx++) {
-				SetRectBlock(&pCurLayer->iColocRefIndex[listIdx][0], 2, 2, 4, colocPic->pRefIndex[listIdx][iMbXy][0], 1);
-				SetRectBlock(&pCurLayer->iColocRefIndex[listIdx][2], 2, 2, 4, colocPic->pRefIndex[listIdx][iMbXy][3], 1);
-				SetRectBlock(&pCurLayer->iColocRefIndex[listIdx][8], 2, 2, 4, colocPic->pRefIndex[listIdx][iMbXy][12], 1);
-				SetRectBlock(&pCurLayer->iColocRefIndex[listIdx][10], 2, 2, 4, colocPic->pRefIndex[listIdx][iMbXy][15], 1);
-
-				SetRectBlock(pCurLayer->iColocMv[listIdx][0], 2, 2, 16, LD32(colocPic->pMv[listIdx][iMbXy][0]), 4);
-				SetRectBlock(pCurLayer->iColocMv[listIdx][2], 2, 2, 16, LD32(colocPic->pMv[listIdx][iMbXy][3]), 4);
-				SetRectBlock(pCurLayer->iColocMv[listIdx][8], 2, 2, 16, LD32(colocPic->pMv[listIdx][iMbXy][12]), 4);
-				SetRectBlock(pCurLayer->iColocMv[listIdx][10], 2, 2, 16, LD32(colocPic->pMv[listIdx][iMbXy][15]), 4);
+			if (!pCtx->pSps->bDirect8x8InferenceFlag) {
+				CopyRectBlock4Cols(pCurLayer->iColocMv[LIST_0], colocPic->pMv[LIST_0][iMbXy], 16, 16, 4, 4);
+				CopyRectBlock4Cols(pCurLayer->iColocRefIndex[LIST_0], colocPic->pRefIndex[LIST_0][iMbXy], 4, 4, 4, 1);
+				if (IS_TYPE_L1(coloc_mbType)) {
+					CopyRectBlock4Cols(pCurLayer->iColocMv[LIST_1], colocPic->pMv[LIST_1][iMbXy], 16, 16, 4, 4);
+					CopyRectBlock4Cols(pCurLayer->iColocRefIndex[LIST_1], colocPic->pRefIndex[LIST_1][iMbXy], 4, 4, 4, 1);
+				}
+				else {// only forward prediction
+					SetRectBlock(pCurLayer->iColocRefIndex[LIST_1], 4, 4, 4, (uint8_t)REF_NOT_IN_LIST, 1);
+				}
 			}
-			if (!IS_TYPE_L1(coloc_mbType))// only forward prediction
-				SetRectBlock(&pCurLayer->iColocRefIndex[1][0], 4, 4, 4, (uint8_t)-1, 1);
-			
+			else {
+				for (int32_t listIdx = 0; listIdx < 1 + !!(coloc_mbType & MB_TYPE_L1); listIdx++) {
+					SetRectBlock(&pCurLayer->iColocRefIndex[listIdx][0], 2, 2, 4, colocPic->pRefIndex[listIdx][iMbXy][0], 1);
+					SetRectBlock(&pCurLayer->iColocRefIndex[listIdx][2], 2, 2, 4, colocPic->pRefIndex[listIdx][iMbXy][3], 1);
+					SetRectBlock(&pCurLayer->iColocRefIndex[listIdx][8], 2, 2, 4, colocPic->pRefIndex[listIdx][iMbXy][12], 1);
+					SetRectBlock(&pCurLayer->iColocRefIndex[listIdx][10], 2, 2, 4, colocPic->pRefIndex[listIdx][iMbXy][15], 1);
+
+					SetRectBlock(pCurLayer->iColocMv[listIdx][0], 2, 2, 16, LD32(colocPic->pMv[listIdx][iMbXy][0]), 4);
+					SetRectBlock(pCurLayer->iColocMv[listIdx][2], 2, 2, 16, LD32(colocPic->pMv[listIdx][iMbXy][3]), 4);
+					SetRectBlock(pCurLayer->iColocMv[listIdx][8], 2, 2, 16, LD32(colocPic->pMv[listIdx][iMbXy][12]), 4);
+					SetRectBlock(pCurLayer->iColocMv[listIdx][10], 2, 2, 16, LD32(colocPic->pMv[listIdx][iMbXy][15]), 4);
+				}
+				if (!(coloc_mbType & MB_TYPE_L1))// only forward prediction
+					SetRectBlock(&pCurLayer->iColocRefIndex[1][0], 4, 4, 4, (uint8_t)REF_NOT_IN_LIST, 1);
+			}
 			if (bSkipOrDirect) {
 				int8_t pSubPartCount[4], pPartW[4];
 				for (int32_t i = 0; i < 4; i++) { //Direct 8x8 Ref and mv
