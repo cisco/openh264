@@ -724,11 +724,7 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 		int16_t pMvDirect[LIST_A][2] = { 0 };
 		if (pSliceHeader->iDirectSpatialMvPredFlag) {
 			//predict direct spatial mv
-			PredMvBDirectSpatial(pCurDqLayer, pMvDirect, iRef);
-			for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
-				UpdateP16x16MotionInfo(pCurDqLayer, listIdx, iRef[listIdx], pMvDirect[listIdx]);
-				UpdateP16x16MvdCabac(pCurDqLayer, pMvd, listIdx);
-			}
+			PredMvBDirectSpatial2(pCtx, pMvDirect, iRef);
 		}
 		else {
 			//temporal direct 16x16 mode
