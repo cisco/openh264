@@ -740,6 +740,11 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 					pSubPartCount[i] = g_ksInterBSubMbTypeInfo[0].iPartCount;
 					pPartW[i] = g_ksInterBSubMbTypeInfo[0].iPartWidth;
 
+					if (IS_SUB_4x4(sub_mb_type)) {
+						pSubPartCount[i] = 4;
+						pPartW[i] = 1;
+					}
+
 					int8_t iPartCount = pSubPartCount[i];
 					int16_t iPartIdx, iBlockW = pPartW[i];
 					uint8_t iScan4Idx, iCacheIdx, iColocIdx;

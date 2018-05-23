@@ -962,6 +962,10 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 					has_direct_called = true;
 				}
 				pCurDqLayer->pSubMbType[iMbXy][i] = directSubMbType;
+				if (IS_SUB_4x4(pCurDqLayer->pSubMbType[iMbXy][i])) {
+					pSubPartCount[i] = 4;
+					pPartW[i] = 1;
+				}
 			}
 			else {
 				pCurDqLayer->pSubMbType[iMbXy][i] = g_ksInterBSubMbTypeInfo[uiSubMbType].iType;
