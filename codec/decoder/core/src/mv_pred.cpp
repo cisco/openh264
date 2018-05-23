@@ -818,7 +818,7 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 						}
 						uint32_t uiColZeroFlag = (0 == pCurLayer->iColocIntra[iColocIdx]) && !colocPic->bIsLongRef &&
 							(pCurLayer->iColocRefIndex[LIST_0][iColocIdx] == 0 || (pCurLayer->iColocRefIndex[LIST_0][iColocIdx] < 0 && pCurLayer->iColocRefIndex[LIST_1][iColocIdx] == 0));
-						const int16_t(*mvColoc)[2] = 0 == pCurLayer->iColocMv[LIST_0][0][iColocIdx] ? pCurLayer->iColocMv[LIST_0] : pCurLayer->iColocMv[LIST_1];
+						const int16_t(*mvColoc)[2] = 0 == pCurLayer->iColocRefIndex[LIST_0][iColocIdx] ? pCurLayer->iColocMv[LIST_0] : pCurLayer->iColocMv[LIST_1];
 						const int16_t *mv = mvColoc[iColocIdx];
 						if (IS_SUB_8x8(sub_mb_type)) {
 							if (uiColZeroFlag && ((unsigned)(mv[0] + 1) <= 2 && (unsigned)(mv[1] + 1) <= 2)) {
