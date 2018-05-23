@@ -987,10 +987,9 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 				pRefIndex[LIST_1][iCacheIdx] = pRefIndex[LIST_1][iCacheIdx + 1]
 					= pRefIndex[LIST_1][iCacheIdx + 6] = pRefIndex[LIST_1][iCacheIdx + 7] = iRef[LIST_1];
 
-				iColocIdx = g_kuiScan4[iIdx8];
 				for (int32_t j = 0; j < iPartCount; j++) {
 					iPartIdx = iIdx8 + j * iBlockW;
-
+					iColocIdx = g_kuiScan4[iPartIdx];
 					iScan4Idx = g_kuiScan4[iPartIdx];
 					iCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
 

@@ -745,11 +745,10 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 					uint8_t iScan4Idx, iCacheIdx, iColocIdx;
 					iCacheIdx = g_kuiCache30ScanIdx[iIdx8];
 
-					iColocIdx = g_kuiScan4[iIdx8];
-
 					for (int32_t j = 0; j < iPartCount; j++) {
 						iPartIdx = iIdx8 + j * iBlockW;
 						iScan4Idx = g_kuiScan4[iPartIdx];
+						iColocIdx = g_kuiScan4[iPartIdx];
 						iCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
 
 						int16_t pMV[4] = { 0 };
