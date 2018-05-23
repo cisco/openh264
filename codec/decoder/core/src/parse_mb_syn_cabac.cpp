@@ -952,11 +952,7 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 			if (IS_DIRECT(g_ksInterBSubMbTypeInfo[uiSubMbType].iType)) {
 				if (!has_direct_called) {
 					if (pSliceHeader->iDirectSpatialMvPredFlag) {
-#if 0
 						directSubMbType = PredMvBDirectSpatial2(pCtx, pMvDirect, iRef);
-#else
-						PredMvBDirectSpatial(pCurDqLayer, pMvDirect, iRef);
-#endif
 					}
 					else {
 						//temporal direct mode
@@ -965,18 +961,14 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 					}
 					has_direct_called = true;
 				}
-#if 0
 				pCurDqLayer->pSubMbType[iMbXy][i] = directSubMbType;
-#else
-				pCurDqLayer->pSubMbType[iMbXy][i] = g_ksInterBSubMbTypeInfo[uiSubMbType].iType;
-#endif
 			}
 			else {
 				pCurDqLayer->pSubMbType[iMbXy][i] = g_ksInterBSubMbTypeInfo[uiSubMbType].iType;
 			}
 		}
-#if 0
 		for (int32_t i = 0; i < 4; i++) { //Direct 8x8 Ref and mv
+
 			int16_t iIdx8 = i << 2;
 			if (IS_DIRECT(pCurDqLayer->pSubMbType[iMbXy][i])) {
 			
@@ -984,9 +976,6 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 				*(uint32_t*)pMvd = 0;
 				UpdateP8x8RefIdxCabac(pCurDqLayer, pRefIndex, iIdx8, iRef[LIST_0], LIST_0);
 				UpdateP8x8RefIdxCabac(pCurDqLayer, pRefIndex, iIdx8, iRef[LIST_1], LIST_1);
-
-				pSubPartCount[i] = g_ksInterBSubMbTypeInfo[12].iPartCount;
-				pPartW[i] = g_ksInterBSubMbTypeInfo[12].iPartWidth;
 
 				int8_t iPartCount = pSubPartCount[i];
 				int16_t iPartIdx, iBlockW = pPartW[i];
@@ -997,11 +986,11 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 					= pRefIndex[LIST_0][iCacheIdx + 6] = pRefIndex[LIST_0][iCacheIdx + 7] = iRef[LIST_0];
 				pRefIndex[LIST_1][iCacheIdx] = pRefIndex[LIST_1][iCacheIdx + 1]
 					= pRefIndex[LIST_1][iCacheIdx + 6] = pRefIndex[LIST_1][iCacheIdx + 7] = iRef[LIST_1];
-				
 
+				iColocIdx = g_kuiScan4[iIdx8];
 				for (int32_t j = 0; j < iPartCount; j++) {
 					iPartIdx = iIdx8 + j * iBlockW;
-					iColocIdx = g_kuiScan4[iPartIdx];
+
 					iScan4Idx = g_kuiScan4[iPartIdx];
 					iCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
 
@@ -1042,11 +1031,12 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 						ST32(pMotionVector[LIST_1][iCacheIdx], LD32(pMvDirect));
 						ST32(pMvdCache[LIST_1][iCacheIdx], LD32(pMvd));
 					}
+
 					bool bIsLongRef = pCtx->sRefPic.pRefList[LIST_1][0]->bIsLongRef;
-					uint32_t uiColZeroFlag = (0 == pCurDqLayer->iColocIntra[iIdx8]) && !bIsLongRef &&
-						(pCurDqLayer->iColocRefIndex[LIST_0][iIdx8] == 0 || (pCurDqLayer->iColocRefIndex[LIST_0][iIdx8] < 0 && pCurDqLayer->iColocRefIndex[LIST_1][iIdx8] == 0));
-					const int16_t(*mvColoc)[2] = 0 == pCurDqLayer->iColocMv[LIST_0][0][iIdx8] ? pCurDqLayer->iColocMv[LIST_0] : pCurDqLayer->iColocMv[LIST_1];
-					const int16_t *mv = mvColoc[iIdx8];
+					uint32_t uiColZeroFlag = (0 == pCurDqLayer->iColocIntra[iColocIdx]) && !bIsLongRef &&
+						(pCurDqLayer->iColocRefIndex[LIST_0][iColocIdx] == 0 || (pCurDqLayer->iColocRefIndex[LIST_0][iColocIdx] < 0 && pCurDqLayer->iColocRefIndex[LIST_1][iColocIdx] == 0));
+					const int16_t(*mvColoc)[2] = 0 == pCurDqLayer->iColocMv[LIST_0][0][iColocIdx] ? pCurDqLayer->iColocMv[LIST_0] : pCurDqLayer->iColocMv[LIST_1];
+					const int16_t *mv = mvColoc[iColocIdx];
 					if (IS_SUB_8x8(pCurDqLayer->pSubMbType[iMbXy][i])) {
 						if (uiColZeroFlag && ((unsigned)(mv[0] + 1) <= 2 && (unsigned)(mv[1] + 1) <= 2)) {
 							*(uint32_t*)pMV = 0;
@@ -1099,48 +1089,6 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 				}
 			}
 		}
-#else
-		for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
-			for (int32_t i = 0; i < 4; i++) { //Direct 8x8 Ref and mv
-				int16_t iIdx8 = i << 2;
-				int32_t subMbType = pCurDqLayer->pSubMbType[iMbXy][i];
-				if (IS_DIRECT(subMbType)) {
-					UpdateP8x8RefIdxCabac(pCurDqLayer, pRefIndex, iIdx8, iRef[listIdx], listIdx);
-
-					int8_t iPartCount = pSubPartCount[i];
-					int16_t iPartIdx, iBlockW = pPartW[i];
-					uint8_t iScan4Idx, iCacheIdx;
-					iCacheIdx = g_kuiCache30ScanIdx[i << 2];
-
-					pRefIndex[listIdx][iCacheIdx] = pRefIndex[listIdx][iCacheIdx + 1]
-						= pRefIndex[listIdx][iCacheIdx + 6] = pRefIndex[listIdx][iCacheIdx + 7] = iRef[listIdx];
-
-					for (int32_t j = 0; j < iPartCount; j++) {
-						iPartIdx = (i << 2) + j * iBlockW;
-						iScan4Idx = g_kuiScan4[iPartIdx];
-						iCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
-
-						if (pSliceHeader->pSps->bDirect8x8InferenceFlag) { //MB_TYPE_8x8
-							ST64(pCurDqLayer->pMv[listIdx][iMbXy][iScan4Idx], LD64(pMvDirect));
-							ST64(pCurDqLayer->pMv[listIdx][iMbXy][iScan4Idx + 4], LD64(pMvDirect));
-							ST64(pCurDqLayer->pMvd[listIdx][iMbXy][iScan4Idx], LD64(pMvd));
-							ST64(pCurDqLayer->pMvd[listIdx][iMbXy][iScan4Idx + 4], LD64(pMvd));
-							ST64(pMotionVector[listIdx][iCacheIdx], LD64(pMvDirect));
-							ST64(pMotionVector[listIdx][iCacheIdx + 6], LD64(pMvDirect));
-							ST64(pMvdCache[listIdx][iCacheIdx], LD64(pMvd));
-							ST64(pMvdCache[listIdx][iCacheIdx + 6], LD64(pMvd));
-						}
-						else { //MB_TYPE_4x4
-							ST32(pCurDqLayer->pMv[listIdx][iMbXy][iScan4Idx], LD32(pMvDirect));
-							ST32(pCurDqLayer->pMvd[listIdx][iMbXy][iScan4Idx], LD32(pMvd));
-							ST32(pMotionVector[listIdx][iCacheIdx], LD32(pMvDirect));
-							ST32(pMvdCache[listIdx][iCacheIdx], LD32(pMvd));
-						}
-					}
-				}
-			}
-		}
-#endif
 		//ref no-direct
 		int8_t ref_idx_list[LIST_A][4] = { 0 };
 		for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {

@@ -737,17 +737,18 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 					UpdateP8x8RefIdxCabac(pCurLayer, pRefIndex, iIdx8, ref[LIST_0], LIST_0);
 					UpdateP8x8RefIdxCabac(pCurLayer, pRefIndex, iIdx8, ref[LIST_1], LIST_1);
 
-					pSubPartCount[i] = g_ksInterBSubMbTypeInfo[12].iPartCount;
-					pPartW[i] = g_ksInterBSubMbTypeInfo[12].iPartWidth;
+					pSubPartCount[i] = g_ksInterBSubMbTypeInfo[0].iPartCount;
+					pPartW[i] = g_ksInterBSubMbTypeInfo[0].iPartWidth;
 
 					int8_t iPartCount = pSubPartCount[i];
 					int16_t iPartIdx, iBlockW = pPartW[i];
 					uint8_t iScan4Idx, iCacheIdx, iColocIdx;
 					iCacheIdx = g_kuiCache30ScanIdx[iIdx8];
 
+					iColocIdx = g_kuiScan4[iIdx8];
+
 					for (int32_t j = 0; j < iPartCount; j++) {
 						iPartIdx = iIdx8 + j * iBlockW;
-						iColocIdx = g_kuiScan4[iPartIdx];
 						iScan4Idx = g_kuiScan4[iPartIdx];
 						iCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
 
@@ -776,10 +777,10 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 							ST32(pCurLayer->pMv[LIST_1][iMbXy][iScan4Idx], LD32(pMV));
 							ST32(pCurLayer->pMvd[LIST_1][iMbXy][iScan4Idx], LD32(pMvd));
 						}
-						uint32_t uiColZeroFlag = (0 == pCurLayer->iColocIntra[iIdx8]) && !colocPic->bIsLongRef &&
-							(pCurLayer->iColocRefIndex[LIST_0][iIdx8] == 0 || (pCurLayer->iColocRefIndex[LIST_0][iIdx8] < 0 && pCurLayer->iColocRefIndex[LIST_1][iIdx8] == 0));
-						const int16_t(*mvColoc)[2] = 0 == pCurLayer->iColocMv[LIST_0][0][iIdx8] ? pCurLayer->iColocMv[LIST_0] : pCurLayer->iColocMv[LIST_1];
-						const int16_t *mv = mvColoc[iIdx8];
+						uint32_t uiColZeroFlag = (0 == pCurLayer->iColocIntra[iColocIdx]) && !colocPic->bIsLongRef &&
+							(pCurLayer->iColocRefIndex[LIST_0][iColocIdx] == 0 || (pCurLayer->iColocRefIndex[LIST_0][iColocIdx] < 0 && pCurLayer->iColocRefIndex[LIST_1][iColocIdx] == 0));
+						const int16_t(*mvColoc)[2] = 0 == pCurLayer->iColocMv[LIST_0][0][iColocIdx] ? pCurLayer->iColocMv[LIST_0] : pCurLayer->iColocMv[LIST_1];
+						const int16_t *mv = mvColoc[iColocIdx];
 						if (IS_SUB_8x8(sub_mb_type)) {
 							if (uiColZeroFlag && ((unsigned)(mv[0] + 1) <= 2 && (unsigned)(mv[1] + 1) <= 2)) {
 								*(uint32_t*)pMV = 0;
