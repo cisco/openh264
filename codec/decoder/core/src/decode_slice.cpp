@@ -1089,6 +1089,9 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAva
 	int32_t iMbResProperty;
 	int32_t i;
 	uint32_t uiMbType = 0, uiCbp = 0, uiCbpLuma = 0, uiCbpChroma = 0;
+	int16_t pMotionVector[LIST_A][30][MV_A];
+	int16_t pMvdCache[LIST_A][30][MV_A];
+	int8_t  pRefIndex[LIST_A][30];
 
 	ENFORCE_STACK_ALIGN_1D(uint8_t, pNonZeroCount, 48, 16);
 
@@ -1100,9 +1103,6 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAva
 		WelsLog(&(pCtx->sLogCtx), WELS_LOG_WARNING, "mb_num and type = [%d %d]", iMbXy, uiMbType);
 #endif
 	if (uiMbType < 23) { //Inter B mode
-		int16_t pMotionVector[LIST_A][30][MV_A];
-		int16_t pMvdCache[LIST_A][30][MV_A];
-		int8_t  pRefIndex[LIST_A][30];
 		pCurLayer->pMbType[iMbXy] = g_ksInterBMbTypeInfo[uiMbType].iType;
 		WelsFillCacheInterCabac(pNeighAvail, pNonZeroCount, pMotionVector, pMvdCache, pRefIndex, pCurLayer);
 		WELS_READ_VERIFY(ParseInterBMotionInfoCabac(pCtx, pNeighAvail, pNonZeroCount, pMotionVector, pMvdCache, pRefIndex));
