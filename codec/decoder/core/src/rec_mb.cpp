@@ -360,14 +360,14 @@ static void BiWeightPrediction(PDqLayer pCurDqLayer, sMCRefMember* pMCRefMem, sM
 
 	uint8_t* pDst;
 	uint8_t* pTempDst;
-	for (int i = 0; i < 2; i++) {
+	for (int k = 0; k < 2; k++) {
 		//iLog2denom = pCurDqLayer->pPredWeightTable->uiChromaLog2WeightDenom;
-		iWoc1 = pCurDqLayer->pPredWeightTable->sPredList[LIST_0].iChromaWeight[iRefIdx1][i];
-		iOoc1 = pCurDqLayer->pPredWeightTable->sPredList[LIST_0].iChromaOffset[iRefIdx1][i];
-		iWoc2 = pCurDqLayer->pPredWeightTable->sPredList[LIST_1].iChromaWeight[iRefIdx2][i];
-		iOoc2 = pCurDqLayer->pPredWeightTable->sPredList[LIST_1].iChromaOffset[iRefIdx2][i];
-		pDst  = i ? pMCRefMem->pDstV : pMCRefMem->pDstU;
-		pTempDst = i ? pTempMCRefMem->pDstV : pTempMCRefMem->pDstU;
+		iWoc1 = pCurDqLayer->pPredWeightTable->sPredList[LIST_0].iChromaWeight[iRefIdx1][k];
+		iOoc1 = pCurDqLayer->pPredWeightTable->sPredList[LIST_0].iChromaOffset[iRefIdx1][k];
+		iWoc2 = pCurDqLayer->pPredWeightTable->sPredList[LIST_1].iChromaWeight[iRefIdx2][k];
+		iOoc2 = pCurDqLayer->pPredWeightTable->sPredList[LIST_1].iChromaOffset[iRefIdx2][k];
+		pDst  =k ? pMCRefMem->pDstV : pMCRefMem->pDstU;
+		pTempDst = k ? pTempMCRefMem->pDstV : pTempMCRefMem->pDstU;
 		//iLineStride = pMCRefMem->iDstLineChroma;
 
 		for (int i = 0; i < iBlkHeight; i++) {
@@ -402,9 +402,9 @@ static void BiPrediction(PDqLayer pCurDqLayer, sMCRefMember* pMCRefMem, sMCRefMe
 
 	uint8_t* pDst;
 	uint8_t* pTempDst;
-	for (int i = 0; i < 2; i++) {
-		pDst = i ? pMCRefMem->pDstV : pMCRefMem->pDstU;
-		pTempDst = i ? pTempMCRefMem->pDstV : pTempMCRefMem->pDstU;
+	for (int k = 0; k < 2; k++) {
+		pDst = k ? pMCRefMem->pDstV : pMCRefMem->pDstU;
+		pTempDst = k ? pTempMCRefMem->pDstV : pTempMCRefMem->pDstU;
 		//iLineStride = pMCRefMem->iDstLineChroma;
 
 		for (int i = 0; i < iBlkHeight; i++) {
