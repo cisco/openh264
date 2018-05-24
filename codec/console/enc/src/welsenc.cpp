@@ -111,6 +111,13 @@ typedef struct tagFilesSet {
   char   sRecFileName[MAX_DEPENDENCY_LAYER][MAX_FNAME_LEN];
   uint32_t uiFrameToBeCoded;
   bool     bEnableMultiBsFile;
+
+  tagFilesSet() {
+    uiFrameToBeCoded = 0;
+    bEnableMultiBsFile = false;
+    for (int i = 0; i < MAX_DEPENDENCY_LAYER; i++)
+      sRecFileName[i][0] = '\0';
+  }
 } SFilesSet;
 
 
@@ -763,14 +770,13 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
 #if defined ( STICK_STREAM_SIZE )
   FILE* fTrackStream = fopen ("coding_size.stream", "wb");
 #endif
-  SFilesSet fs = {};
+  SFilesSet fs;
   // for configuration file
   CReadConfig cRdCfg;
   int iParsedNum = 1;
 
   memset (&sFbi, 0, sizeof (SFrameBSInfo));
   pPtrEnc->GetDefaultParams (&sSvcParam);
-  memset (&fs.sRecFileName[0][0], 0, sizeof (fs.sRecFileName));
   fs.bEnableMultiBsFile = false;
 
   FillSpecificParameters (sSvcParam);
