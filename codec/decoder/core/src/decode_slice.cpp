@@ -1424,8 +1424,8 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 		ST32(&pCurLayer->pNzc[iMbXy][20], 0);
 
 		pCurLayer->pInterPredictionDoneFlag[iMbXy] = 0;
-		memset(pCurLayer->pRefIndex[LIST_0][iMbXy], REF_NOT_AVAIL, sizeof(int8_t) * 16);
-		memset(pCurLayer->pRefIndex[LIST_1][iMbXy], REF_NOT_AVAIL, sizeof(int8_t) * 16);
+		memset(pCurLayer->pRefIndex[LIST_0][iMbXy], 0, sizeof(int8_t) * 16);
+		memset(pCurLayer->pRefIndex[LIST_1][iMbXy], 0, sizeof(int8_t) * 16);
 		pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || !(ppRefPicL0[0] && ppRefPicL0[0]->bIsComplete) || !(ppRefPicL1[0] && ppRefPicL1[0]->bIsComplete);
 		
 		if (pSliceHeader->iDirectSpatialMvPredFlag) {

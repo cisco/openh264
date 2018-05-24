@@ -582,76 +582,39 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 	/*get neb mv&iRefIdxArray*/
 	for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
 		/*left*/
-		if (bLeftAvail && IS_INTER(iLeftType)) {
+		if (bLeftAvail) {
 			ST32(iMvA[listIdx], LD32(pCurLayer->pMv[listIdx][iLeftXy][3]));
 			iLeftRef[listIdx] = pCurLayer->pRefIndex[listIdx][iLeftXy][3];
 		}
 		else {
-			ST32(iMvA[listIdx], 0);
-			if (0 == bLeftAvail) { //not available
-				iLeftRef[listIdx] = REF_NOT_AVAIL;
-			}
-			else { //available but is intra mb type
-				iLeftRef[listIdx] = REF_NOT_IN_LIST;
-			}
-		}
-
-		if (REF_NOT_AVAIL == iLeftRef[listIdx] ||
-			(iLeftRef[listIdx] >= REF_NOT_IN_LIST && 0 == *(int32_t*)iMvA[listIdx])) {
-			ref[listIdx] = iLeftRef[listIdx];
-			ST32(iMvp[listIdx], 0);
-			continue;
+			iLeftRef[listIdx] = REF_NOT_AVAIL;
 		}
 
 		/*top*/
-		if (bTopAvail && IS_INTER(iTopType)) {
+		if (bTopAvail) {
 			ST32(iMvB[listIdx], LD32(pCurLayer->pMv[listIdx][iTopXy][12]));
 			iTopRef[listIdx] = pCurLayer->pRefIndex[listIdx][iTopXy][12];
 		}
 		else {
-			ST32(iMvB[listIdx], 0);
-			if (0 == bTopAvail) { //not available
-				iTopRef[listIdx] = REF_NOT_AVAIL;
-			}
-			else { //available but is intra mb type
-				iTopRef[listIdx] = REF_NOT_IN_LIST;
-			}
-		}
-
-		if (REF_NOT_AVAIL == iTopRef[listIdx] ||
-			(iTopRef[listIdx] >= REF_NOT_IN_LIST && 0 == *(int32_t*)iMvB[listIdx])) {
-			ref[listIdx] = iTopRef[listIdx];
-			ST32(iMvp[listIdx], 0);
-			continue;
+			iTopRef[listIdx] = REF_NOT_AVAIL;
 		}
 
 		/*right_top*/
-		if (bRightTopAvail && IS_INTER(iRightTopType)) {
+		if (bRightTopAvail) {
 			ST32(iMvC[listIdx], LD32(pCurLayer->pMv[listIdx][iRightTopXy][12]));
 			iRightTopRef[listIdx] = pCurLayer->pRefIndex[listIdx][iRightTopXy][12];
 		}
 		else {
-			ST32(iMvC[listIdx], 0);
-			if (0 == bRightTopAvail) { //not available
-				iRightTopRef[listIdx] = REF_NOT_AVAIL;
-			}
-			else { //available but is intra mb type
-				iRightTopRef[listIdx] = REF_NOT_IN_LIST;
-			}
+			iRightTopRef[listIdx] = REF_NOT_AVAIL;
 		}
+		
 		/*left_top*/
-		if (bLeftTopAvail&& IS_INTER(iLeftTopType)) {
+		if (bLeftTopAvail) {
 			ST32(iMvD[listIdx], LD32(pCurLayer->pMv[listIdx][iLeftTopXy][15]));
 			iLeftTopRef[listIdx] = pCurLayer->pRefIndex[listIdx][iLeftTopXy][15];
 		}
 		else {
-			ST32(iMvD[listIdx], 0);
-			if (0 == bLeftTopAvail) { //not available
-				iLeftTopRef[listIdx] = REF_NOT_AVAIL;
-			}
-			else { //available but is intra mb type
-				iLeftTopRef[listIdx] = REF_NOT_IN_LIST;
-			}
+			iLeftTopRef[listIdx] = REF_NOT_AVAIL;
 		}
 
 		iDiagonalRef[listIdx] = iRightTopRef[listIdx];
@@ -660,14 +623,12 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 			*(int32_t*)iMvC[listIdx] = *(int32_t*)iMvD[listIdx];
 		}
 
-		if (REF_NOT_AVAIL == iTopRef[listIdx] && REF_NOT_AVAIL == iDiagonalRef[listIdx] && iLeftRef[listIdx] >= REF_NOT_IN_LIST) {
-			ref[listIdx] = iLeftRef[listIdx];
-			ST32(iMvp[listIdx], LD32(iMvA[listIdx]));
-			continue;
-		}
-
 		ref[listIdx] = WELS_MIN_POSITIVE(iLeftRef[listIdx], WELS_MIN_POSITIVE(iTopRef[listIdx], iRightTopRef[listIdx]));
 		if (ref[listIdx] >= 0) {
+
+			ST32(iMvA[listIdx], LD32(pCurLayer->pMv[listIdx][iLeftXy][3]));
+			ST32(iMvB[listIdx], LD32(pCurLayer->pMv[listIdx][iTopXy][12]));
+
 			uint32_t match_count = (iLeftRef[listIdx] == ref[listIdx]) + (iTopRef[listIdx] == ref[listIdx]) + (iDiagonalRef[listIdx] == ref[listIdx]);
 			if (match_count == 1) {
 				if (iLeftRef[listIdx] == ref[listIdx]) {
@@ -694,11 +655,13 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 	if (ref[LIST_0] <= REF_NOT_IN_LIST && ref[LIST_1] <= REF_NOT_IN_LIST) {
 		ref[LIST_0] = ref[LIST_1] = 0;
 	}
-	else if (ref[1] <= REF_NOT_IN_LIST) {
+	else if (ref[LIST_1] < 0) {
 		mbType &= ~MB_TYPE_L1;
+		sub_mb_type &= ~MB_TYPE_L1;
 	}
-	else if (ref[0] <= REF_NOT_IN_LIST) {
+	else if (ref[LIST_0] < 0) {
 		mbType &= ~MB_TYPE_L0;
+		sub_mb_type &= ~MB_TYPE_L0;
 	}
 	pCurLayer->pMbType[iMbXy] = mbType;
 
@@ -710,13 +673,14 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 		SetRectBlock(pCurLayer->iColocIntra, 4, 4, 4 * sizeof(int8_t), 0, sizeof(int8_t));
 	}
 	int16_t pMvd[4] = { 0 };
-	/*(if (!(is8x8 | *(int32_t*)iMvp[LIST_0] | *(int32_t*)iMvp[LIST_1])) {
+	/*if (!(is8x8 | *(int32_t*)iMvp[LIST_0] | *(int32_t*)iMvp[LIST_1])) {
 		for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
 			UpdateP16x16MotionInfo(pCurLayer, listIdx, ref[listIdx], iMvp[listIdx]);
 			UpdateP16x16MvdCabac(pCurLayer, pMvd, listIdx);
 		}
 	}
-	else*/
+	else
+*/
 	{
 		if (IS_INTER_16x16(mbType)) {
 			int16_t iMVZero[2] = { 0 };
