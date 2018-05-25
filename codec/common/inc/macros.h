@@ -95,7 +95,7 @@
 #define WELS_MIN(x, y) ((x) < (y) ? (x) : (y))
 #endif//WELS_MIN
 #ifndef WELS_MIN_POSITIVE
-#define WELS_MIN_POSITIVE(x, y) (x >= 0 && y >= 0) ? ((x) < (y) ? (x) : (y)) : ((x) > (y) ? (x) : (y))
+#define WELS_MIN_POSITIVE(x, y) (x >= 0 && y >= 0) ? WELS_MIN(x, y) : WELS_MAX(x, y);
 #endif//WELS_MIN_POSITIVE
 #else // Alternative implementation of WELS_MAX and WELS_MIN
 #ifndef WELS_MAX

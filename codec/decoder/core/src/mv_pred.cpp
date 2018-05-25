@@ -464,7 +464,8 @@ void PredMvBDirectSpatial(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2], int8_t re
 			continue;
 		}
 
-		ref[listIdx] = WELS_MIN_POSITIVE(iLeftRef[listIdx], WELS_MIN_POSITIVE(iTopRef[listIdx], iRightTopRef[listIdx]));
+		int8_t tmp = WELS_MIN_POSITIVE(iTopRef[listIdx], iRightTopRef[listIdx]);
+		ref[listIdx] = WELS_MIN_POSITIVE(iLeftRef[listIdx], tmp);
 		if (ref[listIdx] >= 0) {
 			uint32_t match_count = (iLeftRef[listIdx] == ref[listIdx]) + (iTopRef[listIdx] == ref[listIdx]) + (iDiagonalRef[listIdx] == ref[listIdx]);
 			if (match_count == 1) {
@@ -581,40 +582,64 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 
 	/*get neb mv&iRefIdxArray*/
 	for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+
 		/*left*/
-		if (bLeftAvail) {
+		if (bLeftAvail && IS_INTER(iLeftType)) {
 			ST32(iMvA[listIdx], LD32(pCurLayer->pMv[listIdx][iLeftXy][3]));
 			iLeftRef[listIdx] = pCurLayer->pRefIndex[listIdx][iLeftXy][3];
 		}
 		else {
-			iLeftRef[listIdx] = REF_NOT_AVAIL;
+			ST32(iMvA[listIdx], 0);
+			if (0 == bLeftAvail) { //not available
+				iLeftRef[listIdx] = REF_NOT_AVAIL;
+			}
+			else { //available but is intra mb type
+				iLeftRef[listIdx] = REF_NOT_IN_LIST;
+			}
 		}
 
 		/*top*/
-		if (bTopAvail) {
+		if (bTopAvail && IS_INTER(iTopType)) {
 			ST32(iMvB[listIdx], LD32(pCurLayer->pMv[listIdx][iTopXy][12]));
 			iTopRef[listIdx] = pCurLayer->pRefIndex[listIdx][iTopXy][12];
 		}
 		else {
-			iTopRef[listIdx] = REF_NOT_AVAIL;
+			ST32(iMvB[listIdx], 0);
+			if (0 == bTopAvail) { //not available
+				iTopRef[listIdx] = REF_NOT_AVAIL;
+			}
+			else { //available but is intra mb type
+				iTopRef[listIdx] = REF_NOT_IN_LIST;
+			}
 		}
 
 		/*right_top*/
-		if (bRightTopAvail) {
+		if (bRightTopAvail && IS_INTER(iRightTopType)) {
 			ST32(iMvC[listIdx], LD32(pCurLayer->pMv[listIdx][iRightTopXy][12]));
 			iRightTopRef[listIdx] = pCurLayer->pRefIndex[listIdx][iRightTopXy][12];
 		}
 		else {
-			iRightTopRef[listIdx] = REF_NOT_AVAIL;
+			ST32(iMvC[listIdx], 0);
+			if (0 == bRightTopAvail) { //not available
+				iRightTopRef[listIdx] = REF_NOT_AVAIL;
+			}
+			else { //available but is intra mb type
+				iRightTopRef[listIdx] = REF_NOT_IN_LIST;
+			}
 		}
-		
 		/*left_top*/
-		if (bLeftTopAvail) {
+		if (bLeftTopAvail&& IS_INTER(iLeftTopType)) {
 			ST32(iMvD[listIdx], LD32(pCurLayer->pMv[listIdx][iLeftTopXy][15]));
 			iLeftTopRef[listIdx] = pCurLayer->pRefIndex[listIdx][iLeftTopXy][15];
 		}
 		else {
-			iLeftTopRef[listIdx] = REF_NOT_AVAIL;
+			ST32(iMvD[listIdx], 0);
+			if (0 == bLeftTopAvail) { //not available
+				iLeftTopRef[listIdx] = REF_NOT_AVAIL;
+			}
+			else { //available but is intra mb type
+				iLeftTopRef[listIdx] = REF_NOT_IN_LIST;
+			}
 		}
 
 		iDiagonalRef[listIdx] = iRightTopRef[listIdx];
@@ -623,7 +648,8 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 			*(int32_t*)iMvC[listIdx] = *(int32_t*)iMvD[listIdx];
 		}
 
-		ref[listIdx] = WELS_MIN_POSITIVE(iLeftRef[listIdx], WELS_MIN_POSITIVE(iTopRef[listIdx], iRightTopRef[listIdx]));
+		int8_t ref_temp = WELS_MIN_POSITIVE(iTopRef[listIdx], iRightTopRef[listIdx]);
+		ref[listIdx] = WELS_MIN_POSITIVE(iLeftRef[listIdx], ref_temp);
 		if (ref[listIdx] >= 0) {
 
 			uint32_t match_count = (iLeftRef[listIdx] == ref[listIdx]) + (iTopRef[listIdx] == ref[listIdx]) + (iDiagonalRef[listIdx] == ref[listIdx]);
