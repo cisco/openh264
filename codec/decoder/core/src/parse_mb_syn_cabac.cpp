@@ -1038,7 +1038,7 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 					bool bIsLongRef = pCtx->sRefPic.pRefList[LIST_1][0]->bIsLongRef;
 					uint32_t uiColZeroFlag = (0 == pCurDqLayer->iColocIntra[iColocIdx]) && !bIsLongRef &&
 						(pCurDqLayer->iColocRefIndex[LIST_0][iColocIdx] == 0 || (pCurDqLayer->iColocRefIndex[LIST_0][iColocIdx] < 0 && pCurDqLayer->iColocRefIndex[LIST_1][iColocIdx] == 0));
-					const int16_t(*mvColoc)[2] = 0 == pCurDqLayer->iColocRefIndex[LIST_0][iColocIdx] == 0 ? pCurDqLayer->iColocMv[LIST_0] : pCurDqLayer->iColocMv[LIST_1];
+					const int16_t(*mvColoc)[2] = pCurDqLayer->iColocRefIndex[LIST_0][iColocIdx] == 0 ? pCurDqLayer->iColocMv[LIST_0] : pCurDqLayer->iColocMv[LIST_1];
 					const int16_t *mv = mvColoc[iColocIdx];
 					if (IS_SUB_8x8(pCurDqLayer->pSubMbType[iMbXy][i])) {
 						if (uiColZeroFlag && ((unsigned)(mv[0] + 1) <= 2 && (unsigned)(mv[1] + 1) <= 2)) {
