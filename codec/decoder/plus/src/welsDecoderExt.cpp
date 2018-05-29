@@ -188,12 +188,6 @@ CWelsDecoder::~CWelsDecoder() {
     delete m_pWelsTrace;
     m_pWelsTrace = NULL;
   }
-	delete [] m_pForwardPredFrameData[0];
-	delete [] m_pForwardPredFrameData[1];
-	delete [] m_pForwardPredFrameData[2];
-	delete [] m_pNextForwardPredFrameData[0];
-	delete [] m_pNextForwardPredFrameData[1];
-	delete [] m_pNextForwardPredFrameData[2];
 }
 
 long CWelsDecoder::Initialize (const SDecodingParam* pParam) {
