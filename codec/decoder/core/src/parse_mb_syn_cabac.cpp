@@ -1006,8 +1006,8 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 						ST64(pCurDqLayer->pMv[LIST_0][iMbXy][iScan4Idx + 4], LD64(pMV));
 						ST64(pCurDqLayer->pMvd[LIST_0][iMbXy][iScan4Idx], LD64(pMvd));
 						ST64(pCurDqLayer->pMvd[LIST_0][iMbXy][iScan4Idx + 4], LD64(pMvd));
-						ST64(pMotionVector[LIST_0][iCacheIdx], LD64(pMvDirect));
-						ST64(pMotionVector[LIST_0][iCacheIdx + 6], LD64(pMvDirect));
+						ST64(pMotionVector[LIST_0][iCacheIdx], LD64(pMV));
+						ST64(pMotionVector[LIST_0][iCacheIdx + 6], LD64(pMV));
 						ST64(pMvdCache[LIST_0][iCacheIdx], LD64(pMvd));
 						ST64(pMvdCache[LIST_0][iCacheIdx + 6], LD64(pMvd));
 						*(uint32_t*)pMV = *(uint32_t*)pMvDirect[LIST_1];
@@ -1017,8 +1017,8 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 						ST64(pCurDqLayer->pMv[LIST_1][iMbXy][iScan4Idx + 4], LD64(pMV));
 						ST64(pCurDqLayer->pMvd[LIST_1][iMbXy][iScan4Idx], LD64(pMvd));
 						ST64(pCurDqLayer->pMvd[LIST_1][iMbXy][iScan4Idx + 4], LD64(pMvd));
-						ST64(pMotionVector[LIST_1][iCacheIdx], LD64(pMvDirect));
-						ST64(pMotionVector[LIST_1][iCacheIdx + 6], LD64(pMvDirect));
+						ST64(pMotionVector[LIST_1][iCacheIdx], LD64(pMV));
+						ST64(pMotionVector[LIST_1][iCacheIdx + 6], LD64(pMV));
 						ST64(pMvdCache[LIST_1][iCacheIdx], LD64(pMvd));
 						ST64(pMvdCache[LIST_1][iCacheIdx + 6], LD64(pMvd));
 					}
@@ -1026,12 +1026,12 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 						*(uint32_t*)pMV = *(uint32_t*)pMvDirect[LIST_0];
 						ST32(pCurDqLayer->pMv[LIST_0][iMbXy][iScan4Idx], LD32(pMV));
 						ST32(pCurDqLayer->pMvd[LIST_0][iMbXy][iScan4Idx], LD32(pMvd));
-						ST32(pMotionVector[LIST_0][iCacheIdx], LD32(pMvDirect));
+						ST32(pMotionVector[LIST_0][iCacheIdx], LD32(pMV));
 						ST32(pMvdCache[LIST_0][iCacheIdx], LD32(pMvd));
 						*(uint32_t*)pMV = *(uint32_t*)pMvDirect[LIST_1];
 						ST32(pCurDqLayer->pMv[LIST_1][iMbXy][iScan4Idx], LD32(pMV));
 						ST32(pCurDqLayer->pMvd[LIST_1][iMbXy][iScan4Idx], LD32(pMvd));
-						ST32(pMotionVector[LIST_1][iCacheIdx], LD32(pMvDirect));
+						ST32(pMotionVector[LIST_1][iCacheIdx], LD32(pMV));
 						ST32(pMvdCache[LIST_1][iCacheIdx], LD32(pMvd));
 					}
 
@@ -1050,8 +1050,8 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 								ST64(pCurDqLayer->pMv[LIST_0][iMbXy][iScan4Idx + 4], LD64(pMV));
 								ST64(pCurDqLayer->pMvd[LIST_0][iMbXy][iScan4Idx], LD64(pMvd));
 								ST64(pCurDqLayer->pMvd[LIST_0][iMbXy][iScan4Idx + 4], LD64(pMvd));
-								ST64(pMotionVector[LIST_0][iCacheIdx], LD64(pMvDirect));
-								ST64(pMotionVector[LIST_0][iCacheIdx + 6], LD64(pMvDirect));
+								ST64(pMotionVector[LIST_0][iCacheIdx], LD64(pMV));
+								ST64(pMotionVector[LIST_0][iCacheIdx + 6], LD64(pMV));
 								ST64(pMvdCache[LIST_0][iCacheIdx], LD64(pMvd));
 								ST64(pMvdCache[LIST_0][iCacheIdx + 6], LD64(pMvd));
 							}
@@ -1064,8 +1064,8 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 								ST64(pCurDqLayer->pMv[LIST_1][iMbXy][iScan4Idx + 4], LD64(pMV));
 								ST64(pCurDqLayer->pMvd[LIST_1][iMbXy][iScan4Idx], LD64(pMvd));
 								ST64(pCurDqLayer->pMvd[LIST_1][iMbXy][iScan4Idx + 4], LD64(pMvd));
-								ST64(pMotionVector[LIST_1][iCacheIdx], LD64(pMvDirect));
-								ST64(pMotionVector[LIST_1][iCacheIdx + 6], LD64(pMvDirect));
+								ST64(pMotionVector[LIST_1][iCacheIdx], LD64(pMV));
+								ST64(pMotionVector[LIST_1][iCacheIdx + 6], LD64(pMV));
 								ST64(pMvdCache[LIST_1][iCacheIdx], LD64(pMvd));
 								ST64(pMvdCache[LIST_1][iCacheIdx + 6], LD64(pMvd));
 							}
@@ -1077,14 +1077,14 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 								*(uint32_t*)pMV = 0;
 								ST32(pCurDqLayer->pMv[LIST_0][iMbXy][iScan4Idx], LD32(pMV));
 								ST32(pCurDqLayer->pMvd[LIST_0][iMbXy][iScan4Idx], LD32(pMvd));
-								ST32(pMotionVector[LIST_0][iCacheIdx], LD32(pMvDirect));
+								ST32(pMotionVector[LIST_0][iCacheIdx], LD32(pMV));
 								ST32(pMvdCache[LIST_0][iCacheIdx], LD32(pMvd));
 							}
 							if (iRef[LIST_1] == 0) {
 								*(uint32_t*)pMV = 0;
 								ST32(pCurDqLayer->pMv[LIST_1][iMbXy][iScan4Idx], LD32(pMV));
 								ST32(pCurDqLayer->pMvd[LIST_1][iMbXy][iScan4Idx], LD32(pMvd));
-								ST32(pMotionVector[LIST_1][iCacheIdx], LD32(pMvDirect));
+								ST32(pMotionVector[LIST_1][iCacheIdx], LD32(pMV));
 								ST32(pMvdCache[LIST_1][iCacheIdx], LD32(pMvd));
 							}
 						}
