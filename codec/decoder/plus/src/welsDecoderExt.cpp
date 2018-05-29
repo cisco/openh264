@@ -90,11 +90,10 @@ CWelsDecoder::CWelsDecoder (void)
   : m_pDecContext (NULL),
     m_pWelsTrace (NULL),
 		m_sForwardPredFrameBufferInfo(),
-		m_ppForwardPredFrameDst(NULL),
 		m_iForwardPredFramePOC(-1),
 		m_sNextForwardPredFrameBufferInfo(),
-		m_ppNextForwardPredFrameDst(NULL),
-		m_iNextForwardPredFramePOC(-1) {
+		m_iNextForwardPredFramePOC(-1),
+	  m_LastWrittenPOC(0) {
 #ifdef OUTPUT_BIT_STREAM
   char chFileName[1024] = { 0 };  //for .264
   int iBufUsed = 0;
@@ -157,7 +156,6 @@ CWelsDecoder::CWelsDecoder (void)
   m_pFBS = WelsFopen (chFileName, "wb");
   m_pFBSSize = WelsFopen (chFileNameSize, "wb");
 #endif//OUTPUT_BIT_STREAM
-
 }
 
 /***************************************************************************
@@ -190,6 +188,12 @@ CWelsDecoder::~CWelsDecoder() {
     delete m_pWelsTrace;
     m_pWelsTrace = NULL;
   }
+	delete [] m_pForwardPredFrameData[0];
+	delete [] m_pForwardPredFrameData[1];
+	delete [] m_pForwardPredFrameData[2];
+	delete [] m_pNextForwardPredFrameData[0];
+	delete [] m_pNextForwardPredFrameData[1];
+	delete [] m_pNextForwardPredFrameData[2];
 }
 
 long CWelsDecoder::Initialize (const SDecodingParam* pParam) {
@@ -475,12 +479,12 @@ DECODING_STATE CWelsDecoder::DecodeFrameNoDelay (const unsigned char* kpSrc,
   //SBufferInfo sTmpBufferInfo;
   //unsigned char* ppTmpDst[3] = {NULL, NULL, NULL};
 
-  iRet = (int) DecodeFrame2 (kpSrc, kiSrcLen, ppDst, pDstInfo);
+  iRet = (int) DecodeFrame2 (kpSrc, kiSrcLen, m_ppDst, pDstInfo);
   //memcpy (&sTmpBufferInfo, pDstInfo, sizeof (SBufferInfo));
   //ppTmpDst[0] = ppDst[0];
   //ppTmpDst[1] = ppDst[1];
   //ppTmpDst[2] = ppDst[2];
-  iRet |= DecodeFrame2 (NULL, 0, ppDst, pDstInfo);
+  iRet |= DecodeFrame2 (NULL, 0, m_ppDst, pDstInfo);
   //if ((pDstInfo->iBufferStatus == 0) && (sTmpBufferInfo.iBufferStatus == 1)) {
   //memcpy (pDstInfo, &sTmpBufferInfo, sizeof (SBufferInfo));
   //ppDst[0] = ppTmpDst[0];
@@ -492,17 +496,26 @@ DECODING_STATE CWelsDecoder::DecodeFrameNoDelay (const unsigned char* kpSrc,
 		if (m_pDecContext->eSliceType != B_SLICE) {
 			if (pDstInfo->iBufferStatus == 1 && m_iForwardPredFramePOC >= 0 && (m_pDecContext->pSliceHeader->iPicOrderCntLsb > m_pDecContext->pSliceHeader->iFrameNum || (!m_pDecContext->pSliceHeader->iPicOrderCntLsb && !m_pDecContext->pSliceHeader->iFrameNum)) ) {
 				memcpy(&m_sNextForwardPredFrameBufferInfo, pDstInfo, sizeof(SBufferInfo));
-				m_ppNextForwardPredFrameDst = ppDst;
+				m_pNextForwardPredFrameData[0] = m_ppDst[0];
+				m_pNextForwardPredFrameData[1] = m_ppDst[1];
+				m_pNextForwardPredFrameData[2] = m_ppDst[2];
 				m_iNextForwardPredFramePOC = m_pDecContext->pSliceHeader->iPicOrderCntLsb;
 				m_pDecContext->bSliceHeaderFinish = false;
 			}
 			if (m_iForwardPredFramePOC >= 0 && (m_iForwardPredFramePOC < m_pDecContext->pSliceHeader->iPicOrderCntLsb || (!m_pDecContext->pSliceHeader->iPicOrderCntLsb && !m_pDecContext->pSliceHeader->iFrameNum)) ) {
 				memcpy(pDstInfo, &m_sForwardPredFrameBufferInfo, sizeof(SBufferInfo));
-				ppDst = m_ppForwardPredFrameDst;
+				ppDst[0] = m_pForwardPredFrameData[0];
+				ppDst[1] = m_pForwardPredFrameData[1];
+				ppDst[2] = m_pForwardPredFrameData[2];
+				m_LastWrittenPOC = m_iForwardPredFramePOC;
 				m_iForwardPredFramePOC = -1;
+#if defined (_DEBUG)
+				fprintf(stderr, "Output POC: #%d\n", m_LastWrittenPOC);
+#endif//
 				if (m_iNextForwardPredFramePOC >= 0) {
-					memcpy(&m_sForwardPredFrameBufferInfo, &m_sNextForwardPredFrameBufferInfo, sizeof(SBufferInfo));
-					m_ppForwardPredFrameDst = m_ppNextForwardPredFrameDst;
+					m_pForwardPredFrameData[0] = m_pNextForwardPredFrameData[0];
+					m_pForwardPredFrameData[1] = m_pNextForwardPredFrameData[1];
+					m_pForwardPredFrameData[2] = m_pNextForwardPredFrameData[2];
 					m_iForwardPredFramePOC = m_iNextForwardPredFramePOC;
 					m_iNextForwardPredFramePOC = -1;
 				}
@@ -516,11 +529,22 @@ DECODING_STATE CWelsDecoder::DecodeFrameNoDelay (const unsigned char* kpSrc,
 		if (m_pDecContext->eSliceType != B_SLICE) {
 			if (m_pDecContext->pSliceHeader->iPicOrderCntLsb > m_pDecContext->pSliceHeader->iFrameNum) {
 				memcpy(&m_sForwardPredFrameBufferInfo, pDstInfo, sizeof(SBufferInfo));
-				m_ppForwardPredFrameDst = ppDst;
-				m_iForwardPredFramePOC = m_pDecContext->pSliceHeader->iPicOrderCntLsb;
+				m_pForwardPredFrameData[0] = m_ppDst[0];
+				m_pForwardPredFrameData[1] = m_ppDst[1];
+				m_pForwardPredFrameData[2] = m_ppDst[2];
+							m_iForwardPredFramePOC = m_pDecContext->pSliceHeader->iPicOrderCntLsb;
 				pDstInfo->iBufferStatus = 0;
 			}
 		}
+	}
+	if (pDstInfo->iBufferStatus == 1) {
+		m_LastWrittenPOC = m_pDecContext->pSliceHeader->iPicOrderCntLsb;
+#if defined (_DEBUG)
+		fprintf(stderr, "Output POC: #%d\n", m_LastWrittenPOC);
+#endif//
+		ppDst[0] = m_ppDst[0];
+		ppDst[1] = m_ppDst[1];
+		ppDst[2] = m_ppDst[2];
 	}
 #endif
   return (DECODING_STATE) iRet;
