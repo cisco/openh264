@@ -472,7 +472,20 @@ DECODING_STATE CWelsDecoder::DecodeFrameNoDelay (const unsigned char* kpSrc,
   int iRet;
   //SBufferInfo sTmpBufferInfo;
   //unsigned char* ppTmpDst[3] = {NULL, NULL, NULL};
-
+#if 1
+	iRet = (int)DecodeFrame2(kpSrc, kiSrcLen, ppDst, pDstInfo);
+	//memcpy (&sTmpBufferInfo, pDstInfo, sizeof (SBufferInfo));
+	//ppTmpDst[0] = ppDst[0];
+	//ppTmpDst[1] = ppDst[1];
+	//ppTmpDst[2] = ppDst[2];
+	iRet |= DecodeFrame2(NULL, 0, ppDst, pDstInfo);
+	//if ((pDstInfo->iBufferStatus == 0) && (sTmpBufferInfo.iBufferStatus == 1)) {
+	//memcpy (pDstInfo, &sTmpBufferInfo, sizeof (SBufferInfo));
+	//ppDst[0] = ppTmpDst[0];
+	//ppDst[1] = ppTmpDst[1];
+	//ppDst[2] = ppTmpDst[2];
+	//}
+#else
   iRet = (int) DecodeFrame2 (kpSrc, kiSrcLen, m_ppDst, pDstInfo);
   //memcpy (&sTmpBufferInfo, pDstInfo, sizeof (SBufferInfo));
   //ppTmpDst[0] = ppDst[0];
@@ -485,7 +498,6 @@ DECODING_STATE CWelsDecoder::DecodeFrameNoDelay (const unsigned char* kpSrc,
   //ppDst[1] = ppTmpDst[1];
   //ppDst[2] = ppTmpDst[2];
   //}
-#if 1
 	if (m_pDecContext->bSliceHeaderFinish) {
 		if (m_pDecContext->eSliceType != B_SLICE) {
 			if (pDstInfo->iBufferStatus == 1 && m_iForwardPredFramePOC >= 0 && (m_pDecContext->pSliceHeader->iPicOrderCntLsb > m_pDecContext->pSliceHeader->iFrameNum || (!m_pDecContext->pSliceHeader->iPicOrderCntLsb && !m_pDecContext->pSliceHeader->iFrameNum)) ) {
