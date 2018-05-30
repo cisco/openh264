@@ -472,7 +472,7 @@ DECODING_STATE CWelsDecoder::DecodeFrameNoDelay (const unsigned char* kpSrc,
   int iRet;
   //SBufferInfo sTmpBufferInfo;
   //unsigned char* ppTmpDst[3] = {NULL, NULL, NULL};
-#if 1
+#if 0
 	iRet = (int)DecodeFrame2(kpSrc, kiSrcLen, ppDst, pDstInfo);
 	//memcpy (&sTmpBufferInfo, pDstInfo, sizeof (SBufferInfo));
 	//ppTmpDst[0] = ppDst[0];
