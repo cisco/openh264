@@ -34,8 +34,13 @@
 #include "decode_slice.h"
 #include "mv_pred.h"
 #include "error_code.h"
+#include <stdio.h>
 namespace WelsDec {
 #define IDX_UNUSED -1
+
+#if defined(_DEBUG)
+FILE *pFile = fopen("Y:\\p4\\CodeProjects\\Upwork\\projects\\openh264-1\\MV.bin", "wb");
+#endif
 
 static const int16_t g_kMaxPos       [] = {IDX_UNUSED, 15, 14, 15, 3, 14, 63, 3, 3, 14, 14};
 static const int16_t g_kMaxC2       [] = {IDX_UNUSED, 4, 4, 4, 3, 4, 4, 3, 3, 4, 4};
@@ -828,6 +833,13 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 				PredMv(pMotionVector, pRefIndex, listIdx, 0, 4, iRef[listIdx], pMv);
 				WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 0, pMvd[0]));
 				WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 1, pMvd[1]));
+#if defined (_DEBUG)
+				fprintf(pFile, "POC:%d iMbXy:%d MV:%d %d %d %d\n", pCtx->pSliceHeader->iPicOrderCntLsb,  iMbXy, pMv[0], pMv[1], pMvd[0], pMvd[1]);
+				fflush(pFile);
+				if (pCtx->pSliceHeader->iPicOrderCntLsb == 7 && iMbXy == 6959 && pMv[0] == -3 && pMv[1] == 0 && pMvd[0] == 0 && pMvd[1] == 0) {
+					iMbXy = iMbXy;
+				}
+#endif
 				pMv[0] += pMvd[0];
 				pMv[1] += pMvd[1];
 				WELS_CHECK_SE_BOTH_WARNING(pMv[1], iMinVmv, iMaxVmv, "vertical mv");
@@ -872,6 +884,13 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 					PredInter16x8Mv(pMotionVector, pRefIndex, listIdx, iPartIdx, ref_idx, pMv);
 					WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 0, pMvd[0]));
 					WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 1, pMvd[1]));
+#if defined (_DEBUG)				
+					fprintf(pFile, "POC:%d iMbXy:%d MV:%d %d %d %d\n", pCtx->pSliceHeader->iPicOrderCntLsb, iMbXy, pMv[0], pMv[1], pMvd[0], pMvd[1]);
+					fflush(pFile);
+					if (pCtx->pSliceHeader->iPicOrderCntLsb == 7 && iMbXy == 6959 && pMv[0] == -3 && pMv[1] == 0 && pMvd[0] == 0 && pMvd[1] == 0) {
+						iMbXy = iMbXy;
+					}
+#endif
 					pMv[0] += pMvd[0];
 					pMv[1] += pMvd[1];
 					WELS_CHECK_SE_BOTH_WARNING(pMv[1], iMinVmv, iMaxVmv, "vertical mv");
@@ -917,6 +936,13 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 					PredInter8x16Mv(pMotionVector, pRefIndex, listIdx, iPartIdx, ref_idx, pMv);
 					WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 0, pMvd[0]));
 					WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 1, pMvd[1]));
+#if defined (_DEBUG)
+					fprintf(pFile, "POC:%d iMbXy:%d MV:%d %d %d %d\n", pCtx->pSliceHeader->iPicOrderCntLsb, iMbXy, pMv[0], pMv[1], pMvd[0], pMvd[1]);
+					fflush(pFile);
+					if (pCtx->pSliceHeader->iPicOrderCntLsb == 7 && iMbXy == 6959 && pMv[0] == -3 && pMv[1] == 0 && pMvd[0] == 0 && pMvd[1] == 0) {
+						iMbXy = iMbXy;
+					}
+#endif
 					pMv[0] += pMvd[0];
 					pMv[1] += pMvd[1];
 					WELS_CHECK_SE_BOTH_WARNING(pMv[1], iMinVmv, iMaxVmv, "vertical mv");
@@ -1042,8 +1068,8 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 					const int16_t *mv = mvColoc[iColocIdx];
 					if (IS_SUB_8x8(pCurDqLayer->pSubMbType[iMbXy][i])) {
 						if (uiColZeroFlag && ((unsigned)(mv[0] + 1) <= 2 && (unsigned)(mv[1] + 1) <= 2)) {
-							*(uint32_t*)pMV = 0;
 							if (iRef[LIST_0] == 0) {
+								*(uint32_t*)pMV = 0;
 								ST32((pMV + 2), LD32(pMV));
 								ST32((pMvd + 2), LD32(pMvd));
 								ST64(pCurDqLayer->pMv[LIST_0][iMbXy][iScan4Idx], LD64(pMV));
@@ -1149,6 +1175,13 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 						PredMv(pMotionVector, pRefIndex, listIdx, iPartIdx, iBlockW, iref, pMv);
 						WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 0, pMvd[0]));
 						WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 1, pMvd[1]));
+#if defined (_DEBUG)
+						fprintf(pFile, "POC:%d iMbXy:%d MV:%d %d %d %d\n", pCtx->pSliceHeader->iPicOrderCntLsb, iMbXy, pMv[0], pMv[1], pMvd[0], pMvd[1]);
+						fflush(pFile);
+						if (pCtx->pSliceHeader->iPicOrderCntLsb == 7 && iMbXy == 6959 && pMv[0] == -3 && pMv[1] == 0 && pMvd[0] == 0 && pMvd[1] == 0) {
+							iMbXy = iMbXy;
+						}
+#endif
 						pMv[0] += pMvd[0];
 						pMv[1] += pMvd[1];
 						WELS_CHECK_SE_BOTH_WARNING(pMv[1], iMinVmv, iMaxVmv, "vertical mv");
