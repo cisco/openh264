@@ -782,26 +782,24 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 						if (IS_SUB_8x8(sub_mb_type)) {
 							*(uint32_t*)pMV = *(uint32_t*)iMvp[LIST_0];
 							ST32((pMV + 2), LD32(pMV));
-							ST32((pMvd + 2), LD32(pMvd));
 							ST64(pCurLayer->pMv[LIST_0][iMbXy][iScan4Idx], LD64(pMV));
 							ST64(pCurLayer->pMv[LIST_0][iMbXy][iScan4Idx + 4], LD64(pMV));
-							ST64(pCurLayer->pMvd[LIST_0][iMbXy][iScan4Idx], LD64(pMvd));
-							ST64(pCurLayer->pMvd[LIST_0][iMbXy][iScan4Idx + 4], LD64(pMvd));
+							ST64(pCurLayer->pMvd[LIST_0][iMbXy][iScan4Idx], 0);
+							ST64(pCurLayer->pMvd[LIST_0][iMbXy][iScan4Idx + 4], 0);
 							*(uint32_t*)pMV = *(uint32_t*)iMvp[LIST_1];
 							ST32((pMV + 2), LD32(pMV));
-							ST32((pMvd + 2), LD32(pMvd));
 							ST64(pCurLayer->pMv[LIST_1][iMbXy][iScan4Idx], LD64(pMV));
 							ST64(pCurLayer->pMv[LIST_1][iMbXy][iScan4Idx + 4], LD64(pMV));
-							ST64(pCurLayer->pMvd[LIST_1][iMbXy][iScan4Idx], LD64(pMvd));
-							ST64(pCurLayer->pMvd[LIST_1][iMbXy][iScan4Idx + 4], LD64(pMvd));
+							ST64(pCurLayer->pMvd[LIST_1][iMbXy][iScan4Idx], 0);
+							ST64(pCurLayer->pMvd[LIST_1][iMbXy][iScan4Idx + 4], 0);
 						}
 						else { //SUB_4x4
 							*(uint32_t*)pMV = *(uint32_t*)iMvp[LIST_0];
 							ST32(pCurLayer->pMv[LIST_0][iMbXy][iScan4Idx], LD32(pMV));
-							ST32(pCurLayer->pMvd[LIST_0][iMbXy][iScan4Idx], LD32(pMvd));
+							ST32(pCurLayer->pMvd[LIST_0][iMbXy][iScan4Idx], 0);
 							*(uint32_t*)pMV = *(uint32_t*)iMvp[LIST_1];
 							ST32(pCurLayer->pMv[LIST_1][iMbXy][iScan4Idx], LD32(pMV));
-							ST32(pCurLayer->pMvd[LIST_1][iMbXy][iScan4Idx], LD32(pMvd));
+							ST32(pCurLayer->pMvd[LIST_1][iMbXy][iScan4Idx], 0);
 						}
 						uint32_t uiColZeroFlag = (0 == pCurLayer->iColocIntra[iColocIdx]) && !colocPic->bIsLongRef &&
 							(pCurLayer->iColocRefIndex[LIST_0][iColocIdx] == 0 || (pCurLayer->iColocRefIndex[LIST_0][iColocIdx] < 0 && pCurLayer->iColocRefIndex[LIST_1][iColocIdx] == 0));
@@ -809,38 +807,30 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 						const int16_t *mv = mvColoc[iColocIdx];
 						if (IS_SUB_8x8(sub_mb_type)) {
 							if (uiColZeroFlag && ((unsigned)(mv[0] + 1) <= 2 && (unsigned)(mv[1] + 1) <= 2)) {
-								*(uint32_t*)pMV = 0;
 								if (ref[LIST_0] == 0) {
-									ST32((pMV + 2), LD32(pMV));
-									ST32((pMvd + 2), LD32(pMvd));
-									ST64(pCurLayer->pMv[LIST_0][iMbXy][iScan4Idx], LD64(pMV));
-									ST64(pCurLayer->pMv[LIST_0][iMbXy][iScan4Idx + 4], LD64(pMV));
-									ST64(pCurLayer->pMvd[LIST_0][iMbXy][iScan4Idx], LD64(pMvd));
-									ST64(pCurLayer->pMvd[LIST_0][iMbXy][iScan4Idx + 4], LD64(pMvd));
+									ST64(pCurLayer->pMv[LIST_0][iMbXy][iScan4Idx], 0);
+									ST64(pCurLayer->pMv[LIST_0][iMbXy][iScan4Idx + 4], 0);
+									ST64(pCurLayer->pMvd[LIST_0][iMbXy][iScan4Idx], 0);
+									ST64(pCurLayer->pMvd[LIST_0][iMbXy][iScan4Idx + 4], 0);
 								}
 
 								if (ref[LIST_1] == 0) {
-									*(uint32_t*)pMV = 0;
-									ST32((pMV + 2), LD32(pMV));
-									ST32((pMvd + 2), LD32(pMvd));
-									ST64(pCurLayer->pMv[LIST_1][iMbXy][iScan4Idx], LD64(pMV));
-									ST64(pCurLayer->pMv[LIST_1][iMbXy][iScan4Idx + 4], LD64(pMV));
-									ST64(pCurLayer->pMvd[LIST_1][iMbXy][iScan4Idx], LD64(pMvd));
-									ST64(pCurLayer->pMvd[LIST_1][iMbXy][iScan4Idx + 4], LD64(pMvd));
+									ST64(pCurLayer->pMv[LIST_1][iMbXy][iScan4Idx], 0);
+									ST64(pCurLayer->pMv[LIST_1][iMbXy][iScan4Idx + 4], 0);
+									ST64(pCurLayer->pMvd[LIST_1][iMbXy][iScan4Idx], 0);
+									ST64(pCurLayer->pMvd[LIST_1][iMbXy][iScan4Idx + 4], 0);
 								}
 							}
 						}
 						else {
 							if (uiColZeroFlag && ((unsigned)(mv[0] + 1) <= 2 && (unsigned)(mv[1] + 1) <= 2)) {
 								if (ref[LIST_0] == 0) {
-									*(uint32_t*)pMV = 0;
-									ST32(pCurLayer->pMv[LIST_0][iMbXy][iScan4Idx], LD32(pMV));
-									ST32(pCurLayer->pMvd[LIST_0][iMbXy][iScan4Idx], LD32(pMvd));
+									ST32(pCurLayer->pMv[LIST_0][iMbXy][iScan4Idx], 0);
+									ST32(pCurLayer->pMvd[LIST_0][iMbXy][iScan4Idx], 0);
 								}
 								if (ref[LIST_1] == 0) {
-									*(uint32_t*)pMV = 0;
-									ST32(pCurLayer->pMv[LIST_1][iMbXy][iScan4Idx], LD32(pMV));
-									ST32(pCurLayer->pMvd[LIST_1][iMbXy][iScan4Idx], LD32(pMvd));
+									ST32(pCurLayer->pMv[LIST_1][iMbXy][iScan4Idx], 0);
+									ST32(pCurLayer->pMvd[LIST_1][iMbXy][iScan4Idx], 0);
 								}
 							}
 						}
