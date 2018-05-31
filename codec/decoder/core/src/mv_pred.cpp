@@ -648,7 +648,7 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 			*(int32_t*)iMvC[listIdx] = *(int32_t*)iMvD[listIdx];
 		}
 
-		int8_t ref_temp = WELS_MIN_POSITIVE(iTopRef[listIdx], iRightTopRef[listIdx]);
+		int8_t ref_temp = WELS_MIN_POSITIVE(iTopRef[listIdx], iDiagonalRef[listIdx]);
 		ref[listIdx] = WELS_MIN_POSITIVE(iLeftRef[listIdx], ref_temp);
 		if (ref[listIdx] >= 0) {
 
