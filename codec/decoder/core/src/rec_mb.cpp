@@ -1099,7 +1099,7 @@ void GetInterBPred(uint8_t* pPredYCbCr[3], uint8_t* pTempPredYCbCr[3], PWelsDeco
 					int32_t listIdx = IS_TYPE_L0(iSubMBType) ? LIST_0 : LIST_1;
 					iMVs[0] = pCurDqLayer->pMv[listIdx][iMBXY][iIIdx][0];
 					iMVs[1] = pCurDqLayer->pMv[listIdx][iMBXY][iIIdx][1];
-					BaseMC(&pMCRefMem, iXOffset + 4, iYOffset, pMCFunc, 4, 8, iMVs);
+					BaseMC(&pMCRefMem, iXOffset, iYOffset, pMCFunc, 4, 8, iMVs);
 					pMCRefMem.pDstY += 4;
 					pMCRefMem.pDstU += 2;
 					pMCRefMem.pDstV += 2;
