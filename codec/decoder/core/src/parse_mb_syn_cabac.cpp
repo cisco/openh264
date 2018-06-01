@@ -1059,49 +1059,51 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 						ST32(pMvdCache[LIST_1][iCacheIdx], 0);
 					}
 
-					bool bIsLongRef = pCtx->sRefPic.pRefList[LIST_1][0]->bIsLongRef;
-					uint32_t uiColZeroFlag = (0 == pCurDqLayer->iColocIntra[iColocIdx]) && !bIsLongRef &&
-						(pCurDqLayer->iColocRefIndex[LIST_0][iColocIdx] == 0 || (pCurDqLayer->iColocRefIndex[LIST_0][iColocIdx] < 0 && pCurDqLayer->iColocRefIndex[LIST_1][iColocIdx] == 0));
-					const int16_t(*mvColoc)[2] = pCurDqLayer->iColocRefIndex[LIST_0][iColocIdx] == 0 ? pCurDqLayer->iColocMv[LIST_0] : pCurDqLayer->iColocMv[LIST_1];
-					const int16_t *mv = mvColoc[iColocIdx];
-					if (IS_SUB_8x8(pCurDqLayer->pSubMbType[iMbXy][i])) {
-						if (uiColZeroFlag && ((unsigned)(mv[0] + 1) <= 2 && (unsigned)(mv[1] + 1) <= 2)) {
-							if (iRef[LIST_0] == 0) {
-								ST64(pCurDqLayer->pMv[LIST_0][iMbXy][iScan4Idx], 0);
-								ST64(pCurDqLayer->pMv[LIST_0][iMbXy][iScan4Idx + 4], 0);
-								ST64(pCurDqLayer->pMvd[LIST_0][iMbXy][iScan4Idx], 0);
-								ST64(pCurDqLayer->pMvd[LIST_0][iMbXy][iScan4Idx + 4], 0);
-								ST64(pMotionVector[LIST_0][iCacheIdx], 0);
-								ST64(pMotionVector[LIST_0][iCacheIdx + 6], 0);
-								ST64(pMvdCache[LIST_0][iCacheIdx], 0);
-								ST64(pMvdCache[LIST_0][iCacheIdx + 6], 0);
-							}
+					if ((*(int32_t*)pMvDirect[LIST_0] | *(int32_t*)pMvDirect[LIST_1])) {
+						bool bIsLongRef = pCtx->sRefPic.pRefList[LIST_1][0]->bIsLongRef;
+						uint32_t uiColZeroFlag = (0 == pCurDqLayer->iColocIntra[iColocIdx]) && !bIsLongRef &&
+							(pCurDqLayer->iColocRefIndex[LIST_0][iColocIdx] == 0 || (pCurDqLayer->iColocRefIndex[LIST_0][iColocIdx] < 0 && pCurDqLayer->iColocRefIndex[LIST_1][iColocIdx] == 0));
+						const int16_t(*mvColoc)[2] = pCurDqLayer->iColocRefIndex[LIST_0][iColocIdx] == 0 ? pCurDqLayer->iColocMv[LIST_0] : pCurDqLayer->iColocMv[LIST_1];
+						const int16_t *mv = mvColoc[iColocIdx];
+						if (IS_SUB_8x8(pCurDqLayer->pSubMbType[iMbXy][i])) {
+							if (uiColZeroFlag && ((unsigned)(mv[0] + 1) <= 2 && (unsigned)(mv[1] + 1) <= 2)) {
+								if (iRef[LIST_0] == 0) {
+									ST64(pCurDqLayer->pMv[LIST_0][iMbXy][iScan4Idx], 0);
+									ST64(pCurDqLayer->pMv[LIST_0][iMbXy][iScan4Idx + 4], 0);
+									ST64(pCurDqLayer->pMvd[LIST_0][iMbXy][iScan4Idx], 0);
+									ST64(pCurDqLayer->pMvd[LIST_0][iMbXy][iScan4Idx + 4], 0);
+									ST64(pMotionVector[LIST_0][iCacheIdx], 0);
+									ST64(pMotionVector[LIST_0][iCacheIdx + 6], 0);
+									ST64(pMvdCache[LIST_0][iCacheIdx], 0);
+									ST64(pMvdCache[LIST_0][iCacheIdx + 6], 0);
+								}
 
-							if (iRef[LIST_1] == 0) {
-								ST64(pCurDqLayer->pMv[LIST_1][iMbXy][iScan4Idx], 0);
-								ST64(pCurDqLayer->pMv[LIST_1][iMbXy][iScan4Idx + 4], 0);
-								ST64(pCurDqLayer->pMvd[LIST_1][iMbXy][iScan4Idx], 0);
-								ST64(pCurDqLayer->pMvd[LIST_1][iMbXy][iScan4Idx + 4], 0);
-								ST64(pMotionVector[LIST_1][iCacheIdx], 0);
-								ST64(pMotionVector[LIST_1][iCacheIdx + 6], 0);
-								ST64(pMvdCache[LIST_1][iCacheIdx], 0);
-								ST64(pMvdCache[LIST_1][iCacheIdx + 6], 0);
+								if (iRef[LIST_1] == 0) {
+									ST64(pCurDqLayer->pMv[LIST_1][iMbXy][iScan4Idx], 0);
+									ST64(pCurDqLayer->pMv[LIST_1][iMbXy][iScan4Idx + 4], 0);
+									ST64(pCurDqLayer->pMvd[LIST_1][iMbXy][iScan4Idx], 0);
+									ST64(pCurDqLayer->pMvd[LIST_1][iMbXy][iScan4Idx + 4], 0);
+									ST64(pMotionVector[LIST_1][iCacheIdx], 0);
+									ST64(pMotionVector[LIST_1][iCacheIdx + 6], 0);
+									ST64(pMvdCache[LIST_1][iCacheIdx], 0);
+									ST64(pMvdCache[LIST_1][iCacheIdx + 6], 0);
+								}
 							}
 						}
-					}
-					else {
-						if (uiColZeroFlag && ((unsigned)(mv[0] + 1) <= 2 && (unsigned)(mv[1] + 1) <= 2)) {
-							if (iRef[LIST_0] == 0) {
-								ST32(pCurDqLayer->pMv[LIST_0][iMbXy][iScan4Idx], 0);
-								ST32(pCurDqLayer->pMvd[LIST_0][iMbXy][iScan4Idx], 0);
-								ST32(pMotionVector[LIST_0][iCacheIdx], 0);
-								ST32(pMvdCache[LIST_0][iCacheIdx], 0);
-							}
-							if (iRef[LIST_1] == 0) {
-								ST32(pCurDqLayer->pMv[LIST_1][iMbXy][iScan4Idx], 0);
-								ST32(pCurDqLayer->pMvd[LIST_1][iMbXy][iScan4Idx], 0);
-								ST32(pMotionVector[LIST_1][iCacheIdx], 0);
-								ST32(pMvdCache[LIST_1][iCacheIdx], 0);
+						else {
+							if (uiColZeroFlag && ((unsigned)(mv[0] + 1) <= 2 && (unsigned)(mv[1] + 1) <= 2)) {
+								if (iRef[LIST_0] == 0) {
+									ST32(pCurDqLayer->pMv[LIST_0][iMbXy][iScan4Idx], 0);
+									ST32(pCurDqLayer->pMvd[LIST_0][iMbXy][iScan4Idx], 0);
+									ST32(pMotionVector[LIST_0][iCacheIdx], 0);
+									ST32(pMvdCache[LIST_0][iCacheIdx], 0);
+								}
+								if (iRef[LIST_1] == 0) {
+									ST32(pCurDqLayer->pMv[LIST_1][iMbXy][iScan4Idx], 0);
+									ST32(pCurDqLayer->pMvd[LIST_1][iMbXy][iScan4Idx], 0);
+									ST32(pMotionVector[LIST_1][iCacheIdx], 0);
+									ST32(pMvdCache[LIST_1][iCacheIdx], 0);
+								}
 							}
 						}
 					}
