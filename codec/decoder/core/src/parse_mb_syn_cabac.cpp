@@ -1001,21 +1001,11 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 
 			int16_t iIdx8 = i << 2;
 			if (IS_DIRECT(pCurDqLayer->pSubMbType[iMbXy][i])) {
-			
-				//int8_t pRefIndex[LIST_A][30];
-				*(uint32_t*)pMvd = 0;
-				UpdateP8x8RefIdxCabac(pCurDqLayer, pRefIndex, iIdx8, iRef[LIST_0], LIST_0);
-				UpdateP8x8RefIdxCabac(pCurDqLayer, pRefIndex, iIdx8, iRef[LIST_1], LIST_1);
-
+		
 				int8_t iPartCount = pSubPartCount[i];
 				int16_t iPartIdx, iBlockW = pPartW[i];
 				uint8_t iScan4Idx, iCacheIdx, iColocIdx;
 				iCacheIdx = g_kuiCache30ScanIdx[iIdx8];
-
-				pRefIndex[LIST_0][iCacheIdx] = pRefIndex[LIST_0][iCacheIdx + 1]
-					= pRefIndex[LIST_0][iCacheIdx + 6] = pRefIndex[LIST_0][iCacheIdx + 7] = iRef[LIST_0];
-				pRefIndex[LIST_1][iCacheIdx] = pRefIndex[LIST_1][iCacheIdx + 1]
-					= pRefIndex[LIST_1][iCacheIdx + 6] = pRefIndex[LIST_1][iCacheIdx + 7] = iRef[LIST_1];
 
 				for (int32_t j = 0; j < iPartCount; j++) {
 					iPartIdx = iIdx8 + j * iBlockW;
@@ -1116,25 +1106,27 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 			for (int32_t i = 0; i < 4; i++) {
 				int16_t iIdx8 = i << 2;
 				int32_t subMbType = pCurDqLayer->pSubMbType[iMbXy][i];
-				if (IS_DIRECT(subMbType)) {
-					continue;
-				}
 				int8_t iref = REF_NOT_IN_LIST;
-				if (IS_DIR(subMbType, 0, listIdx)) {
-					WELS_READ_VERIFY(ParseRefIdxCabac(pCtx, pNeighAvail, pNonZeroCount, pRefIndex, listIdx, iIdx8, pRefCount[listIdx], 1,
-						iref));
-					if ((iref < 0) || (iref >= pRefCount[listIdx]) || (pCtx->sRefPic.pRefList[listIdx][iref] == NULL)) { //error ref_idx
-						pCtx->bMbRefConcealed = true;
-						if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE) {
-							iref = 0;
-							pCtx->iErrorCode |= dsBitstreamError;
+				if (IS_DIRECT(subMbType)) {
+					iref = iRef[listIdx];
+				}
+				else {
+					if (IS_DIR(subMbType, 0, listIdx)) {
+						WELS_READ_VERIFY(ParseRefIdxCabac(pCtx, pNeighAvail, pNonZeroCount, pRefIndex, listIdx, iIdx8, pRefCount[listIdx], 1,
+							iref));
+						if ((iref < 0) || (iref >= pRefCount[listIdx]) || (pCtx->sRefPic.pRefList[listIdx][iref] == NULL)) { //error ref_idx
+							pCtx->bMbRefConcealed = true;
+							if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE) {
+								iref = 0;
+								pCtx->iErrorCode |= dsBitstreamError;
+							}
+							else {
+								return GENERATE_ERROR_NO(ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_REF_INDEX);
+							}
 						}
-						else {
-							return GENERATE_ERROR_NO(ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_REF_INDEX);
-						}
+						pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || !(pCtx->sRefPic.pRefList[listIdx][iref]
+							&& pCtx->sRefPic.pRefList[listIdx][iref]->bIsComplete);
 					}
-					pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || !(pCtx->sRefPic.pRefList[listIdx][iref]
-						&& pCtx->sRefPic.pRefList[listIdx][iref]->bIsComplete);
 				}
 				UpdateP8x8RefIdxCabac(pCurDqLayer, pRefIndex, iIdx8, iref, listIdx);
 				ref_idx_list[listIdx][i] = iref;
@@ -1147,17 +1139,16 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 				int16_t iPartIdx, iBlockW = pPartW[i];
 				uint8_t iScan4Idx, iCacheIdx;
 
-				uint32_t subMbType = pCurDqLayer->pSubMbType[iMbXy][i];
-				if (IS_DIRECT(subMbType)) {
-					continue;
-				}
-
 				iCacheIdx = g_kuiCache30ScanIdx[i << 2];
 
 				int8_t iref = ref_idx_list[listIdx][i];
 				pRefIndex[listIdx][iCacheIdx] = pRefIndex[listIdx][iCacheIdx + 1]
 					= pRefIndex[listIdx][iCacheIdx + 6] = pRefIndex[listIdx][iCacheIdx + 7] = iref;
-				
+
+				uint32_t subMbType = pCurDqLayer->pSubMbType[iMbXy][i];
+				if (IS_DIRECT(subMbType)) {
+					continue;
+				}
 				bool is_dir = IS_DIR(subMbType, 0, listIdx) > 0;
 				for (int32_t j = 0; j < iPartCount; j++) {
 					iPartIdx = (i << 2) + j * iBlockW;
