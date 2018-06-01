@@ -1100,7 +1100,13 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAva
 	WELS_READ_VERIFY(ParseMBTypeBSliceCabac(pCtx, pNeighAvail, uiMbType));
 
 #if defined(_DEBUG)
+#ifdef _MOTION_VECTOR_DUMP_
+	if (uiTotalFrameCount == 50) {
 		WelsLog(&(pCtx->sLogCtx), WELS_LOG_WARNING, "mb_num and type = [%d %d]", iMbXy, uiMbType);
+		if (iMbXy >= 2700)
+			iMbXy = iMbXy;
+	}
+#endif
 #endif
 	if (uiMbType < 23) { //Inter B mode
 		pCurLayer->pMbType[iMbXy] = g_ksInterBMbTypeInfo[uiMbType].iType;
@@ -1432,6 +1438,14 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 
 			//predict direct spatial mv
 			PredMvBDirectSpatial2(pCtx, pMv, ref);
+#ifdef _DEBUG
+#if 0
+			if (uiTotalFrameCount >= 12) {
+				WelsLog(&(pCtx->sLogCtx), WELS_LOG_WARNING, "iMbXy = [%d] MV = [%d %d %d %d]", iMbXy, pMv[0][0], pMv[0][1], pMv[1][0], pMv[1][1]);
+				iMbXy = iMbXy;
+			}
+#endif
+#endif
 		}
 		else {
 			//temporal direct mode

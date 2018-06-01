@@ -39,7 +39,9 @@ namespace WelsDec {
 #define IDX_UNUSED -1
 
 #if defined(_DEBUG)
+#ifdef _MOTION_VECTOR_DUMP_
 FILE *pFile = fopen("Y:\\p4\\CodeProjects\\Upwork\\projects\\openh264-1\\MV.bin", "wb");
+#endif
 #endif
 
 static const int16_t g_kMaxPos       [] = {IDX_UNUSED, 15, 14, 15, 3, 14, 63, 3, 3, 14, 14};
@@ -834,11 +836,15 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 				WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 0, pMvd[0]));
 				WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 1, pMvd[1]));
 #if defined (_DEBUG)
-				fprintf(pFile, "POC:%d iMbXy:%d MV:%d %d %d %d\n", pCtx->pSliceHeader->iPicOrderCntLsb,  iMbXy, pMv[0], pMv[1], pMvd[0], pMvd[1]);
-				fflush(pFile);
-				if (pCtx->pSliceHeader->iPicOrderCntLsb == 7 && iMbXy == 6959 && pMv[0] == -3 && pMv[1] == 0 && pMvd[0] == 0 && pMvd[1] == 0) {
-					iMbXy = iMbXy;
+#ifdef _MOTION_VECTOR_DUMP_
+				if (pCtx->pSliceHeader->iPicOrderCntLsb == 23) {
+					fprintf(pFile, "POC:%d iMbXy:%d MV:%d %d %d %d\n", pCtx->pSliceHeader->iPicOrderCntLsb, iMbXy, pMv[0], pMv[1], pMvd[0], pMvd[1]);
+					fflush(pFile);
+					if (pCtx->pSliceHeader->iPicOrderCntLsb == 7 && iMbXy == 6959 && pMv[0] == -3 && pMv[1] == 0 && pMvd[0] == 0 && pMvd[1] == 0) {
+						iMbXy = iMbXy;
+					}
 				}
+#endif
 #endif
 				pMv[0] += pMvd[0];
 				pMv[1] += pMvd[1];
@@ -884,12 +890,16 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 					PredInter16x8Mv(pMotionVector, pRefIndex, listIdx, iPartIdx, ref_idx, pMv);
 					WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 0, pMvd[0]));
 					WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 1, pMvd[1]));
-#if defined (_DEBUG)				
-					fprintf(pFile, "POC:%d iMbXy:%d MV:%d %d %d %d\n", pCtx->pSliceHeader->iPicOrderCntLsb, iMbXy, pMv[0], pMv[1], pMvd[0], pMvd[1]);
-					fflush(pFile);
-					if (pCtx->pSliceHeader->iPicOrderCntLsb == 7 && iMbXy == 6959 && pMv[0] == -3 && pMv[1] == 0 && pMvd[0] == 0 && pMvd[1] == 0) {
-						iMbXy = iMbXy;
+#if defined (_DEBUG)	
+#ifdef _MOTION_VECTOR_DUMP_
+					if (pCtx->pSliceHeader->iPicOrderCntLsb == 23) {
+						fprintf(pFile, "POC:%d iMbXy:%d MV:%d %d %d %d\n", pCtx->pSliceHeader->iPicOrderCntLsb, iMbXy, pMv[0], pMv[1], pMvd[0], pMvd[1]);
+						fflush(pFile);
+						if (pCtx->pSliceHeader->iPicOrderCntLsb == 7 && iMbXy == 6959 && pMv[0] == -3 && pMv[1] == 0 && pMvd[0] == 0 && pMvd[1] == 0) {
+							iMbXy = iMbXy;
+						}
 					}
+#endif
 #endif
 					pMv[0] += pMvd[0];
 					pMv[1] += pMvd[1];
@@ -937,11 +947,15 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 					WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 0, pMvd[0]));
 					WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 1, pMvd[1]));
 #if defined (_DEBUG)
-					fprintf(pFile, "POC:%d iMbXy:%d MV:%d %d %d %d\n", pCtx->pSliceHeader->iPicOrderCntLsb, iMbXy, pMv[0], pMv[1], pMvd[0], pMvd[1]);
-					fflush(pFile);
-					if (pCtx->pSliceHeader->iPicOrderCntLsb == 7 && iMbXy == 6959 && pMv[0] == -3 && pMv[1] == 0 && pMvd[0] == 0 && pMvd[1] == 0) {
-						iMbXy = iMbXy;
+#ifdef _MOTION_VECTOR_DUMP_
+					if (pCtx->pSliceHeader->iPicOrderCntLsb == 23) {
+						fprintf(pFile, "POC:%d iMbXy:%d MV:%d %d %d %d\n", pCtx->pSliceHeader->iPicOrderCntLsb, iMbXy, pMv[0], pMv[1], pMvd[0], pMvd[1]);
+						fflush(pFile);
+						if (pCtx->pSliceHeader->iPicOrderCntLsb == 7 && iMbXy == 6959 && pMv[0] == -3 && pMv[1] == 0 && pMvd[0] == 0 && pMvd[1] == 0) {
+							iMbXy = iMbXy;
+						}
 					}
+#endif
 #endif
 					pMv[0] += pMvd[0];
 					pMv[1] += pMvd[1];
@@ -1159,11 +1173,15 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 						WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 0, pMvd[0]));
 						WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 1, pMvd[1]));
 #if defined (_DEBUG)
-						fprintf(pFile, "POC:%d iMbXy:%d MV:%d %d %d %d\n", pCtx->pSliceHeader->iPicOrderCntLsb, iMbXy, pMv[0], pMv[1], pMvd[0], pMvd[1]);
-						fflush(pFile);
-						if (pCtx->pSliceHeader->iPicOrderCntLsb == 7 && iMbXy == 6959 && pMv[0] == -3 && pMv[1] == 0 && pMvd[0] == 0 && pMvd[1] == 0) {
-							iMbXy = iMbXy;
+#ifdef _MOTION_VECTOR_DUMP_
+						if (pCtx->pSliceHeader->iPicOrderCntLsb == 23) {
+							fprintf(pFile, "POC:%d iMbXy:%d MV:%d %d %d %d\n", pCtx->pSliceHeader->iPicOrderCntLsb, iMbXy, pMv[0], pMv[1], pMvd[0], pMvd[1]);
+							fflush(pFile);
+							if (pCtx->pSliceHeader->iPicOrderCntLsb == 7 && iMbXy == 6959 && pMv[0] == -3 && pMv[1] == 0 && pMvd[0] == 0 && pMvd[1] == 0) {
+								iMbXy = iMbXy;
+							}
 						}
+#endif
 #endif
 						pMv[0] += pMvd[0];
 						pMv[1] += pMvd[1];
