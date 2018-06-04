@@ -71,6 +71,8 @@ extern "C" {
 #include <sys/time.h>
 #endif
 
+#define PICTURE_REODERING 1
+
 namespace WelsDec {
 
 //////////////////////////////////////////////////////////////////////
@@ -472,7 +474,7 @@ DECODING_STATE CWelsDecoder::DecodeFrameNoDelay (const unsigned char* kpSrc,
   int iRet;
   //SBufferInfo sTmpBufferInfo;
   //unsigned char* ppTmpDst[3] = {NULL, NULL, NULL};
-#if 0
+#if 1
 	iRet = (int)DecodeFrame2(kpSrc, kiSrcLen, ppDst, pDstInfo);
 	//memcpy (&sTmpBufferInfo, pDstInfo, sizeof (SBufferInfo));
 	//ppTmpDst[0] = ppDst[0];
@@ -599,7 +601,11 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
 
   int64_t iStart, iEnd;
   iStart = WelsTime();
-  ppDst[0] = ppDst[1] = ppDst[2] = NULL;
+#ifdef PICTURE_REODERING
+	m_ppDst[0] = m_ppDst[1] = m_ppDst[2] = NULL;
+#else 
+	ppDst[0] = ppDst[1] = ppDst[2] = NULL;
+#endif
   m_pDecContext->iErrorCode             = dsErrorFree; //initialize at the starting of AU decoding.
   m_pDecContext->iFeedbackVclNalInAu = FEEDBACK_UNKNOWN_NAL; //initialize
   unsigned long long uiInBsTimeStamp = pDstInfo->uiInBsTimeStamp;
@@ -620,8 +626,13 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
   } else {
     m_pDecContext->uiTimeStamp = 0;
   }
-  WelsDecodeBs (m_pDecContext, kpSrc, kiSrcLen, ppDst,
-                pDstInfo, NULL); //iErrorCode has been modified in this function
+#ifdef PICTURE_REODERING
+	WelsDecodeBs(m_pDecContext, kpSrc, kiSrcLen, m_ppDst,
+		pDstInfo, NULL); //iErrorCode has been modified in this function
+#else
+	WelsDecodeBs(m_pDecContext, kpSrc, kiSrcLen, ppDst,
+		pDstInfo, NULL); //iErrorCode has been modified in this function
+#endif
   m_pDecContext->bInstantDecFlag = false; //reset no-delay flag
   if (m_pDecContext->iErrorCode) {
     EWelsNalUnitType eNalType =
@@ -704,7 +715,62 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
   iEnd = WelsTime();
   m_pDecContext->dDecTime += (iEnd - iStart) / 1e3;
 
+#ifdef PICTURE_REODERING
+	if (m_pDecContext->bSliceHeaderFinish) {
+		if (m_pDecContext->eSliceType != B_SLICE) {
+			if (pDstInfo->iBufferStatus == 1 && m_iForwardPredFramePOC >= 0 && (m_pDecContext->pSliceHeader->iPicOrderCntLsb > m_pDecContext->pSliceHeader->iFrameNum || (!m_pDecContext->pSliceHeader->iPicOrderCntLsb && !m_pDecContext->pSliceHeader->iFrameNum))) {
+				memcpy(&m_sNextForwardPredFrameBufferInfo, pDstInfo, sizeof(SBufferInfo));
+				m_pNextForwardPredFrameData[0] = m_ppDst[0];
+				m_pNextForwardPredFrameData[1] = m_ppDst[1];
+				m_pNextForwardPredFrameData[2] = m_ppDst[2];
+				m_iNextForwardPredFramePOC = m_pDecContext->pSliceHeader->iPicOrderCntLsb;
+				m_pDecContext->bSliceHeaderFinish = false;
+			}
+			if (m_iForwardPredFramePOC >= 0 && (m_iForwardPredFramePOC < m_pDecContext->pSliceHeader->iPicOrderCntLsb || (!m_pDecContext->pSliceHeader->iPicOrderCntLsb && !m_pDecContext->pSliceHeader->iFrameNum))) {
+				memcpy(pDstInfo, &m_sForwardPredFrameBufferInfo, sizeof(SBufferInfo));
+				ppDst[0] = m_pForwardPredFrameData[0];
+				ppDst[1] = m_pForwardPredFrameData[1];
+				ppDst[2] = m_pForwardPredFrameData[2];
+				m_LastWrittenPOC = m_iForwardPredFramePOC;
+				m_iForwardPredFramePOC = -1;
+#if defined (_DEBUG)
+				fprintf(stderr, "Output POC: #%d\n", m_LastWrittenPOC);
+#endif//
+				if (m_iNextForwardPredFramePOC >= 0) {
+					m_pForwardPredFrameData[0] = m_pNextForwardPredFrameData[0];
+					m_pForwardPredFrameData[1] = m_pNextForwardPredFrameData[1];
+					m_pForwardPredFrameData[2] = m_pNextForwardPredFrameData[2];
+					m_iForwardPredFramePOC = m_iNextForwardPredFramePOC;
+					m_iNextForwardPredFramePOC = -1;
+				}
+				return dsErrorFree;
+			}
+		}
+	}
 
+	if (pDstInfo->iBufferStatus == 1) {
+		m_pDecContext->bSliceHeaderFinish = false;
+		if (m_pDecContext->eSliceType != B_SLICE) {
+			if (m_pDecContext->pSliceHeader->iPicOrderCntLsb > m_pDecContext->pSliceHeader->iFrameNum) {
+				memcpy(&m_sForwardPredFrameBufferInfo, pDstInfo, sizeof(SBufferInfo));
+				m_pForwardPredFrameData[0] = m_ppDst[0];
+				m_pForwardPredFrameData[1] = m_ppDst[1];
+				m_pForwardPredFrameData[2] = m_ppDst[2];
+				m_iForwardPredFramePOC = m_pDecContext->pSliceHeader->iPicOrderCntLsb;
+				pDstInfo->iBufferStatus = 0;
+			}
+		}
+	}
+	if (pDstInfo->iBufferStatus == 1) {
+		m_LastWrittenPOC = m_pDecContext->pSliceHeader->iPicOrderCntLsb;
+#if defined (_DEBUG)
+		fprintf(stderr, "Output POC: #%d\n", m_LastWrittenPOC);
+#endif//
+		ppDst[0] = m_ppDst[0];
+		ppDst[1] = m_ppDst[1];
+		ppDst[2] = m_ppDst[2];
+	}
+#endif
 
   return dsErrorFree;
 }
