@@ -845,13 +845,6 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
   if (uiSliceType > 4)
     uiSliceType -= 5;
 
-  if (B_SLICE == uiSliceType) {
-    WelsLog (pLogCtx, WELS_LOG_WARNING, "ParseSliceHeaderSyntaxs(): Working to support B slice and is not working yet.");
-#if 0
-    return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_UNSUPPORTED_BIPRED);
-#endif
-  }
-
 	pCtx->bSliceHeaderFinish = true;
   if ((NAL_UNIT_CODED_SLICE_IDR == eNalType) && (I_SLICE != uiSliceType)) {
     WelsLog (pLogCtx, WELS_LOG_WARNING, "Invalid slice type(%d) in IDR picture. ", uiSliceType);

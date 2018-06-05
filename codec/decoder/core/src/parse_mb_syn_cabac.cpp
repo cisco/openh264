@@ -40,7 +40,7 @@ namespace WelsDec {
 
 #if defined(_DEBUG)
 #ifdef _MOTION_VECTOR_DUMP_
-FILE *pFile = fopen("Y:\\p4\\CodeProjects\\Upwork\\projects\\openh264-1\\MV.bin", "wb");
+FILE *pFile = fopen("MV.bin", "wb");
 #endif
 #endif
 
@@ -840,9 +840,6 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 				if (pCtx->pSliceHeader->iPicOrderCntLsb == 23) {
 					fprintf(pFile, "POC:%d iMbXy:%d MV:%d %d %d %d\n", pCtx->pSliceHeader->iPicOrderCntLsb, iMbXy, pMv[0], pMv[1], pMvd[0], pMvd[1]);
 					fflush(pFile);
-					if (pCtx->pSliceHeader->iPicOrderCntLsb == 7 && iMbXy == 6959 && pMv[0] == -3 && pMv[1] == 0 && pMvd[0] == 0 && pMvd[1] == 0) {
-						iMbXy = iMbXy;
-					}
 				}
 #endif
 #endif
@@ -895,9 +892,6 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 					if (pCtx->pSliceHeader->iPicOrderCntLsb == 23) {
 						fprintf(pFile, "POC:%d iMbXy:%d MV:%d %d %d %d\n", pCtx->pSliceHeader->iPicOrderCntLsb, iMbXy, pMv[0], pMv[1], pMvd[0], pMvd[1]);
 						fflush(pFile);
-						if (pCtx->pSliceHeader->iPicOrderCntLsb == 7 && iMbXy == 6959 && pMv[0] == -3 && pMv[1] == 0 && pMvd[0] == 0 && pMvd[1] == 0) {
-							iMbXy = iMbXy;
-						}
 					}
 #endif
 #endif
@@ -951,9 +945,6 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 					if (pCtx->pSliceHeader->iPicOrderCntLsb == 23) {
 						fprintf(pFile, "POC:%d iMbXy:%d MV:%d %d %d %d\n", pCtx->pSliceHeader->iPicOrderCntLsb, iMbXy, pMv[0], pMv[1], pMvd[0], pMvd[1]);
 						fflush(pFile);
-						if (pCtx->pSliceHeader->iPicOrderCntLsb == 7 && iMbXy == 6959 && pMv[0] == -3 && pMv[1] == 0 && pMvd[0] == 0 && pMvd[1] == 0) {
-							iMbXy = iMbXy;
-						}
 					}
 #endif
 #endif
@@ -1177,9 +1168,6 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 						if (pCtx->pSliceHeader->iPicOrderCntLsb == 23) {
 							fprintf(pFile, "POC:%d iMbXy:%d MV:%d %d %d %d\n", pCtx->pSliceHeader->iPicOrderCntLsb, iMbXy, pMv[0], pMv[1], pMvd[0], pMvd[1]);
 							fflush(pFile);
-							if (pCtx->pSliceHeader->iPicOrderCntLsb == 7 && iMbXy == 6959 && pMv[0] == -3 && pMv[1] == 0 && pMvd[0] == 0 && pMvd[1] == 0) {
-								iMbXy = iMbXy;
-							}
 						}
 #endif
 #endif
