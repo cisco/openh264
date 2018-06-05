@@ -80,13 +80,6 @@ void UpdateP8x16MotionInfo (PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A][
 void PredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]);
 
 /*!
-* \brief   get the motion predictor and reference for B-slice direct mode
-* \param
-* \param   output iMvp[] and ref
-*/
-void PredMvBDirectSpatial(PDqLayer pCurLayer, int16_t iMvp[LIST_A][2], int8_t ref[LIST_A]);
-
-/*!
 * \brief   get the motion predictor and reference for B-slice direct mode version 2
 * \param
 * \param   output iMvp[] and ref
