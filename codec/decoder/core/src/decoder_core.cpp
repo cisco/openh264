@@ -1414,6 +1414,9 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
 		pCtx->sMb.pRefIndex[i][LIST_1] = (int8_t(*)[MB_BLOCK4x4_NUM])pMa->WelsMallocz(pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight *
 			sizeof(
 				int8_t) * MB_BLOCK4x4_NUM, "pCtx->sMb.pRefIndex[][]");
+		pCtx->sMb.pDirect[i] = (int8_t(*)[MB_BLOCK4x4_NUM])pMa->WelsMallocz(pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight *
+			sizeof(
+				int8_t) * MB_BLOCK4x4_NUM, "pCtx->sMb.pDirect[]");
     pCtx->sMb.pLumaQp[i] = (int8_t*)pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t),
                            "pCtx->sMb.pLumaQp[]");
     pCtx->sMb.pNoSubMbPartSizeLessThan8x8Flag[i] = (bool*)pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight *
@@ -1474,6 +1477,7 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
 														(NULL == pCtx->sMb.pMv[i][LIST_1]) ||
                             (NULL == pCtx->sMb.pRefIndex[i][LIST_0]) ||
 														(NULL == pCtx->sMb.pRefIndex[i][LIST_1]) ||
+														(NULL == pCtx->sMb.pDirect[i]) ||
                             (NULL == pCtx->sMb.pLumaQp[i]) ||
                             (NULL == pCtx->sMb.pNoSubMbPartSizeLessThan8x8Flag[i]) ||
                             (NULL == pCtx->sMb.pTransformSize8x8Flag[i]) ||
@@ -1536,6 +1540,11 @@ void UninitialDqLayersContext (PWelsDecoderContext pCtx) {
 			if (pCtx->sMb.pRefIndex[i][listIdx]) {
 				pMa->WelsFree(pCtx->sMb.pRefIndex[i][listIdx], "pCtx->sMb.pRefIndex[][]");
 				pCtx->sMb.pRefIndex[i][listIdx] = NULL;
+			}
+
+			if (pCtx->sMb.pDirect[i]) {
+				pMa->WelsFree(pCtx->sMb.pDirect[i], "pCtx->sMb.pDirect[]");
+				pCtx->sMb.pDirect[i] = NULL;
 			}
 
 			if (pCtx->sMb.pMvd[i][listIdx]) {
@@ -2253,6 +2262,7 @@ void InitCurDqLayerData (PWelsDecoderContext pCtx, PDqLayer pCurDq) {
 		pCurDq->pMv[LIST_1]					= pCtx->sMb.pMv[0][LIST_1];
     pCurDq->pRefIndex[LIST_0]    = pCtx->sMb.pRefIndex[0][LIST_0];
 		pCurDq->pRefIndex[LIST_1]		= pCtx->sMb.pRefIndex[0][LIST_1];
+		pCurDq->pDirect							= pCtx->sMb.pDirect[0];
     pCurDq->pNoSubMbPartSizeLessThan8x8Flag = pCtx->sMb.pNoSubMbPartSizeLessThan8x8Flag[0];
     pCurDq->pTransformSize8x8Flag = pCtx->sMb.pTransformSize8x8Flag[0];
     pCurDq->pLumaQp         = pCtx->sMb.pLumaQp[0];

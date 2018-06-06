@@ -68,6 +68,7 @@ struct TagDqLayer {
   int16_t (*pMv[LIST_A])[MB_BLOCK4x4_NUM][MV_A];
   int16_t (*pMvd[LIST_A])[MB_BLOCK4x4_NUM][MV_A];
   int8_t  (*pRefIndex[LIST_A])[MB_BLOCK4x4_NUM];
+	int8_t	(*pDirect)[MB_BLOCK4x4_NUM];
   bool*    pNoSubMbPartSizeLessThan8x8Flag;
   bool*    pTransformSize8x8Flag;
   int8_t*  pLumaQp;

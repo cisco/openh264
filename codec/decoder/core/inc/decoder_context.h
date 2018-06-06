@@ -273,6 +273,7 @@ typedef struct TagWelsDecoderContext {
     uint32_t*  pMbType[LAYER_NUM_EXCHANGEABLE];                      /* mb type */
     int16_t (*pMv[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_BLOCK4x4_NUM][MV_A]; //[LAYER_NUM_EXCHANGEABLE   MB_BLOCK4x4_NUM*]
     int8_t (*pRefIndex[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_BLOCK4x4_NUM];
+		int8_t	(*pDirect[LAYER_NUM_EXCHANGEABLE])[MB_BLOCK4x4_NUM];
     bool*   pNoSubMbPartSizeLessThan8x8Flag[LAYER_NUM_EXCHANGEABLE];
     bool*   pTransformSize8x8Flag[LAYER_NUM_EXCHANGEABLE];
     int8_t* pLumaQp[LAYER_NUM_EXCHANGEABLE];        /*mb luma_qp*/

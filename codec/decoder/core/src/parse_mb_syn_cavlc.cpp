@@ -393,6 +393,47 @@ void WelsFillCacheInterCabac (PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroCoun
 	}
 }
 
+void WelsFillDirectCacheCabac(PWelsNeighAvail pNeighAvail, int8_t iDirect[30], PDqLayer pCurLayer) {
+
+	int32_t iCurXy = pCurLayer->iMbXyIndex;
+	int32_t iTopXy = 0;
+	int32_t iLeftXy = 0;
+	int32_t iLeftTopXy = 0;
+	int32_t iRightTopXy = 0;
+
+	if (pNeighAvail->iTopAvail) {
+		iTopXy = iCurXy - pCurLayer->iMbWidth;
+	}
+	if (pNeighAvail->iLeftAvail) {
+		iLeftXy = iCurXy - 1;
+	}
+	if (pNeighAvail->iLeftTopAvail) {
+		iLeftTopXy = iCurXy - 1 - pCurLayer->iMbWidth;
+	}
+	if (pNeighAvail->iRightTopAvail) {
+		iRightTopXy = iCurXy + 1 - pCurLayer->iMbWidth;
+	}
+	memset(iDirect, 0, 30);
+	if (pNeighAvail->iLeftAvail && IS_INTER(pNeighAvail->iLeftType)) {
+		iDirect[6] = pCurLayer->pDirect[iLeftXy][3];
+		iDirect[12] = pCurLayer->pDirect[iLeftXy][7];
+		iDirect[18] = pCurLayer->pDirect[iLeftXy][11];
+		iDirect[24] = pCurLayer->pDirect[iLeftXy][15];
+	}
+	if (pNeighAvail->iLeftTopAvail && IS_INTER(pNeighAvail->iLeftTopType)) {
+		iDirect[0] = pCurLayer->pDirect[iLeftTopXy][15];
+	}
+
+	if (pNeighAvail->iTopAvail && IS_INTER(pNeighAvail->iTopType)) {
+		iDirect[1] = pCurLayer->pDirect[iTopXy][12];
+	}
+
+	if (pNeighAvail->iRightTopAvail && IS_INTER(pNeighAvail->iRightTopType)) {
+		iDirect[5] = pCurLayer->pDirect[iRightTopXy][12];
+	}
+	//right-top 4*4 block unavailable
+}
+
 void WelsFillCacheInter (PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroCount,
                          int16_t iMvArray[LIST_A][30][MV_A], int8_t iRefIdxArray[LIST_A][30], PDqLayer pCurLayer) {
   int32_t iCurXy      = pCurLayer->iMbXyIndex;

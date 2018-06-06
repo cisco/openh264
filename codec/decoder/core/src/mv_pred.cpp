@@ -540,6 +540,7 @@ iTopRef[listIdx] = REF_NOT_AVAIL;
 					if (0 >= ref[1])	*(uint32_t*)iMvp[LIST_1] = 0;
 				}
 			}
+			UpdateP16x16DirectCabac(pCurLayer);
 			for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
 				UpdateP16x16MotionInfo(pCurLayer, listIdx, ref[listIdx], iMvp[listIdx]);
 				UpdateP16x16MvdCabac(pCurLayer, pMvd, listIdx);
@@ -580,6 +581,7 @@ iTopRef[listIdx] = REF_NOT_AVAIL;
 					int8_t pRefIndex[LIST_A][30];
 					UpdateP8x8RefIdxCabac(pCurLayer, pRefIndex, iIdx8, ref[LIST_0], LIST_0);
 					UpdateP8x8RefIdxCabac(pCurLayer, pRefIndex, iIdx8, ref[LIST_1], LIST_1);
+					UpdateP8x8DirectCabac(pCurLayer, iIdx8);
 
 					pSubPartCount[i] = g_ksInterBSubMbTypeInfo[0].iPartCount;
 					pPartW[i] = g_ksInterBSubMbTypeInfo[0].iPartWidth;

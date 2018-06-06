@@ -52,6 +52,12 @@
 
 namespace WelsDec {
 
+#if defined(_DEBUG)
+#ifdef _MOTION_VECTOR_DUMP_
+	extern FILE *pFile;
+#endif
+#endif
+
 static inline int32_t iAbs(int32_t x) {
 	static const int32_t INT_BITS = (sizeof(int) * CHAR_BIT) - 1;
 	int32_t y = x >> INT_BITS;
@@ -1085,9 +1091,6 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAva
 	int32_t iMbResProperty;
 	int32_t i;
 	uint32_t uiMbType = 0, uiCbp = 0, uiCbpLuma = 0, uiCbpChroma = 0;
-	int16_t pMotionVector[LIST_A][30][MV_A];
-	int16_t pMvdCache[LIST_A][30][MV_A];
-	int8_t  pRefIndex[LIST_A][30];
 
 	ENFORCE_STACK_ALIGN_1D(uint8_t, pNonZeroCount, 48, 16);
 
@@ -1096,9 +1099,14 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAva
 	WELS_READ_VERIFY(ParseMBTypeBSliceCabac(pCtx, pNeighAvail, uiMbType));
 
 	if (uiMbType < 23) { //Inter B mode
+		int16_t pMotionVector[LIST_A][30][MV_A];
+		int16_t pMvdCache[LIST_A][30][MV_A];
+		int8_t  pRefIndex[LIST_A][30];
+		int8_t  pDirect[30];
 		pCurLayer->pMbType[iMbXy] = g_ksInterBMbTypeInfo[uiMbType].iType;
 		WelsFillCacheInterCabac(pNeighAvail, pNonZeroCount, pMotionVector, pMvdCache, pRefIndex, pCurLayer);
-		WELS_READ_VERIFY(ParseInterBMotionInfoCabac(pCtx, pNeighAvail, pNonZeroCount, pMotionVector, pMvdCache, pRefIndex));
+		WelsFillDirectCacheCabac(pNeighAvail, pDirect, pCurLayer);
+		WELS_READ_VERIFY(ParseInterBMotionInfoCabac(pCtx, pNeighAvail, pNonZeroCount, pMotionVector, pMvdCache, pRefIndex, pDirect));
 		pCurLayer->pInterPredictionDoneFlag[iMbXy] = 0;
 	}
 	else { //Intra mode
@@ -1405,6 +1413,15 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 	GetNeighborAvailMbType(&uiNeighAvail, pCurLayer);
 	WELS_READ_VERIFY(ParseSkipFlagCabac(pCtx, &uiNeighAvail, uiCode));	
 
+	memset(pCurLayer->pDirect[iMbXy], 0, sizeof(int8_t) * 16);
+#if defined (_DEBUG)
+#ifdef	_MOTION_VECTOR_DUMP_
+	if (pSliceHeader->iPicOrderCntLsb == 16 && pSliceHeader->iFrameNum == 5) {
+		fprintf(stderr, "iMbXy = %d\n", iMbXy);
+		iMbXy = iMbXy;
+	}
+#endif
+#endif
 	if (uiCode) {
 		int16_t pMv[LIST_A][2] = { 0 };
 		int8_t  ref[LIST_A] = { 0 };
@@ -1424,7 +1441,23 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 		if (pSliceHeader->iDirectSpatialMvPredFlag) {
 
 			//predict direct spatial mv
+#if defined (_DEBUG)
+#ifdef	_MOTION_VECTOR_DUMP_
+			if (pCtx->pSliceHeader->iPicOrderCntLsb == 2 && (iMbXy == 88)) {
+				fprintf(stderr, "Skip iMbXy = %d\n", iMbXy);
+				iMbXy = iMbXy;
+			}
+#endif
+#endif
 			PredMvBDirectSpatial2(pCtx, pMv, ref);
+#if defined (_DEBUG)
+#ifdef	_MOTION_VECTOR_DUMP_
+			if (pCtx->pSliceHeader->iPicOrderCntLsb == 2) {
+				fprintf(pFile, "POC:%d iMbXy:%d MvSkip:%d %d %d %d\n", pCtx->pSliceHeader->iPicOrderCntLsb, iMbXy, pMv[0][0], pMv[0][1], pMv[1][0], pMv[1][1]);
+				fflush(pFile);
+			}
+#endif
+#endif
 		}
 		else {
 			//temporal direct mode
