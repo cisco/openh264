@@ -343,7 +343,7 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 		sub_mb_type = SUB_MB_TYPE_4x4 | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_DIRECT;
 		mbType |= MB_TYPE_8x8 | MB_TYPE_L0 | MB_TYPE_L1;
 	}
-	else if (!is8x8 && (IS_INTER_16x16(coloc_mbType) || IS_INTRA(coloc_mbType))) {
+	else if (!is8x8 && (IS_INTER_16x16(coloc_mbType) || IS_INTRA(coloc_mbType) || IS_SKIP(coloc_mbType))) {
 		sub_mb_type = SUB_MB_TYPE_8x8 | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_DIRECT;
 		mbType |= MB_TYPE_16x16 | MB_TYPE_L0 | MB_TYPE_L1;
 	}
