@@ -425,7 +425,7 @@ void WelsFillDirectCacheCabac(PWelsNeighAvail pNeighAvail, int8_t iDirect[30], P
 	}
 
 	if (pNeighAvail->iTopAvail && IS_INTER(pNeighAvail->iTopType)) {
-		iDirect[1] = pCurLayer->pDirect[iTopXy][12];
+		ST32(&iDirect[1], LD32(&pCurLayer->pDirect[iTopXy][12]));
 	}
 
 	if (pNeighAvail->iRightTopAvail && IS_INTER(pNeighAvail->iRightTopType)) {
