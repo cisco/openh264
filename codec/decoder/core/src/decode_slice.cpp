@@ -1452,7 +1452,7 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 			PredMvBDirectSpatial2(pCtx, pMv, ref);
 #if defined (_DEBUG)
 #ifdef	_MOTION_VECTOR_DUMP_
-			if (pCtx->pSliceHeader->iPicOrderCntLsb == 2) {
+			if (pCtx->pSliceHeader->iPicOrderCntLsb == 16) {
 				fprintf(pFile, "POC:%d iMbXy:%d MvSkip:%d %d %d %d\n", pCtx->pSliceHeader->iPicOrderCntLsb, iMbXy, pMv[0][0], pMv[0][1], pMv[1][0], pMv[1][1]);
 				fflush(pFile);
 			}
