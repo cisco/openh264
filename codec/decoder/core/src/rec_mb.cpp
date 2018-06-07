@@ -702,7 +702,7 @@ void GetInterBPred(uint8_t* pPredYCbCr[3], uint8_t* pTempPredYCbCr[3], PWelsDeco
 						pMCRefMem.pDstV += (iDstLineChroma << 2);
 					}
 					BaseMC(&pMCRefMem, iMBOffsetX, iMBOffsetY + iPartIdx, pMCFunc, 16, 8, iMVs);
-					if (++listCount == 1 && listIdx == LIST_1) {
+					if (++listCount == 2) {
 						iMVs[0] = pCurDqLayer->pMv[LIST_1][iMBXY][iPartIdx][0];
 						iMVs[1] = pCurDqLayer->pMv[LIST_1][iMBXY][iPartIdx][1];
 						GetRefPic(&pTempMCRefMem, pCtx, pCurDqLayer->pRefIndex[LIST_1][iMBXY], iPartIdx, LIST_1);
@@ -739,7 +739,7 @@ void GetInterBPred(uint8_t* pPredYCbCr[3], uint8_t* pTempPredYCbCr[3], PWelsDeco
 						pMCRefMem.pDstV += 4;
 					}
 					BaseMC(&pMCRefMem, iMBOffsetX + (i ? 8 : 0), iMBOffsetY, pMCFunc, 8, 16, iMVs);
-					if (++listCount == 1 && listIdx == LIST_1) {
+					if (++listCount == 2) {
 						iMVs[0] = pCurDqLayer->pMv[LIST_1][iMBXY][i << 1][0];
 						iMVs[1] = pCurDqLayer->pMv[LIST_1][iMBXY][i << 1][1];
 						GetRefPic(&pTempMCRefMem, pCtx, pCurDqLayer->pRefIndex[LIST_1][iMBXY], i << 1, LIST_1);
