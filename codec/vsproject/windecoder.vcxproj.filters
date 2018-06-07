@@ -1,0 +1,401 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\decoder\core\src\au_parser.cpp">
+      <Filter>codec\decoder\core\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\decoder\core\src\bit_stream.cpp">
+      <Filter>codec\decoder\core\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\decoder\core\src\cabac_decoder.cpp">
+      <Filter>codec\decoder\core\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\src\deblocking_common.cpp">
+      <Filter>codec\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\decoder\core\src\deblocking.cpp">
+      <Filter>codec\decoder\core\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\decoder\core\src\decode_mb_aux.cpp">
+      <Filter>codec\decoder\core\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\decoder\core\src\decode_slice.cpp">
+      <Filter>codec\decoder\core\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\decoder\core\src\decoder_data_tables.cpp">
+      <Filter>codec\decoder\core\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\decoder\core\src\error_concealment.cpp">
+      <Filter>codec\decoder\core\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\decoder\core\src\decoder_core.cpp">
+      <Filter>codec\decoder\core\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\decoder\core\src\decoder.cpp">
+      <Filter>codec\decoder\core\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\src\expand_pic.cpp">
+      <Filter>codec\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\decoder\core\src\get_intra_predictor.cpp">
+      <Filter>codec\decoder\core\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\src\intra_pred_common.cpp">
+      <Filter>codec\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\decoder\core\src\manage_dec_ref.cpp">
+      <Filter>codec\decoder\core\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\decoder\core\src\parse_mb_syn_cabac.cpp">
+      <Filter>codec\decoder\core\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\decoder\core\src\parse_mb_syn_cavlc.cpp">
+      <Filter>codec\decoder\core\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\decoder\core\src\memmgr_nal_unit.cpp">
+      <Filter>codec\decoder\core\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\decoder\core\src\pic_queue.cpp">
+      <Filter>codec\decoder\core\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\src\memory_align.cpp">
+      <Filter>codec\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\decoder\core\src\mv_pred.cpp">
+      <Filter>codec\decoder\core\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\src\utils.cpp">
+      <Filter>codec\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\src\common_tables.cpp">
+      <Filter>codec\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\src\copy_mb.cpp">
+      <Filter>codec\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\src\cpu.cpp">
+      <Filter>codec\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\decoder\core\src\rec_mb.cpp">
+      <Filter>codec\decoder\core\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\decoder\core\src\fmo.cpp">
+      <Filter>codec\decoder\core\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\src\welsCodecTrace.cpp">
+      <Filter>codec\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\src\mc.cpp">
+      <Filter>codec\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\src\crt_util_safe_x.cpp">
+      <Filter>codec\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\src\sad_common.cpp">
+      <Filter>codec\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\src\WelsTaskThread.cpp">
+      <Filter>codec\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\src\WelsThread.cpp">
+      <Filter>codec\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\src\WelsThreadLib.cpp">
+      <Filter>codec\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\src\WelsThreadPool.cpp">
+      <Filter>codec\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\console\common\src\read_config.cpp">
+      <Filter>codec\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\console\dec\src\h264dec.cpp">
+      <Filter>codec\console\dec\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\console\dec\src\d3d9_utils.cpp">
+      <Filter>codec\console\dec\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\decoder\plus\src\welsDecoderExt.cpp">
+      <Filter>codec\decoder\plus\src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\decoder\core\inc\au_parser.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\bit_stream.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\cabac_decoder.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\deblocking_common.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\deblocking.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\decode_mb_aux.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\dec_golomb.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\decode_slice.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\decoder_core.h">
+      <Filter>codec\decoder\core\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\decoder_context.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\decoder.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\error_code.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\get_intra_predictor.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\manage_dec_ref.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\error_concealment.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\parse_mb_syn_cabac.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\parse_mb_syn_cavlc.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\parameter_sets.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\memmgr_nal_unit.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\pic_queue.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\picture.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\memory_align.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\mv_pred.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\nal_prefix.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\nalu.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\utils.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\copy_mb.h">
+      <Filter>codec\common\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\rec_mb.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\mb_cache.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\vlc_decoder.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\fmo.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\welsCodecTrace.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\typedefs.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\expand_pic.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\golomb_common.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\wels_common_basis.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\wels_common_defs.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\intra_pred_common.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\cpu.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\wels_const_common.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\wels_const.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\slice.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\mc.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\macros.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\ls_defines.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\cpu_core.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\crt_util_safe_x.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\sad_common.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\WelsList.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\WelsLock.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\WelsTask.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\WelsTaskThread.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\WelsThread.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\WelsThreadLib.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\WelsThreadPool.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\measure_time.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\inc\version.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\console\common\inc\read_config.h">
+      <Filter>codec\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\core\inc\dec_frame.h">
+      <Filter>codec\decoder\core\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\console\dec\inc\d3d9_utils.h">
+      <Filter>codec\console\dec\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\decoder\plus\inc\welsDecoderExt.h">
+      <Filter>codec\decoder\plus\inc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\common\x86\mc_luma.asm">
+      <Filter>codec\common\x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\common\x86\intra_pred_com.asm">
+      <Filter>codec\common\x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\common\x86\expand_picture.asm">
+      <Filter>codec\common\x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\common\x86\deblock.asm">
+      <Filter>codec\common\x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\decoder\core\x86\dct.asm">
+      <Filter>codec\decoder\core\x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\common\x86\dct.asm">
+      <Filter>codec\common\x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\common\x86\cpuid.asm">
+      <Filter>codec\common\x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\common\x86\asm_inc.asm">
+      <Filter>codec\common\x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\decoder\core\x86\intra_pred.asm">
+      <Filter>codec\decoder\core\x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\common\x86\mc_chroma.asm">
+      <Filter>codec\common\x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\common\x86\mb_copy.asm">
+      <Filter>codec\common\x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\common\x86\satd_sad.asm">
+      <Filter>codec\common\x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\common\x86\vaa.asm">
+      <Filter>codec\common\x86</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="codec">
+      <UniqueIdentifier>{0e369d4c-f75f-4348-ae15-39cadfd3c9d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="codec\decoder">
+      <UniqueIdentifier>{fbb13c60-d542-4bc3-82aa-bd7a5c1e565a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="codec\decoder\core">
+      <UniqueIdentifier>{dba9698e-b19e-404c-bbf2-aad8d9da829a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="codec\decoder\core\inc">
+      <UniqueIdentifier>{e4862e81-1fc9-4157-bb4c-8eff694fbcb8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="codec\decoder\core\src">
+      <UniqueIdentifier>{44a3510f-aa48-4798-a564-12d871a4a471}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="codec\common">
+      <UniqueIdentifier>{a76f3531-c469-408d-8ade-8ca0e3a745d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="codec\common\inc">
+      <UniqueIdentifier>{008dbff3-97f0-4c99-9b77-9a013559db02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="codec\common\src">
+      <UniqueIdentifier>{314d2179-c124-4a8f-a516-032c81ba0b7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="codec\common\x86">
+      <UniqueIdentifier>{f49d90d8-48a2-43c2-ab83-95fe0baf726e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="codec\decoder\core\x86">
+      <UniqueIdentifier>{77022dca-1ede-417b-bf72-ff6d2fb2de4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="codec\console">
+      <UniqueIdentifier>{d3858359-ad7b-4dc1-a883-9e191b1c8c36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="codec\console\dec">
+      <UniqueIdentifier>{498f57ca-2c2d-4bc7-b2ea-3bb729cf751c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="codec\console\dec\src">
+      <UniqueIdentifier>{335c9bd0-992b-4020-8947-57c8377753dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="codec\console\dec\inc">
+      <UniqueIdentifier>{ff44409c-81b3-408b-b96c-0398fb26d760}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="codec\decoder\plus">
+      <UniqueIdentifier>{b0596b35-e849-4f25-b627-ad777adcd648}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="codec\decoder\plus\src">
+      <UniqueIdentifier>{d7cadc69-1c45-4f5c-b866-a6fda8d7056a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="codec\decoder\plus\inc">
+      <UniqueIdentifier>{bf350651-afd7-4525-87d8-76ea18f2c051}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

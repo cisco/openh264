@@ -81,6 +81,7 @@ typedef struct {
 #define NEW_CTX_OFFSET_MB_TYPE_I 3
 #define NEW_CTX_OFFSET_SKIP 11
 #define NEW_CTX_OFFSET_SUBMB_TYPE 21
+#define NEW_CTX_OFFSET_B_SUBMB_TYPE 36
 #define NEW_CTX_OFFSET_MVD 40
 #define NEW_CTX_OFFSET_REF_NO 54
 #define NEW_CTX_OFFSET_DELTA_QP 60
@@ -269,9 +270,10 @@ typedef struct TagWelsDecoderContext {
   iDecBlockOffsetArray[24];     // address talbe for sub 4x4 block in intra4x4_mb, so no need to caculta the address every time.
 
   struct {
-    int16_t*  pMbType[LAYER_NUM_EXCHANGEABLE];                      /* mb type */
+    uint32_t*  pMbType[LAYER_NUM_EXCHANGEABLE];                      /* mb type */
     int16_t (*pMv[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_BLOCK4x4_NUM][MV_A]; //[LAYER_NUM_EXCHANGEABLE   MB_BLOCK4x4_NUM*]
     int8_t (*pRefIndex[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_BLOCK4x4_NUM];
+		int8_t	(*pDirect[LAYER_NUM_EXCHANGEABLE])[MB_BLOCK4x4_NUM];
     bool*   pNoSubMbPartSizeLessThan8x8Flag[LAYER_NUM_EXCHANGEABLE];
     bool*   pTransformSize8x8Flag[LAYER_NUM_EXCHANGEABLE];
     int8_t* pLumaQp[LAYER_NUM_EXCHANGEABLE];        /*mb luma_qp*/
@@ -287,7 +289,7 @@ typedef struct TagWelsDecoderContext {
     int8_t*  pChromaPredMode[LAYER_NUM_EXCHANGEABLE];
     int8_t*  pCbp[LAYER_NUM_EXCHANGEABLE];
     uint8_t (*pMotionPredFlag[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_PARTITION_SIZE]; // 8x8
-    int8_t (*pSubMbType[LAYER_NUM_EXCHANGEABLE])[MB_SUB_PARTITION_SIZE];
+		uint32_t (*pSubMbType[LAYER_NUM_EXCHANGEABLE])[MB_SUB_PARTITION_SIZE];
     int32_t* pSliceIdc[LAYER_NUM_EXCHANGEABLE];         // using int32_t for slice_idc
     int8_t*  pResidualPredFlag[LAYER_NUM_EXCHANGEABLE];
     int8_t*  pInterPredictionDoneFlag[LAYER_NUM_EXCHANGEABLE];
@@ -299,6 +301,8 @@ typedef struct TagWelsDecoderContext {
 
 // reconstruction picture
   PPicture                      pDec;                   //pointer to current picture being reconstructed
+
+	PPicture											pTempDec;								//pointer to temp decoder picture to be used only for Bi Prediction.
 
 // reference pictures
   SRefPic                       sRefPic;
@@ -316,7 +320,7 @@ typedef struct TagWelsDecoderContext {
   SPps                          sPpsBuffer[MAX_PPS_COUNT + 1];
   PSliceHeader                  pSliceHeader;
 
-  PPicBuff                      pPicBuff[LIST_A];       // Initially allocated memory for pictures which are used in decoding.
+  PPicBuff                      pPicBuff;       // Initially allocated memory for pictures which are used in decoding.
   int32_t                       iPicQueueNumber;
 
   SSubsetSps                    sSubsetSpsBuffer[MAX_SPS_COUNT + 1];
@@ -377,6 +381,7 @@ typedef struct TagWelsDecoderContext {
 //for Parse only
   bool bFramePending;
   bool bFrameFinish;
+	bool bSliceHeaderFinish;
   int32_t iNalNum;
   int32_t iMaxNalNum; //permitted max NAL num stored in parser
   SSpsBsInfo sSpsBsInfo [MAX_SPS_COUNT];
