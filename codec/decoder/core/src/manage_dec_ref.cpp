@@ -186,6 +186,20 @@ int32_t WelsInitBSliceRefList(PWelsDecoderContext pCtx, int32_t iPoc) {
 			pLTCurrPocList0[iLTCurrPocCount++] = ppShoreRefList[i];
 		}
 	}
+	if (pCtx->sRefPic.uiLongRefCount[LIST_0] > 1) {
+		//long sorts in increasing order
+		PPicture pTemp;
+		for (int32_t i = 0; i < pCtx->sRefPic.uiLongRefCount[LIST_0]; ++i) {
+			for (int32_t j = i + 1; j < pCtx->sRefPic.uiLongRefCount[LIST_0]; ++j) {
+				if (ppLongRefList[j]->iFramePoc < ppLongRefList[i]->iFramePoc) {
+					pTemp = ppLongRefList[i];
+					ppLongRefList[i] = ppLongRefList[j];
+					ppLongRefList[j] = pTemp;
+				}
+			}
+		}
+	}
+	int32_t iCurrPocCount = iLSCurrPocCount + iLTCurrPocCount;
 	int32_t iCount = 0;
 	//LIST_0
 	//short
@@ -193,22 +207,75 @@ int32_t WelsInitBSliceRefList(PWelsDecoderContext pCtx, int32_t iPoc) {
 	for (int32_t i = 0; i < iLSCurrPocCount; ++i) {
 		pCtx->sRefPic.pRefList[LIST_0][iCount++] = pLSCurrPocList0[i];
 	}
+	if (iLSCurrPocCount > 1) {
+		//LIST_0 short sorts in decreasing order
+		PPicture pTemp;
+		for (int32_t i = 0; i < iLSCurrPocCount; ++i) {
+			for (int32_t j = i + 1; j < iLSCurrPocCount; ++j) {
+				if (pCtx->sRefPic.pRefList[LIST_0][j]->iFramePoc > pCtx->sRefPic.pRefList[LIST_0][i]->iFramePoc) {
+					pTemp = pCtx->sRefPic.pRefList[LIST_0][i];
+					pCtx->sRefPic.pRefList[LIST_0][i] = pCtx->sRefPic.pRefList[LIST_0][j];
+					pCtx->sRefPic.pRefList[LIST_0][j] = pTemp;
+				}
+			}
+		}
+	}
 	for (int32_t i = 0; i < iLTCurrPocCount; ++i) {
 		pCtx->sRefPic.pRefList[LIST_0][iCount++] = pLTCurrPocList0[i];
+	}
+	if (iLTCurrPocCount > 1) {
+		//LIST_0 short sorts in increasing order
+		PPicture pTemp;
+		for (int32_t i = iLSCurrPocCount; i < iCurrPocCount; ++i) {
+			for (int32_t j = i + 1; j < iCurrPocCount; ++j) {
+				if (pCtx->sRefPic.pRefList[LIST_0][j]->iFramePoc < pCtx->sRefPic.pRefList[LIST_0][i]->iFramePoc) {
+					pTemp = pCtx->sRefPic.pRefList[LIST_0][i];
+					pCtx->sRefPic.pRefList[LIST_0][i] = pCtx->sRefPic.pRefList[LIST_0][j];
+					pCtx->sRefPic.pRefList[LIST_0][j] = pTemp;
+				}
+			}
+		}
 	}
 	//long
 	for (int32_t i = 0; i < pCtx->sRefPic.uiLongRefCount[LIST_0]; ++i) {
 		pCtx->sRefPic.pRefList[LIST_0][iCount++] = ppLongRefList[i];
 	}
 	pCtx->sRefPic.uiRefCount[LIST_0] = iCount;
+
 	iCount = 0;
 	//LIST_1
 	//short
 	for (int32_t i = 0; i < iLTCurrPocCount; ++i) {
 		pCtx->sRefPic.pRefList[LIST_1][iCount++] = pLTCurrPocList0[i];
 	}
+	if (iLTCurrPocCount > 1) {
+		//LIST_1 short sorts in increasing order
+		PPicture pTemp;
+		for (int32_t i = 0; i < iLTCurrPocCount; ++i) {
+			for (int32_t j = i + 1; j < iLTCurrPocCount; ++j) {
+				if (pCtx->sRefPic.pRefList[LIST_1][j]->iFramePoc < pCtx->sRefPic.pRefList[LIST_1][i]->iFramePoc) {
+					pTemp = pCtx->sRefPic.pRefList[LIST_1][i];
+					pCtx->sRefPic.pRefList[LIST_1][i] = pCtx->sRefPic.pRefList[LIST_1][j];
+					pCtx->sRefPic.pRefList[LIST_1][j] = pTemp;
+				}
+			}
+		}
+	}
 	for (int32_t i = 0; i < iLSCurrPocCount; ++i) {
 		pCtx->sRefPic.pRefList[LIST_1][iCount++] = pLSCurrPocList0[i];
+	}
+	if (iLSCurrPocCount > 1) {
+		//LIST_1 short sorts in decreasing order
+		PPicture pTemp;
+		for (int32_t i = iLTCurrPocCount; i < iCurrPocCount; ++i) {
+			for (int32_t j = i + 1; j < iCurrPocCount; ++j) {
+				if (pCtx->sRefPic.pRefList[LIST_1][j]->iFramePoc > pCtx->sRefPic.pRefList[LIST_1][i]->iFramePoc) {
+					pTemp = pCtx->sRefPic.pRefList[LIST_1][i];
+					pCtx->sRefPic.pRefList[LIST_1][i] = pCtx->sRefPic.pRefList[LIST_1][j];
+					pCtx->sRefPic.pRefList[LIST_1][j] = pTemp;
+				}
+			}
+		}
 	}
 	//long
 	for (int32_t i = 0; i < pCtx->sRefPic.uiLongRefCount[LIST_0]; ++i) {
