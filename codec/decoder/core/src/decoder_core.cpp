@@ -983,11 +983,36 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     pSliceHead->iDeltaPicOrderCnt[1] = 0;
   if (pSps->uiPocType == 0) {
     WELS_READ_VERIFY (BsGetBits (pBs, pSps->iLog2MaxPocLsb, &uiCode)); //pic_order_cnt_lsb
+		const int32_t iMaxPocLsb = 1 << (pSps->iLog2MaxPocLsb);
     pSliceHead->iPicOrderCntLsb = uiCode;
     if (pPps->bPicOrderPresentFlag && !pSliceHead->bFieldPicFlag) {
       WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //delta_pic_order_cnt_bottom
       pSliceHead->iDeltaPicOrderCntBottom = iCode;
     }
+		//Calculate poc if necessary
+		int32_t pocLsb = pSliceHead->iPicOrderCntLsb;
+		if (pSliceHead->bIdrFlag || kpCurNal->sNalHeaderExt.sNalUnitHeader.eNalUnitType == NAL_UNIT_CODED_SLICE_IDR) {
+			pCtx->sLastSliceHeader.iPicOrderCntMsb = 0;
+			pCtx->sLastSliceHeader.iPicOrderCntLsb = 0;
+		}
+		int32_t pocMsb;
+		if (pocLsb < pCtx->sLastSliceHeader.iPicOrderCntLsb && pCtx->sLastSliceHeader.iPicOrderCntLsb - pocLsb >= iMaxPocLsb / 2)
+			pocMsb = pCtx->sLastSliceHeader.iPicOrderCntMsb + iMaxPocLsb;
+		else if (pocLsb > pCtx->sLastSliceHeader.iPicOrderCntLsb && pCtx->sLastSliceHeader.iPicOrderCntLsb - pocLsb < -iMaxPocLsb / 2)
+			pocMsb = pCtx->sLastSliceHeader.iPicOrderCntMsb - iMaxPocLsb;
+		else
+			pocMsb = pCtx->sLastSliceHeader.iPicOrderCntMsb;
+		pSliceHead->iPicOrderCntLsb = pocMsb + pocLsb;
+
+		if (pPps->bPicOrderPresentFlag && !pSliceHead->bFieldPicFlag) {
+			pSliceHead->iPicOrderCntLsb += pSliceHead->iDeltaPicOrderCntBottom;
+		}
+
+		if (kpCurNal->sNalHeaderExt.sNalUnitHeader.uiNalRefIdc != 0) {
+			pCtx->sLastSliceHeader.iPicOrderCntLsb = pocLsb;
+			pCtx->sLastSliceHeader.iPicOrderCntMsb = pocMsb;
+		}
+		//End of Calculating poc
   } else if (pSps->uiPocType == 1 && !pSps->bDeltaPicOrderAlwaysZeroFlag) {
     WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //delta_pic_order_cnt[ 0 ]
     pSliceHead->iDeltaPicOrderCnt[0] = iCode;
@@ -996,7 +1021,6 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
       pSliceHead->iDeltaPicOrderCnt[1] = iCode;
     }
   }
-
   pSliceHead->iRedundantPicCnt = 0;
   if (pPps->bRedundantPicCntPresentFlag) {
     WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //redundant_pic_cnt
