@@ -103,6 +103,7 @@ typedef struct TagSliceHeaders {
 /*****************************slice header syntax and generated****************************/
 int32_t         iFirstMbInSlice;
 int32_t         iFrameNum;
+int32_t					iPicOrderCntMsb;
 int32_t         iPicOrderCntLsb;
 int32_t         iDeltaPicOrderCntBottom;
 int32_t         iDeltaPicOrderCnt[2];
