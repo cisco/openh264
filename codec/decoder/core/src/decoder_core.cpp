@@ -312,6 +312,8 @@ int32_t ParsePredWeightedTable (PBitStringAux pBs, PSliceHeader pSh) {
     pSh->sPredWeightTable.uiChromaLog2WeightDenom = uiCode;
   }
 
+	if ((pSh->sPredWeightTable.uiLumaLog2WeightDenom | pSh->sPredWeightTable.uiChromaLog2WeightDenom) > 7)
+		return ERR_NONE;
 
   do {
 
@@ -364,7 +366,10 @@ int32_t ParsePredWeightedTable (PBitStringAux pBs, PSliceHeader pSh) {
 
     }
     ++iList;
-  } while (iList < LIST_1);//TODO: SUPPORT LIST_A
+		if (pSh->eSliceType != B_SLICE) {
+			break;
+		}
+  } while (iList < LIST_A);//TODO: SUPPORT LIST_A
   return ERR_NONE;
 }
 
@@ -1078,7 +1083,7 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     }
 
 		if ( (pPps->bWeightedPredFlag && uiSliceType == P_SLICE) || (pPps->uiWeightedBipredIdc == 1 && uiSliceType == B_SLICE) ) {
-      iRet = ParsePredWeightedTable (pBs, pSliceHead);
+			iRet = ParsePredWeightedTable (pBs, pSliceHead);
       if (iRet != ERR_NONE) {
         WelsLog (pLogCtx, WELS_LOG_WARNING, "invalid weighted prediction syntaxs!");
         return iRet;
