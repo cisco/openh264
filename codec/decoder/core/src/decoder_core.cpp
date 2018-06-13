@@ -2265,7 +2265,6 @@ void WelsDqLayerDecodeStart (PWelsDecoderContext pCtx, PNalUnit pCurNal, PSps pS
 	pCtx->bUsedAsRef	 = false;
 
   pCtx->iFrameNum    = pSh->iFrameNum;
-	pCtx->bSliceHeaderFinish = true;
   UpdateDecoderStatisticsForActiveParaset (& (pCtx->sDecoderStatistics),
       pSps, pPps);
 }
