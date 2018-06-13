@@ -850,7 +850,6 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
   if (uiSliceType > 4)
     uiSliceType -= 5;
 
-	pCtx->bSliceHeaderFinish = true;
   if ((NAL_UNIT_CODED_SLICE_IDR == eNalType) && (I_SLICE != uiSliceType)) {
     WelsLog (pLogCtx, WELS_LOG_WARNING, "Invalid slice type(%d) in IDR picture. ", uiSliceType);
     return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_SLICE_TYPE);
@@ -2263,9 +2262,10 @@ void WelsDqLayerDecodeStart (PWelsDecoderContext pCtx, PNalUnit pCurNal, PSps pS
 
   pCtx->eSliceType   = pSh->eSliceType;
   pCtx->pSliceHeader = pSh;
+	pCtx->bUsedAsRef	 = false;
 
   pCtx->iFrameNum    = pSh->iFrameNum;
-
+	pCtx->bSliceHeaderFinish = true;
   UpdateDecoderStatisticsForActiveParaset (& (pCtx->sDecoderStatistics),
       pSps, pPps);
 }
@@ -2574,7 +2574,9 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         return iRet;
 
       pCtx->pPreviousDecodedPictureInDpb = pCtx->pDec; //store latest decoded picture for EC
+			pCtx->bUsedAsRef = false;
       if (uiNalRefIdc > 0) {
+				pCtx->bUsedAsRef = true;
 				//save MBType, MV and RefIndex for use in B-Slice direct mode
 				memcpy(pCtx->pDec->pMbType, pCtx->pCurDqLayer->pMbType, pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof(uint32_t));
 				memcpy(pCtx->pDec->pMv[LIST_0], pCtx->pCurDqLayer->pMv[LIST_0], pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof(int16_t) * MV_A * MB_BLOCK4x4_NUM);

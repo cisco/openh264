@@ -105,16 +105,22 @@ virtual DECODING_STATE EXTAPI DecodeFrameEx (const unsigned char* kpSrc,
 virtual long EXTAPI SetOption (DECODER_OPTION eOptID, void* pOption);
 virtual long EXTAPI GetOption (DECODER_OPTION eOptID, void* pOption);
 
+typedef struct tagPictInfo {
+	SBufferInfo 						sBufferInfo;
+	int32_t									iPOC;
+	int32_t									iFrameNum;
+	bool										bLastGOP;
+	unsigned char*					pData[3];
+} SPictInfo, *PPictInfo;
+
  private:
 PWelsDecoderContext     m_pDecContext;
 welsCodecTrace*         m_pWelsTrace;
-SBufferInfo							m_sForwardPredFrameBufferInfo;
-int32_t									m_iForwardPredFramePOC;
-uint8_t*								m_pForwardPredFrameData[3];
-
-SBufferInfo 						m_sNextForwardPredFrameBufferInfo;
-int32_t									m_iNextForwardPredFramePOC;
-unsigned char*					m_pNextForwardPredFrameData[3];
+SPictInfo								m_sPictInfoList[10];
+int32_t									m_iPictInfoIndex;
+int32_t									m_iMinPOC;
+int32_t									m_iNumOfPicts;
+int32_t									m_iLastGOPRemainPicts;
 
 int32_t									m_LastWrittenPOC;
 

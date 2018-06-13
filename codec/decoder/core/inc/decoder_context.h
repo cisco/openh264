@@ -257,6 +257,7 @@ typedef struct TagWelsDecoderContext {
 // Derived common elements
   SNalUnitHeader                sCurNalHead;
   EWelsSliceType                eSliceType;                     // Slice type
+	bool													bUsedAsRef;											//flag as ref
   int32_t                       iFrameNum;
   int32_t                       iPrevFrameNum;          // frame number of previous frame well decoded for non-truncated mode yet
   bool                          bLastHasMmco5;      //
