@@ -674,7 +674,7 @@ namespace WelsDec {
 		m_pDecContext->dDecTime += (iEnd - iStart) / 1e3;
 
 #ifdef PICTURE_REODERING
-	if (pDstInfo->iBufferStatus == 1) {
+	if (pDstInfo->iBufferStatus == 1 && m_pDecContext->pSps->uiProfileIdc != 66) {
 		if (m_pDecContext->pSliceHeader->iPicOrderCntLsb == 0 && m_iNumOfPicts > 0) {
 			m_iLastGOPRemainPicts = m_iNumOfPicts;
 			for (int32_t i = 0; i < 10; ++i) {
