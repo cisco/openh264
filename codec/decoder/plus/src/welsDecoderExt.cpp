@@ -675,11 +675,13 @@ namespace WelsDec {
 
 #ifdef PICTURE_REODERING
 	if (pDstInfo->iBufferStatus == 1 && m_pDecContext->pSps->uiProfileIdc != 66) {
-		if (m_pDecContext->pSliceHeader->iPicOrderCntLsb == 0 && m_iNumOfPicts > 0) {
-			m_iLastGOPRemainPicts = m_iNumOfPicts;
-			for (int32_t i = 0; i < 10; ++i) {
-				if (m_sPictInfoList[i].iPOC >= 0) {
-					m_sPictInfoList[i].bLastGOP = true;
+		if (m_pDecContext->pSliceHeader->iPicOrderCntLsb == 0) {
+			if (m_iNumOfPicts > 0) {
+				m_iLastGOPRemainPicts = m_iNumOfPicts;
+				for (int32_t i = 0; i < 10; ++i) {
+					if (m_sPictInfoList[i].iPOC >= 0) {
+						m_sPictInfoList[i].bLastGOP = true;
+					}
 				}
 			}
 		}
@@ -691,6 +693,7 @@ namespace WelsDec {
 				m_sPictInfoList[i].pData[2] = m_ppDst[2];
 				m_sPictInfoList[i].iPOC = m_pDecContext->pSliceHeader->iPicOrderCntLsb;
 				m_sPictInfoList[i].iFrameNum = m_pDecContext->pSliceHeader->iFrameNum;
+				m_sPictInfoList[i].bLastGOP = false;
 				pDstInfo->iBufferStatus = 0;
 				++m_iNumOfPicts;
 				break;
@@ -741,22 +744,24 @@ namespace WelsDec {
 				}
 			}
 		}
-		//The condition (m_iNumOfPicts >= 3 && (m_iMinPOC - m_LastWrittenPOC) <= 4) is weird, but it is required for the case when there is B-frame as reference.
-		if (m_iMinPOC >= 0 && m_iMinPOC <= m_pDecContext->pSliceHeader->iPicOrderCntLsb && ((m_iMinPOC - m_LastWrittenPOC) <= 2) || (m_iNumOfPicts >= 3 && (m_iMinPOC - m_LastWrittenPOC) <= 4)) {
-			m_LastWrittenPOC = m_iMinPOC;
+		if (m_iMinPOC >= 0) {
+			if (m_iMinPOC - m_LastWrittenPOC <= 1 || m_iMinPOC < m_pDecContext->pSliceHeader->iPicOrderCntLsb) {
+				m_LastWrittenPOC = m_iMinPOC;
 #if defined (_DEBUG)
 #ifdef _MOTION_VECTOR_DUMP_
-			fprintf(stderr, "Output POC: #%d\n", m_LastWrittenPOC);
+				fprintf(stderr, "Output POC: #%d\n", m_LastWrittenPOC);
 #endif
 #endif//
-			memcpy(pDstInfo, &m_sPictInfoList[m_iPictInfoIndex].sBufferInfo, sizeof(SBufferInfo));
-			ppDst[0] = m_sPictInfoList[m_iPictInfoIndex].pData[0];
-			ppDst[1] = m_sPictInfoList[m_iPictInfoIndex].pData[1];
-			ppDst[2] = m_sPictInfoList[m_iPictInfoIndex].pData[2];
-			m_sPictInfoList[m_iPictInfoIndex].iPOC = -1;
-			m_iMinPOC = -1;
-			--m_iNumOfPicts;
-			return dsErrorFree;
+				memcpy(pDstInfo, &m_sPictInfoList[m_iPictInfoIndex].sBufferInfo, sizeof(SBufferInfo));
+				ppDst[0] = m_sPictInfoList[m_iPictInfoIndex].pData[0];
+				ppDst[1] = m_sPictInfoList[m_iPictInfoIndex].pData[1];
+				ppDst[2] = m_sPictInfoList[m_iPictInfoIndex].pData[2];
+				m_sPictInfoList[m_iPictInfoIndex].iPOC = -1;
+				m_sPictInfoList[m_iPictInfoIndex].bLastGOP = false;
+				m_iMinPOC = -1;
+				--m_iNumOfPicts;
+				return dsErrorFree;
+			}
 		}
 	}
 #endif
