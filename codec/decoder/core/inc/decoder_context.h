@@ -432,6 +432,9 @@ typedef struct TagWelsDecoderContext {
 //Save the last nal header info
   SNalUnitHeaderExt sLastNalHdrExt;
   SSliceHeader      sLastSliceHeader;
+	int32_t						iPrevPicOrderCntMsb;
+	int32_t						iPrevPicOrderCntLsb;
+
   SWelsCabacCtx sWelsCabacContexts[4][WELS_QP_MAX + 1][WELS_CONTEXT_COUNT];
   bool bCabacInited;
   SWelsCabacCtx   pCabacCtx[WELS_CONTEXT_COUNT];

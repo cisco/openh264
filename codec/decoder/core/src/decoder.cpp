@@ -325,6 +325,8 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   pCtx->iSubSPSInvalidNum = 0;
   pCtx->iSubSPSLastInvalidId = -1;
   pCtx->iFeedbackNalRefIdc = -1; //initialize
+	pCtx->iPrevPicOrderCntMsb = 0;
+	pCtx->iPrevPicOrderCntLsb = 0;
 
 }
 

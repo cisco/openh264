@@ -479,6 +479,11 @@ int32_t ParseDecRefPicMarking (PWelsDecoderContext pCtx, PBitStringAux pBs, PSli
         } else if (kuiMmco == MMCO_RESET) {
           WELS_VERIFY_RETURN_IF (-1, (!bAllowMmco5 || bMmco5Exist));
           bMmco5Exist = true;
+
+					pCtx->iPrevPicOrderCntLsb = 0;
+					pCtx->iPrevPicOrderCntMsb = 0;
+					pCtx->iPrevFrameNum = 0;
+					pCtx->pSliceHeader->iPicOrderCntLsb = 0;
         }
         ++ iIdx;
 
@@ -993,19 +998,20 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
       WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //delta_pic_order_cnt_bottom
       pSliceHead->iDeltaPicOrderCntBottom = iCode;
     }
+
 		//Calculate poc if necessary
 		int32_t pocLsb = pSliceHead->iPicOrderCntLsb;
 		if (pSliceHead->bIdrFlag || kpCurNal->sNalHeaderExt.sNalUnitHeader.eNalUnitType == NAL_UNIT_CODED_SLICE_IDR) {
-			pCtx->sLastSliceHeader.iPicOrderCntMsb = 0;
-			pCtx->sLastSliceHeader.iPicOrderCntLsb = 0;
+			pCtx->iPrevPicOrderCntMsb = 0;
+			pCtx->iPrevPicOrderCntLsb = 0;
 		}
 		int32_t pocMsb;
-		if (pocLsb < pCtx->sLastSliceHeader.iPicOrderCntLsb && pCtx->sLastSliceHeader.iPicOrderCntLsb - pocLsb >= iMaxPocLsb / 2)
-			pocMsb = pCtx->sLastSliceHeader.iPicOrderCntMsb + iMaxPocLsb;
-		else if (pocLsb > pCtx->sLastSliceHeader.iPicOrderCntLsb && pCtx->sLastSliceHeader.iPicOrderCntLsb - pocLsb < -iMaxPocLsb / 2)
-			pocMsb = pCtx->sLastSliceHeader.iPicOrderCntMsb - iMaxPocLsb;
+		if (pocLsb < pCtx->iPrevPicOrderCntLsb && pCtx->iPrevPicOrderCntLsb - pocLsb >= iMaxPocLsb / 2)
+			pocMsb = pCtx->iPrevPicOrderCntMsb + iMaxPocLsb;
+		else if (pocLsb > pCtx->iPrevPicOrderCntLsb && pCtx->iPrevPicOrderCntLsb - pocLsb < -iMaxPocLsb / 2)
+			pocMsb = pCtx->iPrevPicOrderCntMsb - iMaxPocLsb;
 		else
-			pocMsb = pCtx->sLastSliceHeader.iPicOrderCntMsb;
+			pocMsb = pCtx->iPrevPicOrderCntMsb;
 		pSliceHead->iPicOrderCntLsb = pocMsb + pocLsb;
 
 		if (pPps->bPicOrderPresentFlag && !pSliceHead->bFieldPicFlag) {
@@ -1013,8 +1019,8 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
 		}
 
 		if (kpCurNal->sNalHeaderExt.sNalUnitHeader.uiNalRefIdc != 0) {
-			pCtx->sLastSliceHeader.iPicOrderCntLsb = pocLsb;
-			pCtx->sLastSliceHeader.iPicOrderCntMsb = pocMsb;
+			pCtx->iPrevPicOrderCntLsb = pocLsb;
+			pCtx->iPrevPicOrderCntMsb = pocMsb;
 		}
 		//End of Calculating poc
   } else if (pSps->uiPocType == 1 && !pSps->bDeltaPicOrderAlwaysZeroFlag) {
