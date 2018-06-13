@@ -741,7 +741,8 @@ namespace WelsDec {
 				}
 			}
 		}
-		if (m_iMinPOC >= 0 && m_iMinPOC <= m_pDecContext->pSliceHeader->iPicOrderCntLsb && (m_iMinPOC - m_LastWrittenPOC) <= 2) {
+		//The condition (m_iNumOfPicts >= 3 && (m_iMinPOC - m_LastWrittenPOC) <= 4) is weird, but it is required for the case when there is B-frame as reference.
+		if (m_iMinPOC >= 0 && m_iMinPOC <= m_pDecContext->pSliceHeader->iPicOrderCntLsb && ((m_iMinPOC - m_LastWrittenPOC) <= 2) || (m_iNumOfPicts >= 3 && (m_iMinPOC - m_LastWrittenPOC) <= 4)) {
 			m_LastWrittenPOC = m_iMinPOC;
 #if defined (_DEBUG)
 #ifdef _MOTION_VECTOR_DUMP_
