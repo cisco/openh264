@@ -510,6 +510,9 @@ namespace WelsDec {
 		//ppDst[1] = ppTmpDst[1];
 		//ppDst[2] = ppTmpDst[2];
 		//}
+#ifdef PICTURE_REODERING
+		iRet |= ReorderPicturesInDisplay(ppDst, pDstInfo);
+#endif
 		return (DECODING_STATE)iRet;
 	}
 
@@ -673,7 +676,56 @@ namespace WelsDec {
 		iEnd = WelsTime();
 		m_pDecContext->dDecTime += (iEnd - iStart) / 1e3;
 
-#ifdef PICTURE_REODERING
+  return dsErrorFree;
+}
+
+void CWelsDecoder::OutputStatisticsLog (SDecoderStatistics& sDecoderStatistics) {
+  if ((sDecoderStatistics.uiDecodedFrameCount > 0) && (sDecoderStatistics.iStatisticsLogInterval > 0)
+      && ((sDecoderStatistics.uiDecodedFrameCount % sDecoderStatistics.iStatisticsLogInterval) == 0)) {
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "DecoderStatistics: uiWidth=%d, uiHeight=%d, fAverageFrameSpeedInMs=%.1f, fActualAverageFrameSpeedInMs=%.1f, \
+              uiDecodedFrameCount=%d, uiResolutionChangeTimes=%d, uiIDRCorrectNum=%d, \
+              uiAvgEcRatio=%d, uiAvgEcPropRatio=%d, uiEcIDRNum=%d, uiEcFrameNum=%d, \
+              uiIDRLostNum=%d, uiFreezingIDRNum=%d, uiFreezingNonIDRNum=%d, iAvgLumaQp=%d, \
+              iSpsReportErrorNum=%d, iSubSpsReportErrorNum=%d, iPpsReportErrorNum=%d, iSpsNoExistNalNum=%d, iSubSpsNoExistNalNum=%d, iPpsNoExistNalNum=%d, \
+              uiProfile=%d, uiLevel=%d, \
+              iCurrentActiveSpsId=%d, iCurrentActivePpsId=%d,",
+             sDecoderStatistics.uiWidth,
+             sDecoderStatistics.uiHeight,
+             sDecoderStatistics.fAverageFrameSpeedInMs,
+             sDecoderStatistics.fActualAverageFrameSpeedInMs,
+
+             sDecoderStatistics.uiDecodedFrameCount,
+             sDecoderStatistics.uiResolutionChangeTimes,
+             sDecoderStatistics.uiIDRCorrectNum,
+
+             sDecoderStatistics.uiAvgEcRatio,
+             sDecoderStatistics.uiAvgEcPropRatio,
+             sDecoderStatistics.uiEcIDRNum,
+             sDecoderStatistics.uiEcFrameNum,
+
+             sDecoderStatistics.uiIDRLostNum,
+             sDecoderStatistics.uiFreezingIDRNum,
+             sDecoderStatistics.uiFreezingNonIDRNum,
+             sDecoderStatistics.iAvgLumaQp,
+
+             sDecoderStatistics.iSpsReportErrorNum,
+             sDecoderStatistics.iSubSpsReportErrorNum,
+             sDecoderStatistics.iPpsReportErrorNum,
+             sDecoderStatistics.iSpsNoExistNalNum,
+             sDecoderStatistics.iSubSpsNoExistNalNum,
+             sDecoderStatistics.iPpsNoExistNalNum,
+
+             sDecoderStatistics.uiProfile,
+             sDecoderStatistics.uiLevel,
+
+             sDecoderStatistics.iCurrentActiveSpsId,
+             sDecoderStatistics.iCurrentActivePpsId);
+  }
+}
+
+DECODING_STATE CWelsDecoder::ReorderPicturesInDisplay(unsigned char** ppDst, SBufferInfo* pDstInfo)
+{
 	if (pDstInfo->iBufferStatus == 1 && m_pDecContext->pSps->uiProfileIdc != 66) {
 		if (m_pDecContext->pSliceHeader->iPicOrderCntLsb == 0) {
 			if (m_iNumOfPicts > 0) {
@@ -764,53 +816,7 @@ namespace WelsDec {
 			}
 		}
 	}
-#endif
-  return dsErrorFree;
-}
-
-void CWelsDecoder::OutputStatisticsLog (SDecoderStatistics& sDecoderStatistics) {
-  if ((sDecoderStatistics.uiDecodedFrameCount > 0) && (sDecoderStatistics.iStatisticsLogInterval > 0)
-      && ((sDecoderStatistics.uiDecodedFrameCount % sDecoderStatistics.iStatisticsLogInterval) == 0)) {
-    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
-             "DecoderStatistics: uiWidth=%d, uiHeight=%d, fAverageFrameSpeedInMs=%.1f, fActualAverageFrameSpeedInMs=%.1f, \
-              uiDecodedFrameCount=%d, uiResolutionChangeTimes=%d, uiIDRCorrectNum=%d, \
-              uiAvgEcRatio=%d, uiAvgEcPropRatio=%d, uiEcIDRNum=%d, uiEcFrameNum=%d, \
-              uiIDRLostNum=%d, uiFreezingIDRNum=%d, uiFreezingNonIDRNum=%d, iAvgLumaQp=%d, \
-              iSpsReportErrorNum=%d, iSubSpsReportErrorNum=%d, iPpsReportErrorNum=%d, iSpsNoExistNalNum=%d, iSubSpsNoExistNalNum=%d, iPpsNoExistNalNum=%d, \
-              uiProfile=%d, uiLevel=%d, \
-              iCurrentActiveSpsId=%d, iCurrentActivePpsId=%d,",
-             sDecoderStatistics.uiWidth,
-             sDecoderStatistics.uiHeight,
-             sDecoderStatistics.fAverageFrameSpeedInMs,
-             sDecoderStatistics.fActualAverageFrameSpeedInMs,
-
-             sDecoderStatistics.uiDecodedFrameCount,
-             sDecoderStatistics.uiResolutionChangeTimes,
-             sDecoderStatistics.uiIDRCorrectNum,
-
-             sDecoderStatistics.uiAvgEcRatio,
-             sDecoderStatistics.uiAvgEcPropRatio,
-             sDecoderStatistics.uiEcIDRNum,
-             sDecoderStatistics.uiEcFrameNum,
-
-             sDecoderStatistics.uiIDRLostNum,
-             sDecoderStatistics.uiFreezingIDRNum,
-             sDecoderStatistics.uiFreezingNonIDRNum,
-             sDecoderStatistics.iAvgLumaQp,
-
-             sDecoderStatistics.iSpsReportErrorNum,
-             sDecoderStatistics.iSubSpsReportErrorNum,
-             sDecoderStatistics.iPpsReportErrorNum,
-             sDecoderStatistics.iSpsNoExistNalNum,
-             sDecoderStatistics.iSubSpsNoExistNalNum,
-             sDecoderStatistics.iPpsNoExistNalNum,
-
-             sDecoderStatistics.uiProfile,
-             sDecoderStatistics.uiLevel,
-
-             sDecoderStatistics.iCurrentActiveSpsId,
-             sDecoderStatistics.iCurrentActivePpsId);
-  }
+	return dsErrorFree;
 }
 
 DECODING_STATE CWelsDecoder::DecodeParser (const unsigned char* kpSrc,

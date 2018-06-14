@@ -131,6 +131,7 @@ void UninitDecoder (void);
 int32_t ResetDecoder();
 
 void OutputStatisticsLog (SDecoderStatistics& sDecoderStatistics);
+DECODING_STATE ReorderPicturesInDisplay(unsigned char** ppDst, SBufferInfo* pDstInfo);
 
 #ifdef OUTPUT_BIT_STREAM
 WelsFileHandle* m_pFBS;
