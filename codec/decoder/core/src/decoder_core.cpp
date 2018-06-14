@@ -1008,7 +1008,7 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
 		int32_t pocMsb;
 		if (pocLsb < pCtx->iPrevPicOrderCntLsb && pCtx->iPrevPicOrderCntLsb - pocLsb >= iMaxPocLsb / 2)
 			pocMsb = pCtx->iPrevPicOrderCntMsb + iMaxPocLsb;
-		else if (pocLsb > pCtx->iPrevPicOrderCntLsb && pCtx->iPrevPicOrderCntLsb - pocLsb < -iMaxPocLsb / 2)
+		else if (pocLsb > pCtx->iPrevPicOrderCntLsb && pocLsb - pCtx->iPrevPicOrderCntLsb > iMaxPocLsb / 2)
 			pocMsb = pCtx->iPrevPicOrderCntMsb - iMaxPocLsb;
 		else
 			pocMsb = pCtx->iPrevPicOrderCntMsb;
