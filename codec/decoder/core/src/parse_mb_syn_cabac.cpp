@@ -737,7 +737,7 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 
 	if (IS_DIRECT(mbType)) {
 	
-		int16_t pMvDirect[LIST_A][2] = { 0 };
+		int16_t pMvDirect[LIST_A][2] = { { 0, 0 }, { 0, 0 } };
 		if (pSliceHeader->iDirectSpatialMvPredFlag) {
 			//predict direct spatial mv
 			PredMvBDirectSpatial2(pCtx, pMvDirect, iRef);
@@ -822,7 +822,6 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 						for (int32_t j = 0; j < iPartCount; j++) {
 							iPartIdx = (i << 2) + j * iBlockW;
 							uint8_t iScan4Idx = g_kuiScan4[iPartIdx];
-							uint8_t iCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
 
 							ST64(pCurDqLayer->pMv[listIdx][iMbXy][iScan4Idx], LD64(pMvDirect));
 							ST64(pCurDqLayer->pMv[listIdx][iMbXy][iScan4Idx + 4], LD64(pMvDirect));
@@ -872,7 +871,7 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 		}
 	}
 	else if (IS_INTER_16x8(mbType)) {
-		int8_t ref_idx_list[LIST_A][2] = { REF_NOT_IN_LIST };
+		int8_t ref_idx_list[LIST_A][2] = { {REF_NOT_IN_LIST, REF_NOT_IN_LIST}, { REF_NOT_IN_LIST, REF_NOT_IN_LIST } };
 		for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
 			for (int32_t i = 0; i < 2; ++i) {
 				iPartIdx = i << 3;
@@ -917,7 +916,7 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 		}
 	}
 	else if (IS_INTER_8x16(mbType)) {
-		int8_t ref_idx_list[LIST_A][2] = { REF_NOT_IN_LIST };
+		int8_t ref_idx_list[LIST_A][2] = { { REF_NOT_IN_LIST, REF_NOT_IN_LIST }, { REF_NOT_IN_LIST, REF_NOT_IN_LIST } };
 		for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
 			for (int32_t i = 0; i < 2; ++i) {
 				iPartIdx = i << 2;
@@ -965,7 +964,7 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 		int8_t pRefIdx[4] = { 0 }, pSubPartCount[4], pPartW[4];
 		uint32_t uiSubMbType;
 		//sub_mb_type, partition
-		int16_t pMvDirect[LIST_A][2] = { 0 };
+		int16_t pMvDirect[LIST_A][2] = { {0, 0}, {0, 0} };
 		bool has_direct_called = false;
 		SubMbType directSubMbType = 0;
 		for (int32_t i = 0; i < 4; i++) {
@@ -1107,7 +1106,7 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 			}
 		}
 		//ref no-direct
-		int8_t ref_idx_list[LIST_A][4] = { REF_NOT_IN_LIST };
+		int8_t ref_idx_list[LIST_A][4] = { {REF_NOT_IN_LIST, REF_NOT_IN_LIST}, { REF_NOT_IN_LIST, REF_NOT_IN_LIST } };
 		for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
 			for (int32_t i = 0; i < 4; i++) {
 				int16_t iIdx8 = i << 2;
