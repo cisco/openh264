@@ -173,7 +173,6 @@ int32_t WelsInitBSliceRefList(PWelsDecoderContext pCtx, int32_t iPoc) {
 	memset(pCtx->sRefPic.pRefList[LIST_1], 0, MAX_DPB_COUNT * sizeof(PPicture));
 	int32_t iLSCurrPocCount = 0;
 	int32_t iLTCurrPocCount = 0;
-	int32_t iLongTermRefCount = 0;
 	PPicture pLSCurrPocList0[MAX_DPB_COUNT];
 	PPicture pLTCurrPocList0[MAX_DPB_COUNT];
 	for (int32_t i = 0; i < pCtx->sRefPic.uiShortRefCount[LIST_0]; ++i) {

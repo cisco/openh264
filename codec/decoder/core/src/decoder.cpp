@@ -366,7 +366,6 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
   const int32_t kiPicHeight     = kiMbHeight << 4;
   int32_t iErr = ERR_NONE;
 
-  int32_t iListIdx              = 0;    //, mb_blocks   = 0;
   int32_t iPicQueueSize         = 0;    // adaptive size of picture queue, = (pSps->iNumRefFrames x 2)
   bReallocFlag                  = false;
   bool  bNeedChangePicQueue     = true;
@@ -447,7 +446,7 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
  *  free memory dynamically allocated during decoder
  */
 void WelsFreeDynamicMemory (PWelsDecoderContext pCtx) {
-  int32_t iListIdx = 0;
+ 
   CMemoryAlign* pMa = pCtx->pMemAlign;
 
   //free dq layer memory

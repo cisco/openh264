@@ -52,12 +52,6 @@
 
 namespace WelsDec {
 
-#if defined(_DEBUG)
-#ifdef _MOTION_VECTOR_DUMP_
-	extern FILE *pFile;
-#endif
-#endif
-
 static inline int32_t iAbs(int32_t x) {
 	static const int32_t INT_BITS = (sizeof(int) * CHAR_BIT) - 1;
 	int32_t y = x >> INT_BITS;
@@ -1414,14 +1408,6 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 	WELS_READ_VERIFY(ParseSkipFlagCabac(pCtx, &uiNeighAvail, uiCode));	
 
 	memset(pCurLayer->pDirect[iMbXy], 0, sizeof(int8_t) * 16);
-#if defined (_DEBUG)
-#ifdef	_MOTION_VECTOR_DUMP_
-	if (pSliceHeader->iPicOrderCntLsb == 16 && pSliceHeader->iFrameNum == 5) {
-		fprintf(stderr, "iMbXy = %d\n", iMbXy);
-		iMbXy = iMbXy;
-	}
-#endif
-#endif
 	if (uiCode) {
 		int16_t pMv[LIST_A][2] = { 0 };
 		int8_t  ref[LIST_A] = { 0 };
@@ -1441,23 +1427,7 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 		if (pSliceHeader->iDirectSpatialMvPredFlag) {
 
 			//predict direct spatial mv
-#if defined (_DEBUG)
-#ifdef	_MOTION_VECTOR_DUMP_
-			if (pCtx->pSliceHeader->iPicOrderCntLsb == 2 && (iMbXy == 88)) {
-				fprintf(stderr, "Skip iMbXy = %d\n", iMbXy);
-				iMbXy = iMbXy;
-			}
-#endif
-#endif
 			PredMvBDirectSpatial2(pCtx, pMv, ref);
-#if defined (_DEBUG)
-#ifdef	_MOTION_VECTOR_DUMP_
-			if (pCtx->pSliceHeader->iPicOrderCntLsb == 16) {
-				fprintf(pFile, "POC:%d iMbXy:%d MvSkip:%d %d %d %d\n", pCtx->pSliceHeader->iPicOrderCntLsb, iMbXy, pMv[0][0], pMv[0][1], pMv[1][0], pMv[1][1]);
-				fflush(pFile);
-			}
-#endif
-#endif
 		}
 		else {
 			//temporal direct mode
@@ -1483,13 +1453,11 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 
 						int8_t iPartCount = pSubPartCount[i];
 						int16_t iPartIdx, iBlockW = pPartW[i];
-						uint8_t iScan4Idx, iCacheIdx;
-						iCacheIdx = g_kuiCache30ScanIdx[i << 2];
 
 						for (int32_t j = 0; j < iPartCount; j++) {
 							iPartIdx = (i << 2) + j * iBlockW;
-							iScan4Idx = g_kuiScan4[iPartIdx];
-							iCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
+							uint8_t iScan4Idx = g_kuiScan4[iPartIdx];
+							uint8_t iCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
 
 							ST32(pCurLayer->pMv[listIdx][iMbXy][iScan4Idx], LD32(pMv));
 							ST32(pCurLayer->pMvd[listIdx][iMbXy][iScan4Idx], LD32(pMvd));
