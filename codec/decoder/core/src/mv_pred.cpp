@@ -590,7 +590,7 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 					iPartIdx = iIdx8 + j * iBlockW;
 					uint8_t iScan4Idx = g_kuiScan4[iPartIdx];
 					uint8_t iColocIdx = g_kuiScan4[iPartIdx];
-					uint8_t iCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
+					//uint8_t iCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
 
 					int16_t pMV[4] = { 0 };
 					if (IS_SUB_8x8(sub_mb_type)) {
