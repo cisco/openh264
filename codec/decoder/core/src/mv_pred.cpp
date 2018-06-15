@@ -585,14 +585,12 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 
 				int8_t iPartCount = pSubPartCount[i];
 				int16_t iPartIdx, iBlockW = pPartW[i];
-				uint8_t iScan4Idx, iCacheIdx, iColocIdx;
-				iCacheIdx = g_kuiCache30ScanIdx[iIdx8];
 
 				for (int32_t j = 0; j < iPartCount; j++) {
 					iPartIdx = iIdx8 + j * iBlockW;
-					iScan4Idx = g_kuiScan4[iPartIdx];
-					iColocIdx = g_kuiScan4[iPartIdx];
-					iCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
+					uint8_t iScan4Idx = g_kuiScan4[iPartIdx];
+					uint8_t iColocIdx = g_kuiScan4[iPartIdx];
+					uint8_t iCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
 
 					int16_t pMV[4] = { 0 };
 					if (IS_SUB_8x8(sub_mb_type)) {
@@ -662,7 +660,6 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 void PredBDirectTemporal(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], int8_t ref[LIST_A]) {
 	PDqLayer pCurLayer = pCtx->pCurDqLayer;
 	PSlice pSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
-	PSliceHeader pSliceHeader = &pSlice->sSliceHeaderExt.sSliceHeader;
 	int32_t iMbXy = pCurLayer->iMbXyIndex;
 	uint32_t uiShortRefCount = pCtx->sRefPic.uiShortRefCount[LIST_0];
 	for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {

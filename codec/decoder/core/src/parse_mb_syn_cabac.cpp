@@ -38,12 +38,6 @@
 namespace WelsDec {
 #define IDX_UNUSED -1
 
-#if defined(_DEBUG)
-#ifdef _MOTION_VECTOR_DUMP_
-FILE *pFile = fopen("MV.txt", "w");
-#endif
-#endif
-
 static const int16_t g_kMaxPos       [] = {IDX_UNUSED, 15, 14, 15, 3, 14, 63, 3, 3, 14, 14};
 static const int16_t g_kMaxC2       [] = {IDX_UNUSED, 4, 4, 4, 3, 4, 4, 3, 3, 4, 4};
 static const int16_t g_kBlockCat2CtxOffsetCBF[] = {IDX_UNUSED, 0, 4, 8, 12, 16, 0, 12, 12, 16, 16};
@@ -78,8 +72,6 @@ static uint32_t DecodeCabacIntraMbType(PWelsDecoderContext pCtx, PWelsNeighAvail
 {
 	uint32_t uiCode;
 	uint32_t uiMbType = 0;
-	int32_t iIdxA = 0, iIdxB = 0;
-	int32_t iCtxInc = 0;
 
 	PWelsCabacDecEngine pCabacDecEngine = pCtx->pCabacDecEngine;
 	PWelsCabacCtx pBinCtx = pCtx->pCabacCtx + ctx_base;
@@ -730,8 +722,6 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 	PSlice pSlice = &pCtx->pCurDqLayer->sLayerInfo.sSliceInLayer;
 	PSliceHeader pSliceHeader = &pSlice->sSliceHeaderExt.sSliceHeader;
 	PDqLayer pCurDqLayer = pCtx->pCurDqLayer;
-	PPicture* ppRefPicL0 = pCtx->sRefPic.pRefList[LIST_0];
-	PPicture* ppRefPicL1 = pCtx->sRefPic.pRefList[LIST_1];
 	int32_t pRefCount[LIST_A];
 	int32_t iMbXy = pCurDqLayer->iMbXyIndex;
 	int16_t pMv[4] = { 0 };
@@ -828,13 +818,11 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 
 						int8_t iPartCount = pSubPartCount[i];
 						int16_t iPartIdx, iBlockW = pPartW[i];
-						uint8_t iScan4Idx, iCacheIdx;
-						iCacheIdx = g_kuiCache30ScanIdx[i << 2];
-
+			
 						for (int32_t j = 0; j < iPartCount; j++) {
 							iPartIdx = (i << 2) + j * iBlockW;
-							iScan4Idx = g_kuiScan4[iPartIdx];
-							iCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
+							uint8_t iScan4Idx = g_kuiScan4[iPartIdx];
+							uint8_t iCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
 
 							ST64(pCurDqLayer->pMv[listIdx][iMbXy][iScan4Idx], LD64(pMvDirect));
 							ST64(pCurDqLayer->pMv[listIdx][iMbXy][iScan4Idx + 4], LD64(pMvDirect));
@@ -872,20 +860,6 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 				PredMv(pMotionVector, pRefIndex, listIdx, 0, 4, iRef[listIdx], pMv);
 				WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 0, pMvd[0]));
 				WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 1, pMvd[1]));
-#if defined (_DEBUG)
-#ifdef _MOTION_VECTOR_DUMP_
-				if (pCtx->pSliceHeader->iPicOrderCntLsb == 30) {
-					if (pFile) {
-						fprintf(pFile, "POC:%d iMbXy:%d MV:%d %d %d %d\n", pCtx->pSliceHeader->iPicOrderCntLsb, iMbXy, pMv[0], pMv[1], pMvd[0], pMvd[1]);
-						fflush(pFile);
-						if (iMbXy == 38) {
-							fclose(pFile);
-							pFile = 0;
-						}
-					}
-				}
-#endif
-#endif
 				pMv[0] += pMvd[0];
 				pMv[1] += pMvd[1];
 				WELS_CHECK_SE_BOTH_WARNING(pMv[1], iMinVmv, iMaxVmv, "vertical mv");
@@ -930,20 +904,6 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 					PredInter16x8Mv(pMotionVector, pRefIndex, listIdx, iPartIdx, ref_idx, pMv);
 					WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 0, pMvd[0]));
 					WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 1, pMvd[1]));
-#if defined (_DEBUG)	
-#ifdef _MOTION_VECTOR_DUMP_
-					if (pCtx->pSliceHeader->iPicOrderCntLsb == 30) {
-						if (pFile) {
-							fprintf(pFile, "POC:%d iMbXy:%d MV:%d %d %d %d\n", pCtx->pSliceHeader->iPicOrderCntLsb, iMbXy, pMv[0], pMv[1], pMvd[0], pMvd[1]);
-							fflush(pFile);
-							if (iMbXy == 38) {
-								fclose(pFile);
-								pFile = 0;
-							}
-						}
-					}
-#endif
-#endif
 					pMv[0] += pMvd[0];
 					pMv[1] += pMvd[1];
 					WELS_CHECK_SE_BOTH_WARNING(pMv[1], iMinVmv, iMaxVmv, "vertical mv");
@@ -989,20 +949,6 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 					PredInter8x16Mv(pMotionVector, pRefIndex, listIdx, iPartIdx, ref_idx, pMv);
 					WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 0, pMvd[0]));
 					WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 1, pMvd[1]));
-#if defined (_DEBUG)
-#ifdef _MOTION_VECTOR_DUMP_
-					if (pCtx->pSliceHeader->iPicOrderCntLsb == 30) {
-						if (pFile) {
-							fprintf(pFile, "POC:%d iMbXy:%d MV:%d %d %d %d\n", pCtx->pSliceHeader->iPicOrderCntLsb, iMbXy, pMv[0], pMv[1], pMvd[0], pMvd[1]);
-							fflush(pFile);
-							if (iMbXy == 38) {
-								fclose(pFile);
-								pFile = 0;
-							}
-						}
-					}
-#endif
-#endif
 					pMv[0] += pMvd[0];
 					pMv[1] += pMvd[1];
 					WELS_CHECK_SE_BOTH_WARNING(pMv[1], iMinVmv, iMaxVmv, "vertical mv");
@@ -1219,20 +1165,6 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 						PredMv(pMotionVector, pRefIndex, listIdx, iPartIdx, iBlockW, iref, pMv);
 						WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 0, pMvd[0]));
 						WELS_READ_VERIFY(ParseMvdInfoCabac(pCtx, pNeighAvail, pRefIndex, pMvdCache, iPartIdx, listIdx, 1, pMvd[1]));
-#if defined (_DEBUG)
-#ifdef _MOTION_VECTOR_DUMP_
-						if (pCtx->pSliceHeader->iPicOrderCntLsb == 30) {
-							if (pFile) {
-								fprintf(pFile, "POC:%d iMbXy:%d MV:%d %d %d %d\n", pCtx->pSliceHeader->iPicOrderCntLsb, iMbXy, pMv[0], pMv[1], pMvd[0], pMvd[1]);
-								fflush(pFile);
-								if (iMbXy == 38) {
-									fclose(pFile);
-									pFile = 0;
-								}
-							}
-						}
-#endif
-#endif
 						pMv[0] += pMvd[0];
 						pMv[1] += pMvd[1];
 						WELS_CHECK_SE_BOTH_WARNING(pMv[1], iMinVmv, iMaxVmv, "vertical mv");
@@ -1347,19 +1279,6 @@ int32_t ParseRefIdxCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail,
   }
 	if (pCtx->eSliceType != B_SLICE) {
 		iCtxInc = iIdxA + (iIdxB << 1);
-	}
-	else {
-#if defined (_DEBUG)
-#ifdef	_MOTION_VECTOR_DUMP_
-		PDqLayer pCurLayer = pCtx->pCurDqLayer;
-		PSlice pSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
-		PSliceHeader pSliceHeader = &pSlice->sSliceHeaderExt.sSliceHeader;
-		if (pSliceHeader->iPicOrderCntLsb == 30) {
-			fprintf(stderr, "iMbXy = %d iCtxInc = %d\n", pCtx->pCurDqLayer->iMbXyIndex, iCtxInc);
-			iCtxInc = iCtxInc;
-		}
-#endif
-#endif
 	}
 	
   WELS_READ_VERIFY (DecodeBinCabac (pCtx->pCabacDecEngine, pCtx->pCabacCtx + NEW_CTX_OFFSET_REF_NO + iCtxInc, uiCode));
