@@ -2,6 +2,29 @@
 Releases
 -----------
 
+v1.8.0
+------
+- Add meson build for Linux/Windows platform
+- Disable background detection for screen route
+- Add a workaround for Visual Studio 2013 C++ x64 compiler bug on AVX2. That bug will cause crash and has been fixed in Visual Studio 2014
+- Change the default profile from baseline to high if user does not set it and CABAC is specified
+- Skip frames that are marked as IDR due to scene change and simultaneously marked as skip frame to reduce bit rate
+- Refine threshold calculation algorithms for rate control in lower frame rate to get better effect
+- Encoder return with a specific return value instead of uninitialize encoder when input resolution is invalid
+- Refine strategy on level change to avoid frequent IDR. Encoder will not be reset if level is changed to a smaller one
+- Support to set the min and max QP values on screen content mode
+- Fix a memory issue that may cause encoder crash when temporal layer change
+- Corrected some statistics information
+- Refine error concealment algorithms to improve user experience
+- Support to get information about current output picture is reference picture or not on decoder side
+- Bug fix for decoder when 8x8 prediction mode is enabled on the input bitstream
+- Enable NEON for ChromeOS devices
+- Support for Fuchsia operating systerm
+- Support for building arm64 with MSVC
+- Remove some warnings when building with MSVC
+- Fix clang compiler error when building arm assembly funtions
+- Bug fixes for unit test
+
 v1.7.0
 ------
 - Changed SPS/PPS strategy option name,See enum ENCODER_OPTION
