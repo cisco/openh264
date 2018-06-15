@@ -1492,7 +1492,6 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 						for (int32_t j = 0; j < iPartCount; j++) {
 							iPartIdx = (i << 2) + j * iBlockW;
 							uint8_t iScan4Idx = g_kuiScan4[iPartIdx];
-							uint8_t iCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
 
 							ST64(pCurLayer->pMv[listIdx][iMbXy][iScan4Idx], LD64(pMv));
 							ST64(pCurLayer->pMv[listIdx][iMbXy][iScan4Idx + 4], LD64(pMv));
