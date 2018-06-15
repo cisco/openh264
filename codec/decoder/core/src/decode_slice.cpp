@@ -1409,7 +1409,7 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 
 	memset(pCurLayer->pDirect[iMbXy], 0, sizeof(int8_t) * 16);
 	if (uiCode) {
-		int16_t pMv[LIST_A][2] = { 0 };
+		int16_t pMv[LIST_A][2] = { {0, 0}, { 0, 0 } };
 		int8_t  ref[LIST_A] = { 0 };
 		pCurLayer->pMbType[iMbXy] = MB_TYPE_SKIP | MB_TYPE_DIRECT;
 		ST32(&pCurLayer->pNzc[iMbXy][0], 0);
@@ -1432,7 +1432,7 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 		else {
 			//temporal direct mode
 			ComputeColocated(pCtx);
-			int16_t pMvd[LIST_A][2] = { 0 };
+			int16_t pMvd[LIST_A][2] = { { 0, 0 },{ 0, 0 } };
 			int8_t pRefIndex[LIST_A][30];
 			PredBDirectTemporal(pCtx, pMv, ref);
 			MbType refMBType = pCtx->sRefPic.pRefList[LIST_1][0]->pMbType[iMbXy];
@@ -1457,7 +1457,7 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 						for (int32_t j = 0; j < iPartCount; j++) {
 							iPartIdx = (i << 2) + j * iBlockW;
 							uint8_t iScan4Idx = g_kuiScan4[iPartIdx];
-							uint8_t iCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
+							//uint8_t iCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
 
 							ST32(pCurLayer->pMv[listIdx][iMbXy][iScan4Idx], LD32(pMv));
 							ST32(pCurLayer->pMvd[listIdx][iMbXy][iScan4Idx], LD32(pMvd));
