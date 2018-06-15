@@ -961,7 +961,7 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 		}
 	}
 	else if (IS_Inter_8x8(mbType)) {
-		int8_t pRefIdx[4] = { 0 }, pSubPartCount[4], pPartW[4];
+		int8_t pSubPartCount[4], pPartW[4];
 		uint32_t uiSubMbType;
 		//sub_mb_type, partition
 		int16_t pMvDirect[LIST_A][2] = { {0, 0}, {0, 0} };
