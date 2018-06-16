@@ -124,8 +124,6 @@ int32_t									m_iLastGOPRemainPicts;
 
 int32_t									m_LastWrittenPOC;
 
-unsigned char*								m_ppDst[3];
-
 int32_t InitDecoder (const SDecodingParam* pParam);
 void UninitDecoder (void);
 int32_t ResetDecoder();
