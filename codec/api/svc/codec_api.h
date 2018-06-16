@@ -94,7 +94,7 @@ typedef unsigned char bool;
   *
   * Step 2:decoder creation
   * @code
-  *  CreateDecoder(pSvcDecoder);
+  *  WelsCreateDecoder(&pSvcDecoder);
   * @endcode
   *
   * Step 3:declare required parameter, used to differentiate Decoding only and Parsing only
@@ -107,44 +107,44 @@ typedef unsigned char bool;
   *
   * Step 4:initialize the parameter and decoder context, allocate memory
   * @code
-  *  Initialize(&sDecParam);
+  *  pSvcDecoder->Initialize(&sDecParam);
   * @endcode
   *
   * Step 5:do actual decoding process in slice level;
   *        this can be done in a loop until data ends
   * @code
   *  //for Decoding only
-  *  iRet = DecodeFrameNoDelay(pBuf, iSize, pData, &sDstBufInfo);
+  *  iRet = pSvcDecoder->DecodeFrameNoDelay(pBuf, iSize, pData, &sDstBufInfo);
   *  //or
-  *  iRet = DecodeFrame2(pBuf, iSize, pData, &sDstBufInfo);
+  *  iRet = pSvcDecoder->DecodeFrame2(pBuf, iSize, pData, &sDstBufInfo);
   *  //for Parsing only
-  *  iRet = DecodeParser(pBuf, iSize, &sDstParseInfo);
+  *  iRet = pSvcDecoder->DecodeParser(pBuf, iSize, &sDstParseInfo);
   *  //decode failed
   *  If (iRet != 0){
-  *      RequestIDR or something like that.
+  *      //error handling (RequestIDR or something like that)
   *  }
   *  //for Decoding only, pData can be used for render.
   *  if (sDstBufInfo.iBufferStatus==1){
-  *      output pData[0], pData[1], pData[2];
+  *      //output handling (pData[0], pData[1], pData[2])
   *  }
   * //for Parsing only, sDstParseInfo can be used for, e.g., HW decoding
   *  if (sDstBufInfo.iNalNum > 0){
-  *      Hardware decoding sDstParseInfo;
+  *      //Hardware decoding sDstParseInfo;
   *  }
   *  //no-delay decoding can be realized by directly calling DecodeFrameNoDelay(), which is the recommended usage.
   *  //no-delay decoding can also be realized by directly calling DecodeFrame2() again with NULL input, as in the following. In this case, decoder would immediately reconstruct the input data. This can also be used similarly for Parsing only. Consequent decoding error and output indication should also be considered as above.
-  *  iRet = DecodeFrame2(NULL, 0, pData, &sDstBufInfo);
-  *  judge iRet, sDstBufInfo.iBufferStatus ...
+  *  iRet = pSvcDecoder->DecodeFrame2(NULL, 0, pData, &sDstBufInfo);
+  *  //judge iRet, sDstBufInfo.iBufferStatus ...
   * @endcode
   *
   * Step 6:uninitialize the decoder and memory free
   * @code
-  *  Uninitialize();
+  *  pSvcDecoder->Uninitialize();
   * @endcode
   *
   * Step 7:destroy the decoder
   * @code
-  *  DestroyDecoder();
+  *  DestroyDecoder(pSvcDecoder);
   * @endcode
   *
 */
@@ -157,16 +157,17 @@ typedef unsigned char bool;
   *
   * Step1:setup encoder
   * @code
+  *  ISVCEncoder*  encoder_;
   *  int rv = WelsCreateSVCEncoder (&encoder_);
-  *  ASSERT_EQ (0, rv);
-  *  ASSERT_TRUE (encoder_ != NULL);
+  *  assert (rv == 0);
+  *  assert (encoder_ != NULL);
   * @endcode
   *
   * Step2:initilize with basic parameter
   * @code
   *  SEncParamBase param;
   *  memset (&param, 0, sizeof (SEncParamBase));
-  *  param.iUsageType = usageType;
+  *  param.iUsageType = usageType; //from EUsageType enum
   *  param.fMaxFrameRate = frameRate;
   *  param.iPicWidth = width;
   *  param.iPicHeight = height;
@@ -186,7 +187,7 @@ typedef unsigned char bool;
   *  int frameSize = width * height * 3 / 2;
   *  BufferedData buf;
   *  buf.SetLength (frameSize);
-  *  ASSERT_TRUE (buf.Length() == (size_t)frameSize);
+  *  assert (buf.Length() == (size_t)frameSize);
   *  SFrameBSInfo info;
   *  memset (&info, 0, sizeof (SFrameBSInfo));
   *  SSourcePicture pic;
@@ -202,9 +203,9 @@ typedef unsigned char bool;
   *  for(int num = 0;num<total_num;num++) {
   *     //prepare input data
   *     rv = encoder_->EncodeFrame (&pic, &info);
-  *     ASSERT_TRUE (rv == cmResultSuccess);
-  *     if (info.eFrameType != videoFrameTypeSkip && cbk != NULL) {
-  *      //output bitstream
+  *     assert (rv == cmResultSuccess);
+  *     if (info.eFrameType != videoFrameTypeSkip) {
+  *      //output bitstream handling
   *     }
   *  }
   * @endcode
@@ -229,7 +230,7 @@ typedef unsigned char bool;
   * Step 2:initialize with extension parameter
   * @code
   *  SEncParamExt param;
-  *  encoder->GetDefaultParams (&param);
+  *  encoder_->GetDefaultParams (&param);
   *  param.iUsageType = usageType;
   *  param.fMaxFrameRate = frameRate;
   *  param.iPicWidth = width;
