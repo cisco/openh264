@@ -71,8 +71,6 @@ extern "C" {
 #include <sys/time.h>
 #endif
 
-#define PICTURE_REODERING 1
-
 namespace WelsDec {
 
 //////////////////////////////////////////////////////////////////////
@@ -510,9 +508,11 @@ namespace WelsDec {
 		//ppDst[1] = ppTmpDst[1];
 		//ppDst[2] = ppTmpDst[2];
 		//}
-#ifdef PICTURE_REODERING
-		iRet |= ReorderPicturesInDisplay(ppDst, pDstInfo);
-#endif
+		if (pDstInfo->iBufferStatus == 1) {
+			if (m_pDecContext->pSps->uiProfileIdc != 66) {
+				iRet |= ReorderPicturesInDisplay(ppDst, pDstInfo);
+			}
+		}
 		return (DECODING_STATE)iRet;
 	}
 
@@ -560,11 +560,8 @@ namespace WelsDec {
 
 		int64_t iStart, iEnd;
 		iStart = WelsTime();
-#ifdef PICTURE_REODERING
+
 		m_ppDst[0] = m_ppDst[1] = m_ppDst[2] = NULL;
-#else 
-		ppDst[0] = ppDst[1] = ppDst[2] = NULL;
-#endif
 		m_pDecContext->iErrorCode = dsErrorFree; //initialize at the starting of AU decoding.
 		m_pDecContext->iFeedbackVclNalInAu = FEEDBACK_UNKNOWN_NAL; //initialize
 		unsigned long long uiInBsTimeStamp = pDstInfo->uiInBsTimeStamp;
@@ -586,13 +583,8 @@ namespace WelsDec {
 		else {
 			m_pDecContext->uiTimeStamp = 0;
 		}
-#ifdef PICTURE_REODERING
 		WelsDecodeBs(m_pDecContext, kpSrc, kiSrcLen, m_ppDst,
 			pDstInfo, NULL); //iErrorCode has been modified in this function
-#else
-		WelsDecodeBs(m_pDecContext, kpSrc, kiSrcLen, ppDst,
-			pDstInfo, NULL); //iErrorCode has been modified in this function
-#endif
 		m_pDecContext->bInstantDecFlag = false; //reset no-delay flag
 		if (m_pDecContext->iErrorCode) {
 			EWelsNalUnitType eNalType =
@@ -675,6 +667,12 @@ namespace WelsDec {
 		}
 		iEnd = WelsTime();
 		m_pDecContext->dDecTime += (iEnd - iStart) / 1e3;
+
+		if (pDstInfo->iBufferStatus == 1 && m_pDecContext->pSps->uiProfileIdc == 66) {
+			ppDst[0] = m_ppDst[0];
+			ppDst[1] = m_ppDst[1];
+			ppDst[2] = m_ppDst[2];
+		}
 
   return dsErrorFree;
 }
