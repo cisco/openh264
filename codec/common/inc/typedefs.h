@@ -35,7 +35,11 @@
 #define WELS_TYPE_DEFINES_H__
 
 #include <limits.h>
+#ifdef __cplusplus
+#include <cstddef>
+#else
 #include <stddef.h>
+#endif
 
 ////////////////////////////////////////////////////////////////////////////
 // NOTICE : ALL internal implement MUST use the data type defined as below

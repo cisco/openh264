@@ -1558,16 +1558,43 @@ int32_t ParseVui (PWelsDecoderContext pCtx, PSps pSps, PBitStringAux pBsAux) {
   }
   WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //nal_hrd_parameters_present_flag
   pVui->bNalHrdParamPresentFlag = !!uiCode;
-  if (pVui->bNalHrdParamPresentFlag) { //HRD parse not supported
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "nal_hrd_parameters_present_flag = 1 not supported.");
-    return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_VUI_HRD);
+  if (pVui->bNalHrdParamPresentFlag) { //Add HRD parse. the values are not being used though.
+		int32_t cpb_cnt_minus1 = BsGetUe(pBsAux, &uiCode);
+		/*bit_rate_scale = */BsGetBits(pBsAux, 4, &uiCode);
+		/*cpb_size_scale = */BsGetBits(pBsAux, 4, &uiCode);
+		for (int32_t i = 0; i <= cpb_cnt_minus1; i++) {
+			/*bit_rate_value_minus1[i] = */BsGetUe(pBsAux, &uiCode);
+			/*cpb_size_value_minus1[i] = */BsGetUe(pBsAux, &uiCode);
+			/*cbr_flag[i] = */BsGetOneBit(pBsAux, &uiCode);
+		}
+		/*initial_cpb_removal_delay_length_minus1 = */BsGetBits(pBsAux, 5, &uiCode);
+		/*cpb_removal_delay_length_minus1 = */BsGetBits(pBsAux, 5, &uiCode);
+		/*dpb_output_delay_length_minus1 = */BsGetBits(pBsAux, 5, &uiCode);
+		/*time_offset_length = */BsGetBits(pBsAux, 5, &uiCode);
+    //WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "nal_hrd_parameters_present_flag = 1 not supported.");
+   //return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_VUI_HRD);
   }
   WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //vcl_hrd_parameters_present_flag
   pVui->bVclHrdParamPresentFlag = !!uiCode;
-  if (pVui->bVclHrdParamPresentFlag) { //HRD parse not supported
-    WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "vcl_hrd_parameters_present_flag = 1 not supported.");
-    return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_VUI_HRD);
+  if (pVui->bVclHrdParamPresentFlag) {//Add HRD parse. the values are not being used though.
+		int32_t cpb_cnt_minus1 = BsGetUe(pBsAux, &uiCode);
+		/*bit_rate_scale = */BsGetBits(pBsAux, 4, &uiCode);
+		/*cpb_size_scale = */BsGetBits(pBsAux, 4, &uiCode);
+		for (int32_t i = 0; i <= cpb_cnt_minus1; i++) {
+			/*bit_rate_value_minus1[i] = */BsGetUe(pBsAux, &uiCode);
+			/*cpb_size_value_minus1[i] = */BsGetUe(pBsAux, &uiCode);
+			/*cbr_flag[i] = */BsGetOneBit(pBsAux, &uiCode);
+		}
+		/*initial_cpb_removal_delay_length_minus1 = */BsGetBits(pBsAux, 5, &uiCode);
+		/*cpb_removal_delay_length_minus1 = */BsGetBits(pBsAux, 5, &uiCode);
+		/*dpb_output_delay_length_minus1 = */BsGetBits(pBsAux, 5, &uiCode);
+		/*time_offset_length = */BsGetBits(pBsAux, 5, &uiCode);
+//    WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "vcl_hrd_parameters_present_flag = 1 not supported.");
+//    return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_UNSUPPORTED_VUI_HRD);
   }
+	if (pVui->bNalHrdParamPresentFlag | pVui->bVclHrdParamPresentFlag) {
+		/*low_delay_hrd_flag = */BsGetOneBit(pBsAux, &uiCode);
+	}
   WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //pic_struct_present_flag
   pVui->bPicStructPresentFlag = !!uiCode;
   WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //bitstream_restriction_flag

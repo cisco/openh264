@@ -46,8 +46,10 @@ typedef int32_t (*PWelsDecMbFunc) (PWelsDecoderContext pCtx, PNalUnit pNalCur, u
 
 int32_t WelsDecodeMbCabacISlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint32_t& uiEosFlag);
 int32_t WelsDecodeMbCabacPSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint32_t& uiEosFlag);
+int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint32_t& uiEosFlag);
 int32_t WelsDecodeMbCabacISliceBaseMode0(PWelsDecoderContext pCtx, uint32_t& uiEosFlag);
 int32_t WelsDecodeMbCabacPSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail, uint32_t& uiEosFlag);
+int32_t WelsDecodeMbCabacBSliceBaseMode0(PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail, uint32_t& uiEosFlag);
 
 int32_t WelsTargetSliceConstruction (PWelsDecoderContext pCtx); //construction based on slice
 
@@ -62,6 +64,7 @@ int32_t WelsMbInterConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLayer);
 void WelsLumaDcDequantIdct (int16_t* pBlock, int32_t iQp,PWelsDecoderContext pCtx);
 int32_t WelsMbInterPrediction (PWelsDecoderContext pCtx, PDqLayer pCurLayer);
 void WelsChromaDcIdct (int16_t* pBlock);
+bool ComputeColocated(PWelsDecoderContext pCtx);
 
 #ifdef __cplusplus
 extern "C" {
