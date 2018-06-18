@@ -71,6 +71,8 @@ extern "C" {
 #include <sys/time.h>
 #endif
 
+//#define _PICTURE_REORDERING_ 1
+
 namespace WelsDec {
 
 //////////////////////////////////////////////////////////////////////
@@ -508,11 +510,13 @@ namespace WelsDec {
 		//ppDst[1] = ppTmpDst[1];
 		//ppDst[2] = ppTmpDst[2];
 		//}
+#ifdef		_PICTURE_REORDERING_
 		if (pDstInfo->iBufferStatus == 1) {
 			if (m_pDecContext->pSps->uiProfileIdc != 66) {
 				iRet |= ReorderPicturesInDisplay(ppDst, pDstInfo);
 			}
 		}
+#endif
 		return (DECODING_STATE)iRet;
 	}
 
