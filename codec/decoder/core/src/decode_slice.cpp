@@ -1427,7 +1427,7 @@ int32_t WelsDecodeMbCabacBSlice(PWelsDecoderContext pCtx, PNalUnit pNalCur, uint
 		if (pSliceHeader->iDirectSpatialMvPredFlag) {
 
 			//predict direct spatial mv
-			PredMvBDirectSpatial2(pCtx, pMv, ref);
+			PredMvBDirectSpatial(pCtx, pMv, ref);
 		}
 		else {
 			//temporal direct mode

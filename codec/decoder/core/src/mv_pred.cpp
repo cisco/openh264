@@ -315,8 +315,100 @@ void PredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]) {
   }
 }
 
-SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], int8_t ref[LIST_A]) {
+int32_t GetColocatedMb(PWelsDecoderContext pCtx, MbType& mbType, SubMbType& subMbType) {
 	PDqLayer pCurLayer = pCtx->pCurDqLayer;
+	PSlice pSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
+	PSliceHeader pSliceHeader = &pSlice->sSliceHeaderExt.sSliceHeader;
+	int32_t iMbXy = pCurLayer->iMbXyIndex;
+
+	uint32_t is8x8 = IS_Inter_8x8(pCurLayer->pMbType[iMbXy]);
+	mbType = pCurLayer->pMbType[iMbXy];
+
+	PPicture colocPic = pCtx->sRefPic.pRefList[LIST_1][0];
+
+	MbType coloc_mbType = colocPic->pMbType[iMbXy];
+
+	if (IS_Inter_8x8(coloc_mbType) && !pCtx->pSps->bDirect8x8InferenceFlag) {
+		subMbType = SUB_MB_TYPE_4x4 | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_DIRECT;
+		mbType |= MB_TYPE_8x8 | MB_TYPE_L0 | MB_TYPE_L1;
+	}
+	else if (!is8x8 && (IS_INTER_16x16(coloc_mbType) || IS_INTRA(coloc_mbType)/* || IS_SKIP(coloc_mbType)*/)) {
+		subMbType = SUB_MB_TYPE_8x8 | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_DIRECT;
+		mbType |= MB_TYPE_16x16 | MB_TYPE_L0 | MB_TYPE_L1;
+	}
+	else {
+		subMbType = SUB_MB_TYPE_8x8 | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_DIRECT;
+		mbType |= MB_TYPE_8x8 | MB_TYPE_L0 | MB_TYPE_L1;
+	}
+
+	if (IS_INTRA(coloc_mbType)) {
+		SetRectBlock(pCurLayer->iColocIntra, 4, 4, 4 * sizeof(int8_t), 1, sizeof(int8_t));
+		return 1;
+	}
+	SetRectBlock(pCurLayer->iColocIntra, 4, 4, 4 * sizeof(int8_t), 0, sizeof(int8_t));
+
+	if (IS_INTER_16x16(mbType)) {
+			int16_t iMVZero[2] = { 0 };
+			int16_t * pMv = IS_TYPE_L1(coloc_mbType) ? colocPic->pMv[LIST_1][iMbXy][0] : iMVZero;
+			ST32(pCurLayer->iColocMv[LIST_0][0], LD32(colocPic->pMv[LIST_0][iMbXy][0]));
+			ST32(pCurLayer->iColocMv[LIST_1][0], LD32(pMv));
+			pCurLayer->iColocRefIndex[LIST_0][0] = colocPic->pRefIndex[LIST_0][iMbXy][0];
+			pCurLayer->iColocRefIndex[LIST_1][0] = IS_TYPE_L1(coloc_mbType) ? colocPic->pRefIndex[LIST_1][iMbXy][0] : REF_NOT_IN_LIST;
+			if (!pSliceHeader->iDirectSpatialMvPredFlag) {
+	//			pCurLayer->iColocRefId[LIST_0][0] = colocPic->pRefId[LIST_0][iMbXy][0];
+	//			pCurLayer->iColocRefId[LIST_1][0] = IS_TYPE_L1(coloc_mbType) ? colocPic->pRefId[LIST_1][iMbXy][0] : REF_NOT_IN_LIST;
+			}
+	}
+	else {
+		if (!pCtx->pSps->bDirect8x8InferenceFlag) {
+			CopyRectBlock4Cols(pCurLayer->iColocMv[LIST_0], colocPic->pMv[LIST_0][iMbXy], 16, 16, 4, 4);
+			CopyRectBlock4Cols(pCurLayer->iColocRefIndex[LIST_0], colocPic->pRefIndex[LIST_0][iMbXy], 4, 4, 4, 1);
+			//		CopyRectBlock4Cols(pCurLayer->iColocRefId[LIST_0], colocPic->pRefId[LIST_0][iMbXy], 4, 4, 4, 1);
+			if (IS_TYPE_L1(coloc_mbType)) {
+				CopyRectBlock4Cols(pCurLayer->iColocMv[LIST_1], colocPic->pMv[LIST_1][iMbXy], 16, 16, 4, 4);
+				CopyRectBlock4Cols(pCurLayer->iColocRefIndex[LIST_1], colocPic->pRefIndex[LIST_1][iMbXy], 4, 4, 4, 1);
+				//				CopyRectBlock4Cols(pCurLayer->iColocRefId[LIST_1], colocPic->pRefId[LIST_1][iMbXy], 4, 4, 4, 1);
+			}
+			else {// only forward prediction
+				SetRectBlock(pCurLayer->iColocRefIndex[LIST_1], 4, 4, 4, (uint8_t)REF_NOT_IN_LIST, 1);
+			}
+		}
+		else {
+			for (int32_t listIdx = 0; listIdx < 1 + !!(coloc_mbType & MB_TYPE_L1); listIdx++) {
+				SetRectBlock(pCurLayer->iColocMv[listIdx][0], 2, 2, 16, LD32(colocPic->pMv[listIdx][iMbXy][0]), 4);
+				SetRectBlock(pCurLayer->iColocMv[listIdx][2], 2, 2, 16, LD32(colocPic->pMv[listIdx][iMbXy][3]), 4);
+				SetRectBlock(pCurLayer->iColocMv[listIdx][8], 2, 2, 16, LD32(colocPic->pMv[listIdx][iMbXy][12]), 4);
+				SetRectBlock(pCurLayer->iColocMv[listIdx][10], 2, 2, 16, LD32(colocPic->pMv[listIdx][iMbXy][15]), 4);
+
+				SetRectBlock(&pCurLayer->iColocRefIndex[listIdx][0], 2, 2, 4, colocPic->pRefIndex[listIdx][iMbXy][0], 1);
+				SetRectBlock(&pCurLayer->iColocRefIndex[listIdx][2], 2, 2, 4, colocPic->pRefIndex[listIdx][iMbXy][3], 1);
+				SetRectBlock(&pCurLayer->iColocRefIndex[listIdx][8], 2, 2, 4, colocPic->pRefIndex[listIdx][iMbXy][12], 1);
+				SetRectBlock(&pCurLayer->iColocRefIndex[listIdx][10], 2, 2, 4, colocPic->pRefIndex[listIdx][iMbXy][15], 1);
+
+				if (!pSliceHeader->iDirectSpatialMvPredFlag) {
+					//					SetRectBlock(&pCurLayer->iColocRefId[listIdx][0], 2, 2, 4, colocPic->pRefId[listIdx][iMbXy][0], 1);
+					//					SetRectBlock(&pCurLayer->iColocRefId[listIdx][2], 2, 2, 4, colocPic->pRefId[listIdx][iMbXy][3], 1);
+					//					SetRectBlock(&pCurLayer->iColocRefId[listIdx][8], 2, 2, 4, colocPic->pRefId[listIdx][iMbXy][12], 1);
+					//					SetRectBlock(&pCurLayer->iColocRefId[listIdx][10], 2, 2, 4, colocPic->pRefId[listIdx][iMbXy][15], 1);
+				}
+			}
+			if (!(coloc_mbType & MB_TYPE_L1))// only forward prediction
+				SetRectBlock(&pCurLayer->iColocRefIndex[1][0], 4, 4, 4, (uint8_t)REF_NOT_IN_LIST, 1);
+		}
+	}
+	return 1;
+}
+
+SubMbType PredMvBDirectSpatial(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], int8_t ref[LIST_A]) {
+
+	PDqLayer pCurLayer = pCtx->pCurDqLayer;
+	int32_t iMbXy = pCurLayer->iMbXyIndex;
+	bool bSkipOrDirect = (IS_SKIP(pCurLayer->pMbType[iMbXy]) | IS_DIRECT(pCurLayer->pMbType[iMbXy])) > 0;
+
+	MbType mbType;
+	SubMbType subMbType;
+	GetColocatedMb(pCtx, mbType, subMbType);
+
 	bool bTopAvail, bLeftTopAvail, bRightTopAvail, bLeftAvail;
 	int32_t iLeftTopType, iRightTopType, iTopType, iLeftType;
 	int32_t iCurSliceIdc, iTopSliceIdc, iLeftTopSliceIdc, iRightTopSliceIdc, iLeftSliceIdc;
@@ -329,28 +421,7 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 	int8_t iDiagonalRef[LIST_A];
 	int16_t iMvA[LIST_A][2], iMvB[LIST_A][2], iMvC[LIST_A][2], iMvD[LIST_A][2];
 
-	int32_t iMbXy = pCurLayer->iMbXyIndex;
-	bool bSkipOrDirect = (IS_SKIP(pCurLayer->pMbType[iMbXy]) | IS_DIRECT(pCurLayer->pMbType[iMbXy])) > 0;
-	uint32_t is8x8 = IS_Inter_8x8(pCurLayer->pMbType[iMbXy]);
-	MbType mbType = pCurLayer->pMbType[iMbXy];
 	iCurXy = pCurLayer->iMbXyIndex;
-
-	PPicture colocPic = pCtx->sRefPic.pRefList[LIST_1][0];
-
-	MbType coloc_mbType = colocPic->pMbType[iMbXy];
-	SubMbType sub_mb_type;
-	if (IS_Inter_8x8(coloc_mbType) && !pCtx->pSps->bDirect8x8InferenceFlag) {
-		sub_mb_type = SUB_MB_TYPE_4x4 | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_DIRECT;
-		mbType |= MB_TYPE_8x8 | MB_TYPE_L0 | MB_TYPE_L1;
-	}
-	else if (!is8x8 && (IS_INTER_16x16(coloc_mbType) || IS_INTRA(coloc_mbType)/* || IS_SKIP(coloc_mbType)*/)) {
-		sub_mb_type = SUB_MB_TYPE_8x8 | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_DIRECT;
-		mbType |= MB_TYPE_16x16 | MB_TYPE_L0 | MB_TYPE_L1;
-	}
-	else {
-		sub_mb_type = SUB_MB_TYPE_8x8 | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_DIRECT;
-		mbType |= MB_TYPE_8x8 | MB_TYPE_L0 | MB_TYPE_L1;
-	}
 
 	iCurX = pCurLayer->iMbX;
 	iCurY = pCurLayer->iMbY;
@@ -500,32 +571,21 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 	}
 	else if (ref[LIST_1] < 0) {
 		mbType &= ~MB_TYPE_L1;
-		sub_mb_type &= ~MB_TYPE_L1;
+		subMbType &= ~MB_TYPE_L1;
 	}
 	else if (ref[LIST_0] < 0) {
 		mbType &= ~MB_TYPE_L0;
-		sub_mb_type &= ~MB_TYPE_L0;
+		subMbType &= ~MB_TYPE_L0;
 	}
 	pCurLayer->pMbType[iMbXy] = mbType;
 
-
-	if (IS_INTRA(coloc_mbType)) {
-		SetRectBlock(pCurLayer->iColocIntra, 4, 4, 4 * sizeof(int8_t), 1, sizeof(int8_t));
-	}
-	else {
-		SetRectBlock(pCurLayer->iColocIntra, 4, 4, 4 * sizeof(int8_t), 0, sizeof(int8_t));
-	}
 	int16_t pMvd[4] = { 0 };
+
+	bool bIsLongRef = pCtx->sRefPic.pRefList[LIST_1][0]->bIsLongRef;
 
 	if (IS_INTER_16x16(mbType)) {
 		if ((*(int32_t*)iMvp[LIST_0] | *(int32_t*)iMvp[LIST_1])) {
-			int16_t iMVZero[2] = { 0 };
-			int16_t * pMv = IS_TYPE_L1(coloc_mbType) ? colocPic->pMv[LIST_1][iMbXy][0] : iMVZero;
-			ST32(pCurLayer->iColocMv[LIST_0][0], LD32(colocPic->pMv[LIST_0][iMbXy][0]));
-			ST32(pCurLayer->iColocMv[LIST_1][0], LD32(pMv));
-			pCurLayer->iColocRefIndex[LIST_0][0] = colocPic->pRefIndex[LIST_0][iMbXy][0];
-			pCurLayer->iColocRefIndex[LIST_1][0] = IS_TYPE_L1(coloc_mbType) ? colocPic->pRefIndex[LIST_1][iMbXy][0] : REF_NOT_IN_LIST;
-			if (0 == pCurLayer->iColocIntra[0] && !colocPic->bIsLongRef
+			if (0 == pCurLayer->iColocIntra[0] && !bIsLongRef
 				&& ((pCurLayer->iColocRefIndex[LIST_0][0] == 0 && (unsigned)(pCurLayer->iColocMv[LIST_0][0][0] + 1) <= 2 && (unsigned)(pCurLayer->iColocMv[LIST_0][0][1] + 1) <= 2)
 					|| (pCurLayer->iColocRefIndex[LIST_0][0] <0 && pCurLayer->iColocRefIndex[LIST_1][0] == 0 && (unsigned)(pCurLayer->iColocMv[LIST_1][0][0] + 1) <= 2 && (unsigned)(pCurLayer->iColocMv[LIST_1][0][1] + 1) <= 2))) {
 				if (0 >= ref[0])	*(uint32_t*)iMvp[LIST_0] = 0;
@@ -539,37 +599,11 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 		}
 	}
 	else {
-		if (!pCtx->pSps->bDirect8x8InferenceFlag) {
-			CopyRectBlock4Cols(pCurLayer->iColocMv[LIST_0], colocPic->pMv[LIST_0][iMbXy], 16, 16, 4, 4);
-			CopyRectBlock4Cols(pCurLayer->iColocRefIndex[LIST_0], colocPic->pRefIndex[LIST_0][iMbXy], 4, 4, 4, 1);
-			if (IS_TYPE_L1(coloc_mbType)) {
-				CopyRectBlock4Cols(pCurLayer->iColocMv[LIST_1], colocPic->pMv[LIST_1][iMbXy], 16, 16, 4, 4);
-				CopyRectBlock4Cols(pCurLayer->iColocRefIndex[LIST_1], colocPic->pRefIndex[LIST_1][iMbXy], 4, 4, 4, 1);
-			}
-			else {// only forward prediction
-				SetRectBlock(pCurLayer->iColocRefIndex[LIST_1], 4, 4, 4, (uint8_t)REF_NOT_IN_LIST, 1);
-			}
-		}
-		else {
-			for (int32_t listIdx = 0; listIdx < 1 + !!(coloc_mbType & MB_TYPE_L1); listIdx++) {
-				SetRectBlock(&pCurLayer->iColocRefIndex[listIdx][0], 2, 2, 4, colocPic->pRefIndex[listIdx][iMbXy][0], 1);
-				SetRectBlock(&pCurLayer->iColocRefIndex[listIdx][2], 2, 2, 4, colocPic->pRefIndex[listIdx][iMbXy][3], 1);
-				SetRectBlock(&pCurLayer->iColocRefIndex[listIdx][8], 2, 2, 4, colocPic->pRefIndex[listIdx][iMbXy][12], 1);
-				SetRectBlock(&pCurLayer->iColocRefIndex[listIdx][10], 2, 2, 4, colocPic->pRefIndex[listIdx][iMbXy][15], 1);
-
-				SetRectBlock(pCurLayer->iColocMv[listIdx][0], 2, 2, 16, LD32(colocPic->pMv[listIdx][iMbXy][0]), 4);
-				SetRectBlock(pCurLayer->iColocMv[listIdx][2], 2, 2, 16, LD32(colocPic->pMv[listIdx][iMbXy][3]), 4);
-				SetRectBlock(pCurLayer->iColocMv[listIdx][8], 2, 2, 16, LD32(colocPic->pMv[listIdx][iMbXy][12]), 4);
-				SetRectBlock(pCurLayer->iColocMv[listIdx][10], 2, 2, 16, LD32(colocPic->pMv[listIdx][iMbXy][15]), 4);
-			}
-			if (!(coloc_mbType & MB_TYPE_L1))// only forward prediction
-				SetRectBlock(&pCurLayer->iColocRefIndex[1][0], 4, 4, 4, (uint8_t)REF_NOT_IN_LIST, 1);
-		}
 		if (bSkipOrDirect) {
 			int8_t pSubPartCount[4], pPartW[4];
 			for (int32_t i = 0; i < 4; i++) { //Direct 8x8 Ref and mv
 				int16_t iIdx8 = i << 2;
-				pCurLayer->pSubMbType[iMbXy][i] = sub_mb_type;
+				pCurLayer->pSubMbType[iMbXy][i] = subMbType;
 				int8_t pRefIndex[LIST_A][30];
 				UpdateP8x8RefIdxCabac(pCurLayer, pRefIndex, iIdx8, ref[LIST_0], LIST_0);
 				UpdateP8x8RefIdxCabac(pCurLayer, pRefIndex, iIdx8, ref[LIST_1], LIST_1);
@@ -578,7 +612,7 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 				pSubPartCount[i] = g_ksInterBSubMbTypeInfo[0].iPartCount;
 				pPartW[i] = g_ksInterBSubMbTypeInfo[0].iPartWidth;
 
-				if (IS_SUB_4x4(sub_mb_type)) {
+				if (IS_SUB_4x4(subMbType)) {
 					pSubPartCount[i] = 4;
 					pPartW[i] = 1;
 				}
@@ -593,7 +627,7 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 					//uint8_t iCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
 
 					int16_t pMV[4] = { 0 };
-					if (IS_SUB_8x8(sub_mb_type)) {
+					if (IS_SUB_8x8(subMbType)) {
 						*(uint32_t*)pMV = *(uint32_t*)iMvp[LIST_0];
 						ST32((pMV + 2), LD32(pMV));
 						ST64(pCurLayer->pMv[LIST_0][iMbXy][iScan4Idx], LD64(pMV));
@@ -616,11 +650,11 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 						ST32(pCurLayer->pMvd[LIST_1][iMbXy][iScan4Idx], 0);
 					}
 					if ((*(int32_t*)iMvp[LIST_0] | *(int32_t*)iMvp[LIST_1])) {
-						uint32_t uiColZeroFlag = (0 == pCurLayer->iColocIntra[iColocIdx]) && !colocPic->bIsLongRef &&
+						uint32_t uiColZeroFlag = (0 == pCurLayer->iColocIntra[iColocIdx]) && !bIsLongRef &&
 							(pCurLayer->iColocRefIndex[LIST_0][iColocIdx] == 0 || (pCurLayer->iColocRefIndex[LIST_0][iColocIdx] < 0 && pCurLayer->iColocRefIndex[LIST_1][iColocIdx] == 0));
 						const int16_t(*mvColoc)[2] = 0 == pCurLayer->iColocRefIndex[LIST_0][iColocIdx] ? pCurLayer->iColocMv[LIST_0] : pCurLayer->iColocMv[LIST_1];
 						const int16_t *mv = mvColoc[iColocIdx];
-						if (IS_SUB_8x8(sub_mb_type)) {
+						if (IS_SUB_8x8(subMbType)) {
 							if (uiColZeroFlag && ((unsigned)(mv[0] + 1) <= 2 && (unsigned)(mv[1] + 1) <= 2)) {
 								if (ref[LIST_0] == 0) {
 									ST64(pCurLayer->pMv[LIST_0][iMbXy][iScan4Idx], 0);
@@ -654,7 +688,7 @@ SubMbType PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
 			}
 		}
 	}
-	return sub_mb_type;
+	return subMbType;
 }
 
 void PredBDirectTemporal(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], int8_t ref[LIST_A]) {
