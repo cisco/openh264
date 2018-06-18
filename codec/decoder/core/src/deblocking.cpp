@@ -1187,14 +1187,20 @@ void WelsDeblockingMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t
       * (uint32_t*)nBS[1][0] = 0;
     }
     //SKIP MB_16x16 or others
-    if (!IS_SKIP(iCurMbType)) {
-      if (IS_INTER_16x16(iCurMbType)) {
-        if (!pCurDqLayer->pTransformSize8x8Flag[pCurDqLayer->iMbXyIndex]) {
-          DeblockingBSInsideMBAvsbase (pCurDqLayer->pNzc[iMbXyIndex], nBS, 1);
-        } else {
-          DeblockingBSInsideMBAvsbase8x8 (pCurDqLayer->pNzc[iMbXyIndex], nBS, 1);
-        }
-      } else {
+    if (IS_SKIP(iCurMbType)) {
+      * (uint32_t*)nBS[0][1] = * (uint32_t*)nBS[0][2] = * (uint32_t*)nBS[0][3] =
+                                 * (uint32_t*)nBS[1][1] = * (uint32_t*)nBS[1][2] = * (uint32_t*)nBS[1][3] = 0;
+    }
+		else {
+			if (IS_INTER_16x16(iCurMbType)) {
+				if (!pCurDqLayer->pTransformSize8x8Flag[pCurDqLayer->iMbXyIndex]) {
+					DeblockingBSInsideMBAvsbase(pCurDqLayer->pNzc[iMbXyIndex], nBS, 1);
+				}
+				else {
+					DeblockingBSInsideMBAvsbase8x8(pCurDqLayer->pNzc[iMbXyIndex], nBS, 1);
+				}
+			}
+			else {
 
 				if (bBSlice) {
 					DeblockingBSliceBSInsideMBNormal(pCurDqLayer, nBS, pCurDqLayer->pNzc[iMbXyIndex], iMbXyIndex);
@@ -1202,11 +1208,8 @@ void WelsDeblockingMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t
 				else {
 					DeblockingBSInsideMBNormal(pCurDqLayer, nBS, pCurDqLayer->pNzc[iMbXyIndex], iMbXyIndex);
 				}
-      }
-    } else {
-      * (uint32_t*)nBS[0][1] = * (uint32_t*)nBS[0][2] = * (uint32_t*)nBS[0][3] =
-                                 * (uint32_t*)nBS[1][1] = * (uint32_t*)nBS[1][2] = * (uint32_t*)nBS[1][3] = 0;
-    }
+			}
+		}
     DeblockingInterMb (pCurDqLayer, pFilter, nBS, iBoundryFlag);
     break;
   }
