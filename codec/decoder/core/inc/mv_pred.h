@@ -84,7 +84,14 @@ void PredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]);
 * \param
 * \param   output iMvp[] and ref
 */
-SubMbType  PredMvBDirectSpatial2(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], int8_t ref[LIST_A]);
+SubMbType  PredMvBDirectSpatial(PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], int8_t ref[LIST_A]);
+
+/*!
+* \brief   get Colocated MB for both Spatial and Temporal Direct Mode
+* \param
+* \param   output MbType and SubMbType
+*/
+int32_t GetColocatedMb(PWelsDecoderContext pCtx, MbType& mbType, SubMbType& subMbType);
 
 /*!
 * \brief   get the motion predictor for B-slice temporal direct mode 16x16

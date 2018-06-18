@@ -740,21 +740,7 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 		int16_t pMvDirect[LIST_A][2] = { { 0, 0 }, { 0, 0 } };
 		if (pSliceHeader->iDirectSpatialMvPredFlag) {
 			//predict direct spatial mv
-			PredMvBDirectSpatial2(pCtx, pMvDirect, iRef);
-#if defined (_DEBUG)
-#if 0
-			if (pCtx->pSliceHeader->iPicOrderCntLsb == 30) {
-				if (pFile) {
-					fprintf(pFile, "POC:%d iMbXy:%d MV:%d %d %d %d\n", pCtx->pSliceHeader->iPicOrderCntLsb, iMbXy, pMv[0], pMv[1], pMvd[0], pMvd[1]);
-					fflush(pFile);
-					if (iMbXy == 2655) {
-						fclose(pFile);
-						pFile = 0;
-					}
-				}
-			}
-#endif
-#endif
+			PredMvBDirectSpatial(pCtx, pMvDirect, iRef);
 		}
 		else {
 			//temporal direct 16x16 mode
@@ -983,7 +969,7 @@ int32_t ParseInterBMotionInfoCabac(PWelsDecoderContext pCtx, PWelsNeighAvail pNe
 			if (IS_DIRECT(g_ksInterBSubMbTypeInfo[uiSubMbType].iType)) {
 				if (!has_direct_called) {
 					if (pSliceHeader->iDirectSpatialMvPredFlag) {
-						directSubMbType = PredMvBDirectSpatial2(pCtx, pMvDirect, iRef);
+						directSubMbType = PredMvBDirectSpatial(pCtx, pMvDirect, iRef);
 					}
 					else {
 						//temporal direct mode
