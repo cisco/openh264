@@ -45,8 +45,6 @@
 
 namespace WelsDec {
 
-static bool bBSlicePresent = false;
-
 static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo) {
   PDqLayer pCurDq = pCtx->pCurDqLayer;
   PPicture pPic = pCtx->pDec;
@@ -858,10 +856,6 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
   if (uiSliceType > 4)
     uiSliceType -= 5;
 
-	if (B_SLICE == uiSliceType) {
-		bBSlicePresent = true;
-	}
-
   if ((NAL_UNIT_CODED_SLICE_IDR == eNalType) && (I_SLICE != uiSliceType)) {
     WelsLog (pLogCtx, WELS_LOG_WARNING, "Invalid slice type(%d) in IDR picture. ", uiSliceType);
     return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_SLICE_TYPE);
@@ -1005,32 +999,30 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
       WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //delta_pic_order_cnt_bottom
       pSliceHead->iDeltaPicOrderCntBottom = iCode;
     }
-		if (bBSlicePresent) {
-			//Calculate poc if necessary
-			int32_t pocLsb = pSliceHead->iPicOrderCntLsb;
-			if (pSliceHead->bIdrFlag || kpCurNal->sNalHeaderExt.sNalUnitHeader.eNalUnitType == NAL_UNIT_CODED_SLICE_IDR) {
-				pCtx->iPrevPicOrderCntMsb = 0;
-				pCtx->iPrevPicOrderCntLsb = 0;
-			}
-			int32_t pocMsb;
-			if (pocLsb < pCtx->iPrevPicOrderCntLsb && pCtx->iPrevPicOrderCntLsb - pocLsb >= iMaxPocLsb / 2)
-				pocMsb = pCtx->iPrevPicOrderCntMsb + iMaxPocLsb;
-			else if (pocLsb > pCtx->iPrevPicOrderCntLsb && pocLsb - pCtx->iPrevPicOrderCntLsb > iMaxPocLsb / 2)
-				pocMsb = pCtx->iPrevPicOrderCntMsb - iMaxPocLsb;
-			else
-				pocMsb = pCtx->iPrevPicOrderCntMsb;
-			pSliceHead->iPicOrderCntLsb = pocMsb + pocLsb;
-
-			if (pPps->bPicOrderPresentFlag && !pSliceHead->bFieldPicFlag) {
-				pSliceHead->iPicOrderCntLsb += pSliceHead->iDeltaPicOrderCntBottom;
-			}
-
-			if (kpCurNal->sNalHeaderExt.sNalUnitHeader.uiNalRefIdc != 0) {
-				pCtx->iPrevPicOrderCntLsb = pocLsb;
-				pCtx->iPrevPicOrderCntMsb = pocMsb;
-			}
-			//End of Calculating poc
+		//Calculate poc if necessary
+		int32_t pocLsb = pSliceHead->iPicOrderCntLsb;
+		if (pSliceHead->bIdrFlag || kpCurNal->sNalHeaderExt.sNalUnitHeader.eNalUnitType == NAL_UNIT_CODED_SLICE_IDR) {
+			pCtx->iPrevPicOrderCntMsb = 0;
+			pCtx->iPrevPicOrderCntLsb = 0;
 		}
+		int32_t pocMsb;
+		if (pocLsb < pCtx->iPrevPicOrderCntLsb && pCtx->iPrevPicOrderCntLsb - pocLsb >= iMaxPocLsb / 2)
+			pocMsb = pCtx->iPrevPicOrderCntMsb + iMaxPocLsb;
+		else if (pocLsb > pCtx->iPrevPicOrderCntLsb && pocLsb - pCtx->iPrevPicOrderCntLsb > iMaxPocLsb / 2)
+			pocMsb = pCtx->iPrevPicOrderCntMsb - iMaxPocLsb;
+		else
+			pocMsb = pCtx->iPrevPicOrderCntMsb;
+		pSliceHead->iPicOrderCntLsb = pocMsb + pocLsb;
+
+		if (pPps->bPicOrderPresentFlag && !pSliceHead->bFieldPicFlag) {
+			pSliceHead->iPicOrderCntLsb += pSliceHead->iDeltaPicOrderCntBottom;
+		}
+
+		if (kpCurNal->sNalHeaderExt.sNalUnitHeader.uiNalRefIdc != 0) {
+			pCtx->iPrevPicOrderCntLsb = pocLsb;
+			pCtx->iPrevPicOrderCntMsb = pocMsb;
+		}
+		//End of Calculating poc
   } else if (pSps->uiPocType == 1 && !pSps->bDeltaPicOrderAlwaysZeroFlag) {
     WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //delta_pic_order_cnt[ 0 ]
     pSliceHead->iDeltaPicOrderCnt[0] = iCode;

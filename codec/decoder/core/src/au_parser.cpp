@@ -46,7 +46,7 @@
 #include "bit_stream.h"
 #include "memory_align.h"
 
-//#define _PARSE_NALHRD_VCLHRD_PARAMS_ 1
+#define _PARSE_NALHRD_VCLHRD_PARAMS_ 1
 
 namespace WelsDec {
 /*!
