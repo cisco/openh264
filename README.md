@@ -126,6 +126,10 @@ This is only necessary for building the DLL; the static library can be built wit
 
 For All Platforms
 -------------------
+
+Using make
+----------
+
 From the main project directory:
 - `make` for automatically detecting architecture and building accordingly
 - `make ARCH=i386` for x86 32-bit builds
@@ -138,6 +142,32 @@ The command line programs `h264enc` and `h264dec` will appear in the main projec
 A shell script to run the command-line apps is in `testbin/CmdLineExample.sh`
 
 Usage information can be found in `testbin/CmdLineReadMe`
+
+Using meson
+-----------
+
+Meson build definitions have been added, and are known to work on Linux
+and Windows, for x86 and x86 64-bit.
+
+See <http://mesonbuild.com/Installing.html> for instructions on how to
+install meson, then:
+
+``` shell
+meson builddir
+ninja -C builddir
+```
+
+Run the tests with:
+
+``` shell
+meson test -C builddir -v
+```
+
+Install with:
+
+``` shell
+ninja -C builddir install
+```
 
 Using the Source
 ----------------
