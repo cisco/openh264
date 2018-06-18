@@ -205,9 +205,10 @@ TEST_F (EncoderInterfaceTest, EncoderOptionSetTest) {
   else {
     EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
 
+    fFrameRate = WELS_CLIP3 (fFrameRate, 1, 60);
     iResult = pPtrEnc->GetOption (eOptionId, &fReturn);
     EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
-    EXPECT_EQ (WELS_CLIP3 (fFrameRate, 1, 60), fReturn);
+    EXPECT_EQ (fFrameRate, fReturn);
   }
   PrepareOneSrcFrame();
   iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);

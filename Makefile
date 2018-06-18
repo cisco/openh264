@@ -7,7 +7,7 @@ vpath %.S $(SRC_PATH)
 vpath %.rc $(SRC_PATH)
 vpath %.pc.in $(SRC_PATH)
 
-OS=$(shell uname | tr A-Z a-z | tr -d \\-[:digit:]. | sed -E 's/^(net|open|free)bsd/bsd/')
+OS=$(shell uname | tr A-Z a-z | tr -d \\-0-9. | sed -E 's/^(net|open|free)bsd/bsd/')
 ARCH=$(shell uname -m)
 LIBPREFIX=lib
 LIBSUFFIX=a
@@ -35,7 +35,7 @@ STATIC_LDFLAGS=-lstdc++
 STRIP ?= strip
 
 SHAREDLIB_MAJORVERSION=4
-FULL_VERSION := 1.7.0
+FULL_VERSION := 1.8.0
 
 ifeq (,$(wildcard $(SRC_PATH)gmp-api))
 HAVE_GMP_API=No
