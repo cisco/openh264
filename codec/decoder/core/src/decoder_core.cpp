@@ -2536,7 +2536,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
       }
 #if defined (_DEBUG) &&  !defined (CODEC_FOR_TESTBED)
 			WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "cur_frame : %d\tiCurrIdD : %d\n ",
-				dq_cur->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.iFrameNum, iCurrIdD);
+							 dq_cur->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.iFrameNum, iCurrIdD);
 #endif//#if !CODEC_FOR_TESTBED
       iLastIdD = iCurrIdD;
       iLastIdQ = iCurrIdQ;
@@ -2565,8 +2565,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
 #if defined (_DEBUG) &&  !defined (CODEC_FOR_TESTBED)
 #undef fprintf
 		WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "POC: #%d, FRAME: #%d, D: %d, Q: %d, T: %d, P: %d, %d\n",
-			pSh->iPicOrderCntLsb, pSh->iFrameNum, iCurrIdD, iCurrIdQ, dq_cur->sLayerInfo.sNalHeaderExt.uiTemporalId,
-			dq_cur->sLayerInfo.sNalHeaderExt.uiPriorityId, dq_cur->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.iSliceQp);
+						 pSh->iPicOrderCntLsb, pSh->iFrameNum, iCurrIdD, iCurrIdQ, dq_cur->sLayerInfo.sNalHeaderExt.uiTemporalId,
+						 dq_cur->sLayerInfo.sNalHeaderExt.uiPriorityId, dq_cur->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.iSliceQp);
 #endif//#if !CODEC_FOR_TESTBED
 
     if (dq_cur->uiLayerDqId == kuiTargetLayerDqId) {
