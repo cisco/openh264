@@ -574,7 +574,7 @@ int32_t InitBsBuffer (PWelsDecoderContext pCtx) {
   return ERR_NONE;
 }
 
-int32_t ExpandBsBuffer (PWelsDecoderContext pCtx, const int kiSrcLen) {
+int32_t ExpandBsBuffer (PWelsDecoderContext pCtx, const int32_t kiSrcLen) {
   if (pCtx == NULL)
     return ERR_INFO_INVALID_PTR;
   int32_t iExpandStepShift = 1;
@@ -628,7 +628,7 @@ int32_t ExpandBsBuffer (PWelsDecoderContext pCtx, const int kiSrcLen) {
   return ERR_NONE;
 }
 
-int32_t ExpandBsLenBuffer (PWelsDecoderContext pCtx, const int kiCurrLen) {
+int32_t ExpandBsLenBuffer (PWelsDecoderContext pCtx, const int32_t kiCurrLen) {
   SParserBsInfo* pParser = pCtx->pParserBsInfo;
   if (!pParser->pNalLenInByte)
     return ERR_INFO_INVALID_ACCESS;
