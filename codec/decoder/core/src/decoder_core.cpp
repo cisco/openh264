@@ -44,6 +44,9 @@
 #include "error_concealment.h"
 
 namespace WelsDec {
+
+static bool bBSlicePresent = false;
+
 static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo) {
   PDqLayer pCurDq = pCtx->pCurDqLayer;
   PPicture pPic = pCtx->pDec;
@@ -855,6 +858,10 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
   if (uiSliceType > 4)
     uiSliceType -= 5;
 
+	if (B_SLICE == uiSliceType) {
+		bBSlicePresent = true;
+	}
+
   if ((NAL_UNIT_CODED_SLICE_IDR == eNalType) && (I_SLICE != uiSliceType)) {
     WelsLog (pLogCtx, WELS_LOG_WARNING, "Invalid slice type(%d) in IDR picture. ", uiSliceType);
     return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_SLICE_TYPE);
@@ -998,31 +1005,32 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
       WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //delta_pic_order_cnt_bottom
       pSliceHead->iDeltaPicOrderCntBottom = iCode;
     }
+		if (bBSlicePresent) {
+			//Calculate poc if necessary
+			int32_t pocLsb = pSliceHead->iPicOrderCntLsb;
+			if (pSliceHead->bIdrFlag || kpCurNal->sNalHeaderExt.sNalUnitHeader.eNalUnitType == NAL_UNIT_CODED_SLICE_IDR) {
+				pCtx->iPrevPicOrderCntMsb = 0;
+				pCtx->iPrevPicOrderCntLsb = 0;
+			}
+			int32_t pocMsb;
+			if (pocLsb < pCtx->iPrevPicOrderCntLsb && pCtx->iPrevPicOrderCntLsb - pocLsb >= iMaxPocLsb / 2)
+				pocMsb = pCtx->iPrevPicOrderCntMsb + iMaxPocLsb;
+			else if (pocLsb > pCtx->iPrevPicOrderCntLsb && pocLsb - pCtx->iPrevPicOrderCntLsb > iMaxPocLsb / 2)
+				pocMsb = pCtx->iPrevPicOrderCntMsb - iMaxPocLsb;
+			else
+				pocMsb = pCtx->iPrevPicOrderCntMsb;
+			pSliceHead->iPicOrderCntLsb = pocMsb + pocLsb;
 
-		//Calculate poc if necessary
-		int32_t pocLsb = pSliceHead->iPicOrderCntLsb;
-		if (pSliceHead->bIdrFlag || kpCurNal->sNalHeaderExt.sNalUnitHeader.eNalUnitType == NAL_UNIT_CODED_SLICE_IDR) {
-			pCtx->iPrevPicOrderCntMsb = 0;
-			pCtx->iPrevPicOrderCntLsb = 0;
-		}
-		int32_t pocMsb;
-		if (pocLsb < pCtx->iPrevPicOrderCntLsb && pCtx->iPrevPicOrderCntLsb - pocLsb >= iMaxPocLsb / 2)
-			pocMsb = pCtx->iPrevPicOrderCntMsb + iMaxPocLsb;
-		else if (pocLsb > pCtx->iPrevPicOrderCntLsb && pocLsb - pCtx->iPrevPicOrderCntLsb > iMaxPocLsb / 2)
-			pocMsb = pCtx->iPrevPicOrderCntMsb - iMaxPocLsb;
-		else
-			pocMsb = pCtx->iPrevPicOrderCntMsb;
-		pSliceHead->iPicOrderCntLsb = pocMsb + pocLsb;
+			if (pPps->bPicOrderPresentFlag && !pSliceHead->bFieldPicFlag) {
+				pSliceHead->iPicOrderCntLsb += pSliceHead->iDeltaPicOrderCntBottom;
+			}
 
-		if (pPps->bPicOrderPresentFlag && !pSliceHead->bFieldPicFlag) {
-			pSliceHead->iPicOrderCntLsb += pSliceHead->iDeltaPicOrderCntBottom;
+			if (kpCurNal->sNalHeaderExt.sNalUnitHeader.uiNalRefIdc != 0) {
+				pCtx->iPrevPicOrderCntLsb = pocLsb;
+				pCtx->iPrevPicOrderCntMsb = pocMsb;
+			}
+			//End of Calculating poc
 		}
-
-		if (kpCurNal->sNalHeaderExt.sNalUnitHeader.uiNalRefIdc != 0) {
-			pCtx->iPrevPicOrderCntLsb = pocLsb;
-			pCtx->iPrevPicOrderCntMsb = pocMsb;
-		}
-		//End of Calculating poc
   } else if (pSps->uiPocType == 1 && !pSps->bDeltaPicOrderAlwaysZeroFlag) {
     WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //delta_pic_order_cnt[ 0 ]
     pSliceHead->iDeltaPicOrderCnt[0] = iCode;
@@ -2252,8 +2260,8 @@ static inline void InitDqLayerInfo (PDqLayer pDqLayer, PLayerInfo pLayerInfo, PN
 		pDqLayer->pRefPicMarking = &pSh->sRefMarking;
 
 		pDqLayer->bUseWeightPredictionFlag = pSh->pPps->bWeightedPredFlag;
-		pDqLayer->bUseWeightedBiPredIdc = pSh->pPps->uiWeightedBipredIdc != 0;
-		if (pSh->pPps->bWeightedPredFlag || pSh->pPps->uiWeightedBipredIdc) {
+		pDqLayer->bUseWeightedBiPredIdc = pSh->pPps->uiWeightedBipredIdc == 1;
+		if (pSh->pPps->bWeightedPredFlag || pSh->pPps->uiWeightedBipredIdc == 1) {
 			pDqLayer->pPredWeightTable = &pSh->sPredWeightTable;
 		}
     pDqLayer->pRefPicBaseMarking        = &pShExt->sRefBasePicMarking;
@@ -2527,7 +2535,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         }
       }
 #if defined (_DEBUG) &&  !defined (CODEC_FOR_TESTBED)
-      fprintf (stderr, "cur_frame : %d\tiCurrIdD : %d\n ",
+			WelsLog(&(pCtx->sLogCtx), WELS_LOG_DEBUG, "cur_frame : %d\tiCurrIdD : %d\n ",
                dq_cur->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.iFrameNum, iCurrIdD);
 #endif//#if !CODEC_FOR_TESTBED
       iLastIdD = iCurrIdD;
@@ -2556,7 +2564,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
     // A dq layer decoded here
 #if defined (_DEBUG) &&  !defined (CODEC_FOR_TESTBED)
 #undef fprintf
-    fprintf (stderr, "POC: #%d, FRAME: #%d, D: %d, Q: %d, T: %d, P: %d, %d\n",
+		WelsLog(&(pCtx->sLogCtx), WELS_LOG_DEBUG, "POC: #%d, FRAME: #%d, D: %d, Q: %d, T: %d, P: %d, %d\n",
              pSh->iPicOrderCntLsb, pSh->iFrameNum, iCurrIdD, iCurrIdQ, dq_cur->sLayerInfo.sNalHeaderExt.uiTemporalId,
              dq_cur->sLayerInfo.sNalHeaderExt.uiPriorityId, dq_cur->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.iSliceQp);
 #endif//#if !CODEC_FOR_TESTBED
