@@ -483,7 +483,6 @@ int32_t ParseDecRefPicMarking (PWelsDecoderContext pCtx, PBitStringAux pBs, PSli
 
 					pCtx->iPrevPicOrderCntLsb = 0;
 					pCtx->iPrevPicOrderCntMsb = 0;
-					pCtx->iPrevFrameNum = 0;
 					pCtx->pSliceHeader->iPicOrderCntLsb = 0;
         }
         ++ iIdx;
