@@ -54,6 +54,20 @@ namespace WelsDec {
 void UpdateP16x16MotionInfo (PDqLayer pCurDqLayer, int32_t listIdx, int8_t iRef, int16_t iMVs[2]);
 
 /*!
+* \brief     update ref_index cache for current MB, only for P_16x16 (SKIP inclusive)
+* \param
+* \param
+*/
+void UpdateP16x16RefIdx(PDqLayer pCurDqLayer, int32_t listIdx, int8_t iRef);
+
+/*!
+* \brief     update mv only cache for current MB, only for P_16x16 (SKIP inclusive)
+* \param
+* \param
+*/
+void UpdateP16x16MotionOnly(PDqLayer pCurDqLayer, int32_t listIdx, int16_t iMVs[2]);
+
+/*!
 * \brief   update mv and ref_index cache for current MB, only for P_16x8
 * \param
 * \param
