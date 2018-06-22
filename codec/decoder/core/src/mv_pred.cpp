@@ -317,7 +317,6 @@ void PredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]) {
 
 int32_t GetColocatedMb(PWelsDecoderContext pCtx, MbType& mbType, SubMbType& subMbType) {
 	PDqLayer pCurLayer = pCtx->pCurDqLayer;
-	PSlice pSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
 	int32_t iMbXy = pCurLayer->iMbXyIndex;
 
 	uint32_t is8x8 = IS_Inter_8x8(pCurLayer->pMbType[iMbXy]);
