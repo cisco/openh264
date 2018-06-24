@@ -1247,8 +1247,10 @@ void WelsMdInterFinePartition (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* p
   if (iCost < iBestCost) {
     int32_t iCostPart;
     pCurMb->uiMbType = MB_TYPE_8x8;
-    memset (pCurMb->uiSubMbType, SUB_MB_TYPE_8x8, 4);
-
+		for (int32_t i = 0; i < 4; ++i) {
+			pCurMb->uiSubMbType[i] = SUB_MB_TYPE_8x8;
+		}
+   
 //    WelsLog( pEncCtx, WELS_LOG_INFO, "WelsMdP16x8, p_ref[0]= 0x%p", pMbCache->SPicData.pRefMb[0]);
     iCostPart = WelsMdP16x8 (pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice);
     if (iCostPart <= iCost) {
@@ -1309,7 +1311,9 @@ void WelsMdInterFinePartitionVaa (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice
     if (iCostP8x8 < iBestCost) {
       iBestCost = iCostP8x8;
       pCurMb->uiMbType = MB_TYPE_8x8;
-      memset (pCurMb->uiSubMbType, SUB_MB_TYPE_8x8, 4);
+			for (int32_t i = 0; i < 4; ++i) {
+				pCurMb->uiSubMbType[i] = SUB_MB_TYPE_8x8;
+			}
     }
     break;
 
@@ -1318,7 +1322,9 @@ void WelsMdInterFinePartitionVaa (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice
     if (iCostP8x8 < iBestCost) {
       iBestCost = iCostP8x8;
       pCurMb->uiMbType = MB_TYPE_8x8;
-      memset (pCurMb->uiSubMbType, SUB_MB_TYPE_8x8, 4);
+			for (int32_t i = 0; i < 4; ++i) {
+				pCurMb->uiSubMbType[i] = SUB_MB_TYPE_8x8;
+			}
 
       iCostP16x8 = WelsMdP16x8 (pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice);
       if (iCostP16x8 <= iBestCost) {

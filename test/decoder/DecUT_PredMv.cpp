@@ -161,7 +161,7 @@ void CopyMvInputData (SWelsMvPred* pDstMvPred, SAnchorMvPred* pSrcMvPred) {
 
 #define TEST_MV_PRED \
   AnchorPredMv (sAncMvPred.iMvArray,  sAncMvPred.iRefIdxArray, iIndex, iBlockWidth, iRef,  sAncMvPred.iMvp); \
-  PredMv (sWelsMvPred.iMvArray, sWelsMvPred.iRefIdxArray, iIndex, iBlockWidth, iRef, sWelsMvPred.iMvp); \
+  PredMv (sWelsMvPred.iMvArray, sWelsMvPred.iRefIdxArray, LIST_0, iIndex, iBlockWidth, iRef, sWelsMvPred.iMvp); \
   bOK = ((sAncMvPred.iMvp[0] == sWelsMvPred.iMvp[0]) && (sAncMvPred.iMvp[1] == sWelsMvPred.iMvp[1])); \
   EXPECT_EQ (bOK, true);
 
@@ -236,7 +236,7 @@ TEST (PredMvTest, PredInter16x8Mv) {
     iRef = (rand() % 18) - 2; //-2~15
     INIT_MV_DATA;
     AnchorPredInter16x8Mv (sAncMvPred.iMvArray,  sAncMvPred.iRefIdxArray, iIndex, iRef,  sAncMvPred.iMvp);
-    PredInter16x8Mv (sWelsMvPred.iMvArray, sWelsMvPred.iRefIdxArray, iIndex, iRef, sWelsMvPred.iMvp);
+    PredInter16x8Mv (sWelsMvPred.iMvArray, sWelsMvPred.iRefIdxArray, LIST_0, iIndex, iRef, sWelsMvPred.iMvp);
     bOK = ((sAncMvPred.iMvp[0] == sWelsMvPred.iMvp[0]) && (sAncMvPred.iMvp[1] == sWelsMvPred.iMvp[1]));
     EXPECT_EQ (bOK, true);
   }
@@ -255,7 +255,7 @@ TEST (PredMvTest, PredInter8x16Mv) {
     iRef = (rand() % 18) - 2; //-2~15
     INIT_MV_DATA;
     AnchorPredInter8x16Mv (sAncMvPred.iMvArray,  sAncMvPred.iRefIdxArray, iIndex, iRef,  sAncMvPred.iMvp);
-    PredInter8x16Mv (sWelsMvPred.iMvArray, sWelsMvPred.iRefIdxArray, iIndex, iRef, sWelsMvPred.iMvp);
+    PredInter8x16Mv (sWelsMvPred.iMvArray, sWelsMvPred.iRefIdxArray, LIST_0, iIndex, iRef, sWelsMvPred.iMvp);
     bOK = ((sAncMvPred.iMvp[0] == sWelsMvPred.iMvp[0]) && (sAncMvPred.iMvp[1] == sWelsMvPred.iMvp[1]));
     EXPECT_EQ (bOK, true);
   }
@@ -419,7 +419,7 @@ int32_t AllocLayerData (PDqLayer pDqLayer) {
   if (pDqLayer->pSliceIdc == NULL)
     return 1;
 
-  pDqLayer->pMbType = (int16_t*) WelsMallocz (pDqLayer->iMbWidth * pDqLayer->iMbHeight * sizeof (int16_t),
+  pDqLayer->pMbType = (uint32_t*) WelsMallocz (pDqLayer->iMbWidth * pDqLayer->iMbHeight * sizeof (uint32_t),
                       "pDqLayer->pMbType");
   if (pDqLayer->pMbType == NULL)
     return 1;

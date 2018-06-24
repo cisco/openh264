@@ -107,6 +107,7 @@ int32_t         iPicOrderCntLsb;
 int32_t         iDeltaPicOrderCntBottom;
 int32_t         iDeltaPicOrderCnt[2];
 int32_t         iRedundantPicCnt;
+int32_t					iDirectSpatialMvPredFlag; //!< Direct Mode type to be used (0: Temporal, 1: Spatial)
 int32_t         uiRefCount[LIST_A];
 int32_t         iSliceQpDelta;  //no use for iSliceQp is used directly
 int32_t         iSliceQp;
@@ -198,6 +199,7 @@ bool            bSliceHeaderExtFlag; // Indicate which slice header is used, avc
 uint8_t         eSliceType;
 uint8_t         uiPadding[2];
 int32_t         iLastDeltaQp;
+int16_t         iMvScale[LIST_A][MAX_DPB_COUNT]; //Moton vector scale For Temporal Direct Mode Type
 } SSlice, *PSlice;
 
 } // namespace WelsDec

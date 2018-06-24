@@ -63,11 +63,12 @@ struct TagDqLayer {
 
   PBitStringAux                 pBitStringAux;  // pointer to SBitStringAux
   PFmo                          pFmo;           // Current fmo context pointer used
-  int16_t* pMbType;
+  uint32_t* pMbType;
   int32_t* pSliceIdc;                           // using int32_t for slice_idc
   int16_t (*pMv[LIST_A])[MB_BLOCK4x4_NUM][MV_A];
   int16_t (*pMvd[LIST_A])[MB_BLOCK4x4_NUM][MV_A];
   int8_t  (*pRefIndex[LIST_A])[MB_BLOCK4x4_NUM];
+	int8_t	(*pDirect)[MB_BLOCK4x4_NUM];
   bool*    pNoSubMbPartSizeLessThan8x8Flag;
   bool*    pTransformSize8x8Flag;
   int8_t*  pLumaQp;
@@ -86,7 +87,7 @@ struct TagDqLayer {
   uint8_t  *pIntraNxNAvailFlag;
   int8_t*  pChromaPredMode;
   //uint8_t (*motion_pred_flag[LIST_A])[MB_PARTITION_SIZE]; // 8x8
-  int8_t (*pSubMbType)[MB_SUB_PARTITION_SIZE];
+  uint32_t (*pSubMbType)[MB_SUB_PARTITION_SIZE];
   int32_t iLumaStride;
   int32_t iChromaStride;
   uint8_t* pPred[3];
@@ -114,8 +115,13 @@ struct TagDqLayer {
   PPicture                  pRef;                   // reference picture pointer
   PPicture                  pDec;                   // reconstruction picture pointer for layer
 
+	int16_t										iColocMv[2][16][2];     //Colocated MV cache
+	int8_t										iColocRefIndex[2][16];  //Colocated RefIndex cache
+	int8_t										iColocIntra[16];			  //Colocated Intra cache
+
   bool                      bUseWeightPredictionFlag;
-  bool                      bStoreRefBasePicFlag;                           // iCurTid == 0 && iCurQid = 0 && bEncodeKeyPic = 1
+	bool                      bUseWeightedBiPredIdc;
+	bool                      bStoreRefBasePicFlag;                           // iCurTid == 0 && iCurQid = 0 && bEncodeKeyPic = 1
   bool                      bTCoeffLevelPredFlag;
   bool                      bConstrainedIntraResamplingFlag;
   uint8_t                   uiRefLayerDqId;
@@ -129,7 +135,7 @@ typedef struct TagGpuAvcLayer {
   SLayerInfo                sLayerInfo;
   PBitStringAux             pBitStringAux;  // pointer to SBitStringAux
 
-  int16_t*                  pMbType;
+	uint32_t*                  pMbType;
   int32_t*                  pSliceIdc;      // using int32_t for slice_idc
   int8_t*                   pLumaQp;
   int8_t*                   pCbp;

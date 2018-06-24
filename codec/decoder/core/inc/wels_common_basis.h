@@ -64,8 +64,8 @@ int32_t iBottomOffset;
 } SPosOffset;
 
 /* MB Type & Sub-MB Type */
-typedef int32_t MbType;
-typedef int32_t SubMbType;
+typedef uint32_t MbType;
+typedef uint32_t SubMbType;
 
 #define I16_LUMA_DC  1
 #define I16_LUMA_AC  2
@@ -237,18 +237,67 @@ typedef struct TagPartMbInfo {
     int8_t iPartCount; //P_16*16, P_16*8, P_8*16, P_8*8 based on 8*8 block; P_8*4, P_4*8, P_4*4 based on 4*4 block
     int8_t iPartWidth; //based on 4*4 block
 } SPartMbInfo;
-static const SPartMbInfo g_ksInterMbTypeInfo[5] = {
+
+//Table 7.13. Macroblock type values 0 to 4 for P slices.
+static const SPartMbInfo g_ksInterPMbTypeInfo[5] = {
     {MB_TYPE_16x16,    1, 4},
     {MB_TYPE_16x8,     2, 4},
     {MB_TYPE_8x16,     2, 2},
     {MB_TYPE_8x8,      4, 4},
     {MB_TYPE_8x8_REF0, 4, 4}, //ref0--ref_idx not present in bit-stream and default as 0
 };
-static const SPartMbInfo g_ksInterSubMbTypeInfo[4] = {
+
+//Table 7.14. Macroblock type values 0 to 22 for B slices.
+static const SPartMbInfo g_ksInterBMbTypeInfo[] = {
+	//						Part 0				Part 1
+	{ MB_TYPE_DIRECT, 1, 4 },	//B_Direct_16x16
+	{ MB_TYPE_16x16 | MB_TYPE_P0L0, 1, 4 },	//B_L0_16x16
+	{ MB_TYPE_16x16 | MB_TYPE_P0L1, 1, 4 },	//B_L1_16x16
+	{ MB_TYPE_16x16 | MB_TYPE_P0L0 | MB_TYPE_P0L1, 1, 4 },	//B_Bi_16x16
+	{ MB_TYPE_16x8  | MB_TYPE_P0L0 | MB_TYPE_P1L0, 2, 4 },		//B_L0_L0_16x8
+	{ MB_TYPE_8x16  | MB_TYPE_P0L0 | MB_TYPE_P1L0, 2, 2 },		//B_L0_L0_8x16
+	{ MB_TYPE_16x8  | MB_TYPE_P0L1 | MB_TYPE_P1L1, 2, 4 },		//B_L1_L1_16x8
+	{ MB_TYPE_8x16  | MB_TYPE_P0L1 | MB_TYPE_P1L1, 2, 2 },		//B_L1_L1_8x16
+	{ MB_TYPE_16x8  | MB_TYPE_P0L0 | MB_TYPE_P1L1, 2, 4 },		//B_L0_L1_16x8
+	{ MB_TYPE_8x16  | MB_TYPE_P0L0 | MB_TYPE_P1L1, 2, 2 },		//B_L0_L1_8x16
+	{ MB_TYPE_16x8  | MB_TYPE_P0L1 | MB_TYPE_P1L0, 2, 4 },		//B_L1_L0_16x8
+	{ MB_TYPE_8x16  | MB_TYPE_P0L1 | MB_TYPE_P1L0, 2, 2 },		//B_L1_L0_8x16
+	{ MB_TYPE_16x8  | MB_TYPE_P0L0 | MB_TYPE_P1L0 | MB_TYPE_P1L1, 2, 4 },		//B_L0_Bi_16x8
+	{ MB_TYPE_8x16  | MB_TYPE_P0L0 | MB_TYPE_P1L0 | MB_TYPE_P1L1, 2, 2 },		//B_L0_Bi_8x16
+	{ MB_TYPE_16x8  | MB_TYPE_P0L1 | MB_TYPE_P1L0 | MB_TYPE_P1L1, 2, 4 },		//B_L1_Bi_16x8
+	{ MB_TYPE_8x16  | MB_TYPE_P0L1 | MB_TYPE_P1L0 | MB_TYPE_P1L1, 2, 2 },		//B_L1_Bi_8x16
+	{ MB_TYPE_16x8  | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_P1L0, 2, 4 },		//B_Bi_L0_16x8
+	{ MB_TYPE_8x16  | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_P1L0, 2, 2 },		//B_Bi_L0_8x16
+	{ MB_TYPE_16x8  | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_P1L1, 2, 4 },		//B_Bi_L1_16x8
+	{ MB_TYPE_8x16  | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_P1L1, 2, 2 },		//B_Bi_L1_8x16
+	{ MB_TYPE_16x8  | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_P1L0 | MB_TYPE_P1L1, 2, 4 },		//B_Bi_Bi_16x8
+	{ MB_TYPE_8x16  | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_P1L0 | MB_TYPE_P1L1, 2, 2 },		//B_Bi_Bi_8x16
+	{ MB_TYPE_8x8   | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_P1L0 | MB_TYPE_P1L1,	4, 4 }		//B_8x8
+};
+
+//Table 7.17 – Sub-macroblock types in B macroblocks.
+static const SPartMbInfo g_ksInterPSubMbTypeInfo[4] = {
     {SUB_MB_TYPE_8x8, 1, 2},
     {SUB_MB_TYPE_8x4, 2, 2},
     {SUB_MB_TYPE_4x8, 2, 1},
     {SUB_MB_TYPE_4x4, 4, 1},
+};
+
+//Table 7.18 – Sub-macroblock types in B macroblocks.
+static const SPartMbInfo g_ksInterBSubMbTypeInfo[] = {
+	{ MB_TYPE_DIRECT,																1, 2 },	//B_Direct_8x8
+	{ SUB_MB_TYPE_8x8 | MB_TYPE_P0L0,									1, 2 },	//B_L0_8x8
+	{ SUB_MB_TYPE_8x8 | MB_TYPE_P0L1,									1, 2 },	//B_L1_8x8
+	{ SUB_MB_TYPE_8x8 | MB_TYPE_P0L0 | MB_TYPE_P0L1,	1, 2 },	//B_Bi_8x8
+	{ SUB_MB_TYPE_8x4 | MB_TYPE_P0L0,									2, 2 },	//B_L0_8x4
+	{ SUB_MB_TYPE_4x8 | MB_TYPE_P0L0,									2, 1 },	//B_L0_4x8
+	{ SUB_MB_TYPE_8x4 | MB_TYPE_P0L1,									2, 2 },	//B_L1_8x4
+	{ SUB_MB_TYPE_4x8 | MB_TYPE_P0L1,									2, 1 },	//B_L1_4x8
+	{ SUB_MB_TYPE_8x4 | MB_TYPE_P0L0 | MB_TYPE_P0L1,	2, 2 },	//B_Bi_8x4
+	{ SUB_MB_TYPE_4x8 | MB_TYPE_P0L0 | MB_TYPE_P0L1,	2, 1 },	//B_Bi_4x8
+	{ SUB_MB_TYPE_4x4 | MB_TYPE_P0L0,									4, 1 },	//B_L0_4x4
+	{ SUB_MB_TYPE_4x4 | MB_TYPE_P0L1,									4, 1 },	//B_L1_4x4
+	{ SUB_MB_TYPE_4x4 | MB_TYPE_P0L0 | MB_TYPE_P0L1,	4, 1 }	//B_Bi_4x4
 };
 
 typedef struct TagSar {
