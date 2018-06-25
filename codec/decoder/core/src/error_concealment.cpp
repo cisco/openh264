@@ -267,7 +267,7 @@ void GetAvilInfoFromCorrectMb (PWelsDecoderContext pCtx) {
     for (int32_t iMbX = 0; iMbX < iMbWidth; ++iMbX) {
       iMbXyIndex = iMbY * iMbWidth + iMbX;
       if (pMbCorrectlyDecodedFlag[iMbXyIndex] && IS_INTER (pCurDqLayer->pMbType[iMbXyIndex])) {
-        int32_t iMBType = pCurDqLayer->pMbType[iMbXyIndex];
+        uint32_t iMBType = pCurDqLayer->pMbType[iMbXyIndex];
         switch (iMBType) {
         case MB_TYPE_SKIP:
         case MB_TYPE_16x16:
