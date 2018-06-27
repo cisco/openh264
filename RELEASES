@@ -180,6 +180,21 @@ Binaries
 These binary releases are distributed under this license:
 http://www.openh264.org/BINARY_LICENSE.txt
 
+v1.8.0
+------
+http://ciscobinary.openh264.org/libopenh264-1.8.0-android19.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.8.0-android19.so.sig.bz2
+http://ciscobinary.openh264.org/libopenh264-1.8.0-ios.a.bz2
+http://ciscobinary.openh264.org/libopenh264-1.8.0-ios.a.sig.bz2
+http://ciscobinary.openh264.org/libopenh264-1.8.0-linux32.4.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.8.0-linux32.4.so.sig.bz2
+http://ciscobinary.openh264.org/libopenh264-1.8.0-linux64.4.so.bz2
+http://ciscobinary.openh264.org/libopenh264-1.8.0-linux64.4.so.sig.bz2
+http://ciscobinary.openh264.org/libopenh264-1.8.0-osx32.4.dylib.bz2
+http://ciscobinary.openh264.org/libopenh264-1.8.0-osx64.4.dylib.bz2
+http://ciscobinary.openh264.org/openh264-1.8.0-win32.dll.bz2
+http://ciscobinary.openh264.org/openh264-1.8.0-win64.dll.bz2
+
 v1.7.0
 ------
 http://ciscobinary.openh264.org/libopenh264-1.7.0-android19.so.bz2
