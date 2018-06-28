@@ -58,8 +58,9 @@ void WelsFillCacheConstrain0IntraNxN (PWelsNeighAvail pNeighAvail, uint8_t* pNon
 void WelsFillCacheConstrain1IntraNxN (PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroCount, int8_t* pIntraPredMode,
                                       PDqLayer pCurLayer);
 void WelsFillCacheInterCabac (PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroCount,
-                         int16_t iMvArray[LIST_A][30][MV_A], int16_t iMvdCache[LIST_A][30][MV_A], int8_t iRefIdxArray[LIST_A][30], PDqLayer pCurLayer);
-void WelsFillDirectCacheCabac(PWelsNeighAvail pNeighAvail, int8_t iDirect[30], PDqLayer pCurLayer);
+                              int16_t iMvArray[LIST_A][30][MV_A], int16_t iMvdCache[LIST_A][30][MV_A], int8_t iRefIdxArray[LIST_A][30],
+                              PDqLayer pCurLayer);
+void WelsFillDirectCacheCabac (PWelsNeighAvail pNeighAvail, int8_t iDirect[30], PDqLayer pCurLayer);
 void WelsFillCacheInter (PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroCount,
                          int16_t iMvArray[LIST_A][30][MV_A], int8_t iRefIdxArray[LIST_A][30], PDqLayer pCurLayer);
 
@@ -110,18 +111,18 @@ int32_t WelsResidualBlockCavlc (SVlcTable* pVlcTable,
 
 // Transform8x8
 int32_t WelsResidualBlockCavlc8x8 (SVlcTable* pVlcTable,
-                                uint8_t* pNonZeroCountCache,
-                                PBitStringAux pBs,
-                                /*int16_t* coeff_level,*/
-                                int32_t iIndex,
-                                int32_t iMaxNumCoeff,
-                                const uint8_t* kpZigzagTable,
-                                int32_t iResidualProperty,
-                                /*short *tCoeffLevel,*/
-                                int16_t* pTCoeff,
-                                int32_t  iIdx4x4,
-                                uint8_t uiQp,
-                                PWelsDecoderContext pCtx);
+                                   uint8_t* pNonZeroCountCache,
+                                   PBitStringAux pBs,
+                                   /*int16_t* coeff_level,*/
+                                   int32_t iIndex,
+                                   int32_t iMaxNumCoeff,
+                                   const uint8_t* kpZigzagTable,
+                                   int32_t iResidualProperty,
+                                   /*short *tCoeffLevel,*/
+                                   int16_t* pTCoeff,
+                                   int32_t  iIdx4x4,
+                                   uint8_t uiQp,
+                                   PWelsDecoderContext pCtx);
 
 /*!
  * \brief   parsing inter info (including ref_index and pMvd)

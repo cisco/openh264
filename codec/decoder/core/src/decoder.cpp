@@ -302,7 +302,7 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
 
   pCtx->pDec                      = NULL;
 
-	pCtx->pTempDec									= NULL;
+  pCtx->pTempDec                  = NULL;
 
   WelsResetRefPic (pCtx);
 
@@ -325,8 +325,8 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   pCtx->iSubSPSInvalidNum = 0;
   pCtx->iSubSPSLastInvalidId = -1;
   pCtx->iFeedbackNalRefIdc = -1; //initialize
-	pCtx->iPrevPicOrderCntMsb = 0;
-	pCtx->iPrevPicOrderCntLsb = 0;
+  pCtx->iPrevPicOrderCntMsb = 0;
+  pCtx->iPrevPicOrderCntLsb = 0;
 
 }
 
@@ -390,8 +390,8 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
 
   if (pCtx->bHaveGotMemory && (kiPicWidth == pCtx->iImgWidthInPixel && kiPicHeight == pCtx->iImgHeightInPixel)
       && pCtx->pPicBuff != NULL && pCtx->pPicBuff->iCapacity != iPicQueueSize) {
-    // currently only active for LIST_0 due to have no B frames 
-		// Actually just need one memory allocation for the PicBuff. While it needs two pointer list (LIST_0 and LIST_1).   
+    // currently only active for LIST_0 due to have no B frames
+    // Actually just need one memory allocation for the PicBuff. While it needs two pointer list (LIST_0 and LIST_1).
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO,
              "WelsRequestMem(): memory re-alloc for no resolution change (size = %d * %d), ref list size change from %d to %d",
              kiPicWidth, kiPicHeight, pCtx->pPicBuff->iCapacity, iPicQueueSize);
@@ -416,7 +416,7 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
     if (NULL != ppPic && NULL != *ppPic) {
       DestroyPicBuff (ppPic, pMa);
     }
- 
+
 
     pCtx->pPreviousDecodedPictureInDpb = NULL;
 
@@ -446,7 +446,7 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
  *  free memory dynamically allocated during decoder
  */
 void WelsFreeDynamicMemory (PWelsDecoderContext pCtx) {
- 
+
   CMemoryAlign* pMa = pCtx->pMemAlign;
 
   //free dq layer memory
@@ -457,16 +457,16 @@ void WelsFreeDynamicMemory (PWelsDecoderContext pCtx) {
 
   //free ref-pic list & picture memory
   WelsResetRefPic (pCtx);
- 
+
   PPicBuff* pPicBuff = &pCtx->pPicBuff;
   if (NULL != pPicBuff && NULL != *pPicBuff) {
     DestroyPicBuff (pPicBuff, pMa);
   }
 
-	if (pCtx->pTempDec) {
-		FreePicture(pCtx->pTempDec, pCtx->pMemAlign);
-		pCtx->pTempDec = NULL;
-	}
+  if (pCtx->pTempDec) {
+    FreePicture (pCtx->pTempDec, pCtx->pMemAlign);
+    pCtx->pTempDec = NULL;
+  }
 
   // added for safe memory
   pCtx->iImgWidthInPixel  = 0;

@@ -89,9 +89,9 @@ static inline int32_t BsGetBits (PBitStringAux pBs, int32_t iNumBits, uint32_t* 
 
 // for data sharing cross modules and try to reduce size of binary generated, 12/10/2009
 extern const uint8_t g_kuiIntra4x4CbpTable[48];
-    extern const uint8_t g_kuiIntra4x4CbpTable400[16];
+extern const uint8_t g_kuiIntra4x4CbpTable400[16];
 extern const uint8_t g_kuiInterCbpTable[48];
-    extern const uint8_t g_kuiInterCbpTable400[16];
+extern const uint8_t g_kuiInterCbpTable400[16];
 
 extern const uint8_t g_kuiLeadingZeroTable[256];
 
@@ -236,7 +236,7 @@ static inline int32_t BsGetTrailingBits (uint8_t* pBuf) {
 /*
  *      Check whether there is more rbsp data for processing
  */
-static inline bool CheckMoreRBSPData(PBitStringAux pBsAux) {
+static inline bool CheckMoreRBSPData (PBitStringAux pBsAux) {
   if ((pBsAux->iBits - ((pBsAux->pCurBuf - pBsAux->pStartBuf - 2) << 3) - pBsAux->iLeftBits) > 1) {
     return true;
   } else {

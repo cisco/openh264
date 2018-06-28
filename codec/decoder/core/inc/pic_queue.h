@@ -43,9 +43,9 @@ namespace WelsDec {
 
 
 typedef struct TagPicBuff {
-PPicture*      ppPic;
-int32_t        iCapacity;  // capacity size of queue
-int32_t        iCurrentIdx;
+  PPicture*      ppPic;
+  int32_t        iCapacity;  // capacity size of queue
+  int32_t        iCurrentIdx;
 } SPicBuff, *PPicBuff;
 
 /*

@@ -312,8 +312,8 @@ int32_t ParsePredWeightedTable (PBitStringAux pBs, PSliceHeader pSh) {
     pSh->sPredWeightTable.uiChromaLog2WeightDenom = uiCode;
   }
 
-	if ((pSh->sPredWeightTable.uiLumaLog2WeightDenom | pSh->sPredWeightTable.uiChromaLog2WeightDenom) > 7)
-		return ERR_NONE;
+  if ((pSh->sPredWeightTable.uiLumaLog2WeightDenom | pSh->sPredWeightTable.uiChromaLog2WeightDenom) > 7)
+    return ERR_NONE;
 
   do {
 
@@ -366,9 +366,9 @@ int32_t ParsePredWeightedTable (PBitStringAux pBs, PSliceHeader pSh) {
 
     }
     ++iList;
-		if (pSh->eSliceType != B_SLICE) {
-			break;
-		}
+    if (pSh->eSliceType != B_SLICE) {
+      break;
+    }
   } while (iList < LIST_A);//TODO: SUPPORT LIST_A
   return ERR_NONE;
 }
@@ -480,9 +480,9 @@ int32_t ParseDecRefPicMarking (PWelsDecoderContext pCtx, PBitStringAux pBs, PSli
           WELS_VERIFY_RETURN_IF (-1, (!bAllowMmco5 || bMmco5Exist));
           bMmco5Exist = true;
 
-					pCtx->iPrevPicOrderCntLsb = 0;
-					pCtx->iPrevPicOrderCntMsb = 0;
-					pCtx->pSliceHeader->iPicOrderCntLsb = 0;
+          pCtx->iPrevPicOrderCntLsb = 0;
+          pCtx->iPrevPicOrderCntMsb = 0;
+          pCtx->pSliceHeader->iPicOrderCntLsb = 0;
         }
         ++ iIdx;
 
@@ -798,7 +798,7 @@ void UpdateDecoderStatisticsForActiveParaset (SDecoderStatistics* pDecoderStatis
  */
 int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, const bool kbExtensionFlag) {
   PNalUnit const kpCurNal               = pCtx->pAccessUnitList->pNalUnitsList[pCtx->pAccessUnitList->uiAvailUnitsNum -
-                                          1];
+                                                                                 1];
 
   PNalUnitHeaderExt pNalHeaderExt       = NULL;
   PSliceHeader pSliceHead               = NULL;
@@ -991,36 +991,36 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     pSliceHead->iDeltaPicOrderCnt[1] = 0;
   if (pSps->uiPocType == 0) {
     WELS_READ_VERIFY (BsGetBits (pBs, pSps->iLog2MaxPocLsb, &uiCode)); //pic_order_cnt_lsb
-		const int32_t iMaxPocLsb = 1 << (pSps->iLog2MaxPocLsb);
+    const int32_t iMaxPocLsb = 1 << (pSps->iLog2MaxPocLsb);
     pSliceHead->iPicOrderCntLsb = uiCode;
     if (pPps->bPicOrderPresentFlag && !pSliceHead->bFieldPicFlag) {
       WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //delta_pic_order_cnt_bottom
       pSliceHead->iDeltaPicOrderCntBottom = iCode;
     }
-		//Calculate poc if necessary
-		int32_t pocLsb = pSliceHead->iPicOrderCntLsb;
-		if (pSliceHead->bIdrFlag || kpCurNal->sNalHeaderExt.sNalUnitHeader.eNalUnitType == NAL_UNIT_CODED_SLICE_IDR) {
-			pCtx->iPrevPicOrderCntMsb = 0;
-			pCtx->iPrevPicOrderCntLsb = 0;
-		}
-		int32_t pocMsb;
-		if (pocLsb < pCtx->iPrevPicOrderCntLsb && pCtx->iPrevPicOrderCntLsb - pocLsb >= iMaxPocLsb / 2)
-			pocMsb = pCtx->iPrevPicOrderCntMsb + iMaxPocLsb;
-		else if (pocLsb > pCtx->iPrevPicOrderCntLsb && pocLsb - pCtx->iPrevPicOrderCntLsb > iMaxPocLsb / 2)
-			pocMsb = pCtx->iPrevPicOrderCntMsb - iMaxPocLsb;
-		else
-			pocMsb = pCtx->iPrevPicOrderCntMsb;
-		pSliceHead->iPicOrderCntLsb = pocMsb + pocLsb;
+    //Calculate poc if necessary
+    int32_t pocLsb = pSliceHead->iPicOrderCntLsb;
+    if (pSliceHead->bIdrFlag || kpCurNal->sNalHeaderExt.sNalUnitHeader.eNalUnitType == NAL_UNIT_CODED_SLICE_IDR) {
+      pCtx->iPrevPicOrderCntMsb = 0;
+      pCtx->iPrevPicOrderCntLsb = 0;
+    }
+    int32_t pocMsb;
+    if (pocLsb < pCtx->iPrevPicOrderCntLsb && pCtx->iPrevPicOrderCntLsb - pocLsb >= iMaxPocLsb / 2)
+      pocMsb = pCtx->iPrevPicOrderCntMsb + iMaxPocLsb;
+    else if (pocLsb > pCtx->iPrevPicOrderCntLsb && pocLsb - pCtx->iPrevPicOrderCntLsb > iMaxPocLsb / 2)
+      pocMsb = pCtx->iPrevPicOrderCntMsb - iMaxPocLsb;
+    else
+      pocMsb = pCtx->iPrevPicOrderCntMsb;
+    pSliceHead->iPicOrderCntLsb = pocMsb + pocLsb;
 
-		if (pPps->bPicOrderPresentFlag && !pSliceHead->bFieldPicFlag) {
-			pSliceHead->iPicOrderCntLsb += pSliceHead->iDeltaPicOrderCntBottom;
-		}
+    if (pPps->bPicOrderPresentFlag && !pSliceHead->bFieldPicFlag) {
+      pSliceHead->iPicOrderCntLsb += pSliceHead->iDeltaPicOrderCntBottom;
+    }
 
-		if (kpCurNal->sNalHeaderExt.sNalUnitHeader.uiNalRefIdc != 0) {
-			pCtx->iPrevPicOrderCntLsb = pocLsb;
-			pCtx->iPrevPicOrderCntMsb = pocMsb;
-		}
-		//End of Calculating poc
+    if (kpCurNal->sNalHeaderExt.sNalUnitHeader.uiNalRefIdc != 0) {
+      pCtx->iPrevPicOrderCntLsb = pocLsb;
+      pCtx->iPrevPicOrderCntMsb = pocMsb;
+    }
+    //End of Calculating poc
   } else if (pSps->uiPocType == 1 && !pSps->bDeltaPicOrderAlwaysZeroFlag) {
     WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //delta_pic_order_cnt[ 0 ]
     pSliceHead->iDeltaPicOrderCnt[0] = iCode;
@@ -1042,17 +1042,17 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
     }
   }
 
-	if (B_SLICE == uiSliceType) {
-		//fix me: it needs to use the this flag somewhere for B-Sclice
-		WELS_READ_VERIFY(BsGetOneBit(pBs, &uiCode)); //direct_spatial_mv_pred_flag
-		pSliceHead->iDirectSpatialMvPredFlag = uiCode;
-	}
+  if (B_SLICE == uiSliceType) {
+    //fix me: it needs to use the this flag somewhere for B-Sclice
+    WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //direct_spatial_mv_pred_flag
+    pSliceHead->iDirectSpatialMvPredFlag = uiCode;
+  }
 
   //set defaults, might be overriden a few line later
   pSliceHead->uiRefCount[0] = pPps->uiNumRefIdxL0Active;
   pSliceHead->uiRefCount[1] = pPps->uiNumRefIdxL1Active;
 
-	bool bReadNumRefFlag = (P_SLICE == uiSliceType || B_SLICE == uiSliceType);
+  bool bReadNumRefFlag = (P_SLICE == uiSliceType || B_SLICE == uiSliceType);
   if (kbExtensionFlag) {
     bReadNumRefFlag &= (BASE_QUALITY_ID == pNalHeaderExt->uiQualityId);
   }
@@ -1064,12 +1064,12 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
       WELS_CHECK_SE_UPPER_ERROR (uiCode, MAX_NUM_REF_IDX_L0_ACTIVE_MINUS1, "num_ref_idx_l0_active_minus1",
                                  GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_NUM_REF_IDX_L0_ACTIVE_MINUS1));
       pSliceHead->uiRefCount[0] = 1 + uiCode;
-			if (B_SLICE == uiSliceType) {
-				WELS_READ_VERIFY(BsGetUe(pBs, &uiCode)); //num_ref_idx_l1_active_minus1
-				WELS_CHECK_SE_UPPER_ERROR(uiCode, MAX_NUM_REF_IDX_L1_ACTIVE_MINUS1, "num_ref_idx_l1_active_minus1",
-					GENERATE_ERROR_NO(ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_NUM_REF_IDX_L1_ACTIVE_MINUS1));
-				pSliceHead->uiRefCount[1] = 1 + uiCode;
-			}
+      if (B_SLICE == uiSliceType) {
+        WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //num_ref_idx_l1_active_minus1
+        WELS_CHECK_SE_UPPER_ERROR (uiCode, MAX_NUM_REF_IDX_L1_ACTIVE_MINUS1, "num_ref_idx_l1_active_minus1",
+                                   GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_NUM_REF_IDX_L1_ACTIVE_MINUS1));
+        pSliceHead->uiRefCount[1] = 1 + uiCode;
+      }
     }
   }
 
@@ -1085,8 +1085,8 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
       return iRet;
     }
 
-		if ( (pPps->bWeightedPredFlag && uiSliceType == P_SLICE) || (pPps->uiWeightedBipredIdc == 1 && uiSliceType == B_SLICE) ) {
-			iRet = ParsePredWeightedTable (pBs, pSliceHead);
+    if ((pPps->bWeightedPredFlag && uiSliceType == P_SLICE) || (pPps->uiWeightedBipredIdc == 1 && uiSliceType == B_SLICE)) {
+      iRet = ParsePredWeightedTable (pBs, pSliceHead);
       if (iRet != ERR_NONE) {
         WelsLog (pLogCtx, WELS_LOG_WARNING, "invalid weighted prediction syntaxs!");
         return iRet;
@@ -1436,19 +1436,21 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
     pCtx->sMb.pMbType[i] = (uint32_t*)pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (uint32_t),
                            "pCtx->sMb.pMbType[]");
     pCtx->sMb.pMv[i][LIST_0] = (int16_t (*)[16][2])pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (
-                            int16_t) * MV_A * MB_BLOCK4x4_NUM, "pCtx->sMb.pMv[][]");
-		pCtx->sMb.pMv[i][LIST_1] = (int16_t(*)[16][2])pMa->WelsMallocz(pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof(
-			int16_t) * MV_A * MB_BLOCK4x4_NUM, "pCtx->sMb.pMv[][]");
+                                 int16_t) * MV_A * MB_BLOCK4x4_NUM, "pCtx->sMb.pMv[][]");
+    pCtx->sMb.pMv[i][LIST_1] = (int16_t (*)[16][2])pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (
+                                 int16_t) * MV_A * MB_BLOCK4x4_NUM, "pCtx->sMb.pMv[][]");
 
-    pCtx->sMb.pRefIndex[i][LIST_0] = (int8_t (*)[MB_BLOCK4x4_NUM])pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight *
-                                sizeof (
-                                  int8_t) * MB_BLOCK4x4_NUM, "pCtx->sMb.pRefIndex[][]");
-		pCtx->sMb.pRefIndex[i][LIST_1] = (int8_t(*)[MB_BLOCK4x4_NUM])pMa->WelsMallocz(pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight *
-			sizeof(
-				int8_t) * MB_BLOCK4x4_NUM, "pCtx->sMb.pRefIndex[][]");
-		pCtx->sMb.pDirect[i] = (int8_t(*)[MB_BLOCK4x4_NUM])pMa->WelsMallocz(pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight *
-			sizeof(
-				int8_t) * MB_BLOCK4x4_NUM, "pCtx->sMb.pDirect[]");
+    pCtx->sMb.pRefIndex[i][LIST_0] = (int8_t (*)[MB_BLOCK4x4_NUM])pMa->WelsMallocz (pCtx->sMb.iMbWidth *
+                                     pCtx->sMb.iMbHeight *
+                                     sizeof (
+                                       int8_t) * MB_BLOCK4x4_NUM, "pCtx->sMb.pRefIndex[][]");
+    pCtx->sMb.pRefIndex[i][LIST_1] = (int8_t (*)[MB_BLOCK4x4_NUM])pMa->WelsMallocz (pCtx->sMb.iMbWidth *
+                                     pCtx->sMb.iMbHeight *
+                                     sizeof (
+                                       int8_t) * MB_BLOCK4x4_NUM, "pCtx->sMb.pRefIndex[][]");
+    pCtx->sMb.pDirect[i] = (int8_t (*)[MB_BLOCK4x4_NUM])pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight *
+                           sizeof (
+                             int8_t) * MB_BLOCK4x4_NUM, "pCtx->sMb.pDirect[]");
     pCtx->sMb.pLumaQp[i] = (int8_t*)pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t),
                            "pCtx->sMb.pLumaQp[]");
     pCtx->sMb.pNoSubMbPartSizeLessThan8x8Flag[i] = (bool*)pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight *
@@ -1461,9 +1463,9 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
                                int8_t) * 2,
                              "pCtx->sMb.pChromaQp[]");
     pCtx->sMb.pMvd[i][LIST_0] = (int16_t (*)[16][2])pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (
-                             int16_t) * MV_A * MB_BLOCK4x4_NUM, "pCtx->sMb.pMvd[][]");
-		pCtx->sMb.pMvd[i][LIST_1] = (int16_t(*)[16][2])pMa->WelsMallocz(pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof(
-														 int16_t) * MV_A * MB_BLOCK4x4_NUM, "pCtx->sMb.pMvd[][]");
+                                  int16_t) * MV_A * MB_BLOCK4x4_NUM, "pCtx->sMb.pMvd[][]");
+    pCtx->sMb.pMvd[i][LIST_1] = (int16_t (*)[16][2])pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (
+                                  int16_t) * MV_A * MB_BLOCK4x4_NUM, "pCtx->sMb.pMvd[][]");
     pCtx->sMb.pCbfDc[i] = (uint16_t*)pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (uint16_t),
                           "pCtx->sMb.pCbfDc[]");
     pCtx->sMb.pNzc[i] = (int8_t (*)[24])pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t) * 24,
@@ -1488,7 +1490,7 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
                         "pCtx->sMb.pCbp[]");
     pCtx->sMb.pSubMbType[i] = (uint32_t (*)[MB_PARTITION_SIZE])pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight *
                               sizeof (
-																uint32_t) * MB_PARTITION_SIZE, "pCtx->sMb.pSubMbType[]");
+                                uint32_t) * MB_PARTITION_SIZE, "pCtx->sMb.pSubMbType[]");
     pCtx->sMb.pSliceIdc[i] = (int32_t*) pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int32_t),
                              "pCtx->sMb.pSliceIdc[]"); // using int32_t for slice_idc, 4/21/2010
     pCtx->sMb.pResidualPredFlag[i] = (int8_t*) pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t),
@@ -1506,16 +1508,16 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
     WELS_VERIFY_RETURN_IF (ERR_INFO_OUT_OF_MEMORY,
                            ((NULL == pCtx->sMb.pMbType[i]) ||
                             (NULL == pCtx->sMb.pMv[i][LIST_0]) ||
-														(NULL == pCtx->sMb.pMv[i][LIST_1]) ||
+                            (NULL == pCtx->sMb.pMv[i][LIST_1]) ||
                             (NULL == pCtx->sMb.pRefIndex[i][LIST_0]) ||
-														(NULL == pCtx->sMb.pRefIndex[i][LIST_1]) ||
-														(NULL == pCtx->sMb.pDirect[i]) ||
+                            (NULL == pCtx->sMb.pRefIndex[i][LIST_1]) ||
+                            (NULL == pCtx->sMb.pDirect[i]) ||
                             (NULL == pCtx->sMb.pLumaQp[i]) ||
                             (NULL == pCtx->sMb.pNoSubMbPartSizeLessThan8x8Flag[i]) ||
                             (NULL == pCtx->sMb.pTransformSize8x8Flag[i]) ||
                             (NULL == pCtx->sMb.pChromaQp[i]) ||
                             (NULL == pCtx->sMb.pMvd[i][LIST_0]) ||
-														(NULL == pCtx->sMb.pMvd[i][LIST_1]) ||
+                            (NULL == pCtx->sMb.pMvd[i][LIST_1]) ||
                             (NULL == pCtx->sMb.pCbfDc[i]) ||
                             (NULL == pCtx->sMb.pNzc[i]) ||
                             (NULL == pCtx->sMb.pNzcRs[i]) ||
@@ -1563,27 +1565,27 @@ void UninitialDqLayersContext (PWelsDecoderContext pCtx) {
       pCtx->sMb.pMbType[i] = NULL;
     }
 
-		for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
-			if (pCtx->sMb.pMv[i][listIdx]) {
-				pMa->WelsFree(pCtx->sMb.pMv[i][listIdx], "pCtx->sMb.pMv[][]");
-				pCtx->sMb.pMv[i][listIdx] = NULL;
-			}
+    for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+      if (pCtx->sMb.pMv[i][listIdx]) {
+        pMa->WelsFree (pCtx->sMb.pMv[i][listIdx], "pCtx->sMb.pMv[][]");
+        pCtx->sMb.pMv[i][listIdx] = NULL;
+      }
 
-			if (pCtx->sMb.pRefIndex[i][listIdx]) {
-				pMa->WelsFree(pCtx->sMb.pRefIndex[i][listIdx], "pCtx->sMb.pRefIndex[][]");
-				pCtx->sMb.pRefIndex[i][listIdx] = NULL;
-			}
+      if (pCtx->sMb.pRefIndex[i][listIdx]) {
+        pMa->WelsFree (pCtx->sMb.pRefIndex[i][listIdx], "pCtx->sMb.pRefIndex[][]");
+        pCtx->sMb.pRefIndex[i][listIdx] = NULL;
+      }
 
-			if (pCtx->sMb.pDirect[i]) {
-				pMa->WelsFree(pCtx->sMb.pDirect[i], "pCtx->sMb.pDirect[]");
-				pCtx->sMb.pDirect[i] = NULL;
-			}
+      if (pCtx->sMb.pDirect[i]) {
+        pMa->WelsFree (pCtx->sMb.pDirect[i], "pCtx->sMb.pDirect[]");
+        pCtx->sMb.pDirect[i] = NULL;
+      }
 
-			if (pCtx->sMb.pMvd[i][listIdx]) {
-				pMa->WelsFree(pCtx->sMb.pMvd[i][listIdx], "pCtx->sMb.pMvd[][]");
-				pCtx->sMb.pMvd[i][listIdx] = NULL;
-			}
-		}
+      if (pCtx->sMb.pMvd[i][listIdx]) {
+        pMa->WelsFree (pCtx->sMb.pMvd[i][listIdx], "pCtx->sMb.pMvd[][]");
+        pCtx->sMb.pMvd[i][listIdx] = NULL;
+      }
+    }
 
     if (pCtx->sMb.pNoSubMbPartSizeLessThan8x8Flag[i]) {
       pMa->WelsFree (pCtx->sMb.pNoSubMbPartSizeLessThan8x8Flag[i], "pCtx->sMb.pNoSubMbPartSizeLessThan8x8Flag[]");
@@ -2241,19 +2243,19 @@ static inline void InitDqLayerInfo (PDqLayer pDqLayer, PLayerInfo pLayerInfo, PN
   pDqLayer->uiRefLayerDqId                              = pShExt->uiRefLayerDqId;
   pDqLayer->uiRefLayerChromaPhaseXPlus1Flag             = pShExt->uiRefLayerChromaPhaseXPlus1Flag;
   pDqLayer->uiRefLayerChromaPhaseYPlus1                 = pShExt->uiRefLayerChromaPhaseYPlus1;
-	pDqLayer->bUseWeightPredictionFlag										= false;
-	pDqLayer->bUseWeightedBiPredIdc = false;
+  pDqLayer->bUseWeightPredictionFlag                    = false;
+  pDqLayer->bUseWeightedBiPredIdc = false;
   //memcpy(&pDqLayer->sScaledRefLayer, &pShExt->sScaledRefLayer, sizeof(SPosOffset));//confirmed_safe_unsafe_usage
 
-	if (kuiQualityId == BASE_QUALITY_ID) {
-		pDqLayer->pRefPicListReordering = &pSh->pRefPicListReordering;
-		pDqLayer->pRefPicMarking = &pSh->sRefMarking;
+  if (kuiQualityId == BASE_QUALITY_ID) {
+    pDqLayer->pRefPicListReordering = &pSh->pRefPicListReordering;
+    pDqLayer->pRefPicMarking = &pSh->sRefMarking;
 
-		pDqLayer->bUseWeightPredictionFlag = pSh->pPps->bWeightedPredFlag;
-		pDqLayer->bUseWeightedBiPredIdc = pSh->pPps->uiWeightedBipredIdc == 1;
-		if (pSh->pPps->bWeightedPredFlag || pSh->pPps->uiWeightedBipredIdc == 1) {
-			pDqLayer->pPredWeightTable = &pSh->sPredWeightTable;
-		}
+    pDqLayer->bUseWeightPredictionFlag = pSh->pPps->bWeightedPredFlag;
+    pDqLayer->bUseWeightedBiPredIdc = pSh->pPps->uiWeightedBipredIdc == 1;
+    if (pSh->pPps->bWeightedPredFlag || pSh->pPps->uiWeightedBipredIdc == 1) {
+      pDqLayer->pPredWeightTable = &pSh->sPredWeightTable;
+    }
     pDqLayer->pRefPicBaseMarking        = &pShExt->sRefBasePicMarking;
   }
 
@@ -2266,7 +2268,7 @@ void WelsDqLayerDecodeStart (PWelsDecoderContext pCtx, PNalUnit pCurNal, PSps pS
 
   pCtx->eSliceType   = pSh->eSliceType;
   pCtx->pSliceHeader = pSh;
-	pCtx->bUsedAsRef	 = false;
+  pCtx->bUsedAsRef   = false;
 
   pCtx->iFrameNum    = pSh->iFrameNum;
   UpdateDecoderStatisticsForActiveParaset (& (pCtx->sDecoderStatistics),
@@ -2275,10 +2277,10 @@ void WelsDqLayerDecodeStart (PWelsDecoderContext pCtx, PNalUnit pCurNal, PSps pS
 
 int32_t InitRefPicList (PWelsDecoderContext pCtx, const uint8_t kuiNRi, int32_t iPoc) {
   int32_t iRet = ERR_NONE;
-	if (pCtx->eSliceType == B_SLICE) 
-		iRet = WelsInitBSliceRefList(pCtx, iPoc);
-	else
-		iRet = WelsInitRefList (pCtx, iPoc);
+  if (pCtx->eSliceType == B_SLICE)
+    iRet = WelsInitBSliceRefList (pCtx, iPoc);
+  else
+    iRet = WelsInitRefList (pCtx, iPoc);
   if ((pCtx->eSliceType != I_SLICE && pCtx->eSliceType != SI_SLICE)) {
     iRet = WelsReorderRefList (pCtx);
   }
@@ -2290,17 +2292,17 @@ void InitCurDqLayerData (PWelsDecoderContext pCtx, PDqLayer pCurDq) {
   if (NULL != pCtx && NULL != pCurDq) {
     pCurDq->pMbType         = pCtx->sMb.pMbType[0];
     pCurDq->pSliceIdc       = pCtx->sMb.pSliceIdc[0];
-		pCurDq->pMv[LIST_0]					= pCtx->sMb.pMv[0][LIST_0];
-		pCurDq->pMv[LIST_1]					= pCtx->sMb.pMv[0][LIST_1];
+    pCurDq->pMv[LIST_0]         = pCtx->sMb.pMv[0][LIST_0];
+    pCurDq->pMv[LIST_1]         = pCtx->sMb.pMv[0][LIST_1];
     pCurDq->pRefIndex[LIST_0]    = pCtx->sMb.pRefIndex[0][LIST_0];
-		pCurDq->pRefIndex[LIST_1]		= pCtx->sMb.pRefIndex[0][LIST_1];
-		pCurDq->pDirect							= pCtx->sMb.pDirect[0];
+    pCurDq->pRefIndex[LIST_1]   = pCtx->sMb.pRefIndex[0][LIST_1];
+    pCurDq->pDirect             = pCtx->sMb.pDirect[0];
     pCurDq->pNoSubMbPartSizeLessThan8x8Flag = pCtx->sMb.pNoSubMbPartSizeLessThan8x8Flag[0];
     pCurDq->pTransformSize8x8Flag = pCtx->sMb.pTransformSize8x8Flag[0];
     pCurDq->pLumaQp         = pCtx->sMb.pLumaQp[0];
     pCurDq->pChromaQp       = pCtx->sMb.pChromaQp[0];
     pCurDq->pMvd[LIST_0]         = pCtx->sMb.pMvd[0][LIST_0];
-		pCurDq->pMvd[LIST_1]					= pCtx->sMb.pMvd[0][LIST_1];
+    pCurDq->pMvd[LIST_1]          = pCtx->sMb.pMvd[0][LIST_1];
     pCurDq->pCbfDc          = pCtx->sMb.pCbfDc[0];
     pCurDq->pNzc            = pCtx->sMb.pNzc[0];
     pCurDq->pNzcRs          = pCtx->sMb.pNzcRs[0];
@@ -2525,8 +2527,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         }
       }
 #if defined (_DEBUG) &&  !defined (CODEC_FOR_TESTBED)
-			WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "cur_frame : %d\tiCurrIdD : %d\n ",
-							 dq_cur->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.iFrameNum, iCurrIdD);
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "cur_frame : %d\tiCurrIdD : %d\n ",
+               dq_cur->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.iFrameNum, iCurrIdD);
 #endif//#if !CODEC_FOR_TESTBED
       iLastIdD = iCurrIdD;
       iLastIdQ = iCurrIdQ;
@@ -2554,9 +2556,9 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
     // A dq layer decoded here
 #if defined (_DEBUG) &&  !defined (CODEC_FOR_TESTBED)
 #undef fprintf
-		WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "POC: #%d, FRAME: #%d, D: %d, Q: %d, T: %d, P: %d, %d\n",
-						 pSh->iPicOrderCntLsb, pSh->iFrameNum, iCurrIdD, iCurrIdQ, dq_cur->sLayerInfo.sNalHeaderExt.uiTemporalId,
-						 dq_cur->sLayerInfo.sNalHeaderExt.uiPriorityId, dq_cur->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.iSliceQp);
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "POC: #%d, FRAME: #%d, D: %d, Q: %d, T: %d, P: %d, %d\n",
+             pSh->iPicOrderCntLsb, pSh->iFrameNum, iCurrIdD, iCurrIdQ, dq_cur->sLayerInfo.sNalHeaderExt.uiTemporalId,
+             dq_cur->sLayerInfo.sNalHeaderExt.uiPriorityId, dq_cur->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.iSliceQp);
 #endif//#if !CODEC_FOR_TESTBED
 
     if (dq_cur->uiLayerDqId == kuiTargetLayerDqId) {
@@ -2577,21 +2579,25 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         return iRet;
 
       pCtx->pPreviousDecodedPictureInDpb = pCtx->pDec; //store latest decoded picture for EC
-			pCtx->bUsedAsRef = false;
+      pCtx->bUsedAsRef = false;
       if (uiNalRefIdc > 0) {
-				pCtx->bUsedAsRef = true;
-				//save MBType, MV and RefIndex for use in B-Slice direct mode
-				memcpy(pCtx->pDec->pMbType, pCtx->pCurDqLayer->pMbType, pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof(uint32_t));
-				memcpy(pCtx->pDec->pMv[LIST_0], pCtx->pCurDqLayer->pMv[LIST_0], pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof(int16_t) * MV_A * MB_BLOCK4x4_NUM);
-				memcpy(pCtx->pDec->pMv[LIST_1], pCtx->pCurDqLayer->pMv[LIST_1], pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof(int16_t) * MV_A * MB_BLOCK4x4_NUM);
-				memcpy(pCtx->pDec->pRefIndex[LIST_0], pCtx->pCurDqLayer->pRefIndex[LIST_0], pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof(int8_t) * MB_BLOCK4x4_NUM);
-				memcpy(pCtx->pDec->pRefIndex[LIST_1], pCtx->pCurDqLayer->pRefIndex[LIST_1], pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof(int8_t) * MB_BLOCK4x4_NUM);
-				for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
-					for (uint32_t i = 0; i < pCtx->sRefPic.uiRefCount[listIdx]; ++i) {
-						pCtx->pDec->pRefPic[listIdx][i] = pCtx->sRefPic.pRefList[listIdx][i];
-					}
-				}
-				iRet = WelsMarkAsRef (pCtx);
+        pCtx->bUsedAsRef = true;
+        //save MBType, MV and RefIndex for use in B-Slice direct mode
+        memcpy (pCtx->pDec->pMbType, pCtx->pCurDqLayer->pMbType, pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (uint32_t));
+        memcpy (pCtx->pDec->pMv[LIST_0], pCtx->pCurDqLayer->pMv[LIST_0],
+                pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int16_t) * MV_A * MB_BLOCK4x4_NUM);
+        memcpy (pCtx->pDec->pMv[LIST_1], pCtx->pCurDqLayer->pMv[LIST_1],
+                pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int16_t) * MV_A * MB_BLOCK4x4_NUM);
+        memcpy (pCtx->pDec->pRefIndex[LIST_0], pCtx->pCurDqLayer->pRefIndex[LIST_0],
+                pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t) * MB_BLOCK4x4_NUM);
+        memcpy (pCtx->pDec->pRefIndex[LIST_1], pCtx->pCurDqLayer->pRefIndex[LIST_1],
+                pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t) * MB_BLOCK4x4_NUM);
+        for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+          for (uint32_t i = 0; i < pCtx->sRefPic.uiRefCount[listIdx]; ++i) {
+            pCtx->pDec->pRefPic[listIdx][i] = pCtx->sRefPic.pRefList[listIdx][i];
+          }
+        }
+        iRet = WelsMarkAsRef (pCtx);
         if (iRet != ERR_NONE) {
           if (iRet == ERR_INFO_DUPLICATE_FRAME_NUM)
             pCtx->iErrorCode |= dsBitstreamError;

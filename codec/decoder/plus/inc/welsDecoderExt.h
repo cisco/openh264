@@ -56,84 +56,84 @@ namespace WelsDec {
 
 class CWelsDecoder : public ISVCDecoder {
  public:
-CWelsDecoder (void);
-virtual ~CWelsDecoder();
+  CWelsDecoder (void);
+  virtual ~CWelsDecoder();
 
-virtual long EXTAPI Initialize (const SDecodingParam* pParam);
-virtual long EXTAPI Uninitialize();
+  virtual long EXTAPI Initialize (const SDecodingParam* pParam);
+  virtual long EXTAPI Uninitialize();
 
-/***************************************************************************
-*   Description:
-*       Decompress one frame, and output I420 or RGB24(in the future) decoded stream and its length.
-*   Input parameters:
-*       Parameter       TYPE                   Description
-*       pSrc            unsigned char*         the h264 stream to decode
-*       srcLength       int                    the length of h264 steam
-*       pDst            unsigned char*         buffer pointer of decoded data
-*       pDstInfo        SBufferInfo&           information provided to API including width, height, SW/HW option, etc
-*
-*   return: if decode frame success return 0, otherwise corresponding error returned.
-***************************************************************************/
-virtual DECODING_STATE EXTAPI DecodeFrame (const unsigned char* kpSrc,
-    const int kiSrcLen,
-    unsigned char** ppDst,
-    int* pStride,
-    int& iWidth,
-    int& iHeight);
+  /***************************************************************************
+  *   Description:
+  *       Decompress one frame, and output I420 or RGB24(in the future) decoded stream and its length.
+  *   Input parameters:
+  *       Parameter       TYPE                   Description
+  *       pSrc            unsigned char*         the h264 stream to decode
+  *       srcLength       int                    the length of h264 steam
+  *       pDst            unsigned char*         buffer pointer of decoded data
+  *       pDstInfo        SBufferInfo&           information provided to API including width, height, SW/HW option, etc
+  *
+  *   return: if decode frame success return 0, otherwise corresponding error returned.
+  ***************************************************************************/
+  virtual DECODING_STATE EXTAPI DecodeFrame (const unsigned char* kpSrc,
+      const int kiSrcLen,
+      unsigned char** ppDst,
+      int* pStride,
+      int& iWidth,
+      int& iHeight);
 
-virtual DECODING_STATE EXTAPI DecodeFrameNoDelay (const unsigned char* kpSrc,
-    const int kiSrcLen,
-    unsigned char** ppDst,
-    SBufferInfo* pDstInfo);
+  virtual DECODING_STATE EXTAPI DecodeFrameNoDelay (const unsigned char* kpSrc,
+      const int kiSrcLen,
+      unsigned char** ppDst,
+      SBufferInfo* pDstInfo);
 
-virtual DECODING_STATE EXTAPI DecodeFrame2 (const unsigned char* kpSrc,
-    const int kiSrcLen,
-    unsigned char** ppDst,
-    SBufferInfo* pDstInfo);
-virtual DECODING_STATE EXTAPI DecodeParser (const unsigned char* kpSrc,
-    const int kiSrcLen,
-    SParserBsInfo* pDstInfo);
-virtual DECODING_STATE EXTAPI DecodeFrameEx (const unsigned char* kpSrc,
-    const int kiSrcLen,
-    unsigned char* pDst,
-    int iDstStride,
-    int& iDstLen,
-    int& iWidth,
-    int& iHeight,
-    int& color_format);
+  virtual DECODING_STATE EXTAPI DecodeFrame2 (const unsigned char* kpSrc,
+      const int kiSrcLen,
+      unsigned char** ppDst,
+      SBufferInfo* pDstInfo);
+  virtual DECODING_STATE EXTAPI DecodeParser (const unsigned char* kpSrc,
+      const int kiSrcLen,
+      SParserBsInfo* pDstInfo);
+  virtual DECODING_STATE EXTAPI DecodeFrameEx (const unsigned char* kpSrc,
+      const int kiSrcLen,
+      unsigned char* pDst,
+      int iDstStride,
+      int& iDstLen,
+      int& iWidth,
+      int& iHeight,
+      int& color_format);
 
-virtual long EXTAPI SetOption (DECODER_OPTION eOptID, void* pOption);
-virtual long EXTAPI GetOption (DECODER_OPTION eOptID, void* pOption);
+  virtual long EXTAPI SetOption (DECODER_OPTION eOptID, void* pOption);
+  virtual long EXTAPI GetOption (DECODER_OPTION eOptID, void* pOption);
 
-typedef struct tagPictInfo {
-	SBufferInfo 						sBufferInfo;
-	int32_t									iPOC;
-	int32_t									iFrameNum;
-	bool										bLastGOP;
-	unsigned char*					pData[3];
-} SPictInfo, *PPictInfo;
+  typedef struct tagPictInfo {
+    SBufferInfo             sBufferInfo;
+    int32_t                 iPOC;
+    int32_t                 iFrameNum;
+    bool                    bLastGOP;
+    unsigned char*          pData[3];
+  } SPictInfo, *PPictInfo;
 
  private:
-PWelsDecoderContext     m_pDecContext;
-welsCodecTrace*         m_pWelsTrace;
-SPictInfo								m_sPictInfoList[10];
-int32_t									m_iPictInfoIndex;
-int32_t									m_iMinPOC;
-int32_t									m_iNumOfPicts;
-int32_t									m_iLastGOPRemainPicts;
+  PWelsDecoderContext     m_pDecContext;
+  welsCodecTrace*         m_pWelsTrace;
+  SPictInfo               m_sPictInfoList[10];
+  int32_t                 m_iPictInfoIndex;
+  int32_t                 m_iMinPOC;
+  int32_t                 m_iNumOfPicts;
+  int32_t                 m_iLastGOPRemainPicts;
 
-int32_t									m_LastWrittenPOC;
+  int32_t                 m_LastWrittenPOC;
 
-int32_t InitDecoder (const SDecodingParam* pParam);
-void UninitDecoder (void);
-int32_t ResetDecoder();
+  int32_t InitDecoder (const SDecodingParam* pParam);
+  void UninitDecoder (void);
+  int32_t ResetDecoder();
 
-void OutputStatisticsLog (SDecoderStatistics& sDecoderStatistics);
-DECODING_STATE ReorderPicturesInDisplay(unsigned char** ppDst, SBufferInfo* pDstInfo);
+  void OutputStatisticsLog (SDecoderStatistics& sDecoderStatistics);
+  DECODING_STATE ReorderPicturesInDisplay (unsigned char** ppDst, SBufferInfo* pDstInfo);
 
 #ifdef OUTPUT_BIT_STREAM
-WelsFileHandle* m_pFBS;
-WelsFileHandle* m_pFBSSize;
+  WelsFileHandle* m_pFBS;
+  WelsFileHandle* m_pFBSSize;
 #endif//OUTPUT_BIT_STREAM
 
 };

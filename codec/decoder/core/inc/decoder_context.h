@@ -235,7 +235,8 @@ enum {
 typedef struct TagWelsDecoderContext {
   SLogContext sLogCtx;
 // Input
-  void*                         pArgDec;                        // structured arguments for decoder, reserved here for extension in the future
+  void*
+  pArgDec;                        // structured arguments for decoder, reserved here for extension in the future
 
   SDataBuffer                   sRawData;
   SDataBuffer                   sSavedData; //for parse only purpose
@@ -249,17 +250,20 @@ typedef struct TagWelsDecoderContext {
 
   int32_t                       iImgWidthInPixel;       // width of image in pixel reconstruction picture to be output
   int32_t                       iImgHeightInPixel;// height of image in pixel reconstruction picture to be output
-  int32_t                       iLastImgWidthInPixel;   // width of image in last successful pixel reconstruction picture to be output
-  int32_t                       iLastImgHeightInPixel;// height of image in last successful pixel reconstruction picture to be output
+  int32_t
+  iLastImgWidthInPixel;   // width of image in last successful pixel reconstruction picture to be output
+  int32_t
+  iLastImgHeightInPixel;// height of image in last successful pixel reconstruction picture to be output
   bool bFreezeOutput; // indicating current frame freezing. Default: true
 
 
 // Derived common elements
   SNalUnitHeader                sCurNalHead;
   EWelsSliceType                eSliceType;                     // Slice type
-	bool													bUsedAsRef;											//flag as ref
+  bool                          bUsedAsRef;                     //flag as ref
   int32_t                       iFrameNum;
-  int32_t                       iPrevFrameNum;          // frame number of previous frame well decoded for non-truncated mode yet
+  int32_t
+  iPrevFrameNum;          // frame number of previous frame well decoded for non-truncated mode yet
   bool                          bLastHasMmco5;      //
   int32_t                       iErrorCode;                     // error code return while decoding in case packets lost
   SFmo                          sFmoList[MAX_PPS_COUNT];        // list for FMO storage
@@ -274,23 +278,23 @@ typedef struct TagWelsDecoderContext {
     uint32_t*  pMbType[LAYER_NUM_EXCHANGEABLE];                      /* mb type */
     int16_t (*pMv[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_BLOCK4x4_NUM][MV_A]; //[LAYER_NUM_EXCHANGEABLE   MB_BLOCK4x4_NUM*]
     int8_t (*pRefIndex[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_BLOCK4x4_NUM];
-		int8_t	(*pDirect[LAYER_NUM_EXCHANGEABLE])[MB_BLOCK4x4_NUM];
+    int8_t (*pDirect[LAYER_NUM_EXCHANGEABLE])[MB_BLOCK4x4_NUM];
     bool*   pNoSubMbPartSizeLessThan8x8Flag[LAYER_NUM_EXCHANGEABLE];
     bool*   pTransformSize8x8Flag[LAYER_NUM_EXCHANGEABLE];
     int8_t* pLumaQp[LAYER_NUM_EXCHANGEABLE];        /*mb luma_qp*/
-    int8_t  (*pChromaQp[LAYER_NUM_EXCHANGEABLE])[2];                                        /*mb chroma_qp*/
+    int8_t (*pChromaQp[LAYER_NUM_EXCHANGEABLE])[2];                                         /*mb chroma_qp*/
     int16_t (*pMvd[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_BLOCK4x4_NUM][MV_A]; //[LAYER_NUM_EXCHANGEABLE   MB_BLOCK4x4_NUM*]
     uint16_t* pCbfDc[LAYER_NUM_EXCHANGEABLE];
-    int8_t  (*pNzc[LAYER_NUM_EXCHANGEABLE])[24];
-    int8_t  (*pNzcRs[LAYER_NUM_EXCHANGEABLE])[24];
+    int8_t (*pNzc[LAYER_NUM_EXCHANGEABLE])[24];
+    int8_t (*pNzcRs[LAYER_NUM_EXCHANGEABLE])[24];
     int16_t (*pScaledTCoeff[LAYER_NUM_EXCHANGEABLE])[MB_COEFF_LIST_SIZE]; /*need be aligned*/
-    int8_t  (*pIntraPredMode[LAYER_NUM_EXCHANGEABLE])[8]; //0~3 top4x4 ; 4~6 left 4x4; 7 intra16x16
+    int8_t (*pIntraPredMode[LAYER_NUM_EXCHANGEABLE])[8];  //0~3 top4x4 ; 4~6 left 4x4; 7 intra16x16
     int8_t (*pIntra4x4FinalMode[LAYER_NUM_EXCHANGEABLE])[MB_BLOCK4x4_NUM];
     uint8_t* pIntraNxNAvailFlag[LAYER_NUM_EXCHANGEABLE];
     int8_t*  pChromaPredMode[LAYER_NUM_EXCHANGEABLE];
     int8_t*  pCbp[LAYER_NUM_EXCHANGEABLE];
     uint8_t (*pMotionPredFlag[LAYER_NUM_EXCHANGEABLE][LIST_A])[MB_PARTITION_SIZE]; // 8x8
-		uint32_t (*pSubMbType[LAYER_NUM_EXCHANGEABLE])[MB_SUB_PARTITION_SIZE];
+    uint32_t (*pSubMbType[LAYER_NUM_EXCHANGEABLE])[MB_SUB_PARTITION_SIZE];
     int32_t* pSliceIdc[LAYER_NUM_EXCHANGEABLE];         // using int32_t for slice_idc
     int8_t*  pResidualPredFlag[LAYER_NUM_EXCHANGEABLE];
     int8_t*  pInterPredictionDoneFlag[LAYER_NUM_EXCHANGEABLE];
@@ -303,7 +307,8 @@ typedef struct TagWelsDecoderContext {
 // reconstruction picture
   PPicture                      pDec;                   //pointer to current picture being reconstructed
 
-	PPicture											pTempDec;								//pointer to temp decoder picture to be used only for Bi Prediction.
+  PPicture
+  pTempDec;               //pointer to temp decoder picture to be used only for Bi Prediction.
 
 // reference pictures
   SRefPic                       sRefPic;
@@ -332,7 +337,8 @@ typedef struct TagWelsDecoderContext {
   PSps                          pSps;   // used by current AU
   PPps                          pPps;   // used by current AU
 // Memory for pAccessUnitList is dynamically held till decoder destruction.
-  PDqLayer                      pCurDqLayer;            // current DQ layer representation, also carry reference base layer if applicable
+  PDqLayer
+  pCurDqLayer;            // current DQ layer representation, also carry reference base layer if applicable
   PDqLayer                      pDqLayersList[LAYER_NUM_EXCHANGEABLE];  // DQ layers list with memory allocated
 
   int32_t                       iPicWidthReq;             // picture width have requested the memory
@@ -370,7 +376,8 @@ typedef struct TagWelsDecoderContext {
 #ifdef LONG_TERM_REF
   bool                          bParamSetsLostFlag;     //sps or pps do not exist or not correct
 
-  bool                          bCurAuContainLtrMarkSeFlag; //current AU has the LTR marking syntax element, mark the previous frame or self
+  bool
+  bCurAuContainLtrMarkSeFlag; //current AU has the LTR marking syntax element, mark the previous frame or self
   int32_t                       iFrameNumOfAuMarkedLtr; //if bCurAuContainLtrMarkSeFlag==true, SHOULD set this variable
 
   uint16_t                      uiCurIdrPicId;
@@ -432,8 +439,8 @@ typedef struct TagWelsDecoderContext {
 //Save the last nal header info
   SNalUnitHeaderExt sLastNalHdrExt;
   SSliceHeader      sLastSliceHeader;
-	int32_t						iPrevPicOrderCntMsb;
-	int32_t						iPrevPicOrderCntLsb;
+  int32_t           iPrevPicOrderCntMsb;
+  int32_t           iPrevPicOrderCntLsb;
 
   SWelsCabacCtx sWelsCabacContexts[4][WELS_QP_MAX + 1][WELS_CONTEXT_COUNT];
   bool bCabacInited;

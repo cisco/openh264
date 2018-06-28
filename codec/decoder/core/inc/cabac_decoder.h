@@ -80,7 +80,7 @@ static const uint8_t g_kRenormTable256[256] = {
 
 
 //1. CABAC context initialization
-void WelsCabacGlobalInit(PWelsDecoderContext pCabacCtx);
+void WelsCabacGlobalInit (PWelsDecoderContext pCabacCtx);
 void WelsCabacContextInit (PWelsDecoderContext  pCtx, uint8_t eSliceType, int32_t iCabacInitIdc, int32_t iQp);
 
 //2. decoding Engine initialization
