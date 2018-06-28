@@ -705,8 +705,10 @@ void GetInterBPred (uint8_t* pPredYCbCr[3], uint8_t* pTempPredYCbCr[3], PWelsDec
     for (int32_t i = 0; i < 2; ++i) {
       int32_t iPartIdx = i << 3;
       uint32_t listCount = 0;
+      int32_t lastListIdx = LIST_0;
       for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
         if (IS_DIR (iMBType, i, listIdx)) {
+          lastListIdx = listIdx;
           iMVs[0] = pCurDqLayer->pMv[listIdx][iMBXY][iPartIdx][0];
           iMVs[1] = pCurDqLayer->pMv[listIdx][iMBXY][iPartIdx][1];
           GetRefPic (&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[listIdx][iMBXY], iPartIdx, listIdx);
@@ -733,20 +735,23 @@ void GetInterBPred (uint8_t* pPredYCbCr[3], uint8_t* pTempPredYCbCr[3], PWelsDec
             } else {
               BiPrediction (pCurDqLayer, &pMCRefMem, &pTempMCRefMem, 16, 8);
             }
-          } else {
-            if (bWeightedBipredIdcIs1) {
-              int32_t iRefIndex = pCurDqLayer->pRefIndex[listIdx][iMBXY][iPartIdx];
-              WeightPrediction (pCurDqLayer, &pMCRefMem, listIdx, iRefIndex, 16, 8);
-            }
           }
+        }
+      }
+      if (listCount == 1) {
+        if (bWeightedBipredIdcIs1) {
+          int32_t iRefIndex = pCurDqLayer->pRefIndex[lastListIdx][iMBXY][iPartIdx];
+          WeightPrediction (pCurDqLayer, &pMCRefMem, lastListIdx, iRefIndex, 16, 8);
         }
       }
     }
   } else if (IS_INTER_8x16 (iMBType)) {
     for (int32_t i = 0; i < 2; ++i) {
       uint32_t listCount = 0;
+      int32_t lastListIdx = LIST_0;
       for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
         if (IS_DIR (iMBType, i, listIdx)) {
+          lastListIdx = listIdx;
           iMVs[0] = pCurDqLayer->pMv[listIdx][iMBXY][i << 1][0];
           iMVs[1] = pCurDqLayer->pMv[listIdx][iMBXY][i << 1][1];
           GetRefPic (&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[listIdx][iMBXY], i << 1, listIdx);
@@ -773,12 +778,13 @@ void GetInterBPred (uint8_t* pPredYCbCr[3], uint8_t* pTempPredYCbCr[3], PWelsDec
             } else {
               BiPrediction (pCurDqLayer, &pMCRefMem, &pTempMCRefMem, 8, 16);
             }
-          } else {
-            if (bWeightedBipredIdcIs1) {
-              int32_t iRefIndex = pCurDqLayer->pRefIndex[listIdx][iMBXY][i << 1];
-              WeightPrediction (pCurDqLayer, &pMCRefMem, listIdx, iRefIndex, 8, 16);
-            }
           }
+        }
+      }
+      if (listCount == 1) {
+        if (bWeightedBipredIdcIs1) {
+          int32_t iRefIndex = pCurDqLayer->pRefIndex[lastListIdx][iMBXY][i << 1];
+          WeightPrediction (pCurDqLayer, &pMCRefMem, lastListIdx, iRefIndex, 8, 16);
         }
       }
     }
