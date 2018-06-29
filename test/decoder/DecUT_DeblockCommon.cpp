@@ -925,7 +925,7 @@ TEST (Deblocking, WelsDeblockingMb) {
   sDqLayer.pLumaQp = iLumaQP;
   sDqLayer.pChromaQp = iChromaQP;
 
-  int16_t iMbType[2];
+  uint32_t iMbType[2];
   sDqLayer.pMbType = iMbType;
   sDqLayer.pMbType[0] = MB_TYPE_INTRA4x4;
   sDqLayer.pMbType[1] = MB_TYPE_INTRA4x4;
