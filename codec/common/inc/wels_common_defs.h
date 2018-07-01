@@ -216,14 +216,14 @@ enum EMmcoCode {
 };
 
 enum EVuiVideoFormat {
-   VUI_COMPONENT   = 0,
-   VUI_PAL         = 1,
-   VUI_NTSC        = 2,
-   VUI_SECAM       = 3,
-   VUI_MAC         = 4,
-   VUI_UNSPECIFIED = 5,
-   VUI_RESERVED1   = 6,
-   VUI_RESERVED2   = 7
+  VUI_COMPONENT   = 0,
+  VUI_PAL         = 1,
+  VUI_NTSC        = 2,
+  VUI_SECAM       = 3,
+  VUI_MAC         = 4,
+  VUI_UNSPECIFIED = 5,
+  VUI_RESERVED1   = 6,
+  VUI_RESERVED2   = 7
 };
 
 /*
@@ -284,17 +284,17 @@ typedef struct TagNalUnitHeaderExt {
 #define MB_TYPE_INTRA_PCM   0x00000200
 #define MB_TYPE_INTRA_BL    0x00000400
 #define MB_TYPE_DIRECT      0x00000800
-#define	MB_TYPE_P0L0			  0x00001000
-#define	MB_TYPE_P1L0			  0x00002000
-#define	MB_TYPE_P0L1			  0x00004000
-#define	MB_TYPE_P1L1			  0x00008000
-#define	MB_TYPE_L0				(MB_TYPE_P0L0 | MB_TYPE_P1L0)
-#define	MB_TYPE_L1				(MB_TYPE_P0L1 | MB_TYPE_P1L1)
+#define MB_TYPE_P0L0        0x00001000
+#define MB_TYPE_P1L0        0x00002000
+#define MB_TYPE_P0L1        0x00004000
+#define MB_TYPE_P1L1        0x00008000
+#define MB_TYPE_L0        (MB_TYPE_P0L0 | MB_TYPE_P1L0)
+#define MB_TYPE_L1        (MB_TYPE_P0L1 | MB_TYPE_P1L1)
 
-#define SUB_MB_TYPE_8x8     0x00010000
-#define SUB_MB_TYPE_8x4     0x00020000
-#define SUB_MB_TYPE_4x8     0x00040000
-#define SUB_MB_TYPE_4x4     0x00080000
+#define SUB_MB_TYPE_8x8     0x00000001
+#define SUB_MB_TYPE_8x4     0x00000002
+#define SUB_MB_TYPE_4x8     0x00000004
+#define SUB_MB_TYPE_4x4     0x00000008
 
 #define MB_TYPE_INTRA     (MB_TYPE_INTRA4x4 | MB_TYPE_INTRA16x16 | MB_TYPE_INTRA8x8 | MB_TYPE_INTRA_PCM)
 #define MB_TYPE_INTER     (MB_TYPE_16x16 | MB_TYPE_16x8 | MB_TYPE_8x16 | MB_TYPE_8x8 | MB_TYPE_8x8_REF0 | MB_TYPE_SKIP | MB_TYPE_DIRECT)
@@ -309,7 +309,7 @@ typedef struct TagNalUnitHeaderExt {
 #define IS_INTER_8x16(type) ( (type)&MB_TYPE_8x16 )
 #define IS_TYPE_L0(type) ( (type)&MB_TYPE_L0 )
 #define IS_TYPE_L1(type) ( (type)&MB_TYPE_L1 )
-#define IS_DIR(a, part, list)	((a) & (MB_TYPE_P0L0<<((part)+2*(list))))
+#define IS_DIR(a, part, list) ((a) & (MB_TYPE_P0L0<<((part)+2*(list))))
 
 
 #define IS_SKIP(type) ( (type)&MB_TYPE_SKIP )
