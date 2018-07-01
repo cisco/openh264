@@ -1318,9 +1318,7 @@ void WelsMdInterFinePartitionVaa (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice
     if (iCostP8x8 < iBestCost) {
       iBestCost = iCostP8x8;
       pCurMb->uiMbType = MB_TYPE_8x8;
-      for (int32_t i = 0; i < 4; ++i) {
-        pCurMb->uiSubMbType[i] = SUB_MB_TYPE_8x8;
-      }
+      memset (pCurMb->uiSubMbType, SUB_MB_TYPE_8x8, 4);
 
       iCostP16x8 = WelsMdP16x8 (pEncCtx->pFuncList, pCurDqLayer, pWelsMd, pSlice);
       if (iCostP16x8 <= iBestCost) {
