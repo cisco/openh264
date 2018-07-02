@@ -378,7 +378,7 @@ void CreateImplicitWeightTable (PWelsDecoderContext pCtx) {
   PSlice pSlice = &pCtx->pCurDqLayer->sLayerInfo.sSliceInLayer;
   PSliceHeader pSliceHeader = &pSlice->sSliceHeaderExt.sSliceHeader;
   PDqLayer pCurDqLayer = pCtx->pCurDqLayer;
-  if (pCurDqLayer->bUseWeightedBiPredIdc && pSliceHeader->pPps->uiWeightedBipredIdc != 2) {
+  if (pCurDqLayer->bUseWeightedBiPredIdc && pSliceHeader->pPps->uiWeightedBipredIdc == 2) {
     int32_t iPoc = pSliceHeader->iPicOrderCntLsb;
 
     if (pSliceHeader->uiRefCount[0] == 1 && pSliceHeader->uiRefCount[1] == 1
