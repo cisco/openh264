@@ -378,34 +378,35 @@ void CreateImplicitWeightTable (PWelsDecoderContext pCtx) {
   PSlice pSlice = &pCtx->pCurDqLayer->sLayerInfo.sSliceInLayer;
   PSliceHeader pSliceHeader = &pSlice->sSliceHeaderExt.sSliceHeader;
   PDqLayer pCurDqLayer = pCtx->pCurDqLayer;
+  if (pCurDqLayer->bUseWeightedBiPredIdc && pSliceHeader->pPps->uiWeightedBipredIdc != 2) {
+    int32_t iPoc = pSliceHeader->iPicOrderCntLsb;
 
-  int32_t iPoc = pSliceHeader->iPicOrderCntLsb;
+    if (pSliceHeader->uiRefCount[0] == 1 && pSliceHeader->uiRefCount[1] == 1
+        && pCtx->sRefPic.pRefList[LIST_0][0]->iFramePoc + pCtx->sRefPic.pRefList[LIST_1][0]->iFramePoc == 2 * iPoc) {
+      pCurDqLayer->bUseWeightedBiPredIdc = false;
+      return;
+    }
 
-  if (pSliceHeader->uiRefCount[0] == 1 && pSliceHeader->uiRefCount[1] == 1
-      && pCtx->sRefPic.pRefList[LIST_0][0]->iFramePoc + pCtx->sRefPic.pRefList[LIST_1][0]->iFramePoc == 2 * iPoc) {
-    pCurDqLayer->bUseWeightedBiPredIdc = false;
-    return;
-  }
-
-  pCurDqLayer->pPredWeightTable->uiLumaLog2WeightDenom = 5;
-  pCurDqLayer->pPredWeightTable->uiChromaLog2WeightDenom = 5;
-  for (int32_t iRef0 = 0; iRef0 < pSliceHeader->uiRefCount[0]; iRef0++) {
-    if (pCtx->sRefPic.pRefList[LIST_0][iRef0]) {
-      const int32_t iPoc0 = pCtx->sRefPic.pRefList[LIST_0][iRef0]->iFramePoc;
-      bool bIsLongRef0 = pCtx->sRefPic.pRefList[LIST_0][iRef0]->bIsLongRef;
-      for (int32_t iRef1 = 0; iRef1 < pSliceHeader->uiRefCount[1]; iRef1++) {
-        if (pCtx->sRefPic.pRefList[LIST_1][iRef1]) {
-          const int32_t iPoc1 = pCtx->sRefPic.pRefList[LIST_1][iRef1]->iFramePoc;
-          bool bIsLongRef1 = pCtx->sRefPic.pRefList[LIST_1][iRef1]->bIsLongRef;
-          pCurDqLayer->pPredWeightTable->iImplicitWeight[iRef0][iRef1] = 32;
-          if (!bIsLongRef0 && !bIsLongRef1) {
-            const int32_t iTd = WELS_CLIP3 (iPoc1 - iPoc0, -128, 127);
-            if (iTd) {
-              int32_t iTb = WELS_CLIP3 (iPoc - iPoc0, -128, 127);
-              int32_t iTx = (16384 + (WELS_ABS (iTd) >> 1)) / iTd;
-              int32_t iDistScaleFactor = (iTb * iTx + 32) >> 8;
-              if (iDistScaleFactor >= -64 && iDistScaleFactor <= 128) {
-                pCurDqLayer->pPredWeightTable->iImplicitWeight[iRef0][iRef1] = 64 - iDistScaleFactor;
+    pCurDqLayer->pPredWeightTable->uiLumaLog2WeightDenom = 5;
+    pCurDqLayer->pPredWeightTable->uiChromaLog2WeightDenom = 5;
+    for (int32_t iRef0 = 0; iRef0 < pSliceHeader->uiRefCount[0]; iRef0++) {
+      if (pCtx->sRefPic.pRefList[LIST_0][iRef0]) {
+        const int32_t iPoc0 = pCtx->sRefPic.pRefList[LIST_0][iRef0]->iFramePoc;
+        bool bIsLongRef0 = pCtx->sRefPic.pRefList[LIST_0][iRef0]->bIsLongRef;
+        for (int32_t iRef1 = 0; iRef1 < pSliceHeader->uiRefCount[1]; iRef1++) {
+          if (pCtx->sRefPic.pRefList[LIST_1][iRef1]) {
+            const int32_t iPoc1 = pCtx->sRefPic.pRefList[LIST_1][iRef1]->iFramePoc;
+            bool bIsLongRef1 = pCtx->sRefPic.pRefList[LIST_1][iRef1]->bIsLongRef;
+            pCurDqLayer->pPredWeightTable->iImplicitWeight[iRef0][iRef1] = 32;
+            if (!bIsLongRef0 && !bIsLongRef1) {
+              const int32_t iTd = WELS_CLIP3 (iPoc1 - iPoc0, -128, 127);
+              if (iTd) {
+                int32_t iTb = WELS_CLIP3 (iPoc - iPoc0, -128, 127);
+                int32_t iTx = (16384 + (WELS_ABS (iTd) >> 1)) / iTd;
+                int32_t iDistScaleFactor = (iTb * iTx + 32) >> 8;
+                if (iDistScaleFactor >= -64 && iDistScaleFactor <= 128) {
+                  pCurDqLayer->pPredWeightTable->iImplicitWeight[iRef0][iRef1] = 64 - iDistScaleFactor;
+                }
               }
             }
           }
