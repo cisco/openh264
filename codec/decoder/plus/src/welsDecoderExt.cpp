@@ -625,11 +625,6 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
 
     OutputStatisticsLog (m_pDecContext->sDecoderStatistics);
 
-#ifdef  _PICTURE_REORDERING_
-    if (!kpSrc && kiSrcLen == 0) {
-      ReorderPicturesInDisplay (ppDst, pDstInfo);
-    }
-#endif
     return (DECODING_STATE)m_pDecContext->iErrorCode;
   }
   // else Error free, the current codec works well
@@ -648,7 +643,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
   m_pDecContext->dDecTime += (iEnd - iStart) / 1e3;
 
 #ifdef  _PICTURE_REORDERING_
-  if (!kpSrc && kiSrcLen == 0) {
+  if (kpSrc == NULL && kiSrcLen == 0) {
     ReorderPicturesInDisplay (ppDst, pDstInfo);
   }
 #endif
