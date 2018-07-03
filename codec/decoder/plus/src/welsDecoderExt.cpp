@@ -71,7 +71,7 @@ extern "C" {
 #include <sys/time.h>
 #endif
 
-#define _PICTURE_REORDERING_ 1
+//#define _PICTURE_REORDERING_ 1
 
 namespace WelsDec {
 
