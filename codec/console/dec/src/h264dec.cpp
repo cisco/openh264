@@ -72,7 +72,7 @@ int    g_iDecodedFrameNum = 0;
 void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, const char* kpOuputFileName,
                          int32_t& iWidth, int32_t& iHeight, const char* pOptionFileName, const char* pLengthFileName,
                          int32_t iErrorConMethod,
-                         bool bLegacyCalling ) {
+                         bool bLegacyCalling) {
   FILE* pH264File   = NULL;
   FILE* pYuvFile    = NULL;
   FILE* pOptionFile = NULL;
@@ -99,6 +99,7 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
   int32_t iLastWidth = 0, iLastHeight = 0;
   int32_t iFrameCount = 0;
   int32_t iEndOfStreamFlag = 0;
+  int32_t num_of_frames_in_buffer = 0;
   pDecoder->SetOption (DECODER_OPTION_ERROR_CON_IDC, &iErrorConMethod);
   CUtils cOutputModule;
   double dElapsed = 0;
@@ -238,7 +239,7 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
       if (pOptionFile != NULL) {
         if (iWidth != iLastWidth && iHeight != iLastHeight) {
           fwrite (&iFrameCount, sizeof (iFrameCount), 1, pOptionFile);
-          fwrite (&iWidth , sizeof (iWidth) , 1, pOptionFile);
+          fwrite (&iWidth, sizeof (iWidth), 1, pOptionFile);
           fwrite (&iHeight, sizeof (iHeight), 1, pOptionFile);
           iLastWidth  = iWidth;
           iLastHeight = iHeight;
@@ -270,7 +271,7 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
         if (pOptionFile != NULL) {
           if (iWidth != iLastWidth && iHeight != iLastHeight) {
             fwrite (&iFrameCount, sizeof (iFrameCount), 1, pOptionFile);
-            fwrite (&iWidth , sizeof (iWidth) , 1, pOptionFile);
+            fwrite (&iWidth, sizeof (iWidth), 1, pOptionFile);
             fwrite (&iHeight, sizeof (iHeight), 1, pOptionFile);
             iLastWidth  = iWidth;
             iLastHeight = iHeight;
@@ -283,6 +284,40 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
     ++ iSliceIndex;
   }
 
+  pDecoder->GetOption (DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER, &num_of_frames_in_buffer);
+  for (int32_t i = 0; i < num_of_frames_in_buffer; ++i) {
+    iStart = WelsTime();
+    pData[0] = NULL;
+    pData[1] = NULL;
+    pData[2] = NULL;
+    memset (&sDstBufInfo, 0, sizeof (SBufferInfo));
+    sDstBufInfo.uiInBsTimeStamp = uiTimeStamp;
+    sDstBufInfo.iBufferStatus = 1;
+    pDecoder->FlushFrame (pData, &sDstBufInfo);
+    if (sDstBufInfo.iBufferStatus == 1) {
+      pDst[0] = pData[0];
+      pDst[1] = pData[1];
+      pDst[2] = pData[2];
+    }
+    iEnd = WelsTime();
+    iTotal += iEnd - iStart;
+    if (sDstBufInfo.iBufferStatus == 1) {
+      cOutputModule.Process ((void**)pDst, &sDstBufInfo, pYuvFile);
+      iWidth = sDstBufInfo.UsrData.sSystemBuffer.iWidth;
+      iHeight = sDstBufInfo.UsrData.sSystemBuffer.iHeight;
+
+      if (pOptionFile != NULL) {
+        if (iWidth != iLastWidth && iHeight != iLastHeight) {
+          fwrite (&iFrameCount, sizeof (iFrameCount), 1, pOptionFile);
+          fwrite (&iWidth, sizeof (iWidth), 1, pOptionFile);
+          fwrite (&iHeight, sizeof (iHeight), 1, pOptionFile);
+          iLastWidth = iWidth;
+          iLastHeight = iHeight;
+        }
+      }
+      ++iFrameCount;
+    }
+  }
   dElapsed = iTotal / 1e6;
   fprintf (stderr, "-------------------------------------------------------\n");
   fprintf (stderr, "iWidth:\t\t%d\nheight:\t\t%d\nFrames:\t\t%d\ndecode time:\t%f sec\nFPS:\t\t%f fps\n",

@@ -94,6 +94,7 @@ CWelsDecoder::CWelsDecoder (void)
     m_iPictInfoIndex (0),
     m_iMinPOC (-1),
     m_iNumOfPicts (0),
+    m_iLastGOPRemainPicts (0),
     m_LastWrittenPOC (0) {
 #ifdef OUTPUT_BIT_STREAM
   char chFileName[1024] = { 0 };  //for .264
@@ -466,6 +467,11 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
     iVal = (int)m_pDecContext->pSps->uiLevelIdc;
     * ((int*)pOption) = iVal;
     return cmResultSuccess;
+  } else if (DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER == eOptID) {
+    if (m_pDecContext->pSps && m_pDecContext->pSps->uiProfileIdc != 66 && m_pDecContext->pPps->bEntropyCodingModeFlag) {
+      * ((int*)pOption) = m_iNumOfPicts > 0 ? m_iNumOfPicts : 0;
+    }
+    return cmResultSuccess;
   }
 
   return cmInitParaError;
@@ -490,13 +496,6 @@ DECODING_STATE CWelsDecoder::DecodeFrameNoDelay (const unsigned char* kpSrc,
   //ppDst[1] = ppTmpDst[1];
   //ppDst[2] = ppTmpDst[2];
   //}
-#ifdef    _PICTURE_REORDERING_
-  if (pDstInfo->iBufferStatus == 1) {
-    if (m_pDecContext->pSps->uiProfileIdc != 66) {
-      iRet |= ReorderPicturesInDisplay (ppDst, pDstInfo);
-    }
-  }
-#endif
   return (DECODING_STATE)iRet;
 }
 
@@ -632,6 +631,10 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
 
     OutputStatisticsLog (m_pDecContext->sDecoderStatistics);
 
+#ifdef  _PICTURE_REORDERING_
+    ReorderPicturesInDisplay (ppDst, pDstInfo);
+#endif
+
     return (DECODING_STATE)m_pDecContext->iErrorCode;
   }
   // else Error free, the current codec works well
@@ -649,6 +652,43 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
   iEnd = WelsTime();
   m_pDecContext->dDecTime += (iEnd - iStart) / 1e3;
 
+#ifdef  _PICTURE_REORDERING_
+  ReorderPicturesInDisplay (ppDst, pDstInfo);
+#endif
+  return dsErrorFree;
+}
+
+DECODING_STATE CWelsDecoder::FlushFrame (unsigned char** ppDst,
+    SBufferInfo* pDstInfo) {
+  if (m_pDecContext->bEndOfStreamFlag && m_iNumOfPicts > 0) {
+    m_iMinPOC = -1;
+    for (int32_t i = 0; i < 10; ++i) {
+      if (m_iMinPOC == -1 && m_sPictInfoList[i].iPOC >= 0) {
+        m_iMinPOC = m_sPictInfoList[i].iPOC;
+        m_iPictInfoIndex = i;
+      }
+      if (m_sPictInfoList[i].iPOC >= 0 && m_sPictInfoList[i].iPOC < m_iMinPOC) {
+        m_iMinPOC = m_sPictInfoList[i].iPOC;
+        m_iPictInfoIndex = i;
+      }
+    }
+  }
+  if (m_iMinPOC >= 0) {
+    m_LastWrittenPOC = m_iMinPOC;
+#if defined (_DEBUG)
+#ifdef _MOTION_VECTOR_DUMP_
+    fprintf (stderr, "Output POC: #%d\n", m_LastWrittenPOC);
+#endif
+#endif
+    memcpy (pDstInfo, &m_sPictInfoList[m_iPictInfoIndex].sBufferInfo, sizeof (SBufferInfo));
+    ppDst[0] = m_sPictInfoList[m_iPictInfoIndex].pData[0];
+    ppDst[1] = m_sPictInfoList[m_iPictInfoIndex].pData[1];
+    ppDst[2] = m_sPictInfoList[m_iPictInfoIndex].pData[2];
+    m_sPictInfoList[m_iPictInfoIndex].iPOC = -1;
+    m_sPictInfoList[m_iPictInfoIndex].bLastGOP = false;
+    m_iMinPOC = -1;
+    --m_iNumOfPicts;
+  }
   return dsErrorFree;
 }
 
@@ -698,7 +738,8 @@ void CWelsDecoder::OutputStatisticsLog (SDecoderStatistics& sDecoderStatistics) 
 }
 
 DECODING_STATE CWelsDecoder::ReorderPicturesInDisplay (unsigned char** ppDst, SBufferInfo* pDstInfo) {
-  if (pDstInfo->iBufferStatus == 1 && m_pDecContext->pSps->uiProfileIdc != 66) {
+  if (pDstInfo->iBufferStatus == 1 && m_pDecContext->pSps->uiProfileIdc != 66
+      && m_pDecContext->pPps->bEntropyCodingModeFlag) {
     if (m_pDecContext->pSliceHeader->iPicOrderCntLsb == 0) {
       if (m_iNumOfPicts > 0) {
         m_iLastGOPRemainPicts = m_iNumOfPicts;
@@ -723,7 +764,7 @@ DECODING_STATE CWelsDecoder::ReorderPicturesInDisplay (unsigned char** ppDst, SB
         break;
       }
     }
-    if (m_iLastGOPRemainPicts) {
+    if (m_iLastGOPRemainPicts > 0) {
       m_iMinPOC = -1;
       for (int32_t i = 0; i < 10; ++i) {
         if (m_iMinPOC == -1 && m_sPictInfoList[i].iPOC >= 0 && m_sPictInfoList[i].bLastGOP) {
@@ -740,7 +781,7 @@ DECODING_STATE CWelsDecoder::ReorderPicturesInDisplay (unsigned char** ppDst, SB
 #ifdef _MOTION_VECTOR_DUMP_
       fprintf (stderr, "Output POC: #%d\n", m_LastWrittenPOC);
 #endif
-#endif//
+#endif
       memcpy (pDstInfo, &m_sPictInfoList[m_iPictInfoIndex].sBufferInfo, sizeof (SBufferInfo));
       ppDst[0] = m_sPictInfoList[m_iPictInfoIndex].pData[0];
       ppDst[1] = m_sPictInfoList[m_iPictInfoIndex].pData[1];
@@ -755,7 +796,7 @@ DECODING_STATE CWelsDecoder::ReorderPicturesInDisplay (unsigned char** ppDst, SB
       }
       return dsErrorFree;
     }
-    if (m_iNumOfPicts) {
+    if (m_iNumOfPicts > 0) {
       m_iMinPOC = -1;
       for (int32_t i = 0; i < 10; ++i) {
         if (m_iMinPOC == -1 && m_sPictInfoList[i].iPOC >= 0) {
@@ -775,7 +816,7 @@ DECODING_STATE CWelsDecoder::ReorderPicturesInDisplay (unsigned char** ppDst, SB
 #ifdef _MOTION_VECTOR_DUMP_
         fprintf (stderr, "Output POC: #%d\n", m_LastWrittenPOC);
 #endif
-#endif//
+#endif
         memcpy (pDstInfo, &m_sPictInfoList[m_iPictInfoIndex].sBufferInfo, sizeof (SBufferInfo));
         ppDst[0] = m_sPictInfoList[m_iPictInfoIndex].pData[0];
         ppDst[1] = m_sPictInfoList[m_iPictInfoIndex].pData[1];
@@ -788,6 +829,7 @@ DECODING_STATE CWelsDecoder::ReorderPicturesInDisplay (unsigned char** ppDst, SB
       }
     }
   }
+
   return dsErrorFree;
 }
 

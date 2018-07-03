@@ -109,6 +109,42 @@ void BaseDecoderTest::DecodeFrame (const uint8_t* src, size_t sliceSize, Callbac
     cbk->onDecodeFrame (frame);
   }
 }
+void BaseDecoderTest::FlushFrame (Callback* cbk) {
+  uint8_t* data[3];
+  SBufferInfo bufInfo;
+  memset (data, 0, sizeof (data));
+  memset (&bufInfo, 0, sizeof (SBufferInfo));
+
+  DECODING_STATE rv = decoder_->FlushFrame (data, &bufInfo);
+  ASSERT_TRUE (rv == dsErrorFree);
+
+  if (bufInfo.iBufferStatus == 1 && cbk != NULL) {
+    const Frame frame = {
+      {
+        // y plane
+        data[0],
+        bufInfo.UsrData.sSystemBuffer.iWidth,
+        bufInfo.UsrData.sSystemBuffer.iHeight,
+        bufInfo.UsrData.sSystemBuffer.iStride[0]
+      },
+      {
+        // u plane
+        data[1],
+        bufInfo.UsrData.sSystemBuffer.iWidth / 2,
+        bufInfo.UsrData.sSystemBuffer.iHeight / 2,
+        bufInfo.UsrData.sSystemBuffer.iStride[1]
+      },
+      {
+        // v plane
+        data[2],
+        bufInfo.UsrData.sSystemBuffer.iWidth / 2,
+        bufInfo.UsrData.sSystemBuffer.iHeight / 2,
+        bufInfo.UsrData.sSystemBuffer.iStride[1]
+      },
+    };
+    cbk->onDecodeFrame (frame);
+  }
+}
 void BaseDecoderTest::DecodeFile (const char* fileName, Callback* cbk) {
   std::ifstream file (fileName, std::ios::in | std::ios::binary);
   ASSERT_TRUE (file.is_open());
@@ -133,6 +169,12 @@ void BaseDecoderTest::DecodeFile (const char* fileName, Callback* cbk) {
 
   // Get pending last frame
   DecodeFrame (NULL, 0, cbk);
+  // Flush out last frames in decoder buffer
+  int32_t num_of_frames_in_buffer = 0;
+  decoder_->GetOption (DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER, &num_of_frames_in_buffer);
+  for (int32_t i = 0; i < num_of_frames_in_buffer; ++i) {
+    FlushFrame (cbk);
+  }
 }
 
 bool BaseDecoderTest::Open (const char* fileName) {
