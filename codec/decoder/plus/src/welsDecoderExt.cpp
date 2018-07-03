@@ -490,13 +490,6 @@ DECODING_STATE CWelsDecoder::DecodeFrameNoDelay (const unsigned char* kpSrc,
   //ppDst[1] = ppTmpDst[1];
   //ppDst[2] = ppTmpDst[2];
   //}
-#ifdef    _PICTURE_REORDERING_
-  if (pDstInfo->iBufferStatus == 1) {
-    if (m_pDecContext->pSps->uiProfileIdc != 66) {
-      iRet |= ReorderPicturesInDisplay (ppDst, pDstInfo);
-    }
-  }
-#endif
   return (DECODING_STATE)iRet;
 }
 
@@ -632,6 +625,11 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
 
     OutputStatisticsLog (m_pDecContext->sDecoderStatistics);
 
+#ifdef  _PICTURE_REORDERING_
+    if (!kpSrc && kiSrcLen == 0) {
+      ReorderPicturesInDisplay (ppDst, pDstInfo);
+    }
+#endif
     return (DECODING_STATE)m_pDecContext->iErrorCode;
   }
   // else Error free, the current codec works well
@@ -649,6 +647,11 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
   iEnd = WelsTime();
   m_pDecContext->dDecTime += (iEnd - iStart) / 1e3;
 
+#ifdef  _PICTURE_REORDERING_
+  if (!kpSrc && kiSrcLen == 0) {
+    ReorderPicturesInDisplay (ppDst, pDstInfo);
+  }
+#endif
   return dsErrorFree;
 }
 
@@ -788,6 +791,7 @@ DECODING_STATE CWelsDecoder::ReorderPicturesInDisplay (unsigned char** ppDst, SB
       }
     }
   }
+
   return dsErrorFree;
 }
 
