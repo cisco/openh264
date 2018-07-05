@@ -38,6 +38,7 @@ class BaseDecoderTest {
 
  private:
   void DecodeFrame (const uint8_t* src, size_t sliceSize, Callback* cbk);
+  void FlushFrame (Callback* cbk);
 
   std::ifstream file_;
   BufferedData buf_;

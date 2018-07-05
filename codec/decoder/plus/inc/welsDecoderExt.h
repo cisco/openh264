@@ -90,6 +90,10 @@ class CWelsDecoder : public ISVCDecoder {
       const int kiSrcLen,
       unsigned char** ppDst,
       SBufferInfo* pDstInfo);
+
+  virtual DECODING_STATE EXTAPI FlushFrame (unsigned char** ppDst,
+      SBufferInfo* pDstInfo);
+
   virtual DECODING_STATE EXTAPI DecodeParser (const unsigned char* kpSrc,
       const int kiSrcLen,
       SParserBsInfo* pDstInfo);

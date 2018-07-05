@@ -130,7 +130,7 @@ static const FileParam kFileParamArray[] = {
   {"res/test_scalinglist_jm.264", "f690a3af2896a53360215fb5d35016bfd41499b3"},
   {"res/test_vd_1d.264", "5827d2338b79ff82cd091c707823e466197281d3"},
   {"res/test_vd_rc.264", "eea02e97bfec89d0418593a8abaaf55d02eaa1ca"},
-  //{"res/HighProfile_B_Frame_1920x1080p_30fps.h264", "16d9177c8679918924d67257ab1ab6b89da27488" },
+  {"res/HighProfile_B_Frame_1920x1080p_30fps.h264", "7b907acb3c6dbb5f59f69711022beb066f8b2f0e" },
   {"res/HighProfile_B_Frame_1920x1080p_2397fps.h264", "1a98d1e9d444db1074c6480f7eeeaa47c2bd0d3f" },
 };
 
