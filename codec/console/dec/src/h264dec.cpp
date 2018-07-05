@@ -99,6 +99,7 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
   int32_t iLastWidth = 0, iLastHeight = 0;
   int32_t iFrameCount = 0;
   int32_t iEndOfStreamFlag = 0;
+  int32_t num_of_frames_in_buffer = 0;
   pDecoder->SetOption (DECODER_OPTION_ERROR_CON_IDC, &iErrorConMethod);
   CUtils cOutputModule;
   double dElapsed = 0;
@@ -282,8 +283,7 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
     iBufPos += iSliceSize;
     ++ iSliceIndex;
   }
-#if 0
-  int32_t num_of_frames_in_buffer = 0;
+
   pDecoder->GetOption (DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER, &num_of_frames_in_buffer);
   for (int32_t i = 0; i < num_of_frames_in_buffer; ++i) {
     iStart = WelsTime();
@@ -318,7 +318,6 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
       ++iFrameCount;
     }
   }
-#endif
   dElapsed = iTotal / 1e6;
   fprintf (stderr, "-------------------------------------------------------\n");
   fprintf (stderr, "iWidth:\t\t%d\nheight:\t\t%d\nFrames:\t\t%d\ndecode time:\t%f sec\nFPS:\t\t%f fps\n",
