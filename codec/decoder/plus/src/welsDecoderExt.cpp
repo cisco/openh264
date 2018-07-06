@@ -467,7 +467,7 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
     * ((int*)pOption) = iVal;
     return cmResultSuccess;
   } else if (DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER == eOptID) {
-    if (m_pDecContext->pSps && m_pDecContext->pSps->uiProfileIdc != 66) {
+    if (m_pDecContext->pSps && m_pDecContext->pSps->uiProfileIdc != 66 && m_pDecContext->pPps->bEntropyCodingModeFlag) {
       * ((int*)pOption) = m_iNumOfPicts > 0 ? m_iNumOfPicts : 0;
     }
     return cmResultSuccess;
@@ -737,7 +737,8 @@ void CWelsDecoder::OutputStatisticsLog (SDecoderStatistics& sDecoderStatistics) 
 }
 
 DECODING_STATE CWelsDecoder::ReorderPicturesInDisplay (unsigned char** ppDst, SBufferInfo* pDstInfo) {
-  if (pDstInfo->iBufferStatus == 1 && m_pDecContext->pSps->uiProfileIdc != 66) {
+  if (pDstInfo->iBufferStatus == 1 && m_pDecContext->pSps->uiProfileIdc != 66
+      && m_pDecContext->pPps->bEntropyCodingModeFlag) {
     if (m_pDecContext->pSliceHeader->iPicOrderCntLsb == 0) {
       if (m_iNumOfPicts > 0) {
         m_iLastGOPRemainPicts = m_iNumOfPicts;
