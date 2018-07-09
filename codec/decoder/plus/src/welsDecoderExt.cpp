@@ -94,7 +94,8 @@ CWelsDecoder::CWelsDecoder (void)
     m_iPictInfoIndex (0),
     m_iMinPOC (-1),
     m_iNumOfPicts (0),
-    m_LastWrittenPOC (0) {
+    m_LastWrittenPOC (0),
+    m_iLastGOPRemainPicts (0) {
 #ifdef OUTPUT_BIT_STREAM
   char chFileName[1024] = { 0 };  //for .264
   int iBufUsed = 0;
@@ -678,7 +679,7 @@ DECODING_STATE CWelsDecoder::FlushFrame (unsigned char** ppDst,
 #ifdef _MOTION_VECTOR_DUMP_
     fprintf (stderr, "Output POC: #%d\n", m_LastWrittenPOC);
 #endif
-#endif//
+#endif
     memcpy (pDstInfo, &m_sPictInfoList[m_iPictInfoIndex].sBufferInfo, sizeof (SBufferInfo));
     ppDst[0] = m_sPictInfoList[m_iPictInfoIndex].pData[0];
     ppDst[1] = m_sPictInfoList[m_iPictInfoIndex].pData[1];
@@ -763,7 +764,7 @@ DECODING_STATE CWelsDecoder::ReorderPicturesInDisplay (unsigned char** ppDst, SB
         break;
       }
     }
-    if (m_iLastGOPRemainPicts) {
+    if (m_iLastGOPRemainPicts > 0) {
       m_iMinPOC = -1;
       for (int32_t i = 0; i < 10; ++i) {
         if (m_iMinPOC == -1 && m_sPictInfoList[i].iPOC >= 0 && m_sPictInfoList[i].bLastGOP) {
@@ -780,7 +781,7 @@ DECODING_STATE CWelsDecoder::ReorderPicturesInDisplay (unsigned char** ppDst, SB
 #ifdef _MOTION_VECTOR_DUMP_
       fprintf (stderr, "Output POC: #%d\n", m_LastWrittenPOC);
 #endif
-#endif//
+#endif
       memcpy (pDstInfo, &m_sPictInfoList[m_iPictInfoIndex].sBufferInfo, sizeof (SBufferInfo));
       ppDst[0] = m_sPictInfoList[m_iPictInfoIndex].pData[0];
       ppDst[1] = m_sPictInfoList[m_iPictInfoIndex].pData[1];
@@ -795,7 +796,7 @@ DECODING_STATE CWelsDecoder::ReorderPicturesInDisplay (unsigned char** ppDst, SB
       }
       return dsErrorFree;
     }
-    if (m_iNumOfPicts) {
+    if (m_iNumOfPicts > 0) {
       m_iMinPOC = -1;
       for (int32_t i = 0; i < 10; ++i) {
         if (m_iMinPOC == -1 && m_sPictInfoList[i].iPOC >= 0) {
@@ -815,7 +816,7 @@ DECODING_STATE CWelsDecoder::ReorderPicturesInDisplay (unsigned char** ppDst, SB
 #ifdef _MOTION_VECTOR_DUMP_
         fprintf (stderr, "Output POC: #%d\n", m_LastWrittenPOC);
 #endif
-#endif//
+#endif
         memcpy (pDstInfo, &m_sPictInfoList[m_iPictInfoIndex].sBufferInfo, sizeof (SBufferInfo));
         ppDst[0] = m_sPictInfoList[m_iPictInfoIndex].pData[0];
         ppDst[1] = m_sPictInfoList[m_iPictInfoIndex].pData[1];
