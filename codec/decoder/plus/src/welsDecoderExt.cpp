@@ -94,8 +94,8 @@ CWelsDecoder::CWelsDecoder (void)
     m_iPictInfoIndex (0),
     m_iMinPOC (-1),
     m_iNumOfPicts (0),
-    m_LastWrittenPOC (0),
-    m_iLastGOPRemainPicts (0) {
+    m_iLastGOPRemainPicts (0),
+    m_LastWrittenPOC (0) {
 #ifdef OUTPUT_BIT_STREAM
   char chFileName[1024] = { 0 };  //for .264
   int iBufUsed = 0;
