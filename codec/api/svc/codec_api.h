@@ -319,7 +319,7 @@ class ISVCEncoder {
   * @param  bIDR true: force encoder to encode frame as IDR frame;false, return 1 and nothing to do
   * @return 0 - success; otherwise - failed;
   */
-  virtual int EXTAPI ForceIntraFrame (bool bIDR,int iLayerId = -1) = 0;
+  virtual int EXTAPI ForceIntraFrame (bool bIDR, int iLayerId = -1) = 0;
 
   /**
   * @brief   Set option for encoder, detail option type, please refer to enumurate ENCODER_OPTION.
@@ -372,18 +372,18 @@ class ISVCDecoder {
       int& iWidth,
       int& iHeight) = 0;
 
-/**
-  * @brief    For slice level DecodeFrameNoDelay() (4 parameters input),
-  *           whatever the function return value is, the output data
-  *           of I420 format will only be available when pDstInfo->iBufferStatus == 1,.
-  *           This function will parse and reconstruct the input frame immediately if it is complete
-  *           It is recommended as the main decoding function for H.264/AVC format input
-  * @param   pSrc the h264 stream to be decoded
-  * @param   iSrcLen the length of h264 stream
-  * @param   ppDst buffer pointer of decoded data (YUV)
-  * @param   pDstInfo information provided to API(width, height, etc.)
-  * @return  0 - success; otherwise -failed;
-  */
+  /**
+    * @brief    For slice level DecodeFrameNoDelay() (4 parameters input),
+    *           whatever the function return value is, the output data
+    *           of I420 format will only be available when pDstInfo->iBufferStatus == 1,.
+    *           This function will parse and reconstruct the input frame immediately if it is complete
+    *           It is recommended as the main decoding function for H.264/AVC format input
+    * @param   pSrc the h264 stream to be decoded
+    * @param   iSrcLen the length of h264 stream
+    * @param   ppDst buffer pointer of decoded data (YUV)
+    * @param   pDstInfo information provided to API(width, height, etc.)
+    * @return  0 - success; otherwise -failed;
+    */
   virtual DECODING_STATE EXTAPI DecodeFrameNoDelay (const unsigned char* pSrc,
       const int iSrcLen,
       unsigned char** ppDst,
@@ -404,6 +404,18 @@ class ISVCDecoder {
   virtual DECODING_STATE EXTAPI DecodeFrame2 (const unsigned char* pSrc,
       const int iSrcLen,
       unsigned char** ppDst,
+      SBufferInfo* pDstInfo) = 0;
+
+
+  /**
+  * @brief   This function gets a decoded ready frame remaining in buffers after the last frame has been decoded.
+  * Use GetOption with option DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER to get the number of frames remaining in buffers.
+  * Note that it is only applicable for profile_idc != 66
+  * @param   ppDst buffer pointer of decoded data (YUV)
+  * @param   pDstInfo information provided to API(width, height, etc.)
+  * @return  0 - success; otherwise -failed;
+  */
+  virtual DECODING_STATE EXTAPI FlushFrame (unsigned char** ppDst,
       SBufferInfo* pDstInfo) = 0;
 
   /**
@@ -493,14 +505,17 @@ DECODING_STATE (*DecodeFrame) (ISVCDecoder*, const unsigned char* pSrc,
                                int* iHeight);
 
 DECODING_STATE (*DecodeFrameNoDelay) (ISVCDecoder*, const unsigned char* pSrc,
-                                const int iSrcLen,
-                                unsigned char** ppDst,
-                                SBufferInfo* pDstInfo);
+                                      const int iSrcLen,
+                                      unsigned char** ppDst,
+                                      SBufferInfo* pDstInfo);
 
 DECODING_STATE (*DecodeFrame2) (ISVCDecoder*, const unsigned char* pSrc,
                                 const int iSrcLen,
                                 unsigned char** ppDst,
                                 SBufferInfo* pDstInfo);
+
+DECODING_STATE (*FlushFrame) (ISVCDecoder*, unsigned char** ppDst,
+                              SBufferInfo* pDstInfo);
 
 DECODING_STATE (*DecodeParser) (ISVCDecoder*, const unsigned char* pSrc,
                                 const int iSrcLen,
@@ -567,7 +582,7 @@ OpenH264Version WelsGetCodecVersion (void);
 /** @brief   Get codec version
  *  @param   pVersion  struct to fill in with the version
 */
-void WelsGetCodecVersionEx (OpenH264Version *pVersion);
+void WelsGetCodecVersionEx (OpenH264Version* pVersion);
 
 #ifdef __cplusplus
 }

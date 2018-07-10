@@ -166,6 +166,7 @@ typedef enum {
   DECODER_OPTION_LEVEL,                 ///< get current AU level info,only is used in GetOption
   DECODER_OPTION_STATISTICS_LOG_INTERVAL,///< set log output interval
   DECODER_OPTION_IS_REF_PIC,             ///< feedback current frame is ref pic or not
+  DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER  ///< number of frames remaining in decoder buffer when pictures are required to re-ordered into display-order.
 
 } DECODER_OPTION;
 
@@ -345,8 +346,10 @@ typedef enum {
  */
 typedef struct {
   SliceModeEnum uiSliceMode;    ///< by default, uiSliceMode will be SM_SINGLE_SLICE
-  unsigned int  uiSliceNum;     ///< only used when uiSliceMode=1, when uiSliceNum=0 means auto design it with cpu core number
-  unsigned int  uiSliceMbNum[MAX_SLICES_NUM_TMP]; ///< only used when uiSliceMode=2; when =0 means setting one MB row a slice
+  unsigned int
+  uiSliceNum;     ///< only used when uiSliceMode=1, when uiSliceNum=0 means auto design it with cpu core number
+  unsigned int
+  uiSliceMbNum[MAX_SLICES_NUM_TMP]; ///< only used when uiSliceMode=2; when =0 means setting one MB row a slice
   unsigned int  uiSliceSizeConstraint; ///< now only used when uiSliceMode=4
 } SSliceArgument;
 
@@ -361,7 +364,7 @@ typedef enum {
   VF_MAC,
   VF_UNDEF,
   VF_NUM_ENUM
-} EVideoFormatSPS;	// EVideoFormat is already defined/used elsewhere!
+} EVideoFormatSPS;  // EVideoFormat is already defined/used elsewhere!
 
 /**
 * @brief Enumerate the type of color primaries
@@ -461,16 +464,20 @@ typedef struct {
   SSliceArgument sSliceArgument;
 
   // Note: members bVideoSignalTypePresent through uiColorMatrix below are also defined in SWelsSPS in parameter_sets.h.
-  bool			bVideoSignalTypePresent;	// false => do not write any of the following information to the header
-  unsigned char	uiVideoFormat;				// EVideoFormatSPS; 3 bits in header; 0-5 => component, kpal, ntsc, secam, mac, undef
-  bool			bFullRange;					// false => analog video data range [16, 235]; true => full data range [0,255]
-  bool			bColorDescriptionPresent;	// false => do not write any of the following three items to the header
-  unsigned char	uiColorPrimaries;			// EColorPrimaries; 8 bits in header; 0 - 9 => ???, bt709, undef, ???, bt470m, bt470bg,
-                                            //    smpte170m, smpte240m, film, bt2020
-  unsigned char	uiTransferCharacteristics;	// ETransferCharacteristics; 8 bits in header; 0 - 15 => ???, bt709, undef, ???, bt470m, bt470bg, smpte170m,
-										    //   smpte240m, linear, log100, log316, iec61966-2-4, bt1361e, iec61966-2-1, bt2020-10, bt2020-12
-  unsigned char	uiColorMatrix;				// EColorMatrix; 8 bits in header (corresponds to FFmpeg "colorspace"); 0 - 10 => GBR, bt709,
-										    //   undef, ???, fcc, bt470bg, smpte170m, smpte240m, YCgCo, bt2020nc, bt2020c
+  bool      bVideoSignalTypePresent;  // false => do not write any of the following information to the header
+  unsigned char
+  uiVideoFormat;        // EVideoFormatSPS; 3 bits in header; 0-5 => component, kpal, ntsc, secam, mac, undef
+  bool      bFullRange;         // false => analog video data range [16, 235]; true => full data range [0,255]
+  bool      bColorDescriptionPresent; // false => do not write any of the following three items to the header
+  unsigned char
+  uiColorPrimaries;     // EColorPrimaries; 8 bits in header; 0 - 9 => ???, bt709, undef, ???, bt470m, bt470bg,
+  //    smpte170m, smpte240m, film, bt2020
+  unsigned char
+  uiTransferCharacteristics;  // ETransferCharacteristics; 8 bits in header; 0 - 15 => ???, bt709, undef, ???, bt470m, bt470bg, smpte170m,
+  //   smpte240m, linear, log100, log316, iec61966-2-4, bt1361e, iec61966-2-1, bt2020-10, bt2020-12
+  unsigned char
+  uiColorMatrix;        // EColorMatrix; 8 bits in header (corresponds to FFmpeg "colorspace"); 0 - 10 => GBR, bt709,
+  //   undef, ???, fcc, bt470bg, smpte170m, smpte240m, YCgCo, bt2020nc, bt2020c
 
   bool bAspectRatioPresent; ///< aspect ratio present in VUI
   ESampleAspectRatio eAspectRatio; ///< aspect ratio idc
@@ -494,7 +501,7 @@ typedef enum {
 * @brief Enumulate the complexity mode
 */
 typedef enum {
-  LOW_COMPLEXITY = 0 ,             ///< the lowest compleixty,the fastest speed,
+  LOW_COMPLEXITY = 0,              ///< the lowest compleixty,the fastest speed,
   MEDIUM_COMPLEXITY,          ///< medium complexity, medium speed,medium quality
   HIGH_COMPLEXITY             ///< high complexity, lowest speed, high quality
 } ECOMPLEXITY_MODE;
@@ -713,7 +720,7 @@ typedef struct TagDecoderCapability {
 */
 typedef struct TagParserBsInfo {
   int iNalNum;                                 ///< total NAL number in current AU
-  int *pNalLenInByte;  ///< each nal length
+  int* pNalLenInByte;  ///< each nal length
   unsigned char* pDstBuff;                     ///< outputted dst buffer for parsed bitstream
   int iSpsWidthInPixel;                        ///< required SPS width info
   int iSpsHeightInPixel;                       ///< required SPS height info
@@ -770,7 +777,8 @@ typedef struct TagVideoDecoderStatistics {
   unsigned int uiEcIDRNum;                     ///< number of actual unintegrity IDR or not received but eced
   unsigned int uiEcFrameNum;                   ///<
   unsigned int uiIDRLostNum;                   ///< number of whole lost IDR
-  unsigned int uiFreezingIDRNum;               ///< number of freezing IDR with error (partly received), under resolution change
+  unsigned int
+  uiFreezingIDRNum;               ///< number of freezing IDR with error (partly received), under resolution change
   unsigned int uiFreezingNonIDRNum;            ///< number of freezing non-IDR with error
   int iAvgLumaQp;                              ///< average luma QP. default: -1, no correct frame outputted
   int iSpsReportErrorNum;                      ///< number of Sps Invalid report

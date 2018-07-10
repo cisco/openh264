@@ -55,12 +55,12 @@ namespace WelsDec {
  * \brief   Wels Flexible Macroblock Ordering (FMO)
  */
 typedef struct TagFmo {
-uint8_t*        pMbAllocMap;
-int32_t         iCountMbNum;
-int32_t         iSliceGroupCount;
-int32_t         iSliceGroupType;
-bool            bActiveFlag;
-uint8_t         uiReserved[3];          // reserved padding bytes
+  uint8_t*        pMbAllocMap;
+  int32_t         iCountMbNum;
+  int32_t         iSliceGroupCount;
+  int32_t         iSliceGroupType;
+  bool            bActiveFlag;
+  uint8_t         uiReserved[3];          // reserved padding bytes
 } SFmo, *PFmo;
 
 

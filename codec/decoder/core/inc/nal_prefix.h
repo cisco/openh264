@@ -44,11 +44,11 @@ namespace WelsDec {
 
 /* Prefix NAL Unix syntax, refer to Page 392 in JVT X201wcm */
 typedef struct TagPrefixNalUnit {
-SRefBasePicMarking sRefPicBaseMarking;
-bool               bStoreRefBasePicFlag;
-bool               bPrefixNalUnitAdditionalExtFlag;
-bool               bPrefixNalUnitExtFlag;
-bool               bPrefixNalCorrectFlag;
+  SRefBasePicMarking sRefPicBaseMarking;
+  bool               bStoreRefBasePicFlag;
+  bool               bPrefixNalUnitAdditionalExtFlag;
+  bool               bPrefixNalUnitExtFlag;
+  bool               bPrefixNalCorrectFlag;
 } SPrefixNalUnit, *PPrefixNalUnit;
 
 } // namespace WelsDec
