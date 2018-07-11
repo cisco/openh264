@@ -2327,7 +2327,12 @@ int32_t InitRefPicList (PWelsDecoderContext pCtx, const uint8_t kuiNRi, int32_t 
   } else
     iRet = WelsInitRefList (pCtx, iPoc);
   if ((pCtx->eSliceType != I_SLICE && pCtx->eSliceType != SI_SLICE)) {
-    iRet = WelsReorderRefList (pCtx);
+#if 0
+    if (pCtx->pSps->uiProfileIdc != 66 && pCtx->pPps->bEntropyCodingModeFlag)
+      iRet = WelsReorderRefList2 (pCtx);
+    else
+#endif
+      iRet = WelsReorderRefList (pCtx);
   }
 
   return iRet;
