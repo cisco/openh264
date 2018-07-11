@@ -78,7 +78,9 @@ struct SPicture {
   uint8_t         uiQualityId;
 
   int32_t         iFrameNum;              // frame number                 //for ref pic management
+  int32_t         iFrameWrapNum;          // frame wrap number            //for ref pic management
   int32_t         iLongTermFrameIdx;                                      //id for long term ref pic
+  uint32_t        uiLongTermPicNum;       //long_term_pic_num
 
   int32_t     iSpsId; //against mosaic caused by cross-IDR interval reference.
   int32_t     iPpsId;
