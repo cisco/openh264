@@ -102,7 +102,7 @@ static uint32_t DecodeCabacIntraMbType (PWelsDecoderContext pCtx, PWelsNeighAvai
 
 void UpdateP16x8RefIdxCabac (PDqLayer pCurDqLayer, int8_t pRefIndex[LIST_A][30], int32_t iPartIdx, const int8_t iRef,
                              const int8_t iListIdx) {
-  int32_t iRef32Bit = (int32_t) iRef;
+  uint32_t iRef32Bit = (uint32_t) iRef;
   const int32_t iRef4Bytes = (iRef32Bit << 24) | (iRef32Bit << 16) | (iRef32Bit << 8) | iRef32Bit;
   int32_t iMbXy = pCurDqLayer->iMbXyIndex;
   const uint8_t iScan4Idx = g_kuiScan4[iPartIdx];
@@ -119,7 +119,7 @@ void UpdateP16x8RefIdxCabac (PDqLayer pCurDqLayer, int8_t pRefIndex[LIST_A][30],
 
 void UpdateP8x16RefIdxCabac (PDqLayer pCurDqLayer, int8_t pRefIndex[LIST_A][30], int32_t iPartIdx, const int8_t iRef,
                              const int8_t iListIdx) {
-  int16_t iRef16Bit = (int16_t) iRef;
+  uint16_t iRef16Bit = (uint16_t) iRef;
   const int16_t iRef2Bytes = (iRef16Bit << 8) | iRef16Bit;
   int32_t i;
   int32_t iMbXy = pCurDqLayer->iMbXyIndex;
