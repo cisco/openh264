@@ -219,14 +219,16 @@ static inline void GetRefPic (sMCRefMember* pMCRefMem, PWelsDecoderContext pCtx,
   PPicture pRefPic;
 
   int8_t iRefIdx = pRefIdxList[iIndex];
-  pRefPic = pCtx->sRefPic.pRefList[listIdx][iRefIdx];
+  if (iRefIdx >= 0) {
+    pRefPic = pCtx->sRefPic.pRefList[listIdx][iRefIdx];
 
-  pMCRefMem->iSrcLineLuma   = pRefPic->iLinesize[0];
-  pMCRefMem->iSrcLineChroma = pRefPic->iLinesize[1];
+    pMCRefMem->iSrcLineLuma = pRefPic->iLinesize[0];
+    pMCRefMem->iSrcLineChroma = pRefPic->iLinesize[1];
 
-  pMCRefMem->pSrcY = pRefPic->pData[0];
-  pMCRefMem->pSrcU = pRefPic->pData[1];
-  pMCRefMem->pSrcV = pRefPic->pData[2];
+    pMCRefMem->pSrcY = pRefPic->pData[0];
+    pMCRefMem->pSrcU = pRefPic->pData[1];
+    pMCRefMem->pSrcV = pRefPic->pData[2];
+  }
 }
 
 

@@ -843,7 +843,7 @@ void PredInter16x8Mv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[
 //update iMVs and iRefIndex cache for current MB, only for P_16*16 (SKIP inclusive)
 /* can be further optimized */
 void UpdateP16x16MotionInfo (PDqLayer pCurDqLayer, int32_t listIdx, int8_t iRef, int16_t iMVs[2]) {
-  const int16_t kiRef2 = (iRef << 8) | iRef;
+  const int16_t kiRef2 = ((uint8_t)iRef << 8) | (uint8_t)iRef;
   const int32_t kiMV32 = LD32 (iMVs);
   int32_t i;
   int32_t iMbXy = pCurDqLayer->iMbXyIndex;
@@ -866,7 +866,7 @@ void UpdateP16x16MotionInfo (PDqLayer pCurDqLayer, int32_t listIdx, int8_t iRef,
 //update iRefIndex cache for current MB, only for P_16*16 (SKIP inclusive)
 /* can be further optimized */
 void UpdateP16x16RefIdx (PDqLayer pCurDqLayer, int32_t listIdx, int8_t iRef) {
-  const int16_t kiRef2 = (iRef << 8) | iRef;
+  const int16_t kiRef2 = ((uint8_t)iRef << 8) | (uint8_t)iRef;
   int32_t i;
   int32_t iMbXy = pCurDqLayer->iMbXyIndex;
 
@@ -904,7 +904,7 @@ void UpdateP16x16MotionOnly (PDqLayer pCurDqLayer, int32_t listIdx, int16_t iMVs
 void UpdateP16x8MotionInfo (PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A][30][MV_A],
                             int8_t iRefIndex[LIST_A][30],
                             int32_t listIdx, int32_t iPartIdx, int8_t iRef, int16_t iMVs[2]) {
-  const int16_t kiRef2 = (iRef << 8) | iRef;
+  const int16_t kiRef2 = ((uint8_t)iRef << 8) | (uint8_t)iRef;
   const int32_t kiMV32 = LD32 (iMVs);
   int32_t i;
   int32_t iMbXy = pCurDqLayer->iMbXyIndex;
@@ -934,7 +934,7 @@ void UpdateP16x8MotionInfo (PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A][
 void UpdateP8x16MotionInfo (PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A][30][MV_A],
                             int8_t iRefIndex[LIST_A][30],
                             int32_t listIdx, int32_t iPartIdx, int8_t iRef, int16_t iMVs[2]) {
-  const int16_t kiRef2 = (iRef << 8) | iRef;
+  const int16_t kiRef2 = ((uint8_t)iRef << 8) | (uint8_t)iRef;
   const int32_t kiMV32 = LD32 (iMVs);
   int32_t i;
   int32_t iMbXy = pCurDqLayer->iMbXyIndex;
