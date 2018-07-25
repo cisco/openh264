@@ -120,13 +120,13 @@ class CWelsDecoder : public ISVCDecoder {
  private:
   PWelsDecoderContext     m_pDecContext;
   welsCodecTrace*         m_pWelsTrace;
-  SPictInfo               m_sPictInfoList[10];
+  SPictInfo               m_sPictInfoList[16];
   int32_t                 m_iPictInfoIndex;
   int32_t                 m_iMinPOC;
   int32_t                 m_iNumOfPicts;
   int32_t                 m_iLastGOPRemainPicts;
-
   int32_t                 m_LastWrittenPOC;
+  int32_t                 m_iLargestBufferedPicIndex;
 
   int32_t InitDecoder (const SDecodingParam* pParam);
   void UninitDecoder (void);

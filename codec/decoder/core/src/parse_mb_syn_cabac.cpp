@@ -441,6 +441,7 @@ int32_t ParseBSubMBTypeCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAv
   if (uiCode) {
     WELS_READ_VERIFY (DecodeBinCabac (pCabacDecEngine, pBinCtx + 3, uiCode));
     if (uiCode) {
+      WELS_READ_VERIFY (DecodeBinCabac (pCabacDecEngine, pBinCtx + 3, uiCode));
       uiSubMbType = 11 + uiCode; /* B_L1_4x4, B_Bi_4x4 */
       return ERR_NONE;
     }
