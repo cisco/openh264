@@ -56,8 +56,10 @@ static int32_t MMCOProcess (PWelsDecoderContext pCtx, uint32_t uiMmcoType,
 static int32_t SlidingWindow (PWelsDecoderContext pCtx);
 
 static int32_t AddShortTermToList (PRefPic pRefPic, PPicture pPic);
-static int32_t AddLongTermToList (PRefPic pRefPic, PPicture pPic, int32_t iLongTermFrameIdx);
-static int32_t MarkAsLongTerm (PRefPic pRefPic, int32_t iFrameNum, int32_t iLongTermFrameIdx);
+static int32_t AddLongTermToList (PRefPic pRefPic, PPicture pPic, int32_t iLongTermFrameIdx, uint32_t uiLongTermPicNum);
+static int32_t MarkAsLongTerm (PRefPic pRefPic, int32_t iFrameNum, int32_t iLongTermFrameIdx,
+                               uint32_t uiLongTermPicNum);
+static int32_t WelsCheckAndRecoverForFutureDecoding (PWelsDecoderContext pCtx);
 #ifdef LONG_TERM_REF
 int32_t GetLTRFrameIndex (PRefPic pRefPic, int32_t iAncLTRFrameNum);
 #endif
@@ -68,8 +70,10 @@ static void SetUnRef (PPicture pRef) {
     pRef->bUsedAsRef = false;
     pRef->bIsLongRef = false;
     pRef->iFrameNum = -1;
+    pRef->iFrameWrapNum = -1;
     //pRef->iFramePoc = 0;
     pRef->iLongTermFrameIdx = -1;
+    pRef->uiLongTermPicNum = 0;
     pRef->uiQualityId = -1;
     pRef->uiTemporalId = -1;
     pRef->uiSpatialId = -1;
@@ -88,6 +92,7 @@ void WelsResetRefPic (PWelsDecoderContext pCtx) {
   pCtx->sRefPic.uiLongRefCount[LIST_0] = pCtx->sRefPic.uiShortRefCount[LIST_0] = 0;
 
   pRefPic->uiRefCount[LIST_0] = 0;
+  pRefPic->uiRefCount[LIST_1] = 0;
 
   for (i = 0; i < MAX_DPB_COUNT; i++) {
     if (pRefPic->pShortRefList[LIST_0][i] != NULL) {
@@ -106,17 +111,12 @@ void WelsResetRefPic (PWelsDecoderContext pCtx) {
   pRefPic->uiLongRefCount[LIST_0] = 0;
 }
 
-/**
- * fills the pRefPic.pRefList.
- */
-int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc) {
-  int32_t i, iCount = 0;
-
+static int32_t WelsCheckAndRecoverForFutureDecoding (PWelsDecoderContext pCtx) {
   if ((pCtx->sRefPic.uiShortRefCount[LIST_0] + pCtx->sRefPic.uiLongRefCount[LIST_0] <= 0) && (pCtx->eSliceType != I_SLICE
       && pCtx->eSliceType != SI_SLICE)) {
     if (pCtx->pParam->eEcActiveIdc !=
         ERROR_CON_DISABLE) { //IDR lost!, recover it for future decoding with data all set to 0
-      PPicture pRef = PrefetchPic (pCtx->pPicBuff[0]);
+      PPicture pRef = PrefetchPic (pCtx->pPicBuff);
       if (pRef != NULL) {
         // IDR lost, set new
         pRef->bIsComplete = false; // Set complete flag to false for lost IDR ref picture
@@ -156,10 +156,168 @@ int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc) {
       }
     }
   }
+  return ERR_NONE;
+}
+
+static void WrapShortRefPicNum (PWelsDecoderContext pCtx) {
+  int32_t i;
+  PSliceHeader pSliceHeader = &pCtx->pCurDqLayer->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader;
+  int32_t iMaxPicNum = 1 << pSliceHeader->pSps->uiLog2MaxFrameNum;
+  PPicture* ppShoreRefList = pCtx->sRefPic.pShortRefList[LIST_0];
+  int32_t iShortRefCount = pCtx->sRefPic.uiShortRefCount[LIST_0];
+  //wrap pic num
+  for (i = 0; i < iShortRefCount; i++) {
+    if (ppShoreRefList[i]) {
+      if (ppShoreRefList[i]->iFrameNum > pSliceHeader->iFrameNum)
+        ppShoreRefList[i]->iFrameWrapNum = ppShoreRefList[i]->iFrameNum - iMaxPicNum;
+      else
+        ppShoreRefList[i]->iFrameWrapNum = ppShoreRefList[i]->iFrameNum;
+    }
+  }
+}
+
+/**
+* fills the pRefPic.pRefList LIST_0 and LIST_0 for B-Slice.
+*/
+int32_t WelsInitBSliceRefList (PWelsDecoderContext pCtx, int32_t iPoc) {
+
+  int32_t err = WelsCheckAndRecoverForFutureDecoding (pCtx);
+  if (err != ERR_NONE) return err;
+
+  WrapShortRefPicNum (pCtx);
+
+  PPicture* ppShoreRefList = pCtx->sRefPic.pShortRefList[LIST_0];
+  PPicture* ppLongRefList = pCtx->sRefPic.pLongRefList[LIST_0];
+  memset (pCtx->sRefPic.pRefList[LIST_0], 0, MAX_DPB_COUNT * sizeof (PPicture));
+  memset (pCtx->sRefPic.pRefList[LIST_1], 0, MAX_DPB_COUNT * sizeof (PPicture));
+  int32_t iLSCurrPocCount = 0;
+  int32_t iLTCurrPocCount = 0;
+  PPicture pLSCurrPocList0[MAX_DPB_COUNT];
+  PPicture pLTCurrPocList0[MAX_DPB_COUNT];
+  for (int32_t i = 0; i < pCtx->sRefPic.uiShortRefCount[LIST_0]; ++i) {
+    if (ppShoreRefList[i]->iFramePoc < iPoc) {
+      pLSCurrPocList0[iLSCurrPocCount++] = ppShoreRefList[i];
+    }
+  }
+  for (int32_t i = pCtx->sRefPic.uiShortRefCount[LIST_0] - 1; i >= 0; --i) {
+    if (ppShoreRefList[i]->iFramePoc > iPoc) {
+      pLTCurrPocList0[iLTCurrPocCount++] = ppShoreRefList[i];
+    }
+  }
+  if (pCtx->sRefPic.uiLongRefCount[LIST_0] > 1) {
+    //long sorts in increasing order
+    PPicture pTemp;
+    for (int32_t i = 0; i < pCtx->sRefPic.uiLongRefCount[LIST_0]; ++i) {
+      for (int32_t j = i + 1; j < pCtx->sRefPic.uiLongRefCount[LIST_0]; ++j) {
+        if (ppLongRefList[j]->iFramePoc < ppLongRefList[i]->iFramePoc) {
+          pTemp = ppLongRefList[i];
+          ppLongRefList[i] = ppLongRefList[j];
+          ppLongRefList[j] = pTemp;
+        }
+      }
+    }
+  }
+  int32_t iCurrPocCount = iLSCurrPocCount + iLTCurrPocCount;
+  int32_t iCount = 0;
+  //LIST_0
+  //short
+  //It may need to sort LIST_0 and LIST_1 so that they will have the right default orders.
+  for (int32_t i = 0; i < iLSCurrPocCount; ++i) {
+    pCtx->sRefPic.pRefList[LIST_0][iCount++] = pLSCurrPocList0[i];
+  }
+  if (iLSCurrPocCount > 1) {
+    //LIST_0 short sorts in decreasing order
+    PPicture pTemp;
+    for (int32_t i = 0; i < iLSCurrPocCount; ++i) {
+      for (int32_t j = i + 1; j < iLSCurrPocCount; ++j) {
+        if (pCtx->sRefPic.pRefList[LIST_0][j]->iFramePoc > pCtx->sRefPic.pRefList[LIST_0][i]->iFramePoc) {
+          pTemp = pCtx->sRefPic.pRefList[LIST_0][i];
+          pCtx->sRefPic.pRefList[LIST_0][i] = pCtx->sRefPic.pRefList[LIST_0][j];
+          pCtx->sRefPic.pRefList[LIST_0][j] = pTemp;
+        }
+      }
+    }
+  }
+  for (int32_t i = 0; i < iLTCurrPocCount; ++i) {
+    pCtx->sRefPic.pRefList[LIST_0][iCount++] = pLTCurrPocList0[i];
+  }
+  if (iLTCurrPocCount > 1) {
+    //LIST_0 short sorts in increasing order
+    PPicture pTemp;
+    for (int32_t i = iLSCurrPocCount; i < iCurrPocCount; ++i) {
+      for (int32_t j = i + 1; j < iCurrPocCount; ++j) {
+        if (pCtx->sRefPic.pRefList[LIST_0][j]->iFramePoc < pCtx->sRefPic.pRefList[LIST_0][i]->iFramePoc) {
+          pTemp = pCtx->sRefPic.pRefList[LIST_0][i];
+          pCtx->sRefPic.pRefList[LIST_0][i] = pCtx->sRefPic.pRefList[LIST_0][j];
+          pCtx->sRefPic.pRefList[LIST_0][j] = pTemp;
+        }
+      }
+    }
+  }
+  //long
+  for (int32_t i = 0; i < pCtx->sRefPic.uiLongRefCount[LIST_0]; ++i) {
+    pCtx->sRefPic.pRefList[LIST_0][iCount++] = ppLongRefList[i];
+  }
+  pCtx->sRefPic.uiRefCount[LIST_0] = iCount;
+
+  iCount = 0;
+  //LIST_1
+  //short
+  for (int32_t i = 0; i < iLTCurrPocCount; ++i) {
+    pCtx->sRefPic.pRefList[LIST_1][iCount++] = pLTCurrPocList0[i];
+  }
+  if (iLTCurrPocCount > 1) {
+    //LIST_1 short sorts in increasing order
+    PPicture pTemp;
+    for (int32_t i = 0; i < iLTCurrPocCount; ++i) {
+      for (int32_t j = i + 1; j < iLTCurrPocCount; ++j) {
+        if (pCtx->sRefPic.pRefList[LIST_1][j]->iFramePoc < pCtx->sRefPic.pRefList[LIST_1][i]->iFramePoc) {
+          pTemp = pCtx->sRefPic.pRefList[LIST_1][i];
+          pCtx->sRefPic.pRefList[LIST_1][i] = pCtx->sRefPic.pRefList[LIST_1][j];
+          pCtx->sRefPic.pRefList[LIST_1][j] = pTemp;
+        }
+      }
+    }
+  }
+  for (int32_t i = 0; i < iLSCurrPocCount; ++i) {
+    pCtx->sRefPic.pRefList[LIST_1][iCount++] = pLSCurrPocList0[i];
+  }
+  if (iLSCurrPocCount > 1) {
+    //LIST_1 short sorts in decreasing order
+    PPicture pTemp;
+    for (int32_t i = iLTCurrPocCount; i < iCurrPocCount; ++i) {
+      for (int32_t j = i + 1; j < iCurrPocCount; ++j) {
+        if (pCtx->sRefPic.pRefList[LIST_1][j]->iFramePoc > pCtx->sRefPic.pRefList[LIST_1][i]->iFramePoc) {
+          pTemp = pCtx->sRefPic.pRefList[LIST_1][i];
+          pCtx->sRefPic.pRefList[LIST_1][i] = pCtx->sRefPic.pRefList[LIST_1][j];
+          pCtx->sRefPic.pRefList[LIST_1][j] = pTemp;
+        }
+      }
+    }
+  }
+  //long
+  for (int32_t i = 0; i < pCtx->sRefPic.uiLongRefCount[LIST_0]; ++i) {
+    pCtx->sRefPic.pRefList[LIST_1][iCount++] = ppLongRefList[i];
+  }
+  pCtx->sRefPic.uiRefCount[LIST_1] = iCount;
+  return ERR_NONE;
+}
+
+/**
+ * fills the pRefPic.pRefList.
+ */
+int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc) {
+
+  int32_t err = WelsCheckAndRecoverForFutureDecoding (pCtx);
+  if (err != ERR_NONE) return err;
+
+  WrapShortRefPicNum (pCtx);
 
   PPicture* ppShoreRefList = pCtx->sRefPic.pShortRefList[LIST_0];
   PPicture* ppLongRefList  = pCtx->sRefPic.pLongRefList[LIST_0];
   memset (pCtx->sRefPic.pRefList[LIST_0], 0, MAX_DPB_COUNT * sizeof (PPicture));
+
+  int32_t i, iCount = 0;
   //short
   for (i = 0; i < pCtx->sRefPic.uiShortRefCount[LIST_0]; ++i) {
     pCtx->sRefPic.pRefList[LIST_0][iCount++ ] = ppShoreRefList[i];
@@ -175,88 +333,194 @@ int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc) {
 }
 
 int32_t WelsReorderRefList (PWelsDecoderContext pCtx) {
-  PRefPicListReorderSyn pRefPicListReorderSyn = pCtx->pCurDqLayer->pRefPicListReordering;
-  PNalUnitHeaderExt pNalHeaderExt = &pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt;
-  PSliceHeader pSliceHeader = &pCtx->pCurDqLayer->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader;
-  PPicture pPic = NULL;
-  PPicture* ppRefList = pCtx->sRefPic.pRefList[LIST_0];
-  int32_t iMaxRefIdx = pCtx->pSps->iNumRefFrames;
-  int32_t iRefCount = pCtx->sRefPic.uiRefCount[LIST_0];
-  int32_t iPredFrameNum = pSliceHeader->iFrameNum;
-  int32_t iMaxPicNum = 1 << pSliceHeader->pSps->uiLog2MaxFrameNum;
-  int32_t iAbsDiffPicNum = -1;
-  int32_t iReorderingIndex = 0;
-  int32_t i = 0;
 
   if (pCtx->eSliceType == I_SLICE || pCtx->eSliceType == SI_SLICE) {
     return ERR_NONE;
   }
 
-  if (iRefCount <= 0) {
-    pCtx->iErrorCode = dsNoParamSets; //No any reference for decoding, SHOULD request IDR
-    return ERR_INFO_REFERENCE_PIC_LOST;
+  PRefPicListReorderSyn pRefPicListReorderSyn = pCtx->pCurDqLayer->pRefPicListReordering;
+  PNalUnitHeaderExt pNalHeaderExt = &pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt;
+  PSliceHeader pSliceHeader = &pCtx->pCurDqLayer->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader;
+  int32_t ListCount = 1;
+  if (pCtx->eSliceType == B_SLICE) ListCount = 2;
+  for (int32_t listIdx = 0; listIdx < ListCount; ++listIdx) {
+    PPicture pPic = NULL;
+    PPicture* ppRefList = pCtx->sRefPic.pRefList[listIdx];
+    int32_t iMaxRefIdx = pCtx->pSps->iNumRefFrames;
+    int32_t iRefCount = pCtx->sRefPic.uiRefCount[listIdx];
+    int32_t iPredFrameNum = pSliceHeader->iFrameNum;
+    int32_t iMaxPicNum = 1 << pSliceHeader->pSps->uiLog2MaxFrameNum;
+    int32_t iAbsDiffPicNum = -1;
+    int32_t iReorderingIndex = 0;
+    int32_t i = 0;
+
+    if (iRefCount <= 0) {
+      pCtx->iErrorCode = dsNoParamSets; //No any reference for decoding, SHOULD request IDR
+      return ERR_INFO_REFERENCE_PIC_LOST;
+    }
+
+    if (pRefPicListReorderSyn->bRefPicListReorderingFlag[listIdx]) {
+      while ((iReorderingIndex < iMaxRefIdx)
+             && (pRefPicListReorderSyn->sReorderingSyn[listIdx][iReorderingIndex].uiReorderingOfPicNumsIdc != 3)) {
+        uint16_t uiReorderingOfPicNumsIdc =
+          pRefPicListReorderSyn->sReorderingSyn[listIdx][iReorderingIndex].uiReorderingOfPicNumsIdc;
+        if (uiReorderingOfPicNumsIdc < 2) {
+          iAbsDiffPicNum = pRefPicListReorderSyn->sReorderingSyn[listIdx][iReorderingIndex].uiAbsDiffPicNumMinus1 + 1;
+
+          if (uiReorderingOfPicNumsIdc == 0) {
+            iPredFrameNum -= iAbsDiffPicNum;
+          } else {
+            iPredFrameNum += iAbsDiffPicNum;
+          }
+          iPredFrameNum &= iMaxPicNum - 1;
+
+          for (i = iMaxRefIdx - 1; i >= 0; i--) {
+            if (ppRefList[i] != NULL && ppRefList[i]->iFrameNum == iPredFrameNum && !ppRefList[i]->bIsLongRef) {
+              if ((pNalHeaderExt->uiQualityId == ppRefList[i]->uiQualityId)
+                  && (pSliceHeader->iSpsId != ppRefList[i]->iSpsId)) {   //check;
+                WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "WelsReorderRefList()::::BASE LAYER::::iSpsId:%d, ref_sps_id:%d",
+                         pSliceHeader->iSpsId, ppRefList[i]->iSpsId);
+                pCtx->iErrorCode = dsNoParamSets; //cross-IDR reference frame selection, SHOULD request IDR.--
+                return ERR_INFO_REFERENCE_PIC_LOST;
+              } else {
+                break;
+              }
+            }
+          }
+
+        } else if (uiReorderingOfPicNumsIdc == 2) {
+          for (i = iMaxRefIdx - 1; i >= 0; i--) {
+            if (ppRefList[i] != NULL && ppRefList[i]->bIsLongRef
+                && ppRefList[i]->iLongTermFrameIdx ==
+                pRefPicListReorderSyn->sReorderingSyn[listIdx][iReorderingIndex].uiLongTermPicNum) {
+              if ((pNalHeaderExt->uiQualityId == ppRefList[i]->uiQualityId)
+                  && (pSliceHeader->iSpsId != ppRefList[i]->iSpsId)) {    //check;
+                WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "WelsReorderRefList()::::BASE LAYER::::iSpsId:%d, ref_sps_id:%d",
+                         pSliceHeader->iSpsId, ppRefList[i]->iSpsId);
+                pCtx->iErrorCode = dsNoParamSets; //cross-IDR reference frame selection, SHOULD request IDR.--
+                return ERR_INFO_REFERENCE_PIC_LOST;
+              } else {
+                break;
+              }
+            }
+          }
+        }
+        if (i < 0) {
+          return ERR_INFO_REFERENCE_PIC_LOST;
+        }
+        pPic = ppRefList[i];
+        if (i > iReorderingIndex) {
+          memmove (&ppRefList[1 + iReorderingIndex], &ppRefList[iReorderingIndex],
+                   (i - iReorderingIndex) * sizeof (PPicture)); //confirmed_safe_unsafe_usage
+        } else if (i < iReorderingIndex) {
+          memmove (&ppRefList[1 + iReorderingIndex], &ppRefList[iReorderingIndex],
+                   (iMaxRefIdx - iReorderingIndex) * sizeof (PPicture));
+        }
+        ppRefList[iReorderingIndex] = pPic;
+        iReorderingIndex++;
+      }
+    }
+  }
+  return ERR_NONE;
+}
+
+//WelsReorderRefList2 is the test code
+int32_t WelsReorderRefList2 (PWelsDecoderContext pCtx) {
+
+  if (pCtx->eSliceType == I_SLICE || pCtx->eSliceType == SI_SLICE) {
+    return ERR_NONE;
   }
 
-  if (pRefPicListReorderSyn->bRefPicListReorderingFlag[LIST_0]) {
-    while ((iReorderingIndex < iMaxRefIdx)
-           && (pRefPicListReorderSyn->sReorderingSyn[LIST_0][iReorderingIndex].uiReorderingOfPicNumsIdc != 3)) {
-      uint16_t uiReorderingOfPicNumsIdc =
-        pRefPicListReorderSyn->sReorderingSyn[LIST_0][iReorderingIndex].uiReorderingOfPicNumsIdc;
-      if (uiReorderingOfPicNumsIdc < 2) {
-        iAbsDiffPicNum = pRefPicListReorderSyn->sReorderingSyn[LIST_0][iReorderingIndex].uiAbsDiffPicNumMinus1 + 1;
+  PRefPicListReorderSyn pRefPicListReorderSyn = pCtx->pCurDqLayer->pRefPicListReordering;
+  PSliceHeader pSliceHeader = &pCtx->pCurDqLayer->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader;
 
-        if (uiReorderingOfPicNumsIdc == 0) {
-          iPredFrameNum -= iAbsDiffPicNum;
-        } else {
-          iPredFrameNum += iAbsDiffPicNum;
-        }
-        iPredFrameNum &= iMaxPicNum - 1;
+  PPicture* ppShoreRefList = pCtx->sRefPic.pShortRefList[LIST_0];
+  int32_t iShortRefCount = pCtx->sRefPic.uiShortRefCount[LIST_0];
+  PPicture* ppLongRefList = pCtx->sRefPic.pLongRefList[LIST_0];
+  int32_t iLongRefCount = pCtx->sRefPic.uiLongRefCount[LIST_0];
+  int32_t i = 0;
+  int32_t j = 0;
+  int32_t k = 0;
+  int32_t iMaxRefIdx = pCtx->pSps->iNumRefFrames;
+  const int32_t iCurFrameNum = pSliceHeader->iFrameNum;
+  const int32_t iMaxPicNum = 1 << pSliceHeader->pSps->uiLog2MaxFrameNum;
+  int32_t iListCount = 1;
+  if (pCtx->eSliceType == B_SLICE) iListCount = 2;
+  for (int32_t listIdx = 0; listIdx < iListCount; ++listIdx) {
+    PPicture* ppRefList = pCtx->sRefPic.pRefList[listIdx];
+    int32_t iCount = 0;
+    int32_t iRefCount = pSliceHeader->uiRefCount[listIdx];
+    int32_t iAbsDiffPicNum = -1;
 
-        for (i = iMaxRefIdx - 1; i >= 0; i--) {
-          if (ppRefList[i] != NULL && ppRefList[i]->iFrameNum == iPredFrameNum && !ppRefList[i]->bIsLongRef) {
-            if ((pNalHeaderExt->uiQualityId == ppRefList[i]->uiQualityId)
-                && (pSliceHeader->iSpsId != ppRefList[i]->iSpsId)) {   //check;
-              WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "WelsReorderRefList()::::BASE LAYER::::iSpsId:%d, ref_sps_id:%d",
-                       pSliceHeader->iSpsId, ppRefList[i]->iSpsId);
-              pCtx->iErrorCode = dsNoParamSets; //cross-IDR reference frame selection, SHOULD request IDR.--
-              return ERR_INFO_REFERENCE_PIC_LOST;
-            } else {
-              break;
+    if (pRefPicListReorderSyn->bRefPicListReorderingFlag[listIdx]) {
+      int32_t iPredFrameNum = iCurFrameNum;
+      for (i = 0; pRefPicListReorderSyn->sReorderingSyn[listIdx][i].uiReorderingOfPicNumsIdc != 3; i++) {
+        if (iCount >= iMaxRefIdx)
+          break;
+
+        for (j = iRefCount; j > iCount; j--)
+          ppRefList[j] = ppRefList[j - 1];
+
+        uint16_t uiReorderingOfPicNumsIdc =
+          pRefPicListReorderSyn->sReorderingSyn[listIdx][i].uiReorderingOfPicNumsIdc;
+
+        if (uiReorderingOfPicNumsIdc < 2) { // reorder short references
+          iAbsDiffPicNum = (int32_t) (pRefPicListReorderSyn->sReorderingSyn[listIdx][i].uiAbsDiffPicNumMinus1 + 1);
+          if (uiReorderingOfPicNumsIdc == 0) {
+            if (iPredFrameNum - iAbsDiffPicNum < 0)
+              iPredFrameNum -= (iAbsDiffPicNum - iMaxPicNum);
+            else
+              iPredFrameNum -= iAbsDiffPicNum;
+          } else {
+            if (iPredFrameNum + iAbsDiffPicNum >= iMaxPicNum)
+              iPredFrameNum += (iAbsDiffPicNum - iMaxPicNum);
+            else
+              iPredFrameNum += iAbsDiffPicNum;
+          }
+
+          if (iPredFrameNum > iCurFrameNum) {
+            iPredFrameNum -= iMaxPicNum;
+          }
+
+          for (j = 0; j < iShortRefCount; j++) {
+            if (ppShoreRefList[j]) {
+              if (ppShoreRefList[j]->iFrameWrapNum == iPredFrameNum) {
+                ppRefList[iCount++] = ppShoreRefList[j];
+                break;
+              }
+            }
+          }
+          k = iCount;
+          for (j = k; j <= iRefCount; j++) {
+            if (ppRefList[j] != NULL) {
+              if (ppRefList[j]->bIsLongRef || ppRefList[j]->iFrameWrapNum != iPredFrameNum)
+                ppRefList[k++] = ppRefList[j];
+            }
+          }
+        } else { // reorder long term references uiReorderingOfPicNumsIdc == 2
+          iPredFrameNum = pRefPicListReorderSyn->sReorderingSyn[listIdx][i].uiLongTermPicNum;
+          for (j = 0; j < iLongRefCount; j++) {
+            if (ppLongRefList[j] != NULL) {
+              if (ppLongRefList[j]->uiLongTermPicNum == (uint32_t)iPredFrameNum) {
+                ppRefList[iCount++] = ppLongRefList[j];
+                break;
+              }
+            }
+          }
+          k = iCount;
+          for (j = k; j <= iRefCount; j++) {
+            if (ppRefList[j] != NULL) {
+              if (!ppRefList[j]->bIsLongRef || ppLongRefList[j]->uiLongTermPicNum != (uint32_t)iPredFrameNum)
+                ppRefList[k++] = ppRefList[j];
             }
           }
         }
-
-      } else if (uiReorderingOfPicNumsIdc == 2) {
-        for (i = iMaxRefIdx - 1; i >= 0; i--) {
-          if (ppRefList[i] != NULL && ppRefList[i]->bIsLongRef
-              && ppRefList[i]->iLongTermFrameIdx ==
-              pRefPicListReorderSyn->sReorderingSyn[LIST_0][iReorderingIndex].uiLongTermPicNum) {
-            if ((pNalHeaderExt->uiQualityId == ppRefList[i]->uiQualityId)
-                && (pSliceHeader->iSpsId != ppRefList[i]->iSpsId)) {    //check;
-              WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "WelsReorderRefList()::::BASE LAYER::::iSpsId:%d, ref_sps_id:%d",
-                       pSliceHeader->iSpsId, ppRefList[i]->iSpsId);
-              pCtx->iErrorCode = dsNoParamSets; //cross-IDR reference frame selection, SHOULD request IDR.--
-              return ERR_INFO_REFERENCE_PIC_LOST;
-            } else {
-              break;
-            }
-          }
-        }
       }
-      if (i < 0) {
-        return ERR_INFO_REFERENCE_PIC_LOST;
-      }
-      pPic = ppRefList[i];
-      if (i > iReorderingIndex) {
-        memmove (&ppRefList[1 + iReorderingIndex], &ppRefList[iReorderingIndex],
-                 (i - iReorderingIndex)*sizeof (PPicture)); //confirmed_safe_unsafe_usage
-      } else if (i < iReorderingIndex) {
-        memmove (&ppRefList[1 + iReorderingIndex], &ppRefList[iReorderingIndex],
-                 (iMaxRefIdx - iReorderingIndex)*sizeof (PPicture));
-      }
-      ppRefList[iReorderingIndex] = pPic;
-      iReorderingIndex++;
     }
+
+    for (i = WELS_MAX (1, WELS_MAX (iCount, pCtx->sRefPic.uiRefCount[listIdx])); i < iRefCount; i++)
+      ppRefList[i] = ppRefList[i - 1];
+    pCtx->sRefPic.uiRefCount[listIdx] = (uint8_t)WELS_MIN (WELS_MAX (iCount, pCtx->sRefPic.uiRefCount[listIdx]), iRefCount);
   }
   return ERR_NONE;
 }
@@ -285,7 +549,7 @@ int32_t WelsMarkAsRef (PWelsDecoderContext pCtx) {
   if (bIsIDRAU) {
     if (pRefPicMarking->bLongTermRefFlag) {
       pCtx->sRefPic.iMaxLongTermFrameIdx = 0;
-      AddLongTermToList (pRefPic, pCtx->pDec, 0);
+      AddLongTermToList (pRefPic, pCtx->pDec, 0, 0);
     } else {
       pCtx->sRefPic.iMaxLongTermFrameIdx = -1;
     }
@@ -360,7 +624,7 @@ static int32_t MMCO (PWelsDecoderContext pCtx, PRefPicMarking pRefPicMarking) {
   return ERR_NONE;
 }
 static int32_t MMCOProcess (PWelsDecoderContext pCtx, uint32_t uiMmcoType,
-                            int32_t iShortFrameNum, uint32_t uiLongTermPicNum , int32_t iLongTermFrameIdx, int32_t iMaxLongTermFrameIdx) {
+                            int32_t iShortFrameNum, uint32_t uiLongTermPicNum, int32_t iLongTermFrameIdx, int32_t iMaxLongTermFrameIdx) {
   PRefPic pRefPic = &pCtx->sRefPic;
   PPicture pPic = NULL;
   int32_t i = 0;
@@ -396,7 +660,7 @@ static int32_t MMCOProcess (PWelsDecoderContext pCtx, uint32_t uiMmcoType,
              pCtx->iFrameNumOfAuMarkedLtr);
 #endif
 
-    MarkAsLongTerm (pRefPic, iShortFrameNum, iLongTermFrameIdx);
+    MarkAsLongTerm (pRefPic, iShortFrameNum, iLongTermFrameIdx, uiLongTermPicNum);
     break;
   case MMCO_SET_MAX_LONG:
     pRefPic->iMaxLongTermFrameIdx = iMaxLongTermFrameIdx;
@@ -424,7 +688,7 @@ static int32_t MMCOProcess (PWelsDecoderContext pCtx, uint32_t uiMmcoType,
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_INFO, "ex_mark_avc():::MMCO_LONG:::LTR marking....iFrameNum: %d",
              pCtx->iFrameNum);
 #endif
-    iRet = AddLongTermToList (pRefPic, pCtx->pDec, iLongTermFrameIdx);
+    iRet = AddLongTermToList (pRefPic, pCtx->pDec, iLongTermFrameIdx, uiLongTermPicNum);
     break;
   default :
     break;
@@ -539,12 +803,14 @@ static int32_t AddShortTermToList (PRefPic pRefPic, PPicture pPic) {
   return ERR_NONE;
 }
 
-static int32_t AddLongTermToList (PRefPic pRefPic, PPicture pPic, int32_t iLongTermFrameIdx) {
+static int32_t AddLongTermToList (PRefPic pRefPic, PPicture pPic, int32_t iLongTermFrameIdx,
+                                  uint32_t uiLongTermPicNum) {
   int32_t i = 0;
 
   pPic->bUsedAsRef = true;
   pPic->bIsLongRef = true;
   pPic->iLongTermFrameIdx = iLongTermFrameIdx;
+  pPic->uiLongTermPicNum = uiLongTermPicNum;
   if (pRefPic->uiLongRefCount[LIST_0] == 0) {
     pRefPic->pLongRefList[LIST_0][pRefPic->uiLongRefCount[LIST_0]] = pPic;
   } else {
@@ -562,7 +828,8 @@ static int32_t AddLongTermToList (PRefPic pRefPic, PPicture pPic, int32_t iLongT
   return ERR_NONE;
 }
 
-static int32_t MarkAsLongTerm (PRefPic pRefPic, int32_t iFrameNum, int32_t iLongTermFrameIdx) {
+static int32_t MarkAsLongTerm (PRefPic pRefPic, int32_t iFrameNum, int32_t iLongTermFrameIdx,
+                               uint32_t uiLongTermPicNum) {
   PPicture pPic = NULL;
   int32_t i = 0;
   int32_t iRet = ERR_NONE;
@@ -571,7 +838,7 @@ static int32_t MarkAsLongTerm (PRefPic pRefPic, int32_t iFrameNum, int32_t iLong
   for (i = 0; i < pRefPic->uiRefCount[LIST_0]; i++) {
     pPic = pRefPic->pRefList[LIST_0][i];
     if (pPic->iFrameNum == iFrameNum && !pPic->bIsLongRef) {
-      iRet = AddLongTermToList (pRefPic, pPic, iLongTermFrameIdx);
+      iRet = AddLongTermToList (pRefPic, pPic, iLongTermFrameIdx, uiLongTermPicNum);
       break;
     }
   }

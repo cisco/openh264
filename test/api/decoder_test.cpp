@@ -130,6 +130,10 @@ static const FileParam kFileParamArray[] = {
   {"res/test_scalinglist_jm.264", "f690a3af2896a53360215fb5d35016bfd41499b3"},
   {"res/test_vd_1d.264", "5827d2338b79ff82cd091c707823e466197281d3"},
   {"res/test_vd_rc.264", "eea02e97bfec89d0418593a8abaaf55d02eaa1ca"},
+  {"res/HighProfile_B_Frame_1920x1080p_30fps.h264", "50c5b8d175598c1d9e604542c4160fa1c6639adc"},
+  {"res/HighProfile_B_Frame_1920x1080p_2397fps.h264", "16967cc21b6853b651cfd0a1a858eeec8565836a"},
+  {"res/HighProfile_B_Frame_1280x544_2397p.h264", "8567f85b1162b70bb2ccc49fd16d8aa27523efcf"},
+  {"res/HighProfile_B_Frame_1280x720_2397p.h264", "5a3176bd9bc1af2a5d58e880088434ee57c57602"},
 };
 
 INSTANTIATE_TEST_CASE_P (DecodeFile, DecoderOutputTest,
