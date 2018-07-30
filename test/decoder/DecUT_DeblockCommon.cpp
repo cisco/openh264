@@ -889,6 +889,7 @@ TEST (Deblocking, WelsDeblockingMb) {
   // void WelsDeblockingMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t iBoundryFlag)
   /* Deblock one MB, calculate the Bs inside the function, only consider the intra / intra block */
   SDqLayer sDqLayer;
+  sDqLayer.sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.eSliceType = P_SLICE;
 
   SDeblockingFilter sFilter;
   SDeblockingFunc sDBFunc;
