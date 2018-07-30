@@ -89,7 +89,7 @@ struct SVCDecoderImpl : public ISVCDecoder {
   }
   virtual DECODING_STATE EXTAPI FlushFrame (unsigned char** ppDst, SBufferInfo* pDstInfo) {
     EXPECT_TRUE (gThis == this);
-    return static_cast<DECODING_STATE> (5);
+    return static_cast<DECODING_STATE> (10);
   }
   virtual DECODING_STATE EXTAPI DecodeFrameEx (const unsigned char* pSrc,
       const int iSrcLen, unsigned char* pDst, int iDstStride,
