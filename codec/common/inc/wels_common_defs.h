@@ -312,16 +312,16 @@ typedef struct TagNalUnitHeaderExt {
 #define IS_DIR(a, part, list) ((a) & (MB_TYPE_P0L0<<((part)+2*(list))))
 
 
-#define IS_SKIP(type) ( (type)&MB_TYPE_SKIP )
-#define IS_DIRECT(type) ( (type)&MB_TYPE_DIRECT )
+#define IS_SKIP(type) ( ((type)&MB_TYPE_SKIP) != 0 )
+#define IS_DIRECT(type) ( ((type)&MB_TYPE_DIRECT) != 0 )
 #define IS_SVC_INTER(type) IS_INTER(type)
 #define IS_I_BL(type) ( (type) == MB_TYPE_INTRA_BL )
 #define IS_SVC_INTRA(type) ( IS_I_BL(type) || IS_INTRA(type) )
-#define IS_Inter_8x8(type) ( (type)&MB_TYPE_8x8)
-#define IS_SUB_8x8(sub_type) ((sub_type)&SUB_MB_TYPE_8x8)
-#define IS_SUB_8x4(sub_type) ((sub_type)&SUB_MB_TYPE_8x4)
-#define IS_SUB_4x8(sub_type) ((sub_type)&SUB_MB_TYPE_4x8)
-#define IS_SUB_4x4(sub_type) ((sub_type)&SUB_MB_TYPE_4x4)
+#define IS_Inter_8x8(type) ( ((type)&MB_TYPE_8x8) != 0)
+#define IS_SUB_8x8(sub_type) (((sub_type)&SUB_MB_TYPE_8x8) != 0)
+#define IS_SUB_8x4(sub_type) (((sub_type)&SUB_MB_TYPE_8x4) != 0)
+#define IS_SUB_4x8(sub_type) (((sub_type)&SUB_MB_TYPE_4x8) != 0)
+#define IS_SUB_4x4(sub_type) (((sub_type)&SUB_MB_TYPE_4x4) != 0)
 
 #define REF_NOT_AVAIL   -2
 #define REF_NOT_IN_LIST -1  //intra
