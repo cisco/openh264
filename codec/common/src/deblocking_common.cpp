@@ -274,3 +274,22 @@ extern "C" {
 
 #endif
 
+#ifdef HAVE_MMI
+extern "C" {
+  void DeblockLumaLt4H_mmi (uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* pTc) {
+    ENFORCE_STACK_ALIGN_1D (uint8_t,  uiBuf,   16 * 8, 16);
+
+    DeblockLumaTransposeH2V_mmi (pPixY - 4, iStride, &uiBuf[0]);
+    DeblockLumaLt4V_mmi (&uiBuf[4 * 16], 16, iAlpha, iBeta, pTc);
+    DeblockLumaTransposeV2H_mmi (pPixY - 4, iStride, &uiBuf[0]);
+  }
+
+  void DeblockLumaEq4H_mmi (uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta) {
+    ENFORCE_STACK_ALIGN_1D (uint8_t,  uiBuf,   16 * 8, 16);
+
+    DeblockLumaTransposeH2V_mmi (pPixY - 4, iStride, &uiBuf[0]);
+    DeblockLumaEq4V_mmi (&uiBuf[4 * 16], 16, iAlpha, iBeta);
+    DeblockLumaTransposeV2H_mmi (pPixY - 4, iStride, &uiBuf[0]);
+  }
+}
+#endif//HAVE_MMI
