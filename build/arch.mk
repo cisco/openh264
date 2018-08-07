@@ -31,10 +31,10 @@ endif
 endif
 
 #for loongson
-ifneq ($(filter mips64, $(ARCH)),)
+ifneq ($(filter mips mips64, $(ARCH)),)
 ifeq ($(USE_ASM), Yes)
-ASM_ARCH = mips64
-ASMFLAGS += -I$(SRC_PATH)codec/common/mips64/
+ASM_ARCH = mips
+ASMFLAGS += -I$(SRC_PATH)codec/common/mips/
 LOONGSON3A = $(shell g++ -dM -E - < /dev/null | grep '_MIPS_TUNE ' | cut -f 3 -d " ")
 ifeq ($(LOONGSON3A), "loongson3a")
 CFLAGS += -DHAVE_MMI
