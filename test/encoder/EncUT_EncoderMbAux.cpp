@@ -271,6 +271,11 @@ GENERATE_UT_FOR_COPY (16, 8, WelsCopy16x8NotAligned_sse2);
 GENERATE_UT_FOR_COPY (16, 16, WelsCopy16x16NotAligned_sse2);
 GENERATE_UT_FOR_COPY (16, 16, WelsCopy16x16_sse2);
 #endif
+#ifdef HAVE_MMI
+GENERATE_UT_FOR_COPY (16, 8, WelsCopy16x8NotAligned_mmi);
+GENERATE_UT_FOR_COPY (16, 16, WelsCopy16x16NotAligned_mmi);
+GENERATE_UT_FOR_COPY (16, 16, WelsCopy16x16_mmi);
+#endif
 
 namespace {
 

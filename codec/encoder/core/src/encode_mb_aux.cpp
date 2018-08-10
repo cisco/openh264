@@ -586,5 +586,16 @@ void WelsInitEncodingFuncs (SWelsFuncPtrList* pFuncList, uint32_t  uiCpuFlag) {
     pFuncList->pfDctFourT4              = WelsDctFourT4_AArch64_neon;
   }
 #endif
+
+#if defined(HAVE_MMI)
+  if (uiCpuFlag & WELS_CPU_MMI) {
+    pFuncList->pfCopy8x8Aligned         = WelsCopy8x8_mmi;
+    pFuncList->pfCopy8x16Aligned        = WelsCopy8x16_mmi;
+
+    pFuncList->pfCopy16x16Aligned       = WelsCopy16x16_mmi;
+    pFuncList->pfCopy16x16NotAligned    = WelsCopy16x16NotAligned_mmi;
+    pFuncList->pfCopy16x8NotAligned     = WelsCopy16x8NotAligned_mmi;
+  }
+#endif//HAVE_MMI
 }
 }

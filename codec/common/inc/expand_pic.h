@@ -73,6 +73,15 @@ void ExpandPictureChroma_AArch64_neon (uint8_t* pDst, const int32_t kiStride, co
                                        const int32_t kiPicH);
 #endif
 
+#if defined(HAVE_MMI)
+void ExpandPictureLuma_mmi (uint8_t* pDst, const int32_t kiStride, const int32_t kiPicW,
+                            const int32_t kiPicH);
+void ExpandPictureChromaAlign_mmi (uint8_t* pDst, const int32_t kiStride, const int32_t kiPicW,
+                                   const int32_t kiPicH);
+void ExpandPictureChromaUnalign_mmi (uint8_t* pDst, const int32_t kiStride, const int32_t kiPicW,
+                                     const int32_t kiPicH);
+#endif//HAVE_MMI
+
 typedef void (*PExpandPictureFunc) (uint8_t* pDst, const int32_t kiStride, const int32_t kiPicW, const int32_t kiPicH);
 
 typedef struct TagExpandPicFunc {

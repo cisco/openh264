@@ -672,6 +672,20 @@ GENERATE_Sad16x8_UT (WelsSampleSatd16x8_AArch64_neon, WelsSampleSatd16x8_c, WELS
 GENERATE_Sad16x16_UT (WelsSampleSatd16x16_AArch64_neon, WelsSampleSatd16x16_c, WELS_CPU_NEON)
 #endif
 
+#ifdef HAVE_MMI
+GENERATE_Sad4x4_UT (WelsSampleSad4x4_mmi, WelsSampleSad4x4_c, WELS_CPU_MMI)
+GENERATE_Sad8x8_UT (WelsSampleSad8x8_mmi, WelsSampleSad8x8_c, WELS_CPU_MMI)
+GENERATE_Sad8x16_UT (WelsSampleSad8x16_mmi, WelsSampleSad8x16_c, WELS_CPU_MMI)
+GENERATE_Sad16x8_UT (WelsSampleSad16x8_mmi, WelsSampleSad16x8_c, WELS_CPU_MMI)
+GENERATE_Sad16x16_UT (WelsSampleSad16x16_mmi, WelsSampleSad16x16_c, WELS_CPU_MMI)
+
+GENERATE_Sad4x4_UT (WelsSampleSatd4x4_mmi, WelsSampleSatd4x4_c, WELS_CPU_MMI)
+GENERATE_Sad8x8_UT (WelsSampleSatd8x8_mmi, WelsSampleSatd8x8_c, WELS_CPU_MMI)
+GENERATE_Sad8x16_UT (WelsSampleSatd8x16_mmi, WelsSampleSatd8x16_c, WELS_CPU_MMI)
+GENERATE_Sad16x8_UT (WelsSampleSatd16x8_mmi, WelsSampleSatd16x8_c, WELS_CPU_MMI)
+GENERATE_Sad16x16_UT (WelsSampleSatd16x16_mmi, WelsSampleSatd16x16_c, WELS_CPU_MMI)
+#endif
+
 #define GENERATE_SadFour_UT(func, CPUFLAGS, width, height) \
 TEST_F (SadSatdAssemblyFuncTest, func) { \
   if (0 == (m_uiCpuFeatureFlag & CPUFLAGS)) \
@@ -719,4 +733,11 @@ GENERATE_SadFour_UT (WelsSampleSadFour8x8_AArch64_neon, WELS_CPU_NEON, 8, 8)
 GENERATE_SadFour_UT (WelsSampleSadFour8x16_AArch64_neon, WELS_CPU_NEON, 8, 16)
 GENERATE_SadFour_UT (WelsSampleSadFour16x8_AArch64_neon, WELS_CPU_NEON, 16, 8)
 GENERATE_SadFour_UT (WelsSampleSadFour16x16_AArch64_neon, WELS_CPU_NEON, 16, 16)
+#endif
+
+#ifdef HAVE_MMI
+GENERATE_SadFour_UT (WelsSampleSadFour8x8_mmi, WELS_CPU_MMI, 8, 8)
+GENERATE_SadFour_UT (WelsSampleSadFour8x16_mmi, WELS_CPU_MMI, 8, 16)
+GENERATE_SadFour_UT (WelsSampleSadFour16x8_mmi, WELS_CPU_MMI, 16, 8)
+GENERATE_SadFour_UT (WelsSampleSadFour16x16_mmi, WELS_CPU_MMI, 16, 16)
 #endif
