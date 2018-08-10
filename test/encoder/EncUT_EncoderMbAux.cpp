@@ -315,6 +315,11 @@ TEST (EncodeMbAuxTest, WelsGetNoneZeroCount_sse42) {
     TestGetNoneZeroCount (WelsGetNoneZeroCount_sse42);
 }
 #endif
+#ifdef HAVE_MMI
+TEST (EncodeMbAuxTest, WelsGetNoneZeroCount_mmi) {
+  TestGetNoneZeroCount (WelsGetNoneZeroCount_mmi);
+}
+#endif
 #define WELS_ABS_LC(a) ((sign ^ (int32_t)(a)) - sign)
 #define NEW_QUANT(pDct, ff, mf) (((ff)+ WELS_ABS_LC(pDct))*(mf)) >>16
 #define WELS_NEW_QUANT(pDct,ff,mf) WELS_ABS_LC(NEW_QUANT(pDct, ff, mf))
@@ -478,6 +483,24 @@ TEST (EncodeMbAuxTest, WelsQuantFour4x4Max_avx2) {
 }
 #endif //HAVE_AVX2
 #endif
+#ifdef HAVE_MMI
+TEST (EncodeMbAuxTest, WelsQuant4x4_mmi) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_MMI)
+    TestWelsQuant4x4 (WelsQuant4x4_mmi);
+}
+TEST (EncodeMbAuxTest, WelsQuant4x4Dc_mmi) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_MMI)
+    TestWelsQuant4x4Dc (WelsQuant4x4Dc_mmi);
+}
+TEST (EncodeMbAuxTest, WelsQuantFour4x4_mmi) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_MMI)
+    TestWelsQuantFour4x4 (WelsQuantFour4x4_mmi);
+}
+TEST (EncodeMbAuxTest, WelsQuantFour4x4Max_mmi) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_MMI)
+    TestWelsQuantFour4x4Max (WelsQuantFour4x4Max_mmi);
+}
+#endif //HAVE_MMI
 int32_t WelsHadamardQuant2x2SkipAnchor (int16_t* rs, int16_t ff,  int16_t mf) {
   int16_t pDct[4], s[4];
   int16_t threshold = ((1 << 16) - 1) / mf - ff;
@@ -604,6 +627,23 @@ TEST (EncodeMbAuxTest, WelsHadamardT4Dc_sse2) {
     iDct[i] = (rand() & 32767) - 16384;
   WelsHadamardT4Dc_c (iLumaDcC, iDct);
   WelsHadamardT4Dc_sse2 (iLumaDcS, iDct);
+  for (int i = 0; i < 16; i++)
+    EXPECT_EQ (iLumaDcC[i], iLumaDcS[i]);
+  FREE_MEMORY (iDct);
+  FREE_MEMORY (iLumaDcC);
+  FREE_MEMORY (iLumaDcS);
+}
+#endif
+#ifdef HAVE_MMI
+TEST (EncodeMbAuxTest, WelsHadamardT4Dc_mmi) {
+  CMemoryAlign cMemoryAlign (0);
+  ALLOC_MEMORY (int16_t, iDct, 128 * 16);
+  ALLOC_MEMORY (int16_t, iLumaDcC, 16);
+  ALLOC_MEMORY (int16_t, iLumaDcS, 16);
+  for (int i = 0; i < 128 * 16; i++)
+    iDct[i] = (rand() & 32767) - 16384;
+  WelsHadamardT4Dc_c (iLumaDcC, iDct);
+  WelsHadamardT4Dc_mmi (iLumaDcS, iDct);
   for (int i = 0; i < 16; i++)
     EXPECT_EQ (iLumaDcC[i], iLumaDcS[i]);
   FREE_MEMORY (iDct);

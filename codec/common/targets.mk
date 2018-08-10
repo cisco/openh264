@@ -64,7 +64,11 @@ endif
 OBJS += $(COMMON_OBJSARM64)
 
 COMMON_ASM_MIPS_SRCS=\
+	$(COMMON_SRCDIR)/mips/copy_mb_mmi.c\
 	$(COMMON_SRCDIR)/mips/deblock_mmi.c\
+	$(COMMON_SRCDIR)/mips/expand_picture_mmi.c\
+	$(COMMON_SRCDIR)/mips/intra_pred_com_mmi.c\
+	$(COMMON_SRCDIR)/mips/satd_sad_mmi.c\
 
 COMMON_OBJSMIPS += $(COMMON_ASM_MIPS_SRCS:.c=.$(OBJ))
 ifeq ($(ASM_ARCH), mips)
