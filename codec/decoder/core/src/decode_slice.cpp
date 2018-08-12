@@ -1415,15 +1415,24 @@ int32_t WelsDecodeMbCabacBSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uin
     pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || ! (ppRefPicL0[0] && ppRefPicL0[0]->bIsComplete)
                             || ! (ppRefPicL1[0] && ppRefPicL1[0]->bIsComplete);
 
+
     if (pSliceHeader->iDirectSpatialMvPredFlag) {
 
       //predict direct spatial mv
-      PredMvBDirectSpatial (pCtx, pMv, ref);
+      SubMbType subMbType;
+      int32_t ret = PredMvBDirectSpatial (pCtx, pMv, ref, subMbType);
+      if (ret != ERR_NONE) {
+        return ret;
+      }
     } else {
       //temporal direct mode
       ComputeColocated (pCtx);
-      PredBDirectTemporal (pCtx, pMv, ref);
+      int32_t ret = PredBDirectTemporal (pCtx, pMv, ref);
+      if (ret != ERR_NONE) {
+        return ret;
+      }
     }
+
 
     //reset rS
     pCurLayer->pLumaQp[iMbXy] = pSlice->iLastMbQp; //??????????????? dqaunt of previous mb

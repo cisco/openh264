@@ -313,6 +313,12 @@ int32_t GetColocatedMb (PWelsDecoderContext pCtx, MbType& mbType, SubMbType& sub
 
   PPicture colocPic = pCtx->sRefPic.pRefList[LIST_1][0];
 
+  if (colocPic == NULL) {
+    SLogContext* pLogCtx = & (pCtx->sLogCtx);
+    WelsLog (pLogCtx, WELS_LOG_ERROR, "Colocated Ref Picture for B-Slice is lost, B-Slice decoding cannot be continued!");
+    return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_DATA, ERR_INFO_REFERENCE_PIC_LOST);
+  }
+
   MbType coloc_mbType = colocPic->pMbType[iMbXy];
 
   if (IS_Inter_8x8 (coloc_mbType) && !pCtx->pSps->bDirect8x8InferenceFlag) {
@@ -328,7 +334,7 @@ int32_t GetColocatedMb (PWelsDecoderContext pCtx, MbType& mbType, SubMbType& sub
 
   if (IS_INTRA (coloc_mbType)) {
     SetRectBlock (pCurLayer->iColocIntra, 4, 4, 4 * sizeof (int8_t), 1, sizeof (int8_t));
-    return 1;
+    return ERR_NONE;
   }
   SetRectBlock (pCurLayer->iColocIntra, 4, 4, 4 * sizeof (int8_t), 0, sizeof (int8_t));
 
@@ -366,18 +372,22 @@ int32_t GetColocatedMb (PWelsDecoderContext pCtx, MbType& mbType, SubMbType& sub
         SetRectBlock (&pCurLayer->iColocRefIndex[1][0], 4, 4, 4, (uint8_t)REF_NOT_IN_LIST, 1);
     }
   }
-  return 1;
+  return ERR_NONE;
 }
 
-SubMbType PredMvBDirectSpatial (PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], int8_t ref[LIST_A]) {
+int32_t PredMvBDirectSpatial (PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], int8_t ref[LIST_A],
+                              SubMbType& subMbType) {
 
+  int32_t ret = ERR_NONE;
   PDqLayer pCurLayer = pCtx->pCurDqLayer;
   int32_t iMbXy = pCurLayer->iMbXyIndex;
   bool bSkipOrDirect = (IS_SKIP (pCurLayer->pMbType[iMbXy]) | IS_DIRECT (pCurLayer->pMbType[iMbXy])) > 0;
 
   MbType mbType;
-  SubMbType subMbType;
-  GetColocatedMb (pCtx, mbType, subMbType);
+  ret = GetColocatedMb (pCtx, mbType, subMbType);
+  if (ret != ERR_NONE) {
+    return ret;
+  }
 
   bool bTopAvail, bLeftTopAvail, bRightTopAvail, bLeftAvail;
   int32_t iLeftTopType, iRightTopType, iTopType, iLeftType;
@@ -643,16 +653,20 @@ SubMbType PredMvBDirectSpatial (PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2
       }
     }
   }
-  return subMbType;
+  return ret;
 }
 
-void PredBDirectTemporal (PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], int8_t ref[LIST_A]) {
+int32_t PredBDirectTemporal (PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], int8_t ref[LIST_A]) {
+  int32_t ret = ERR_NONE;
   PDqLayer pCurLayer = pCtx->pCurDqLayer;
   int32_t iMbXy = pCurLayer->iMbXyIndex;
   bool bSkipOrDirect = (IS_SKIP (pCurLayer->pMbType[iMbXy]) | IS_DIRECT (pCurLayer->pMbType[iMbXy])) > 0;
   MbType mbType;
   SubMbType subMbType;
-  GetColocatedMb (pCtx, mbType, subMbType);
+  ret = GetColocatedMb (pCtx, mbType, subMbType);
+  if (ret != ERR_NONE) {
+    return ret;
+  }
   PSlice pSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
   if (IS_INTER_16x16 (mbType)) {
     ref[LIST_0] = 0;
@@ -748,6 +762,7 @@ void PredBDirectTemporal (PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], int
       }
     }
   }
+  return ret;
 }
 
 //basic iMVs prediction unit for iMVs partition width (4, 2, 1)
