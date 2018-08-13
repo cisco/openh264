@@ -74,6 +74,39 @@ TEST (EncodeMbAuxTest, WelsScan4x4DcAc_sse2) {
   FREE_MEMORY (iDct);
 }
 #endif
+#ifdef HAVE_MMI
+TEST (EncodeMbAuxTest, WelsScan4x4Ac_mmi) {
+  CMemoryAlign cMemoryAlign (0);
+  ALLOC_MEMORY (int16_t, iLevelA, 16);
+  ALLOC_MEMORY (int16_t, iLevelB, 16);
+  ALLOC_MEMORY (int16_t, iDct, 16);
+  for (int i = 0; i < 16; i++) {
+    iDct[i] = rand() % 256 + 1;
+  }
+  WelsScan4x4Ac_c (iLevelA, iDct);
+  WelsScan4x4Ac_mmi (iLevelB, iDct);
+  for (int j = 0; j < 16; j++)
+    EXPECT_EQ (iLevelA[j], iLevelB[j]);
+  FREE_MEMORY (iLevelA);
+  FREE_MEMORY (iLevelB);
+  FREE_MEMORY (iDct);
+}
+TEST (EncodeMbAuxTest, WelsScan4x4DcAc_mmi) {
+  CMemoryAlign cMemoryAlign (0);
+  ALLOC_MEMORY (int16_t, iLevelA, 32);
+  ALLOC_MEMORY (int16_t, iLevelB, 32);
+  ALLOC_MEMORY (int16_t, iDct, 32);
+  for (int i = 0; i < 32; i++)
+    iDct[i] = (rand() & 32767) - 16384;
+  WelsScan4x4DcAc_mmi (iLevelA, iDct);
+  WelsScan4x4DcAc_c (iLevelB, iDct);
+  for (int i = 0; i < 16; i++)
+    EXPECT_EQ (iLevelA[i], iLevelB[i]);
+  FREE_MEMORY (iLevelA);
+  FREE_MEMORY (iLevelB);
+  FREE_MEMORY (iDct);
+}
+#endif
 TEST (EncodeMbAuxTest, TestScan_4x4_dcc) {
   CMemoryAlign cMemoryAlign (0);
   ALLOC_MEMORY (int16_t, iLevel, 16);
@@ -230,6 +263,29 @@ TEST (EncodeMbAuxTest, WelsCalculateSingleCtr4x4_sse2) {
     iDctC[i] = iDctS[i] = (rand() & 65535) - 32768;
   WelsCalculateSingleCtr4x4_c (iDctC);
   WelsCalculateSingleCtr4x4_sse2 (iDctS);
+  for (int i = 0; i < 16; i++)
+    EXPECT_EQ (iDctC[i], iDctS[i]);
+  FREE_MEMORY (iDctC);
+  FREE_MEMORY (iDctS);
+}
+#endif
+#ifdef HAVE_MMI
+TEST (EncodeMbAuxTest, WelsDctT4_mmi) {
+  TestDctT4 (WelsDctT4_mmi);
+}
+
+TEST (EncodeMbAuxTest, WelsDctFourT4_mmi) {
+  TestDctFourT4 (WelsDctFourT4_mmi);
+}
+
+TEST (EncodeMbAuxTest, WelsCalculateSingleCtr4x4_mmi) {
+  CMemoryAlign cMemoryAlign (0);
+  ALLOC_MEMORY (int16_t, iDctC, 16);
+  ALLOC_MEMORY (int16_t, iDctS, 16);
+  for (int i = 0; i < 16; i++)
+    iDctC[i] = iDctS[i] = (rand() & 65535) - 32768;
+  WelsCalculateSingleCtr4x4_c (iDctC);
+  WelsCalculateSingleCtr4x4_mmi (iDctS);
   for (int i = 0; i < 16; i++)
     EXPECT_EQ (iDctC[i], iDctS[i]);
   FREE_MEMORY (iDctC);

@@ -43,6 +43,7 @@
 #include "cpu_core.h"
 #include "ls_defines.h"
 #include "macros.h"
+#include "asmdefs_mmi.h"
 
 namespace {
 
@@ -1659,6 +1660,2541 @@ void PixelAvg_AArch64_neon (uint8_t* pDst, int32_t iDstStride, const uint8_t* pS
 }
 #endif
 
+#if defined(HAVE_MMI)
+#define MMI_LOAD_8P(f0, f2, f4, r0) \
+  "gsldlc1    "#f0", 0x7("#r0")               \n\t" \
+  "gsldrc1    "#f0", 0x0("#r0")               \n\t" \
+  "punpckhbh  "#f2", "#f0", "#f4"             \n\t" \
+  "punpcklbh  "#f0", "#f0", "#f4"             \n\t"
+
+#define FILTER_HV_W4(f0, f2, f4, f6, f8, f10, f12, f14, f16, f18, \
+                     f20, f22, f24, f26, f28, f30, r0, r1, r2) \
+  "paddh      "#f0", "#f0", "#f20"            \n\t" \
+  "paddh      "#f2", "#f2", "#f22"            \n\t" \
+  "mov.d      "#f28", "#f8"                   \n\t" \
+  "mov.d      "#f30", "#f10"                  \n\t" \
+  "mov.d      "#f24", "#f4"                   \n\t" \
+  "mov.d      "#f26", "#f6"                   \n\t" \
+  "dmfc1      "#r2", "#f8"                    \n\t" \
+  "dli        "#r1", 0x0010001000100010       \n\t" \
+  "dmtc1      "#r1", "#f8"                    \n\t" \
+  "paddh      "#f0", "#f0", "#f8"             \n\t" \
+  "paddh      "#f2", "#f2", "#f8"             \n\t" \
+  "paddh      "#f28", "#f28", "#f12"          \n\t" \
+  "paddh      "#f30", "#f30", "#f14"          \n\t" \
+  "paddh      "#f24", "#f24", "#f16"          \n\t" \
+  "paddh      "#f26", "#f26", "#f18"          \n\t" \
+  "dli        "#r1", 0x2                      \n\t" \
+  "dmtc1      "#r1", "#f8"                    \n\t" \
+  "psllh      "#f28", "#f28", "#f8"           \n\t" \
+  "psllh      "#f30", "#f30", "#f8"           \n\t" \
+  "psubh      "#f28", "#f28", "#f24"          \n\t" \
+  "psubh      "#f30", "#f30", "#f26"          \n\t" \
+  "paddh      "#f0", "#f0", "#f28"            \n\t" \
+  "paddh      "#f2", "#f2", "#f30"            \n\t" \
+  "psllh      "#f28", "#f28", "#f8"           \n\t" \
+  "psllh      "#f30", "#f30", "#f8"           \n\t" \
+  "paddh      "#f0", "#f0", "#f28"            \n\t" \
+  "paddh      "#f2", "#f2", "#f30"            \n\t" \
+  "dli        "#r1", 0x5                      \n\t" \
+  "dmtc1      "#r1", "#f8"                    \n\t" \
+  "psrah      "#f0", "#f0", "#f8"             \n\t" \
+  "psrah      "#f2", "#f2", "#f8"             \n\t" \
+  "xor        "#f28", "#f28", "#f28"          \n\t" \
+  "packushb   "#f0", "#f0", "#f2"             \n\t" \
+  "gsswlc1    "#f0", 0x3("#r0")               \n\t" \
+  "gsswrc1    "#f0", 0x0("#r0")               \n\t" \
+  "dmtc1      "#r2", "#f8"                    \n\t"
+
+#define FILTER_HV_W8(f0, f2, f4, f6, f8, f10, f12, f14, f16, f18, \
+                     f20, f22, f24, f26, f28, f30, r0, r1, r2) \
+  "paddh      "#f0", "#f0", "#f20"            \n\t" \
+  "paddh      "#f2", "#f2", "#f22"            \n\t" \
+  "mov.d      "#f28", "#f8"                   \n\t" \
+  "mov.d      "#f30", "#f10"                  \n\t" \
+  "mov.d      "#f24", "#f4"                   \n\t" \
+  "mov.d      "#f26", "#f6"                   \n\t" \
+  "dmfc1      "#r2", "#f8"                    \n\t" \
+  "dli        "#r1", 0x0010001000100010       \n\t" \
+  "dmtc1      "#r1", "#f8"                    \n\t" \
+  "paddh      "#f0", "#f0", "#f8"             \n\t" \
+  "paddh      "#f2", "#f2", "#f8"             \n\t" \
+  "paddh      "#f28", "#f28", "#f12"          \n\t" \
+  "paddh      "#f30", "#f30", "#f14"          \n\t" \
+  "paddh      "#f24", "#f24", "#f16"          \n\t" \
+  "paddh      "#f26", "#f26", "#f18"          \n\t" \
+  "dli        "#r1", 0x2                      \n\t" \
+  "dmtc1      "#r1", "#f8"                    \n\t" \
+  "psllh      "#f28", "#f28", "#f8"           \n\t" \
+  "psllh      "#f30", "#f30", "#f8"           \n\t" \
+  "psubh      "#f28", "#f28", "#f24"          \n\t" \
+  "psubh      "#f30", "#f30", "#f26"          \n\t" \
+  "paddh      "#f0", "#f0", "#f28"            \n\t" \
+  "paddh      "#f2", "#f2", "#f30"            \n\t" \
+  "psllh      "#f28", "#f28", "#f8"           \n\t" \
+  "psllh      "#f30", "#f30", "#f8"           \n\t" \
+  "paddh      "#f0", "#f0", "#f28"            \n\t" \
+  "paddh      "#f2", "#f2", "#f30"            \n\t" \
+  "dli        "#r1", 0x5                      \n\t" \
+  "dmtc1      "#r1", "#f8"                    \n\t" \
+  "psrah      "#f0", "#f0", "#f8"             \n\t" \
+  "psrah      "#f2", "#f2", "#f8"             \n\t" \
+  "xor        "#f28", "#f28", "#f28"          \n\t" \
+  "packushb   "#f0", "#f0", "#f2"             \n\t" \
+  "gssdlc1    "#f0", 0x7("#r0")               \n\t" \
+  "gssdrc1    "#f0", 0x0("#r0")               \n\t" \
+  "dmtc1      "#r2", "#f8"                    \n\t"
+
+#define FILTER_VER_ALIGN(f0, f2, f4, f6, f8, f10, f12, f14, f16, f18, \
+                         f20, f22, f24, f26, f28, f30, r0, r1, r2, r3, r4) \
+  "paddh      "#f0", "#f0", "#f20"            \n\t" \
+  "paddh      "#f2", "#f2", "#f22"            \n\t" \
+  "mov.d      "#f24", "#f4"                   \n\t" \
+  "mov.d      "#f26", "#f6"                   \n\t" \
+  "mov.d      "#f28", "#f8"                   \n\t" \
+  "mov.d      "#f30", "#f10"                  \n\t" \
+  "dli        "#r2", 0x2                      \n\t" \
+  "paddh      "#f24", "#f24", "#f16"          \n\t" \
+  "paddh      "#f26", "#f26", "#f18"          \n\t" \
+  "dmfc1      "#r3", "#f8"                    \n\t" \
+  "paddh      "#f28", "#f28", "#f12"          \n\t" \
+  "paddh      "#f30", "#f30", "#f14"          \n\t" \
+  "dmtc1      "#r2", "#f8"                    \n\t" \
+  "psubh      "#f0", "#f0", "#f24"            \n\t" \
+  "psubh      "#f2", "#f2", "#f26"            \n\t" \
+  "psrah      "#f0", "#f0", "#f8"             \n\t" \
+  "psrah      "#f2", "#f2", "#f8"             \n\t" \
+  "paddh      "#f0", "#f0", "#f28"            \n\t" \
+  "paddh      "#f2", "#f2", "#f30"            \n\t" \
+  "psubh      "#f0", "#f0", "#f24"            \n\t" \
+  "psubh      "#f2", "#f2", "#f26"            \n\t" \
+  "psrah      "#f0", "#f0", "#f8"             \n\t" \
+  "psrah      "#f2", "#f2", "#f8"             \n\t" \
+  "dmtc1      "#r4", "#f8"                    \n\t" \
+  "paddh      "#f28", "#f28", "#f0"           \n\t" \
+  "paddh      "#f30", "#f30", "#f2"           \n\t" \
+  "dli        "#r2", 0x6                      \n\t" \
+  "paddh      "#f28", "#f28", "#f8"           \n\t" \
+  "paddh      "#f30", "#f30", "#f8"           \n\t" \
+  "dmtc1      "#r2", "#f8"                    \n\t" \
+  "psrah      "#f28", "#f28", "#f8"           \n\t" \
+  "psrah      "#f30", "#f30", "#f8"           \n\t" \
+  "packushb   "#f28", "#f28", "#f30"          \n\t" \
+  "gssdxc1    "#f28", 0x0("#r0", "#r1")       \n\t" \
+  "dmtc1      "#r3", "#f8"                    \n\t"
+
+#define FILTER_VER_UNALIGN(f0, f2, f4, f6, f8, f10, f12, f14, f16, f18, \
+                           f20, f22, f24, f26, f28, f30, r0, r1, r2, r3) \
+  "paddh      "#f0", "#f0", "#f20"            \n\t" \
+  "paddh      "#f2", "#f2", "#f22"            \n\t" \
+  "mov.d      "#f24", "#f4"                   \n\t" \
+  "mov.d      "#f26", "#f6"                   \n\t" \
+  "mov.d      "#f28", "#f8"                   \n\t" \
+  "mov.d      "#f30", "#f10"                  \n\t" \
+  "dli        "#r1", 0x2                      \n\t" \
+  "paddh      "#f24", "#f24", "#f16"          \n\t" \
+  "paddh      "#f26", "#f26", "#f18"          \n\t" \
+  "dmfc1      "#r2", "#f8"                    \n\t" \
+  "paddh      "#f28", "#f28", "#f12"          \n\t" \
+  "paddh      "#f30", "#f30", "#f14"          \n\t" \
+  "dmtc1      "#r1", "#f8"                    \n\t" \
+  "psubh      "#f0", "#f0", "#f24"            \n\t" \
+  "psubh      "#f2", "#f2", "#f26"            \n\t" \
+  "psrah      "#f0", "#f0", "#f8"             \n\t" \
+  "psrah      "#f2", "#f2", "#f8"             \n\t" \
+  "paddh      "#f0", "#f0", "#f28"            \n\t" \
+  "paddh      "#f2", "#f2", "#f30"            \n\t" \
+  "psubh      "#f0", "#f0", "#f24"            \n\t" \
+  "psubh      "#f2", "#f2", "#f26"            \n\t" \
+  "psrah      "#f0", "#f0", "#f8"             \n\t" \
+  "psrah      "#f2", "#f2", "#f8"             \n\t" \
+  "dmtc1      "#r3", "#f8"                    \n\t" \
+  "paddh      "#f28", "#f28", "#f0"           \n\t" \
+  "paddh      "#f30", "#f30", "#f2"           \n\t" \
+  "dli        "#r1", 0x6                      \n\t" \
+  "paddh      "#f28", "#f28", "#f8"           \n\t" \
+  "paddh      "#f30", "#f30", "#f8"           \n\t" \
+  "dmtc1      "#r1", "#f8"                    \n\t" \
+  "psrah      "#f28", "#f28", "#f8"           \n\t" \
+  "psrah      "#f30", "#f30", "#f8"           \n\t" \
+  "packushb   "#f28", "#f28", "#f30"          \n\t" \
+  "gssdlc1    "#f28", 0x7("#r0")              \n\t" \
+  "gssdrc1    "#f28", 0x0("#r0")              \n\t" \
+  "dmtc1      "#r2", "#f8"                    \n\t"
+
+void McHorVer20Width5_mmi(const uint8_t *pSrc, int32_t iSrcStride, uint8_t *pDst,
+                          int32_t iDstStride, int32_t iWidth, int32_t iHeight) {
+  BACKUP_REG;
+  __asm__ volatile (
+    ".set       arch=loongson3a                 \n\t"
+    "xor        $f28, $f28, $f28                \n\t"
+    PTR_ADDIU  "%[pSrc], %[pSrc], -0x2          \n\t"
+    "dli        $8, 0x2                         \n\t"
+    "dli        $10, 0x0010001000100010         \n\t"
+    "dli        $11, 0x5                        \n\t"
+    "1:                                         \n\t"
+    "xor        $f28, $f28, $f28                \n\t"
+    "gsldlc1    $f0, 0x7(%[pSrc])               \n\t"
+    "gsldlc1    $f4, 0xc(%[pSrc])               \n\t"
+    "gsldlc1    $f8, 0x8(%[pSrc])               \n\t"
+    "gsldlc1    $f12, 0xb(%[pSrc])              \n\t"
+    "gsldlc1    $f16, 0x9(%[pSrc])              \n\t"
+    "gsldlc1    $f20, 0xa(%[pSrc])              \n\t"
+    "gsldrc1    $f0, 0x0(%[pSrc])               \n\t"
+    "gsldrc1    $f4, 0x5(%[pSrc])               \n\t"
+    "gsldrc1    $f8, 0x1(%[pSrc])               \n\t"
+    "gsldrc1    $f12, 0x4(%[pSrc])              \n\t"
+    "gsldrc1    $f16, 0x2(%[pSrc])              \n\t"
+    "gsldrc1    $f20, 0x3(%[pSrc])              \n\t"
+    "punpckhbh  $f2, $f0, $f28                  \n\t"
+    "punpckhbh  $f6, $f4, $f28                  \n\t"
+    "punpckhbh  $f10, $f8, $f28                 \n\t"
+    "punpckhbh  $f14, $f12, $f28                \n\t"
+    "punpckhbh  $f18, $f16, $f28                \n\t"
+    "punpckhbh  $f22, $f20, $f28                \n\t"
+    "punpcklbh  $f0, $f0, $f28                  \n\t"
+    "punpcklbh  $f4, $f4, $f28                  \n\t"
+    "punpcklbh  $f8, $f8, $f28                  \n\t"
+    "punpcklbh  $f12, $f12, $f28                \n\t"
+    "punpcklbh  $f16, $f16, $f28                \n\t"
+    "punpcklbh  $f20, $f20, $f28                \n\t"
+
+    "mov.d      $f28, $f8                       \n\t"
+    "mov.d      $f30, $f10                      \n\t"
+    "paddh      $f28, $f28, $f12                \n\t"
+    "paddh      $f30, $f30, $f14                \n\t"
+    "mov.d      $f24, $f16                      \n\t"
+    "mov.d      $f26, $f18                      \n\t"
+    "paddh      $f24, $f24, $f20                \n\t"
+    "paddh      $f26, $f26, $f22                \n\t"
+    "dmfc1      $9, $f12                        \n\t"
+    "dmtc1      $8, $f12                        \n\t"
+    "psllh      $f24, $f24, $f12                \n\t"
+    "psllh      $f26, $f26, $f12                \n\t"
+    "psubh      $f24, $f24, $f28                \n\t"
+    "psubh      $f26, $f26, $f30                \n\t"
+    "paddh      $f0, $f0, $f4                   \n\t"
+    "paddh      $f2, $f2, $f6                   \n\t"
+    "paddh      $f0, $f0, $f24                  \n\t"
+    "paddh      $f2, $f2, $f26                  \n\t"
+    "psllh      $f24, $f24, $f12                \n\t"
+    "psllh      $f26, $f26, $f12                \n\t"
+    "paddh      $f0, $f0, $f24                  \n\t"
+    "paddh      $f2, $f2, $f26                  \n\t"
+
+    "dmtc1      $10, $f12                       \n\t"
+    "paddh      $f0, $f0, $f12                  \n\t"
+    "paddh      $f2, $f2, $f12                  \n\t"
+    "dmtc1      $11, $f12                       \n\t"
+    "psrah      $f0, $f0, $f12                  \n\t"
+    "psrah      $f2, $f2, $f12                  \n\t"
+    "packushb   $f0, $f0, $f2                   \n\t"
+
+    "gsswlc1    $f0, 0x3(%[pDst])               \n\t"
+    "gsswrc1    $f0, 0x0(%[pDst])               \n\t"
+
+    "gsldlc1    $f0, 0xd(%[pSrc])               \n\t"
+    "xor        $f28, $f28, $f28                \n\t"
+    "gsldrc1    $f0, 0x6(%[pSrc])               \n\t"
+    "punpckhbh  $f2, $f0, $f28                  \n\t"
+    "punpcklbh  $f0, $f0, $f28                  \n\t"
+    "dmtc1      $9, $f12                        \n\t"
+    "dmtc1      $8, $f24                        \n\t"
+
+    "paddh      $f16, $f16, $f4                 \n\t"
+    "paddh      $f18, $f18, $f6                 \n\t"
+    "paddh      $f20, $f20, $f12                \n\t"
+    "paddh      $f22, $f22, $f14                \n\t"
+    "psllh      $f20, $f20, $f24                \n\t"
+    "psllh      $f22, $f22, $f24                \n\t"
+    "psubh      $f20, $f20, $f16                \n\t"
+    "psubh      $f22, $f22, $f18                \n\t"
+    "paddh      $f8, $f8, $f0                   \n\t"
+    "paddh      $f10, $f10, $f2                 \n\t"
+    "paddh      $f8, $f8, $f20                  \n\t"
+    "paddh      $f10, $f10, $f22                \n\t"
+    "psllh      $f20, $f20, $f24                \n\t"
+    "psllh      $f22, $f22, $f24                \n\t"
+    "paddh      $f8, $f8, $f20                  \n\t"
+    "paddh      $f10, $f10, $f22                \n\t"
+
+    "dmtc1      $10, $f24                       \n\t"
+    "paddh      $f8, $f8, $f24                  \n\t"
+    "paddh      $f10, $f10, $f24                \n\t"
+    "dmtc1      $11, $f24                       \n\t"
+    "psrah      $f8, $f8, $f24                  \n\t"
+    "psrah      $f10, $f10, $f24                \n\t"
+    "packushb   $f8, $f8, $f10                  \n\t"
+    "gsswlc1    $f8, 0x4(%[pDst])               \n\t"
+    "gsswrc1    $f8, 0x1(%[pDst])               \n\t"
+
+    PTR_ADDU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "bnez       %[iHeight], 1b                  \n\t"
+    : [pSrc]"+&r"((unsigned char *)pSrc), [pDst]"+&r"((unsigned char *)pDst),
+      [iWidth]"+&r"((int)iWidth), [iHeight]"+&r"((int)iHeight)
+    : [iSrcStride]"r"((int)iSrcStride),  [iDstStride]"r"((int)iDstStride)
+    : "memory", "$8", "$9", "$10", "$11", "$f0", "$f2", "$f4", "$f6", "$f8",
+      "$f10", "$f12", "$f14", "$f16", "$f18", "$f20", "$f22", "$f24", "$f26",
+      "$f28", "$f30"
+  );
+  RECOVER_REG;
+}
+
+void McHorVer20Width9Or17_mmi(const uint8_t *pSrc, int32_t iSrcStride, uint8_t *pDst,
+                              int32_t iDstStride, int32_t iWidth, int32_t iHeight) {
+  BACKUP_REG;
+  __asm__ volatile (
+    ".set       arch=loongson3a                 \n\t"
+    PTR_ADDIU  "%[pSrc], %[pSrc], -0x2          \n\t"
+    "xor        $f28, $f28, $f28                \n\t"
+    "dli        $8, 0x2                         \n\t"
+    "dli        $9, 0x9                         \n\t"
+    "dli        $10, 0x0010001000100010         \n\t"
+    "dli        $11, 0x5                        \n\t"
+    "bne        %[iWidth], $9, 2f               \n\t"
+    "1:                                         \n\t"
+    "xor        $f28, $f28, $f28                \n\t"
+    "gsldlc1    $f0, 0x7(%[pSrc])               \n\t"
+    "gsldlc1    $f4, 0xc(%[pSrc])               \n\t"
+    "gsldlc1    $f8, 0x8(%[pSrc])               \n\t"
+    "gsldlc1    $f12, 0xb(%[pSrc])              \n\t"
+    "gsldlc1    $f16, 0x9(%[pSrc])              \n\t"
+    "gsldlc1    $f20, 0xa(%[pSrc])              \n\t"
+    "gsldrc1    $f0, 0x0(%[pSrc])               \n\t"
+    "gsldrc1    $f4, 0x5(%[pSrc])               \n\t"
+    "gsldrc1    $f8, 0x1(%[pSrc])               \n\t"
+    "gsldrc1    $f12, 0x4(%[pSrc])              \n\t"
+    "gsldrc1    $f16, 0x2(%[pSrc])              \n\t"
+    "gsldrc1    $f20, 0x3(%[pSrc])              \n\t"
+    "punpckhbh  $f2, $f0, $f28                  \n\t"
+    "punpckhbh  $f6, $f4, $f28                  \n\t"
+    "punpckhbh  $f10, $f8, $f28                 \n\t"
+    "punpckhbh  $f14, $f12, $f28                \n\t"
+    "punpckhbh  $f18, $f16, $f28                \n\t"
+    "punpckhbh  $f22, $f20, $f28                \n\t"
+    "punpcklbh  $f0, $f0, $f28                  \n\t"
+    "punpcklbh  $f4, $f4, $f28                  \n\t"
+    "punpcklbh  $f8, $f8, $f28                  \n\t"
+    "punpcklbh  $f12, $f12, $f28                \n\t"
+    "punpcklbh  $f16, $f16, $f28                \n\t"
+    "punpcklbh  $f20, $f20, $f28                \n\t"
+
+    "mov.d      $f28, $f8                       \n\t"
+    "mov.d      $f30, $f10                      \n\t"
+    "paddh      $f28, $f28, $f12                \n\t"
+    "paddh      $f30, $f30, $f14                \n\t"
+    "mov.d      $f24, $f16                      \n\t"
+    "mov.d      $f26, $f18                      \n\t"
+    "paddh      $f24, $f24, $f20                \n\t"
+    "paddh      $f26, $f26, $f22                \n\t"
+    "dmfc1      $9, $f12                        \n\t"
+    "dmtc1      $8, $f12                        \n\t"
+    "psllh      $f24, $f24, $f12                \n\t"
+    "psllh      $f26, $f26, $f12                \n\t"
+    "psubh      $f24, $f24, $f28                \n\t"
+    "psubh      $f26, $f26, $f30                \n\t"
+    "paddh      $f0, $f0, $f4                   \n\t"
+    "paddh      $f2, $f2, $f6                   \n\t"
+    "paddh      $f0, $f0, $f24                  \n\t"
+    "paddh      $f2, $f2, $f26                  \n\t"
+    "psllh      $f24, $f24, $f12                \n\t"
+    "psllh      $f26, $f26, $f12                \n\t"
+    "paddh      $f0, $f0, $f24                  \n\t"
+    "paddh      $f2, $f2, $f26                  \n\t"
+
+    "dmtc1      $10, $f12                       \n\t"
+    "paddh      $f0, $f0, $f12                  \n\t"
+    "paddh      $f2, $f2, $f12                  \n\t"
+    "dmtc1      $11, $f12                       \n\t"
+    "psrah      $f0, $f0, $f12                  \n\t"
+    "psrah      $f2, $f2, $f12                  \n\t"
+    "packushb   $f0, $f0, $f2                   \n\t"
+
+    "gsswlc1    $f0, 0x3(%[pDst])               \n\t"
+    "gsswrc1    $f0, 0x0(%[pDst])               \n\t"
+
+    "gsldlc1    $f0, 0xd(%[pSrc])               \n\t"
+    "xor        $f28, $f28, $f28                \n\t"
+    "gsldrc1    $f0, 0x6(%[pSrc])               \n\t"
+    "punpckhbh  $f2, $f0, $f28                  \n\t"
+    "punpcklbh  $f0, $f0, $f28                  \n\t"
+    "dmtc1      $9, $f12                        \n\t"
+    "dmtc1      $8, $f24                        \n\t"
+
+    "paddh      $f16, $f16, $f4                 \n\t"
+    "paddh      $f18, $f18, $f6                 \n\t"
+    "paddh      $f20, $f20, $f12                \n\t"
+    "paddh      $f22, $f22, $f14                \n\t"
+    "psllh      $f20, $f20, $f24                \n\t"
+    "psllh      $f22, $f22, $f24                \n\t"
+    "psubh      $f20, $f20, $f16                \n\t"
+    "psubh      $f22, $f22, $f18                \n\t"
+    "paddh      $f8, $f8, $f0                   \n\t"
+    "paddh      $f10, $f10, $f2                 \n\t"
+    "paddh      $f8, $f8, $f20                  \n\t"
+    "paddh      $f10, $f10, $f22                \n\t"
+    "psllh      $f20, $f20, $f24                \n\t"
+    "psllh      $f22, $f22, $f24                \n\t"
+    "paddh      $f8, $f8, $f20                  \n\t"
+    "paddh      $f10, $f10, $f22                \n\t"
+
+    "dmtc1      $10, $f24                       \n\t"
+    "paddh      $f8, $f8, $f24                  \n\t"
+    "paddh      $f10, $f10, $f24                \n\t"
+    "dmtc1      $11, $f24                       \n\t"
+    "psrah      $f8, $f8, $f24                  \n\t"
+    "psrah      $f10, $f10, $f24                \n\t"
+    "packushb   $f8, $f8, $f10                  \n\t"
+    "gssdlc1    $f8, 0x8(%[pDst])               \n\t"
+    "gssdrc1    $f8, 0x1(%[pDst])               \n\t"
+
+    PTR_ADDU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "bnez       %[iHeight], 1b                  \n\t"
+    "j          3f                              \n\t"
+
+    "2:                                         \n\t"
+    "xor        $f28, $f28, $f28                \n\t"
+    "gsldlc1    $f0, 0x7(%[pSrc])               \n\t"
+    "gsldlc1    $f4, 0xc(%[pSrc])               \n\t"
+    "gsldlc1    $f8, 0x8(%[pSrc])               \n\t"
+    "gsldlc1    $f12, 0xb(%[pSrc])              \n\t"
+    "gsldlc1    $f16, 0x9(%[pSrc])              \n\t"
+    "gsldlc1    $f20, 0xa(%[pSrc])              \n\t"
+    "gsldrc1    $f0, 0x0(%[pSrc])               \n\t"
+    "gsldrc1    $f4, 0x5(%[pSrc])               \n\t"
+    "gsldrc1    $f8, 0x1(%[pSrc])               \n\t"
+    "gsldrc1    $f12, 0x4(%[pSrc])              \n\t"
+    "gsldrc1    $f16, 0x2(%[pSrc])              \n\t"
+    "gsldrc1    $f20, 0x3(%[pSrc])              \n\t"
+    "punpckhbh  $f2, $f0, $f28                  \n\t"
+    "punpckhbh  $f6, $f4, $f28                  \n\t"
+    "punpckhbh  $f10, $f8, $f28                 \n\t"
+    "punpckhbh  $f14, $f12, $f28                \n\t"
+    "punpckhbh  $f18, $f16, $f28                \n\t"
+    "punpckhbh  $f22, $f20, $f28                \n\t"
+    "punpcklbh  $f0, $f0, $f28                  \n\t"
+    "punpcklbh  $f4, $f4, $f28                  \n\t"
+    "punpcklbh  $f8, $f8, $f28                  \n\t"
+    "punpcklbh  $f12, $f12, $f28                \n\t"
+    "punpcklbh  $f16, $f16, $f28                \n\t"
+    "punpcklbh  $f20, $f20, $f28                \n\t"
+
+    "dmtc1      $8, $f30                        \n\t"
+    "paddh      $f8, $f8, $f12                  \n\t"
+    "paddh      $f10, $f10, $f14                \n\t"
+    "paddh      $f16, $f16, $f20                \n\t"
+    "paddh      $f18, $f18, $f22                \n\t"
+    "psllh      $f16, $f16, $f30                \n\t"
+    "psllh      $f18, $f18, $f30                \n\t"
+    "psubh      $f16, $f16, $f8                 \n\t"
+    "psubh      $f18, $f18, $f10                \n\t"
+    "paddh      $f0, $f0, $f4                   \n\t"
+    "paddh      $f2, $f2, $f6                   \n\t"
+    "paddh      $f0, $f0, $f16                  \n\t"
+    "paddh      $f2, $f2, $f18                  \n\t"
+    "psllh      $f16, $f16, $f30                \n\t"
+    "psllh      $f18, $f18, $f30                \n\t"
+    "paddh      $f0, $f0, $f16                  \n\t"
+    "paddh      $f2, $f2, $f18                  \n\t"
+
+    "dmtc1      $10, $f30                       \n\t"
+    "paddh      $f0, $f0, $f30                  \n\t"
+    "paddh      $f2, $f2, $f30                  \n\t"
+    "dmtc1      $11, $f30                       \n\t"
+    "psrah      $f0, $f0, $f30                  \n\t"
+    "psrah      $f2, $f2, $f30                  \n\t"
+    "packushb   $f0, $f0, $f2                   \n\t"
+    "gssdlc1    $f0, 0x7(%[pDst])               \n\t"
+    "gssdrc1    $f0, 0x0(%[pDst])               \n\t"
+
+    "gsldlc1    $f0, 15(%[pSrc])                \n\t"
+    "gsldlc1    $f4, 0x14(%[pSrc])              \n\t"
+    "gsldlc1    $f8, 0x10(%[pSrc])              \n\t"
+    "gsldlc1    $f12, 0x13(%[pSrc])             \n\t"
+    "gsldlc1    $f16, 0x11(%[pSrc])             \n\t"
+    "gsldlc1    $f20, 0x12(%[pSrc])             \n\t"
+    "gsldrc1    $f0, 8(%[pSrc])                 \n\t"
+    "gsldrc1    $f4, 0xd(%[pSrc])               \n\t"
+    "gsldrc1    $f8, 0x9(%[pSrc])               \n\t"
+    "gsldrc1    $f12, 0xc(%[pSrc])              \n\t"
+    "gsldrc1    $f16, 0xa(%[pSrc])              \n\t"
+    "gsldrc1    $f20, 0xb(%[pSrc])              \n\t"
+    "punpckhbh  $f2, $f0, $f28                  \n\t"
+    "punpckhbh  $f6, $f4, $f28                  \n\t"
+    "punpckhbh  $f10, $f8, $f28                 \n\t"
+    "punpckhbh  $f14, $f12, $f28                \n\t"
+    "punpckhbh  $f18, $f16, $f28                \n\t"
+    "punpckhbh  $f22, $f20, $f28                \n\t"
+    "punpcklbh  $f0, $f0, $f28                  \n\t"
+    "punpcklbh  $f4, $f4, $f28                  \n\t"
+    "punpcklbh  $f8, $f8, $f28                  \n\t"
+    "punpcklbh  $f12, $f12, $f28                \n\t"
+    "punpcklbh  $f16, $f16, $f28                \n\t"
+    "punpcklbh  $f20, $f20, $f28                \n\t"
+
+    "mov.d      $f28, $f8                       \n\t"
+    "mov.d      $f30, $f10                      \n\t"
+    "paddh      $f28, $f28, $f12                \n\t"
+    "paddh      $f30, $f30, $f14                \n\t"
+    "mov.d      $f24, $f16                      \n\t"
+    "mov.d      $f26, $f18                      \n\t"
+    "paddh      $f24, $f24, $f20                \n\t"
+    "paddh      $f26, $f26, $f22                \n\t"
+    "dmfc1      $9, $f12                        \n\t"
+    "dmtc1      $8, $f12                        \n\t"
+    "psllh      $f24, $f24, $f12                \n\t"
+    "psllh      $f26, $f26, $f12                \n\t"
+    "psubh      $f24, $f24, $f28                \n\t"
+    "psubh      $f26, $f26, $f30                \n\t"
+    "paddh      $f0, $f0, $f4                   \n\t"
+    "paddh      $f2, $f2, $f6                   \n\t"
+    "paddh      $f0, $f0, $f24                  \n\t"
+    "paddh      $f2, $f2, $f26                  \n\t"
+    "psllh      $f24, $f24, $f12                \n\t"
+    "psllh      $f26, $f26, $f12                \n\t"
+    "paddh      $f0, $f0, $f24                  \n\t"
+    "paddh      $f2, $f2, $f26                  \n\t"
+
+    "dmtc1      $10, $f30                       \n\t"
+    "paddh      $f0, $f0, $f30                  \n\t"
+    "paddh      $f2, $f2, $f30                  \n\t"
+    "dmtc1      $11, $f30                       \n\t"
+    "psrah      $f0, $f0, $f30                  \n\t"
+    "psrah      $f2, $f2, $f30                  \n\t"
+    "packushb   $f0, $f0, $f2                   \n\t"
+    "gsswlc1    $f0, 0xb(%[pDst])               \n\t"
+    "gsswrc1    $f0, 0x8(%[pDst])               \n\t"
+
+    "dmtc1      $9, $f12                        \n\t"
+    "xor        $f28, $f28, $f28                \n\t"
+    "dli        $9, 0x20                        \n\t"
+    "gsldlc1    $f0, 0x15(%[pSrc])              \n\t"
+    "dmtc1      $9, $f30                        \n\t"
+    "gsldrc1    $f0, 0xE(%[pSrc])               \n\t"
+    "punpckhbh  $f2, $f0, $f28                  \n\t"
+    "punpcklbh  $f0, $f0, $f28                  \n\t"
+    "dmtc1      $8, $f24                        \n\t"
+
+    "paddh      $f16, $f16, $f4                 \n\t"
+    "paddh      $f18, $f18, $f6                 \n\t"
+    "paddh      $f20, $f20, $f12                \n\t"
+    "paddh      $f22, $f22, $f14                \n\t"
+    "psllh      $f20, $f20, $f24                \n\t"
+    "psllh      $f22, $f22, $f24                \n\t"
+    "psubh      $f20, $f20, $f16                \n\t"
+    "psubh      $f22, $f22, $f18                \n\t"
+    "paddh      $f8, $f8, $f0                   \n\t"
+    "paddh      $f10, $f10, $f2                 \n\t"
+    "paddh      $f8, $f8, $f20                  \n\t"
+    "paddh      $f10, $f10, $f22                \n\t"
+    "psllh      $f20, $f20, $f24                \n\t"
+    "psllh      $f22, $f22, $f24                \n\t"
+    "paddh      $f8, $f8, $f20                  \n\t"
+    "paddh      $f10, $f10, $f22                \n\t"
+
+    "dmtc1      $10, $f24                       \n\t"
+    "paddh      $f8, $f8, $f24                  \n\t"
+    "paddh      $f10, $f10, $f24                \n\t"
+    "dmtc1      $11, $f24                       \n\t"
+    "psrah      $f8, $f8, $f24                  \n\t"
+    "psrah      $f10, $f10, $f24                \n\t"
+    "packushb   $f8, $f8, $f10                  \n\t"
+    "gssdlc1    $f8, 0x10(%[pDst])              \n\t"
+    "gssdrc1    $f8, 0x9(%[pDst])               \n\t"
+
+    PTR_ADDU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "bnez       %[iHeight], 2b                  \n\t"
+    "3:                                         \n\t"
+    : [pSrc]"+&r"((unsigned char *)pSrc), [pDst]"+&r"((unsigned char *)pDst),
+      [iWidth]"+&r"((int)iWidth), [iHeight]"+&r"((int)iHeight)
+    : [iSrcStride]"r"((int)iSrcStride),  [iDstStride]"r"((int)iDstStride)
+    : "memory", "$8", "$9", "$10", "$11", "$f0", "$f2", "$f4", "$f6", "$f8",
+      "$f10", "$f12", "$f14", "$f16", "$f18", "$f20", "$f22", "$f24", "$f26",
+      "$f28", "$f30"
+  );
+  RECOVER_REG;
+}
+
+//horizontal filter to gain half sample, that is (2, 0) location in quarter sample
+static inline void McHorVer20Width5Or9Or17_mmi(const uint8_t* pSrc, int32_t iSrcStride,
+                                               uint8_t* pDst, int32_t iDstStride,
+                                               int32_t iWidth, int32_t iHeight) {
+  if (iWidth == 17 || iWidth == 9)
+      McHorVer20Width9Or17_mmi(pSrc, iSrcStride, pDst, iDstStride, iWidth, iHeight);
+  else //if (iWidth == 5)
+      McHorVer20Width5_mmi(pSrc, iSrcStride, pDst, iDstStride, iWidth, iHeight);
+}
+
+void McHorVer02Height5_mmi(const uint8_t *pSrc, int32_t iSrcStride, uint8_t *pDst,
+                           int32_t iDstStride, int32_t iWidth, int32_t iHeight) {
+  BACKUP_REG;
+  __asm__ volatile (
+    ".set       arch=loongson3a                 \n\t"
+    "move       $12, %[pSrc]                    \n\t"
+    "move       $13, %[pDst]                    \n\t"
+    "move       $14, %[iHeight]                 \n\t"
+
+    "dsrl       %[iWidth], %[iWidth], 0x2       \n\t"
+    PTR_ADDU   "$10, %[iSrcStride], %[iSrcStride] \n\t"
+    PTR_SUBU   "%[pSrc], %[pSrc], $10           \n\t"
+
+    "1:                                         \n\t"
+    "xor        $f28, $f28, $f28                \n\t"
+    MMI_LOAD_8P($f0, $f2, $f28, %[pSrc])
+    PTR_ADDU   "$8, %[pSrc], %[iSrcStride]      \n\t"
+    MMI_LOAD_8P($f4, $f6, $f28, $8)
+
+    PTR_ADDU   "%[pSrc], %[pSrc], $10           \n\t"
+    MMI_LOAD_8P($f8, $f10, $f28, %[pSrc])
+    PTR_ADDU   "$8, %[pSrc], %[iSrcStride]      \n\t"
+    MMI_LOAD_8P($f12, $f14, $f28, $8)
+    PTR_ADDU   "%[pSrc], %[pSrc], $10           \n\t"
+    MMI_LOAD_8P($f16, $f18, $f28, %[pSrc])
+    PTR_ADDU   "$8, %[pSrc], %[iSrcStride]      \n\t"
+    MMI_LOAD_8P($f20, $f22, $f28, $8)
+    FILTER_HV_W4($f0, $f2, $f4, $f6, $f8, $f10, $f12, $f14, $f16, $f18, $f20,
+                 $f22, $f24, $f26, $f28, $f30, %[pDst], $8, $9)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    PTR_ADDU   "%[pSrc], %[pSrc], $10           \n\t"
+    MMI_LOAD_8P($f24, $f26, $f28, %[pSrc])
+    "mov.d      $f0, $f4                        \n\t"
+    "mov.d      $f2, $f6                        \n\t"
+    "mov.d      $f4, $f8                        \n\t"
+    "mov.d      $f6, $f10                       \n\t"
+    "mov.d      $f8, $f12                       \n\t"
+    "mov.d      $f10, $f14                      \n\t"
+    "mov.d      $f12, $f16                      \n\t"
+    "mov.d      $f14, $f18                      \n\t"
+    "mov.d      $f16, $f20                      \n\t"
+    "mov.d      $f18, $f22                      \n\t"
+    "mov.d      $f20, $f24                      \n\t"
+    "mov.d      $f22, $f26                      \n\t"
+
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_SUBU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+
+    "2:                                         \n\t"
+    FILTER_HV_W4($f0, $f2, $f4, $f6, $f8, $f10, $f12, $f14, $f16, $f18, $f20,
+                 $f22, $f24, $f26, $f28, $f30, %[pDst], $8, $9)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 3f                  \n\t"
+
+    PTR_ADDU   "%[pSrc], %[pSrc], $10           \n\t"
+    MMI_LOAD_8P($f24, $f26, $f28, %[pSrc])
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    FILTER_HV_W4($f4, $f6, $f8, $f10, $f12, $f14, $f16, $f18, $f20, $f22, $f24,
+                 $f26, $f28, $f30, $f0, $f2, %[pDst], $8, $9)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 3f                  \n\t"
+
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDU   "$8, %[pSrc], %[iSrcStride]      \n\t"
+    MMI_LOAD_8P($f28, $f30, $f0, $8)
+    FILTER_HV_W4($f8, $f10, $f12, $f14, $f16, $f18, $f20, $f22, $f24, $f26, $f28,
+                 $f30, $f0, $f2, $f4, $f6, %[pDst], $8, $9)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 3f                  \n\t"
+
+    PTR_ADDU   "%[pSrc], %[pSrc], $10           \n\t"
+    MMI_LOAD_8P($f0, $f2, $f4, %[pSrc])
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    FILTER_HV_W4($f12, $f14, $f16, $f18, $f20, $f22, $f24, $f26, $f28, $f30, $f0,
+                 $f2, $f4, $f6, $f8, $f10, %[pDst], $8, $9)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 3f                  \n\t"
+
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDU   "$8, %[pSrc], %[iSrcStride]      \n\t"
+    MMI_LOAD_8P($f4, $f6, $f8, $8)
+    FILTER_HV_W4($f16, $f18, $f20, $f22, $f24, $f26, $f28, $f30, $f0, $f2, $f4, $f6,
+                 $f8, $f10, $f12, $f14, %[pDst], $8, $9)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 3f                  \n\t"
+
+    PTR_ADDU   "%[pSrc], %[pSrc], $10           \n\t"
+    MMI_LOAD_8P($f8, $f10, $f12, %[pSrc])
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    FILTER_HV_W4($f20, $f22, $f24, $f26, $f28, $f30, $f0, $f2, $f4, $f6, $f8, $f10,
+                 $f12, $f14, $f16, $f18, %[pDst], $8, $9)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 3f                  \n\t"
+
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDU   "$8, %[pSrc], %[iSrcStride]      \n\t"
+    MMI_LOAD_8P($f12, $f14, $f16, $8)
+    FILTER_HV_W4($f24, $f26, $f28, $f30, $f0, $f2, $f4, $f6, $f8, $f10, $f12, $f14,
+                 $f16, $f18, $f20, $f22, %[pDst], $8, $9)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 3f                  \n\t"
+
+    PTR_ADDU   "%[pSrc], %[pSrc], $10           \n\t"
+    MMI_LOAD_8P($f16, $f18, $f20, %[pSrc])
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    FILTER_HV_W4($f28, $f30, $f0, $f2, $f4, $f6, $f8, $f10, $f12, $f14, $f16, $f18,
+                 $f20, $f22, $f24, $f26, %[pDst], $8, $9)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 3f                  \n\t"
+
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDU   "$8, %[pSrc], %[iSrcStride]      \n\t"
+    MMI_LOAD_8P($f20, $f22, $f24, $8)
+    "j          2b                              \n\t"
+
+    "3:                                         \n\t"
+    PTR_ADDIU  "%[iWidth], %[iWidth], -0x1      \n\t"
+    "beqz       %[iWidth], 4f                   \n\t"
+    "move       %[pSrc], $12                    \n\t"
+    "move       %[pDst], $13                    \n\t"
+    "move       %[iHeight], $14                 \n\t"
+    PTR_SUBU   "%[pSrc], %[pSrc], $10           \n\t"
+    PTR_ADDIU  "%[pSrc], %[pSrc], 0x4           \n\t"
+    PTR_ADDIU  "%[pDst], %[pDst], 0x4           \n\t"
+    "j          1b                              \n\t"
+    "4:                                         \n\t"
+    : [pSrc]"+&r"((unsigned char *)pSrc), [pDst]"+&r"((unsigned char *)pDst),
+      [iWidth]"+&r"(iWidth), [iHeight]"+&r"(iHeight)
+    : [iSrcStride]"r"(iSrcStride),  [iDstStride]"r"(iDstStride)
+    : "memory", "$8", "$9", "$10", "$12", "$13", "$14", "$f0", "$f2", "$f4",
+      "$f6", "$f8", "$f10", "$f12", "$f14", "$f16", "$f18", "$f20", "$f22",
+      "$f24", "$f26", "$f28", "$f30"
+  );
+  RECOVER_REG;
+}
+
+void McHorVer02Height9Or17_mmi(const uint8_t *pSrc, int32_t iSrcStride, uint8_t *pDst,
+                               int32_t iDstStride, int32_t iWidth, int32_t iHeight) {
+  BACKUP_REG;
+  __asm__ volatile (
+    ".set       arch=loongson3a                 \n\t"
+    "move       $12, %[pSrc]                    \n\t"
+    "move       $13, %[pDst]                    \n\t"
+    "move       $14, %[iHeight]                 \n\t"
+
+    "dsrl       %[iWidth], %[iWidth], 0x3       \n\t"
+    PTR_ADDU   "$10, %[iSrcStride], %[iSrcStride] \n\t"
+    PTR_SUBU   "%[pSrc], %[pSrc], $10           \n\t"
+
+    "1:                                         \n\t"
+    "dli        $8, 0x20                        \n\t"
+    "xor        $f28, $f28, $f28                \n\t"
+    "dmtc1      $8, $f30                        \n\t"
+
+    MMI_LOAD_8P($f0, $f2, $f28, %[pSrc])
+    PTR_ADDU   "$8, %[pSrc], %[iSrcStride]      \n\t"
+    MMI_LOAD_8P($f4, $f6, $f28, $8)
+    PTR_ADDU   "%[pSrc], %[pSrc], $10           \n\t"
+    MMI_LOAD_8P($f8, $f10, $f28, %[pSrc])
+    PTR_ADDU   "$8, %[pSrc], %[iSrcStride]      \n\t"
+    MMI_LOAD_8P($f12, $f14, $f28, $8)
+    PTR_ADDU   "%[pSrc], %[pSrc], $10           \n\t"
+    MMI_LOAD_8P($f16, $f18, $f28, %[pSrc])
+    PTR_ADDU   "$8, %[pSrc], %[iSrcStride]      \n\t"
+    MMI_LOAD_8P($f20, $f22, $f28, $8)
+    FILTER_HV_W8($f0, $f2, $f4, $f6, $f8, $f10, $f12, $f14, $f16, $f18, $f20,
+                 $f22, $f24, $f26, $f28, $f30, %[pDst], $8, $9)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    PTR_ADDU   "%[pSrc], %[pSrc], $10           \n\t"
+    MMI_LOAD_8P($f24, $f26, $f28, %[pSrc])
+    "mov.d      $f0, $f4                        \n\t"
+    "mov.d      $f2, $f6                        \n\t"
+    "mov.d      $f4, $f8                        \n\t"
+    "mov.d      $f6, $f10                       \n\t"
+    "mov.d      $f8, $f12                       \n\t"
+    "mov.d      $f10, $f14                      \n\t"
+    "mov.d      $f12, $f16                      \n\t"
+    "mov.d      $f14, $f18                      \n\t"
+    "mov.d      $f16, $f20                      \n\t"
+    "mov.d      $f18, $f22                      \n\t"
+    "mov.d      $f20, $f24                      \n\t"
+    "mov.d      $f22, $f26                      \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_SUBU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+
+    "2:                                         \n\t"
+    FILTER_HV_W8($f0, $f2, $f4, $f6, $f8, $f10, $f12, $f14, $f16, $f18, $f20,
+                 $f22, $f24, $f26, $f28, $f30, %[pDst], $8, $9)
+    "dmtc1      $9, $f8                         \n\t"
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 3f                  \n\t"
+
+    PTR_ADDU   "%[pSrc], %[pSrc], $10           \n\t"
+    MMI_LOAD_8P($f24, $f26, $f28, %[pSrc])
+    PTR_ADDU   "%[pDst],  %[pDst], %[iDstStride] \n\t"
+    FILTER_HV_W8($f4, $f6, $f8, $f10, $f12, $f14, $f16, $f18, $f20, $f22, $f24,
+                 $f26, $f28, $f30, $f0, $f2, %[pDst], $8, $9)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 3f                  \n\t"
+
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDU   "$8, %[pSrc], %[iSrcStride]      \n\t"
+    MMI_LOAD_8P($f28, $f30, $f0, $8)
+    FILTER_HV_W8($f8, $f10, $f12, $f14, $f16, $f18, $f20, $f22, $f24, $f26, $f28,
+                 $f30, $f0, $f2, $f4, $f6, %[pDst], $8, $9)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 3f                  \n\t"
+
+    PTR_ADDU   "%[pSrc], %[pSrc], $10           \n\t"
+    MMI_LOAD_8P($f0, $f2, $f4, %[pSrc])
+    PTR_ADDU   "%[pDst],  %[pDst], %[iDstStride] \n\t"
+    FILTER_HV_W8($f12, $f14, $f16, $f18, $f20, $f22, $f24, $f26, $f28, $f30, $f0,
+                 $f2, $f4, $f6, $f8, $f10, %[pDst], $8, $9)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 3f                  \n\t"
+
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDU   "$8, %[pSrc], %[iSrcStride]      \n\t"
+    MMI_LOAD_8P($f4, $f6, $f8, $8)
+    FILTER_HV_W8($f16, $f18, $f20, $f22, $f24, $f26, $f28, $f30, $f0, $f2, $f4,
+                 $f6, $f8, $f10, $f12, $f14, %[pDst], $8, $9)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 3f                  \n\t"
+
+    PTR_ADDU   "%[pSrc], %[pSrc], $10           \n\t"
+    MMI_LOAD_8P($f8, $f10, $f12, %[pSrc])
+    PTR_ADDU   "%[pDst],  %[pDst], %[iDstStride] \n\t"
+    FILTER_HV_W8($f20, $f22, $f24, $f26, $f28, $f30, $f0, $f2, $f4, $f6, $f8,
+                 $f10, $f12, $f14, $f16, $f18, %[pDst], $8, $9)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 3f                  \n\t"
+
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDU   "$8, %[pSrc], %[iSrcStride]      \n\t"
+    MMI_LOAD_8P($f12, $f14, $f16, $8)
+    FILTER_HV_W8($f24, $f26, $f28, $f30, $f0, $f2, $f4, $f6, $f8, $f10, $f12,
+                 $f14, $f16, $f18, $f20, $f22, %[pDst], $8, $9)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 3f                  \n\t"
+
+    PTR_ADDU   "%[pSrc], %[pSrc], $10           \n\t"
+    MMI_LOAD_8P($f16, $f18, $f20, %[pSrc])
+    PTR_ADDU   "%[pDst],  %[pDst], %[iDstStride] \n\t"
+    FILTER_HV_W8($f28, $f30, $f0, $f2, $f4, $f6, $f8, $f10, $f12, $f14, $f16,
+                 $f18, $f20, $f22, $f24, $f26, %[pDst], $8, $9)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 3f                  \n\t"
+
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDU   "$8, %[pSrc], %[iSrcStride]      \n\t"
+    MMI_LOAD_8P($f20, $f22, $f24, $8)
+    "j          2b                              \n\t"
+
+    "3:                                         \n\t"
+    PTR_ADDIU  "%[iWidth], %[iWidth], -0x1      \n\t"
+    "beqz       %[iWidth], 4f                   \n\t"
+
+    "move       %[pSrc], $12                    \n\t"
+    "move       %[pDst], $13                    \n\t"
+    "move       %[iHeight], $14                 \n\t"
+    PTR_SUBU   "%[pSrc], %[pSrc], $10           \n\t"
+    PTR_ADDIU  "%[pSrc], %[pSrc], 0x8           \n\t"
+    PTR_ADDIU  "%[pDst], %[pDst], 0x8           \n\t"
+    "j          1b                              \n\t"
+    "4:                                         \n\t"
+    : [pSrc]"+&r"((unsigned char *)pSrc), [pDst]"+&r"((unsigned char *)pDst),
+      [iWidth]"+&r"(iWidth), [iHeight]"+&r"(iHeight)
+    : [iSrcStride]"r"(iSrcStride),  [iDstStride]"r"(iDstStride)
+    : "memory", "$8", "$9", "$10", "$12", "$13", "$14", "$f0", "$f2", "$f4",
+      "$f6", "$f8", "$f10", "$f12", "$f14", "$f16", "$f18", "$f20", "$f22",
+      "$f24", "$f26", "$f28", "$f30"
+  );
+  RECOVER_REG;
+}
+
+//vertical filter to gain half sample, that is (0, 2) location in quarter sample
+static inline void McHorVer02Height5Or9Or17_mmi(const uint8_t* pSrc, int32_t iSrcStride,
+                                                uint8_t* pDst, int32_t iDstStride,
+                                                int32_t iWidth, int32_t iHeight) {
+  if (iWidth == 16 || iWidth == 8)
+    McHorVer02Height9Or17_mmi(pSrc, iSrcStride, pDst, iDstStride, iWidth, iHeight );
+  else
+    McHorVer02Height5_mmi (pSrc, iSrcStride, pDst, iDstStride, iWidth, iHeight);
+}
+
+static inline void McHorVer22HorFirst_mmi(const uint8_t *pSrc, int32_t iSrcStride,
+                                          uint8_t * pTap, int32_t iTapStride,
+                                          int32_t iWidth, int32_t iHeight) {
+  BACKUP_REG;
+  __asm__ volatile (
+    ".set       arch=loongson3a                 \n\t"
+    "dli        $8, 0x9                         \n\t"
+    PTR_SUBU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    PTR_SUBU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    "bne        %[iWidth], $8, 2f               \n\t"
+
+    "1:                                         \n\t"
+    "gsldlc1    $f0, 0x7(%[pSrc])               \n\t"
+    "xor        $f28, $f28, $f28                \n\t"
+    "gsldrc1    $f0, 0x0(%[pSrc])               \n\t"
+    "punpckhbh  $f2, $f0, $f28                  \n\t"
+    "gsldlc1    $f4, 0xc(%[pSrc])               \n\t"
+    "punpcklbh  $f0, $f0, $f28                  \n\t"
+    "gsldrc1    $f4, 0x5(%[pSrc])               \n\t"
+    "punpckhbh  $f6, $f4, $f28                  \n\t"
+    "gsldlc1    $f8, 0x8(%[pSrc])               \n\t"
+    "punpcklbh  $f4, $f4, $f28                  \n\t"
+    "gsldrc1    $f8, 0x1(%[pSrc])               \n\t"
+    "punpckhbh  $f10, $f8, $f28                 \n\t"
+    "gsldlc1    $f12, 0xb(%[pSrc])              \n\t"
+    "punpcklbh  $f8, $f8, $f28                  \n\t"
+    "gsldrc1    $f12, 0x4(%[pSrc])              \n\t"
+    "punpckhbh  $f14, $f12, $f28                \n\t"
+    "gsldlc1    $f16, 0x9(%[pSrc])              \n\t"
+    "punpcklbh  $f12, $f12, $f28                \n\t"
+    "gsldrc1    $f16, 0x2(%[pSrc])              \n\t"
+    "punpckhbh  $f18, $f16, $f28                \n\t"
+    "gsldlc1    $f20, 0xa(%[pSrc])              \n\t"
+    "punpcklbh  $f16, $f16, $f28                \n\t"
+    "gsldrc1    $f20, 0x3(%[pSrc])              \n\t"
+    "punpckhbh  $f22, $f20, $f28                \n\t"
+    "punpcklbh  $f20, $f20, $f28                \n\t"
+
+    "mov.d      $f28, $f8                       \n\t"
+    "mov.d      $f30, $f10                      \n\t"
+    "paddh      $f28, $f28, $f12                \n\t"
+    "paddh      $f30, $f30, $f14                \n\t"
+    "mov.d      $f24, $f16                      \n\t"
+    "mov.d      $f26, $f18                      \n\t"
+    "paddh      $f24, $f24, $f20                \n\t"
+    "paddh      $f26, $f26, $f22                \n\t"
+    "dli        $8, 0x2                         \n\t"
+    "dmfc1      $9, $f12                        \n\t"
+    "dmtc1      $8, $f12                        \n\t"
+    "psllh      $f24, $f24, $f12                \n\t"
+    "psllh      $f26, $f26, $f12                \n\t"
+    "psubh      $f24, $f24, $f28                \n\t"
+    "psubh      $f26, $f26, $f30                \n\t"
+    "paddh      $f0, $f0, $f4                   \n\t"
+    "paddh      $f2, $f2, $f6                   \n\t"
+    "paddh      $f0, $f0, $f24                  \n\t"
+    "paddh      $f2, $f2, $f26                  \n\t"
+    "psllh      $f24, $f24, $f12                \n\t"
+    "psllh      $f26, $f26, $f12                \n\t"
+    "paddh      $f0, $f0, $f24                  \n\t"
+    "paddh      $f2, $f2, $f26                  \n\t"
+    "gsswlc1    $f0, 0x3(%[pTap])               \n\t"
+    "gsswrc1    $f0, 0x0(%[pTap])               \n\t"
+
+    "gsldlc1    $f0, 0xd(%[pSrc])               \n\t"
+    "xor        $f28, $f28, $f28                \n\t"
+    "gsldrc1    $f0, 0x6(%[pSrc])               \n\t"
+    "punpckhbh  $f2, $f0, $f28                  \n\t"
+    "punpcklbh  $f0, $f0, $f28                  \n\t"
+    "dli        $8, 0x2                         \n\t"
+    "dmtc1      $9, $f12                        \n\t"
+    "dmtc1      $8, $f24                        \n\t"
+
+    "paddh      $f16, $f16, $f4                 \n\t"
+    "paddh      $f18, $f18, $f6                 \n\t"
+    "paddh      $f20, $f20, $f12                \n\t"
+    "paddh      $f22, $f22, $f14                \n\t"
+    "psllh      $f20, $f20, $f24                \n\t"
+    "psllh      $f22, $f22, $f24                \n\t"
+    "psubh      $f20, $f20, $f16                \n\t"
+    "psubh      $f22, $f22, $f18                \n\t"
+    "paddh      $f8, $f8, $f0                   \n\t"
+    "paddh      $f10, $f10, $f2                 \n\t"
+    "paddh      $f8, $f8, $f20                  \n\t"
+    "paddh      $f10, $f10, $f22                \n\t"
+    "psllh      $f20, $f20, $f24                \n\t"
+    "psllh      $f22, $f22, $f24                \n\t"
+    "paddh      $f8, $f8, $f20                  \n\t"
+    "paddh      $f10, $f10, $f22                \n\t"
+    "gssdlc1    $f8, 0x9(%[pTap])               \n\t"
+    "gssdlc1    $f10, 0x11(%[pTap])             \n\t"
+    "gssdrc1    $f8, 0x2(%[pTap])               \n\t"
+    "gssdrc1    $f10, 0xa(%[pTap])              \n\t"
+
+    PTR_ADDU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    PTR_ADDU   "%[pTap], %[pTap], %[iTapStride] \n\t"
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "bnez       %[iHeight], 1b                  \n\t"
+    "j          3f                              \n\t"
+
+    "2:                                         \n\t"
+    "gsldlc1    $f0, 0x7(%[pSrc])               \n\t"
+    "xor        $f28, $f28, $f28                \n\t"
+    "gsldrc1    $f0, 0x0(%[pSrc])               \n\t"
+    "punpckhbh  $f2, $f0, $f28                  \n\t"
+    "gsldlc1    $f4, 0xc(%[pSrc])               \n\t"
+    "punpcklbh  $f0, $f0, $f28                  \n\t"
+    "gsldrc1    $f4, 0x5(%[pSrc])               \n\t"
+    "punpckhbh  $f6, $f4, $f28                  \n\t"
+    "gsldlc1    $f8, 0x8(%[pSrc])               \n\t"
+    "punpcklbh  $f4, $f4, $f28                  \n\t"
+    "gsldrc1    $f8, 0x1(%[pSrc])               \n\t"
+    "punpckhbh  $f10, $f8, $f28                 \n\t"
+    "gsldlc1    $f12, 0xb(%[pSrc])              \n\t"
+    "punpcklbh  $f8, $f8, $f28                  \n\t"
+    "gsldrc1    $f12, 0x4(%[pSrc])              \n\t"
+    "punpckhbh  $f14, $f12, $f28                \n\t"
+    "gsldlc1    $f16, 0x9(%[pSrc])              \n\t"
+    "punpcklbh  $f12, $f12, $f28                \n\t"
+    "gsldrc1    $f16, 0x2(%[pSrc])              \n\t"
+    "punpckhbh  $f18, $f16, $f28                \n\t"
+    "gsldlc1    $f20, 0xa(%[pSrc])              \n\t"
+    "punpcklbh  $f16, $f16, $f28                \n\t"
+    "gsldrc1    $f20, 0x3(%[pSrc])              \n\t"
+    "punpckhbh  $f22, $f20, $f28                \n\t"
+    "dli        $8, 0x2                         \n\t"
+    "punpcklbh  $f20, $f20, $f28                \n\t"
+
+    "dmtc1      $8, $f30                        \n\t"
+    "paddh      $f8, $f8, $f12                  \n\t"
+    "paddh      $f10, $f10, $f14                \n\t"
+    "paddh      $f16, $f16, $f20                \n\t"
+    "paddh      $f18, $f18, $f22                \n\t"
+    "psllh      $f16, $f16, $f30                \n\t"
+    "psllh      $f18, $f18, $f30                \n\t"
+    "psubh      $f16, $f16, $f8                 \n\t"
+    "psubh      $f18, $f18, $f10                \n\t"
+    "paddh      $f0, $f0, $f4                   \n\t"
+    "paddh      $f2, $f2, $f6                   \n\t"
+    "paddh      $f0, $f0, $f16                  \n\t"
+    "paddh      $f2, $f2, $f18                  \n\t"
+    "psllh      $f16, $f16, $f30                \n\t"
+    "psllh      $f18, $f18, $f30                \n\t"
+    "paddh      $f0, $f0, $f16                  \n\t"
+    "paddh      $f2, $f2, $f18                  \n\t"
+    "gssqc1     $f2, $f0, 0x0(%[pTap])          \n\t"
+
+    "gsldlc1    $f0, 15(%[pSrc])                \n\t"
+    "gsldrc1    $f0, 8(%[pSrc])                 \n\t"
+    "punpckhbh  $f2, $f0, $f28                  \n\t"
+    "gsldlc1    $f4, 0x14(%[pSrc])              \n\t"
+    "punpcklbh  $f0, $f0, $f28                  \n\t"
+    "gsldrc1    $f4, 0xd(%[pSrc])               \n\t"
+    "punpckhbh  $f6, $f4, $f28                  \n\t"
+    "gsldlc1    $f8, 0x10(%[pSrc])              \n\t"
+    "punpcklbh  $f4, $f4, $f28                  \n\t"
+    "gsldrc1    $f8, 0x9(%[pSrc])               \n\t"
+    "punpckhbh  $f10, $f8, $f28                 \n\t"
+    "gsldlc1    $f12, 0x13(%[pSrc])             \n\t"
+    "punpcklbh  $f8, $f8, $f28                  \n\t"
+    "gsldrc1    $f12, 0xc(%[pSrc])              \n\t"
+    "punpckhbh  $f14, $f12, $f28                \n\t"
+    "gsldlc1    $f16, 0x11(%[pSrc])             \n\t"
+    "punpcklbh  $f12, $f12, $f28                \n\t"
+    "gsldrc1    $f16, 0xa(%[pSrc])              \n\t"
+    "punpckhbh  $f18, $f16, $f28                \n\t"
+    "gsldlc1    $f20, 0x12(%[pSrc])             \n\t"
+    "punpcklbh  $f16, $f16, $f28                \n\t"
+    "gsldrc1    $f20, 0xb(%[pSrc])              \n\t"
+    "punpckhbh  $f22, $f20, $f28                \n\t"
+    "punpcklbh  $f20, $f20, $f28                \n\t"
+
+    "mov.d      $f28, $f8                       \n\t"
+    "mov.d      $f30, $f10                      \n\t"
+    "paddh      $f28, $f28, $f12                \n\t"
+    "paddh      $f30, $f30, $f14                \n\t"
+    "mov.d      $f24, $f16                      \n\t"
+    "mov.d      $f26, $f18                      \n\t"
+    "dli        $8, 0x2                         \n\t"
+    "paddh      $f24, $f24, $f20                \n\t"
+    "paddh      $f26, $f26, $f22                \n\t"
+    "dmfc1      $9, $f12                        \n\t"
+    "dmtc1      $8, $f12                        \n\t"
+    "psllh      $f24, $f24, $f12                \n\t"
+    "psllh      $f26, $f26, $f12                \n\t"
+    "psubh      $f24, $f24, $f28                \n\t"
+    "psubh      $f26, $f26, $f30                \n\t"
+    "paddh      $f0, $f0, $f4                   \n\t"
+    "paddh      $f2, $f2, $f6                   \n\t"
+    "paddh      $f0, $f0, $f24                  \n\t"
+    "paddh      $f2, $f2, $f26                  \n\t"
+    "psllh      $f24, $f24, $f12                \n\t"
+    "psllh      $f26, $f26, $f12                \n\t"
+    "paddh      $f0, $f0, $f24                  \n\t"
+    "paddh      $f2, $f2, $f26                  \n\t"
+    "gsswlc1    $f0, 0x13(%[pTap])              \n\t"
+    "gsswrc1    $f0, 0x10(%[pTap])              \n\t"
+
+    "gsldlc1    $f0, 0x15(%[pSrc])              \n\t"
+    "xor        $f28, $f28, $f28                \n\t"
+    "gsldrc1    $f0, 0xE(%[pSrc])               \n\t"
+    "punpckhbh  $f2, $f0, $f28                  \n\t"
+    "punpcklbh  $f0, $f0, $f28                  \n\t"
+    "dli        $8, 0x2                         \n\t"
+    "dmtc1      $9, $f12                        \n\t"
+    "dmtc1      $8, $f24                        \n\t"
+
+    "paddh      $f16, $f16, $f4                 \n\t"
+    "paddh      $f18, $f18, $f6                 \n\t"
+    "paddh      $f20, $f20, $f12                \n\t"
+    "paddh      $f22, $f22, $f14                \n\t"
+    "psllh      $f20, $f20, $f24                \n\t"
+    "psllh      $f22, $f22, $f24                \n\t"
+    "psubh      $f20, $f20, $f16                \n\t"
+    "psubh      $f22, $f22, $f18                \n\t"
+    "paddh      $f8, $f8, $f0                   \n\t"
+    "paddh      $f10, $f10, $f2                 \n\t"
+    "paddh      $f8, $f8, $f20                  \n\t"
+    "paddh      $f10, $f10, $f22                \n\t"
+    "psllh      $f20, $f20, $f24                \n\t"
+    "psllh      $f22, $f22, $f24                \n\t"
+    "paddh      $f8, $f8, $f20                  \n\t"
+    "paddh      $f10, $f10, $f22                \n\t"
+    "gssdlc1    $f8, 0x19(%[pTap])              \n\t"
+    "gssdlc1    $f10, 0x21(%[pTap])             \n\t"
+    "gssdrc1    $f8, 0x12(%[pTap])              \n\t"
+    "gssdrc1    $f10, 0x1a(%[pTap])             \n\t"
+
+    PTR_ADDU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    PTR_ADDU   "%[pTap], %[pTap], %[iTapStride] \n\t"
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "bnez       %[iHeight], 2b                  \n\t"
+    "3:                                         \n\t"
+    : [pSrc]"+&r"(pSrc), [pTap]"+&r"(pTap), [iWidth]"+&r"(iWidth),
+      [iHeight]"+&r"(iHeight)
+    : [iSrcStride]"r"(iSrcStride),  [iTapStride]"r"(iTapStride)
+    : "memory", "$8", "$9", "$f0", "$f2", "$f4", "$f6", "$f8", "$f10", "$f12",
+      "$f14", "$f16", "$f18", "$f20", "$f22", "$f24", "$f26", "$f28", "$f30"
+  );
+  RECOVER_REG;
+}
+
+static inline void McHorVer22Width8VerLastAlign_mmi(const uint8_t *pTap,
+                   int32_t iTapStride, uint8_t * pDst, int32_t iDstStride,
+                   int32_t iWidth, int32_t iHeight) {
+  BACKUP_REG;
+  __asm__ volatile (
+    ".set       arch=loongson3a                 \n\t"
+    "move       $10, %[pTap]                    \n\t"
+    "move       $11, %[pDst]                    \n\t"
+    "move       $12, %[iHeight]                 \n\t"
+    "dsrl       %[iWidth], 0x3                  \n\t"
+    PTR_ADDU   "$13, %[iTapStride], %[iTapStride] \n\t"
+    PTR_ADDU   "$14, %[iDstStride], %[iDstStride] \n\t"
+    "dli        $15, 0x0020002000200020         \n\t"
+
+    "4:                                         \n\t"
+    "gslqc1     $f2, $f0, 0x0(%[pTap])          \n\t"
+    PTR_ADDU   "$8, %[pTap], %[iTapStride]      \n\t"
+    "gslqc1     $f6, $f4, 0x0($8)               \n\t"
+    PTR_ADDU   "%[pTap], %[pTap], $13           \n\t"
+    "gslqc1     $f10, $f8, 0x0(%[pTap])         \n\t"
+    PTR_ADDU   "$8, %[pTap], %[iTapStride]      \n\t"
+    "gslqc1     $f14, $f12, 0x0($8)             \n\t"
+    PTR_ADDU   "%[pTap], %[pTap], $13           \n\t"
+    "gslqc1     $f18, $f16, 0x0(%[pTap])        \n\t"
+    PTR_ADDU   "$8, %[pTap], %[iTapStride]      \n\t"
+    "gslqc1     $f22, $f20, 0x0($8)             \n\t"
+
+    FILTER_VER_ALIGN($f0, $f2, $f4, $f6, $f8, $f10, $f12, $f14, $f16, $f18, $f20,
+                     $f22, $f24, $f26, $f28, $f30, %[pDst], $0, $8, $9, $15)
+
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    PTR_ADDU   "%[pTap], %[pTap], $13           \n\t"
+    "gslqc1     $f26, $f24, 0x0(%[pTap])        \n\t"
+    "mov.d      $f0, $f4                        \n\t"
+    "mov.d      $f2, $f6                        \n\t"
+    "mov.d      $f4, $f8                        \n\t"
+    "mov.d      $f6, $f10                       \n\t"
+    "mov.d      $f8, $f12                       \n\t"
+    "mov.d      $f10, $f14                      \n\t"
+    "mov.d      $f12, $f16                      \n\t"
+    "mov.d      $f14, $f18                      \n\t"
+    "mov.d      $f16, $f20                      \n\t"
+    "mov.d      $f18, $f22                      \n\t"
+    "mov.d      $f20, $f24                      \n\t"
+    "mov.d      $f22, $f26                      \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_SUBU   "%[pTap], %[pTap], %[iTapStride] \n\t"
+
+    "5:                                         \n\t"
+    FILTER_VER_ALIGN($f0, $f2, $f4, $f6, $f8, $f10, $f12, $f14, $f16, $f18, $f20,
+                     $f22, $f24, $f26, $f28, $f30, %[pDst], $0, $8, $9, $15)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 6f                  \n\t"
+    PTR_ADDU   "%[pTap], %[pTap], $13           \n\t"
+    "gslqc1     $f26, $f24, 0x0(%[pTap])        \n\t"
+
+    FILTER_VER_ALIGN($f4, $f6, $f8, $f10, $f12, $f14, $f16, $f18, $f20, $f22, $f24,
+                     $f26, $f28, $f30, $f0, $f2, %[pDst], %[iDstStride], $8, $9, $15)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 6f                  \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], $14           \n\t"
+    PTR_ADDU   "$8, %[pTap], %[iTapStride]      \n\t"
+    "gslqc1     $f30, $f28, 0x0($8)             \n\t"
+
+    FILTER_VER_ALIGN($f8, $f10, $f12, $f14, $f16, $f18, $f20, $f22, $f24, $f26, $f28,
+                     $f30, $f0, $f2, $f4, $f6, %[pDst], $0, $8, $9, $15)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 6f                  \n\t"
+    PTR_ADDU   "%[pTap], %[pTap], $13           \n\t"
+    "gslqc1     $f2, $f0, 0x0(%[pTap])          \n\t"
+
+    FILTER_VER_ALIGN($f12, $f14, $f16, $f18, $f20, $f22, $f24, $f26, $f28, $f30, $f0,
+                     $f2, $f4, $f6, $f8, $f10, %[pDst], %[iDstStride], $8, $9, $15)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 6f                  \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], $14           \n\t"
+    PTR_ADDU   "$8, %[pTap], %[iTapStride]      \n\t"
+    "gslqc1     $f6, $f4, 0x0($8)               \n\t"
+
+    FILTER_VER_ALIGN($f16, $f18, $f20, $f22, $f24, $f26, $f28, $f30, $f0, $f2, $f4,
+                     $f6, $f8, $f10, $f12, $f14, %[pDst], $0, $8, $9, $15)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 6f                  \n\t"
+    PTR_ADDU   "%[pTap], %[pTap], $13           \n\t"
+    "gslqc1     $f10, $f8, 0x0(%[pTap])         \n\t"
+
+    FILTER_VER_ALIGN($f20, $f22, $f24, $f26, $f28, $f30, $f0, $f2, $f4, $f6, $f8,
+                     $f10, $f12, $f14, $f16, $f18, %[pDst], %[iDstStride], $8, $9, $15)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 6f                  \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], $14           \n\t"
+    PTR_ADDU   "$8, %[pTap], %[iTapStride]      \n\t"
+    "gslqc1     $f14, $f12, 0x0($8)             \n\t"
+
+    FILTER_VER_ALIGN($f24, $f26, $f28, $f30, $f0, $f2, $f4, $f6, $f8, $f10, $f12,
+                     $f14, $f16, $f18, $f20, $f22, %[pDst], $0, $8, $9, $15)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 6f                  \n\t"
+    PTR_ADDU   "%[pTap], %[pTap], $13           \n\t"
+    "gslqc1     $f18, $f16, 0x0(%[pTap])        \n\t"
+
+    FILTER_VER_ALIGN($f28, $f30, $f0, $f2, $f4, $f6, $f8, $f10, $f12, $f14, $f16,
+                     $f18, $f20, $f22, $f24, $f26, %[pDst], %[iDstStride], $8, $9, $15)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 6f                  \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], $14           \n\t"
+    PTR_ADDU   "$8, %[pTap], %[iTapStride]      \n\t"
+    "gslqc1     $f22, $f20, 0x0($8)             \n\t"
+    "j          5b                              \n\t"
+
+    "6:                                         \n\t"
+    PTR_ADDIU  "%[iWidth], %[iWidth], -0x1      \n\t"
+    "beqz       %[iWidth], 7f                   \n\t"
+    "move       %[pTap], $10                    \n\t"
+    "move       %[pDst], $11                    \n\t"
+    "move       %[iHeight], $12                 \n\t"
+    PTR_ADDIU  "%[pTap], %[pTap], 0x10          \n\t"
+    PTR_ADDIU  "%[pDst], %[pDst], 0x8           \n\t"
+    "j          4b                              \n\t"
+    "7:                                         \n\t"
+    : [pTap]"+&r"((unsigned char *)pTap), [pDst]"+&r"((unsigned char *)pDst),
+      [iWidth]"+&r"((int)iWidth), [iHeight]"+&r"((int)iHeight)
+    : [iTapStride]"r"((int)iTapStride), [iDstStride]"r"((int)iDstStride)
+    : "memory", "$8", "$9", "$10", "$11", "$12", "$13", "$14", "$15", "$f0",
+      "$f2", "$f4", "$f6", "$f8", "$f10", "$f12", "$f14", "$f16", "$f18",
+      "$f20", "$f22", "$f24", "$f26", "$f28", "$f30"
+  );
+  RECOVER_REG;
+}
+
+static inline void McHorVer22Width8VerLastUnAlign_mmi(const uint8_t *pTap,
+                   int32_t iTapStride, uint8_t * pDst, int32_t iDstStride,
+                   int32_t iWidth, int32_t iHeight) {
+  BACKUP_REG;
+  __asm__ volatile (
+    ".set       arch=loongson3a                 \n\t"
+    "move       $10, %[pTap]                    \n\t"
+    "move       $11, %[pDst]                    \n\t"
+    "move       $12, %[iHeight]                 \n\t"
+    "dsrl       %[iWidth], 0x3                  \n\t"
+    PTR_ADDU   "$13, %[iTapStride], %[iTapStride] \n\t"
+    "dli        $14, 0x0020002000200020         \n\t"
+
+    "4:                                         \n\t"
+    PTR_ADDU   "$8, %[pTap], %[iTapStride]      \n\t"
+    "gsldlc1    $f0, 0x7(%[pTap])               \n\t"
+    "gsldlc1    $f2, 0xF(%[pTap])               \n\t"
+    "gsldlc1    $f4, 0x7($8)                    \n\t"
+    "gsldlc1    $f6, 0xF($8)                    \n\t"
+    "gsldrc1    $f0, 0x0(%[pTap])               \n\t"
+    "gsldrc1    $f2, 0x8(%[pTap])               \n\t"
+    "gsldrc1    $f4, 0x0($8)                    \n\t"
+    "gsldrc1    $f6, 0x8($8)                    \n\t"
+    PTR_ADDU   "%[pTap], %[pTap], $13           \n\t"
+    PTR_ADDU   "$8, %[pTap], %[iTapStride]      \n\t"
+    "gsldlc1    $f8, 0x7(%[pTap])               \n\t"
+    "gsldlc1    $f10, 0xF(%[pTap])              \n\t"
+    "gsldlc1    $f12, 0x7($8)                   \n\t"
+    "gsldlc1    $f14, 0xF($8)                   \n\t"
+    "gsldrc1    $f8, 0x0(%[pTap])               \n\t"
+    "gsldrc1    $f10, 0x8(%[pTap])              \n\t"
+    "gsldrc1    $f12, 0x0($8)                   \n\t"
+    "gsldrc1    $f14, 0x8($8)                   \n\t"
+    PTR_ADDU   "%[pTap], %[pTap], $13           \n\t"
+    PTR_ADDU   "$8, %[pTap], %[iTapStride]      \n\t"
+    "gsldlc1    $f16, 0x7(%[pTap])              \n\t"
+    "gsldlc1    $f18, 0xF(%[pTap])              \n\t"
+    "gsldlc1    $f20, 0x7($8)                   \n\t"
+    "gsldlc1    $f22, 0xF($8)                   \n\t"
+    "gsldrc1    $f16, 0x0(%[pTap])              \n\t"
+    "gsldrc1    $f18, 0x8(%[pTap])              \n\t"
+    "gsldrc1    $f20, 0x0($8)                   \n\t"
+    "gsldrc1    $f22, 0x8($8)                   \n\t"
+
+    FILTER_VER_UNALIGN($f0, $f2, $f4, $f6, $f8, $f10, $f12, $f14, $f16, $f18,
+                       $f20, $f22, $f24, $f26, $f28, $f30, %[pDst], $8, $9, $14)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    PTR_ADDU   "%[pTap], %[pTap], $13           \n\t"
+    "gsldlc1    $f24, 0x7(%[pTap])              \n\t"
+    "gsldlc1    $f26, 0xF(%[pTap])              \n\t"
+    "gsldrc1    $f24, 0x0(%[pTap])              \n\t"
+    "gsldrc1    $f26, 0x8(%[pTap])              \n\t"
+    "mov.d      $f0, $f4                        \n\t"
+    "mov.d      $f2, $f6                        \n\t"
+    "mov.d      $f4, $f8                        \n\t"
+    "mov.d      $f6, $f10                       \n\t"
+    "mov.d      $f8, $f12                       \n\t"
+    "mov.d      $f10, $f14                      \n\t"
+    "mov.d      $f12, $f16                      \n\t"
+    "mov.d      $f14, $f18                      \n\t"
+    "mov.d      $f16, $f20                      \n\t"
+    "mov.d      $f18, $f22                      \n\t"
+    "mov.d      $f20, $f24                      \n\t"
+    "mov.d      $f22, $f26                      \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_SUBU   "%[pTap], %[pTap], %[iTapStride] \n\t"
+
+    "5:                                         \n\t"
+    FILTER_VER_UNALIGN($f0, $f2, $f4, $f6, $f8, $f10, $f12, $f14, $f16, $f18,
+                       $f20, $f22, $f24, $f26, $f28, $f30, %[pDst], $8, $9, $14)
+
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 6f                  \n\t"
+    PTR_ADDU   "%[pTap], %[pTap], $13           \n\t"
+    "gsldlc1    $f24, 0x7(%[pTap])              \n\t"
+    "gsldlc1    $f26, 0xF(%[pTap])              \n\t"
+    "gsldrc1    $f24, 0x0(%[pTap])              \n\t"
+    "gsldrc1    $f26, 0x8(%[pTap])              \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+
+    FILTER_VER_UNALIGN($f4, $f6, $f8, $f10, $f12, $f14, $f16, $f18, $f20, $f22,
+                       $f24, $f26, $f28, $f30, $f0, $f2, %[pDst], $8, $9, $14)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 6f                  \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDU   "$8, %[pTap], %[iTapStride]      \n\t"
+    "gsldlc1    $f28, 0x7($8)                   \n\t"
+    "gsldlc1    $f30, 0xF($8)                   \n\t"
+    "gsldrc1    $f28, 0x0($8)                   \n\t"
+    "gsldrc1    $f30, 0x8($8)                   \n\t"
+
+    FILTER_VER_UNALIGN($f8, $f10, $f12, $f14, $f16, $f18, $f20, $f22, $f24, $f26,
+                       $f28, $f30, $f0, $f2, $f4, $f6, %[pDst], $8, $9, $14)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 6f                  \n\t"
+    PTR_ADDU   "%[pTap], %[pTap], $13           \n\t"
+    "gsldlc1    $f0, 0x7(%[pTap])               \n\t"
+    "gsldlc1    $f2, 0xF(%[pTap])               \n\t"
+    "gsldrc1    $f0, 0x0(%[pTap])               \n\t"
+    "gsldrc1    $f2, 0x8(%[pTap])               \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+
+    FILTER_VER_UNALIGN($f12, $f14, $f16, $f18, $f20, $f22, $f24, $f26, $f28,
+                       $f30, $f0, $f2, $f4, $f6, $f8, $f10, %[pDst], $8, $9, $14)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 6f                  \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDU   "$8, %[pTap], %[iTapStride]      \n\t"
+    "gsldlc1    $f4, 0x7($8)                    \n\t"
+    "gsldlc1    $f6, 0xF($8)                    \n\t"
+    "gsldrc1    $f4, 0x0($8)                    \n\t"
+    "gsldrc1    $f6, 0x8($8)                    \n\t"
+
+    FILTER_VER_UNALIGN($f16, $f18, $f20, $f22, $f24, $f26, $f28, $f30, $f0, $f2,
+                       $f4, $f6, $f8, $f10, $f12, $f14, %[pDst], $8, $9, $14)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 6f                  \n\t"
+    PTR_ADDU   "%[pTap], %[pTap], $13           \n\t"
+    "gsldlc1    $f8, 0x7(%[pTap])               \n\t"
+    "gsldlc1    $f10, 0xF(%[pTap])              \n\t"
+    "gsldrc1    $f8, 0x0(%[pTap])               \n\t"
+    "gsldrc1    $f10, 0x8(%[pTap])              \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+
+    FILTER_VER_UNALIGN($f20, $f22, $f24, $f26, $f28, $f30, $f0, $f2, $f4, $f6,
+                       $f8, $f10, $f12, $f14, $f16, $f18, %[pDst], $8, $9, $14)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 6f                  \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDU   "$8, %[pTap], %[iTapStride]      \n\t"
+    "gsldlc1    $f12, 0x7($8)                   \n\t"
+    "gsldlc1    $f14, 0xF($8)                   \n\t"
+    "gsldrc1    $f12, 0x0($8)                   \n\t"
+    "gsldrc1    $f14, 0x8($8)                   \n\t"
+
+    FILTER_VER_UNALIGN($f24, $f26, $f28, $f30, $f0, $f2, $f4, $f6, $f8, $f10,
+                       $f12, $f14, $f16, $f18, $f20, $f22, %[pDst], $8, $9, $14)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 6f                  \n\t"
+    PTR_ADDU   "%[pTap], %[pTap], $13           \n\t"
+    "gsldlc1    $f16, 0x7(%[pTap])              \n\t"
+    "gsldlc1    $f18, 0xF(%[pTap])              \n\t"
+    "gsldrc1    $f16, 0x0(%[pTap])              \n\t"
+    "gsldrc1    $f18, 0x8(%[pTap])              \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+
+    FILTER_VER_UNALIGN($f28, $f30, $f0, $f2, $f4, $f6, $f8, $f10, $f12, $f14,
+                       $f16, $f18, $f20, $f22, $f24, $f26, %[pDst], $8, $9, $14)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 6f                  \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDU   "$8, %[pTap], %[iTapStride]      \n\t"
+    "gsldlc1    $f20, 0x7($8)                   \n\t"
+    "gsldlc1    $f22, 0xF($8)                   \n\t"
+    "gsldrc1    $f20, 0x0($8)                   \n\t"
+    "gsldrc1    $f22, 0x8($8)                   \n\t"
+    "j          5b                              \n\t"
+
+    "6:                                         \n\t"
+    PTR_ADDIU  "%[iWidth], %[iWidth], -0x1      \n\t"
+    "beqz       %[iWidth], 7f                   \n\t"
+    "move       %[pTap], $10                    \n\t"
+    "move       %[pDst], $11                    \n\t"
+    "move       %[iHeight], $12                 \n\t"
+    PTR_ADDIU  "%[pTap], %[pTap], 0x10          \n\t"
+    PTR_ADDIU  "%[pDst], %[pDst], 0x8           \n\t"
+    "j          4b                              \n\t"
+
+    "7:                                         \n\t"
+    : [pTap]"+&r"((unsigned char *)pTap), [pDst]"+&r"((unsigned char *)pDst),
+      [iWidth]"+&r"((int)iWidth), [iHeight]"+&r"((int)iHeight)
+    : [iTapStride]"r"((int)iTapStride), [iDstStride]"r"((int)iDstStride)
+    : "memory", "$8", "$9", "$10", "$11", "$12", "$13", "$14", "$f0", "$f2",
+      "$f4", "$f6", "$f8", "$f10", "$f12", "$f14", "$f16", "$f18", "$f20",
+      "$f22", "$f24", "$f26", "$f28", "$f30"
+  );
+  RECOVER_REG;
+}
+
+//horizontal and vertical filter to gain half sample, that is (2, 2) location in quarter sample
+static inline void McHorVer22Width5Or9Or17Height5Or9Or17_mmi(const uint8_t* pSrc,
+                   int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                   int32_t iWidth, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_2D (int16_t, pTap, 22, 24, 16)
+
+  if (iWidth == 17 || iWidth == 9){
+    int32_t tmp1 = 2 * (iWidth - 8);
+    McHorVer22HorFirst_mmi(pSrc - 2, iSrcStride, (uint8_t*)pTap, 48, iWidth, iHeight + 5);
+
+    McHorVer22Width8VerLastAlign_mmi((uint8_t*)pTap,  48, pDst, iDstStride, iWidth - 1, iHeight);
+
+    McHorVer22Width8VerLastUnAlign_mmi((uint8_t*)pTap + tmp1,  48, pDst + iWidth - 8,
+                                        iDstStride, 8, iHeight);
+  } else {
+    int16_t iTmp[17 + 5];
+    int32_t i, j, k;
+
+    for (i = 0; i < iHeight; i++) {
+      for (j = 0; j < iWidth + 5; j++) {
+        iTmp[j] = FilterInput8bitWithStride_c (pSrc - 2 + j, iSrcStride);
+      }
+      for (k = 0; k < iWidth; k++) {
+        pDst[k] = WelsClip1 ((HorFilterInput16bit_c (&iTmp[k]) + 512) >> 10);
+      }
+      pSrc += iSrcStride;
+      pDst += iDstStride;
+    }
+  }
+}
+
+void McCopyWidthEq4_mmi(const uint8_t *pSrc, int iSrcStride,
+                        uint8_t *pDst, int iDstStride, int iHeight) {
+  __asm__ volatile (
+    ".set       arch=loongson3a                 \n\t"
+    "1:                                         \n\t"
+    "lwl        $8, 0x3(%[pSrc])                \n\t"
+    "lwr        $8, 0x0(%[pSrc])                \n\t"
+    "swl        $8, 0x3(%[pDst])                \n\t"
+    "swr        $8, 0x0(%[pDst])                \n\t"
+    PTR_ADDU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDIU  "%[iHeight], %[iHeight], -1      \n\t"
+    "bnez       %[iHeight], 1b                  \n\t"
+    : [pSrc]"+&r"(pSrc), [pDst]"+&r"(pDst), [iHeight]"+&r"(iHeight)
+    : [iSrcStride]"r"(iSrcStride), [iDstStride]"r"(iDstStride)
+    : "memory", "$8"
+  );
+}
+
+void McCopyWidthEq8_mmi(const uint8_t *pSrc, int iSrcStride,
+                        uint8_t *pDst, int iDstStride, int iHeight) {
+  __asm__ volatile (
+    ".set       arch=loongson3a                 \n\t"
+    "1:                                         \n\t"
+    "ldl        $8, 0x7(%[pSrc])                \n\t"
+    "ldr        $8, 0x0(%[pSrc])                \n\t"
+    "sdl        $8, 0x7(%[pDst])                \n\t"
+    "sdr        $8, 0x0(%[pDst])                \n\t"
+    PTR_ADDU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDIU  "%[iHeight], %[iHeight], -1      \n\t"
+    "bnez       %[iHeight], 1b                  \n\t"
+    : [pSrc]"+&r"(pSrc), [pDst]"+&r"(pDst), [iHeight]"+&r"(iHeight)
+    : [iSrcStride]"r"(iSrcStride), [iDstStride]"r"(iDstStride)
+    : "memory", "$8"
+  );
+}
+
+void McCopyWidthEq16_mmi(const uint8_t *pSrc, int iSrcStride,
+                         uint8_t *pDst, int iDstStride, int iHeight) {
+  __asm__ volatile (
+    ".set       arch=loongson3a                 \n\t"
+    "1:                                         \n\t"
+    "ldl        $8, 0x7(%[pSrc])                \n\t"
+    "ldl        $9, 0xF(%[pSrc])                \n\t"
+    "ldr        $8, 0x0(%[pSrc])                \n\t"
+    "ldr        $9, 0x8(%[pSrc])                \n\t"
+    "sdl        $8, 0x7(%[pDst])                \n\t"
+    "sdl        $9, 0xF(%[pDst])                \n\t"
+    "sdr        $8, 0x0(%[pDst])                \n\t"
+    "sdr        $9, 0x8(%[pDst])                \n\t"
+    PTR_ADDU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDIU  "%[iHeight], %[iHeight], -1      \n\t"
+    "bnez       %[iHeight], 1b                  \n\t"
+    : [pSrc]"+&r"(pSrc), [pDst]"+&r"(pDst), [iHeight]"+&r"(iHeight)
+    : [iSrcStride]"r"(iSrcStride), [iDstStride]"r"(iDstStride)
+    : "memory", "$8", "$9"
+  );
+}
+
+static inline void McCopy_mmi(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst,
+                              int32_t iDstStride, int32_t iWidth, int32_t iHeight) {
+  if (iWidth == 16)
+    McCopyWidthEq16_mmi (pSrc, iSrcStride, pDst, iDstStride, iHeight);
+  else if (iWidth == 8)
+    McCopyWidthEq8_mmi (pSrc, iSrcStride, pDst, iDstStride, iHeight);
+  else if (iWidth == 4)
+    McCopyWidthEq4_mmi (pSrc, iSrcStride, pDst, iDstStride, iHeight);
+  else
+    McCopyWidthEq2_c (pSrc, iSrcStride, pDst, iDstStride, iHeight);
+}
+
+void McChromaWidthEq4_mmi(const uint8_t *pSrc, int32_t iSrcStride, uint8_t *pDst,
+                          int32_t iDstStride, const uint8_t *pABCD, int32_t iHeight) {
+  __asm__ volatile (
+    ".set       arch=loongson3a                 \n\t"
+    "gsldlc1    $f6, 0x7(%[pABCD])              \n\t"
+    "gsldrc1    $f6, 0x0(%[pABCD])              \n\t"
+    "xor        $f14, $f14, $f14                \n\t"
+    "punpcklbh  $f6, $f6, $f6                   \n\t"
+    "mov.d      $f8, $f6                        \n\t"
+    "punpcklhw  $f6, $f6, $f6                   \n\t"
+    "punpckhhw  $f8, $f8, $f8                   \n\t"
+    "mov.d      $f10, $f6                       \n\t"
+    "punpcklbh  $f6, $f6, $f14                  \n\t"
+    "punpckhbh  $f10, $f10, $f14                \n\t"
+
+    "mov.d      $f12, $f8                       \n\t"
+    "punpcklbh  $f8, $f8, $f14                  \n\t"
+    "punpckhbh  $f12, $f12, $f14                \n\t"
+    PTR_ADDU   "%[pABCD], %[pSrc], %[iSrcStride] \n\t"
+    "dli        $8, 0x6                         \n\t"
+    "gsldlc1    $f0, 0x7(%[pSrc])               \n\t"
+    "gsldlc1    $f2, 0x8(%[pSrc])               \n\t"
+    "dmtc1      $8, $f16                        \n\t"
+    "gsldrc1    $f0, 0x0(%[pSrc])               \n\t"
+    "gsldrc1    $f2, 0x1(%[pSrc])               \n\t"
+    "dli        $8, 0x0020002000200020          \n\t"
+    "punpcklbh  $f0, $f0, $f14                  \n\t"
+    "punpcklbh  $f2, $f2, $f14                  \n\t"
+
+    "dmtc1      $8, $f18                        \n\t"
+    "1:                                         \n\t"
+    "pmullh     $f0, $f0, $f6                   \n\t"
+    "pmullh     $f2, $f2, $f10                  \n\t"
+    "paddh      $f0, $f0, $f2                   \n\t"
+
+    "gsldlc1    $f2, 0x7(%[pABCD])              \n\t"
+    "gsldrc1    $f2, 0x0(%[pABCD])              \n\t"
+    "punpcklbh  $f2, $f2, $f14                  \n\t"
+    "mov.d      $f4, $f2                        \n\t"
+    "pmullh     $f2, $f2, $f8                   \n\t"
+    "paddh      $f0, $f0, $f2                   \n\t"
+    "gsldlc1    $f2, 0x8(%[pABCD])              \n\t"
+    "gsldrc1    $f2, 0x1(%[pABCD])              \n\t"
+    "punpcklbh  $f2, $f2, $f14                  \n\t"
+    "mov.d      $f14, $f2                       \n\t"
+    "pmullh     $f2, $f2, $f12                  \n\t"
+    "paddh      $f0, $f0, $f2                   \n\t"
+    "mov.d      $f2, $f14                       \n\t"
+    "paddh      $f0, $f0, $f18                  \n\t"
+    "psrlh      $f0, $f0, $f16                  \n\t"
+    "xor        $f14, $f14, $f14                \n\t"
+    "packushb   $f0, $f0, $f14                  \n\t"
+    "gsswlc1    $f0, 0x3(%[pDst])               \n\t"
+    "gsswrc1    $f0, 0x0(%[pDst])               \n\t"
+    "mov.d      $f0, $f4                        \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDU   "%[pABCD], %[pABCD], %[iSrcStride] \n\t"
+    PTR_ADDIU  "%[iHeight], %[iHeight], -1      \n\t"
+    "bnez       %[iHeight], 1b                  \n\t"
+    : [pSrc]"+&r"((unsigned char *)pSrc), [pDst]"+&r"((unsigned char *)pDst),
+      [pABCD]"+&r"((unsigned char *)pABCD), [iHeight]"+&r"((int)iHeight)
+    : [iSrcStride]"r"((int)iSrcStride), [iDstStride]"r"((int)iDstStride)
+    : "memory", "$8", "$f0", "$f2", "$f4", "$f6", "$f8", "$f10", "$f12",
+      "$f14", "$f16", "$f18"
+  );
+}
+
+void McChromaWidthEq8_mmi(const uint8_t *pSrc, int32_t iSrcStride, uint8_t *pDst,
+                          int32_t iDstStride, const uint8_t *pABCD, int32_t iHeight) {
+  BACKUP_REG;
+  __asm__ volatile (
+    ".set       arch=loongson3a                 \n\t"
+    "gsldlc1    $f12, 0x7(%[pABCD])             \n\t"
+    "xor        $f28, $f28, $f28                \n\t"
+    "gsldrc1    $f12, 0x0(%[pABCD])             \n\t"
+    "punpcklbh  $f12, $f12, $f12                \n\t"
+    "punpckhhw  $f14, $f12, $f12                \n\t"
+    "punpcklhw  $f12, $f12, $f12                \n\t"
+
+    "mov.d      $f16, $f14                      \n\t"
+    "punpckhwd  $f14, $f12, $f12                \n\t"
+    "punpcklwd  $f12, $f12, $f12                \n\t"
+    "punpckhwd  $f18, $f16, $f16                \n\t"
+    "punpcklwd  $f16, $f16, $f16                \n\t"
+    "mov.d      $f20, $f14                      \n\t"
+    "mov.d      $f24, $f18                      \n\t"
+
+    "punpckhbh  $f14, $f12, $f28                \n\t"
+    "punpcklbh  $f12, $f12, $f28                \n\t"
+    "punpckhbh  $f22, $f20, $f28                \n\t"
+    "punpcklbh  $f20, $f20, $f28                \n\t"
+    "punpckhbh  $f18, $f16, $f28                \n\t"
+    "punpcklbh  $f16, $f16, $f28                \n\t"
+    "punpckhbh  $f26, $f24, $f28                \n\t"
+    "punpcklbh  $f24, $f24, $f28                \n\t"
+
+    PTR_ADDU   "%[pABCD], %[pSrc], %[iSrcStride] \n\t"
+    "gsldlc1    $f0, 0x7(%[pSrc])               \n\t"
+    "gsldlc1    $f4, 0x8(%[pSrc])               \n\t"
+    "gsldrc1    $f0, 0x0(%[pSrc])               \n\t"
+    "gsldrc1    $f4, 0x1(%[pSrc])               \n\t"
+    "punpckhbh  $f2, $f0, $f28                  \n\t"
+    "punpcklbh  $f0, $f0, $f28                  \n\t"
+    "punpckhbh  $f6, $f4, $f28                  \n\t"
+    "punpcklbh  $f4, $f4, $f28                  \n\t"
+    "1:                                         \n\t"
+    "dli        $8, 0x20                        \n\t"
+    "dmtc1      $8, $f30                        \n\t"
+
+    "pmullh     $f0, $f0, $f12                  \n\t"
+    "pmullh     $f2, $f2, $f14                  \n\t"
+    "pmullh     $f4, $f4, $f20                  \n\t"
+    "pmullh     $f6, $f6, $f22                  \n\t"
+    "paddh      $f0, $f0, $f4                   \n\t"
+    "paddh      $f2, $f2, $f6                   \n\t"
+
+    "gsldlc1    $f4, 0x7(%[pABCD])              \n\t"
+    "gsldrc1    $f4, 0x0(%[pABCD])              \n\t"
+    "punpckhbh  $f6, $f4, $f28                  \n\t"
+    "punpcklbh  $f4, $f4, $f28                  \n\t"
+    "mov.d      $f8, $f4                        \n\t"
+    "mov.d      $f10, $f6                       \n\t"
+    "pmullh     $f4, $f4, $f16                  \n\t"
+    "pmullh     $f6, $f6, $f18                  \n\t"
+    "paddh      $f0, $f0, $f4                   \n\t"
+    "paddh      $f2, $f2, $f6                   \n\t"
+
+    "gsldlc1    $f4, 0x8(%[pABCD])              \n\t"
+    "gsldrc1    $f4, 0x1(%[pABCD])              \n\t"
+    "punpckhbh  $f6, $f4, $f28                  \n\t"
+    "punpcklbh  $f4, $f4, $f28                  \n\t"
+    "mov.d      $f28, $f4                       \n\t"
+    "mov.d      $f30, $f6                       \n\t"
+    "pmullh     $f4, $f4, $f24                  \n\t"
+    "pmullh     $f6, $f6, $f26                  \n\t"
+    "paddh      $f0, $f0, $f4                   \n\t"
+    "paddh      $f2, $f2, $f6                   \n\t"
+    "mov.d      $f4, $f28                       \n\t"
+    "mov.d      $f6, $f30                       \n\t"
+
+    "dli        $8, 0x0020002000200020          \n\t"
+    "dmfc1      $9, $f20                        \n\t"
+    "dmtc1      $8, $f20                        \n\t"
+    "dli        $8, 0x6                         \n\t"
+    "paddh      $f0, $f0, $f20                  \n\t"
+    "paddh      $f2, $f2, $f20                  \n\t"
+    "dmtc1      $8, $f20                        \n\t"
+    "psrlh      $f0, $f0, $f20                  \n\t"
+    "psrlh      $f2, $f2, $f20                  \n\t"
+
+    "xor        $f28, $f28, $f28                \n\t"
+    "packushb   $f0, $f0, $f2                   \n\t"
+    "gssdlc1    $f0, 0x7(%[pDst])               \n\t"
+    "gssdrc1    $f0, 0x0(%[pDst])               \n\t"
+
+    "mov.d      $f0, $f8                        \n\t"
+    "mov.d      $f2, $f10                       \n\t"
+    "dmtc1      $9, $f20                        \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDU   "%[pABCD], %[pABCD], %[iSrcStride] \n\t"
+
+    PTR_ADDIU  "%[iHeight], %[iHeight], -1      \n\t"
+    "bnez       %[iHeight], 1b                  \n\t"
+    : [pSrc]"+&r"(pSrc), [pDst]"+&r"(pDst), [pABCD]"+&r"(pABCD),
+      [iHeight]"+&r"(iHeight)
+    : [iSrcStride]"r"(iSrcStride), [iDstStride]"r"(iDstStride)
+    : "memory", "$8", "$9", "$f0", "$f2", "$f4", "$f6", "$f8", "$f10", "$f12",
+      "$f14", "$f16", "$f18", "$f20", "$f22", "$f24", "$f26", "$f28", "$f30"
+  );
+  RECOVER_REG;
+}
+
+void McChroma_mmi(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst,
+                  int32_t iDstStride, int16_t iMvX, int16_t iMvY,
+                  int32_t iWidth, int32_t iHeight) {
+  static const PMcChromaWidthExtFunc kpMcChromaWidthFuncs[2] = {
+    McChromaWidthEq4_mmi,
+    McChromaWidthEq8_mmi
+  };
+  const int32_t kiD8x = iMvX & 0x07;
+  const int32_t kiD8y = iMvY & 0x07;
+  if (kiD8x == 0 && kiD8y == 0) {
+    McCopy_mmi (pSrc, iSrcStride, pDst, iDstStride, iWidth, iHeight);
+    return;
+  }
+  if (iWidth != 2) {
+    kpMcChromaWidthFuncs[iWidth >> 3] (pSrc, iSrcStride, pDst, iDstStride,
+                                      g_kuiABCD[kiD8y][kiD8x], iHeight);
+  } else
+    McChromaWithFragMv_c (pSrc, iSrcStride, pDst, iDstStride, iMvX, iMvY,
+                          iWidth, iHeight);
+}
+
+void McHorVer20WidthEq8_mmi(const uint8_t *pSrc, int iSrcStride, uint8_t *pDst,
+                            int iDstStride, int iHeight) {
+  BACKUP_REG;
+  __asm__ volatile (
+    ".set       arch=loongson3a                 \n\t"
+    PTR_ADDIU  "%[pSrc], %[pSrc], -0x2          \n\t"
+    "xor        $f28, $f28, $f28                \n\t"
+    "dli        $8, 0x0010001000100010          \n\t"
+    "dmtc1      $8, $f24                        \n\t"
+    "dli        $8, 0x2                         \n\t"
+    "dmtc1      $8, $f26                        \n\t"
+    "dli        $8, 0x5                         \n\t"
+    "dmtc1      $8, $f30                        \n\t"
+    "1:                                         \n\t"
+    "gsldlc1    $f0, 0x7(%[pSrc])               \n\t"
+    "gsldlc1    $f4, 0xc(%[pSrc])               \n\t"
+    "gsldlc1    $f8, 0x8(%[pSrc])               \n\t"
+    "gsldlc1    $f12, 0xb(%[pSrc])              \n\t"
+    "gsldlc1    $f16, 0x9(%[pSrc])              \n\t"
+    "gsldlc1    $f20, 0xa(%[pSrc])              \n\t"
+    "gsldrc1    $f0, 0x0(%[pSrc])               \n\t"
+    "gsldrc1    $f4, 0x5(%[pSrc])               \n\t"
+    "gsldrc1    $f8, 0x1(%[pSrc])               \n\t"
+    "gsldrc1    $f12, 0x4(%[pSrc])              \n\t"
+    "gsldrc1    $f16, 0x2(%[pSrc])              \n\t"
+    "gsldrc1    $f20, 0x3(%[pSrc])              \n\t"
+    "punpckhbh  $f2, $f0, $f28                  \n\t"
+    "punpckhbh  $f6, $f4, $f28                  \n\t"
+    "punpckhbh  $f10, $f8, $f28                 \n\t"
+    "punpckhbh  $f14, $f12, $f28                \n\t"
+    "punpckhbh  $f18, $f16, $f28                \n\t"
+    "punpckhbh  $f22, $f20, $f28                \n\t"
+    "punpcklbh  $f0, $f0, $f28                  \n\t"
+    "punpcklbh  $f4, $f4, $f28                  \n\t"
+    "punpcklbh  $f8, $f8, $f28                  \n\t"
+    "punpcklbh  $f12, $f12, $f28                \n\t"
+    "punpcklbh  $f16, $f16, $f28                \n\t"
+    "punpcklbh  $f20, $f20, $f28                \n\t"
+    "paddh      $f8, $f8, $f12                  \n\t"
+    "paddh      $f10, $f10, $f14                \n\t"
+    "paddh      $f16, $f16, $f20                \n\t"
+    "paddh      $f18, $f18, $f22                \n\t"
+    "psllh      $f16, $f16, $f26                \n\t"
+    "psllh      $f18, $f18, $f26                \n\t"
+    "psubh      $f16, $f16, $f8                 \n\t"
+    "psubh      $f18, $f18, $f10                \n\t"
+    "paddh      $f0, $f0, $f4                   \n\t"
+    "paddh      $f2, $f2, $f6                   \n\t"
+    "paddh      $f0, $f0, $f16                  \n\t"
+    "paddh      $f2, $f2, $f18                  \n\t"
+    "psllh      $f16, $f16, $f26                \n\t"
+    "psllh      $f18, $f18, $f26                \n\t"
+    "paddh      $f0, $f0, $f16                  \n\t"
+    "paddh      $f2, $f2, $f18                  \n\t"
+    "paddh      $f0, $f0, $f24                  \n\t"
+    "paddh      $f2, $f2, $f24                  \n\t"
+    "psrah      $f0, $f0, $f30                  \n\t"
+    "psrah      $f2, $f2, $f30                  \n\t"
+    "packushb   $f0, $f0, $f2                   \n\t"
+    "gssdlc1    $f0, 0x7(%[pDst])               \n\t"
+    "gssdrc1    $f0, 0x0(%[pDst])               \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "bnez       %[iHeight], 1b                  \n\t"
+    : [pSrc]"+&r"(pSrc), [pDst]"+&r"(pDst), [iHeight]"+&r"(iHeight)
+    : [iSrcStride]"r"(iSrcStride), [iDstStride]"r"(iDstStride)
+    : "memory", "$8", "$f0", "$f2", "$f4", "$f6", "$f8", "$f10", "$f12",
+      "$f14", "$f16", "$f18", "$f20", "$f22", "$f24", "$f26", "$f28", "$f30"
+  );
+  RECOVER_REG;
+}
+
+void McHorVer20WidthEq16_mmi(const uint8_t *pSrc, int iSrcStride, uint8_t *pDst,
+                             int iDstStride, int iHeight) {
+  BACKUP_REG;
+  __asm__ volatile (
+    ".set       arch=loongson3a                 \n\t"
+    PTR_ADDIU  "%[pSrc], %[pSrc], -0x2          \n\t"
+    "dli        $8, 0x0010001000100010          \n\t"
+    "dmtc1      $8, $f24                        \n\t"
+    "dli        $8, 0x2                         \n\t"
+    "dmtc1      $8, $f26                        \n\t"
+    "dli        $8, 0x5                         \n\t"
+    "dmtc1      $8, $f30                        \n\t"
+    "1:                                         \n\t"
+    "xor        $f28, $f28, $f28                \n\t"
+    "gsldlc1    $f0, 0x7(%[pSrc])               \n\t"
+    "gsldlc1    $f4, 0xc(%[pSrc])               \n\t"
+    "gsldlc1    $f8, 0x8(%[pSrc])               \n\t"
+    "gsldlc1    $f12, 0xb(%[pSrc])              \n\t"
+    "gsldlc1    $f16, 0x9(%[pSrc])              \n\t"
+    "gsldlc1    $f20, 0xa(%[pSrc])              \n\t"
+    "gsldrc1    $f0, 0x0(%[pSrc])               \n\t"
+    "gsldrc1    $f4, 0x5(%[pSrc])               \n\t"
+    "gsldrc1    $f8, 0x1(%[pSrc])               \n\t"
+    "gsldrc1    $f12, 0x4(%[pSrc])              \n\t"
+    "gsldrc1    $f16, 0x2(%[pSrc])              \n\t"
+    "gsldrc1    $f20, 0x3(%[pSrc])              \n\t"
+    "punpckhbh  $f2, $f0, $f28                  \n\t"
+    "punpckhbh  $f6, $f4, $f28                  \n\t"
+    "punpckhbh  $f10, $f8, $f28                 \n\t"
+    "punpckhbh  $f14, $f12, $f28                \n\t"
+    "punpckhbh  $f18, $f16, $f28                \n\t"
+    "punpckhbh  $f22, $f20, $f28                \n\t"
+    "punpcklbh  $f0, $f0, $f28                  \n\t"
+    "punpcklbh  $f4, $f4, $f28                  \n\t"
+    "punpcklbh  $f8, $f8, $f28                  \n\t"
+    "punpcklbh  $f12, $f12, $f28                \n\t"
+    "punpcklbh  $f16, $f16, $f28                \n\t"
+    "punpcklbh  $f20, $f20, $f28                \n\t"
+    "paddh      $f8, $f8, $f12                  \n\t"
+    "paddh      $f10, $f10, $f14                \n\t"
+    "paddh      $f16, $f16, $f20                \n\t"
+    "paddh      $f18, $f18, $f22                \n\t"
+    "psllh      $f16, $f16, $f26                \n\t"
+    "psllh      $f18, $f18, $f26                \n\t"
+    "psubh      $f16, $f16, $f8                 \n\t"
+    "psubh      $f18, $f18, $f10                \n\t"
+    "paddh      $f0, $f0, $f4                   \n\t"
+    "paddh      $f2, $f2, $f6                   \n\t"
+    "paddh      $f0, $f0, $f16                  \n\t"
+    "paddh      $f2, $f2, $f18                  \n\t"
+    "psllh      $f16, $f16, $f26                \n\t"
+    "psllh      $f18, $f18, $f26                \n\t"
+    "paddh      $f0, $f0, $f16                  \n\t"
+    "paddh      $f2, $f2, $f18                  \n\t"
+    "paddh      $f0, $f0, $f24                  \n\t"
+    "paddh      $f2, $f2, $f24                  \n\t"
+    "psrah      $f0, $f0, $f30                  \n\t"
+    "psrah      $f2, $f2, $f30                  \n\t"
+    "packushb   $f0, $f0, $f2                   \n\t"
+    "gssdlc1    $f0, 0x7(%[pDst])               \n\t"
+    "gssdrc1    $f0, 0x0(%[pDst])               \n\t"
+    "gsldlc1    $f0, 0xF(%[pSrc])               \n\t"
+    "gsldlc1    $f4, 0x14(%[pSrc])              \n\t"
+    "gsldlc1    $f8, 0x10(%[pSrc])              \n\t"
+    "gsldlc1    $f12, 0x13(%[pSrc])             \n\t"
+    "gsldlc1    $f16, 0x11(%[pSrc])             \n\t"
+    "gsldlc1    $f20, 0x12(%[pSrc])             \n\t"
+    "gsldrc1    $f0, 0x8(%[pSrc])               \n\t"
+    "gsldrc1    $f4, 0xd(%[pSrc])               \n\t"
+    "gsldrc1    $f8, 0x9(%[pSrc])               \n\t"
+    "gsldrc1    $f12, 0xc(%[pSrc])              \n\t"
+    "gsldrc1    $f16, 0xa(%[pSrc])              \n\t"
+    "gsldrc1    $f20, 0xb(%[pSrc])              \n\t"
+    "punpckhbh  $f2, $f0, $f28                  \n\t"
+    "punpckhbh  $f6, $f4, $f28                  \n\t"
+    "punpckhbh  $f10, $f8, $f28                 \n\t"
+    "punpckhbh  $f14, $f12, $f28                \n\t"
+    "punpckhbh  $f18, $f16, $f28                \n\t"
+    "punpckhbh  $f22, $f20, $f28                \n\t"
+    "punpcklbh  $f0, $f0, $f28                  \n\t"
+    "punpcklbh  $f4, $f4, $f28                  \n\t"
+    "punpcklbh  $f8, $f8, $f28                  \n\t"
+    "punpcklbh  $f12, $f12, $f28                \n\t"
+    "punpcklbh  $f16, $f16, $f28                \n\t"
+    "punpcklbh  $f20, $f20, $f28                \n\t"
+    "paddh      $f8, $f8, $f12                  \n\t"
+    "paddh      $f10, $f10, $f14                \n\t"
+    "paddh      $f16, $f16, $f20                \n\t"
+    "paddh      $f18, $f18, $f22                \n\t"
+    "psllh      $f16, $f16, $f26                \n\t"
+    "psllh      $f18, $f18, $f26                \n\t"
+    "psubh      $f16, $f16, $f8                 \n\t"
+    "psubh      $f18, $f18, $f10                \n\t"
+    "paddh      $f0, $f0, $f4                   \n\t"
+    "paddh      $f2, $f2, $f6                   \n\t"
+    "paddh      $f0, $f0, $f16                  \n\t"
+    "paddh      $f2, $f2, $f18                  \n\t"
+    "psllh      $f16, $f16, $f26                \n\t"
+    "psllh      $f18, $f18, $f26                \n\t"
+    "paddh      $f0, $f0, $f16                  \n\t"
+    "paddh      $f2, $f2, $f18                  \n\t"
+    "paddh      $f0, $f0, $f24                  \n\t"
+    "paddh      $f2, $f2, $f24                  \n\t"
+    "psrah      $f0, $f0, $f30                  \n\t"
+    "psrah      $f2, $f2, $f30                  \n\t"
+    "packushb   $f0, $f0, $f2                   \n\t"
+    "gssdlc1    $f0, 0xF(%[pDst])               \n\t"
+    "gssdrc1    $f0, 0x8(%[pDst])               \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "bnez       %[iHeight], 1b                  \n\t"
+    : [pSrc]"+&r"(pSrc), [pDst]"+&r"(pDst), [iHeight]"+&r"(iHeight)
+    : [iSrcStride]"r"(iSrcStride), [iDstStride]"r"(iDstStride)
+    : "memory", "$8", "$f0", "$f2", "$f4", "$f6", "$f8", "$f10", "$f12",
+      "$f14", "$f16", "$f18", "$f20", "$f22", "$f24", "$f26", "$f28", "$f30"
+  );
+  RECOVER_REG;
+}
+
+void McHorVer20WidthEq4_mmi(const uint8_t *pSrc, int iSrcStride, uint8_t *pDst,
+                            int iDstStride, int iHeight) {
+  __asm__ volatile (
+    ".set       arch=loongson3a                 \n\t"
+    "1:                                         \n\t"
+    PTR_ADDIU  "%[pSrc], %[pSrc], -0x2          \n\t"
+    "xor        $f14, $f14, $f14                \n\t"
+    "dli        $8, 0x0010001000100010          \n\t"
+    "dmtc1      $8, $f12                        \n\t"
+    "1:                                         \n\t"
+    "gsldlc1    $f0, 0x7(%[pSrc])               \n\t"
+    "gsldlc1    $f2, 0xc(%[pSrc])               \n\t"
+    "gsldlc1    $f4, 0x8(%[pSrc])               \n\t"
+    "gsldlc1    $f6, 0xb(%[pSrc])               \n\t"
+    "gsldlc1    $f8, 0x9(%[pSrc])               \n\t"
+    "gsldlc1    $f10, 0xa(%[pSrc])              \n\t"
+    "gsldrc1    $f0, 0x0(%[pSrc])               \n\t"
+    "gsldrc1    $f2, 0x5(%[pSrc])               \n\t"
+    "gsldrc1    $f4, 0x1(%[pSrc])               \n\t"
+    "gsldrc1    $f6, 0x4(%[pSrc])               \n\t"
+    "gsldrc1    $f8, 0x2(%[pSrc])               \n\t"
+    "gsldrc1    $f10, 0x3(%[pSrc])              \n\t"
+    "dli        $8, 0x2                         \n\t"
+    "punpcklbh  $f0, $f0, $f14                  \n\t"
+    "punpcklbh  $f2, $f2, $f14                  \n\t"
+    "punpcklbh  $f4, $f4, $f14                  \n\t"
+    "punpcklbh  $f6, $f6, $f14                  \n\t"
+    "punpcklbh  $f8, $f8, $f14                  \n\t"
+    "punpcklbh  $f10, $f10, $f14                \n\t"
+    "dmtc1      $8, $f16                        \n\t"
+    "paddh      $f4, $f4, $f6                   \n\t"
+    "paddh      $f8, $f8, $f10                  \n\t"
+    "psllh      $f8, $f8, $f16                  \n\t"
+    "psubh      $f8, $f8, $f4                   \n\t"
+    "paddh      $f0, $f0, $f2                   \n\t"
+    "paddh      $f0, $f0, $f8                   \n\t"
+    "dli        $8, 0x5                         \n\t"
+    "psllh      $f8, $f8, $f16                  \n\t"
+    "paddh      $f0, $f0, $f8                   \n\t"
+    "paddh      $f0, $f0, $f12                  \n\t"
+    "dmtc1      $8, $f16                        \n\t"
+    "psrah      $f0, $f0, $f16                  \n\t"
+    "packushb   $f0, $f0, $f14                  \n\t"
+    "gsswlc1    $f0, 0x3(%[pDst])               \n\t"
+    "gsswrc1    $f0, 0x0(%[pDst])               \n\t"
+    PTR_ADDU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "bnez       %[iHeight], 1b                  \n\t"
+    : [pSrc]"+&r"(pSrc), [pDst]"+&r"(pDst), [iHeight]"+&r"(iHeight)
+    : [iSrcStride]"r"(iSrcStride), [iDstStride]"r"(iDstStride)
+    : "memory", "$8", "$f0", "$f2", "$f4", "$f6", "$f8", "$f10", "$f12",
+      "$f14", "$f16"
+  );
+}
+
+static inline void McHorVer20_mmi(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst,
+                                  int32_t iDstStride, int32_t iWidth, int32_t iHeight) {
+  if (iWidth == 16)
+    McHorVer20WidthEq16_mmi (pSrc, iSrcStride, pDst, iDstStride, iHeight);
+  else if (iWidth == 8)
+    McHorVer20WidthEq8_mmi (pSrc, iSrcStride, pDst, iDstStride, iHeight);
+  else
+    McHorVer20WidthEq4_mmi (pSrc, iSrcStride, pDst, iDstStride, iHeight);
+}
+
+void McHorVer02WidthEq8_mmi(const uint8_t *pSrc, int iSrcStride, uint8_t *pDst,
+                            int iDstStride, int iHeight) {
+  BACKUP_REG;
+  __asm__ volatile (
+    ".set       arch=loongson3a                 \n\t"
+    PTR_SUBU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    PTR_SUBU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    "xor        $f28, $f28, $f28                \n\t"
+    MMI_LOAD_8P($f0, $f2, $f28, %[pSrc])
+    PTR_ADDU   "$8, %[pSrc], %[iSrcStride]      \n\t"
+    MMI_LOAD_8P($f4, $f6, $f28, $8)
+    PTR_ADDU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    PTR_ADDU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    MMI_LOAD_8P($f8, $f10, $f28, %[pSrc])
+    PTR_ADDU   "$8, %[pSrc], %[iSrcStride]      \n\t"
+    MMI_LOAD_8P($f12, $f14, $f28, $8)
+    PTR_ADDU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    PTR_ADDU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    MMI_LOAD_8P($f16, $f18, $f28, %[pSrc])
+    PTR_ADDU   "$8, %[pSrc], %[iSrcStride]      \n\t"
+    MMI_LOAD_8P($f20, $f22, $f28, $8)
+
+    "1:                                         \n\t"
+    FILTER_HV_W8($f0, $f2, $f4, $f6, $f8, $f10, $f12, $f14, $f16, $f18, $f20,
+                 $f22, $f24, $f26, $f28, $f30, %[pDst], $8, $9)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 2f                  \n\t"
+    PTR_ADDU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    PTR_ADDU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    MMI_LOAD_8P($f24, $f26, $f28, %[pSrc])
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    FILTER_HV_W8($f4, $f6, $f8, $f10, $f12, $f14, $f16, $f18, $f20, $f22, $f24,
+                 $f26, $f28, $f30, $f0, $f2, %[pDst], $8, $9)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 2f                  \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDU   "$8, %[pSrc], %[iSrcStride]      \n\t"
+    MMI_LOAD_8P($f28, $f30, $f0, $8)
+    FILTER_HV_W8($f8, $f10, $f12, $f14, $f16, $f18, $f20, $f22, $f24, $f26, $f28,
+                 $f30, $f0, $f2, $f4, $f6, %[pDst], $8, $9)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 2f                  \n\t"
+    PTR_ADDU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    PTR_ADDU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    MMI_LOAD_8P($f0, $f2, $f4, %[pSrc])
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    FILTER_HV_W8($f12, $f14, $f16, $f18, $f20, $f22, $f24, $f26, $f28, $f30, $f0,
+                 $f2, $f4, $f6, $f8, $f10, %[pDst], $8, $9)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 2f                  \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDU   "$8, %[pSrc], %[iSrcStride]      \n\t"
+    MMI_LOAD_8P($f4, $f6, $f8, $8)
+    FILTER_HV_W8($f16, $f18, $f20, $f22, $f24, $f26, $f28, $f30, $f0, $f2, $f4,
+                 $f6, $f8, $f10, $f12, $f14, %[pDst], $8, $9)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 2f                  \n\t"
+    PTR_ADDU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    PTR_ADDU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    MMI_LOAD_8P($f8, $f10, $f12, %[pSrc])
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    FILTER_HV_W8($f20, $f22, $f24, $f26, $f28, $f30, $f0, $f2, $f4, $f6, $f8,
+                 $f10, $f12, $f14, $f16, $f18, %[pDst], $8, $9)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 2f                  \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDU   "$8, %[pSrc], %[iSrcStride]      \n\t"
+    MMI_LOAD_8P($f12, $f14, $f16, $8)
+    FILTER_HV_W8($f24, $f26, $f28, $f30, $f0, $f2, $f4, $f6, $f8, $f10, $f12,
+                 $f14, $f16, $f18, $f20, $f22, %[pDst], $8, $9)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 2f                  \n\t"
+    PTR_ADDU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    PTR_ADDU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    MMI_LOAD_8P($f16, $f18, $f20, %[pSrc])
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    FILTER_HV_W8($f28, $f30, $f0, $f2, $f4, $f6, $f8, $f10, $f12, $f14, $f16,
+                 $f18, $f20, $f22, $f24, $f26, %[pDst], $8, $9)
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "beqz       %[iHeight], 2f                  \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDU   "$8, %[pSrc], %[iSrcStride]      \n\t"
+    MMI_LOAD_8P($f20, $f22, $f24, $8)
+    "j          1b                              \n\t"
+    "2:                                         \n\t"
+    : [pSrc]"+&r"(pSrc), [pDst]"+&r"(pDst), [iHeight]"+&r"(iHeight)
+    : [iSrcStride]"r"(iSrcStride), [iDstStride]"r"(iDstStride)
+    : "memory", "$8", "$9", "$f0", "$f2", "$f4", "$f6", "$f8", "$f10", "$f12",
+      "$f14", "$f16", "$f18", "$f20", "$f22", "$f24", "$f26", "$f28", "$f30"
+  );
+  RECOVER_REG;
+}
+
+static inline void McHorVer02WidthEq16_mmi(const uint8_t* pSrc, int32_t iSrcStride,
+                   uint8_t* pDst, int32_t iDstStride, int32_t iHeight) {
+  McHorVer02WidthEq8_mmi (pSrc,     iSrcStride, pDst,     iDstStride, iHeight);
+  McHorVer02WidthEq8_mmi (&pSrc[8], iSrcStride, &pDst[8], iDstStride, iHeight);
+}
+
+static inline void McHorVer02_mmi(const uint8_t* pSrc, int32_t iSrcStride,
+                   uint8_t* pDst, int32_t iDstStride, int32_t iWidth,
+                   int32_t iHeight) {
+  if (iWidth == 16)
+    McHorVer02WidthEq16_mmi (pSrc, iSrcStride, pDst, iDstStride, iHeight);
+  else if (iWidth == 8)
+    McHorVer02WidthEq8_mmi (pSrc, iSrcStride, pDst, iDstStride, iHeight);
+  else
+    McHorVer02_c (pSrc, iSrcStride, pDst, iDstStride, 4, iHeight);
+}
+
+void McHorVer22Width8HorFirst_mmi(const uint8_t *pSrc, int16_t iSrcStride,
+     uint8_t *pDst, int32_t iDstStride, int32_t iHeight) {
+  BACKUP_REG;
+  __asm__ volatile (
+    ".set       arch=loongson3a                 \n\t"
+    "xor        $f28, $f28, $f28                \n\t"
+    PTR_SUBU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    PTR_SUBU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    "dli        $8, 0x2                         \n\t"
+    "dmtc1      $8, $f30                        \n\t"
+    "1:                                         \n\t"
+    "xor        $f28, $f28, $f28                \n\t"
+    "gsldlc1    $f0, 0x7(%[pSrc])               \n\t"
+    "gsldlc1    $f4, 0xc(%[pSrc])               \n\t"
+    "gsldlc1    $f8, 0x8(%[pSrc])               \n\t"
+    "gsldlc1    $f12, 0xb(%[pSrc])              \n\t"
+    "gsldlc1    $f16, 0x9(%[pSrc])              \n\t"
+    "gsldlc1    $f20, 0xa(%[pSrc])              \n\t"
+    "gsldrc1    $f0, 0x0(%[pSrc])               \n\t"
+    "gsldrc1    $f4, 0x5(%[pSrc])               \n\t"
+    "gsldrc1    $f8, 0x1(%[pSrc])               \n\t"
+    "gsldrc1    $f12, 0x4(%[pSrc])              \n\t"
+    "gsldrc1    $f16, 0x2(%[pSrc])              \n\t"
+    "gsldrc1    $f20, 0x3(%[pSrc])              \n\t"
+    "punpckhbh  $f2, $f0, $f28                  \n\t"
+    "punpckhbh  $f6, $f4, $f28                  \n\t"
+    "punpckhbh  $f10, $f8, $f28                 \n\t"
+    "punpckhbh  $f14, $f12, $f28                \n\t"
+    "punpckhbh  $f18, $f16, $f28                \n\t"
+    "punpckhbh  $f22, $f20, $f28                \n\t"
+    "punpcklbh  $f0, $f0, $f28                  \n\t"
+    "punpcklbh  $f4, $f4, $f28                  \n\t"
+    "punpcklbh  $f8, $f8, $f28                  \n\t"
+    "punpcklbh  $f12, $f12, $f28                \n\t"
+    "punpcklbh  $f16, $f16, $f28                \n\t"
+    "punpcklbh  $f20, $f20, $f28                \n\t"
+    "paddh      $f8, $f8, $f12                  \n\t"
+    "paddh      $f10, $f10, $f14                \n\t"
+    "paddh      $f16, $f16, $f20                \n\t"
+    "paddh      $f18, $f18, $f22                \n\t"
+    "psllh      $f16, $f16, $f30                \n\t"
+    "psllh      $f18, $f18, $f30                \n\t"
+    "psubh      $f16, $f16, $f8                 \n\t"
+    "psubh      $f18, $f18, $f10                \n\t"
+    "paddh      $f0, $f0, $f4                   \n\t"
+    "paddh      $f2, $f2, $f6                   \n\t"
+    "paddh      $f0, $f0, $f16                  \n\t"
+    "paddh      $f2, $f2, $f18                  \n\t"
+    "psllh      $f16, $f16, $f30                \n\t"
+    "psllh      $f18, $f18, $f30                \n\t"
+    "paddh      $f0, $f0, $f16                  \n\t"
+    "paddh      $f2, $f2, $f18                  \n\t"
+    "gssdlc1    $f0, 0x7(%[pDst])               \n\t"
+    "gssdlc1    $f2, 0xF(%[pDst])               \n\t"
+    "gssdrc1    $f0, 0x0(%[pDst])               \n\t"
+    "gssdrc1    $f2, 0x8(%[pDst])               \n\t"
+    PTR_ADDU   "%[pSrc], %[pSrc], %[iSrcStride] \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride] \n\t"
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1    \n\t"
+    "bnez       %[iHeight], 1b                  \n\t"
+    : [pSrc]"+&r"(pSrc), [pDst]"+&r"(pDst), [iHeight]"+&r"(iHeight)
+    : [iSrcStride]"r"(iSrcStride),  [iDstStride]"r"(iDstStride)
+    : "memory", "$8", "$f0", "$f2", "$f4", "$f6", "$f8", "$f10", "$f12",
+      "$f14", "$f16", "$f18", "$f20", "$f22", "$f24", "$f26", "$f28", "$f30"
+  );
+  RECOVER_REG;
+}
+
+static inline void McHorVer22WidthEq8_mmi(const uint8_t* pSrc, int32_t iSrcStride,
+                   uint8_t* pDst, int32_t iDstStride, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_2D (int16_t, iTap, 21, 8, 16)
+  McHorVer22Width8HorFirst_mmi (pSrc - 2, iSrcStride, (uint8_t*)iTap, 16, iHeight + 5);
+  McHorVer22Width8VerLastAlign_mmi ((uint8_t*)iTap, 16, pDst, iDstStride, 8, iHeight);
+}
+
+static inline void McHorVer22WidthEq16_mmi(const uint8_t* pSrc, int32_t iSrcStride,
+                   uint8_t* pDst, int32_t iDstStride, int32_t iHeight) {
+  McHorVer22WidthEq8_mmi (pSrc,     iSrcStride, pDst,     iDstStride, iHeight);
+  McHorVer22WidthEq8_mmi (&pSrc[8], iSrcStride, &pDst[8], iDstStride, iHeight);
+}
+
+static inline void McHorVer22_mmi(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst,
+                   int32_t iDstStride, int32_t iWidth, int32_t iHeight) {
+  if (iWidth == 16)
+    McHorVer22WidthEq16_mmi (pSrc, iSrcStride, pDst, iDstStride, iHeight);
+  else if (iWidth == 8)
+    McHorVer22WidthEq8_mmi (pSrc, iSrcStride, pDst, iDstStride, iHeight);
+  else
+    McHorVer22_c (pSrc, iSrcStride, pDst, iDstStride, 4, iHeight);
+}
+
+void PixelAvgWidthEq4_mmi(uint8_t *pDst,  int iDstStride, const uint8_t *pSrcA,
+     int iSrcAStride, const uint8_t *pSrcB, int iSrcBStride, int iHeight ) {
+  __asm__ volatile (
+    ".set       arch=loongson3a                    \n\t"
+    "1:                                            \n\t"
+    "gsldlc1    $f0, 0x7(%[pSrcB])                 \n\t"
+    "gsldlc1    $f2, 0x7(%[pSrcA])                 \n\t"
+    "gsldrc1    $f0, 0x0(%[pSrcB])                 \n\t"
+    "gsldrc1    $f2, 0x0(%[pSrcA])                 \n\t"
+    "pavgb      $f0, $f0, $f2                      \n\t"
+    "gsswlc1    $f0, 0x3(%[pDst])                  \n\t"
+    "gsswrc1    $f0, 0x0(%[pDst])                  \n\t"
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x1       \n\t"
+    PTR_ADDU   "%[pDst], %[pDst], %[iDstStride]    \n\t"
+    PTR_ADDU   "%[pSrcA], %[pSrcA], %[iSrcAStride] \n\t"
+    PTR_ADDU   "%[pSrcB], %[pSrcB], %[iSrcBStride] \n\t"
+    "bnez       %[iHeight], 1b                     \n\t"
+    : [pDst]"+&r"((unsigned char *)pDst), [pSrcA]"+&r"((unsigned char *)pSrcA),
+      [pSrcB]"+&r"((unsigned char *)pSrcB), [iHeight]"+&r"((int)iHeight)
+    : [iDstStride]"r"((int)iDstStride), [iSrcAStride]"r"((int)iSrcAStride),
+      [iSrcBStride]"r"((int)iSrcBStride)
+    : "memory", "$8", "$9", "$10", "$f0", "$f2"
+  );
+}
+
+void PixelAvgWidthEq8_mmi(uint8_t *pDst,  int iDstStride, const uint8_t *pSrcA,
+     int iSrcAStride, const uint8_t *pSrcB, int iSrcBStride, int iHeight ) {
+  __asm__ volatile (
+    ".set       arch=loongson3a                 \n\t"
+    "1:                                         \n\t"
+    "gsldlc1    $f0, 0x7(%[pSrcA])              \n\t"
+    "gsldlc1    $f2, 0x7(%[pSrcB])              \n\t"
+    "gsldrc1    $f0, 0x0(%[pSrcA])              \n\t"
+    "gsldrc1    $f2, 0x0(%[pSrcB])              \n\t"
+    "pavgb      $f0, $f0, $f2                   \n\t"
+    PTR_ADDU   "$8, %[pSrcA], %[iSrcAStride]    \n\t"
+    "gssdlc1    $f0, 0x7(%[pDst])               \n\t"
+    PTR_ADDU   "$9, %[pSrcB], %[iSrcBStride]    \n\t"
+    "gssdrc1    $f0, 0x0(%[pDst])               \n\t"
+    "gsldlc1    $f0, 0x7($8)                    \n\t"
+    "gsldlc1    $f2, 0x7($9)                    \n\t"
+    "gsldrc1    $f0, 0x0($8)                    \n\t"
+    "gsldrc1    $f2, 0x0($9)                    \n\t"
+    "pavgb      $f0, $f0, $f2                   \n\t"
+    PTR_ADDU   "$10, %[pDst], %[iDstStride]     \n\t"
+    "gssdlc1    $f0, 0x7($10)                   \n\t"
+    PTR_ADDU   "%[pSrcA], $8, %[iSrcAStride]    \n\t"
+    "gssdrc1    $f0, 0x0($10)                   \n\t"
+    PTR_ADDU   "%[pSrcB], $9, %[iSrcBStride]    \n\t"
+    PTR_ADDU   "%[pDst], $10, %[iDstStride]     \n\t"
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x2    \n\t"
+    "bnez       %[iHeight], 1b                  \n\t"
+    : [pDst]"+&r"((unsigned char *)pDst), [pSrcA]"+&r"((unsigned char *)pSrcA),
+      [pSrcB]"+&r"((unsigned char *)pSrcB), [iHeight]"+&r"((int)iHeight)
+    : [iDstStride]"r"((int)iDstStride), [iSrcAStride]"r"((int)iSrcAStride),
+      [iSrcBStride]"r"((int)iSrcBStride)
+    : "memory", "$8", "$9", "$10", "$f0", "$f2"
+  );
+}
+
+void PixelAvgWidthEq16_mmi(uint8_t *pDst, int iDstStride, const uint8_t *pSrcA,
+     int iSrcAStride, const uint8_t *pSrcB, int iSrcBStride, int iHeight ) {
+  __asm__ volatile (
+    ".set       arch=loongson3a                 \n\t"
+    "1:                                         \n\t"
+    "gsldlc1    $f0, 0x7(%[pSrcA])              \n\t"
+    "gsldlc1    $f2, 0xF(%[pSrcA])              \n\t"
+    "gsldlc1    $f4, 0x7(%[pSrcB])              \n\t"
+    "gsldlc1    $f6, 0xF(%[pSrcB])              \n\t"
+    "gsldrc1    $f0, 0x0(%[pSrcA])              \n\t"
+    "gsldrc1    $f2, 0x8(%[pSrcA])              \n\t"
+    "gsldrc1    $f4, 0x0(%[pSrcB])              \n\t"
+    "gsldrc1    $f6, 0x8(%[pSrcB])              \n\t"
+    "pavgb      $f0, $f0, $f4                   \n\t"
+    "pavgb      $f2, $f2, $f6                   \n\t"
+    PTR_ADDU   "$8, %[pSrcA], %[iSrcAStride]    \n\t"
+    "gssdlc1    $f0, 0x7(%[pDst])               \n\t"
+    "gssdlc1    $f2, 0xF(%[pDst])               \n\t"
+    "gssdrc1    $f0, 0x0(%[pDst])               \n\t"
+    "gssdrc1    $f2, 0x8(%[pDst])               \n\t"
+    PTR_ADDU   "$9, %[pSrcB], %[iSrcBStride]    \n\t"
+    "gsldlc1    $f0, 0x7($8)                    \n\t"
+    "gsldlc1    $f2, 0xF($8)                    \n\t"
+    "gsldrc1    $f0, 0x0($8)                    \n\t"
+    "gsldrc1    $f2, 0x8($8)                    \n\t"
+    PTR_ADDU   "$10, %[pDst], %[iDstStride]     \n\t"
+    "gsldlc1    $f4, 0x7($9)                    \n\t"
+    "gsldlc1    $f6, 0xF($9)                    \n\t"
+    "gsldrc1    $f4, 0x0($9)                    \n\t"
+    "gsldrc1    $f6, 0x8($9)                    \n\t"
+    "pavgb      $f0, $f0, $f4                   \n\t"
+    "pavgb      $f2, $f2, $f6                   \n\t"
+    "gssdlc1    $f0, 0x7($10)                   \n\t"
+    "gssdlc1    $f2, 0xF($10)                   \n\t"
+    "gssdrc1    $f0, 0x0($10)                   \n\t"
+    "gssdrc1    $f2, 0x8($10)                   \n\t"
+
+    PTR_ADDU   "%[pSrcA], $8, %[iSrcAStride]    \n\t"
+    PTR_ADDU   "%[pSrcB], $9, %[iSrcBStride]    \n\t"
+    PTR_ADDU   "%[pDst], $10, %[iDstStride]     \n\t"
+    "gsldlc1    $f0, 0x7(%[pSrcA])              \n\t"
+    "gsldlc1    $f2, 0xF(%[pSrcA])              \n\t"
+    "gsldlc1    $f4, 0x7(%[pSrcB])              \n\t"
+    "gsldlc1    $f6, 0xF(%[pSrcB])              \n\t"
+    "gsldrc1    $f0, 0x0(%[pSrcA])              \n\t"
+    "gsldrc1    $f2, 0x8(%[pSrcA])              \n\t"
+    "gsldrc1    $f4, 0x0(%[pSrcB])              \n\t"
+    "gsldrc1    $f6, 0x8(%[pSrcB])              \n\t"
+    "pavgb      $f0, $f0, $f4                   \n\t"
+    "pavgb      $f2, $f2, $f6                   \n\t"
+    PTR_ADDU   "$8, %[pSrcA], %[iSrcAStride]    \n\t"
+    PTR_ADDU   "$9, %[pSrcB], %[iSrcBStride]    \n\t"
+    "gssdlc1    $f0, 0x7(%[pDst])               \n\t"
+    "gssdlc1    $f2, 0xF(%[pDst])               \n\t"
+    "gssdrc1    $f0, 0x0(%[pDst])               \n\t"
+    "gssdrc1    $f2, 0x8(%[pDst])               \n\t"
+    "gsldlc1    $f0, 0x7($8)                    \n\t"
+    "gsldlc1    $f2, 0xF($8)                    \n\t"
+    "gsldlc1    $f4, 0x7($9)                    \n\t"
+    "gsldlc1    $f6, 0xF($9)                    \n\t"
+    "gsldrc1    $f0, 0x0($8)                    \n\t"
+    "gsldrc1    $f2, 0x8($8)                    \n\t"
+    "gsldrc1    $f4, 0x0($9)                    \n\t"
+    "gsldrc1    $f6, 0x8($9)                    \n\t"
+    PTR_ADDU   "$10, %[pDst], %[iDstStride]     \n\t"
+    "pavgb      $f0, $f0, $f4                   \n\t"
+    "pavgb      $f2, $f2, $f6                   \n\t"
+    "gssdlc1    $f0, 0x7($10)                   \n\t"
+    "gssdlc1    $f2, 0xF($10)                   \n\t"
+    "gssdrc1    $f0, 0x0($10)                   \n\t"
+    "gssdrc1    $f2, 0x8($10)                   \n\t"
+    PTR_ADDU   "%[pSrcA], $8, %[iSrcAStride]    \n\t"
+    PTR_ADDU   "%[pSrcB], $9, %[iSrcBStride]    \n\t"
+    PTR_ADDU   "%[pDst], $10, %[iDstStride]     \n\t"
+    PTR_ADDIU  "%[iHeight], %[iHeight], -0x4    \n\t"
+    "bnez       %[iHeight], 1b                  \n\t"
+    : [pDst]"+&r"((unsigned char *)pDst), [pSrcA]"+&r"((unsigned char *)pSrcA),
+      [pSrcB]"+&r"((unsigned char *)pSrcB), [iHeight]"+&r"((int)iHeight)
+    : [iDstStride]"r"((int)iDstStride), [iSrcAStride]"r"((int)iSrcAStride),
+      [iSrcBStride]"r"((int)iSrcBStride)
+    : "memory", "$8", "$9", "$10", "$f0", "$f2", "$f4", "$f6"
+  );
+}
+
+static inline void McHorVer01_mmi(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst,
+                                  int32_t iDstStride, int32_t iWidth, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 256, 16);
+  if (iWidth == 16) {
+    McHorVer02WidthEq16_mmi (pSrc, iSrcStride, pTmp, 16, iHeight);
+    PixelAvgWidthEq16_mmi (pDst, iDstStride, pSrc, iSrcStride, pTmp, 16, iHeight);
+  } else if (iWidth == 8) {
+    McHorVer02WidthEq8_mmi (pSrc, iSrcStride, pTmp, 16, iHeight);
+    PixelAvgWidthEq8_mmi (pDst, iDstStride, pSrc, iSrcStride, pTmp, 16, iHeight);
+  } else {
+    McHorVer02_c (pSrc, iSrcStride, pTmp, 16, 4, iHeight);
+    PixelAvgWidthEq4_mmi (pDst, iDstStride, pSrc, iSrcStride, pTmp, 16, iHeight);
+  }
+}
+
+static inline void McHorVer03_mmi(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst,
+                                  int32_t iDstStride, int32_t iWidth, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 256, 16);
+  if (iWidth == 16) {
+    McHorVer02WidthEq16_mmi (pSrc, iSrcStride, pTmp, 16, iHeight);
+    PixelAvgWidthEq16_mmi (pDst, iDstStride, pSrc + iSrcStride, iSrcStride, pTmp, 16, iHeight);
+  } else if (iWidth == 8) {
+    McHorVer02WidthEq8_mmi (pSrc, iSrcStride, pTmp, 16, iHeight);
+    PixelAvgWidthEq8_mmi (pDst, iDstStride, pSrc + iSrcStride, iSrcStride, pTmp, 16, iHeight);
+  } else {
+    McHorVer02_c (pSrc, iSrcStride, pTmp, 16, 4, iHeight);
+    PixelAvgWidthEq4_mmi (pDst, iDstStride, pSrc + iSrcStride, iSrcStride, pTmp, 16, iHeight);
+  }
+}
+
+static inline void McHorVer10_mmi(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst,
+                                  int32_t iDstStride, int32_t iWidth, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pTmp, 256, 16);
+  if (iWidth == 16) {
+    McHorVer20WidthEq16_mmi (pSrc, iSrcStride, pTmp, 16, iHeight);
+    PixelAvgWidthEq16_mmi (pDst, iDstStride, pSrc, iSrcStride, pTmp, 16, iHeight);
+  } else if (iWidth == 8) {
+    McHorVer20WidthEq8_mmi (pSrc, iSrcStride, pTmp, 16, iHeight);
+    PixelAvgWidthEq8_mmi (pDst, iDstStride, pSrc, iSrcStride, pTmp, 16, iHeight);
+  } else {
+    McHorVer20WidthEq4_mmi (pSrc, iSrcStride, pTmp, 16, iHeight);
+    PixelAvgWidthEq4_mmi (pDst, iDstStride, pSrc, iSrcStride, pTmp, 16, iHeight);
+  }
+}
+
+static inline void McHorVer11_mmi(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst,
+                                  int32_t iDstStride, int32_t iWidth, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pHorTmp, 256, 16);
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pVerTmp, 256, 16);
+  if (iWidth == 16) {
+    McHorVer20WidthEq16_mmi (pSrc, iSrcStride, pHorTmp, 16, iHeight);
+    McHorVer02WidthEq16_mmi (pSrc, iSrcStride, pVerTmp, 16, iHeight);
+    PixelAvgWidthEq16_mmi (pDst, iDstStride, pHorTmp, 16, pVerTmp, 16, iHeight);
+  } else if (iWidth == 8) {
+    McHorVer20WidthEq8_mmi (pSrc, iSrcStride, pHorTmp, 16, iHeight);
+    McHorVer02WidthEq8_mmi (pSrc, iSrcStride, pVerTmp, 16, iHeight);
+    PixelAvgWidthEq8_mmi (pDst, iDstStride, pHorTmp, 16, pVerTmp, 16, iHeight);
+  } else {
+    McHorVer20WidthEq4_mmi (pSrc, iSrcStride, pHorTmp, 16, iHeight);
+    McHorVer02_c (pSrc, iSrcStride, pVerTmp, 16, 4, iHeight);
+    PixelAvgWidthEq4_mmi (pDst, iDstStride, pHorTmp, 16, pVerTmp, 16, iHeight);
+  }
+}
+
+static inline void McHorVer12_mmi(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst,
+                                  int32_t iDstStride, int32_t iWidth, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pVerTmp, 256, 16);
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pCtrTmp, 256, 16);
+  if (iWidth == 16) {
+    McHorVer02WidthEq16_mmi (pSrc, iSrcStride, pVerTmp, 16, iHeight);
+    McHorVer22WidthEq16_mmi (pSrc, iSrcStride, pCtrTmp, 16, iHeight);
+    PixelAvgWidthEq16_mmi (pDst, iDstStride, pVerTmp, 16, pCtrTmp, 16, iHeight);
+  } else if (iWidth == 8) {
+    McHorVer02WidthEq8_mmi (pSrc, iSrcStride, pVerTmp, 16, iHeight);
+    McHorVer22WidthEq8_mmi (pSrc, iSrcStride, pCtrTmp, 16, iHeight);
+    PixelAvgWidthEq8_mmi (pDst, iDstStride, pVerTmp, 16, pCtrTmp, 16, iHeight);
+  } else {
+    McHorVer02_c (pSrc, iSrcStride, pVerTmp, 16, 4, iHeight);
+    McHorVer22_c (pSrc, iSrcStride, pCtrTmp, 16, 4, iHeight);
+    PixelAvgWidthEq4_mmi (pDst, iDstStride, pVerTmp, 16, pCtrTmp, 16, iHeight);
+  }
+}
+static inline void McHorVer13_mmi(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst,
+                                  int32_t iDstStride, int32_t iWidth, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pHorTmp, 256, 16);
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pVerTmp, 256, 16);
+  if (iWidth == 16) {
+    McHorVer20WidthEq16_mmi (pSrc + iSrcStride, iSrcStride, pHorTmp, 16, iHeight);
+    McHorVer02WidthEq16_mmi (pSrc,            iSrcStride, pVerTmp, 16, iHeight);
+    PixelAvgWidthEq16_mmi (pDst, iDstStride, pHorTmp, 16, pVerTmp, 16, iHeight);
+  } else if (iWidth == 8) {
+    McHorVer20WidthEq8_mmi (pSrc + iSrcStride, iSrcStride, pHorTmp, 16, iHeight);
+    McHorVer02WidthEq8_mmi (pSrc,            iSrcStride, pVerTmp, 16, iHeight);
+    PixelAvgWidthEq8_mmi (pDst, iDstStride, pHorTmp, 16, pVerTmp, 16, iHeight);
+  } else {
+    McHorVer20WidthEq4_mmi (pSrc + iSrcStride, iSrcStride, pHorTmp, 16, iHeight);
+    McHorVer02_c (pSrc,            iSrcStride, pVerTmp, 16, 4 , iHeight);
+    PixelAvgWidthEq4_mmi (pDst, iDstStride, pHorTmp, 16, pVerTmp, 16, iHeight);
+  }
+}
+static inline void McHorVer21_mmi(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst,
+                                  int32_t iDstStride, int32_t iWidth, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pHorTmp, 256, 16);
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pCtrTmp, 256, 16);
+  if (iWidth == 16) {
+    McHorVer20WidthEq16_mmi (pSrc, iSrcStride, pHorTmp, 16, iHeight);
+    McHorVer22WidthEq16_mmi (pSrc, iSrcStride, pCtrTmp, 16, iHeight);
+    PixelAvgWidthEq16_mmi (pDst, iDstStride, pHorTmp, 16, pCtrTmp, 16, iHeight);
+  } else if (iWidth == 8) {
+    McHorVer20WidthEq8_mmi (pSrc, iSrcStride, pHorTmp, 16, iHeight);
+    McHorVer22WidthEq8_mmi (pSrc, iSrcStride, pCtrTmp, 16, iHeight);
+    PixelAvgWidthEq8_mmi (pDst, iDstStride, pHorTmp, 16, pCtrTmp, 16, iHeight);
+  } else {
+    McHorVer20WidthEq4_mmi (pSrc, iSrcStride, pHorTmp, 16, iHeight);
+    McHorVer22_c (pSrc, iSrcStride, pCtrTmp, 16, 4, iHeight);
+    PixelAvgWidthEq4_mmi (pDst, iDstStride, pHorTmp, 16, pCtrTmp, 16, iHeight);
+  }
+}
+
+static inline void McHorVer23_mmi(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst,
+                                  int32_t iDstStride, int32_t iWidth, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pHorTmp, 256, 16);
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pCtrTmp, 256, 16);
+  if (iWidth == 16) {
+    McHorVer20WidthEq16_mmi (pSrc + iSrcStride, iSrcStride, pHorTmp, 16, iHeight);
+    McHorVer22WidthEq16_mmi (pSrc,            iSrcStride, pCtrTmp, 16, iHeight);
+    PixelAvgWidthEq16_mmi (pDst, iDstStride, pHorTmp, 16, pCtrTmp, 16, iHeight);
+  } else if (iWidth == 8) {
+    McHorVer20WidthEq8_mmi (pSrc + iSrcStride, iSrcStride, pHorTmp, 16, iHeight);
+    McHorVer22WidthEq8_mmi (pSrc,            iSrcStride, pCtrTmp, 16, iHeight);
+    PixelAvgWidthEq8_mmi (pDst, iDstStride, pHorTmp, 16, pCtrTmp, 16, iHeight);
+  } else {
+    McHorVer20WidthEq4_mmi (pSrc + iSrcStride, iSrcStride, pHorTmp, 16, iHeight);
+    McHorVer22_c (pSrc,            iSrcStride, pCtrTmp, 16, 4, iHeight);
+    PixelAvgWidthEq4_mmi (pDst, iDstStride, pHorTmp, 16, pCtrTmp, 16, iHeight);
+  }
+}
+static inline void McHorVer30_mmi(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst,
+                                  int32_t iDstStride, int32_t iWidth, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pHorTmp, 256, 16);
+  if (iWidth == 16) {
+    McHorVer20WidthEq16_mmi (pSrc, iSrcStride, pHorTmp, 16, iHeight);
+    PixelAvgWidthEq16_mmi (pDst, iDstStride, pSrc + 1, iSrcStride, pHorTmp, 16, iHeight);
+  } else if (iWidth == 8) {
+    McHorVer20WidthEq8_mmi (pSrc, iSrcStride, pHorTmp, 16, iHeight);
+    PixelAvgWidthEq8_mmi (pDst, iDstStride, pSrc + 1, iSrcStride, pHorTmp, 16, iHeight);
+  } else {
+    McHorVer20WidthEq4_mmi (pSrc, iSrcStride, pHorTmp, 16, iHeight);
+    PixelAvgWidthEq4_mmi (pDst, iDstStride, pSrc + 1, iSrcStride, pHorTmp, 16, iHeight);
+  }
+}
+static inline void McHorVer31_mmi(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst,
+                                  int32_t iDstStride, int32_t iWidth, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pHorTmp, 256, 16);
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pVerTmp, 256, 16);
+  if (iWidth == 16) {
+    McHorVer20WidthEq16_mmi (pSrc,   iSrcStride, pHorTmp, 16, iHeight);
+    McHorVer02WidthEq16_mmi (pSrc + 1, iSrcStride, pVerTmp, 16, iHeight);
+    PixelAvgWidthEq16_mmi (pDst, iDstStride, pHorTmp, 16, pVerTmp, 16, iHeight);
+  } else if (iWidth == 8) {
+    McHorVer20WidthEq8_mmi (pSrc, iSrcStride, pHorTmp, 16, iHeight);
+    McHorVer02WidthEq8_mmi (pSrc + 1, iSrcStride, pVerTmp, 16, iHeight);
+    PixelAvgWidthEq8_mmi (pDst, iDstStride, pHorTmp, 16, pVerTmp, 16, iHeight);
+  } else {
+    McHorVer20WidthEq4_mmi (pSrc, iSrcStride, pHorTmp, 16, iHeight);
+    McHorVer02_c (pSrc + 1, iSrcStride, pVerTmp, 16, 4, iHeight);
+    PixelAvgWidthEq4_mmi (pDst, iDstStride, pHorTmp, 16, pVerTmp, 16, iHeight);
+  }
+}
+static inline void McHorVer32_mmi(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst,
+                                  int32_t iDstStride, int32_t iWidth, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pVerTmp, 256, 16);
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pCtrTmp, 256, 16);
+  if (iWidth == 16) {
+    McHorVer02WidthEq16_mmi (pSrc + 1, iSrcStride, pVerTmp, 16, iHeight);
+    McHorVer22WidthEq16_mmi (pSrc,   iSrcStride, pCtrTmp, 16, iHeight);
+    PixelAvgWidthEq16_mmi (pDst, iDstStride, pVerTmp, 16, pCtrTmp, 16, iHeight);
+  } else if (iWidth == 8) {
+    McHorVer02WidthEq8_mmi (pSrc + 1, iSrcStride, pVerTmp, 16, iHeight);
+    McHorVer22WidthEq8_mmi (pSrc,   iSrcStride, pCtrTmp, 16, iHeight);
+    PixelAvgWidthEq8_mmi (pDst, iDstStride, pVerTmp, 16, pCtrTmp, 16, iHeight);
+  } else {
+    McHorVer02_c (pSrc + 1, iSrcStride, pVerTmp, 16, 4, iHeight);
+    McHorVer22_c (pSrc,   iSrcStride, pCtrTmp, 16, 4, iHeight);
+    PixelAvgWidthEq4_mmi (pDst, iDstStride, pVerTmp, 16, pCtrTmp, 16, iHeight);
+  }
+}
+static inline void McHorVer33_mmi(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst,
+                                  int32_t iDstStride, int32_t iWidth, int32_t iHeight) {
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pHorTmp, 256, 16);
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pVerTmp, 256, 16);
+  if (iWidth == 16) {
+    McHorVer20WidthEq16_mmi (pSrc + iSrcStride, iSrcStride, pHorTmp, 16, iHeight);
+    McHorVer02WidthEq16_mmi (pSrc + 1,          iSrcStride, pVerTmp, 16, iHeight);
+    PixelAvgWidthEq16_mmi (pDst, iDstStride, pHorTmp, 16, pVerTmp, 16, iHeight);
+  } else if (iWidth == 8) {
+    McHorVer20WidthEq8_mmi (pSrc + iSrcStride, iSrcStride, pHorTmp, 16, iHeight);
+    McHorVer02WidthEq8_mmi (pSrc + 1,          iSrcStride, pVerTmp, 16, iHeight);
+    PixelAvgWidthEq8_mmi (pDst, iDstStride, pHorTmp, 16, pVerTmp, 16, iHeight);
+  } else {
+    McHorVer20WidthEq4_mmi (pSrc + iSrcStride, iSrcStride, pHorTmp, 16, iHeight);
+    McHorVer02_c (pSrc + 1,          iSrcStride, pVerTmp, 16, 4, iHeight);
+    PixelAvgWidthEq4_mmi (pDst, iDstStride, pHorTmp, 16, pVerTmp, 16, iHeight);
+  }
+}
+
+void McLuma_mmi(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
+                int16_t iMvX, int16_t iMvY, int32_t iWidth, int32_t iHeight) {
+  static const PWelsMcWidthHeightFunc pWelsMcFunc[4][4] = { //[x][y]
+    {McCopy_mmi,     McHorVer01_mmi, McHorVer02_mmi, McHorVer03_mmi},
+    {McHorVer10_mmi, McHorVer11_mmi, McHorVer12_mmi, McHorVer13_mmi},
+    {McHorVer20_mmi, McHorVer21_mmi, McHorVer22_mmi, McHorVer23_mmi},
+    {McHorVer30_mmi, McHorVer31_mmi, McHorVer32_mmi, McHorVer33_mmi},
+  };
+
+  pWelsMcFunc[iMvX & 0x03][iMvY & 0x03] (pSrc, iSrcStride, pDst, iDstStride, iWidth, iHeight);
+}
+
+void PixelAvg_mmi(uint8_t* pDst, int32_t iDstStride, const uint8_t* pSrcA, int32_t iSrcAStride,
+                  const uint8_t* pSrcB, int32_t iSrcBStride, int32_t iWidth, int32_t iHeight) {
+  static const PWelsSampleWidthAveragingFunc kpfFuncs[2] = {
+    PixelAvgWidthEq8_mmi,
+    PixelAvgWidthEq16_mmi
+  };
+  kpfFuncs[iWidth >> 4] (pDst, iDstStride, pSrcA, iSrcAStride, pSrcB, iSrcBStride, iHeight);
+}
+#endif//HAVE_MMI
 } // anon ns.
 
 void WelsCommon::InitMcFunc (SMcFunc* pMcFuncs, uint32_t uiCpuFlag) {
@@ -1716,4 +4252,15 @@ void WelsCommon::InitMcFunc (SMcFunc* pMcFuncs, uint32_t uiCpuFlag) {
     pMcFuncs->pfLumaHalfpelCen  = McHorVer22Width5Or9Or17Height5Or9Or17_AArch64_neon;//iWidth+1/heigh+1
   }
 #endif
+
+#if defined(HAVE_MMI)
+  if (uiCpuFlag & WELS_CPU_MMI) {
+    pMcFuncs->pfLumaHalfpelHor  = McHorVer20Width5Or9Or17_mmi;
+    pMcFuncs->pfLumaHalfpelVer  = McHorVer02Height5Or9Or17_mmi;
+    pMcFuncs->pfLumaHalfpelCen  = McHorVer22Width5Or9Or17Height5Or9Or17_mmi;
+    pMcFuncs->pfSampleAveraging = PixelAvg_mmi;
+    pMcFuncs->pMcChromaFunc     = McChroma_mmi;
+    pMcFuncs->pMcLumaFunc       = McLuma_mmi;
+  }
+#endif//HAVE_MMI
 }

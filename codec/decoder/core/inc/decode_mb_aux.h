@@ -63,6 +63,10 @@ void IdctResAddPred_AArch64_neon (uint8_t* pred, const int32_t stride, int16_t* 
 #endif
 
 
+#if defined(HAVE_MMI)
+void IdctResAddPred_mmi (uint8_t* pPred, const int32_t kiStride, int16_t* pRs);
+#endif//HAVE_MMI
+
 #if defined(__cplusplus)
 }
 #endif//__cplusplus

@@ -649,3 +649,16 @@ GENERATE_8x8_UT (WelsDecoderIChromaPredDc_AArch64_neon, WelsIChromaPredDc_ref, 1
 GENERATE_8x8_UT (WelsDecoderIChromaPredPlane_AArch64_neon, WelsIChromaPredPlane_ref, 1, WELS_CPU_NEON)
 GENERATE_8x8_UT (WelsDecoderIChromaPredDcTop_AArch64_neon, WelsIChromaPredDcTop_ref, 1, WELS_CPU_NEON)
 #endif
+
+#if defined(HAVE_MMI)
+GENERATE_4x4_UT (WelsDecoderI4x4LumaPredH_mmi, LumaI4x4PredH, 1, WELS_CPU_MMI)
+GENERATE_8x8_UT (WelsDecoderIChromaPredDcTop_mmi, WelsIChromaPredDcTop_ref, 1, WELS_CPU_MMI)
+GENERATE_8x8_UT (WelsDecoderIChromaPredDc_mmi, WelsIChromaPredDc_ref, 1, WELS_CPU_MMI)
+GENERATE_8x8_UT (WelsDecoderIChromaPredPlane_mmi, WelsIChromaPredPlane_ref, 1, WELS_CPU_MMI)
+GENERATE_16x16_UT (WelsDecoderI16x16LumaPredPlane_mmi, WelsI16x16LumaPredPlane_ref, 1, WELS_CPU_MMI)
+GENERATE_16x16_UT (WelsDecoderI16x16LumaPredH_mmi, LumaI16x16PredH, 1, WELS_CPU_MMI)
+GENERATE_16x16_UT (WelsDecoderI16x16LumaPredV_mmi, LumaI16x16PredV, 1, WELS_CPU_MMI)
+GENERATE_16x16_UT (WelsDecoderI16x16LumaPredDc_mmi, LumaI16x16PredDC, 1, WELS_CPU_MMI)
+GENERATE_16x16_UT (WelsDecoderI16x16LumaPredDcTop_mmi, LumaI16x16PredDCTop, 1, WELS_CPU_MMI)
+GENERATE_16x16_UT (WelsDecoderI16x16LumaPredDcNA_mmi, LumaI16x16PredDCNone, 1, WELS_CPU_MMI)
+#endif
