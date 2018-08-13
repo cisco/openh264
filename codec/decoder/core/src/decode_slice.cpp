@@ -52,6 +52,8 @@
 
 namespace WelsDec {
 
+extern void FreePicture (PPicture pPic, CMemoryAlign* pMa);
+
 static inline int32_t iAbs (int32_t x) {
   static const int32_t INT_BITS = (sizeof (int) * CHAR_BIT) - 1;
   int32_t y = x >> INT_BITS;
@@ -208,6 +210,12 @@ int32_t WelsMbInterConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLayer) {
   } else {
     if (pCtx->pTempDec == NULL)
       pCtx->pTempDec = AllocPicture (pCtx, pCtx->pSps->iMbWidth << 4, pCtx->pSps->iMbHeight << 4);
+    else {
+      if (pCtx->pTempDec->iLinesize[0] != pCtx->pDec->iLinesize[0]) {
+        FreePicture (pCtx->pTempDec, pCtx->pMemAlign);
+        pCtx->pTempDec = AllocPicture (pCtx, pCtx->pSps->iMbWidth << 4, pCtx->pSps->iMbHeight << 4);
+      }
+    }
     uint8_t*   pTempDstYCbCr[3];
     uint8_t*   pDstYCbCr[3];
     pTempDstYCbCr[0] = pCtx->pTempDec->pData[0] + ((iMbY * iLumaStride + iMbX) << 4);
