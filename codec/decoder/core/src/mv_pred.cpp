@@ -678,7 +678,8 @@ int32_t PredBDirectTemporal (PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], 
       UpdateP16x16MotionOnly (pCurLayer, LIST_1, iMvp[LIST_1]);
       UpdateP16x16RefIdx (pCurLayer, LIST_0, ref[LIST_0]);
     } else {
-      ref[LIST_0] = pCurLayer->iColocRefIndex[LIST_0][0];
+      ref[LIST_0] = pCurLayer->iColocRefIndex[LIST_0][0] >= 0 ? pCurLayer->iColocRefIndex[LIST_0][0] :
+                    pCurLayer->iColocRefIndex[LIST_1][0];
       const int16_t (*mvColoc)[2] = 0 == ref[LIST_0] ? pCurLayer->iColocMv[LIST_0] : pCurLayer->iColocMv[LIST_1];
       const int16_t* mv = mvColoc[0];
       UpdateP16x16RefIdx (pCurLayer, LIST_0, ref[LIST_0]);
