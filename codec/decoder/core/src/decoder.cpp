@@ -1027,6 +1027,7 @@ void InitPredFunc (PWelsDecoderContext pCtx, uint32_t uiCpuFlag) {
 #if defined(HAVE_MMI)
   if (uiCpuFlag & WELS_CPU_MMI) {
     pCtx->pIdctResAddPredFunc   = IdctResAddPred_mmi;
+    pCtx->pIdctFourResAddPredFunc = IdctFourResAddPred_<IdctResAddPred_mmi>;
 
     pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC] = WelsDecoderI16x16LumaPredDc_mmi;
     pCtx->pGetI16x16LumaPredFunc[I16_PRED_P]  = WelsDecoderI16x16LumaPredPlane_mmi;
