@@ -739,21 +739,19 @@ int32_t ParseInterBMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pN
   if (IS_DIRECT (mbType)) {
 
     int16_t pMvDirect[LIST_A][2] = { { 0, 0 }, { 0, 0 } };
-    if (pCtx->sRefPic.pRefList[LIST_1][0] != NULL) {
-      if (pSliceHeader->iDirectSpatialMvPredFlag) {
-        //predict direct spatial mv
-        SubMbType subMbType;
-        int32_t ret = PredMvBDirectSpatial (pCtx, pMvDirect, iRef, subMbType);
-        if (ret != ERR_NONE) {
-          return ret;
-        }
-      } else {
-        //temporal direct 16x16 mode
-        ComputeColocated (pCtx);
-        int32_t ret = PredBDirectTemporal (pCtx, pMvDirect, iRef);
-        if (ret != ERR_NONE) {
-          return ret;
-        }
+    if (pSliceHeader->iDirectSpatialMvPredFlag) {
+      //predict direct spatial mv
+      SubMbType subMbType;
+      int32_t ret = PredMvBDirectSpatial (pCtx, pMvDirect, iRef, subMbType);
+      if (ret != ERR_NONE) {
+        return ret;
+      }
+    } else {
+      //temporal direct 16x16 mode
+      ComputeColocated (pCtx);
+      int32_t ret = PredBDirectTemporal (pCtx, pMvDirect, iRef);
+      if (ret != ERR_NONE) {
+        return ret;
       }
     }
   } else if (IS_INTER_16x16 (mbType)) {
