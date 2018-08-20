@@ -145,6 +145,9 @@ int32_t DecodeBinCabac (PWelsCabacDecEngine pDecEngine, PWelsCabacCtx pBinCtx, u
   int32_t iRenorm = 1;
   uint32_t uiRangeLPS = g_kuiCabacRangeLps[uiState][ (uiRange >> 6) & 0x03];
   uiRange -= uiRangeLPS;
+  if (pDecEngine->iBitsLeft < 0) {
+    return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_CABAC_NO_BS_TO_READ);
+  }
   if (uiOffset >= (uiRange << pDecEngine->iBitsLeft)) { //LPS
     uiOffset -= (uiRange << pDecEngine->iBitsLeft);
     uiBinVal ^= 0x0001;
