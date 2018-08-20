@@ -145,8 +145,8 @@ int32_t DecodeBinCabac (PWelsCabacDecEngine pDecEngine, PWelsCabacCtx pBinCtx, u
   int32_t iRenorm = 1;
   uint32_t uiRangeLPS = g_kuiCabacRangeLps[uiState][ (uiRange >> 6) & 0x03];
   uiRange -= uiRangeLPS;
-  if (uiOffset >= (uiRange << (uint32_t)pDecEngine->iBitsLeft)) { //LPS
-    uiOffset -= (uiRange << (uint32_t)pDecEngine->iBitsLeft);
+  if (uiOffset >= (uiRange << pDecEngine->iBitsLeft)) { //LPS
+    uiOffset -= (uiRange << pDecEngine->iBitsLeft);
     uiBinVal ^= 0x0001;
     if (!uiState)
       pBinCtx->uiMPS ^= 0x01;

@@ -504,7 +504,7 @@ int32_t PredMvBDirectSpatial (PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2],
     iDiagonalRef[listIdx] = iRightTopRef[listIdx];
     if (REF_NOT_AVAIL == iDiagonalRef[listIdx]) {
       iDiagonalRef[listIdx] = iLeftTopRef[listIdx];
-      * (int32_t*)iMvC[listIdx] = * (int32_t*)iMvD[listIdx];
+      ST32 (iMvC[listIdx], LD32 (iMvD[listIdx]));
     }
 
     int8_t ref_temp = WELS_MIN_POSITIVE (iTopRef[listIdx], iDiagonalRef[listIdx]);

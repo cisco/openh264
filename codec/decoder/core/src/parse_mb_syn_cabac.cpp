@@ -80,7 +80,7 @@ static uint32_t DecodeCabacIntraMbType (PWelsDecoderContext pCtx, PWelsNeighAvai
     return 0; /* I4x4 */
   }
 
-  DecodeTerminateCabac (pCabacDecEngine, uiCode);
+  WELS_READ_VERIFY (DecodeTerminateCabac (pCabacDecEngine, uiCode));
   if (uiCode) {
     return 25; /* PCM */
   }
