@@ -52,6 +52,8 @@
 
 namespace WelsDec {
 
+extern void FreePicture (PPicture pPic, CMemoryAlign* pMa);
+
 static inline int32_t iAbs (int32_t x) {
   static const int32_t INT_BITS = (sizeof (int) * CHAR_BIT) - 1;
   int32_t y = x >> INT_BITS;
@@ -208,6 +210,12 @@ int32_t WelsMbInterConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLayer) {
   } else {
     if (pCtx->pTempDec == NULL)
       pCtx->pTempDec = AllocPicture (pCtx, pCtx->pSps->iMbWidth << 4, pCtx->pSps->iMbHeight << 4);
+    else {
+      if (pCtx->pTempDec->iLinesize[0] != pCtx->pDec->iLinesize[0]) {
+        FreePicture (pCtx->pTempDec, pCtx->pMemAlign);
+        pCtx->pTempDec = AllocPicture (pCtx, pCtx->pSps->iMbWidth << 4, pCtx->pSps->iMbHeight << 4);
+      }
+    }
     uint8_t*   pTempDstYCbCr[3];
     uint8_t*   pDstYCbCr[3];
     pTempDstYCbCr[0] = pCtx->pTempDec->pData[0] + ((iMbY * iLumaStride + iMbX) << 4);
@@ -1415,15 +1423,24 @@ int32_t WelsDecodeMbCabacBSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uin
     pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || ! (ppRefPicL0[0] && ppRefPicL0[0]->bIsComplete)
                             || ! (ppRefPicL1[0] && ppRefPicL1[0]->bIsComplete);
 
+
     if (pSliceHeader->iDirectSpatialMvPredFlag) {
 
       //predict direct spatial mv
-      PredMvBDirectSpatial (pCtx, pMv, ref);
+      SubMbType subMbType;
+      int32_t ret = PredMvBDirectSpatial (pCtx, pMv, ref, subMbType);
+      if (ret != ERR_NONE) {
+        return ret;
+      }
     } else {
       //temporal direct mode
       ComputeColocated (pCtx);
-      PredBDirectTemporal (pCtx, pMv, ref);
+      int32_t ret = PredBDirectTemporal (pCtx, pMv, ref);
+      if (ret != ERR_NONE) {
+        return ret;
+      }
     }
+
 
     //reset rS
     pCurLayer->pLumaQp[iMbXy] = pSlice->iLastMbQp; //??????????????? dqaunt of previous mb

@@ -80,7 +80,7 @@ static uint32_t DecodeCabacIntraMbType (PWelsDecoderContext pCtx, PWelsNeighAvai
     return 0; /* I4x4 */
   }
 
-  DecodeTerminateCabac (pCabacDecEngine, uiCode);
+  WELS_READ_VERIFY (DecodeTerminateCabac (pCabacDecEngine, uiCode));
   if (uiCode) {
     return 25; /* PCM */
   }
@@ -741,11 +741,18 @@ int32_t ParseInterBMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pN
     int16_t pMvDirect[LIST_A][2] = { { 0, 0 }, { 0, 0 } };
     if (pSliceHeader->iDirectSpatialMvPredFlag) {
       //predict direct spatial mv
-      PredMvBDirectSpatial (pCtx, pMvDirect, iRef);
+      SubMbType subMbType;
+      int32_t ret = PredMvBDirectSpatial (pCtx, pMvDirect, iRef, subMbType);
+      if (ret != ERR_NONE) {
+        return ret;
+      }
     } else {
       //temporal direct 16x16 mode
       ComputeColocated (pCtx);
-      PredBDirectTemporal (pCtx, pMvDirect, iRef);
+      int32_t ret = PredBDirectTemporal (pCtx, pMvDirect, iRef);
+      if (ret != ERR_NONE) {
+        return ret;
+      }
     }
   } else if (IS_INTER_16x16 (mbType)) {
     iPartIdx = 0;
@@ -894,11 +901,18 @@ int32_t ParseInterBMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pN
       if (IS_DIRECT (g_ksInterBSubMbTypeInfo[uiSubMbType].iType)) {
         if (!has_direct_called) {
           if (pSliceHeader->iDirectSpatialMvPredFlag) {
-            directSubMbType = PredMvBDirectSpatial (pCtx, pMvDirect, iRef);
+            int32_t ret = PredMvBDirectSpatial (pCtx, pMvDirect, iRef, directSubMbType);
+            if (ret != ERR_NONE) {
+              return ret;
+            }
+
           } else {
             //temporal direct mode
             ComputeColocated (pCtx);
-            PredBDirectTemporal (pCtx, pMvDirect, iRef);
+            int32_t ret = PredBDirectTemporal (pCtx, pMvDirect, iRef);
+            if (ret != ERR_NONE) {
+              return ret;
+            }
           }
           has_direct_called = true;
         }
