@@ -163,13 +163,11 @@
   "dmtc1      "#r1", "#f18"                   \n\t"
 
 #define MMI_XSwap_HW_SINGLE(f0, f2, f4) \
-  "mov.d      "#f4", "#f0"                    \n\t" \
-  "punpckhhw  "#f4", "#f4", "#f2"             \n\t" \
+  "punpckhhw  "#f4", "#f0", "#f2"             \n\t" \
   "punpcklhw  "#f0", "#f0", "#f2"             \n\t"
 
 #define MMI_XSwap_WD_SINGLE(f0, f2, f4) \
-  "mov.d      "#f4", "#f0"                    \n\t" \
-  "punpckhwd  "#f4", "#f4", "#f2"             \n\t" \
+  "punpckhwd  "#f4", "#f0", "#f2"             \n\t" \
   "punpcklwd  "#f0", "#f0", "#f2"             \n\t"
 
 #define MMI_Trans4x4H_SINGLE(f0, f2, f4, f6, f8) \
