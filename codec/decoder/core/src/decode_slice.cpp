@@ -224,7 +224,7 @@ int32_t WelsMbInterConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLayer) {
     pDstYCbCr[0] = pDstY;
     pDstYCbCr[1] = pDstCb;
     pDstYCbCr[2] = pDstCr;
-    GetInterBPred (pDstYCbCr, pTempDstYCbCr, pCtx);
+    WELS_B_MB_REC_VERIFY (GetInterBPred (pDstYCbCr, pTempDstYCbCr, pCtx));
   }
   WelsMbInterSampleConstruction (pCtx, pCurLayer, pDstY, pDstCb, pDstCr, iLumaStride, iChromaStride);
 
