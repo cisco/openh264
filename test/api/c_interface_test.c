@@ -31,6 +31,7 @@ void CheckDecoderInterface (ISVCDecoder* p, CheckFunc check) {
   CHECK (7, p, DecodeParser);
   CHECK (8, p, SetOption);
   CHECK (9, p, GetOption);
+  CHECK (10, p, FlushFrame);
 }
 
 struct bool_test_struct {
