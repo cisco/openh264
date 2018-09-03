@@ -124,6 +124,8 @@ If building for Windows Phone with MSVC 2013, there's no included bat file that 
 
 This is only necessary for building the DLL; the static library can be built without setting this.
 
+Note, only Windows Phone 8.1 or newer is supported, 8.0 is no longer supported.
+
 For All Platforms
 -------------------
 
