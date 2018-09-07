@@ -148,7 +148,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
   ++ (*pConsumedBytes);
 
   if (! (IS_SEI_NAL (pNalUnitHeader->eNalUnitType) || IS_SPS_NAL (pNalUnitHeader->eNalUnitType)
-         || IS_AU_DELIMITER_NAL (pNalUnitHeader->eNalUnitType) || pCtx->bSpsExistAheadFlag)) {
+         || pCtx->bSpsExistAheadFlag)) {
     if (pCtx->bPrintFrameErrorTraceFlag && pCtx->iSpsErrorIgnored == 0) {
       WelsLog (pLogCtx, WELS_LOG_WARNING,
                "parse_nal(), no exist Sequence Parameter Sets ahead of sequence when try to decode NAL(type:%d).",
@@ -162,7 +162,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
   }
   pCtx->iSpsErrorIgnored = 0;
   if (! (IS_SEI_NAL (pNalUnitHeader->eNalUnitType) || IS_PARAM_SETS_NALS (pNalUnitHeader->eNalUnitType)
-         || IS_AU_DELIMITER_NAL (pNalUnitHeader->eNalUnitType) || pCtx->bPpsExistAheadFlag)) {
+         || pCtx->bPpsExistAheadFlag)) {
     if (pCtx->bPrintFrameErrorTraceFlag && pCtx->iPpsErrorIgnored == 0) {
       WelsLog (pLogCtx, WELS_LOG_WARNING,
                "parse_nal(), no exist Picture Parameter Sets ahead of sequence when try to decode NAL(type:%d).",

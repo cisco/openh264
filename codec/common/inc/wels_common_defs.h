@@ -147,7 +147,6 @@ extern const EVclType g_keTypeMap[32][2];
 #define IS_SUBSET_SPS_NAL(t)                    ( (t) == NAL_UNIT_SUBSET_SPS )
 #define IS_PPS_NAL(t)                           ( (t) == NAL_UNIT_PPS )
 #define IS_SEI_NAL(t)                           ( (t) == NAL_UNIT_SEI )
-#define IS_AU_DELIMITER_NAL(t)                  ( (t) == NAL_UNIT_AU_DELIMITER )
 #define IS_PREFIX_NAL(t)                        ( (t) == NAL_UNIT_PREFIX )
 #define IS_SUBSET_SPS_USED(t)                   ( (t) == NAL_UNIT_SUBSET_SPS || (t) == NAL_UNIT_CODED_SLICE_EXT )
 #define IS_VCL_NAL_AVC_BASE(t)                  ( (t) == NAL_UNIT_CODED_SLICE || (t) == NAL_UNIT_CODED_SLICE_IDR )
