@@ -122,7 +122,7 @@ for file in cfiles:
   c = file.split('/')
   if 'mips' in c:
     mipsfiles.append(file)
-    cfiles.remove(file)
+cfiles = [x for x in cfiles if x not in mipsfiles]
 
 
 
