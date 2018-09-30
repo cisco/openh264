@@ -10,13 +10,19 @@
 using namespace WelsDec;
 
 #define BUF_SIZE 100
+typedef enum DecCase {
+  CorrectDec = 0,
+  ErrorDec = 1,
+  CorrectParseOnly = 2,
+  ErrorParseOnly = 3,
+  RESERVED,
+} EDecCase;
 
 DECODING_STATE DecodeFrame (const unsigned char* kpSrc,
                             const int kiSrcLen,
                             unsigned char** ppDst,
                             SBufferInfo* pDstInfo,
                             PWelsDecoderContext pCtx) {
-
   PWelsDecoderContext m_pDecContext = pCtx;
   if (CheckBsBuffer (m_pDecContext, kiSrcLen)) {
     return dsOutOfMemory;
@@ -55,7 +61,7 @@ DECODING_STATE DecodeFrame (const unsigned char* kpSrc,
                 pDstInfo, NULL); //iErrorCode has been modified in this function
   m_pDecContext->bInstantDecFlag = false; //reset no-delay flag
 
-  return dsErrorFree;
+  return (DECODING_STATE) m_pDecContext->iErrorCode;
 }
 
 void UninitDecoder (PWelsDecoderContext& pCtx) {
@@ -132,13 +138,14 @@ class DecoderParseSyntaxTest : public ::testing::Test {
   //Uninit members
   void Uninit();
   //Decoder real bitstream
-  bool DecodeBs (const char* sFileName);
+  bool DecodeBs (const char* sFileName, EDecCase eDecCase);
   //Parse real bitstream
-  bool ParseBs (const char* sFileName);
+  bool ParseBs (const char* sFileName, EDecCase eDecCase);
   //Scalinglist
   void TestScalingList();
   //specific bitstream test
   void TestSpecificBs();
+  void TestSpecificBsError();
   //Do whole tests here
   void DecoderParseSyntaxTestAll();
 
@@ -204,17 +211,17 @@ void DecoderParseSyntaxTest::Uninit() {
   m_iBufLength = 0;
 }
 
-bool DecoderParseSyntaxTest::DecodeBs (const char* sFileName) {
+bool DecoderParseSyntaxTest::DecodeBs (const char* sFileName, EDecCase eDecCase) {
 
   uint8_t* pBuf = NULL;
   int32_t iBufPos = 0;
   int32_t iFileSize;
   int32_t i = 0;
   int32_t iSliceSize;
-  int32_t iSliceIndex = 0;
   int32_t iEndOfStreamFlag = 0;
   FILE* pH264File;
   uint8_t uiStartCode[4] = {0, 0, 0, 1};
+  int iRet = 0;
 
 #if defined(ANDROID_NDK)
   std::string filename = std::string ("/sdcard/") + sFileName;
@@ -255,12 +262,13 @@ bool DecoderParseSyntaxTest::DecodeBs (const char* sFileName) {
       }
     }
     iSliceSize = i;
-    DecodeFrame (pBuf + iBufPos, iSliceSize, m_pData, &m_sBufferInfo, m_pCtx);
+    iRet |= DecodeFrame (pBuf + iBufPos, iSliceSize, m_pData, &m_sBufferInfo, m_pCtx);
     iBufPos += iSliceSize;
-    ++ iSliceIndex;
-    if (iSliceIndex == 4)
-      break;
   }
+  if (eDecCase == CorrectDec)
+    EXPECT_TRUE (iRet == dsErrorFree);
+  else if (eDecCase == ErrorDec)
+    EXPECT_TRUE ((iRet & (dsBitstreamError | dsRefLost | dsDataErrorConcealed)) != 0) << "iRet = " << iRet;
 
   fclose (pH264File);
   if (pBuf) {
@@ -270,7 +278,7 @@ bool DecoderParseSyntaxTest::DecodeBs (const char* sFileName) {
 
   return true;
 }
-bool DecoderParseSyntaxTest::ParseBs (const char* sFileName) {
+bool DecoderParseSyntaxTest::ParseBs (const char* sFileName, EDecCase eDecCase) {
 
   uint8_t* pBuf = NULL;
   int32_t iBufPos = 0;
@@ -281,7 +289,7 @@ bool DecoderParseSyntaxTest::ParseBs (const char* sFileName) {
   int32_t iEndOfStreamFlag = 0;
   FILE* pH264File;
   uint8_t uiStartCode[4] = { 0, 0, 0, 1 };
-  int iRet;
+  int iRet = 0;
 
 #if defined(ANDROID_NDK)
   std::string filename = std::string ("/sdcard/") + sFileName;
@@ -323,15 +331,17 @@ bool DecoderParseSyntaxTest::ParseBs (const char* sFileName) {
     }
     iSliceSize = i;
     memset (&m_sParserBsInfo, 0, sizeof (SParserBsInfo));
-    iRet = m_pDec->DecodeParser (pBuf + iBufPos, iSliceSize, &m_sParserBsInfo);
-    EXPECT_TRUE (iRet == dsErrorFree || iRet == dsFramePending);
-    iRet = m_pDec->DecodeParser (NULL, 0, &m_sParserBsInfo);
-    EXPECT_TRUE (iRet == dsErrorFree || iRet == dsFramePending);
+    iRet |= m_pDec->DecodeParser (pBuf + iBufPos, iSliceSize, &m_sParserBsInfo);
+    iRet |= m_pDec->DecodeParser (NULL, 0, &m_sParserBsInfo);
+    if (eDecCase == CorrectParseOnly)
+      EXPECT_TRUE (iRet == dsErrorFree || iRet == dsFramePending);
     iBufPos += iSliceSize;
     ++iSliceIndex;
     if (iSliceIndex == 4)
       break;
   }
+  if (eDecCase == ErrorDec)
+    EXPECT_TRUE ((iRet & (dsBitstreamError | dsRefLost | dsDataErrorConcealed)) != 0) << iRet;
 
   fclose (pH264File);
   if (pBuf) {
@@ -366,7 +376,7 @@ void DecoderParseSyntaxTest::TestScalingList() {
   int32_t iRet = ERR_NONE;
   iRet = Init();
   ASSERT_EQ (iRet, ERR_NONE);
-  ASSERT_TRUE (DecodeBs ("res/BA_MW_D.264"));
+  ASSERT_TRUE (DecodeBs ("res/BA_MW_D.264", CorrectDec));
   ASSERT_TRUE (m_pCtx->sSpsBuffer[0].bSeqScalingMatrixPresentFlag == false);
   EXPECT_EQ (0, memcmp (iScalingListZero, m_pCtx->sSpsBuffer[0].iScalingList4x4, 6 * 16 * sizeof (uint8_t)));
   ASSERT_TRUE (m_pCtx->sPpsBuffer[0].bPicScalingMatrixPresentFlag == false);
@@ -375,7 +385,7 @@ void DecoderParseSyntaxTest::TestScalingList() {
   //Scalinglist value just written into sps and pps
   iRet = Init();
   ASSERT_EQ (iRet, ERR_NONE);
-  ASSERT_TRUE (DecodeBs ("res/test_scalinglist_jm.264"));
+  ASSERT_TRUE (DecodeBs ("res/test_scalinglist_jm.264", CorrectDec));
   ASSERT_TRUE (m_pCtx->sSpsBuffer[0].bSeqScalingMatrixPresentFlag);
   for (int i = 0; i < 6; i++) {
     EXPECT_EQ (0, memcmp (iScalingList[i], m_pCtx->sSpsBuffer[0].iScalingList4x4[i], 16 * sizeof (uint8_t)));
@@ -390,20 +400,28 @@ void DecoderParseSyntaxTest::TestScalingList() {
 
 void DecoderParseSyntaxTest::TestSpecificBs() {
   int32_t iRet = ERR_NONE;
-  Uninit();
   m_sDecParam.bParseOnly = true;
   m_sDecParam.eEcActiveIdc = ERROR_CON_DISABLE;
   iRet = m_pDec->Initialize (&m_sDecParam);
   ASSERT_EQ (iRet, ERR_NONE);
-  ASSERT_TRUE (ParseBs ("res/jm_1080p_allslice.264"));
+  ASSERT_TRUE (ParseBs ("res/jm_1080p_allslice.264", CorrectParseOnly));
   m_pDec->Uninitialize();
-  //Uninit();
 }
+
+void DecoderParseSyntaxTest::TestSpecificBsError() {
+  int32_t iRet = ERR_NONE;
+  Init();
+  ASSERT_EQ (iRet, ERR_NONE);
+  ASSERT_TRUE (DecodeBs ("res/Cisco_Men_whisper_640x320_CAVLC_Bframe_9.264", ErrorDec));
+  Uninit();
+}
+
 //TEST here for whole tests
 TEST_F (DecoderParseSyntaxTest, DecoderParseSyntaxTestAll) {
 
   TestScalingList();
   TestSpecificBs();
+  TestSpecificBsError();
 }
 
 
