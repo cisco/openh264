@@ -166,6 +166,20 @@ void WelsDecoderIChromaPredDc_AArch64_neon (uint8_t* pPred, const int32_t kiStri
 void WelsDecoderIChromaPredPlane_AArch64_neon (uint8_t* pPred, const int32_t kiStride);
 void WelsDecoderIChromaPredDcTop_AArch64_neon (uint8_t* pPred, const int32_t kiStride);
 #endif//HAVE_NEON_AARCH64
+
+#if defined(HAVE_MMI)
+void WelsDecoderI16x16LumaPredDc_mmi (uint8_t* pPred, const int32_t kiStride);
+void WelsDecoderI16x16LumaPredPlane_mmi (uint8_t* pPred, const int32_t kiStride);
+void WelsDecoderI16x16LumaPredH_mmi (uint8_t* pPred, const int32_t kiStride);
+void WelsDecoderI16x16LumaPredV_mmi (uint8_t* pPred, const int32_t kiStride);
+void WelsDecoderI16x16LumaPredDcTop_mmi (uint8_t* pPred, const int32_t kiStride);
+void WelsDecoderI16x16LumaPredDcNA_mmi (uint8_t* pPred, const int32_t kiStride);
+
+void WelsDecoderIChromaPredDcTop_mmi (uint8_t* pPred, const int32_t kiStride);
+void WelsDecoderIChromaPredPlane_mmi (uint8_t* pPred, const int32_t kiStride);
+void WelsDecoderIChromaPredDc_mmi (uint8_t* pPred, const int32_t kiStride);
+void WelsDecoderI4x4LumaPredH_mmi (uint8_t* pPred, const int32_t kiStride);
+#endif//HAVE_MMI
 #if defined(__cplusplus)
 }
 #endif//__cplusplus

@@ -154,6 +154,10 @@ GENERATE_IDCTRESADDPRED (IdctResAddPred_neon, WELS_CPU_NEON)
 GENERATE_IDCTRESADDPRED (IdctResAddPred_AArch64_neon, WELS_CPU_NEON)
 #endif
 
+#if defined(HAVE_MMI)
+GENERATE_IDCTRESADDPRED (IdctResAddPred_mmi, WELS_CPU_MMI)
+#endif
+
 #define GENERATE_SETNONZEROCOUNT(method, flag) \
 TEST(DecoderDecodeMbAux, method) \
 {\

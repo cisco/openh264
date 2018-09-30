@@ -132,6 +132,16 @@ VAACalcSadSsdFunc       VAACalcSadSsd_AArch64_neon;
 WELSVP_EXTERN_C_END
 #endif
 
+#ifdef HAVE_MMI
+WELSVP_EXTERN_C_BEGIN
+VAACalcSadBgdFunc       VAACalcSadBgd_mmi;
+VAACalcSadSsdBgdFunc    VAACalcSadSsdBgd_mmi;
+VAACalcSadFunc          VAACalcSad_mmi;
+VAACalcSadVarFunc       VAACalcSadVar_mmi;
+VAACalcSadSsdFunc       VAACalcSadSsd_mmi;
+WELSVP_EXTERN_C_END
+#endif
+
 class CVAACalculation : public IStrategy {
  public:
   CVAACalculation (int32_t iCpuFlag);

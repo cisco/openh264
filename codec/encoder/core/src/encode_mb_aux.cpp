@@ -586,5 +586,31 @@ void WelsInitEncodingFuncs (SWelsFuncPtrList* pFuncList, uint32_t  uiCpuFlag) {
     pFuncList->pfDctFourT4              = WelsDctFourT4_AArch64_neon;
   }
 #endif
+
+#if defined(HAVE_MMI)
+  if (uiCpuFlag & WELS_CPU_MMI) {
+    pFuncList->pfCopy8x8Aligned         = WelsCopy8x8_mmi;
+    pFuncList->pfCopy8x16Aligned        = WelsCopy8x16_mmi;
+
+    pFuncList->pfGetNoneZeroCount       = WelsGetNoneZeroCount_mmi;
+    pFuncList->pfTransformHadamard4x4Dc = WelsHadamardT4Dc_mmi;
+
+    pFuncList->pfQuantization4x4        = WelsQuant4x4_mmi;
+    pFuncList->pfQuantizationDc4x4      = WelsQuant4x4Dc_mmi;
+    pFuncList->pfQuantizationFour4x4    = WelsQuantFour4x4_mmi;
+    pFuncList->pfQuantizationFour4x4Max = WelsQuantFour4x4Max_mmi;
+
+    pFuncList->pfCopy16x16Aligned       = WelsCopy16x16_mmi;
+    pFuncList->pfCopy16x16NotAligned    = WelsCopy16x16NotAligned_mmi;
+    pFuncList->pfCopy16x8NotAligned     = WelsCopy16x8NotAligned_mmi;
+
+    pFuncList->pfScan4x4                = WelsScan4x4DcAc_mmi;
+    pFuncList->pfScan4x4Ac              = WelsScan4x4Ac_mmi;
+    pFuncList->pfCalculateSingleCtr4x4  = WelsCalculateSingleCtr4x4_mmi;
+
+    pFuncList->pfDctT4                  = WelsDctT4_mmi;
+    pFuncList->pfDctFourT4              = WelsDctFourT4_mmi;
+  }
+#endif//HAVE_MMI
 }
 }

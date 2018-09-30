@@ -863,3 +863,11 @@ GENERATE_VAACalcSadSsdBgd_UT (VAACalcSadSsdBgd_AArch64_neon, 1, WELS_CPU_NEON)
 GENERATE_VAACalcSadSsd_UT (VAACalcSadSsd_AArch64_neon, 1, WELS_CPU_NEON)
 GENERATE_VAACalcSadVar_UT (VAACalcSadVar_AArch64_neon, 1, WELS_CPU_NEON)
 #endif
+
+#if defined(HAVE_MMI)
+GENERATE_VAACalcSad_UT (VAACalcSad_mmi, 1, WELS_CPU_MMI)
+GENERATE_VAACalcSadBgd_UT (VAACalcSadBgd_mmi, 1, WELS_CPU_MMI)
+GENERATE_VAACalcSadSsdBgd_UT (VAACalcSadSsdBgd_mmi, 1, WELS_CPU_MMI)
+GENERATE_VAACalcSadSsd_UT (VAACalcSadSsd_mmi, 1, WELS_CPU_MMI)
+GENERATE_VAACalcSadVar_UT (VAACalcSadVar_mmi, 1, WELS_CPU_MMI)
+#endif

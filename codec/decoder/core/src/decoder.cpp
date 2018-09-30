@@ -1023,6 +1023,24 @@ void InitPredFunc (PWelsDecoderContext pCtx, uint32_t uiCpuFlag) {
 #endif
 
 #endif
+
+#if defined(HAVE_MMI)
+  if (uiCpuFlag & WELS_CPU_MMI) {
+    pCtx->pIdctResAddPredFunc   = IdctResAddPred_mmi;
+    pCtx->pIdctFourResAddPredFunc = IdctFourResAddPred_<IdctResAddPred_mmi>;
+
+    pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC] = WelsDecoderI16x16LumaPredDc_mmi;
+    pCtx->pGetI16x16LumaPredFunc[I16_PRED_P]  = WelsDecoderI16x16LumaPredPlane_mmi;
+    pCtx->pGetI16x16LumaPredFunc[I16_PRED_H]  = WelsDecoderI16x16LumaPredH_mmi;
+    pCtx->pGetI16x16LumaPredFunc[I16_PRED_V]  = WelsDecoderI16x16LumaPredV_mmi;
+    pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC_T  ] = WelsDecoderI16x16LumaPredDcTop_mmi;
+    pCtx->pGetI16x16LumaPredFunc[I16_PRED_DC_128] = WelsDecoderI16x16LumaPredDcNA_mmi;
+    pCtx->pGetIChromaPredFunc[C_PRED_P ]      = WelsDecoderIChromaPredPlane_mmi;
+    pCtx->pGetIChromaPredFunc[C_PRED_DC]      = WelsDecoderIChromaPredDc_mmi;
+    pCtx->pGetIChromaPredFunc[C_PRED_DC_T]    = WelsDecoderIChromaPredDcTop_mmi;
+    pCtx->pGetI4x4LumaPredFunc[I4_PRED_H]     = WelsDecoderI4x4LumaPredH_mmi;
+  }
+#endif//HAVE_MMI
 }
 
 //reset decoder number related statistics info

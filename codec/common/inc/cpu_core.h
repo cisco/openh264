@@ -84,6 +84,9 @@
 #define WELS_CPU_VFPv3      0x000002    /* VFPv3 */
 #define WELS_CPU_NEON       0x000004    /* NEON */
 
+/* For loongson */
+#define WELS_CPU_MMI        0x00000001  /* mmi */
+
 /*
  *  Interfaces for CPU core feature detection as below
  */

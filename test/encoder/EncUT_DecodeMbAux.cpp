@@ -246,6 +246,11 @@ TEST (DecodeMbAuxTest, WelsIDctT4Rec_avx2) {
 }
 #endif
 #endif
+#if defined(HAVE_MMI)
+TEST (DecodeMbAuxTest, WelsIDctT4Rec_mmi) {
+  TestIDctT4Rec<int16_t> (WelsIDctT4Rec_mmi);
+}
+#endif
 template<typename clip_t>
 void WelsIDctT8Anchor (uint8_t* p_dst, int16_t dct[4][16]) {
   WelsIDctT4Anchor<clip_t> (&p_dst[0],                   dct[0]);
@@ -367,6 +372,42 @@ TEST (DecodeMbAuxTest, WelsIDctRecI16x16Dc_sse2) {
                                           14); //2^14 limit, (2^15+32) will cause overflow for SSE2.
     WelsIDctRecI16x16DcAnchor (iRefDst, iRefDct);
     WelsIDctRecI16x16Dc_sse2 (iRec, FDEC_STRIDE, iPred, FDEC_STRIDE, iDct);
+    int ok = -1;
+    for (int i = 0; i < 16; i++) {
+      for (int j = 0; j < 16; j++) {
+        if (iRec[i * FDEC_STRIDE + j] != iRefDst[i * FDEC_STRIDE + j]) {
+          ok = i * 16 + j;
+          break;
+        }
+      }
+    }
+    EXPECT_EQ (ok, -1);
+  }
+}
+#endif
+#if defined(HAVE_MMI)
+TEST (DecodeMbAuxTest, WelsIDctFourT4Rec_mmi) {
+  TestIDctFourT4Rec<int16_t> (WelsIDctFourT4Rec_mmi);
+}
+TEST (DecodeMbAuxTest, WelsIDctRecI16x16Dc_mmi) {
+  int32_t iCpuCores = 0;
+  uint32_t uiCpuFeatureFlag = WelsCPUFeatureDetect (&iCpuCores);
+
+  if (uiCpuFeatureFlag & WELS_CPU_MMI) {
+    uint8_t iRefDst[16 * FDEC_STRIDE];
+    int16_t iRefDct[4][4];
+    ENFORCE_STACK_ALIGN_1D (int16_t, iDct, 16, 16);
+    ENFORCE_STACK_ALIGN_1D (uint8_t, iPred, 16 * FDEC_STRIDE, 16);
+    ENFORCE_STACK_ALIGN_1D (uint8_t, iRec, 16 * FDEC_STRIDE, 16);
+    for (int i = 0; i < 16; i++)
+      for (int j = 0; j < 16; j++)
+        iRefDst[i * FDEC_STRIDE + j] = iPred[i * FDEC_STRIDE + j] = rand() & 255;
+    for (int i = 0; i < 4; i++)
+      for (int j = 0; j < 4; j++)
+        iRefDct[i][j] = iDct[i * 4 + j] = (rand() & ((1 << 15) - 1)) - (1 <<
+                                          14); //2^14 limit, (2^15+32) will cause overflow for SSE2.
+    WelsIDctRecI16x16DcAnchor (iRefDst, iRefDct);
+    WelsIDctRecI16x16Dc_mmi (iRec, FDEC_STRIDE, iPred, FDEC_STRIDE, iDct);
     int ok = -1;
     for (int i = 0; i < 16; i++) {
       for (int j = 0; j < 16; j++) {

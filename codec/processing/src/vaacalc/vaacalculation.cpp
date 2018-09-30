@@ -93,6 +93,16 @@ void CVAACalculation::InitVaaFuncs (SVaaFuncs& sVaaFuncs, int32_t iCpuFlag) {
     sVaaFuncs.pfVAACalcSadVar    = VAACalcSadVar_AArch64_neon;
   }
 #endif//HAVE_NEON_AARCH64
+
+#ifdef HAVE_MMI
+  if ((iCpuFlag & WELS_CPU_MMI) == WELS_CPU_MMI) {
+    sVaaFuncs.pfVAACalcSad       = VAACalcSad_mmi;
+    sVaaFuncs.pfVAACalcSadBgd    = VAACalcSadBgd_mmi;
+    sVaaFuncs.pfVAACalcSadSsd    = VAACalcSadSsd_mmi;
+    sVaaFuncs.pfVAACalcSadSsdBgd = VAACalcSadSsdBgd_mmi;
+    sVaaFuncs.pfVAACalcSadVar    = VAACalcSadVar_mmi;
+  }
+#endif//HAVE_MMI
 }
 
 EResult CVAACalculation::Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pRefPixMap) {

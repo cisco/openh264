@@ -540,6 +540,17 @@ TEST (DecoderDeblocking, DeblockingInit) {
   DeblockingInit (&sDBFunc, 0x000004);
   DB_FUNC_CPUFLAG (AArch64_neon)
 #endif
+
+#ifdef HAVE_MMI
+  // pure C
+  DeblockingInit (&sDBFunc, 0x00000000);
+  DB_FUNC_CPUFLAG (c)
+
+  // mmi
+  DeblockingInit (&sDBFunc, 0x00000001);
+  DB_FUNC_CPUFLAG (mmi)
+#endif
+
 }
 
 TEST (DecoderDeblocking, WelsDeblockingFilterSlice) {

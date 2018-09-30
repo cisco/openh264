@@ -146,3 +146,20 @@ GENERATE_CHROMA_UT (ChromaEq4V_AArch64_neon, DeblockChromaEq4V_AArch64_neon_wrap
 GENERATE_CHROMA_UT (ChromaEq4H_AArch64_neon, DeblockChromaEq4H_AArch64_neon_wrap, DeblockChromaEq4H_c_wrap,
                     WELS_CPU_NEON, 1)
 #endif
+
+#if defined(HAVE_MMI)
+WRAP_LUMA_FUNC (DeblockLumaEq4V_mmi)
+WRAP_LUMA_FUNC (DeblockLumaEq4H_mmi)
+WRAP_CHROMA_FUNC (DeblockChromaEq4V_mmi)
+WRAP_CHROMA_FUNC (DeblockChromaEq4H_mmi)
+
+GENERATE_LUMA_UT (LumaLt4V_mmi, DeblockLumaLt4V_mmi, DeblockLumaLt4V_c, WELS_CPU_MMI, 0)
+GENERATE_LUMA_UT (LumaLt4H_mmi, DeblockLumaLt4H_mmi, DeblockLumaLt4H_c, WELS_CPU_MMI, 1)
+GENERATE_LUMA_UT (LumaEq4V_mmi, DeblockLumaEq4V_mmi_wrap, DeblockLumaEq4V_c_wrap, WELS_CPU_MMI, 0)
+GENERATE_LUMA_UT (LumaEq4H_mmi, DeblockLumaEq4H_mmi_wrap, DeblockLumaEq4H_c_wrap, WELS_CPU_MMI, 1)
+
+GENERATE_CHROMA_UT (ChromaLt4V_mmi, DeblockChromaLt4V_mmi, DeblockChromaLt4V_c, WELS_CPU_MMI, 0)
+GENERATE_CHROMA_UT (ChromaLt4H_mmi, DeblockChromaLt4H_mmi, DeblockChromaLt4H_c, WELS_CPU_MMI, 1)
+GENERATE_CHROMA_UT (ChromaEq4V_mmi, DeblockChromaEq4V_mmi_wrap, DeblockChromaEq4V_c_wrap, WELS_CPU_MMI, 0)
+GENERATE_CHROMA_UT (ChromaEq4H_mmi, DeblockChromaEq4H_mmi_wrap, DeblockChromaEq4H_c_wrap, WELS_CPU_MMI, 1)
+#endif//HAVE_MMI

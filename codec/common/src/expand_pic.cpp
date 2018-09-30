@@ -140,6 +140,13 @@ void InitExpandPictureFunc (SExpandPicFunc* pExpandPicFunc, const uint32_t kuiCP
     pExpandPicFunc->pfExpandChromaPicture[1] = ExpandPictureChroma_AArch64_neon;
   }
 #endif//HAVE_NEON_AARCH64
+#if defined(HAVE_MMI)
+  if (kuiCPUFlag & WELS_CPU_MMI) {
+    pExpandPicFunc->pfExpandLumaPicture      = ExpandPictureLuma_mmi;
+    pExpandPicFunc->pfExpandChromaPicture[0] = ExpandPictureChromaUnalign_mmi;
+    pExpandPicFunc->pfExpandChromaPicture[1] = ExpandPictureChromaAlign_mmi;
+  }
+#endif//HAVE_MMI
 }
 
 

@@ -124,6 +124,14 @@ int32_t WelsIntra8x8Combined3Sad_AArch64_neon (uint8_t*, int32_t, uint8_t*, int3
 int32_t WelsIntra4x4Combined3Satd_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t, uint8_t*, int32_t*, int32_t, int32_t,
                                             int32_t);
 #endif
+
+#if defined (HAVE_MMI)
+int32_t WelsSampleSatd8x8_mmi (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSatd16x8_mmi (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSatd8x16_mmi (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSatd16x16_mmi (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSatd4x4_mmi (uint8_t*, int32_t, uint8_t*, int32_t);
+#endif//HAVE_MMI
 #if defined(__cplusplus)
 }
 #endif//__cplusplus
