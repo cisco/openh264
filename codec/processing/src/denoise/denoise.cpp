@@ -97,7 +97,7 @@ void CDenoiser::BilateralDenoiseLuma (uint8_t* pSrcY, int32_t iWidth, int32_t iH
     for (w = m_uiSpaceRadius; w < iWidth - m_uiSpaceRadius - TAIL_OF_LINE8; w += 8) {
       m_pfDenoise.pfBilateralLumaFilter8 (pSrcY + w, iStride);
     }
-    for (w = w + TAIL_OF_LINE8; w < iWidth - m_uiSpaceRadius; w++) {
+    for (; w < iWidth - m_uiSpaceRadius; w++) {
       Gauss3x3Filter (pSrcY + w, iStride);
     }
     pSrcY += iStride;
@@ -113,7 +113,7 @@ void CDenoiser::WaverageDenoiseChroma (uint8_t* pSrcUV, int32_t iWidth, int32_t 
       m_pfDenoise.pfWaverageChromaFilter8 (pSrcUV + w, iStride);
     }
 
-    for (w = w + TAIL_OF_LINE8; w < iWidth - UV_WINDOWS_RADIUS; w++) {
+    for (; w < iWidth - UV_WINDOWS_RADIUS; w++) {
       Gauss3x3Filter (pSrcUV + w, iStride);
     }
     pSrcUV += iStride;
