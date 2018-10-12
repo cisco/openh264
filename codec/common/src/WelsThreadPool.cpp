@@ -46,8 +46,8 @@ namespace WelsCommon {
 namespace {
 
 CWelsLock& GetInitLock() {
-  static CWelsLock initLock;
-  return initLock;
+  static CWelsLock *initLock = new CWelsLock;
+  return *initLock;
 }
 
 }
