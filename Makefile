@@ -30,6 +30,7 @@ SHAREDLIB_DIR=$(PREFIX)/lib
 PROJECT_NAME=openh264
 MODULE_NAME=gmpopenh264
 GMP_API_BRANCH=Firefox39
+GTEST_VER=release-1.8.1
 CCASFLAGS=$(CFLAGS)
 STATIC_LDFLAGS=-lstdc++
 STRIP ?= strip
@@ -175,7 +176,8 @@ gmp-bootstrap:
 	cd gmp-api && git fetch origin && git checkout $(GMP_API_BRANCH)
 
 gtest-bootstrap:
-	if [ ! -d gtest ] ; then git clone https://github.com/google/googletest.git gtest ; fi
+	if [ ! -d gtest ] ; then git clone https://github.com/google/googletest.git gtest && \
+       cd gtest && git checkout -b $(GTEST_VER) $(GTEST_VER) ; fi
 
 ifeq ($(HAVE_GTEST),Yes)
 
