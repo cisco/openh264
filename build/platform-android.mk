@@ -37,15 +37,22 @@ $(error TARGET is not set)
 endif
 
 TOOLCHAINPREFIX = $(shell NDK_PROJECT_PATH=$(SRC_PATH)/codec/build/android/dec make --no-print-dir -f $(NDKROOT)/build/core/build-local.mk DUMP_TOOLCHAIN_PREFIX APP_ABI=$(APP_ABI))
+TOOLCHAIN_NAME = $(shell NDK_PROJECT_PATH=$(SRC_PATH)/codec/build/android/dec make --no-print-dir -f $(NDKROOT)/build/core/build-local.mk DUMP_TOOLCHAIN_NAME APP_ABI=$(APP_ABI))
+GCC_TOOLCHAIN_PATH = $(shell dirname $(TOOLCHAINPREFIX) | xargs dirname )
 
 SYSROOT = $(NDKROOT)/platforms/android-$(NDKLEVEL)/arch-$(ARCH)
 CXX = $(TOOLCHAINPREFIX)g++
 CC = $(TOOLCHAINPREFIX)gcc
 AR = $(TOOLCHAINPREFIX)ar
 CFLAGS += -DANDROID_NDK -fpic --sysroot=$(SYSROOT) -MMD -MP
+CFLAGS += -isystem $(NDKROOT)/sysroot/usr/include -isystem $(NDKROOT)/sysroot/usr/include/$(TOOLCHAIN_NAME)
 CXXFLAGS += -fno-rtti -fno-exceptions
 LDFLAGS += --sysroot=$(SYSROOT)
 SHLDFLAGS = -Wl,--no-undefined -Wl,-z,relro -Wl,-z,now -Wl,-soname,lib$(PROJECT_NAME).so
+
+ifeq ($(NDK_TOOLCHAIN_VERSION), clang)
+  LDFLAGS += -gcc-toolchain $(GCC_TOOLCHAIN_PATH)
+endif
 
 ifneq ($(CXX),$(wildcard $(CXX)))
 ifneq ($(CXX).exe,$(wildcard $(CXX).exe))
@@ -68,10 +75,10 @@ ifeq (./,$(SRC_PATH))
 binaries: decdemo encdemo
 
 decdemo: libraries
-	cd ./codec/build/android/dec && $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI) && android update project -t $(TARGET) -p . && ant debug
+	cd ./codec/build/android/dec && $(NDKROOT)/ndk-build -B NDK_TOOLCHAIN_VERSION=$(NDK_TOOLCHAIN_VERSION) APP_ABI=$(APP_ABI) APP_PLATFORM=$(TARGET) && android update project -t $(TARGET) -p . && ant debug
 
 encdemo: libraries
-	cd ./codec/build/android/enc && $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI) && android update project -t $(TARGET) -p . && ant debug
+	cd ./codec/build/android/enc && $(NDKROOT)/ndk-build -B NDK_TOOLCHAIN_VERSION=$(NDK_TOOLCHAIN_VERSION) APP_ABI=$(APP_ABI) APP_PLATFORM=$(TARGET) && android update project -t $(TARGET) -p . && ant debug
 
 clean_Android: clean_Android_dec clean_Android_enc
 
