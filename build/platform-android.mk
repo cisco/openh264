@@ -37,15 +37,41 @@ $(error TARGET is not set)
 endif
 
 TOOLCHAINPREFIX = $(shell NDK_PROJECT_PATH=$(SRC_PATH)/codec/build/android/dec make --no-print-dir -f $(NDKROOT)/build/core/build-local.mk DUMP_TOOLCHAIN_PREFIX APP_ABI=$(APP_ABI))
+TOOLCHAIN_NAME = $(shell NDK_TOOLCHAIN_VERSION= NDK_PROJECT_PATH=$(SRC_PATH)/codec/build/android/dec make --no-print-dir -f $(NDKROOT)/build/core/build-local.mk DUMP_TOOLCHAIN_NAME APP_ABI=$(APP_ABI))
+GCC_TOOLCHAIN_PATH = $(shell dirname $(TOOLCHAINPREFIX) | xargs dirname )
 
 SYSROOT = $(NDKROOT)/platforms/android-$(NDKLEVEL)/arch-$(ARCH)
 CXX = $(TOOLCHAINPREFIX)g++
 CC = $(TOOLCHAINPREFIX)gcc
 AR = $(TOOLCHAINPREFIX)ar
 CFLAGS += -DANDROID_NDK -fpic --sysroot=$(SYSROOT) -MMD -MP
+CFLAGS += -isystem $(NDKROOT)/sysroot/usr/include -isystem $(NDKROOT)/sysroot/usr/include/$(TOOLCHAIN_NAME) -D__ANDROID_API__=$(NDKLEVEL)
 CXXFLAGS += -fno-rtti -fno-exceptions
 LDFLAGS += --sysroot=$(SYSROOT)
 SHLDFLAGS = -Wl,--no-undefined -Wl,-z,relro -Wl,-z,now -Wl,-soname,lib$(PROJECT_NAME).so
+
+ifeq ($(NDK_TOOLCHAIN_VERSION), clang)
+  HOST_OS = $(shell uname -s | tr [A-Z] [a-z])
+  LLVM_INSTALL_DIR = $(NDKROOT)/toolchains/llvm/prebuilt/$(HOST_OS)-x86_64/bin
+  CC = $(LLVM_INSTALL_DIR)/clang
+  CXX = $(LLVM_INSTALL_DIR)/clang++
+
+  ifeq ($(ARCH), arm)
+    TARGET_NAME = armv7-none-linux-androideabi
+  else ifeq ($(ARCH), arm64)
+    TARGET_NAME = aarch64-none-linux-android
+  else ifeq ($(ARCH), x86)
+    TARGET_NAME = i686-none-linux-android
+  else ifeq ($(ARCH), x86_64)
+    TARGET_NAME = x86_64-none-linux-android
+  else
+    $(error "does not support this arch now!")
+  endif
+
+  CFLAGS += -target $(TARGET_NAME)
+  LDFLAGS += -target $(TARGET_NAME) -gcc-toolchain $(GCC_TOOLCHAIN_PATH)
+  LDFLAGS += -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libunwind.a
+endif
 
 ifneq ($(CXX),$(wildcard $(CXX)))
 ifneq ($(CXX).exe,$(wildcard $(CXX).exe))
@@ -68,10 +94,10 @@ ifeq (./,$(SRC_PATH))
 binaries: decdemo encdemo
 
 decdemo: libraries
-	cd ./codec/build/android/dec && $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI) && android update project -t $(TARGET) -p . && ant debug
+	cd ./codec/build/android/dec && $(NDKROOT)/ndk-build -B NDK_TOOLCHAIN_VERSION=$(NDK_TOOLCHAIN_VERSION) APP_ABI=$(APP_ABI) APP_PLATFORM=$(TARGET) && android update project -t $(TARGET) -p . && ant debug
 
 encdemo: libraries
-	cd ./codec/build/android/enc && $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI) && android update project -t $(TARGET) -p . && ant debug
+	cd ./codec/build/android/enc && $(NDKROOT)/ndk-build -B NDK_TOOLCHAIN_VERSION=$(NDK_TOOLCHAIN_VERSION) APP_ABI=$(APP_ABI) APP_PLATFORM=$(TARGET) && android update project -t $(TARGET) -p . && ant debug
 
 clean_Android: clean_Android_dec clean_Android_enc
 
