@@ -47,6 +47,38 @@ CXXFLAGS += -fno-rtti -fno-exceptions
 LDFLAGS += --sysroot=$(SYSROOT)
 SHLDFLAGS = -Wl,--no-undefined -Wl,-z,relro -Wl,-z,now -Wl,-soname,lib$(PROJECT_NAME).so
 
+ifeq ($(NDK_TOOLCHAIN_VERSION), clang)
+  HOST_OS = $(shell uname -s | tr A-Z a-z)
+  CC = $(NDKROOT)/toolchains/llvm/prebuilt/$(HOST_OS)-x86_64/bin/clang
+  CXX = $(NDKROOT)/toolchains/llvm/prebuilt/$(HOST_OS)-x86_64/bin/clang++
+  AR = $(NDKROOT)/toolchains/llvm/prebuilt/$(HOST_OS)-x86_64/bin/llvm-ar
+  ifeq ($(ARCH), arm)
+  CFLAGS += -target armv7-none-linux-androideabi
+  CFLAGS += --sysroot=$(NDKROOT)/sysroot -I$(NDKROOT)/sysroot/usr/include/arm-linux-androideabi/
+  LDFLAGS += -target armv7a-none-linux-androideabi -isysroot $(SYSROOT)
+  LDFLAGS += -B $(NDKROOT)/toolchains/arm-linux-androideabi-4.9/prebuilt/$(HOST_OS)-x86_64/bin/arm-linux-androideabi-
+  LDFLAGS += -L$(NDKROOT)/toolchains/arm-linux-androideabi-4.9/prebuilt/$(HOST_OS)-x86_64/lib/gcc/arm-linux-androideabi/4.9.x
+  else ifeq ($(ARCH), arm64)
+  CFLAGS += -target aarch64-none-linux-androideabi
+  CFLAGS += --sysroot=$(NDKROOT)/sysroot -I$(NDKROOT)/sysroot/usr/include/aarch64-linux-android
+  LDFLAGS += -target aarch64-none-linux-android -isysroot $(SYSROOT)
+  LDFLAGS += -B $(NDKROOT)/toolchains/aarch64-linux-android-4.9/prebuilt/$(HOST_OS)-x86_64/bin/aarch64-linux-android-
+  LDFLAGS += -L$(NDKROOT)/toolchains/aarch64-linux-android-4.9/prebuilt/$(HOST_OS)-x86_64/lib/gcc/aarch64-linux-android/4.9.x
+  else ifeq ($(ARCH), x86)
+  CFLAGS += -target i686-none-linux-android
+  CFLAGS += --sysroot=$(NDKROOT)/sysroot -I$(NDKROOT)/sysroot/usr/include/i686-linux-android
+  LDFLAGS += -target i686-none-linux-android -isysroot $(SYSROOT)
+  LDFLAGS += -B $(NDKROOT)/toolchains/x86-4.9/prebuilt/$(HOST_OS)-x86_64/bin/i686-linux-android-
+  LDFLAGS += -L$(NDKROOT)/toolchains/x86-4.9/prebuilt/$(HOST_OS)-x86_64/lib/gcc/i686-linux-android/4.9.x
+  else ifeq ($(ARCH), x86_64)
+  CFLAGS += -target x86_64-none-linux-android
+  CFLAGS += --sysroot=$(NDKROOT)/sysroot -I$(NDKROOT)/sysroot/usr/include/x86_64-linux-android
+  LDFLAGS += -target x86_64-none-linux-android -isysroot $(SYSROOT)
+  LDFLAGS += -B $(NDKROOT)/toolchains/x86_64-4.9/prebuilt/$(HOST_OS)-x86_64/bin/x86_64-linux-android-
+  LDFLAGS += -L$(NDKROOT)/toolchains/x86_64-4.9/prebuilt/$(HOST_OS)-x86_64/lib/gcc/x86_64-linux-android/4.9.x
+  endif
+endif
+
 ifneq ($(CXX),$(wildcard $(CXX)))
 ifneq ($(CXX).exe,$(wildcard $(CXX).exe))
 $(error Compiler not found, bad NDKROOT or ARCH?)
@@ -68,10 +100,10 @@ ifeq (./,$(SRC_PATH))
 binaries: decdemo encdemo
 
 decdemo: libraries
-	cd ./codec/build/android/dec && $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI) && android update project -t $(TARGET) -p . && ant debug
+	cd ./codec/build/android/dec && $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI) NDK_TOOLCHAIN_VERSION=$(NDK_TOOLCHAIN_VERSION) APP_PLATFORM=$(TARGET) && android update project -t $(TARGET) -p . && ant debug
 
 encdemo: libraries
-	cd ./codec/build/android/enc && $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI) && android update project -t $(TARGET) -p . && ant debug
+	cd ./codec/build/android/enc && $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI) NDK_TOOLCHAIN_VERSION=$(NDK_TOOLCHAIN_VERSION) APP_PLATFORM=$(TARGET) && android update project -t $(TARGET) -p . && ant debug
 
 clean_Android: clean_Android_dec clean_Android_enc
 
