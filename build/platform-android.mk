@@ -5,7 +5,7 @@ SHAREDLIBSUFFIX = so
 SHAREDLIBSUFFIXFULLVER=$(SHAREDLIBSUFFIX)
 SHAREDLIBSUFFIXMAJORVER=$(SHAREDLIBSUFFIX)
 SHLDFLAGS =
-NDKLEVEL = $(shell echo $(TARGET) | grep -E -o "[0-9]+")
+NDKLEVEL = 12
 ifeq ($(ARCH), arm)
   ifneq ($(APP_ABI), armeabi)
     CFLAGS += -march=armv7-a -mfloat-abi=softfp
@@ -64,6 +64,8 @@ ifeq ($(NDK_TOOLCHAIN_VERSION), clang)
     TARGET_NAME = i686-none-linux-android
   else ifeq ($(ARCH), x86_64)
     TARGET_NAME = x86_64-none-linux-android
+  else
+    $(error "does not support this arch now!")
   endif
 
   CFLAGS += -target $(TARGET_NAME)
