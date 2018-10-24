@@ -5,7 +5,7 @@ SHAREDLIBSUFFIX = so
 SHAREDLIBSUFFIXFULLVER=$(SHAREDLIBSUFFIX)
 SHAREDLIBSUFFIXMAJORVER=$(SHAREDLIBSUFFIX)
 SHLDFLAGS =
-NDKLEVEL = 12
+NDKLEVEL = $(shell echo $(TARGET) | grep -E -o "[0-9]+")
 ifeq ($(ARCH), arm)
   ifneq ($(APP_ABI), armeabi)
     CFLAGS += -march=armv7-a -mfloat-abi=softfp
@@ -45,13 +45,29 @@ CXX = $(TOOLCHAINPREFIX)g++
 CC = $(TOOLCHAINPREFIX)gcc
 AR = $(TOOLCHAINPREFIX)ar
 CFLAGS += -DANDROID_NDK -fpic --sysroot=$(SYSROOT) -MMD -MP
-CFLAGS += -isystem $(NDKROOT)/sysroot/usr/include -isystem $(NDKROOT)/sysroot/usr/include/$(TOOLCHAIN_NAME)
+CFLAGS += -isystem $(NDKROOT)/sysroot/usr/include -isystem $(NDKROOT)/sysroot/usr/include/$(TOOLCHAIN_NAME) -D__ANDROID_API__=$(NDKLEVEL)
 CXXFLAGS += -fno-rtti -fno-exceptions
 LDFLAGS += --sysroot=$(SYSROOT)
 SHLDFLAGS = -Wl,--no-undefined -Wl,-z,relro -Wl,-z,now -Wl,-soname,lib$(PROJECT_NAME).so
 
 ifeq ($(NDK_TOOLCHAIN_VERSION), clang)
-  LDFLAGS += -gcc-toolchain $(GCC_TOOLCHAIN_PATH)
+  HOST_OS = $(shell uname -s | tr [A-Z] [a-z])
+  LLVM_INSTALL_DIR = $(NDKROOT)/toolchains/llvm/prebuilt/$(HOST_OS)-x86_64/bin
+  CC = $(LLVM_INSTALL_DIR)/clang
+  CXX = $(LLVM_INSTALL_DIR)/clang++
+
+  ifeq ($(ARCH), arm)
+    TARGET_NAME = armv7-none-linux-androideabi
+  else ifeq ($(ARCH), arm64)
+    TARGET_NAME = aarch64-none-linux-android
+  else ifeq ($(ARCH), x86)
+    TARGET_NAME = i686-none-linux-android
+  else ifeq ($(ARCH), x86_64)
+    TARGET_NAME = x86_64-none-linux-android
+  endif
+
+  CFLAGS += -target $(TARGET_NAME)
+  LDFLAGS += -target $(TARGET_NAME) -gcc-toolchain $(GCC_TOOLCHAIN_PATH)
 endif
 
 ifneq ($(CXX),$(wildcard $(CXX)))
