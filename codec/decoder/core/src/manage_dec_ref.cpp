@@ -412,7 +412,9 @@ static int32_t MMCOProcess (PWelsDecoderContext pCtx, uint32_t uiMmcoType,
     break;
   case MMCO_LONG:
     if (iLongTermFrameIdx > pRefPic->iMaxLongTermFrameIdx) {
-      return ERR_INFO_INVALID_MMCO_LONG_TERM_IDX_EXCEED_MAX;
+      // for now turn off the error return for safari encoder issue
+      // will be open in new version
+      // return ERR_INFO_INVALID_MMCO_LONG_TERM_IDX_EXCEED_MAX;
     }
     WelsDelLongFromListSetUnref (pRefPic, iLongTermFrameIdx);
     if (pRefPic->uiLongRefCount[LIST_0] + pRefPic->uiShortRefCount[LIST_0] >= WELS_MAX (1, pCtx->pSps->iNumRefFrames)) {
