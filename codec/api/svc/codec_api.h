@@ -61,7 +61,7 @@ typedef unsigned char bool;
   *   * This page is for openh264 codec API usage.
   *   * For how to use the encoder,please refer to page UsageExampleForEncoder
   *   * For how to use the decoder,please refer to page UsageExampleForDecoder
-  *   * For more detail about ISVEncoder,please refer to page ISVCEnoder
+  *   * For more detail about ISVEncoder,please refer to page ISVCEncoder
   *   * For more detail about ISVDecoder,please refer to page ISVCDecoder
 */
 
