@@ -100,7 +100,6 @@ class  CWelsThreadPool : public CWelsThread, public IWelsTaskThreadSink {
   WELS_THREAD_ERROR_CODE StopAllRunning();
 
   static int32_t   m_iRefCount;
-  static CWelsLock m_cInitLock;
   static int32_t   m_iMaxThreadNum;
   static CWelsThreadPool* m_pThreadPoolSelf;
 
