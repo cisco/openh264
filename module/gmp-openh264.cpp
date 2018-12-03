@@ -192,9 +192,9 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
     max_payload_size_ (0),
     callback_ (nullptr),
     stats_ ("Encoder"),
-    shutting_down_(false) {
-      AddRef();
-    }
+    shutting_down_ (false) {
+    AddRef();
+  }
 
   virtual void InitEncode (const GMPVideoCodec& codecSettings,
                            const uint8_t* aCodecSpecific,
@@ -229,7 +229,7 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
 
     // Translate parameters.
     param.iUsageType = CAMERA_VIDEO_REAL_TIME;
-    if(codecSettings.mMode == kGMPScreensharing)
+    if (codecSettings.mMode == kGMPScreensharing)
       param.iUsageType = SCREEN_CONTENT_REAL_TIME;
     param.iPicWidth = codecSettings.mWidth;
     param.iPicHeight = codecSettings.mHeight;
@@ -254,14 +254,15 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
     SSpatialLayerConfig* layer = &param.sSpatialLayers[0];
 
     // Make sure the output resolution doesn't exceed the Openh264 capability
-    double width_mb = std::ceil(codecSettings.mWidth/16.0);
-    double height_mb = std::ceil(codecSettings.mHeight/16.0);
+    double width_mb = std::ceil (codecSettings.mWidth / 16.0);
+    double height_mb = std::ceil (codecSettings.mHeight / 16.0);
     double input_mb = width_mb * height_mb;
-    if (static_cast<uint32_t>(input_mb) > OPENH264_MAX_MB) {
-      double scale = std::sqrt(OPENH264_MAX_MB / input_mb);
-      layer->iVideoWidth = static_cast<uint32_t>(width_mb * 16 * scale);
-      layer->iVideoHeight = static_cast<uint32_t>(height_mb * 16 * scale);
-      GMPLOG (GL_INFO, "InitEncode: the output resolution overflows, w x h = " << codecSettings.mWidth << " x " << codecSettings.mHeight
+    if (static_cast<uint32_t> (input_mb) > OPENH264_MAX_MB) {
+      double scale = std::sqrt (OPENH264_MAX_MB / input_mb);
+      layer->iVideoWidth = static_cast<uint32_t> (width_mb * 16 * scale);
+      layer->iVideoHeight = static_cast<uint32_t> (height_mb * 16 * scale);
+      GMPLOG (GL_INFO, "InitEncode: the output resolution overflows, w x h = " << codecSettings.mWidth << " x " <<
+              codecSettings.mHeight
               << ", turned to be " << layer->iVideoWidth << " x " << layer->iVideoHeight);
     } else {
       layer->iVideoWidth = codecSettings.mWidth;
@@ -401,23 +402,23 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
   virtual ~OpenH264VideoEncoder() {
   }
 
-   void TearDownEncoder() {
-     // Stop the worker thread first
-     if (worker_thread_) {
-       worker_thread_->Join();
-       worker_thread_ = nullptr;
-     }
+  void TearDownEncoder() {
+    // Stop the worker thread first
+    if (worker_thread_) {
+      worker_thread_->Join();
+      worker_thread_ = nullptr;
+    }
 
-     // Destroy OpenH264 encoder
-     if (encoder_) {
-       WelsDestroySVCEncoder(encoder_);
-       encoder_ = nullptr;
-     }
-   }
+    // Destroy OpenH264 encoder
+    if (encoder_) {
+      WelsDestroySVCEncoder (encoder_);
+      encoder_ = nullptr;
+    }
+  }
 
-  void TryAsyncRunOnMainThread(GMPTask* aTask) {
+  void TryAsyncRunOnMainThread (GMPTask* aTask) {
     if (!shutting_down_ && g_platform_api) {
-      g_platform_api->runonmainthread(aTask);
+      g_platform_api->runonmainthread (aTask);
     }
   }
 
@@ -500,30 +501,30 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
     if (!has_frame) {
       // This frame must be destroyed on the main thread.
       TryAsyncRunOnMainThread (WrapTaskRefCounted (
-                                   this,
-                                   &OpenH264VideoEncoder::DestroyInputFrame_m,
-                                   inputImage));
+                                 this,
+                                 &OpenH264VideoEncoder::DestroyInputFrame_m,
+                                 inputImage));
       return;
     }
 
     // Synchronously send this back to the main thread for delivery.
     TryAsyncRunOnMainThread (WrapTaskRefCounted (
-                                   this,
-                                   &OpenH264VideoEncoder::Encode_m,
-                                   inputImage,
-                                   encoded,
-                                   encoded_type));
+                               this,
+                               &OpenH264VideoEncoder::Encode_m,
+                               inputImage,
+                               encoded,
+                               encoded_type));
   }
 
   void Encode_m (GMPVideoi420Frame* frame, std::shared_ptr<SFrameBSInfo> encoded,
                  GMPVideoFrameType frame_type) {
     // Attach a self-destructor so that this dies on return.
     SelfDestruct<GMPVideoi420Frame> ifd (frame);
-    
+
     if (!host_) {
       return;
     }
-    
+
     // Now return the encoded data back to the parent.
     GMPVideoFrame* ftmp;
     GMPErr err = host_->CreateFrame (kGMPEncodedVideoFrame, &ftmp);
@@ -610,14 +611,14 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
   std::atomic_bool shutting_down_;
 };
 
-uint16_t readU16BE(const uint8_t* in) {
+uint16_t readU16BE (const uint8_t* in) {
   return in[0] << 8 | in[1];
 }
 
-void copyWithStartCode(std::vector<uint8_t>& out, const uint8_t* in, size_t size) {
+void copyWithStartCode (std::vector<uint8_t>& out, const uint8_t* in, size_t size) {
   static const uint8_t code[] = { 0x00, 0x00, 0x00, 0x01 };
-  out.insert(out.end(), code, code + sizeof(code));
-  out.insert(out.end(), in, in + size);
+  out.insert (out.end(), code, code + sizeof (code));
+  out.insert (out.end(), in, in + size);
 }
 
 class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
@@ -628,9 +629,9 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
     callback_ (nullptr),
     decoder_ (nullptr),
     stats_ ("Decoder"),
-    shutting_down_(false) {
-      AddRef();
-    }
+    shutting_down_ (false) {
+    AddRef();
+  }
 
   virtual void InitDecode (const GMPVideoCodec& codecSettings,
                            const uint8_t* aCodecSpecific,
@@ -664,7 +665,7 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
     memset (&param, 0, sizeof (param));
     param.uiTargetDqLayer = UCHAR_MAX;  // Default value
     param.eEcActiveIdc = ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE; // Error concealment on.
-    param.sVideoProperty.size = sizeof(param.sVideoProperty);
+    param.sVideoProperty.size = sizeof (param.sVideoProperty);
     param.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
 
     if (decoder_->Initialize (&param)) {
@@ -673,27 +674,27 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
       return;
     }
 
-    if (aCodecSpecific && aCodecSpecificSize >= sizeof(GMPVideoCodecH264)) {
+    if (aCodecSpecific && aCodecSpecificSize >= sizeof (GMPVideoCodecH264)) {
       std::vector<uint8_t> annexb;
 
       // Convert the AVCC data, starting at the byte containing
       // numOfSequenceParameterSets, to Annex B format.
-      const uint8_t* avcc = aCodecSpecific + offsetof(GMPVideoCodecH264, mAVCC.mNumSPS);
+      const uint8_t* avcc = aCodecSpecific + offsetof (GMPVideoCodecH264, mAVCC.mNumSPS);
 
       static const int kSPSMask = (1 << 5) - 1;
       uint8_t spsCount = *avcc++ & kSPSMask;
       for (int i = 0; i < spsCount; ++i) {
-        size_t size = readU16BE(avcc);
+        size_t size = readU16BE (avcc);
         avcc += 2;
-        copyWithStartCode(annexb, avcc, size);
+        copyWithStartCode (annexb, avcc, size);
         avcc += size;
       }
 
       uint8_t ppsCount = *avcc++;
       for (int i = 0; i < ppsCount; ++i) {
-        size_t size = readU16BE(avcc);
+        size_t size = readU16BE (avcc);
         avcc += 2;
-        copyWithStartCode(annexb, avcc, size);
+        copyWithStartCode (annexb, avcc, size);
         avcc += size;
       }
 
@@ -701,9 +702,9 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
       memset (&decoded, 0, sizeof (decoded));
       unsigned char* data[3] = {nullptr, nullptr, nullptr};
       DECODING_STATE dState = decoder_->DecodeFrame2 (&*annexb.begin(),
-                                                      annexb.size(),
-                                                      data,
-                                                      &decoded);
+                              annexb.size(),
+                              data,
+                              &decoded);
       if (dState) {
         GMPLOG (GL_ERROR, "Decoding error dState=" << dState);
       }
@@ -765,13 +766,13 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
 
   virtual void Reset() {
     if (callback_) {
-      callback_->ResetComplete ();
+      callback_->ResetComplete();
     }
   }
 
   virtual void Drain() {
     if (callback_) {
-      callback_->DrainComplete ();
+      callback_->DrainComplete();
     }
   }
 
@@ -799,14 +800,14 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
 
     // Destroy OpenH264 decoder
     if (decoder_) {
-      WelsDestroyDecoder(decoder_);
+      WelsDestroyDecoder (decoder_);
       decoder_ = nullptr;
     }
   }
 
-  void TryAsyncRunOnMainThread(GMPTask* aTask) {
+  void TryAsyncRunOnMainThread (GMPTask* aTask) {
     if (!shutting_down_ && g_platform_api) {
-      g_platform_api->runonmainthread(aTask);
+      g_platform_api->runonmainthread (aTask);
     }
   }
 
@@ -829,9 +830,9 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
     unsigned char* data[3] = {nullptr, nullptr, nullptr};
 
     dState = decoder_->DecodeFrameNoDelay (inputFrame->Buffer(),
-                                     inputFrame->Size(),
-                                     data,
-                                     decoded.get());
+                                           inputFrame->Size(),
+                                           data,
+                                           decoded.get());
 
     if (dState) {
       GMPLOG (GL_ERROR, "Decoding error dState=" << dState);
@@ -840,15 +841,15 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
     }
 
     TryAsyncRunOnMainThread (WrapTaskRefCounted (
-                                 this,
-                                 &OpenH264VideoDecoder::Decode_m,
-                                 inputFrame,
-                                 decoded,
-                                 data[0],
-                                 data[1],
-                                 data[2],
-                                 renderTimeMs,
-                                 valid));
+                               this,
+                               &OpenH264VideoDecoder::Decode_m,
+                               inputFrame,
+                               decoded,
+                               data[0],
+                               data[1],
+                               data[2],
+                               renderTimeMs,
+                               valid));
   }
 
   // Return the decoded data back to the parent.
@@ -894,7 +895,7 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
     if (!host_) {
       return;
     }
-    
+
     // Translate the image.
     GMPErr err = host_->CreateFrame (kGMPI420VideoFrame, &ftmp);
     if (err != GMPNoErr) {
