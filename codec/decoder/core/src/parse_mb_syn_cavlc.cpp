@@ -1324,14 +1324,17 @@ int32_t ParseInterBMotionInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A
   PDqLayer pCurDqLayer = pCtx->pCurDqLayer;
   int32_t i, j;
   int32_t iMbXy = pCurDqLayer->iMbXyIndex;
-  int32_t iMotionPredFlag[4];
+  int32_t iMotionPredFlag[LIST_A][4];
   int16_t iMv[2];
   uint32_t uiCode;
   int32_t iCode;
   int16_t iMinVmv = pSliceHeader->pSps->pSLevelLimits->iMinVmv;
   int16_t iMaxVmv = pSliceHeader->pSps->pSLevelLimits->iMaxVmv;
-  iMotionPredFlag[0] = iMotionPredFlag[1] = iMotionPredFlag[2] = iMotionPredFlag[3] =
-                         pSlice->sSliceHeaderExt.bDefaultMotionPredFlag;
+  for (int lst = LIST_0; lst < LIST_A; ++lst) {
+    for (int i = 0; i < 4; ++i) {
+      iMotionPredFlag[lst][i] = pSlice->sSliceHeaderExt.bDefaultMotionPredFlag;
+    }
+  }
   iRefCount[0] = pSliceHeader->uiRefCount[0];
   iRefCount[1] = pSliceHeader->uiRefCount[1];
 
@@ -1341,13 +1344,13 @@ int32_t ParseInterBMotionInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A
       if (IS_DIR (mbType, 0, listIdx)) {
         if (pSlice->sSliceHeaderExt.bAdaptiveMotionPredFlag) {
           WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //motion_prediction_flag_l0/l1[ mbPartIdx ]
-          iMotionPredFlag[listIdx] = uiCode;
+          iMotionPredFlag[listIdx][0] = uiCode;
         }
       }
     }
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (IS_DIR (mbType, 0, listIdx)) {
-        if (iMotionPredFlag[listIdx] == 0) {
+        if (iMotionPredFlag[listIdx][0] == 0) {
           WELS_READ_VERIFY (BsGetTe0 (pBs, iRefCount[listIdx], &uiCode)); //motion_prediction_flag_l1[ mbPartIdx ]
           iRef[listIdx] = uiCode;
           // Security check: iRefIdx should be in range 0 to num_ref_idx_l0_active_minus1, includsive
@@ -1380,13 +1383,123 @@ int32_t ParseInterBMotionInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A
         UpdateP16x16MotionInfo (pCurDqLayer, listIdx, iRef[listIdx], iMv);
       }
     }
+  } else if (IS_INTER_16x8 (mbType)) {
+    for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+      for (int32_t i = 0; i < 2; ++i) {
+        if (IS_DIR (mbType, i, listIdx)) {
+          if (pSlice->sSliceHeaderExt.bAdaptiveMotionPredFlag) {
+            WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //motion_prediction_flag_l0/l1[ mbPartIdx ]
+            iMotionPredFlag[listIdx][i] = uiCode;
+          }
+        }
+      }
+    }
+    int8_t ref_idx_list[LIST_A][2] = { { REF_NOT_IN_LIST, REF_NOT_IN_LIST }, { REF_NOT_IN_LIST, REF_NOT_IN_LIST } };
+    for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+      if (IS_DIR (mbType, 0, listIdx)) {
+        for (int32_t i = 0; i < 2; ++i) {
+          if (iMotionPredFlag[listIdx][i] == 0) {
+            WELS_READ_VERIFY (BsGetTe0 (pBs, iRefCount[listIdx], &uiCode)); //motion_prediction_flag_l1[ mbPartIdx ]
+            int32_t iRefIdx = uiCode;
+            // Security check: iRefIdx should be in range 0 to num_ref_idx_l0_active_minus1, includsive
+            // ref to standard section 7.4.5.1. iRefCount[0] is 1 + num_ref_idx_l0_active_minus1.
+            if ((iRefIdx < 0) || (iRefIdx >= iRefCount[listIdx]) || (ppRefPic[iRefIdx] == NULL)) { //error ref_idx
+              pCtx->bMbRefConcealed = true;
+              if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE) {
+                iRefIdx = 0;
+                pCtx->iErrorCode |= dsBitstreamError;
+              } else {
+                return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_REF_INDEX);
+              }
+            }
+            ref_idx_list[listIdx][i] = iRefIdx;
+            pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || ! (ppRefPic[iRef[listIdx]]
+                                    && ppRefPic[iRef[listIdx]]->bIsComplete);
+          } else {
+            WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "inter parse: iMotionPredFlag = 1 not supported. ");
+            return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_UNSUPPORTED_ILP);
+          }
+        }
+      }
+    }
+    for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+      if (IS_DIR (mbType, 0, listIdx)) {
+        for (i = 0; i < 2; i++) {
+          int iPartIdx = i << 3;
+          int32_t iRefIdx = ref_idx_list[listIdx][i];
+          PredInter16x8Mv (iMvArray, iRefIdxArray, listIdx, iPartIdx, iRefIdx, iMv);
+
+          WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l0[ mbPartIdx ][ 0 ][ compIdx ]
+          iMv[0] += iCode;
+          WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l1[ mbPartIdx ][ 0 ][ compIdx ]
+          iMv[1] += iCode;
+          WELS_CHECK_SE_BOTH_WARNING (iMv[1], iMinVmv, iMaxVmv, "vertical mv");
+          UpdateP16x8MotionInfo (pCurDqLayer, iMvArray, iRefIdxArray, listIdx, iPartIdx, iRefIdx, iMv);
+        }
+      }
+    }
+  } else if (IS_INTER_8x16 (mbType)) {
+    for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+      for (int32_t i = 0; i < 2; ++i) {
+        if (IS_DIR (mbType, i, listIdx)) {
+          if (pSlice->sSliceHeaderExt.bAdaptiveMotionPredFlag) {
+            WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //motion_prediction_flag_l0/l1[ mbPartIdx ]
+            iMotionPredFlag[listIdx][i] = uiCode;
+          }
+        }
+      }
+    }
+    int8_t ref_idx_list[LIST_A][2] = { { REF_NOT_IN_LIST, REF_NOT_IN_LIST }, { REF_NOT_IN_LIST, REF_NOT_IN_LIST } };
+    for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+      if (IS_DIR (mbType, 0, listIdx)) {
+        for (int32_t i = 0; i < 2; ++i) {
+          if (iMotionPredFlag[listIdx][i] == 0) {
+            WELS_READ_VERIFY (BsGetTe0 (pBs, iRefCount[listIdx], &uiCode)); //motion_prediction_flag_l1[ mbPartIdx ]
+            int32_t iRefIdx = uiCode;
+            // Security check: iRefIdx should be in range 0 to num_ref_idx_l0_active_minus1, includsive
+            // ref to standard section 7.4.5.1. iRefCount[0] is 1 + num_ref_idx_l0_active_minus1.
+            if ((iRefIdx < 0) || (iRefIdx >= iRefCount[listIdx]) || (ppRefPic[iRefIdx] == NULL)) { //error ref_idx
+              pCtx->bMbRefConcealed = true;
+              if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE) {
+                iRefIdx = 0;
+                pCtx->iErrorCode |= dsBitstreamError;
+              } else {
+                return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_REF_INDEX);
+              }
+            }
+            ref_idx_list[listIdx][i] = iRefIdx;
+            pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || ! (ppRefPic[iRef[listIdx]]
+                                    && ppRefPic[iRef[listIdx]]->bIsComplete);
+          } else {
+            WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "inter parse: iMotionPredFlag = 1 not supported. ");
+            return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_UNSUPPORTED_ILP);
+          }
+        }
+      }
+    }
+    for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+      if (IS_DIR (mbType, 0, listIdx)) {
+        for (i = 0; i < 2; i++) {
+          int iPartIdx = i << 2;
+          int32_t iRefIdx = ref_idx_list[listIdx][i];
+          PredInter8x16Mv (iMvArray, iRefIdxArray, listIdx, iPartIdx, iRefIdx, iMv);
+
+          WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l0[ mbPartIdx ][ 0 ][ compIdx ]
+          iMv[0] += iCode;
+          WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l1[ mbPartIdx ][ 0 ][ compIdx ]
+          iMv[1] += iCode;
+          WELS_CHECK_SE_BOTH_WARNING (iMv[1], iMinVmv, iMaxVmv, "vertical mv");
+          UpdateP8x16MotionInfo (pCurDqLayer, iMvArray, iRefIdxArray, listIdx, iPartIdx, iRefIdx, iMv);
+        }
+      }
+    }
   }
   switch (pCurDqLayer->pMbType[iMbXy]) {
   case MB_TYPE_16x16: {
     int32_t iRefIdx = 0;
     if (pSlice->sSliceHeaderExt.bAdaptiveMotionPredFlag) {
       WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //motion_prediction_flag_l0[ mbPartIdx ]
-      iMotionPredFlag[0] = uiCode;
+      iMotionPredFlag[0][0] = uiCode;
     }
     if (iMotionPredFlag[0] == 0) {
       WELS_READ_VERIFY (BsGetTe0 (pBs, iRefCount[0], &uiCode)); //motion_prediction_flag_l1[ mbPartIdx ]
@@ -1423,7 +1536,7 @@ int32_t ParseInterBMotionInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A
     for (i = 0; i < 2; i++) {
       if (pSlice->sSliceHeaderExt.bAdaptiveMotionPredFlag) {
         WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //motion_prediction_flag_l0[ mbPartIdx ]
-        iMotionPredFlag[i] = uiCode;
+        iMotionPredFlag[i][0] = uiCode;
       }
     }
 
@@ -1463,7 +1576,7 @@ int32_t ParseInterBMotionInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A
     for (i = 0; i < 2; i++) {
       if (pSlice->sSliceHeaderExt.bAdaptiveMotionPredFlag) {
         WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //motion_prediction_flag_l0[ mbPartIdx ]
-        iMotionPredFlag[i] = uiCode;
+        iMotionPredFlag[0][i] = uiCode;
       }
     }
 
@@ -1528,7 +1641,7 @@ int32_t ParseInterBMotionInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A
     if (pSlice->sSliceHeaderExt.bAdaptiveMotionPredFlag) {
       for (i = 0; i < 4; i++) {
         WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //motion_prediction_flag_l0[ mbPartIdx ]
-        iMotionPredFlag[i] = uiCode;
+        iMotionPredFlag[0][i] = uiCode;
       }
     }
 
