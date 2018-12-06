@@ -42,8 +42,6 @@
 #include <memory>
 #include <assert.h>
 #include <limits.h>
-#include <memory>
-#include <atomic>
 
 #include "gmp-platform.h"
 #include "gmp-video-host.h"
@@ -93,6 +91,10 @@
 #endif
 
 #include "task_utils.h"
+#include "SharedObj.h"
+
+typedef RefPtr<SharedObj<SFrameBSInfo> > SFrameBSInfoSharedPtr;
+typedef RefPtr<SharedObj<SBufferInfo> > SBufferInfooSharedPtr;
 
 static int g_log_level = 0;
 
@@ -430,8 +432,8 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
 
   void Encode_w (GMPVideoi420Frame* inputImage,
                  GMPVideoFrameType frame_type) {
-    std::shared_ptr<SFrameBSInfo> encoded = std::make_shared<SFrameBSInfo>();
-    memset (encoded.get(), 0, sizeof (SFrameBSInfo));
+    SFrameBSInfoSharedPtr encodedPtr (MakeShared<SFrameBSInfo>());
+    SFrameBSInfo* encoded = encodedPtr->get();
 
     if (frame_type  == kGMPKeyFrame) {
       encoder_->ForceIntraFrame (true);
@@ -461,7 +463,7 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
     src.uiTimeStamp = inputImage->Timestamp() / 1000; //encoder needs millisecond
     const SSourcePicture* pics = &src;
 
-    int result = encoder_->EncodeFrame (pics, encoded.get());
+    int result = encoder_->EncodeFrame (pics, encoded);
     if (result != cmResultSuccess) {
       GMPLOG (GL_ERROR, "Couldn't encode frame. Error = " << result);
     }
@@ -512,14 +514,15 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
                                this,
                                &OpenH264VideoEncoder::Encode_m,
                                inputImage,
-                               encoded,
+                               encodedPtr,
                                encoded_type));
   }
 
-  void Encode_m (GMPVideoi420Frame* frame, std::shared_ptr<SFrameBSInfo> encoded,
+  void Encode_m (GMPVideoi420Frame* frame, SFrameBSInfoSharedPtr encodedPtr,
                  GMPVideoFrameType frame_type) {
     // Attach a self-destructor so that this dies on return.
     SelfDestruct<GMPVideoi420Frame> ifd (frame);
+    SFrameBSInfo* encoded = encodedPtr->get();
 
     if (!host_) {
       return;
@@ -608,7 +611,7 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
   uint32_t max_payload_size_;
   GMPVideoEncoderCallback* callback_;
   FrameStats stats_;
-  std::atomic_bool shutting_down_;
+  bool shutting_down_;
 };
 
 uint16_t readU16BE (const uint8_t* in) {
@@ -824,15 +827,14 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
     GMPLOG (GL_DEBUG, "Frame decode on worker thread length = "
             << inputFrame->Size());
 
-    std::shared_ptr<SBufferInfo> decoded = std::make_shared<SBufferInfo>();
+    SBufferInfooSharedPtr decoded (MakeShared<SBufferInfo>());
     bool valid = false;
-    memset (decoded.get(), 0, sizeof (SBufferInfo));
     unsigned char* data[3] = {nullptr, nullptr, nullptr};
 
     dState = decoder_->DecodeFrameNoDelay (inputFrame->Buffer(),
                                            inputFrame->Size(),
                                            data,
-                                           decoded.get());
+                                           decoded->get());
 
     if (dState) {
       GMPLOG (GL_ERROR, "Decoding error dState=" << dState);
@@ -854,7 +856,7 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
 
   // Return the decoded data back to the parent.
   void Decode_m (GMPVideoEncodedFrame* inputFrame,
-                 std::shared_ptr<SBufferInfo> decoded,
+                 SBufferInfooSharedPtr decodedPtr,
                  const uint8_t* y,
                  const uint8_t* u,
                  const uint8_t* v,
@@ -862,6 +864,7 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
                  bool valid) {
     // Attach a self-destructor so that this dies on return.
     SelfDestruct<GMPVideoEncodedFrame> ifd (inputFrame);
+    SBufferInfo* decoded = decodedPtr->get();
 
     // If we don't actually have data, just abort.
     if (!valid) {
@@ -932,7 +935,7 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
   GMPVideoDecoderCallback* callback_;
   ISVCDecoder* decoder_;
   FrameStats stats_;
-  std::atomic_bool shutting_down_;
+  bool shutting_down_;
 };
 
 extern "C" {
