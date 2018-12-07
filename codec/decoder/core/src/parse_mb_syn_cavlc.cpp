@@ -1321,8 +1321,8 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
   return ERR_NONE;
 }
 
-int32_t ParseInterBMotionInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][MV_A],
-                               int8_t iRefIdxArray[LIST_A][30], int8_t pDirect[30], PBitStringAux pBs) {
+int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][MV_A],
+                         int8_t iRefIdxArray[LIST_A][30], PBitStringAux pBs) {
   PSlice pSlice = &pCtx->pCurDqLayer->sLayerInfo.sSliceInLayer;
   PSliceHeader pSliceHeader = &pSlice->sSliceHeaderExt.sSliceHeader;
   PPicture* ppRefPic = pCtx->sRefPic.pRefList[LIST_0];
