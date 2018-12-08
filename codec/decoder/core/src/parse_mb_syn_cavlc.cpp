@@ -441,6 +441,13 @@ void WelsFillCacheInter (PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroCount,
   int32_t iLeftTopXy  = 0;
   int32_t iRightTopXy = 0;
 
+  PSlice pSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
+  PSliceHeader pSliceHeader = &pSlice->sSliceHeaderExt.sSliceHeader;
+  int32_t listCount = 1;
+  if (pSliceHeader->eSliceType == B_SLICE) {
+    listCount = 2;
+  }
+
   //stuff non_zero_coeff_count from pNeighAvail(left and top)
   WelsFillCacheNonZeroCount (pNeighAvail, pNonZeroCount, pCurLayer);
 
@@ -457,86 +464,88 @@ void WelsFillCacheInter (PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroCount,
     iRightTopXy = iCurXy + 1 - pCurLayer->iMbWidth;
   }
 
-  //stuff mv_cache and iRefIdxArray from left and top (inter)
-  if (pNeighAvail->iLeftAvail && IS_INTER (pNeighAvail->iLeftType)) {
-    ST32 (iMvArray[0][ 6], LD32 (pCurLayer->pMv[0][iLeftXy][ 3]));
-    ST32 (iMvArray[0][12], LD32 (pCurLayer->pMv[0][iLeftXy][ 7]));
-    ST32 (iMvArray[0][18], LD32 (pCurLayer->pMv[0][iLeftXy][11]));
-    ST32 (iMvArray[0][24], LD32 (pCurLayer->pMv[0][iLeftXy][15]));
-    iRefIdxArray[0][ 6] = pCurLayer->pRefIndex[0][iLeftXy][ 3];
-    iRefIdxArray[0][12] = pCurLayer->pRefIndex[0][iLeftXy][ 7];
-    iRefIdxArray[0][18] = pCurLayer->pRefIndex[0][iLeftXy][11];
-    iRefIdxArray[0][24] = pCurLayer->pRefIndex[0][iLeftXy][15];
-  } else {
-    ST32 (iMvArray[0][ 6], 0);
-    ST32 (iMvArray[0][12], 0);
-    ST32 (iMvArray[0][18], 0);
-    ST32 (iMvArray[0][24], 0);
+  for (int32_t listIdx = 0; listIdx < listCount; ++listIdx) {
+    //stuff mv_cache and iRefIdxArray from left and top (inter)
+    if (pNeighAvail->iLeftAvail && IS_INTER (pNeighAvail->iLeftType)) {
+      ST32 (iMvArray[listIdx][6], LD32 (pCurLayer->pMv[listIdx][iLeftXy][3]));
+      ST32 (iMvArray[listIdx][12], LD32 (pCurLayer->pMv[listIdx][iLeftXy][7]));
+      ST32 (iMvArray[listIdx][18], LD32 (pCurLayer->pMv[listIdx][iLeftXy][11]));
+      ST32 (iMvArray[listIdx][24], LD32 (pCurLayer->pMv[listIdx][iLeftXy][15]));
+      iRefIdxArray[listIdx][6] = pCurLayer->pRefIndex[listIdx][iLeftXy][3];
+      iRefIdxArray[listIdx][12] = pCurLayer->pRefIndex[listIdx][iLeftXy][7];
+      iRefIdxArray[listIdx][18] = pCurLayer->pRefIndex[listIdx][iLeftXy][11];
+      iRefIdxArray[listIdx][24] = pCurLayer->pRefIndex[listIdx][iLeftXy][15];
+    } else {
+      ST32 (iMvArray[listIdx][6], 0);
+      ST32 (iMvArray[listIdx][12], 0);
+      ST32 (iMvArray[listIdx][18], 0);
+      ST32 (iMvArray[listIdx][24], 0);
 
-    if (0 == pNeighAvail->iLeftAvail) { //not available
-      iRefIdxArray[0][ 6] =
-        iRefIdxArray[0][12] =
-          iRefIdxArray[0][18] =
-            iRefIdxArray[0][24] = REF_NOT_AVAIL;
-    } else { //available but is intra mb type
-      iRefIdxArray[0][ 6] =
-        iRefIdxArray[0][12] =
-          iRefIdxArray[0][18] =
-            iRefIdxArray[0][24] = REF_NOT_IN_LIST;
+      if (0 == pNeighAvail->iLeftAvail) { //not available
+        iRefIdxArray[listIdx][6] =
+          iRefIdxArray[listIdx][12] =
+            iRefIdxArray[listIdx][18] =
+              iRefIdxArray[listIdx][24] = REF_NOT_AVAIL;
+      } else { //available but is intra mb type
+        iRefIdxArray[listIdx][6] =
+          iRefIdxArray[listIdx][12] =
+            iRefIdxArray[listIdx][18] =
+              iRefIdxArray[listIdx][24] = REF_NOT_IN_LIST;
+      }
     }
-  }
-  if (pNeighAvail->iLeftTopAvail && IS_INTER (pNeighAvail->iLeftTopType)) {
-    ST32 (iMvArray[0][0], LD32 (pCurLayer->pMv[0][iLeftTopXy][15]));
-    iRefIdxArray[0][0] = pCurLayer->pRefIndex[0][iLeftTopXy][15];
-  } else {
-    ST32 (iMvArray[0][0], 0);
-    if (0 == pNeighAvail->iLeftTopAvail) { //not available
-      iRefIdxArray[0][0] = REF_NOT_AVAIL;
-    } else { //available but is intra mb type
-      iRefIdxArray[0][0] = REF_NOT_IN_LIST;
+    if (pNeighAvail->iLeftTopAvail && IS_INTER (pNeighAvail->iLeftTopType)) {
+      ST32 (iMvArray[listIdx][0], LD32 (pCurLayer->pMv[listIdx][iLeftTopXy][15]));
+      iRefIdxArray[listIdx][0] = pCurLayer->pRefIndex[listIdx][iLeftTopXy][15];
+    } else {
+      ST32 (iMvArray[listIdx][0], 0);
+      if (0 == pNeighAvail->iLeftTopAvail) { //not available
+        iRefIdxArray[listIdx][0] = REF_NOT_AVAIL;
+      } else { //available but is intra mb type
+        iRefIdxArray[listIdx][0] = REF_NOT_IN_LIST;
+      }
     }
-  }
-  if (pNeighAvail->iTopAvail && IS_INTER (pNeighAvail->iTopType)) {
-    ST64 (iMvArray[0][1], LD64 (pCurLayer->pMv[0][iTopXy][12]));
-    ST64 (iMvArray[0][3], LD64 (pCurLayer->pMv[0][iTopXy][14]));
-    ST32 (&iRefIdxArray[0][1], LD32 (&pCurLayer->pRefIndex[0][iTopXy][12]));
-  } else {
-    ST64 (iMvArray[0][1], 0);
-    ST64 (iMvArray[0][3], 0);
-    if (0 == pNeighAvail->iTopAvail) { //not available
-      iRefIdxArray[0][1] =
-        iRefIdxArray[0][2] =
-          iRefIdxArray[0][3] =
-            iRefIdxArray[0][4] = REF_NOT_AVAIL;
-    } else { //available but is intra mb type
-      iRefIdxArray[0][1] =
-        iRefIdxArray[0][2] =
-          iRefIdxArray[0][3] =
-            iRefIdxArray[0][4] = REF_NOT_IN_LIST;
+    if (pNeighAvail->iTopAvail && IS_INTER (pNeighAvail->iTopType)) {
+      ST64 (iMvArray[listIdx][1], LD64 (pCurLayer->pMv[listIdx][iTopXy][12]));
+      ST64 (iMvArray[listIdx][3], LD64 (pCurLayer->pMv[listIdx][iTopXy][14]));
+      ST32 (&iRefIdxArray[listIdx][1], LD32 (&pCurLayer->pRefIndex[listIdx][iTopXy][12]));
+    } else {
+      ST64 (iMvArray[listIdx][1], 0);
+      ST64 (iMvArray[listIdx][3], 0);
+      if (0 == pNeighAvail->iTopAvail) { //not available
+        iRefIdxArray[listIdx][1] =
+          iRefIdxArray[listIdx][2] =
+            iRefIdxArray[listIdx][3] =
+              iRefIdxArray[listIdx][4] = REF_NOT_AVAIL;
+      } else { //available but is intra mb type
+        iRefIdxArray[listIdx][1] =
+          iRefIdxArray[listIdx][2] =
+            iRefIdxArray[listIdx][3] =
+              iRefIdxArray[listIdx][4] = REF_NOT_IN_LIST;
+      }
     }
-  }
-  if (pNeighAvail->iRightTopAvail && IS_INTER (pNeighAvail->iRightTopType)) {
-    ST32 (iMvArray[0][5], LD32 (pCurLayer->pMv[0][iRightTopXy][12]));
-    iRefIdxArray[0][5] = pCurLayer->pRefIndex[0][iRightTopXy][12];
-  } else {
-    ST32 (iMvArray[0][5], 0);
-    if (0 == pNeighAvail->iRightTopAvail) { //not available
-      iRefIdxArray[0][5] = REF_NOT_AVAIL;
-    } else { //available but is intra mb type
-      iRefIdxArray[0][5] = REF_NOT_IN_LIST;
+    if (pNeighAvail->iRightTopAvail && IS_INTER (pNeighAvail->iRightTopType)) {
+      ST32 (iMvArray[listIdx][5], LD32 (pCurLayer->pMv[listIdx][iRightTopXy][12]));
+      iRefIdxArray[listIdx][5] = pCurLayer->pRefIndex[listIdx][iRightTopXy][12];
+    } else {
+      ST32 (iMvArray[listIdx][5], 0);
+      if (0 == pNeighAvail->iRightTopAvail) { //not available
+        iRefIdxArray[listIdx][5] = REF_NOT_AVAIL;
+      } else { //available but is intra mb type
+        iRefIdxArray[listIdx][5] = REF_NOT_IN_LIST;
+      }
     }
+    //right-top 4*4 block unavailable
+    ST32 (iMvArray[listIdx][9], 0);
+    ST32 (iMvArray[listIdx][21], 0);
+    ST32 (iMvArray[listIdx][11], 0);
+    ST32 (iMvArray[listIdx][17], 0);
+    ST32 (iMvArray[listIdx][23], 0);
+    iRefIdxArray[listIdx][9] =
+      iRefIdxArray[listIdx][21] =
+        iRefIdxArray[listIdx][11] =
+          iRefIdxArray[listIdx][17] =
+            iRefIdxArray[listIdx][23] = REF_NOT_AVAIL;
   }
-  //right-top 4*4 block unavailable
-  ST32 (iMvArray[0][ 9], 0);
-  ST32 (iMvArray[0][21], 0);
-  ST32 (iMvArray[0][11], 0);
-  ST32 (iMvArray[0][17], 0);
-  ST32 (iMvArray[0][23], 0);
-  iRefIdxArray[0][ 9] =
-    iRefIdxArray[0][21] =
-      iRefIdxArray[0][11] =
-        iRefIdxArray[0][17] =
-          iRefIdxArray[0][23] = REF_NOT_AVAIL;
 }
 
 int32_t PredIntra4x4Mode (int8_t* pIntraPredMode, int32_t iIdx4) {
@@ -1420,8 +1429,8 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
     }
     int8_t ref_idx_list[LIST_A][2] = { { REF_NOT_IN_LIST, REF_NOT_IN_LIST }, { REF_NOT_IN_LIST, REF_NOT_IN_LIST } };
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
-      if (IS_DIR (mbType, 0, listIdx)) {
-        for (int32_t i = 0; i < 2; ++i) {
+      for (int32_t i = 0; i < 2; ++i) {
+        if (IS_DIR (mbType, i, listIdx)) {
           if (iMotionPredFlag[listIdx][i] == 0) {
             WELS_READ_VERIFY (BsGetTe0 (pBs, iRefCount[listIdx], &uiCode)); //motion_prediction_flag_l1[ mbPartIdx ]
             int32_t iRefIdx = uiCode;
@@ -1447,8 +1456,8 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
       }
     }
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
-      if (IS_DIR (mbType, 0, listIdx)) {
-        for (int32_t i = 0; i < 2; i++) {
+      for (int32_t i = 0; i < 2; i++) {
+        if (IS_DIR (mbType, i, listIdx)) {
           int iPartIdx = i << 3;
           int32_t iRefIdx = ref_idx_list[listIdx][i];
           PredInter16x8Mv (iMvArray, iRefIdxArray, listIdx, iPartIdx, iRefIdx, iMv);
@@ -1475,8 +1484,8 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
     }
     int8_t ref_idx_list[LIST_A][2] = { { REF_NOT_IN_LIST, REF_NOT_IN_LIST }, { REF_NOT_IN_LIST, REF_NOT_IN_LIST } };
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
-      if (IS_DIR (mbType, 0, listIdx)) {
-        for (int32_t i = 0; i < 2; ++i) {
+      for (int32_t i = 0; i < 2; ++i) {
+        if (IS_DIR (mbType, i, listIdx)) {
           if (iMotionPredFlag[listIdx][i] == 0) {
             WELS_READ_VERIFY (BsGetTe0 (pBs, iRefCount[listIdx], &uiCode)); //motion_prediction_flag_l1[ mbPartIdx ]
             int32_t iRefIdx = uiCode;
@@ -1502,8 +1511,8 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
       }
     }
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
-      if (IS_DIR (mbType, 0, listIdx)) {
-        for (int32_t i = 0; i < 2; i++) {
+      for (int32_t i = 0; i < 2; i++) {
+        if (IS_DIR (mbType, i, listIdx)) {
           int iPartIdx = i << 2;
           int32_t iRefIdx = ref_idx_list[listIdx][i];
           PredInter8x16Mv (iMvArray, iRefIdxArray, listIdx, iPartIdx, iRefIdx, iMv);
@@ -1529,14 +1538,15 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
     for (int32_t i = 0; i < 4; i++) {
       WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //sub_mb_type[ mbPartIdx ]
       uiSubMbType = uiCode;
-      if (uiSubMbType >= 4) { //invalid uiSubMbType
+      if (uiSubMbType > 13) { //invalid uiSubMbType
         return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_SUB_MB_TYPE);
       }
       pSubPartCount[i] = g_ksInterBSubMbTypeInfo[uiSubMbType].iPartCount;
       pPartW[i] = g_ksInterBSubMbTypeInfo[uiSubMbType].iPartWidth;
 
       // Need modification when B picture add in, reference to 7.3.5
-      pCurDqLayer->pNoSubMbPartSizeLessThan8x8Flag[iMbXy] &= (uiSubMbType == 0);
+      if (pSubPartCount[i] > 1)
+        pCurDqLayer->pNoSubMbPartSizeLessThan8x8Flag[iMbXy] = false;
 
       if (IS_DIRECT (g_ksInterBSubMbTypeInfo[uiSubMbType].iType)) {
         if (!has_direct_called) {
@@ -1769,7 +1779,6 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
         int8_t iPartCount = pSubPartCount[i];
         int16_t iPartIdx, iBlockW = pPartW[i];
         uint8_t uiScan4Idx, uiCacheIdx;
-        int16_t iMv[2];
 
         uiCacheIdx = g_kuiCache30ScanIdx[i << 2];
 
@@ -1787,7 +1796,7 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
           uiScan4Idx = g_kuiScan4[iPartIdx];
           uiCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
           if (is_dir) {
-            PredMv (iMvArray, iRefIdxArray, LIST_0, iPartIdx, iBlockW, iref, iMv);
+            PredMv (iMvArray, iRefIdxArray, listIdx, iPartIdx, iBlockW, iref, iMv);
 
             WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l0[ mbPartIdx ][ subMbPartIdx ][ compIdx ]
             iMv[0] += iCode;

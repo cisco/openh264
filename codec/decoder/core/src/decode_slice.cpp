@@ -2479,10 +2479,13 @@ int32_t WelsActualDecodeMbCavlcBSlice (PWelsDecoderContext pCtx) {
   pCurLayer->pInterPredictionDoneFlag[iMbXy] = 0;//2009.10.23
   WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //uiMbType
   uiMbType = uiCode;
+#ifdef _DEBUG
+// WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "iMbXy = %d, uiMbType = %d", iMbXy, uiMbType);
+#endif
   if (uiMbType < 23) { //inter MB type
     int16_t iMotionVector[LIST_A][30][MV_A];
     int8_t  iRefIndex[LIST_A][30];
-    pCurLayer->pMbType[iMbXy] = g_ksInterPMbTypeInfo[uiMbType].iType;
+    pCurLayer->pMbType[iMbXy] = g_ksInterBMbTypeInfo[uiMbType].iType;
     WelsFillCacheInter (&sNeighAvail, pNonZeroCount, iMotionVector, iRefIndex, pCurLayer);
 
     if ((iRet = ParseInterBInfo (pCtx, iMotionVector, iRefIndex, pBs)) != ERR_NONE) {
