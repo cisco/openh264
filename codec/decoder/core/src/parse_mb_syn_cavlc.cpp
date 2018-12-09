@@ -47,6 +47,11 @@
 namespace WelsDec {
 #define MAX_LEVEL_PREFIX 15
 
+#if defined(_DEBUG)
+extern FILE* pFile;
+extern uint32_t uiTotalFrameCount;
+#endif
+
 typedef struct TagReadBitsCache {
   uint32_t uiCache32Bit;
   uint8_t  uiRemainBits;
@@ -1382,6 +1387,7 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
       }
     }
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+      iRef[listIdx] = REF_NOT_IN_LIST;
       if (IS_DIR (mbType, 0, listIdx)) {
         if (iMotionPredFlag[listIdx][0] == 0) {
           WELS_READ_VERIFY (BsGetTe0 (pBs, iRefCount[listIdx], &uiCode)); //motion_prediction_flag_l1[ mbPartIdx ]
@@ -1412,9 +1418,14 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
         iMv[0] += iCode;
         WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l1[ mbPartIdx ][ 0 ][ compIdx ]
         iMv[1] += iCode;
+#ifdef _DEBUG
+        fprintf (pFile, "iMv: %d %d\n", iMv[0], iMv[1]);
+#endif
         WELS_CHECK_SE_BOTH_WARNING (iMv[1], iMinVmv, iMaxVmv, "vertical mv");
-        UpdateP16x16MotionInfo (pCurDqLayer, listIdx, iRef[listIdx], iMv);
+      } else {
+        * (uint32_t*)iMv = 0;
       }
+      UpdateP16x16MotionInfo (pCurDqLayer, listIdx, iRef[listIdx], iMv);
     }
   } else if (IS_INTER_16x8 (mbType)) {
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
@@ -1457,18 +1468,23 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
     }
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       for (int32_t i = 0; i < 2; i++) {
+        int iPartIdx = i << 3;
+        int32_t iRefIdx = ref_idx_list[listIdx][i];
         if (IS_DIR (mbType, i, listIdx)) {
-          int iPartIdx = i << 3;
-          int32_t iRefIdx = ref_idx_list[listIdx][i];
           PredInter16x8Mv (iMvArray, iRefIdxArray, listIdx, iPartIdx, iRefIdx, iMv);
 
           WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l0[ mbPartIdx ][ 0 ][ compIdx ]
           iMv[0] += iCode;
           WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l1[ mbPartIdx ][ 0 ][ compIdx ]
           iMv[1] += iCode;
+#ifdef _DEBUG
+          fprintf (pFile, "iMv: %d %d\n", iMv[0], iMv[1]);
+#endif
           WELS_CHECK_SE_BOTH_WARNING (iMv[1], iMinVmv, iMaxVmv, "vertical mv");
-          UpdateP16x8MotionInfo (pCurDqLayer, iMvArray, iRefIdxArray, listIdx, iPartIdx, iRefIdx, iMv);
+        } else {
+          * (uint32_t*)iMv = 0;
         }
+        UpdateP16x8MotionInfo (pCurDqLayer, iMvArray, iRefIdxArray, listIdx, iPartIdx, iRefIdx, iMv);
       }
     }
   } else if (IS_INTER_8x16 (mbType)) {
@@ -1512,18 +1528,23 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
     }
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       for (int32_t i = 0; i < 2; i++) {
+        int iPartIdx = i << 2;
+        int32_t iRefIdx = ref_idx_list[listIdx][i];
         if (IS_DIR (mbType, i, listIdx)) {
-          int iPartIdx = i << 2;
-          int32_t iRefIdx = ref_idx_list[listIdx][i];
           PredInter8x16Mv (iMvArray, iRefIdxArray, listIdx, iPartIdx, iRefIdx, iMv);
 
           WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l0[ mbPartIdx ][ 0 ][ compIdx ]
           iMv[0] += iCode;
           WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l1[ mbPartIdx ][ 0 ][ compIdx ]
           iMv[1] += iCode;
+#ifdef _DEBUG
+          fprintf (pFile, "iMv: %d %d\n", iMv[0], iMv[1]);
+#endif
           WELS_CHECK_SE_BOTH_WARNING (iMv[1], iMinVmv, iMaxVmv, "vertical mv");
-          UpdateP8x16MotionInfo (pCurDqLayer, iMvArray, iRefIdxArray, listIdx, iPartIdx, iRefIdx, iMv);
+        } else {
+          * (uint32_t*)iMv = 0;
         }
+        UpdateP8x16MotionInfo (pCurDqLayer, iMvArray, iRefIdxArray, listIdx, iPartIdx, iRefIdx, iMv);
       }
     }
   } else if (IS_Inter_8x8 (mbType)) {
@@ -1802,6 +1823,10 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
             iMv[0] += iCode;
             WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l1[ mbPartIdx ][ subMbPartIdx ][ compIdx ]
             iMv[1] += iCode;
+#ifdef _DEBUG
+
+            fprintf (pFile, "iMv: %d %d\n", iMv[0], iMv[1]);
+#endif
             WELS_CHECK_SE_BOTH_WARNING (iMv[1], iMinVmv, iMaxVmv, "vertical mv");
           } else {
             * (uint32_t*)iMv = 0;
