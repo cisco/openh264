@@ -1748,6 +1748,7 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       for (int32_t i = 0; i < 4; i++) {
         int16_t iIdx8 = i << 2;
+        uint8_t uiScan4Idx = g_kuiScan4[iIdx8];
         int32_t subMbType = pCurDqLayer->pSubMbType[iMbXy][i];
         int8_t iref = REF_NOT_IN_LIST;
         if (IS_DIRECT (subMbType)) {
@@ -1768,7 +1769,6 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
           UpdateP8x8Direct (pCurDqLayer, iIdx8);
         } else {
           if (IS_DIR (subMbType, 0, listIdx)) {
-            uint8_t uiScan4Idx = g_kuiScan4[iIdx8];
             if (iMotionPredFlag[listIdx][i] == 0) {
               WELS_READ_VERIFY (BsGetTe0 (pBs, iRefCount[listIdx], &uiCode)); //ref_idx_l0[ mbPartIdx ]
               iref = uiCode;
@@ -1783,15 +1783,15 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
               }
               pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || ! (ppRefPic[iref]
                                       && ppRefPic[iref]->bIsComplete);
-              pCurDqLayer->pRefIndex[listIdx][iMbXy][uiScan4Idx] = pCurDqLayer->pRefIndex[listIdx][iMbXy][uiScan4Idx + 1] =
-                    pCurDqLayer->pRefIndex[listIdx][iMbXy][uiScan4Idx + 4] = pCurDqLayer->pRefIndex[listIdx][iMbXy][uiScan4Idx + 5] = iref;
-              ref_idx_list[listIdx][i] = iref;
             } else {
               WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "inter parse: iMotionPredFlag = 1 not supported. ");
               return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_UNSUPPORTED_ILP);
             }
           }
         }
+        pCurDqLayer->pRefIndex[listIdx][iMbXy][uiScan4Idx] = pCurDqLayer->pRefIndex[listIdx][iMbXy][uiScan4Idx + 1] =
+              pCurDqLayer->pRefIndex[listIdx][iMbXy][uiScan4Idx + 4] = pCurDqLayer->pRefIndex[listIdx][iMbXy][uiScan4Idx + 5] = iref;
+        ref_idx_list[listIdx][i] = iref;
       }
     }
     //mv
