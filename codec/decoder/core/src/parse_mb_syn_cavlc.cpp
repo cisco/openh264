@@ -1761,7 +1761,6 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
               }
             }
           }
-          UpdateP8x8Direct (pCurDqLayer, iIdx8);
         } else {
           if (IS_DIR (subMbType, 0, listIdx)) {
             if (iMotionPredFlag[listIdx][i] == 0) {
