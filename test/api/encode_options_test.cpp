@@ -1033,6 +1033,13 @@ TEST_F (EncodeDecodeTestAPI, SimulcastSVC) {
       EXPECT_TRUE (iResult == cmResultSuccess) << "iResult=" << iResult << "LayerIdx=" << iIdx;
       iResult = decoder[iIdx]->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_);
       EXPECT_TRUE (iResult == cmResultSuccess) << "iResult=" << iResult << "LayerIdx=" << iIdx;
+      if (dstBufInfo_.iBufferStatus == 0) {
+        int32_t num_of_frames_in_buffer = 0;
+        decoder[iIdx]->GetOption (DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER, &num_of_frames_in_buffer);
+        for (int32_t i = 0; i < num_of_frames_in_buffer; ++i) {
+          decoder[iIdx]->FlushFrame (pData, &dstBufInfo_);
+        }
+      }
       EXPECT_EQ (dstBufInfo_.iBufferStatus, 1) << "LayerIdx=" << iIdx;
     }
   }
@@ -2299,7 +2306,7 @@ TEST_F (EncodeDecodeTestAPI,  TemporalLayerChangeDuringEncoding_Specific) {
 
     while (fileStream.read (buf_.data(), frameSize) == frameSize) {
 
-      if ( (iStepIdx < 3) && (iFrameNum == ((iTotalFrame / 3) * (iStepIdx + 1)))) {
+      if ((iStepIdx < 3) && (iFrameNum == ((iTotalFrame / 3) * (iStepIdx + 1)))) {
         sParam.iTemporalLayerNum = originalTemporalLayerNum * iSteps[iStepIdx];
         sParam.iTargetBitrate = sParam.sSpatialLayers[0].iSpatialBitrate = originalBR * iSteps[iStepIdx];
         sParam.fMaxFrameRate = sParam.sSpatialLayers[0].fFrameRate = originalFR * pow (2.0f, iSteps[iStepIdx]);
@@ -2314,9 +2321,11 @@ TEST_F (EncodeDecodeTestAPI,  TemporalLayerChangeDuringEncoding_Specific) {
 
       if (bSetOption) {
         if ((iStepIdx == 1) || (iStepIdx == 3)) {
-          EXPECT_TRUE (info.eFrameType == videoFrameTypeIDR) << "iStepIdx=" << iStepIdx << "iFrameNum=" << iFrameNum << "iTotalFrame=" << iTotalFrame;
+          EXPECT_TRUE (info.eFrameType == videoFrameTypeIDR) << "iStepIdx=" << iStepIdx << "iFrameNum=" << iFrameNum <<
+              "iTotalFrame=" << iTotalFrame;
         } else {
-          EXPECT_TRUE (info.eFrameType != videoFrameTypeIDR) << "iStepIdx=" << iStepIdx << "iFrameNum=" << iFrameNum << "iTotalFrame=" << iTotalFrame;
+          EXPECT_TRUE (info.eFrameType != videoFrameTypeIDR) << "iStepIdx=" << iStepIdx << "iFrameNum=" << iFrameNum <<
+              "iTotalFrame=" << iTotalFrame;
         }
 
         bSetOption = false;
