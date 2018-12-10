@@ -60,13 +60,6 @@ typedef struct TagReadBitsCache {
   uint8_t*  pBuf;
 } SReadBitsCache;
 
-static void UpdateP8x8Direct (PDqLayer pCurDqLayer, int32_t iPartIdx) {
-  int32_t iMbXy = pCurDqLayer->iMbXyIndex;
-  const uint8_t iScan4Idx = g_kuiScan4[iPartIdx];
-  pCurDqLayer->pDirect[iMbXy][iScan4Idx] = pCurDqLayer->pDirect[iMbXy][iScan4Idx + 1] =
-        pCurDqLayer->pDirect[iMbXy][iScan4Idx + 4] = pCurDqLayer->pDirect[iMbXy][iScan4Idx + 5] = 1;
-}
-
 void GetNeighborAvailMbType (PWelsNeighAvail pNeighAvail, PDqLayer pCurLayer) {
   int32_t iCurSliceIdc, iTopSliceIdc, iLeftTopSliceIdc, iRightTopSliceIdc, iLeftSliceIdc;
   int32_t iCurXy, iTopXy = 0, iLeftXy = 0, iLeftTopXy = 0, iRightTopXy = 0;
