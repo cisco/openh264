@@ -1390,8 +1390,8 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
               || (ppRefPic[ref_idx_list[listIdx][0]] == NULL)) { //error ref_idx
             pCtx->bMbRefConcealed = true;
             if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE) {
-              ref_idx_list[listIdx][0],
-                           pCtx->iErrorCode |= dsBitstreamError;
+              ref_idx_list[listIdx][0] = 0;
+              pCtx->iErrorCode |= dsBitstreamError;
             } else {
               return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_REF_INDEX);
             }
@@ -1596,7 +1596,6 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
     if (pSlice->sSliceHeaderExt.bAdaptiveMotionPredFlag) {
       for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
         for (int32_t i = 0; i < 4; i++) {
-          int32_t subMbType = pCurDqLayer->pSubMbType[iMbXy][i];
           bool is_dir = IS_DIR (pCurDqLayer->pSubMbType[iMbXy][i], 0, listIdx) > 0;
           if (is_dir) {
             WELS_READ_VERIFY (BsGetOneBit (pBs, &uiCode)); //motion_prediction_flag_l0[ mbPartIdx ]
