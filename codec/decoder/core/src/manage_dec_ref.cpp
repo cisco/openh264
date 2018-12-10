@@ -374,7 +374,7 @@ int32_t WelsReorderRefList (PWelsDecoderContext pCtx) {
           }
           iPredFrameNum &= iMaxPicNum - 1;
 
-          for (i = iMaxRefIdx; i >= 0; i--) {
+          for (i = iMaxRefIdx - 1; i >= 0; i--) {
             if (ppRefList[i] != NULL && ppRefList[i]->iFrameNum == iPredFrameNum && !ppRefList[i]->bIsLongRef) {
               if ((pNalHeaderExt->uiQualityId == ppRefList[i]->uiQualityId)
                   && (pSliceHeader->iSpsId != ppRefList[i]->iSpsId)) {   //check;
@@ -389,7 +389,7 @@ int32_t WelsReorderRefList (PWelsDecoderContext pCtx) {
           }
 
         } else if (uiReorderingOfPicNumsIdc == 2) {
-          for (i = iMaxRefIdx; i >= 0; i--) {
+          for (i = iMaxRefIdx - 1; i >= 0; i--) {
             if (ppRefList[i] != NULL && ppRefList[i]->bIsLongRef
                 && ppRefList[i]->iLongTermFrameIdx ==
                 pRefPicListReorderSyn->sReorderingSyn[listIdx][iReorderingIndex].uiLongTermPicNum) {
