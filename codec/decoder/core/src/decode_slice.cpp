@@ -51,10 +51,12 @@
 #include "cpu_core.h"
 
 namespace WelsDec {
-
+//#define _MV_DUMP_ 1
+#ifdef _MV_DUMP_
 #if defined(_DEBUG)
 FILE* pFile = fopen ("Y:/p4/CodeProjects/Upwork/screencast/xiaotiansf/openh264-1/MV_CAVLC.txt", "w");
 uint32_t uiTotalFrameCount;
+#endif
 #endif
 
 extern void FreePicture (PPicture pPic, CMemoryAlign* pMa);
@@ -2363,12 +2365,14 @@ int32_t WelsDecodeMbCavlcBSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uin
   int32_t iRet = 0; //should have the return value to indicate decoding error or not, It's NECESSARY--2010.4.15
   uint32_t uiCode;
 
+#ifdef _MV_DUMP_
 #ifdef _DEBUG
   if (iMbXy == 0) {
     ++uiTotalFrameCount;
     fprintf (pFile, "BFrameCount = %d\n", uiTotalFrameCount);
     fflush (pFile);
   }
+#endif
 #endif
 
   pCurLayer->pNoSubMbPartSizeLessThan8x8Flag[iMbXy] = true;
@@ -2404,9 +2408,6 @@ int32_t WelsDecodeMbCavlcBSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uin
       //predict direct spatial mv
       SubMbType subMbType;
       int32_t ret = PredMvBDirectSpatial (pCtx, iMv, ref, subMbType);
-#ifdef _DEBUG
-//      fprintf (pFile, "Direct iMbXy = %d iMv: %d %d\n", iMbXy, iMv[0], iMv[1]);
-#endif
       if (ret != ERR_NONE) {
         return ret;
       }
@@ -2495,12 +2496,10 @@ int32_t WelsActualDecodeMbCavlcBSlice (PWelsDecoderContext pCtx) {
   pCurLayer->pInterPredictionDoneFlag[iMbXy] = 0;//2009.10.23
   WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //uiMbType
   uiMbType = uiCode;
+#ifdef _MV_DUMP_
 #ifdef _DEBUG
   fprintf (pFile, "iMbXy = %d uiMbType = %d\n", iMbXy, uiMbType);
-  if (iMbXy == 162) {
-    int32_t tmp = 162;
-    tmp = iMbXy;
-  }
+#endif
 #endif
   if (uiMbType < 23) { //inter MB type
     int16_t iMotionVector[LIST_A][30][MV_A];

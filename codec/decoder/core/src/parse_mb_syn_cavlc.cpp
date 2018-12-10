@@ -46,10 +46,12 @@
 
 namespace WelsDec {
 #define MAX_LEVEL_PREFIX 15
-
+//#define _MV_DUMP_ 1
+#ifdef _MV_DUMP_
 #if defined(_DEBUG)
 extern FILE* pFile;
 extern uint32_t uiTotalFrameCount;
+#endif
 #endif
 
 typedef struct TagReadBitsCache {
@@ -1416,8 +1418,10 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
         iMv[0] += iCode;
         WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l1[ mbPartIdx ][ 0 ][ compIdx ]
         iMv[1] += iCode;
+#ifdef _MV_DUMP_
 #ifdef _DEBUG
         fprintf (pFile, "iMv: %d %d\n", iMv[0], iMv[1]);
+#endif
 #endif
         WELS_CHECK_SE_BOTH_WARNING (iMv[1], iMinVmv, iMaxVmv, "vertical mv");
       } else {
@@ -1474,8 +1478,10 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
           iMv[0] += iCode;
           WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l1[ mbPartIdx ][ 0 ][ compIdx ]
           iMv[1] += iCode;
+#ifdef _MV_DUMP_
 #ifdef _DEBUG
           fprintf (pFile, "iMv: %d %d\n", iMv[0], iMv[1]);
+#endif
 #endif
           WELS_CHECK_SE_BOTH_WARNING (iMv[1], iMinVmv, iMaxVmv, "vertical mv");
         } else {
@@ -1533,8 +1539,10 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
           iMv[0] += iCode;
           WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l1[ mbPartIdx ][ 0 ][ compIdx ]
           iMv[1] += iCode;
+#ifdef _MV_DUMP_
 #ifdef _DEBUG
           fprintf (pFile, "iMv: %d %d\n", iMv[0], iMv[1]);
+#endif
 #endif
           WELS_CHECK_SE_BOTH_WARNING (iMv[1], iMinVmv, iMaxVmv, "vertical mv");
         } else {
@@ -1817,9 +1825,10 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
             iMv[0] += iCode;
             WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l1[ mbPartIdx ][ subMbPartIdx ][ compIdx ]
             iMv[1] += iCode;
+#ifdef _MV_DUMP_
 #ifdef _DEBUG
-
             fprintf (pFile, "iMv: %d %d\n", iMv[0], iMv[1]);
+#endif
 #endif
             WELS_CHECK_SE_BOTH_WARNING (iMv[1], iMinVmv, iMaxVmv, "vertical mv");
           } else {
