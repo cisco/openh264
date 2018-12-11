@@ -133,6 +133,7 @@ static const FileParam kFileParamArray[] = {
   {"res/test_vd_rc.264", "eea02e97bfec89d0418593a8abaaf55d02eaa1ca"},
   {"res/Cisco_Men_whisper_640x320_CABAC_Bframe_9.264", "88b8864a69cee7656202bc54d2ffa8b7b6f1f6c5"},
   {"res/Cisco_Men_whisper_640x320_CAVLC_Bframe_9.264", "270a500d2f91c9e2c8ffabc03f62e0dc0b3a24ed" },
+  {"res/Cisco_Adobe_PDF_sample_a_1024x768_CAVLC_Bframe_9.264", "d3b2b986178ce3eafa806cd984543d0da830f408"},
 };
 
 INSTANTIATE_TEST_CASE_P (DecodeFile, DecoderOutputTest,
