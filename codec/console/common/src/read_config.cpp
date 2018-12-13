@@ -37,9 +37,8 @@
  *      08/18/2008 Created
  *
  *****************************************************************************/
-#if !defined(_CRT_SECURE_NO_WARNINGS)
+
 #define _CRT_SECURE_NO_WARNINGS
-#endif
 #include <stdio.h>
 #include <string.h>
 #include "read_config.h"

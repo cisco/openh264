@@ -51,13 +51,6 @@
 #include "cpu_core.h"
 
 namespace WelsDec {
-//#define _MV_DUMP_ 1
-#ifdef _MV_DUMP_
-#if defined(_DEBUG)
-FILE* pFile = fopen ("Y:/p4/CodeProjects/Upwork/screencast/xiaotiansf/openh264-1/MV_CAVLC.txt", "w");
-uint32_t uiTotalFrameCount;
-#endif
-#endif
 
 extern void FreePicture (PPicture pPic, CMemoryAlign* pMa);
 
@@ -2364,16 +2357,6 @@ int32_t WelsDecodeMbCavlcBSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uin
   int32_t iBaseModeFlag, i;
   int32_t iRet = 0; //should have the return value to indicate decoding error or not, It's NECESSARY--2010.4.15
   uint32_t uiCode;
-
-#ifdef _MV_DUMP_
-#ifdef _DEBUG
-  if (iMbXy == 0) {
-    ++uiTotalFrameCount;
-    fprintf (pFile, "BFrameCount = %d\n", uiTotalFrameCount);
-    fflush (pFile);
-  }
-#endif
-#endif
 
   pCurLayer->pNoSubMbPartSizeLessThan8x8Flag[iMbXy] = true;
   pCurLayer->pTransformSize8x8Flag[iMbXy] = false;
