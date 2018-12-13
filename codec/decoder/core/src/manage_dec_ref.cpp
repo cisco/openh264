@@ -360,7 +360,7 @@ int32_t WelsReorderRefList (PWelsDecoderContext pCtx) {
     }
 
     if (pRefPicListReorderSyn->bRefPicListReorderingFlag[listIdx]) {
-      while ((iReorderingIndex < MAX_REF_PIC_COUNT)
+      while ((iReorderingIndex <= iMaxRefIdx)
              && (pRefPicListReorderSyn->sReorderingSyn[listIdx][iReorderingIndex].uiReorderingOfPicNumsIdc != 3)) {
         uint16_t uiReorderingOfPicNumsIdc =
           pRefPicListReorderSyn->sReorderingSyn[listIdx][iReorderingIndex].uiReorderingOfPicNumsIdc;
@@ -455,7 +455,7 @@ int32_t WelsReorderRefList2 (PWelsDecoderContext pCtx) {
     if (pRefPicListReorderSyn->bRefPicListReorderingFlag[listIdx]) {
       int32_t iPredFrameNum = iCurFrameNum;
       for (i = 0; pRefPicListReorderSyn->sReorderingSyn[listIdx][i].uiReorderingOfPicNumsIdc != 3; i++) {
-        if (iCount >= MAX_REF_PIC_COUNT)
+        if (iCount >= iMaxRefIdx)
           break;
 
         for (j = iRefCount; j > iCount; j--)
