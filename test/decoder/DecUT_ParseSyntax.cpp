@@ -412,7 +412,7 @@ void DecoderParseSyntaxTest::TestSpecificBsError() {
   int32_t iRet = ERR_NONE;
   Init();
   ASSERT_EQ (iRet, ERR_NONE);
-  ASSERT_TRUE (DecodeBs ("res/Cisco_Men_whisper_640x320_CAVLC_Bframe_9.264", CorrectDec));
+  ASSERT_TRUE (DecodeBs ("res/Cisco_Men_whisper_640x320_CAVLC_Bframe_9.264", ErrorDec));
   Uninit();
 }
 
