@@ -2479,11 +2479,6 @@ int32_t WelsActualDecodeMbCavlcBSlice (PWelsDecoderContext pCtx) {
   pCurLayer->pInterPredictionDoneFlag[iMbXy] = 0;//2009.10.23
   WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //uiMbType
   uiMbType = uiCode;
-#ifdef _MV_DUMP_
-#ifdef _DEBUG
-  fprintf (pFile, "iMbXy = %d uiMbType = %d\n", iMbXy, uiMbType);
-#endif
-#endif
   if (uiMbType < 23) { //inter MB type
     int16_t iMotionVector[LIST_A][30][MV_A];
     int8_t  iRefIndex[LIST_A][30];
