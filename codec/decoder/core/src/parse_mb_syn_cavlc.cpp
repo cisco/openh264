@@ -1334,9 +1334,7 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
                          int8_t iRefIdxArray[LIST_A][30], PBitStringAux pBs) {
   PSlice pSlice = &pCtx->pCurDqLayer->sLayerInfo.sSliceInLayer;
   PSliceHeader pSliceHeader = &pSlice->sSliceHeaderExt.sSliceHeader;
-  PPicture* ppRefPic[2];
-  ppRefPic[LIST_0] = pCtx->sRefPic.pRefList[LIST_0];
-  ppRefPic[LIST_1] = pCtx->sRefPic.pRefList[LIST_1];
+  PPicture* ppRefPic = pCtx->sRefPic.pRefList[LIST_0];
   int8_t ref_idx_list[LIST_A][4];
   int8_t iRef[2] = {0, 0};
   int32_t iRefCount[2];
@@ -1389,7 +1387,7 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
           // Security check: iRefIdx should be in range 0 to num_ref_idx_l0_active_minus1, includsive
           // ref to standard section 7.4.5.1. iRefCount[0] is 1 + num_ref_idx_l0_active_minus1.
           if ((ref_idx_list[listIdx][0] < 0) || (ref_idx_list[listIdx][0] >= iRefCount[listIdx])
-              || (ppRefPic[listIdx][ref_idx_list[listIdx][0]] == NULL)) { //error ref_idx
+              || (ppRefPic[ref_idx_list[listIdx][0]] == NULL)) { //error ref_idx
             pCtx->bMbRefConcealed = true;
             if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE) {
               ref_idx_list[listIdx][0] = 0;
@@ -1398,8 +1396,8 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
               return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_REF_INDEX);
             }
           }
-          pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || ! (ppRefPic[listIdx][ref_idx_list[listIdx][0]]
-                                  && ppRefPic[listIdx][ref_idx_list[listIdx][0]]->bIsComplete);
+          pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || ! (ppRefPic[ref_idx_list[listIdx][0]]
+                                  && ppRefPic[ref_idx_list[listIdx][0]]->bIsComplete);
         } else {
           WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "inter parse: iMotionPredFlag = 1 not supported. ");
           return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_UNSUPPORTED_ILP);
@@ -1443,7 +1441,7 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
             int32_t iRefIdx = uiCode;
             // Security check: iRefIdx should be in range 0 to num_ref_idx_l0_active_minus1, includsive
             // ref to standard section 7.4.5.1. iRefCount[0] is 1 + num_ref_idx_l0_active_minus1.
-            if ((iRefIdx < 0) || (iRefIdx >= iRefCount[listIdx]) || (ppRefPic[listIdx][iRefIdx] == NULL)) { //error ref_idx
+            if ((iRefIdx < 0) || (iRefIdx >= iRefCount[listIdx]) || (ppRefPic[iRefIdx] == NULL)) { //error ref_idx
               pCtx->bMbRefConcealed = true;
               if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE) {
                 iRefIdx = 0;
@@ -1453,8 +1451,8 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
               }
             }
             ref_idx_list[listIdx][i] = iRefIdx;
-            pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || ! (ppRefPic[listIdx][iRefIdx]
-                                    && ppRefPic[listIdx][iRefIdx]->bIsComplete);
+            pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || ! (ppRefPic[iRefIdx]
+                                    && ppRefPic[iRefIdx]->bIsComplete);
           } else {
             WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "inter parse: iMotionPredFlag = 1 not supported. ");
             return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_UNSUPPORTED_ILP);
@@ -1504,7 +1502,7 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
             int32_t iRefIdx = uiCode;
             // Security check: iRefIdx should be in range 0 to num_ref_idx_l0_active_minus1, includsive
             // ref to standard section 7.4.5.1. iRefCount[0] is 1 + num_ref_idx_l0_active_minus1.
-            if ((iRefIdx < 0) || (iRefIdx >= iRefCount[listIdx]) || (ppRefPic[listIdx][iRefIdx] == NULL)) { //error ref_idx
+            if ((iRefIdx < 0) || (iRefIdx >= iRefCount[listIdx]) || (ppRefPic[iRefIdx] == NULL)) { //error ref_idx
               pCtx->bMbRefConcealed = true;
               if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE) {
                 iRefIdx = 0;
@@ -1514,8 +1512,8 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
               }
             }
             ref_idx_list[listIdx][i] = iRefIdx;
-            pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || ! (ppRefPic[listIdx][iRefIdx]
-                                    && ppRefPic[listIdx][iRefIdx]->bIsComplete);
+            pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || ! (ppRefPic[iRefIdx]
+                                    && ppRefPic[iRefIdx]->bIsComplete);
           } else {
             WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "inter parse: iMotionPredFlag = 1 not supported. ");
             return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_UNSUPPORTED_ILP);
@@ -1768,7 +1766,7 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
             if (iMotionPredFlag[listIdx][i] == 0) {
               WELS_READ_VERIFY (BsGetTe0 (pBs, iRefCount[listIdx], &uiCode)); //ref_idx_l0[ mbPartIdx ]
               iref = uiCode;
-              if ((iref < 0) || (iref >= iRefCount[0]) || (ppRefPic[listIdx][iref] == NULL)) { //error ref_idx
+              if ((iref < 0) || (iref >= iRefCount[0]) || (ppRefPic[iref] == NULL)) { //error ref_idx
                 pCtx->bMbRefConcealed = true;
                 if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE) {
                   iref = 0;
@@ -1777,8 +1775,8 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
                   return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_REF_INDEX);
                 }
               }
-              pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || ! (ppRefPic[listIdx][iref]
-                                      && ppRefPic[listIdx][iref]->bIsComplete);
+              pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || ! (ppRefPic[iref]
+                                      && ppRefPic[iref]->bIsComplete);
             } else {
               WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "inter parse: iMotionPredFlag = 1 not supported. ");
               return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_UNSUPPORTED_ILP);
