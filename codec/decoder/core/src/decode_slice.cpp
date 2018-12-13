@@ -1349,7 +1349,7 @@ int32_t WelsDecodeMbCabacPSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uin
 
   if (uiCode) {
     int16_t pMv[2] = {0};
-    pCurLayer->pMbType[iMbXy] = MB_TYPE_SKIP | MB_TYPE_16x16 | MB_TYPE_P0L0 | MB_TYPE_P1L0;
+    pCurLayer->pMbType[iMbXy] = MB_TYPE_SKIP;
     ST32 (&pCurLayer->pNzc[iMbXy][0], 0);
     ST32 (&pCurLayer->pNzc[iMbXy][4], 0);
     ST32 (&pCurLayer->pNzc[iMbXy][8], 0);
@@ -1566,16 +1566,6 @@ int32_t WelsDecodeSlice (PWelsDecoderContext pCtx, bool bFirstSliceInLayer, PNal
   iMbY = iNextMbXyIndex / pCurLayer->iMbWidth; // error is introduced by multiple slices case, 11/23/2009
   pSlice->iMbSkipRun = -1;
   iSliceIdc = (pSliceHeader->iFirstMbInSlice << 7) + pCurLayer->uiLayerDqId;
-
-#ifdef _MV_DUMP_
-#ifdef _DEBUG
-  if (iNextMbXyIndex == 0) {
-    ++uiTotalFrameCount;
-    fprintf (pFile, "BFrameCount = %d\n", uiTotalFrameCount);
-    fflush (pFile);
-  }
-#endif
-#endif
 
   pCurLayer->iMbX =  iMbX;
   pCurLayer->iMbY = iMbY;
@@ -2295,7 +2285,7 @@ int32_t WelsDecodeMbCavlcPSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uin
   if (pSlice->iMbSkipRun--) {
     int16_t iMv[2];
 
-    pCurLayer->pMbType[iMbXy] = MB_TYPE_SKIP | MB_TYPE_16x16 | MB_TYPE_P0L0 | MB_TYPE_P1L0;
+    pCurLayer->pMbType[iMbXy] = MB_TYPE_SKIP;
     ST32A4 (&pNzc[0], 0);
     ST32A4 (&pNzc[4], 0);
     ST32A4 (&pNzc[8], 0);

@@ -445,9 +445,6 @@ void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDec
   int16_t iMVs[2] = {0};
 
   uint32_t iMBType = pCurDqLayer->pMbType[iMBXY];
-  if (IS_SKIP (iMBType)) {
-    iMBType = MB_TYPE_SKIP;
-  }
 
   int32_t iMBOffsetX = pCurDqLayer->iMbX << 4;
   int32_t iMBOffsetY = pCurDqLayer->iMbY << 4;
