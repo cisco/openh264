@@ -255,6 +255,8 @@ void GetAvilInfoFromCorrectMb (PWelsDecoderContext pCtx) {
   int32_t iMbHeight = (int32_t) pCtx->pSps->iMbHeight;
   bool* pMbCorrectlyDecodedFlag = pCtx->pCurDqLayer->pMbCorrectlyDecodedFlag;
   PDqLayer pCurDqLayer = pCtx->pCurDqLayer;
+  PSlice pSlice = &pCtx->pCurDqLayer->sLayerInfo.sSliceInLayer;
+  PSliceHeader pSliceHeader = &pSlice->sSliceHeaderExt.sSliceHeader;
   int32_t iInterMbCorrectNum[16];
   int32_t iMbXyIndex;
 
@@ -268,6 +270,8 @@ void GetAvilInfoFromCorrectMb (PWelsDecoderContext pCtx) {
       iMbXyIndex = iMbY * iMbWidth + iMbX;
       if (pMbCorrectlyDecodedFlag[iMbXyIndex] && IS_INTER (pCurDqLayer->pMbType[iMbXyIndex])) {
         uint32_t iMBType = pCurDqLayer->pMbType[iMbXyIndex];
+        if (IS_SKIP (iMBType) && pSliceHeader->eSliceType == P_SLICE)
+          iMBType = MB_TYPE_SKIP;
         switch (iMBType) {
         case MB_TYPE_SKIP:
         case MB_TYPE_16x16:
