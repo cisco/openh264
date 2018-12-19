@@ -148,13 +148,13 @@ static const uint8_t g_kuiTableB8x8Idx[2][16] = {
     8,  9,  12, 13, 10, 11, 14, 15
   },
 };
-
+//fix Bugzilla 1486223
 #define TC0_TBL_LOOKUP(tc, iIndexA, pBS, bChroma) \
 {\
-  tc[0] = g_kiTc0Table(iIndexA)[pBS[0]] + bChroma;\
-  tc[1] = g_kiTc0Table(iIndexA)[pBS[1]] + bChroma;\
-  tc[2] = g_kiTc0Table(iIndexA)[pBS[2]] + bChroma;\
-  tc[3] = g_kiTc0Table(iIndexA)[pBS[3]] + bChroma;\
+  tc[0] = g_kiTc0Table(iIndexA)[pBS[0] & 3] + bChroma;\
+  tc[1] = g_kiTc0Table(iIndexA)[pBS[1] & 3] + bChroma;\
+  tc[2] = g_kiTc0Table(iIndexA)[pBS[2] & 3] + bChroma;\
+  tc[3] = g_kiTc0Table(iIndexA)[pBS[3] & 3] + bChroma;\
 }
 
 void inline DeblockingBSInsideMBAvsbase (int8_t* pNnzTab, uint8_t nBS[2][4][4], int32_t iLShiftFactor) {
