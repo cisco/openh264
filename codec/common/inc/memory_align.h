@@ -49,11 +49,16 @@
 #include <stdio.h>
 #endif//MEMORY_CHECK
 
+#include <stdlib.h>
+
 namespace WelsCommon {
+
+typedef void*(*MALLOC_FP)(uint32_t);
+typedef void(*FREE_FP)(void*);
 
 class CMemoryAlign {
  public:
-CMemoryAlign (const uint32_t kuiCacheLineSize);
+CMemoryAlign (const uint32_t kuiCacheLineSize, MALLOC_FP fpMalloc = CMemoryAlign::malloc, FREE_FP fpFree = CMemoryAlign::free);
 virtual ~CMemoryAlign();
 
 void* WelsMallocz (const uint32_t kuiSize, const char* kpTag);
@@ -62,6 +67,9 @@ void WelsFree (void* pPointer, const char* kpTag);
 const uint32_t WelsGetCacheLineSize() const;
 const uint32_t WelsGetMemoryUsage() const;
 
+static void * malloc(const uint32_t kuiSize) { return ::malloc(kuiSize); }
+static void free(void * pP) { return ::free(pP); }
+
  private:
 // private copy & assign constructors adding to fix klocwork scan issues
 CMemoryAlign (const CMemoryAlign& kcMa);
@@ -69,6 +77,8 @@ CMemoryAlign& operator= (const CMemoryAlign& kcMa);
 
  protected:
 uint32_t        m_nCacheLineSize;
+MALLOC_FP       m_fpMalloc;
+FREE_FP         m_fpFree;
 
 #ifdef MEMORY_MONITOR
 uint32_t        m_nMemoryUsageInBytes;
@@ -86,7 +96,7 @@ uint32_t        m_nMemoryUsageInBytes;
 * \note N/A
 *************************************************************************************
 */
-void* WelsMallocz (const uint32_t kuiSize, const char* kpTag);
+void* WelsMallocz (const uint32_t kuiSize, const char* kpTag, MALLOC_FP fpMalloc = CMemoryAlign::malloc);
 
 /*!
 *************************************************************************************
@@ -100,7 +110,7 @@ void* WelsMallocz (const uint32_t kuiSize, const char* kpTag);
 * \note N/A
 *************************************************************************************
 */
-void WelsFree (void* pPtr, const char* kpTag);
+void WelsFree (void* pPtr, const char* kpTag, FREE_FP fpFree = CMemoryAlign::free);
 
 #define WELS_SAFE_FREE(pPtr, pTag)              if (pPtr) { WelsFree(pPtr, pTag); pPtr = NULL; }
 

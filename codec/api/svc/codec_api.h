@@ -537,6 +537,8 @@ long (*GetOption) (ISVCDecoder*, DECODER_OPTION eOptionId, void* pOption);
 #endif
 
 typedef void (*WelsTraceCallback) (void* ctx, int level, const char* string);
+typedef void*(*WelsMallocCallback)(unsigned int size);
+typedef void(*WelsFreeCallback)(void* p);
 
 /** @brief   Create encoder
  *  @param   ppEncoder encoder

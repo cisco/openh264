@@ -93,6 +93,8 @@ namespace WelsDec {
 CWelsDecoder::CWelsDecoder (void)
   : m_pDecContext (NULL),
     m_pWelsTrace (NULL),
+    m_pMalloc (NULL),
+    m_pFree (NULL),
     m_iPictInfoIndex (0),
     m_iMinPOC (sIMinInt32),
     m_iNumOfPicts (0),
@@ -243,7 +245,7 @@ void CWelsDecoder::UninitDecoder (void) {
   }
 
   if (NULL != m_pDecContext) {
-    WelsFree (m_pDecContext, "m_pDecContext");
+    WelsFree (m_pDecContext, "m_pDecContext", m_pFree?m_pFree:CMemoryAlign::free);
 
     m_pDecContext = NULL;
   }
@@ -259,11 +261,12 @@ int32_t CWelsDecoder::InitDecoder (const SDecodingParam* pParam) {
   //reset decoder context
   if (m_pDecContext) //free
     UninitDecoder();
-  m_pDecContext = (PWelsDecoderContext)WelsMallocz (sizeof (SWelsDecoderContext), "m_pDecContext");
+  m_pDecContext = (PWelsDecoderContext)WelsMallocz (sizeof (SWelsDecoderContext), "m_pDecContext", m_pMalloc?m_pMalloc:CMemoryAlign::malloc);
   if (NULL == m_pDecContext)
     return cmMallocMemeError;
   int32_t iCacheLineSize = 16;   // on chip cache line size in byte
-  m_pDecContext->pMemAlign = new CMemoryAlign (iCacheLineSize);
+  m_pDecContext->pMemAlign = new CMemoryAlign (iCacheLineSize, m_pMalloc?m_pMalloc:CMemoryAlign::malloc,
+                                               m_pFree?m_pFree:CMemoryAlign::free);
   WELS_VERIFY_RETURN_PROC_IF (cmMallocMemeError, (NULL == m_pDecContext->pMemAlign), UninitDecoder())
 
   //fill in default value into context
@@ -305,7 +308,8 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
   int iVal = 0;
 
   if (m_pDecContext == NULL && eOptID != DECODER_OPTION_TRACE_LEVEL &&
-      eOptID != DECODER_OPTION_TRACE_CALLBACK && eOptID != DECODER_OPTION_TRACE_CALLBACK_CONTEXT)
+      eOptID != DECODER_OPTION_TRACE_CALLBACK && eOptID != DECODER_OPTION_TRACE_CALLBACK_CONTEXT &&
+      eOptID != DECODER_OPTION_MALLOC && eOptID != DECODER_OPTION_FREE)
     return dsInitialOptExpected;
   if (eOptID == DECODER_OPTION_END_OF_STREAM) { // Indicate bit-stream of the final frame to be decoded
     if (pOption == NULL)
@@ -368,6 +372,20 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_WARNING,
              "CWelsDecoder::SetOption():DECODER_OPTION_GET_SAR_INFO: this option is get-only!");
     return cmInitParaError;
+  } else if (eOptID == DECODER_OPTION_MALLOC) {
+    WelsMallocCallback callback = * ((WelsMallocCallback*)pOption);
+    m_pMalloc = callback;
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "CWelsDecoder::SetOption():DECODER_OPTION_MALLOC function = %p.",
+             callback);
+    return cmResultSuccess;
+  } else if (eOptID == DECODER_OPTION_FREE) {
+    WelsFreeCallback callback = * ((WelsFreeCallback*)pOption);
+    m_pFree = callback;
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "CWelsDecoder::SetOption():DECODER_OPTION_FREE function = %p.",
+             callback);
+    return cmResultSuccess;
   }
   return cmInitParaError;
 }

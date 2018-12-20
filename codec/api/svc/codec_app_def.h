@@ -166,7 +166,10 @@ typedef enum {
   DECODER_OPTION_LEVEL,                 ///< get current AU level info,only is used in GetOption
   DECODER_OPTION_STATISTICS_LOG_INTERVAL,///< set log output interval
   DECODER_OPTION_IS_REF_PIC,             ///< feedback current frame is ref pic or not
-  DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER  ///< number of frames remaining in decoder buffer when pictures are required to re-ordered into display-order.
+  DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER, ///< number of frames remaining in decoder buffer when pictures are required to re-ordered into display-order.
+
+  DECODER_OPTION_MALLOC,                ///< a void* (*)(unsigned int) function which allocates memory
+  DECODER_OPTION_FREE                   ///< a void (*)(void*) function which deallocates memory
 
 } DECODER_OPTION;
 

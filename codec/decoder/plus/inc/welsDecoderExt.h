@@ -120,6 +120,8 @@ class CWelsDecoder : public ISVCDecoder {
  private:
   PWelsDecoderContext     m_pDecContext;
   welsCodecTrace*         m_pWelsTrace;
+  WelsMallocCallback      m_pMalloc;
+  WelsFreeCallback        m_pFree;
   SPictInfo               m_sPictInfoList[16];
   int32_t                 m_iPictInfoIndex;
   int32_t                 m_iMinPOC;
