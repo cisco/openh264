@@ -320,7 +320,10 @@ int32_t GetColocatedMb (PWelsDecoderContext pCtx, MbType& mbType, SubMbType& sub
   }
 
   MbType coloc_mbType = colocPic->pMbType[iMbXy];
-
+  if (coloc_mbType == MB_TYPE_SKIP) {
+    //This indicates the colocated MB is P SKIP MB
+    coloc_mbType |= MB_TYPE_16x16 | MB_TYPE_P0L0 | MB_TYPE_P1L0;
+  }
   if (IS_Inter_8x8 (coloc_mbType) && !pCtx->pSps->bDirect8x8InferenceFlag) {
     subMbType = SUB_MB_TYPE_4x4 | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_DIRECT;
     mbType |= MB_TYPE_8x8 | MB_TYPE_L0 | MB_TYPE_L1;
