@@ -330,7 +330,7 @@ class ISVCEncoder {
   virtual int EXTAPI SetOption (ENCODER_OPTION eOptionId, void* pOption) = 0;
 
   /**
-  * @brief   Set option for encoder, detail option type, please refer to enumurate ENCODER_OPTION.
+  * @brief   Get option for encoder, detail option type, please refer to enumurate ENCODER_OPTION.
   * @param   pOption option for encoder such as InDataFormat, IDRInterval, SVC Encode Param, Frame Rate, Bitrate,...
   * @return  CM_RETURN: 0 - success; otherwise - failed;
   */
