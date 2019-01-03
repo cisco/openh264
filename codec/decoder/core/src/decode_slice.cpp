@@ -54,12 +54,6 @@ namespace WelsDec {
 
 extern void FreePicture (PPicture pPic, CMemoryAlign* pMa);
 
-static inline int32_t iAbs (int32_t x) {
-  static const int32_t INT_BITS = (sizeof (int) * CHAR_BIT) - 1;
-  int32_t y = x >> INT_BITS;
-  return (x ^ y) - y;
-}
-
 extern PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const int32_t kiPicHeight);
 
 int32_t WelsTargetSliceConstruction (PWelsDecoderContext pCtx) {
