@@ -1423,19 +1423,17 @@ int32_t WelsDecodeMbCabacBSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uin
     pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || ! (ppRefPicL0[0] && ppRefPicL0[0]->bIsComplete)
                             || ! (ppRefPicL1[0] && ppRefPicL1[0]->bIsComplete);
 
-
+    SubMbType subMbType;
     if (pSliceHeader->iDirectSpatialMvPredFlag) {
 
       //predict direct spatial mv
-      SubMbType subMbType;
       int32_t ret = PredMvBDirectSpatial (pCtx, pMv, ref, subMbType);
       if (ret != ERR_NONE) {
         return ret;
       }
     } else {
       //temporal direct mode
-      ComputeColocated (pCtx);
-      int32_t ret = PredBDirectTemporal (pCtx, pMv, ref);
+      int32_t ret = PredBDirectTemporal (pCtx, pMv, ref, subMbType);
       if (ret != ERR_NONE) {
         return ret;
       }
@@ -2386,18 +2384,17 @@ int32_t WelsDecodeMbCavlcBSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uin
     pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || ! (ppRefPicL0[0] && ppRefPicL0[0]->bIsComplete)
                             || ! (ppRefPicL1[0] && ppRefPicL1[0]->bIsComplete);
     //predict iMv
+    SubMbType subMbType;
     if (pSliceHeader->iDirectSpatialMvPredFlag) {
 
       //predict direct spatial mv
-      SubMbType subMbType;
       int32_t ret = PredMvBDirectSpatial (pCtx, iMv, ref, subMbType);
       if (ret != ERR_NONE) {
         return ret;
       }
     } else {
       //temporal direct mode
-      ComputeColocated (pCtx);
-      int32_t ret = PredBDirectTemporal (pCtx, iMv, ref);
+      int32_t ret = PredBDirectTemporal (pCtx, iMv, ref, subMbType);
       if (ret != ERR_NONE) {
         return ret;
       }
@@ -2838,17 +2835,21 @@ bool ComputeColocated (PWelsDecoderContext pCtx) {
   PSlice pCurSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
   PSliceHeader pSliceHeader = &pCurSlice->sSliceHeaderExt.sSliceHeader;
   if (!pSliceHeader->iDirectSpatialMvPredFlag) {
-    uint32_t uiShortRefCount = pCtx->sRefPic.uiShortRefCount[LIST_0];
-    for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
-      for (uint32_t i = 0; i < uiShortRefCount; ++i) {
-        int32_t iTRb = WELS_CLIP3 (-128, 127, pSliceHeader->iPicOrderCntLsb - pCtx->sRefPic.pRefList[listIdx][i]->iFramePoc);
-        int32_t iTRp = WELS_CLIP3 (-128, 127,
-                                   pCtx->sRefPic.pRefList[LIST_1][i]->iFramePoc - pCtx->sRefPic.pRefList[LIST_0][i]->iFramePoc);
-        if (iTRp != 0) {
-          int32_t prescale = (16384 + iAbs (iTRp / 2)) / iTRp;
-          pCurSlice->iMvScale[listIdx][i] = WELS_CLIP3 (-1024, 1023, (iTRb * prescale + 32) >> 6);
-        } else {
-          pCurSlice->iMvScale[listIdx][i] = 0x03FFF;
+    uint32_t uiRefCount = pSliceHeader->uiRefCount[LIST_0];
+    if (pCtx->sRefPic.pRefList[LIST_1][0] != NULL) {
+      for (uint32_t i = 0; i < uiRefCount; ++i) {
+        if (pCtx->sRefPic.pRefList[LIST_0][i] != NULL) {
+          const int32_t poc0 = pCtx->sRefPic.pRefList[LIST_0][i]->iFramePoc;
+          const int32_t poc1 = pCtx->sRefPic.pRefList[LIST_1][0]->iFramePoc;
+          const int32_t poc = pSliceHeader->iPicOrderCntLsb;
+          const int32_t td = WELS_CLIP3 (poc1 - poc0, -128, 127);
+          if (td == 0) {
+            pCurSlice->iMvScale[LIST_0][i] = 1 << 8;
+          } else {
+            int32_t tb = WELS_CLIP3 (poc - poc0, -128, 127);
+            int32_t tx = (16384 + (abs (td) >> 1)) / td;
+            pCurSlice->iMvScale[LIST_0][i] = WELS_CLIP3 ((tb * tx + 32) >> 6, -1024, 1023);
+          }
         }
       }
     }

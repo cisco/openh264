@@ -122,7 +122,8 @@ typedef struct TagSliceHeaders {
   PPps            pPps;
   int32_t         iSpsId;
   int32_t         iPpsId;
-  bool bIdrFlag;
+  bool            bIdrFlag;
+  bool            bIsRefPic;
 
   /*********************got from other layer for efficency if possible*********************/
   SRefPicListReorderSyn   pRefPicListReordering;  // Reference picture list reordering syntaxs
