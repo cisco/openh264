@@ -873,6 +873,8 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
 
   pSliceHeadExt = &kpCurNal->sNalData.sVclNal.sSliceHeaderExt;
 
+  pSliceHead->bIsRefPic = false;
+
   if (pSliceHeadExt) {
     SRefBasePicMarking sBaseMarking;
     const bool kbStoreRefBaseFlag = pSliceHeadExt->bStoreRefBasePicFlag;
@@ -2473,6 +2475,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
       dq_cur->pBitStringAux = &pNalCur->sNalData.sVclNal.sSliceBitsRead;
 
       uiNalRefIdc = pNalCur->sNalHeaderExt.sNalUnitHeader.uiNalRefIdc;
+      pSh->bIsRefPic = uiNalRefIdc > 0;
 
       iPpsId = pSh->iPpsId;
 
@@ -2547,6 +2550,9 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
             }
           }
         }
+        //calculate Colocated mv scaler factor for temporal direct prediction
+        if (pSh->eSliceType == B_SLICE && !pSh->iDirectSpatialMvPredFlag)
+          ComputeColocated (pCtx);
 
         iRet = WelsDecodeSlice (pCtx, bFreshSliceAvailable, pNalCur);
 
@@ -2645,8 +2651,10 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         memcpy (pCtx->pDec->pRefIndex[LIST_1], pCtx->pCurDqLayer->pRefIndex[LIST_1],
                 pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t) * MB_BLOCK4x4_NUM);
         for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
-          for (uint32_t i = 0; i < pCtx->sRefPic.uiRefCount[listIdx]; ++i) {
+          uint32_t i = 0;
+          while (pCtx->sRefPic.pRefList[listIdx][i]) {
             pCtx->pDec->pRefPic[listIdx][i] = pCtx->sRefPic.pRefList[listIdx][i];
+            ++i;
           }
         }
         iRet = WelsMarkAsRef (pCtx);
