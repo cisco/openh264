@@ -1,7 +1,7 @@
 @echo off
 rem *************************************************************************************************
 rem   usage:
-rem      AutoBuildForWPAndWindows.bat % Configuration %
+rem      AutoBuildForWPAndWindows.bat Configuration [-winsdk_version=winsdk_version] [-vc_version=vc_version]
 rem      --For debug  version:
 rem          Win32-C-Only:      AutoBuildForWPAndWindows.bat  Win32-Debug-C
 rem          Win32-ASM:         AutoBuildForWPAndWindows.bat  Win32-Debug-ASM
@@ -32,6 +32,11 @@ rem         --win32 folder bin\i386*
 rem         --win64 folder bin\x86_64*
 rem         --arm   folder bin\arm*
 rem
+rem      [winsdk_version] : full Windows 10 SDK number (e.g. 10.0.10240.0) or "8.1" to use the Windows 8.1 SDK.
+rem      [vc_version] : Specify a VC++ version
+rem                     VC15 for VC++ 2017
+rem                     VC12 for VC++ 2013
+rem
 rem   Environment:
 rem        ----for windows phone, Visual studio with update 3 or later is needed
 rem        ----gas-preprocessor(windows phone build only)
@@ -48,6 +53,7 @@ rem   2015/03/15 huashi@cisco.com
 rem *************************************************************************************************
 
 set WP8Flag=0
+set "OPENH264_BUILD_ARGS_LIST=%*"
 call :BasicSetting
 call :PathSetting
 call :SetBuildOption %1
@@ -55,6 +61,7 @@ if not %ERRORLEVEL%==0 (
     echo not suppot option!
     goto :ErrorReturn
 )
+call :ParseAdditionalArgs
 call :EnvSetting     %1
 call :BuildResultInit
 call :RunBuild
@@ -98,6 +105,12 @@ goto :EOF
   set MinGWPath=C:\MinGW\bin
   set MsysPath=C:\MinGW\msys\1.0\bin
   set GitPath=C:\Program Files (x86)\Git\bin
+  set VC15CommunityPath=C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC
+  set VC15ProfessionalPath=C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC
+  set VC15EnterprisePath=C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC
+  if exist "%VC15CommunityPath%" set VC15PATH=%VC15CommunityPath%
+  if exist "%VC15ProfessionalPath%" set VC15PATH=%VC15ProfessionalPath%
+  if exist "%VC15EnterprisePath%" set VC15PATH=%VC15EnterprisePath%
 
   set VC14Path=C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC
   set VC12Path=C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC
@@ -114,18 +127,34 @@ goto :EOF
   if exist "%VC11Path%"    set VCPATH=%VC11Path%
   if exist "%VC12Path%"    set VCPATH=%VC12Path%
   if exist "%VC14Path%"    set VCPATH=%VC14Path%
-  if %WP8Flag%==1          set VCPATH=%VC12Path%
+  set VCVARSPATH=%VCPATH%
+  if exist "%VC15Path%"    set VCVARSPATH=%VC15Path%\Auxiliary\Build
+
+  if %WP8Flag%==1 (
+    set "VCPATH=%VC12Path%"
+    set "VCVARSPATH=%VCPATH%"
+)
+
+  if /I "%OPENH264_VC_VERSION%" == "VC15" (
+    set VCPATH=
+    set "VCVARSPATH=%VC15Path%\Auxiliary\Build"
+) else if /I "%OPENH264_VC_VERSION%" == "VC12" (
+    set "VCPATH=%VC12Path%"
+	set "VCVARSPATH=%VCPATH%"
+)
 
   set GasScriptPath=%VCPATH%\bin
 
-  if "%vArcType%" =="i386"   set PATH=%MinGWPath%;%MsysPath%;%VCPATH%\bin;%GitPath%;%PATH%
-  if "%vArcType%" =="x86_64" set PATH=%MinGWPath%;%MsysPath%;%VCPATH%\bin;%GitPath%;%PATH%
-  if "%vArcType%" =="arm"    set PATH=%MinGWPath%;%MsysPath%;%VCPATH%\bin;%GitPath%;%PATH%
+  if "%VCPATH%" NEQ "" (
+    if "%vArcType%" =="i386"   set "PATH=%MinGWPath%;%MsysPath%;%VCPATH%\bin;%GitPath%;%PATH%"
+    if "%vArcType%" =="x86_64" set "PATH=%MinGWPath%;%MsysPath%;%VCPATH%\bin;%GitPath%;%PATH%"
+    if "%vArcType%" =="arm"    set "PATH=%MinGWPath%;%MsysPath%;%VCPATH%\bin;%GitPath%;%PATH%"
+)
   rem if "%vArcType%" =="arm"    set PATH=C:\MinGW\bin;C:\MinGW\msys\1.0\bin;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin;C:\Program Files (x86)\Git\bin;%PATH%
 
-  if "%vArcType%" =="i386"   call "%VCPATH%\vcvarsall.bat" x86
-  if "%vArcType%" =="x86_64" call "%VCPATH%\vcvarsall.bat" x64
-  if "%vArcType%" =="arm"    call "%VCPATH%\vcvarsall.bat" x86_arm
+  if "%vArcType%" =="i386"   call "%VCVARSPATH%\vcvarsall.bat" x86 %OPENH264_WINSDK_VERSION%
+  if "%vArcType%" =="x86_64" call "%VCVARSPATH%\vcvarsall.bat" x64 %OPENH264_WINSDK_VERSION%
+  if "%vArcType%" =="arm"    call "%VCVARSPATH%\vcvarsall.bat" x86_arm %OPENH264_WINSDK_VERSION%
   if %WP8Flag%==1            call :WPSetting
 
   echo PATH is %PATH%
@@ -351,7 +380,7 @@ rem ***********************************************
 :help
   echo *******************************************************************************
   echo   usage:
-  echo      AutoBuildForWPAndWindows.bat % Configuration %
+  echo      AutoBuildForWPAndWindows.bat Configuration  [-winsdk_version=winsdk_version] [-vc_version=vc_version]
   echo      --For debug  version:
   echo          Win32-C-Only:      AutoBuildForWPAndWindows.bat  Win32-Debug-C
   echo          Win32-ASM:         AutoBuildForWPAndWindows.bat  Win32-Debug-ASM
@@ -376,6 +405,11 @@ rem ***********************************************
   echo      --For default:
   echo         AutoBuildForWPAndWindows.bat
   echo           ARM-All-ASM(WP8)
+  echo      [winsdk_version] : full Windows 10 SDK number (e.g. 10.0.10240.0) or "8.1" to use the Windows 8.1 SDK.
+  echo      [vc_version] : Specify a VC++ version
+  echo                     VC15 for VC++ 2017
+  echo                     VC12 for VC++ 2013
+
   echo *******************************************************************************
 goto :EOF
 
@@ -430,6 +464,23 @@ goto :EOF
     bash -c "cp -f  %%k  %DestDir%"
   )
   cd %WorkingDir%
+goto :EOF
+
+:ParseAdditionalArgs
+	for /F "tokens=1,* delims= " %%a in ("%OPENH264_BUILD_ARGS_LIST%") do (
+		call :ParseArgument %%a
+		set "OPENH264_BUILD_ARGS_LIST=%%b"
+		goto :ParseAdditionalArgs
+)
+goto :EOF
+
+:ParseArgument
+	if /I "%1" == "-winsdk_version" (
+		set OPENH264_WINSDK_VERSION=%2
+)
+	if /I "%1" == "-vc_version" (
+		set OPENH264_VC_VERSION=%2
+)
 goto :EOF
 
 :ErrorReturn
