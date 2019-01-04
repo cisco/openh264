@@ -76,7 +76,7 @@ void WelsLog (SLogContext* logCtx, int32_t iLevel, const char* kpFmt, ...) {
 
 #ifndef CALC_PSNR
 #define CONST_FACTOR_PSNR       (10.0 / log(10.0))      // for good computation
-#define CALC_PSNR(w, h, s)      ((float)(CONST_FACTOR_PSNR * log( 65025.0 * w * h / iSqe )))
+#define CALC_PSNR(w, h, s)      ((float)(CONST_FACTOR_PSNR * log( 65025.0 * w * h / s )))
 #endif//CALC_PSNR
 
 /*
