@@ -1627,7 +1627,7 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
             if (iMotionPredFlag[listIdx][i] == 0) {
               WELS_READ_VERIFY (BsGetTe0 (pBs, iRefCount[listIdx], &uiCode)); //ref_idx_l0[ mbPartIdx ]
               iref = uiCode;
-              if ((iref < 0) || (iref >= iRefCount[0]) || (ppRefPic[listIdx][iref] == NULL)) { //error ref_idx
+              if ((iref < 0) || (iref >= iRefCount[listIdx]) || (ppRefPic[listIdx][iref] == NULL)) { //error ref_idx
                 pCtx->bMbRefConcealed = true;
                 if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE) {
                   iref = 0;
