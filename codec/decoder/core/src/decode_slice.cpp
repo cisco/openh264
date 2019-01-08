@@ -210,12 +210,6 @@ int32_t WelsMbInterConstruction (PWelsDecoderContext pCtx, PDqLayer pCurLayer) {
   } else {
     if (pCtx->pTempDec == NULL)
       pCtx->pTempDec = AllocPicture (pCtx, pCtx->pSps->iMbWidth << 4, pCtx->pSps->iMbHeight << 4);
-    else {
-      if (pCtx->pTempDec->iLinesize[0] != pCtx->pDec->iLinesize[0]) {
-        FreePicture (pCtx->pTempDec, pCtx->pMemAlign);
-        pCtx->pTempDec = AllocPicture (pCtx, pCtx->pSps->iMbWidth << 4, pCtx->pSps->iMbHeight << 4);
-      }
-    }
     uint8_t*   pTempDstYCbCr[3];
     uint8_t*   pDstYCbCr[3];
     pTempDstYCbCr[0] = pCtx->pTempDec->pData[0] + ((iMbY * iLumaStride + iMbX) << 4);
