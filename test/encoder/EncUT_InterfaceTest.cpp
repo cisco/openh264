@@ -68,7 +68,7 @@ TEST_F (EncInterfaceCallTest, SetOptionLTR) {
 
   BufferedData buf;
   buf.SetLength (frameSize);
-  ASSERT_TRUE (buf.Length() == (size_t)frameSize);
+  ASSERT_TRUE (buf.Length() == (size_t)frameSize); //include memory fail (-1) case
 
   SFrameBSInfo info;
   memset (&info, 0, sizeof (SFrameBSInfo));

@@ -76,9 +76,9 @@ TEST_P (DecoderOutputTest, CompareOutput) {
   FileParam p = GetParam();
 #if defined(ANDROID_NDK)
   std::string filename = std::string ("/sdcard/") + p.fileName;
-  DecodeFile (filename.c_str(), this);
+  ASSERT_TRUE ( DecodeFile (filename.c_str(), this));
 #else
-  DecodeFile (p.fileName, this);
+  ASSERT_TRUE (DecodeFile(p.fileName, this));
 #endif
 
   unsigned char digest[SHA_DIGEST_LENGTH];

@@ -16,7 +16,7 @@ bool EncodeDecodeTestAPIBase::InitialEncDec (int iWidth, int iHeight) {
   int frameSize = iWidth * iHeight * 3 / 2;
 
   buf_.SetLength (frameSize);
-  if (buf_.Length() != (size_t)frameSize) {
+  if (buf_.Length() != (size_t)frameSize) { //include memory fail (-1) case
     printf ("buf_.Length() failed! frameSize = %d\n", frameSize);
     return false;
   }
