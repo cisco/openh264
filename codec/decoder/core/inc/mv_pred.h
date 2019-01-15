@@ -111,7 +111,8 @@ int32_t GetColocatedMb (PWelsDecoderContext pCtx, MbType& mbType, SubMbType& sub
 /*!
 * \brief   get the motion predictor for B-slice temporal direct mode 16x16
 */
-int32_t PredBDirectTemporal (PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], int8_t ref[LIST_A]);
+int32_t PredBDirectTemporal (PWelsDecoderContext pCtx, int16_t iMvp[LIST_A][2], int8_t ref[LIST_A],
+                             SubMbType& subMbType);
 
 /*!
 * \brief   get the motion params for B-slice spatial direct mode
@@ -142,6 +143,39 @@ void PredInter16x8Mv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[
  */
 void PredInter8x16Mv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30],
                       int32_t listIdx, int32_t iPartIdx, int8_t iRef, int16_t iMVP[2]);
+
+/*!
+* \brief   Fill the spatial direct motion vectors for 8x8 direct MB
+* \param
+* \param   output motion vector cache and motion vector deviation cache
+*/
+void FillSpatialDirect8x8Mv (PDqLayer pCurLayer, const int16_t& iIdx8, const int8_t& iPartCount, const int8_t& iPartW,
+                             const SubMbType& subMbType, const bool& bIsLongRef, int16_t pMvDirect[LIST_A][2], int8_t iRef[LIST_A],
+                             int16_t pMotionVector[LIST_A][30][MV_A], int16_t pMvdCache[LIST_A][30][MV_A]);
+
+/*!
+* \brief   Fill the temporal direct motion vectors for 8x8 direct MB
+* \param
+* \param   output motion vector cache and motion vector deviation cache
+*/
+void FillTemporalDirect8x8Mv (PDqLayer pCurLayer, const int16_t& iIdx8, const int8_t& iPartCount, const int8_t& iPartW,
+                              const SubMbType& subMbType, int8_t iRef[LIST_A], int16_t (*mvColoc)[2],
+                              int16_t pMotionVector[LIST_A][30][MV_A], int16_t pMvdCache[LIST_A][30][MV_A]);
+
+/*!
+* \brief   returns ref_index in List_0 from the colocated ref_index in LIST_0.
+* \param
+*  returns ref_index in List_0 of ref picture LIST_0
+*/
+int8_t MapColToList0 (PWelsDecoderContext& pCtx, const int8_t& colocRefIndexL0,
+                      const int32_t& ref0Count); //ISO/IEC 14496-10:2009(E) (8-193)
+
+/*!
+* \brief     update ref_index cache for current MB, for 8x8
+* \param
+* \param
+*/
+void Update8x8RefIdx (PDqLayer& pCurDqLayer, const int16_t& iPartIdx, const int32_t& listIdx, const int8_t& iRef);
 
 } // namespace WelsDec
 

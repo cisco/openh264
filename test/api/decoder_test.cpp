@@ -134,6 +134,12 @@ static const FileParam kFileParamArray[] = {
   {"res/Cisco_Men_whisper_640x320_CABAC_Bframe_9.264", "88b8864a69cee7656202bc54d2ffa8b7b6f1f6c5"},
   {"res/Cisco_Men_whisper_640x320_CAVLC_Bframe_9.264", "270a500d2f91c9e2c8ffabc03f62e0dc0b3a24ed"},
   {"res/Cisco_Adobe_PDF_sample_a_1024x768_CAVLC_Bframe_9.264", "d3b2b986178ce3eafa806cd984543d0da830f408"},
+  {"res/VID_1280x544_cabac_temporal_direct.264", "46ec1d702ffef31492f933afdd0b1ea155aac922"},
+  {"res/VID_1280x720_cabac_temporal_direct.264", "449e70d68b2b216d7d1cf3439d80298df3c3d50c"},
+  {"res/VID_1920x1080_cabac_temporal_direct.264", "7da13d15f660c953094e238220fdba29f29465e5"},
+  {"res/VID_1280x544_cavlc_temporal_direct.264", "290b06a9be6a991269d2d2dd42d85bd4ba02783f"},
+  {"res/VID_1280x720_cavlc_temporal_direct.264", "a339f84be1a3268638cc389f611ac4648c8c26c8"},
+  {"res/VID_1920x1080_cavlc_temporal_direct.264", "fbc5a3253180f1e24d9a2d3c4a2ae0d43630c8f9"},
 };
 
 INSTANTIATE_TEST_CASE_P (DecodeFile, DecoderOutputTest,

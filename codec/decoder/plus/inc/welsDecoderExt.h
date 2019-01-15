@@ -112,7 +112,7 @@ class CWelsDecoder : public ISVCDecoder {
   typedef struct tagPictInfo {
     SBufferInfo             sBufferInfo;
     int32_t                 iPOC;
-    int32_t                 iFrameNum;
+    int32_t                 iPicBuffIdx;
     bool                    bLastGOP;
     unsigned char*          pData[3];
   } SPictInfo, *PPictInfo;
