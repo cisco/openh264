@@ -83,7 +83,7 @@ include $(SRC_PATH)build/platform-$(OS).mk
 
 MODULE := $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIX)
 
-CFLAGS += -DGENERATED_VERSION_HEADER
+CFLAGS += -DGENERATED_VERSION_HEADER -fstack-protector-strong
 LDFLAGS +=
 
 ifeq (Yes, $(GCOV))
