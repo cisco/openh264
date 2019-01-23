@@ -882,6 +882,11 @@ int32_t ParseInterBMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pN
     uint32_t uiSubMbType;
     //sub_mb_type, partition
     int16_t pMvDirect[LIST_A][2] = { {0, 0}, {0, 0} };
+    if (pCtx->sRefPic.pRefList[LIST_1][0] == NULL) {
+      SLogContext* pLogCtx = & (pCtx->sLogCtx);
+      WelsLog (pLogCtx, WELS_LOG_ERROR, "Colocated Ref Picture for B-Slice is lost, B-Slice decoding cannot be continued!");
+      return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_DATA, ERR_INFO_REFERENCE_PIC_LOST);
+    }
     bool bIsLongRef = pCtx->sRefPic.pRefList[LIST_1][0]->bIsLongRef;
     const int32_t ref0Count = WELS_MIN (pSliceHeader->uiRefCount[LIST_0], pCtx->sRefPic.uiRefCount[LIST_0]);
     bool has_direct_called = false;
