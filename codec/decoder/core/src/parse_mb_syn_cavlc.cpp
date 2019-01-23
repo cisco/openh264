@@ -1537,7 +1537,7 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
     for (int32_t i = 0; i < 4; i++) {
       WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //sub_mb_type[ mbPartIdx ]
       uiSubMbType = uiCode;
-      if (uiSubMbType > 13) { //invalid uiSubMbType
+      if (uiSubMbType >= 13) { //invalid uiSubMbType
         return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_SUB_MB_TYPE);
       }
       pSubPartCount[i] = g_ksInterBSubMbTypeInfo[uiSubMbType].iPartCount;

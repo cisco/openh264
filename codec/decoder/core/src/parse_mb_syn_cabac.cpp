@@ -888,7 +888,7 @@ int32_t ParseInterBMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pN
     SubMbType directSubMbType = 0;
     for (int32_t i = 0; i < 4; i++) {
       WELS_READ_VERIFY (ParseBSubMBTypeCabac (pCtx, pNeighAvail, uiSubMbType));
-      if (uiSubMbType > 13) { //invalid sub_mb_type
+      if (uiSubMbType >= 13) { //invalid sub_mb_type
         return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_SUB_MB_TYPE);
       }
 //      pCurDqLayer->pSubMbType[iMbXy][i] = g_ksInterBSubMbTypeInfo[uiSubMbType].iType;
