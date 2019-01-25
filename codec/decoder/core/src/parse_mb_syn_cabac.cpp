@@ -882,13 +882,18 @@ int32_t ParseInterBMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pN
     uint32_t uiSubMbType;
     //sub_mb_type, partition
     int16_t pMvDirect[LIST_A][2] = { {0, 0}, {0, 0} };
+    if (pCtx->sRefPic.pRefList[LIST_1][0] == NULL) {
+      SLogContext* pLogCtx = & (pCtx->sLogCtx);
+      WelsLog (pLogCtx, WELS_LOG_ERROR, "Colocated Ref Picture for B-Slice is lost, B-Slice decoding cannot be continued!");
+      return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_DATA, ERR_INFO_REFERENCE_PIC_LOST);
+    }
     bool bIsLongRef = pCtx->sRefPic.pRefList[LIST_1][0]->bIsLongRef;
     const int32_t ref0Count = WELS_MIN (pSliceHeader->uiRefCount[LIST_0], pCtx->sRefPic.uiRefCount[LIST_0]);
     bool has_direct_called = false;
     SubMbType directSubMbType = 0;
     for (int32_t i = 0; i < 4; i++) {
       WELS_READ_VERIFY (ParseBSubMBTypeCabac (pCtx, pNeighAvail, uiSubMbType));
-      if (uiSubMbType > 13) { //invalid sub_mb_type
+      if (uiSubMbType >= 13) { //invalid sub_mb_type
         return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_SUB_MB_TYPE);
       }
 //      pCurDqLayer->pSubMbType[iMbXy][i] = g_ksInterBSubMbTypeInfo[uiSubMbType].iType;

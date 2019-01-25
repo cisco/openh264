@@ -690,7 +690,8 @@ DECODING_STATE CWelsDecoder::FlushFrame (unsigned char** ppDst,
     ppDst[1] = m_sPictInfoList[m_iPictInfoIndex].pData[1];
     ppDst[2] = m_sPictInfoList[m_iPictInfoIndex].pData[2];
     m_sPictInfoList[m_iPictInfoIndex].iPOC = sIMinInt32;
-    m_pDecContext->pPicBuff->ppPic[m_sPictInfoList[m_iPictInfoIndex].iPicBuffIdx]->bAvailableFlag = true;
+    if (m_sPictInfoList[m_iPictInfoIndex].iPicBuffIdx < m_pDecContext->pPicBuff->iCapacity)
+      m_pDecContext->pPicBuff->ppPic[m_sPictInfoList[m_iPictInfoIndex].iPicBuffIdx]->bAvailableFlag = true;
     m_sPictInfoList[m_iPictInfoIndex].bLastGOP = false;
     m_iMinPOC = sIMinInt32;
     --m_iNumOfPicts;
@@ -797,7 +798,8 @@ DECODING_STATE CWelsDecoder::ReorderPicturesInDisplay (unsigned char** ppDst, SB
       ppDst[1] = m_sPictInfoList[m_iPictInfoIndex].pData[1];
       ppDst[2] = m_sPictInfoList[m_iPictInfoIndex].pData[2];
       m_sPictInfoList[m_iPictInfoIndex].iPOC = sIMinInt32;
-      m_pDecContext->pPicBuff->ppPic[m_sPictInfoList[m_iPictInfoIndex].iPicBuffIdx]->bAvailableFlag = true;
+      if (m_sPictInfoList[m_iPictInfoIndex].iPicBuffIdx < m_pDecContext->pPicBuff->iCapacity)
+        m_pDecContext->pPicBuff->ppPic[m_sPictInfoList[m_iPictInfoIndex].iPicBuffIdx]->bAvailableFlag = true;
       m_sPictInfoList[m_iPictInfoIndex].bLastGOP = false;
       m_iMinPOC = sIMinInt32;
       --m_iNumOfPicts;
@@ -834,7 +836,8 @@ DECODING_STATE CWelsDecoder::ReorderPicturesInDisplay (unsigned char** ppDst, SB
         ppDst[1] = m_sPictInfoList[m_iPictInfoIndex].pData[1];
         ppDst[2] = m_sPictInfoList[m_iPictInfoIndex].pData[2];
         m_sPictInfoList[m_iPictInfoIndex].iPOC = sIMinInt32;
-        m_pDecContext->pPicBuff->ppPic[m_sPictInfoList[m_iPictInfoIndex].iPicBuffIdx]->bAvailableFlag = true;
+        if (m_sPictInfoList[m_iPictInfoIndex].iPicBuffIdx < m_pDecContext->pPicBuff->iCapacity)
+          m_pDecContext->pPicBuff->ppPic[m_sPictInfoList[m_iPictInfoIndex].iPicBuffIdx]->bAvailableFlag = true;
         m_sPictInfoList[m_iPictInfoIndex].bLastGOP = false;
         m_iMinPOC = sIMinInt32;
         --m_iNumOfPicts;
