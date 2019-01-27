@@ -131,6 +131,7 @@ class CWelsDecoder : public ISVCDecoder {
   int32_t InitDecoder (const SDecodingParam* pParam);
   void UninitDecoder (void);
   int32_t ResetDecoder();
+  void ResetReorderingPictureBuffers();
 
   void OutputStatisticsLog (SDecoderStatistics& sDecoderStatistics);
   DECODING_STATE ReorderPicturesInDisplay (unsigned char** ppDst, SBufferInfo* pDstInfo);

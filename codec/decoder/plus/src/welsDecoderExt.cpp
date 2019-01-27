@@ -295,6 +295,9 @@ int32_t CWelsDecoder::ResetDecoder() {
   } else if (m_pWelsTrace != NULL) {
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "ResetDecoder() failed as decoder context null");
   }
+#ifdef _PICTURE_REORDERING_
+  ResetReorderingPictureBuffers();
+#endif
   return ERR_INFO_UNINIT;
 }
 
@@ -971,6 +974,18 @@ DECODING_STATE CWelsDecoder::DecodeFrameEx (const unsigned char* kpSrc,
   return state;
 }
 
+void CWelsDecoder::ResetReorderingPictureBuffers() {
+  m_iPictInfoIndex = 0;
+  m_iMinPOC = sIMinInt32;
+  m_iNumOfPicts = 0;
+  m_iLastGOPRemainPicts = 0;
+  m_LastWrittenPOC = sIMinInt32;
+  m_iLargestBufferedPicIndex = 0;
+  for (int32_t i = 0; i < 16; ++i) {
+    m_sPictInfoList[i].bLastGOP = false;
+    m_sPictInfoList[i].iPOC = sIMinInt32;
+  }
+}
 
 } // namespace WelsDec
 
