@@ -582,7 +582,8 @@ int32_t InitBsBuffer (PWelsDecoderContext pCtx) {
 
   CMemoryAlign* pMa = pCtx->pMemAlign;
 
-  pCtx->iMaxBsBufferSizeInByte = MIN_ACCESS_UNIT_CAPACITY * MAX_BUFFERED_NUM;
+  pCtx->iMaxBsBufferSizeInByte = pCtx->pParam->uiMaxBitstreamSize?pCtx->pParam->uiMaxBitstreamSize:MIN_ACCESS_UNIT_CAPACITY * MAX_BUFFERED_NUM;
+
   if ((pCtx->sRawData.pHead = static_cast<uint8_t*> (pMa->WelsMallocz (pCtx->iMaxBsBufferSizeInByte,
                               "pCtx->sRawData.pHead"))) == NULL) {
     return ERR_INFO_OUT_OF_MEMORY;

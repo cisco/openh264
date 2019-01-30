@@ -234,18 +234,18 @@ void CWelsDecoder::UninitDecoder (void) {
 
   WelsEndDecoder (m_pDecContext);
 
-  if (m_pDecContext->pMemAlign != NULL) {
-    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
-             "CWelsDecoder::UninitDecoder(), verify memory usage (%d bytes) after free..",
-             m_pDecContext->pMemAlign->WelsGetMemoryUsage());
-    delete m_pDecContext->pMemAlign;
-    m_pDecContext->pMemAlign = NULL;
-  }
+  CMemoryAlign * pSMemAllocator = m_pDecContext->pMemAlign;
 
   if (NULL != m_pDecContext) {
-    WelsFree (m_pDecContext, "m_pDecContext");
-
+    pSMemAllocator->WelsFree (m_pDecContext, "m_pDecContext");
     m_pDecContext = NULL;
+  }
+
+  if (NULL != pSMemAllocator) {
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
+             "CWelsDecoder::UninitDecoder(), verify memory usage (%d bytes) after free..",
+             pSMemAllocator->WelsGetMemoryUsage());
+    delete pSMemAllocator;
   }
 }
 
@@ -259,11 +259,21 @@ int32_t CWelsDecoder::InitDecoder (const SDecodingParam* pParam) {
   //reset decoder context
   if (m_pDecContext) //free
     UninitDecoder();
-  m_pDecContext = (PWelsDecoderContext)WelsMallocz (sizeof (SWelsDecoderContext), "m_pDecContext");
-  if (NULL == m_pDecContext)
+
+  const int32_t iCacheLineSize = 16;   // on chip cache line size in byte
+  CMemoryAlign * pSMemAllocator = new CMemoryAlign (iCacheLineSize, pParam->pSAllocator);
+
+  if (NULL == pSMemAllocator)
     return cmMallocMemeError;
-  int32_t iCacheLineSize = 16;   // on chip cache line size in byte
-  m_pDecContext->pMemAlign = new CMemoryAlign (iCacheLineSize);
+
+  m_pDecContext = (PWelsDecoderContext)pSMemAllocator->WelsMallocz (sizeof (SWelsDecoderContext), "m_pDecContext");
+  if (NULL == m_pDecContext) {
+    delete (pSMemAllocator);
+    return cmMallocMemeError;
+  }
+
+  m_pDecContext->pMemAlign = pSMemAllocator;
+
   WELS_VERIFY_RETURN_PROC_IF (cmMallocMemeError, (NULL == m_pDecContext->pMemAlign), UninitDecoder())
 
   //fill in default value into context

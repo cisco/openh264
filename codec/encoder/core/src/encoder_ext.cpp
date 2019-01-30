@@ -2321,7 +2321,7 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
 
   pCtx->sLogCtx = *pLogCtx;
 
-  pCtx->pMemAlign = new CMemoryAlign (iCacheLineSize);
+  pCtx->pMemAlign = new CMemoryAlign (iCacheLineSize, NULL);
   WELS_VERIFY_RETURN_PROC_IF (1, (NULL == pCtx->pMemAlign), WelsUninitEncoderExt (&pCtx))
 
   iRet = AllocCodingParam (&pCtx->pSvcParam, pCtx->pMemAlign);

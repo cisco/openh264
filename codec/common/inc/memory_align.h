@@ -34,9 +34,10 @@
 #define WELS_COMMON_MEMORY_ALIGN_H__
 
 #include "typedefs.h"
+#include "codec_app_def.h"
 
 // NOTE: please do not clean below lines even comment, turn on for potential memory leak verify and memory usage monitor etc.
-//#define MEMORY_CHECK
+#define MEMORY_CHECK
 #define MEMORY_MONITOR
 #ifdef MEMORY_CHECK
 #ifndef MEMORY_MONITOR
@@ -49,15 +50,17 @@
 #include <stdio.h>
 #endif//MEMORY_CHECK
 
+
 namespace WelsCommon {
 
 class CMemoryAlign {
  public:
-CMemoryAlign (const uint32_t kuiCacheLineSize);
+CMemoryAlign (const uint32_t kuiCacheLineSize, SMemoryAllocator * pSExtAllocator);
 virtual ~CMemoryAlign();
 
 void* WelsMallocz (const uint32_t kuiSize, const char* kpTag);
 void* WelsMalloc (const uint32_t kuiSize, const char* kpTag);
+
 void WelsFree (void* pPointer, const char* kpTag);
 const uint32_t WelsGetCacheLineSize() const;
 const uint32_t WelsGetMemoryUsage() const;
@@ -67,26 +70,17 @@ const uint32_t WelsGetMemoryUsage() const;
 CMemoryAlign (const CMemoryAlign& kcMa);
 CMemoryAlign& operator= (const CMemoryAlign& kcMa);
 
+void* WelsMalloc (const uint32_t kuiSize, const char* kpTag, const uint32_t kiAlign);
+
  protected:
 uint32_t        m_nCacheLineSize;
+bool            m_bExternalAllocator;
+SMemoryAllocator *m_pSMemoryAllocator;
 
 #ifdef MEMORY_MONITOR
 uint32_t        m_nMemoryUsageInBytes;
 #endif//MEMORY_MONITOR
 };
-
-/*!
-*************************************************************************************
-* \brief        malloc with zero filled utilization in Wels
-*
-* \param        kuiSize     size of memory block required
-*
-* \return       allocated memory pointer exactly, failed in case of NULL return
-*
-* \note N/A
-*************************************************************************************
-*/
-void* WelsMallocz (const uint32_t kuiSize, const char* kpTag);
 
 /*!
 *************************************************************************************

@@ -599,6 +599,15 @@ typedef struct {
   VIDEO_BITSTREAM_TYPE  eVideoBsType;  ///< video stream type (AVC/SVC)
 } SVideoProperty;
 
+
+/**
+* @brief Optional external allocator to use.
+*/
+typedef struct {
+  virtual void* allocate(unsigned int) = 0; ///< Allocator
+  virtual void  deallocate(void *) = 0; ///< Deallocator
+} SMemoryAllocator;
+
 /**
 * @brief SVC Decoding Parameters, reserved here and potential applicable in the future
 */
@@ -611,11 +620,14 @@ typedef struct TagSVCDecodingParam {
   ERROR_CON_IDC eEcActiveIdc;          ///< whether active error concealment feature in decoder
   bool bParseOnly;                     ///< decoder for parse only, no reconstruction. When it is true, SPS/PPS size should not exceed SPS_PPS_BS_SIZE (128). Otherwise, it will return error info
 
+  SMemoryAllocator* pSAllocator;     ///< external memory allocator to use
+  unsigned int  uiMaxBitstreamSize;    ///< bitstream buffer size to allocate in bytes. default MIN_ACCESS_UNIT_CAPACITY * MAX_BUFFERED_NUM
+
   SVideoProperty   sVideoProperty;    ///< video stream property
 } SDecodingParam, *PDecodingParam;
 
 /**
-* @brief Bitstream inforamtion of a layer being encoded
+* @brief Bitstream information of a layer being encoded
 */
 typedef struct {
   unsigned char uiTemporalId;
