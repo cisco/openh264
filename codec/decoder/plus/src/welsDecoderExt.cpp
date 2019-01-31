@@ -246,6 +246,7 @@ void CWelsDecoder::UninitDecoder (void) {
              "CWelsDecoder::UninitDecoder(), verify memory usage (%d bytes) after free..",
              pSMemAllocator->WelsGetMemoryUsage());
     delete pSMemAllocator;
+    pSMemAllocator = NULL;
   }
 }
 
