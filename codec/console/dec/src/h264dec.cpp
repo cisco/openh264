@@ -479,6 +479,8 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
   }
 
 
+
+
   if (WelsCreateDecoder (&pDecoder)  || (NULL == pDecoder)) {
     printf ("Create Decoder failed.\n");
     return 1;
