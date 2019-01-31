@@ -603,7 +603,8 @@ typedef struct {
 /**
 * @brief Optional external allocator to use.
 */
-typedef struct {
+typedef struct SMemoryAllocator {
+  virtual ~SMemoryAllocator() {}
   virtual void* allocate(unsigned int) = 0; ///< Allocator
   virtual void  deallocate(void *) = 0; ///< Deallocator
 } SMemoryAllocator;
