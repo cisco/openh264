@@ -369,7 +369,7 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
 
   sDecParam.sVideoProperty.size = sizeof (sDecParam.sVideoProperty);
   sDecParam.eEcActiveIdc = ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE;
-  
+
   if (iArgC < 2) {
     printf ("usage 1: h264dec.exe welsdec.cfg\n");
     printf ("usage 2: h264dec.exe welsdec.264 out.yuv\n");
