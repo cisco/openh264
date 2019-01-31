@@ -603,11 +603,11 @@ typedef struct {
 /**
 * @brief Optional external allocator to use.
 */
-typedef struct SMemoryAllocator {
+struct SMemoryAllocator {
   virtual ~SMemoryAllocator() {}
   virtual void* allocate(unsigned int) = 0; ///< Allocator
   virtual void  deallocate(void *) = 0; ///< Deallocator
-} SMemoryAllocator;
+};
 
 /**
 * @brief SVC Decoding Parameters, reserved here and potential applicable in the future
