@@ -73,12 +73,6 @@ ifeq ($(NDK_TOOLCHAIN_VERSION), clang)
   LDFLAGS += -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libunwind.a
 endif
 
-ifneq ($(CXX),$(wildcard $(CXX)))
-ifneq ($(CXX).exe,$(wildcard $(CXX).exe))
-$(error Compiler not found, bad NDKROOT or ARCH?)
-endif
-endif
-
 STL_INCLUDES = \
     -I$(NDKROOT)/sources/cxx-stl/stlport/stlport
 STL_LIB = \
