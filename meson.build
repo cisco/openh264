@@ -112,6 +112,7 @@ libopenh264_shared = shared_library('openh264',
   install: true,
   soversion: major_version,
   version: meson.project_version(),
+  vs_module_defs: 'openh264.def',
   dependencies: deps)
 
 libopenh264_static = static_library('openh264',
