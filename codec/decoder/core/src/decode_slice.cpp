@@ -2375,7 +2375,7 @@ int32_t WelsDecodeMbCavlcBSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uin
     if (pCtx->bMbRefConcealed) {
       SLogContext* pLogCtx = & (pCtx->sLogCtx);
       WelsLog (pLogCtx, WELS_LOG_ERROR, "Ref Picture for B-Slice is lost, B-Slice decoding cannot be continued!");
-      return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_DATA, ERR_INFO_REFERENCE_PIC_LOST);
+      return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_DATA, ERR_INFO_REFERENCE_PIC_LOST) | dsOutOfMemory;
     }
     //predict iMv
     SubMbType subMbType;
