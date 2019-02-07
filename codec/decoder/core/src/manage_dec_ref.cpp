@@ -79,6 +79,10 @@ static void SetUnRef (PPicture pRef) {
     pRef->uiSpatialId = -1;
     pRef->iSpsId = -1;
     pRef->bIsComplete = false;
+    for (int32_t i = 0; i < MAX_DPB_COUNT; ++i) {
+      pRef->pRefPic[LIST_0][i] = NULL;
+      pRef->pRefPic[LIST_1][i] = NULL;
+    }
   }
 }
 

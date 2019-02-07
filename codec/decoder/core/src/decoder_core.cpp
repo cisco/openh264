@@ -2652,7 +2652,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
                 pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int8_t) * MB_BLOCK4x4_NUM);
         for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
           uint32_t i = 0;
-          while (pCtx->sRefPic.pRefList[listIdx][i]) {
+          while (pCtx->sRefPic.pRefList[listIdx][i] && i < MAX_DPB_COUNT) {
             pCtx->pDec->pRefPic[listIdx][i] = pCtx->sRefPic.pRefList[listIdx][i];
             ++i;
           }
