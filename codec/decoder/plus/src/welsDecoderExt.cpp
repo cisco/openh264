@@ -583,7 +583,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
 
     if ((m_pDecContext->iErrorCode & dsRefLost) && m_pDecContext->eSliceType == B_SLICE) {
       if (ResetDecoder())
-        return dsOutOfMemory;
+        return dsRefLost;
 
       return dsErrorFree;
     }
