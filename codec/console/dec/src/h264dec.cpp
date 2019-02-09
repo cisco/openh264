@@ -148,7 +148,7 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
 
   fseek (pH264File, 0L, SEEK_END);
   iFileSize = (int32_t) ftell (pH264File);
-  if (iFileSize <= 0) {
+  if (iFileSize <= 4) {
     fprintf (stderr, "Current Bit Stream File is too small, read error!!!!\n");
     goto label_exit;
   }
