@@ -62,9 +62,15 @@ static bool CheckRefPics (const PWelsDecoderContext& pCtx) {
     ++listCount;
   }
   for (int32_t list = LIST_0; list < listCount; ++list) {
-    int32_t refCount = pCtx->sRefPic.uiRefCount[list];
-    for (int32_t refIdx = 0; refIdx < refCount; ++refIdx) {
-      if (!pCtx->sRefPic.pRefList[list][refIdx]) {
+    int32_t shortRefCount = pCtx->sRefPic.uiShortRefCount[list];
+    for (int32_t refIdx = 0; refIdx < shortRefCount; ++refIdx) {
+      if (!pCtx->sRefPic.pShortRefList[list][refIdx]) {
+        return false;
+      }
+    }
+    int32_t longRefCount = pCtx->sRefPic.uiLongRefCount[list];
+    for (int32_t refIdx = 0; refIdx < longRefCount; ++refIdx) {
+      if (!pCtx->sRefPic.pLongRefList[list][refIdx]) {
         return false;
       }
     }
