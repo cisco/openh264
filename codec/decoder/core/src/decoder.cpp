@@ -826,7 +826,8 @@ int32_t SyncPictureResolutionExt (PWelsDecoderContext pCtx, const int32_t kiMbWi
   const int32_t kiPicWidth    = kiMbWidth << 4;
   const int32_t kiPicHeight   = kiMbHeight << 4;
   //fix Bugzilla Bug1479656 reallocate temp dec picture
-  if (pCtx->pTempDec != NULL) {
+  if (pCtx->pTempDec != NULL && (pCtx->pTempDec->iWidthInPixel != kiPicWidth
+                                 || pCtx->pTempDec->iHeightInPixel != kiPicHeight)) {
     FreePicture (pCtx->pTempDec, pCtx->pMemAlign);
     pCtx->pTempDec = AllocPicture (pCtx, pCtx->pSps->iMbWidth << 4, pCtx->pSps->iMbHeight << 4);
   }

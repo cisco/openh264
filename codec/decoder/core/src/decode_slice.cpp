@@ -56,6 +56,22 @@ extern void FreePicture (PPicture pPic, CMemoryAlign* pMa);
 
 extern PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const int32_t kiPicHeight);
 
+static bool CheckRefPics (const PWelsDecoderContext& pCtx) {
+  int32_t listCount = 1;
+  if (pCtx->eSliceType == B_SLICE) {
+    ++listCount;
+  }
+  for (int32_t list = LIST_0; list < listCount; ++list) {
+    int32_t refCount = pCtx->sRefPic.uiRefCount[list];
+    for (int32_t refIdx = 0; refIdx < refCount; ++refIdx) {
+      if (!pCtx->sRefPic.pRefList[list][refIdx]) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 int32_t WelsTargetSliceConstruction (PWelsDecoderContext pCtx) {
   PDqLayer pCurLayer = pCtx->pCurDqLayer;
   PSlice pCurSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
@@ -318,7 +334,10 @@ int32_t WelsTargetMbConstruction (PWelsDecoderContext pCtx) {
     WelsMbIntraPredictionConstruction (pCtx, pCurLayer, 1);
   } else if (IS_INTER (pCurLayer->pMbType[pCurLayer->iMbXyIndex])) { //InterMB
     if (0 == pCurLayer->pCbp[pCurLayer->iMbXyIndex]) { //uiCbp==0 include SKIP
-      WelsMbInterPrediction (pCtx, pCurLayer);
+      if (!CheckRefPics (pCtx)) {
+        return ERR_INFO_MB_RECON_FAIL;
+      }
+      return WelsMbInterPrediction (pCtx, pCurLayer);
     } else {
       WelsMbInterConstruction (pCtx, pCurLayer);
     }
@@ -2783,7 +2802,7 @@ int32_t WelsActualDecodeMbCavlcBSlice (PWelsDecoderContext pCtx) {
   return ERR_NONE;
 }
 
-void WelsBlockFuncInit (SBlockFunc*   pFunc,  int32_t iCpu) {
+void WelsBlockFuncInit (SBlockFunc*    pFunc,  int32_t iCpu) {
   pFunc->pWelsSetNonZeroCountFunc   = WelsNonZeroCount_c;
   pFunc->pWelsBlockZero16x16Func    = WelsBlockZero16x16_c;
   pFunc->pWelsBlockZero8x8Func      = WelsBlockZero8x8_c;
