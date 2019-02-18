@@ -213,6 +213,21 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
     if (iPrevPicIdx != iPicIdx) {
       if (pPicOldBuf->ppPic[iPicIdx] != NULL) {
         FreePicture (pPicOldBuf->ppPic[iPicIdx], pMa);
+        //seach and reset the references of deleted references.
+        for (int32_t list = LIST_0; list < LIST_A; ++list) {
+          int32_t refIdx = 0;
+          PPicture pPic = pCtx->sRefPic.pRefList[list][refIdx];
+          while (refIdx < MAX_DPB_COUNT && pPic != NULL) {
+            ++refIdx;
+            int32_t ref = 0;
+            while (ref < MAX_DPB_COUNT && *pPic->pRefPic[ref] != NULL) {
+              if (*pPic->pRefPic[ref] == pPicOldBuf->ppPic[iPicIdx]) {
+                *pPic->pRefPic[ref] = NULL;
+              }
+              ++ref;
+            }
+          }
+        }
         pPicOldBuf->ppPic[iPicIdx] = NULL;
       }
     }
