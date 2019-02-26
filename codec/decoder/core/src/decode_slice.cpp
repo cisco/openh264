@@ -1130,7 +1130,7 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0 (PWelsDecoderContext pCtx, PWelsNeighAv
       return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_MB_TYPE);
 
     if (25 == uiMbType) {   //I_PCM
-      WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "I_PCM mode exists in P slice!");
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "I_PCM mode exists in B slice!");
       WELS_READ_VERIFY (ParseIPCMInfoCabac (pCtx));
       pSlice->iLastDeltaQp = 0;
       WELS_READ_VERIFY (ParseEndOfSliceCabac (pCtx, uiEosFlag));
@@ -2532,7 +2532,7 @@ int32_t WelsActualDecodeMbCavlcBSlice (PWelsDecoderContext pCtx) {
       return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_MB_TYPE);
 
     if (25 == uiMbType) {
-      WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "I_PCM mode exists in P slice!");
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "I_PCM mode exists in B slice!");
       int32_t iDecStrideL = pCurLayer->pDec->iLinesize[0];
       int32_t iDecStrideC = pCurLayer->pDec->iLinesize[1];
 
