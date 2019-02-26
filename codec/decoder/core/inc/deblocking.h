@@ -82,9 +82,6 @@ uint32_t DeblockingBSliceBsMarginalMBAvcbase (PDqLayer pCurDqLayer, int32_t iEdg
 
 int32_t DeblockingAvailableNoInterlayer (PDqLayer pCurDqLayer, int32_t iFilterIdc);
 
-void DeblockingIntraMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t iBoundryFlag);
-void DeblockingInterMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, uint8_t nBS[2][4][4], int32_t iBoundryFlag);
-
 void WelsDeblockingMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t iBoundryFlag);
 
 } // namespace WelsDec
