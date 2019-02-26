@@ -1448,16 +1448,18 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
         }
       }
     }
+    // Read mvd_L0 then mvd_L1
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+      // Partitions
       for (int32_t i = 0; i < 2; i++) {
         int iPartIdx = i << 3;
         int32_t iRefIdx = ref_idx_list[listIdx][i];
         if (IS_DIR (mbType, i, listIdx)) {
           PredInter16x8Mv (iMvArray, iRefIdxArray, listIdx, iPartIdx, iRefIdx, iMv);
 
-          WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l0[ mbPartIdx ][ 0 ][ compIdx ]
+          WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l{0,1}[ mbPartIdx ][ listIdx ][x]
           iMv[0] += iCode;
-          WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l1[ mbPartIdx ][ 0 ][ compIdx ]
+          WELS_READ_VERIFY (BsGetSe (pBs, &iCode)); //mvd_l{0,1}[ mbPartIdx ][ listIdx ][y]
           iMv[1] += iCode;
 
           WELS_CHECK_SE_BOTH_WARNING (iMv[1], iMinVmv, iMaxVmv, "vertical mv");
