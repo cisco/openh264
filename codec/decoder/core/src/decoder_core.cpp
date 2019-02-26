@@ -2550,9 +2550,9 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
             }
           }
         }
-        //calculate Colocated mv scaler factor for temporal direct prediction
+        //calculate Colocated mv scaling factor for temporal direct prediction
         if (pSh->eSliceType == B_SLICE && !pSh->iDirectSpatialMvPredFlag)
-          ComputeColocated (pCtx);
+          ComputeColocatedTemporalScaling (pCtx);
 
         iRet = WelsDecodeSlice (pCtx, bFreshSliceAvailable, pNalCur);
 
