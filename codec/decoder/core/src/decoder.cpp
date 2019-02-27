@@ -165,6 +165,24 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   return ERR_NONE;
 }
 
+static void ResetRefPicReferences (const PWelsDecoderContext& pCtx, const PPicture& inPPic) {
+  //seach and reset the references of deleted references.
+  for (int32_t list = LIST_0; list < LIST_A; ++list) {
+    int32_t refIdx = 0;
+    PPicture pPic = pCtx->sRefPic.pRefList[list][refIdx];
+    while (refIdx < MAX_DPB_COUNT && pPic != NULL) {
+      ++refIdx;
+      int32_t ref = 0;
+      while (ref < MAX_DPB_COUNT && *pPic->pRefPic[ref] != NULL) {
+        if (*pPic->pRefPic[ref] == inPPic) {
+          *pPic->pRefPic[ref] = NULL;
+        }
+        ++ref;
+      }
+    }
+  }
+}
+
 static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, const int32_t kiOldSize,
                                 const int32_t kiPicWidth, const int32_t kiPicHeight, const int32_t kiNewSize) {
   PPicBuff pPicOldBuf = *ppPicBuf;
@@ -212,6 +230,7 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   for (iPicIdx = iDelIdx; iPicIdx < kiOldSize; iPicIdx++) {
     if (iPrevPicIdx != iPicIdx) {
       if (pPicOldBuf->ppPic[iPicIdx] != NULL) {
+        ResetRefPicReferences (pCtx, pPicOldBuf->ppPic[iPicIdx]);
         FreePicture (pPicOldBuf->ppPic[iPicIdx], pMa);
         pPicOldBuf->ppPic[iPicIdx] = NULL;
       }
@@ -826,7 +845,8 @@ int32_t SyncPictureResolutionExt (PWelsDecoderContext pCtx, const int32_t kiMbWi
   const int32_t kiPicWidth    = kiMbWidth << 4;
   const int32_t kiPicHeight   = kiMbHeight << 4;
   //fix Bugzilla Bug1479656 reallocate temp dec picture
-  if (pCtx->pTempDec != NULL) {
+  if (pCtx->pTempDec != NULL && (pCtx->pTempDec->iWidthInPixel != kiPicWidth
+                                 || pCtx->pTempDec->iHeightInPixel != kiPicHeight)) {
     FreePicture (pCtx->pTempDec, pCtx->pMemAlign);
     pCtx->pTempDec = AllocPicture (pCtx, pCtx->pSps->iMbWidth << 4, pCtx->pSps->iMbHeight << 4);
   }

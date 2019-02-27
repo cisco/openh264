@@ -78,13 +78,14 @@ typedef enum {
   /**
   * Errors derived from bitstream parsing
   */
-  dsErrorFree           = 0x00,   ///< bit stream error-free
-  dsFramePending        = 0x01,   ///< need more throughput to generate a frame output,
-  dsRefLost             = 0x02,   ///< layer lost at reference frame with temporal id 0
-  dsBitstreamError      = 0x04,   ///< error bitstreams(maybe broken internal frame) the decoder cared
-  dsDepLayerLost        = 0x08,   ///< dependented layer is ever lost
-  dsNoParamSets         = 0x10,   ///< no parameter set NALs involved
-  dsDataErrorConcealed  = 0x20,   ///< current data error concealed specified
+  dsErrorFree = 0x00,   ///< bit stream error-free
+  dsFramePending = 0x01,   ///< need more throughput to generate a frame output,
+  dsRefLost = 0x02,   ///< layer lost at reference frame with temporal id 0
+  dsBitstreamError = 0x04,   ///< error bitstreams(maybe broken internal frame) the decoder cared
+  dsDepLayerLost = 0x08,   ///< dependented layer is ever lost
+  dsNoParamSets = 0x10,   ///< no parameter set NALs involved
+  dsDataErrorConcealed = 0x20,   ///< current data error concealed specified
+  dsRefListNullPtrs = 0x40, ///<ref picure list contains null ptrs within uiRefCount range
 
   /**
   * Errors derived from logic level

@@ -2720,7 +2720,10 @@ bool CheckAndFinishLastPic (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferIn
       DecodeFrameConstruction (pCtx, ppDst, pDstInfo);
       pCtx->pPreviousDecodedPictureInDpb = pCtx->pDec; //save ECed pic for future use
       if (pCtx->sLastNalHdrExt.sNalUnitHeader.uiNalRefIdc > 0) {
-        MarkECFrameAsRef (pCtx);
+        if (MarkECFrameAsRef (pCtx) == ERR_INFO_INVALID_PTR) {
+          pCtx->iErrorCode |= dsRefListNullPtrs;
+          return false;
+        }
       }
     } else if (pCtx->pParam->bParseOnly) { //clear parse only internal data status
       pCtx->pParserBsInfo->iNalNum = 0;

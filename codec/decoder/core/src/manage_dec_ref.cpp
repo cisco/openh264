@@ -792,6 +792,9 @@ static int32_t AddShortTermToList (PRefPic pRefPic, PPicture pPic) {
   if (pRefPic->uiShortRefCount[LIST_0] > 0) {
     // Check the duplicate frame_num in short ref list
     for (int32_t iPos = 0; iPos < pRefPic->uiShortRefCount[LIST_0]; iPos++) {
+      if (!pRefPic->pShortRefList[LIST_0][iPos]) {
+        return ERR_INFO_INVALID_PTR;
+      }
       if (pPic->iFrameNum == pRefPic->pShortRefList[LIST_0][iPos]->iFrameNum) {
         // Replace the previous ref pic with the new one with the same frame_num
         pRefPic->pShortRefList[LIST_0][iPos] = pPic;
@@ -819,6 +822,9 @@ static int32_t AddLongTermToList (PRefPic pRefPic, PPicture pPic, int32_t iLongT
     pRefPic->pLongRefList[LIST_0][pRefPic->uiLongRefCount[LIST_0]] = pPic;
   } else {
     for (i = 0; i < pRefPic->uiLongRefCount[LIST_0]; i++) {
+      if (!pRefPic->pLongRefList[LIST_0][i]) {
+        return ERR_INFO_INVALID_PTR;
+      }
       if (pRefPic->pLongRefList[LIST_0][i]->iLongTermFrameIdx > pPic->iLongTermFrameIdx) {
         break;
       }
