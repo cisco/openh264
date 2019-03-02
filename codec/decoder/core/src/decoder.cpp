@@ -167,6 +167,9 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
 
 static void ResetRefPicReferences (const PWelsDecoderContext& pCtx, const PPicture& inPPic) {
   //seach and reset the references of deleted references.
+  if (pCtx->eSliceType != B_SLICE) {
+    return;
+  }
   for (int32_t list = LIST_0; list < LIST_A; ++list) {
     int32_t refIdx = 0;
     PPicture pPic = pCtx->sRefPic.pRefList[list][refIdx];
