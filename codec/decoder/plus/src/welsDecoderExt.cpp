@@ -581,12 +581,6 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
 
     eNalType = m_pDecContext->sCurNalHead.eNalUnitType;
 
-    if ((m_pDecContext->iErrorCode & dsRefLost) && m_pDecContext->eSliceType == B_SLICE) {
-      if (ResetDecoder()) {
-        return dsRefLost;
-      }
-      return dsErrorFree;
-    }
     if (m_pDecContext->iErrorCode & dsOutOfMemory) {
       if (ResetDecoder()) {
         return dsOutOfMemory;
