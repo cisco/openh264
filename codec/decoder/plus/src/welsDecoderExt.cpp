@@ -580,7 +580,6 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
       NAL_UNIT_UNSPEC_0; //for NBR, IDR frames are expected to decode as followed if error decoding an IDR currently
 
     eNalType = m_pDecContext->sCurNalHead.eNalUnitType;
-
     if (m_pDecContext->iErrorCode & dsOutOfMemory) {
       if (ResetDecoder()) {
         return dsOutOfMemory;
@@ -762,6 +761,25 @@ DECODING_STATE CWelsDecoder::ReorderPicturesInDisplay (unsigned char** ppDst, SB
         for (int32_t i = 0; i <= m_iLargestBufferedPicIndex; ++i) {
           if (m_sPictInfoList[i].iPOC > sIMinInt32) {
             m_sPictInfoList[i].bLastGOP = true;
+          }
+        }
+      }
+    } else {
+      if (m_iNumOfPicts > 0) {
+        //This can happen when decoder moves to next GOP without being able to decoder first picture PicOrderCntLsb = 0
+        bool hasGOPChanged = false;
+        for (int32_t i = 0; i <= m_iLargestBufferedPicIndex; ++i) {
+          if (m_sPictInfoList[i].iPOC == m_pDecContext->pSliceHeader->iPicOrderCntLsb) {
+            hasGOPChanged = true;
+            break;
+          }
+        }
+        if (hasGOPChanged) {
+          m_iLastGOPRemainPicts = m_iNumOfPicts;
+          for (int32_t i = 0; i <= m_iLargestBufferedPicIndex; ++i) {
+            if (m_sPictInfoList[i].iPOC > sIMinInt32) {
+              m_sPictInfoList[i].bLastGOP = true;
+            }
           }
         }
       }
