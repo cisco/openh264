@@ -229,7 +229,9 @@ static inline int32_t GetRefPic (sMCRefMember* pMCRefMem, PWelsDecoderContext pC
       pMCRefMem->pSrcY = pRefPic->pData[0];
       pMCRefMem->pSrcU = pRefPic->pData[1];
       pMCRefMem->pSrcV = pRefPic->pData[2];
-
+      if (!pMCRefMem->pSrcY || !pMCRefMem->pSrcU || !pMCRefMem->pSrcV) {
+        return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_DATA, ERR_INFO_REFERENCE_PIC_LOST);
+      }
       return ERR_NONE;
     }
   }
@@ -435,7 +437,7 @@ static void BiPrediction (PDqLayer pCurDqLayer, sMCRefMember* pMCRefMem, sMCRefM
   }
 }
 
-void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDecoderContext pCtx) {
+int32_t GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDecoderContext pCtx) {
   sMCRefMember pMCRefMem;
   PDqLayer pCurDqLayer = pCtx->pCurDqLayer;
   SMcFunc* pMCFunc = &pCtx->sMcFunc;
@@ -471,7 +473,7 @@ void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDec
   case MB_TYPE_16x16:
     iMVs[0] = pCurDqLayer->pMv[0][iMBXY][0][0];
     iMVs[1] = pCurDqLayer->pMv[0][iMBXY][0][1];
-    GetRefPic (&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[0][iMBXY], 0, LIST_0);
+    WELS_B_MB_REC_VERIFY (GetRefPic (&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[0][iMBXY], 0, LIST_0));
     BaseMC (&pMCRefMem, iMBOffsetX, iMBOffsetY, pMCFunc, 16, 16, iMVs);
 
     if (pCurDqLayer->bUseWeightPredictionFlag) {
@@ -482,7 +484,7 @@ void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDec
   case MB_TYPE_16x8:
     iMVs[0] = pCurDqLayer->pMv[0][iMBXY][0][0];
     iMVs[1] = pCurDqLayer->pMv[0][iMBXY][0][1];
-    GetRefPic (&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[0][iMBXY], 0, LIST_0);
+    WELS_B_MB_REC_VERIFY (GetRefPic (&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[0][iMBXY], 0, LIST_0));
     BaseMC (&pMCRefMem, iMBOffsetX, iMBOffsetY, pMCFunc, 16, 8, iMVs);
 
     if (pCurDqLayer->bUseWeightPredictionFlag) {
@@ -492,7 +494,7 @@ void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDec
 
     iMVs[0] = pCurDqLayer->pMv[0][iMBXY][8][0];
     iMVs[1] = pCurDqLayer->pMv[0][iMBXY][8][1];
-    GetRefPic (&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[0][iMBXY], 8, LIST_0);
+    WELS_B_MB_REC_VERIFY (GetRefPic (&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[0][iMBXY], 8, LIST_0));
     pMCRefMem.pDstY = pPredY  + (iDstLineLuma << 3);
     pMCRefMem.pDstU = pPredCb + (iDstLineChroma << 2);
     pMCRefMem.pDstV = pPredCr + (iDstLineChroma << 2);
@@ -506,7 +508,7 @@ void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDec
   case MB_TYPE_8x16:
     iMVs[0] = pCurDqLayer->pMv[0][iMBXY][0][0];
     iMVs[1] = pCurDqLayer->pMv[0][iMBXY][0][1];
-    GetRefPic (&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[0][iMBXY], 0, LIST_0);
+    WELS_B_MB_REC_VERIFY (GetRefPic (&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[0][iMBXY], 0, LIST_0));
     BaseMC (&pMCRefMem, iMBOffsetX, iMBOffsetY, pMCFunc, 8, 16, iMVs);
     if (pCurDqLayer->bUseWeightPredictionFlag) {
       iRefIndex = pCurDqLayer->pRefIndex[0][iMBXY][0];
@@ -515,7 +517,7 @@ void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDec
 
     iMVs[0] = pCurDqLayer->pMv[0][iMBXY][2][0];
     iMVs[1] = pCurDqLayer->pMv[0][iMBXY][2][1];
-    GetRefPic (&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[0][iMBXY], 2, LIST_0);
+    WELS_B_MB_REC_VERIFY (GetRefPic (&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[0][iMBXY], 2, LIST_0));
     pMCRefMem.pDstY = pPredY + 8;
     pMCRefMem.pDstU = pPredCb + 4;
     pMCRefMem.pDstV = pPredCr + 4;
@@ -539,7 +541,7 @@ void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDec
       iYOffset = iMBOffsetY + iBlk8Y;
 
       iIIdx = ((i >> 1) << 3) + ((i & 1) << 1);
-      GetRefPic (&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[0][iMBXY], iIIdx, LIST_0);
+      WELS_B_MB_REC_VERIFY (GetRefPic (&pMCRefMem, pCtx, pCurDqLayer->pRefIndex[0][iMBXY], iIIdx, LIST_0));
       iRefIndex = pCurDqLayer->bUseWeightPredictionFlag ? pCurDqLayer->pRefIndex[0][iMBXY][iIIdx] : 0;
 
       pDstY = pPredY + iBlk8X + iBlk8Y * iDstLineLuma;
@@ -636,6 +638,7 @@ void GetInterPred (uint8_t* pPredY, uint8_t* pPredCb, uint8_t* pPredCr, PWelsDec
   default:
     break;
   }
+  return ERR_NONE;
 }
 
 int32_t GetInterBPred (uint8_t* pPredYCbCr[3], uint8_t* pTempPredYCbCr[3], PWelsDecoderContext pCtx) {
