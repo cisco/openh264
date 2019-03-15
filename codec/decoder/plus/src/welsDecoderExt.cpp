@@ -756,15 +756,15 @@ DECODING_STATE CWelsDecoder::ReorderPicturesInDisplay (unsigned char** ppDst, SB
   DECODING_STATE iRet = dsErrorFree;
   if (pDstInfo->iBufferStatus == 1 && m_pDecContext->pSps->uiProfileIdc != 66
       && m_pDecContext->pSps->uiProfileIdc != 83) {
-    if (m_pDecContext->pSliceHeader->iPicOrderCntLsb == 0) {
-      m_LastWrittenPOC = 0;
-      return dsErrorFree;
-    }
-    if (m_iNumOfPicts == 0 && m_pDecContext->pPreviousDecodedPictureInDpb->bNewSeqBegin
-        && m_pDecContext->eSliceType != I_SLICE) {
-      m_LastWrittenPOC = m_pDecContext->pSliceHeader->iPicOrderCntLsb;
-      return dsErrorFree;
-    }
+    /* if (m_pDecContext->pSliceHeader->iPicOrderCntLsb == 0) {
+       m_LastWrittenPOC = 0;
+       return dsErrorFree;
+     }
+     if (m_iNumOfPicts == 0 && m_pDecContext->pPreviousDecodedPictureInDpb->bNewSeqBegin
+         && m_pDecContext->eSliceType != I_SLICE) {
+       m_LastWrittenPOC = m_pDecContext->pSliceHeader->iPicOrderCntLsb;
+       return dsErrorFree;
+     }*/
     if (m_iNumOfPicts && m_pDecContext->pPreviousDecodedPictureInDpb
         && m_pDecContext->pPreviousDecodedPictureInDpb->bNewSeqBegin) {
       m_iLastGOPRemainPicts = m_iNumOfPicts;
