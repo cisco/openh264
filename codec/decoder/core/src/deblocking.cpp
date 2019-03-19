@@ -971,7 +971,7 @@ void FilteringEdgeChromaIntraV (SDeblockingFilter* pFilter, uint8_t* pPixCb, uin
 }
 
 
-void DeblockingInterMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, uint8_t nBS[2][4][4],
+static void DeblockingInterMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, uint8_t nBS[2][4][4],
                         int32_t iBoundryFlag) {
   int32_t iMbXyIndex = pCurDqLayer->iMbXyIndex;
   int32_t iMbX = pCurDqLayer->iMbX;
@@ -1215,7 +1215,7 @@ void FilteringEdgeChromaHV (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, in
 }
 
 // merge h&v lookup table operation to save performance
-void DeblockingIntraMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t iBoundryFlag) {
+static void DeblockingIntraMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t iBoundryFlag) {
   FilteringEdgeLumaHV (pCurDqLayer, pFilter, iBoundryFlag);
   FilteringEdgeChromaHV (pCurDqLayer, pFilter, iBoundryFlag);
 }

@@ -1130,7 +1130,7 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0 (PWelsDecoderContext pCtx, PWelsNeighAv
       return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_MB_TYPE);
 
     if (25 == uiMbType) {   //I_PCM
-      WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "I_PCM mode exists in P slice!");
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "I_PCM mode exists in B slice!");
       WELS_READ_VERIFY (ParseIPCMInfoCabac (pCtx));
       pSlice->iLastDeltaQp = 0;
       WELS_READ_VERIFY (ParseEndOfSliceCabac (pCtx, uiEosFlag));
@@ -2532,7 +2532,7 @@ int32_t WelsActualDecodeMbCavlcBSlice (PWelsDecoderContext pCtx) {
       return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_MB_TYPE);
 
     if (25 == uiMbType) {
-      WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "I_PCM mode exists in P slice!");
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_DEBUG, "I_PCM mode exists in B slice!");
       int32_t iDecStrideL = pCurLayer->pDec->iLinesize[0];
       int32_t iDecStrideC = pCurLayer->pDec->iLinesize[1];
 
@@ -2855,7 +2855,11 @@ void WelsBlockZero16x16_c (int16_t* pBlock, int32_t iStride) {
 void WelsBlockZero8x8_c (int16_t* pBlock, int32_t iStride) {
   WelsBlockInit (pBlock, 8, 8, iStride, 0);
 }
-bool ComputeColocated (PWelsDecoderContext pCtx) {
+
+// Compute the temporal-direct scaling factor that's common
+// to all direct MBs in this slice, as per clause 8.4.1.2.3
+// of T-REC H.264 201704
+bool ComputeColocatedTemporalScaling (PWelsDecoderContext pCtx) {
   PDqLayer pCurLayer = pCtx->pCurDqLayer;
   PSlice pCurSlice = &pCurLayer->sLayerInfo.sSliceInLayer;
   PSliceHeader pSliceHeader = &pCurSlice->sSliceHeaderExt.sSliceHeader;
@@ -2879,11 +2883,6 @@ bool ComputeColocated (PWelsDecoderContext pCtx) {
       }
     }
   }
-  //Implement the following
-  //get Mv_colocated_L1
-  //and do calculation
-  //iMvp[LIST_0] = Mv_colocated_L1 * (POC(cur) - POC(L0))/POC(L1) - POC(L0))
-  //iMvp[LIST_1] = Mv_colocated_L1 * (POC(cur) - POC(L1))/POC(L1) - POC(L0))
   return true;
 }
 } // namespace WelsDec
