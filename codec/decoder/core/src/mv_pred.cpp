@@ -1104,6 +1104,10 @@ void FillTemporalDirect8x8Mv (PDqLayer pCurLayer, const int16_t& iIdx8, const in
 }
 int8_t MapColToList0 (PWelsDecoderContext& pCtx, const int8_t& colocRefIndexL0,
                       const int32_t& ref0Count) { //ISO/IEC 14496-10:2009(E) (8-193)
+  //When reference is lost, this function must be skipped.
+  if ((pCtx->iErrorCode & dsRefLost) == dsRefLost) {
+    return 0;
+  }
   PPicture pic1 = pCtx->sRefPic.pRefList[LIST_1][0];
   if (pic1 && pic1->pRefPic[LIST_0][colocRefIndexL0]) {
     const int32_t iFramePoc = pic1->pRefPic[LIST_0][colocRefIndexL0]->iFramePoc;

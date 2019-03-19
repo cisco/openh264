@@ -754,14 +754,23 @@ void CWelsDecoder::OutputStatisticsLog (SDecoderStatistics& sDecoderStatistics) 
 
 DECODING_STATE CWelsDecoder::ReorderPicturesInDisplay (unsigned char** ppDst, SBufferInfo* pDstInfo) {
   DECODING_STATE iRet = dsErrorFree;
-  if (pDstInfo->iBufferStatus == 1 && m_pDecContext->pSps->uiProfileIdc != 66) {
-    if (m_pDecContext->pSliceHeader->iPicOrderCntLsb == 0) {
-      if (m_iNumOfPicts > 0) {
-        m_iLastGOPRemainPicts = m_iNumOfPicts;
-        for (int32_t i = 0; i <= m_iLargestBufferedPicIndex; ++i) {
-          if (m_sPictInfoList[i].iPOC > sIMinInt32) {
-            m_sPictInfoList[i].bLastGOP = true;
-          }
+  if (pDstInfo->iBufferStatus == 1 && m_pDecContext->pSps->uiProfileIdc != 66
+      && m_pDecContext->pSps->uiProfileIdc != 83) {
+    /*if (m_pDecContext->pSliceHeader->iPicOrderCntLsb == 0) {
+      m_LastWrittenPOC = 0;
+      return dsErrorFree;
+    }
+    if (m_iNumOfPicts == 0 && m_pDecContext->pPreviousDecodedPictureInDpb->bNewSeqBegin
+        && m_pDecContext->eSliceType != I_SLICE) {
+      m_LastWrittenPOC = m_pDecContext->pSliceHeader->iPicOrderCntLsb;
+      return dsErrorFree;
+    }*/
+    if (m_iNumOfPicts && m_pDecContext->pPreviousDecodedPictureInDpb
+        && m_pDecContext->pPreviousDecodedPictureInDpb->bNewSeqBegin) {
+      m_iLastGOPRemainPicts = m_iNumOfPicts;
+      for (int32_t i = 0; i <= m_iLargestBufferedPicIndex; ++i) {
+        if (m_sPictInfoList[i].iPOC > sIMinInt32) {
+          m_sPictInfoList[i].bLastGOP = true;
         }
       }
     } else {
