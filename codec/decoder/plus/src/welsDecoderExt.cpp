@@ -592,6 +592,12 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
       }
       return dsErrorFree;
     }
+    if ((m_pDecContext->iErrorCode == (dsBitstreamError | dsDataErrorConcealed)) && m_pDecContext->eSliceType == B_SLICE) {
+      if (ResetDecoder()) {
+        return DECODING_STATE (dsBitstreamError | dsDataErrorConcealed);
+      }
+      return dsErrorFree;
+    }
     //for AVC bitstream (excluding AVC with temporal scalability, including TP), as long as error occur, SHOULD notify upper layer key frame loss.
     if ((IS_PARAM_SETS_NALS (eNalType) || NAL_UNIT_CODED_SLICE_IDR == eNalType) ||
         (VIDEO_BITSTREAM_AVC == m_pDecContext->eVideoType)) {

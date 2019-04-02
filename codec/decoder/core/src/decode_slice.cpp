@@ -2403,11 +2403,11 @@ int32_t WelsDecodeMbCavlcBSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uin
     pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || ! (ppRefPicL0[0] && ppRefPicL0[0]->bIsComplete)
                             || ! (ppRefPicL1[0] && ppRefPicL1[0]->bIsComplete);
 
-    if (pCtx->bMbRefConcealed) {
+    /*if (pCtx->bMbRefConcealed) {
       SLogContext* pLogCtx = & (pCtx->sLogCtx);
       WelsLog (pLogCtx, WELS_LOG_ERROR, "Ref Picture for B-Slice is lost, B-Slice decoding cannot be continued!");
       return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_DATA, ERR_INFO_REFERENCE_PIC_LOST);
-    }
+    }*/
     //predict iMv
     SubMbType subMbType;
     if (pSliceHeader->iDirectSpatialMvPredFlag) {
@@ -2467,7 +2467,7 @@ int32_t WelsDecodeMbCavlcBSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uin
   if (iUsedBits > (pBs->iBits -
                    1)) { //When BS incomplete, as long as find it, SHOULD stop decoding to avoid mosaic or crash.
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
-             "WelsDecodeMbCavlcISlice()::::pBs incomplete, iUsedBits:%" PRId64 " > pBs->iBits:%d, MUST stop decoding.",
+             "WelsDecodeMbCavlcBSlice()::::pBs incomplete, iUsedBits:%" PRId64 " > pBs->iBits:%d, MUST stop decoding.",
              (int64_t)iUsedBits, pBs->iBits);
     return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_BS_INCOMPLETE);
   }
