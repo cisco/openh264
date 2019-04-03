@@ -129,7 +129,7 @@ static int32_t WelsCheckAndRecoverForFutureDecoding (PWelsDecoderContext pCtx) {
         if (pCtx->eSliceType == B_SLICE) {
           //reset reference's references when IDR is lost
           for (int32_t list = LIST_0; list < LIST_A; ++list) {
-            for (int32_t i = 0; i < 17; ++i) {
+            for (int32_t i = 0; i < MAX_DPB_COUNT; ++i) {
               pRef->pRefPic[list][i] = NULL;
             }
           }
