@@ -126,6 +126,14 @@ static int32_t WelsCheckAndRecoverForFutureDecoding (PWelsDecoderContext pCtx) {
         pRef->bIsComplete = false; // Set complete flag to false for lost IDR ref picture
         pRef->iSpsId = pCtx->pSps->iSpsId;
         pRef->iPpsId = pCtx->pPps->iPpsId;
+        if (pCtx->eSliceType == B_SLICE) {
+          //reset reference's references when IDR is lost
+          for (int32_t list = LIST_0; list < LIST_A; ++list) {
+            for (int32_t i = 0; i < 17; ++i) {
+              pRef->pRefPic[list][i] = NULL;
+            }
+          }
+        }
         pCtx->iErrorCode |= dsDataErrorConcealed;
         bool bCopyPrevious = ((ERROR_CON_FRAME_COPY_CROSS_IDR == pCtx->pParam->eEcActiveIdc)
                               || (ERROR_CON_SLICE_COPY_CROSS_IDR == pCtx->pParam->eEcActiveIdc)
