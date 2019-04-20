@@ -228,6 +228,14 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
     pPicNewBuf->ppPic[i]->uiRefCount = 0;
     pPicNewBuf->ppPic[i]->bAvailableFlag = true;
     pPicNewBuf->ppPic[i]->bIsComplete = false;
+    //remove references
+    for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+      uint32_t i = 0;
+      while (i < MAX_DPB_COUNT && pPicNewBuf->ppPic[i]->pRefPic[listIdx][i]) {
+        pPicNewBuf->ppPic[i]->pRefPic[listIdx][i] = 0;
+        ++i;
+      }
+    }
   }
   // remove old PicBuf
   if (pPicOldBuf->ppPic != NULL) {
