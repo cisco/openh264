@@ -212,20 +212,19 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   //update references due to allocation changes
   for (int32_t i = 0; i < kiNewSize; i++) {
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
-      for (int32_t j = 0; j < MAX_DPB_COUNT; j++) {
-        if (pPicNewBuf->ppPic[i]->pRefPic[listIdx][j] != NULL) {
-          unsigned long long uiTimeStamp = pPicNewBuf->ppPic[i]->pRefPic[listIdx][j]->uiTimeStamp;
-          bool foundThePic = false;
-          for (int32_t k = 0; k < kiNewSize; k++) {
-            if (pPicNewBuf->ppPic[k]->uiTimeStamp == uiTimeStamp) {
-              pPicNewBuf->ppPic[i]->pRefPic[listIdx][j] = pPicNewBuf->ppPic[k];
-              foundThePic = true;
-              break;
-            }
+      int32_t j = -1;
+      while (++j < MAX_DPB_COUNT && pPicNewBuf->ppPic[i]->pRefPic[listIdx][j] != NULL) {
+        unsigned long long uiTimeStamp = pPicNewBuf->ppPic[i]->pRefPic[listIdx][j]->uiTimeStamp;
+        bool foundThePic = false;
+        for (int32_t k = 0; k < kiNewSize; k++) {
+          if (pPicNewBuf->ppPic[k]->uiTimeStamp == uiTimeStamp) {
+            pPicNewBuf->ppPic[i]->pRefPic[listIdx][j] = pPicNewBuf->ppPic[k];
+            foundThePic = true;
+            break;
           }
-          if (!foundThePic) {
-            pPicNewBuf->ppPic[i]->pRefPic[listIdx][j] = NULL;
-          }
+        }
+        if (!foundThePic) {
+          pPicNewBuf->ppPic[i]->pRefPic[listIdx][j] = NULL;
         }
       }
     }
@@ -242,7 +241,7 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
 
   // initialize context in queue
   pPicNewBuf->iCapacity = kiNewSize;
-  *ppPicBuf             = pPicNewBuf;
+  * ppPicBuf             = pPicNewBuf;
 
   for (int32_t i = 0; i < pPicNewBuf->iCapacity; i++) {
     pPicNewBuf->ppPic[i]->bUsedAsRef = false;
