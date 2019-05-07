@@ -2,6 +2,18 @@
 Releases
 -----------
 
+v2.0.0
+------
+— B-frame decoding support for Main and High Profile with two test cases
+— Add support for loongson(https://en.wikipedia.org/wiki/Loongson) platform
+— Add clang support for arm/arm64/x86 for NDK version over 17
+— Enable stack protector
+— Add some test cases
+— Avoid using C++/CX code for threads for Windows Phone/Windows Store/UWP
+— Remove extra visual studio projects for the decoder
+— Remove check for working compiler in NDK
+— Bug fixes
+
 v1.8.0
 ------
 - Add meson build for Linux/Windows platform
