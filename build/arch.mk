@@ -35,9 +35,15 @@ ifneq ($(filter mips mips64, $(ARCH)),)
 ifeq ($(USE_ASM), Yes)
 ASM_ARCH = mips
 ASMFLAGS += -I$(SRC_PATH)codec/common/mips/
-LOONGSON3A = $(shell g++ -dM -E - < /dev/null | grep '_MIPS_TUNE ' | cut -f 3 -d " ")
-ifeq ($(LOONGSON3A), "loongson3a")
+#detect mmi
+MMI = $(shell $(SRC_PATH)/build/mipsVectorInstruction.sh mmi)
+ifeq ($(MMI), Yes)
 CFLAGS += -DHAVE_MMI
+endif
+#detect msa
+MSA = $(shell $(SRC_PATH)/build/mipsVectorInstruction.sh msa)
+ifeq ($(MSA), Yes)
+CFLAGS += -DHAVE_MSA
 endif
 endif
 endif

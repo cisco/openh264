@@ -309,12 +309,33 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
 
 #elif defined(mips)
 /* for loongson */
+static uint32_t get_cpu_flags_from_cpuinfo(void)
+{
+    uint32_t flags = 0;
+    char buf[1024];
+
+# ifdef __linux__
+    FILE* fp = fopen("/proc/cpuinfo", "r");
+    if (!fp)
+        return flags;
+
+    memset(buf, 0, sizeof(buf));
+    fread(buf, sizeof(char), sizeof(buf) - 1, fp);
+    fclose(fp);
+    if (strstr(buf, "3A4000")) {
+        flags |= WELS_CPU_MSA | WELS_CPU_MMI;
+    } else if (strstr(buf, "2K1000")) {
+        flags |= WELS_CPU_MSA | WELS_CPU_MMI;
+    } else {
+        flags |= WELS_CPU_MMI;
+    }
+# endif
+    return flags;
+}
+
 uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
-#if defined(HAVE_MMI)
-  return WELS_CPU_MMI;
-#else
-  return 0;
-#endif
+    uint32_t flags = get_cpu_flags_from_cpuinfo();
+    return flags;
 }
 
 #else /* Neither X86_ASM, HAVE_NEON, HAVE_NEON_AARCH64 nor mips */
@@ -324,5 +345,3 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
 }
 
 #endif
-
-
