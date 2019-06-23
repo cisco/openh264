@@ -172,6 +172,7 @@ typedef struct tagDeblockingFilter {
   int8_t  iChromaQP[2];
   int8_t  iLumaQP;
   struct TagDeblockingFunc*  pLoopf;
+  PPicture *pRefPics[LIST_A];
 } SDeblockingFilter, *PDeblockingFilter;
 
 typedef void (*PDeblockingFilterMbFunc) (PDqLayer pCurDqLayer, PDeblockingFilter  filter, int32_t boundry_flag);

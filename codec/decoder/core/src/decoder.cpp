@@ -165,27 +165,6 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   return ERR_NONE;
 }
 
-static void ResetRefPicReferences (const PWelsDecoderContext& pCtx, const PPicture& inPPic) {
-  //seach and reset the references of deleted references.
-  int32_t list_count = pCtx->eSliceType == B_SLICE ? 2 : 1;
-  for (int32_t list = LIST_0; list < list_count; ++list) {
-    int32_t refIdx = 0;
-    PPicture pPic = pCtx->sRefPic.pRefList[list][refIdx];
-    while (refIdx < MAX_DPB_COUNT && pPic != NULL) {
-      ++refIdx;
-      for (int32_t i = LIST_0; i < LIST_A; ++i) {
-        int32_t ref = 0;
-        while (ref < MAX_DPB_COUNT && pPic->pRefPic[i][ref] != NULL) {
-          if (pPic->pRefPic[i][ref] == inPPic) {
-            pPic->pRefPic[i][ref] = NULL;
-          }
-          ++ref;
-        }
-      }
-    }
-  }
-}
-
 static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, const int32_t kiOldSize,
                                 const int32_t kiPicWidth, const int32_t kiPicHeight, const int32_t kiNewSize) {
   PPicBuff pPicOldBuf = *ppPicBuf;
@@ -230,10 +209,30 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
     iDelIdx = kiNewSize;
   }
 
+  //update references due to allocation changes
+  for (int32_t i = 0; i < kiNewSize; i++) {
+    for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+      int32_t j = -1;
+      while (++j < MAX_DPB_COUNT && pPicNewBuf->ppPic[i]->pRefPic[listIdx][j] != NULL) {
+        unsigned long long uiTimeStamp = pPicNewBuf->ppPic[i]->pRefPic[listIdx][j]->uiTimeStamp;
+        bool foundThePic = false;
+        for (int32_t k = 0; k < kiNewSize; k++) {
+          if (pPicNewBuf->ppPic[k]->uiTimeStamp == uiTimeStamp) {
+            pPicNewBuf->ppPic[i]->pRefPic[listIdx][j] = pPicNewBuf->ppPic[k];
+            foundThePic = true;
+            break;
+          }
+        }
+        if (!foundThePic) {
+          pPicNewBuf->ppPic[i]->pRefPic[listIdx][j] = NULL;
+        }
+      }
+    }
+  }
+
   for (iPicIdx = iDelIdx; iPicIdx < kiOldSize; iPicIdx++) {
     if (iPrevPicIdx != iPicIdx) {
       if (pPicOldBuf->ppPic[iPicIdx] != NULL) {
-        ResetRefPicReferences (pCtx, pPicOldBuf->ppPic[iPicIdx]);
         FreePicture (pPicOldBuf->ppPic[iPicIdx], pMa);
         pPicOldBuf->ppPic[iPicIdx] = NULL;
       }
@@ -242,7 +241,7 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
 
   // initialize context in queue
   pPicNewBuf->iCapacity = kiNewSize;
-  *ppPicBuf             = pPicNewBuf;
+  * ppPicBuf             = pPicNewBuf;
 
   for (int32_t i = 0; i < pPicNewBuf->iCapacity; i++) {
     pPicNewBuf->ppPic[i]->bUsedAsRef = false;
