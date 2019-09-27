@@ -860,6 +860,10 @@
 				RelativePath="..\..\..\common\inc\wels_const_common.h"
 				>
 			</File>
+			<File
+				RelativePath="..\..\..\decoder\core\inc\wels_decoder_thread.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Source Files"
@@ -975,6 +979,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\common\src\utils.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\decoder\core\src\wels_decoder_thread.cpp"
 				>
 			</File>
 		</Filter>
