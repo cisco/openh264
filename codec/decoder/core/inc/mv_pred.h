@@ -91,7 +91,7 @@ void UpdateP8x16MotionInfo (PDqLayer pCurDqLayer, int16_t iMotionVector[LIST_A][
  * \param
  * \param   output iMvp[]
  */
-void PredPSkipMvFromNeighbor (PDqLayer pCurLayer, int16_t iMvp[2]);
+void PredPSkipMvFromNeighbor (PDqLayer pCurDqLayer, int16_t iMvp[2]);
 
 /*!
 * \brief   get the motion predictor and reference for B-slice direct mode version 2
@@ -149,7 +149,7 @@ void PredInter8x16Mv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[
 * \param
 * \param   output motion vector cache and motion vector deviation cache
 */
-void FillSpatialDirect8x8Mv (PDqLayer pCurLayer, const int16_t& iIdx8, const int8_t& iPartCount, const int8_t& iPartW,
+void FillSpatialDirect8x8Mv (PDqLayer pCurDqLayer, const int16_t& iIdx8, const int8_t& iPartCount, const int8_t& iPartW,
                              const SubMbType& subMbType, const bool& bIsLongRef, int16_t pMvDirect[LIST_A][2], int8_t iRef[LIST_A],
                              int16_t pMotionVector[LIST_A][30][MV_A], int16_t pMvdCache[LIST_A][30][MV_A]);
 
@@ -158,7 +158,8 @@ void FillSpatialDirect8x8Mv (PDqLayer pCurLayer, const int16_t& iIdx8, const int
 * \param
 * \param   output motion vector cache and motion vector deviation cache
 */
-void FillTemporalDirect8x8Mv (PDqLayer pCurLayer, const int16_t& iIdx8, const int8_t& iPartCount, const int8_t& iPartW,
+void FillTemporalDirect8x8Mv (PDqLayer pCurDqLayer, const int16_t& iIdx8, const int8_t& iPartCount,
+                              const int8_t& iPartW,
                               const SubMbType& subMbType, int8_t iRef[LIST_A], int16_t (*mvColoc)[2],
                               int16_t pMotionVector[LIST_A][30][MV_A], int16_t pMvdCache[LIST_A][30][MV_A]);
 
@@ -176,6 +177,14 @@ int8_t MapColToList0 (PWelsDecoderContext& pCtx, const int8_t& colocRefIndexL0,
 * \param
 */
 void Update8x8RefIdx (PDqLayer& pCurDqLayer, const int16_t& iPartIdx, const int32_t& listIdx, const int8_t& iRef);
+
+inline uint32_t* GetMbType (PDqLayer& pCurDqLayer) {
+  if (pCurDqLayer->pDec != NULL) {
+    return pCurDqLayer->pDec->pMbType;
+  } else {
+    return pCurDqLayer->pMbType;
+  }
+}
 
 } // namespace WelsDec
 

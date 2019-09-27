@@ -22,6 +22,7 @@ DECODER_CPP_SRCS=\
 	$(DECODER_SRCDIR)/core/src/parse_mb_syn_cavlc.cpp\
 	$(DECODER_SRCDIR)/core/src/pic_queue.cpp\
 	$(DECODER_SRCDIR)/core/src/rec_mb.cpp\
+	$(DECODER_SRCDIR)/core/src/wels_decoder_thread.cpp\
 	$(DECODER_SRCDIR)/plus/src/welsDecoderExt.cpp\
 
 DECODER_OBJS += $(DECODER_CPP_SRCS:.cpp=.$(OBJ))

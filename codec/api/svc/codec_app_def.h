@@ -167,8 +167,9 @@ typedef enum {
   DECODER_OPTION_LEVEL,                 ///< get current AU level info,only is used in GetOption
   DECODER_OPTION_STATISTICS_LOG_INTERVAL,///< set log output interval
   DECODER_OPTION_IS_REF_PIC,             ///< feedback current frame is ref pic or not
-  DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER  ///< number of frames remaining in decoder buffer when pictures are required to re-ordered into display-order.
-
+  DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER,  ///< number of frames remaining in decoder buffer when pictures are required to re-ordered into display-order.
+  DECODER_OPTION_NUM_OF_THREADS,         ///< number of decoding threads. The maximum thread count is equal or less than lesser of (cpu core counts and 16).
+  DECODER_OPTION_DISABLE_PICTURE_ORORDER_FOR_DISPLAY ///< disable holding of decoded frame buffers for ordering based on POC for display
 } DECODER_OPTION;
 
 /**

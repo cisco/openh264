@@ -129,6 +129,34 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
  */
 bool PrefetchNalHeaderExtSyntax (PWelsDecoderContext pCtx, PNalUnit const kpDst, PNalUnit const kpSrc);
 
+/*
+* WelsDecodeInitAccessUnitStart
+* check and (re)allocate picture buffers on new sequence begin
+*  bit_len:    size in bit length of data
+*  buf_len:    size in byte length of data
+*  coded_au:   mark an Access Unit decoding finished
+* return:
+*  0 - success; otherwise returned error_no defined in error_no.h
+*/
+int32_t WelsDecodeInitAccessUnitStart (PWelsDecoderContext pCtx, SBufferInfo* pDstInfo);
+/*
+* AllocPicBuffOnNewSeqBegin
+* check and (re)allocate picture buffers on new sequence begin
+* return:
+*  0 - success; otherwise returned error_no defined in error_no.h
+*/
+int32_t AllocPicBuffOnNewSeqBegin (PWelsDecoderContext pCtx);
+
+/*
+* InitConstructAccessUnit
+* Init before constructing an access unit for given input bitstream, maybe partial NAL Unit, one or more Units are involved to
+* joint a collective access unit.
+* parameter\
+*  SBufferInfo:    Buffer info
+* return:
+*  0 - success; otherwise returned error_no defined in error_no.h
+*/
+int32_t InitConstructAccessUnit (PWelsDecoderContext pCtx, SBufferInfo* pDstInfo);
 
 /*
  * ConstructAccessUnit
@@ -152,6 +180,12 @@ int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferI
 int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo);
 
 /*
+* ReconstructCurrentAccessUnit
+*  Reconstruct image pixels after DecodeCurrentAccessUnit is completed.
+*/
+int32_t ReconstructCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo);
+
+/*
  * Check if frame is completed and EC is required
  */
 bool CheckAndFinishLastPic (PWelsDecoderContext pCtx, uint8_t** pDst, SBufferInfo* pDstInfo);
@@ -171,6 +205,7 @@ void ForceClearCurrentNal (PAccessUnit pAu);
 bool CheckRefPicturesComplete (PWelsDecoderContext pCtx); // Check whether all ref pictures are complete
 
 void ForceResetParaSetStatusAndAUList (PWelsDecoderContext pCtx);
+
 } // namespace WelsDec
 
 #endif//WELS_DECODER_CORE_H__
