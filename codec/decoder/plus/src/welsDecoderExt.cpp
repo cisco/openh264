@@ -1263,9 +1263,6 @@ void CWelsDecoder::ReleaseBufferedReadyPicture (PWelsDecoderContext pCtx, unsign
       }
     }
     m_LastWrittenPOC = m_iMinPOC;
-    if (m_LastWrittenPOC < 0) {
-      m_LastWrittenPOC = m_LastWrittenPOC;
-    }
 #if defined (_DEBUG)
 #ifdef _MOTION_VECTOR_DUMP_
     fprintf (stderr, "Output POC: #%d\n", m_LastWrittenPOC);

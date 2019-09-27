@@ -181,7 +181,6 @@ static inline void MBPadBottomLeftChroma_c (uint8_t*& pDst, const int32_t& kiStr
   int32_t i = 0;
   uint8_t* pBottom = pDstLastLine;
   do {
-    const int32_t kiStrides = (1 + i) * kiStride;
     pBottom += kiStride;
     // pad pBottom
     memcpy (pBottom, pDstLastLine, 8);         // confirmed_safe_unsafe_usage
