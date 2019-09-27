@@ -289,7 +289,7 @@
  * backup register
  */
 #define BACKUP_REG \
-   double __back_temp[8];                                      \
+   double __attribute__((aligned(16))) __back_temp[8];         \
    if (_MIPS_SIM == _ABI64)                                    \
    __asm__ volatile (                                          \
      "gssqc1       $f25,      $f24,       0x00(%[temp])  \n\t" \

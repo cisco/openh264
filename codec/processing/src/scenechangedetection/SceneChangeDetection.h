@@ -89,6 +89,12 @@ class CSceneChangeDetectorVideo {
     }
 #endif
 
+#ifdef HAVE_MMI
+    if (iCpuFlag & WELS_CPU_MMI) {
+      m_pfSad = WelsSampleSad8x8_mmi;
+    }
+#endif
+
     m_fSceneChangeMotionRatioLarge = SCENE_CHANGE_MOTION_RATIO_LARGE_VIDEO;
     m_fSceneChangeMotionRatioMedium = SCENE_CHANGE_MOTION_RATIO_MEDIUM;
   }
