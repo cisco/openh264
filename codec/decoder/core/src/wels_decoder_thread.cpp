@@ -104,7 +104,7 @@ void EventPost (SWelsDecEvent* e) {
 
 int EventWait (SWelsDecEvent* e, int32_t timeout) {
   DWORD result;
-  if (timeout == WELS_DEC_THREAD_WAIT_INFINITE || timeout < 0)
+  if ((uint32_t)timeout == WELS_DEC_THREAD_WAIT_INFINITE || timeout < 0)
     result = WaitForSingleObject (e->h, INFINITE);
   else
     result = WaitForSingleObject (e->h, timeout);
@@ -127,7 +127,7 @@ int SemCreate (SWelsDecSemphore* s, long value, long max) {
 
 int SemWait (SWelsDecSemphore* s, int32_t timeout) {
   DWORD result;
-  if (timeout == WELS_DEC_THREAD_WAIT_INFINITE || timeout < 0)
+  if ((uint32_t)timeout == WELS_DEC_THREAD_WAIT_INFINITE || timeout < 0)
     result = WaitForSingleObject (s->h, INFINITE);
   else
     result = WaitForSingleObject (s->h, timeout);
