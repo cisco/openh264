@@ -165,7 +165,6 @@ int EventCreate (SWelsDecEvent* e, int manualReset, int initialState) {
 
   e->isSignaled = initialState;
   e->manualReset = manualReset;
-  e->isValid = 1;
 
   return 0;
 }

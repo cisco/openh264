@@ -86,7 +86,6 @@ typedef struct tagWelsDecSemphore {
 typedef struct tagWelsDecEvent {
   int manualReset;
   int isSignaled;
-  int isValid;
   pthread_cond_t c;
   WELS_MUTEX m;
 } SWelsDecEvent;
