@@ -2479,6 +2479,16 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
   int32_t iIdx = pCurAu->uiStartPos;
   int32_t iEndIdx = pCurAu->uiEndPos;
 
+  //get current thread ctx
+  PWelsDecoderThreadCTX pThreadCtx = NULL;
+  if (pCtx->pThreadCtx != NULL) {
+    pThreadCtx = (PWelsDecoderThreadCTX)pCtx->pThreadCtx;
+  }
+  //get last thread ctx
+  PWelsDecoderThreadCTX pLastThreadCtx = NULL;
+  if (pCtx->pLastThreadCtx != NULL) {
+    pLastThreadCtx = (PWelsDecoderThreadCTX) (pCtx->pLastThreadCtx);
+  }
   int32_t iPpsId = 0;
   int32_t iRet = ERR_NONE;
 
@@ -2507,9 +2517,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
     PSliceHeader pSh = NULL;
 
     if (pCtx->pDec == NULL) {
-      pCtx->pDec = pCtx->pThreadCtx != NULL ? PrefetchPicForThread (pCtx->pPicBuff) : PrefetchPic (pCtx->pPicBuff);
-      if (pCtx->pLastThreadCtx != NULL) {
-        PWelsDecoderThreadCTX pLastThreadCtx = (PWelsDecoderThreadCTX) (pCtx->pLastThreadCtx);
+      pCtx->pDec = pThreadCtx != NULL ? PrefetchPicForThread (pCtx->pPicBuff) : PrefetchPic (pCtx->pPicBuff);
+      if (pLastThreadCtx != NULL) {
         pLastThreadCtx->pDec->bUsedAsRef = pLastThreadCtx->pCtx->uiNalRefIdc > 0;
         if (pLastThreadCtx->pDec->bUsedAsRef) {
           for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
@@ -2538,8 +2547,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
           }
         }
       }
-      if (pCtx->pThreadCtx) {
-        PWelsDecoderThreadCTX pThreadCtx = (PWelsDecoderThreadCTX) (pCtx->pThreadCtx);
+      if (pThreadCtx != NULL) {
         pThreadCtx->pDec = pCtx->pDec;
         if (pCtx->pDec != NULL) {
           uint32_t uiMbHeight = (pCtx->pDec->iHeightInPixel + 15) >> 4;
@@ -2646,11 +2654,9 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
                                  || (dq_cur->sLayerInfo.sNalHeaderExt.sNalUnitHeader.eNalUnitType == NAL_UNIT_CODED_SLICE_IDR);
           // Subclause 8.2.5.2 Decoding process for gaps in frame_num
           int32_t iPrevFrameNum = pCtx->pLastDecPicInfo->iPrevFrameNum;
-          if (pCtx->pLastThreadCtx != NULL) {
-            PWelsDecoderThreadCTX pLastThreadCtx = (PWelsDecoderThreadCTX) (pCtx->pLastThreadCtx);
+          if (pLastThreadCtx != NULL) {
             iPrevFrameNum = pCtx->bNewSeqBegin ? 0 : pLastThreadCtx->pCtx->iFrameNum;
           }
-          //if (pCtx->pLastThreadCtx == NULL) {
           if (!kbIdrFlag  &&
               pSh->iFrameNum != iPrevFrameNum &&
               pSh->iFrameNum != ((iPrevFrameNum + 1) & ((1 << dq_cur->sLayerInfo.pSps->uiLog2MaxFrameNum) -
@@ -2672,7 +2678,6 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
             }
           }
         }
-        //}
 
         if (iCurrIdD == kuiDependencyIdMax && iCurrIdQ == BASE_QUALITY_ID) {
           iRet = InitRefPicList (pCtx, pCtx->uiNalRefIdc, pSh->iPicOrderCntLsb);
@@ -2694,9 +2699,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         if (pSh->eSliceType == B_SLICE && !pSh->iDirectSpatialMvPredFlag)
           ComputeColocatedTemporalScaling (pCtx);
 
-        if (pCtx->pThreadCtx != NULL) {
+        if (pThreadCtx != NULL) {
           memset (&pCtx->lastReadyHeightOffset[0][0], -1, LIST_A * MAX_REF_PIC_COUNT * sizeof (int16_t));
-          PWelsDecoderThreadCTX pThreadCtx  = (PWelsDecoderThreadCTX) (pCtx->pThreadCtx);
           SET_EVENT (&pThreadCtx->sSliceDecodeStart);
           iRet = WelsDecodeAndConstructSlice (pCtx);
         } else {
@@ -2717,7 +2721,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
           }
         }
 
-        if (pCtx->pThreadCtx == NULL && bReconstructSlice) {
+        if (pThreadCtx == NULL && bReconstructSlice) {
           if ((iRet = WelsDecodeConstructSlice (pCtx, pNalCur)) != ERR_NONE) {
             pCtx->pDec->bIsComplete = false; // reconstruction error, directly set the flag false
             return iRet;
@@ -2781,7 +2785,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         }
       }
 
-      if (pCtx->pThreadCtx != NULL && pCtx->uiDecodingTimeStamp > 1
+      if (pThreadCtx != NULL && pCtx->uiDecodingTimeStamp > 1
           && pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb != NULL) {
         while (pCtx->uiDecodingTimeStamp > pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb->uiDecodingTimeStamp + 1) {
           WelsSleep (1);
@@ -2819,7 +2823,6 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
                                       pCtx->sExpandPicFunc.pfExpandLumaPicture, pCtx->sExpandPicFunc.pfExpandChromaPicture);
         }
       } else {
-        PWelsDecoderThreadCTX pThreadCtx = (PWelsDecoderThreadCTX) (pCtx->pThreadCtx);
         SET_EVENT (&pThreadCtx->sImageReady);
       }
       pCtx->pDec = NULL; //after frame decoding, always set to NULL
@@ -2830,8 +2833,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
       pCtx->pLastDecPicInfo->iPrevFrameNum = pSh->iFrameNum;
     if (pCtx->pLastDecPicInfo->bLastHasMmco5)
       pCtx->pLastDecPicInfo->iPrevFrameNum = 0;
-    if (pCtx->pThreadCtx) {
-      PWelsDecoderThreadCTX pThreadCtx = (PWelsDecoderThreadCTX) (pCtx->pThreadCtx);
+    if (pThreadCtx != NULL) {
       int32_t threadCount = pThreadCtx->sThreadInfo.uiThrMaxNum;
       int32_t  id = pThreadCtx->sThreadInfo.uiThrNum;
       for (int32_t i = 0; i < threadCount; ++i) {
@@ -2842,8 +2844,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
             if (pCtx->pPicBuff != pThreadCtx[i - id].pCtx->pPicBuff) {
               pCtx->pPicBuff = pThreadCtx[i - id].pCtx->pPicBuff;
             }
-            InitialDqLayersContext (pCtx, pCtx->pSps->iMbWidth << 4,
-                                    pCtx->pSps->iMbHeight << 4);
+            InitialDqLayersContext (pCtx, pCtx->pSps->iMbWidth << 4, pCtx->pSps->iMbHeight << 4);
             break;
           }
         }
