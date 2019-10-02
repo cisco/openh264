@@ -113,29 +113,64 @@ class CWelsDecoder : public ISVCDecoder {
     SBufferInfo             sBufferInfo;
     int32_t                 iPOC;
     int32_t                 iPicBuffIdx;
+    uint32_t                uiDecodingTimeStamp;
     bool                    bLastGOP;
     unsigned char*          pData[3];
   } SPictInfo, *PPictInfo;
+ public:
+  DECODING_STATE DecodeFrame2WithCtx (PWelsDecoderContext pCtx, const unsigned char* kpSrc, const int kiSrcLen,
+                                      unsigned char** ppDst, SBufferInfo* pDstInfo);
+  DECODING_STATE ParseFrame (SWelsDecoderThreadCTX& sThreadCtx);
 
  private:
-  PWelsDecoderContext     m_pDecContext;
   welsCodecTrace*         m_pWelsTrace;
-  SPictInfo               m_sPictInfoList[16];
   int32_t                 m_iPictInfoIndex;
   int32_t                 m_iMinPOC;
+  uint32_t                m_uiDecodeTimeStamp;
+  int32_t                 m_iLastDecodedPoc;
+  bool                    m_bIsBaseline;
   int32_t                 m_iNumOfPicts;
   int32_t                 m_iLastGOPRemainPicts;
   int32_t                 m_LastWrittenPOC;
   int32_t                 m_iLargestBufferedPicIndex;
+  int32_t                 m_iCpuCount;
+  int32_t                 m_iThreadCount;
+  PPicBuff                m_pPicBuff;
+  int32_t                 m_iPicQueueNumber;
+  bool                    m_bParamSetsLostFlag;
+  bool                    m_bFreezeOutput;
+  bool                    m_bEnablePictReordering;
+  int32_t                 m_DecCtxActiveCount;
+  PWelsDecoderThreadCTX   m_pDecThrCtx;
+  PWelsDecoderThreadCTX   m_pLastDecThrCtx;
+  WELS_MUTEX              m_csDecoder;
+  SWelsDecEvent           m_sBufferingEvent;
+  SWelsDecEvent           m_sReleaseBufferEvent;
+  SWelsDecSemphore        m_sIsBusy;
+  SPictInfo               m_sPictInfoList[16];
+  PWelsDecoderThreadCTX   m_pDecThrCtxActive[WELS_DEC_MAX_NUM_CPU];
+  SVlcTable               m_sVlcTable;
+  SWelsLastDecPicInfo     m_sLastDecPicInfo;
+  SDecoderStatistics      m_sDecoderStatistics;// For real time debugging
 
+ private:
   int32_t InitDecoder (const SDecodingParam* pParam);
   void UninitDecoder (void);
-  int32_t ResetDecoder();
+  int32_t InitDecoderCtx (PWelsDecoderContext& pCtx, const SDecodingParam* pParam);
+  void UninitDecoderCtx (PWelsDecoderContext& pCtx);
+  int32_t ResetDecoder (PWelsDecoderContext& pCtx);
+  int32_t ThreadResetDecoder (PWelsDecoderContext& pCtx);
   void ResetReorderingPictureBuffers();
 
   void OutputStatisticsLog (SDecoderStatistics& sDecoderStatistics);
-  DECODING_STATE ReorderPicturesInDisplay (unsigned char** ppDst, SBufferInfo* pDstInfo);
+  DECODING_STATE ReorderPicturesInDisplay (PWelsDecoderContext pCtx, unsigned char** ppDst, SBufferInfo* pDstInfo);
+  int ThreadDecodeFrameInternal (const unsigned char* kpSrc, const int kiSrcLen, unsigned char** ppDst,
+                                 SBufferInfo* pDstInfo);
+  void BufferingReadyPicture (PWelsDecoderContext pCtx, unsigned char** ppDst, SBufferInfo* pDstInfo);
+  void ReleaseBufferedReadyPicture (PWelsDecoderContext pCtx, unsigned char** ppDst, SBufferInfo* pDstInfo);
 
+  void OpenDecoderThreads();
+  void CloseDecoderThreads();
 #ifdef OUTPUT_BIT_STREAM
   WelsFileHandle* m_pFBS;
   WelsFileHandle* m_pFBSSize;

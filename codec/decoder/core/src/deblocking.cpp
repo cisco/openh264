@@ -201,11 +201,12 @@ void inline DeblockingBSInsideMBAvsbase8x8 (int8_t* pNnzTab, uint8_t nBS[2][4][4
   nBS[1][2][2] = nBS[1][2][3] = (i8x8NnzTab[1] | i8x8NnzTab[3]) << iLShiftFactor;
 }
 
-void static inline DeblockingBSInsideMBNormal (PDeblockingFilter  pFilter, PDqLayer pCurDqLayer, uint8_t nBS[2][4][4], int8_t* pNnzTab,
+void static inline DeblockingBSInsideMBNormal (PDeblockingFilter  pFilter, PDqLayer pCurDqLayer, uint8_t nBS[2][4][4],
+    int8_t* pNnzTab,
     int32_t iMbXy) {
   uint32_t uiNnz32b0, uiNnz32b1, uiNnz32b2, uiNnz32b3;
-  int8_t* iRefIdx = pCurDqLayer->pRefIndex[LIST_0][iMbXy];
-  void *iRefs[MB_BLOCK4x4_NUM];
+  int8_t* iRefIdx = pCurDqLayer->pDec->pRefIndex[LIST_0][iMbXy];
+  void* iRefs[MB_BLOCK4x4_NUM];
   int i;
   ENFORCE_STACK_ALIGN_1D (uint8_t, uiBsx4, 4, 4);
 
@@ -226,15 +227,15 @@ void static inline DeblockingBSInsideMBNormal (PDeblockingFilter  pFilter, PDqLa
                        pNnzTab[g_kuiMbCountScan4Idx[iBlkIdx + 2]] | pNnzTab[g_kuiMbCountScan4Idx[iBlkIdx + 3]]);
     }
     //vertical
-    nBS[0][2][0] = nBS[0][2][1] = BS_EDGE ((i8x8NnzTab[0] | i8x8NnzTab[1]), iRefs, pCurDqLayer->pMv[LIST_0][iMbXy],
+    nBS[0][2][0] = nBS[0][2][1] = BS_EDGE ((i8x8NnzTab[0] | i8x8NnzTab[1]), iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy],
                                            g_kuiMbCountScan4Idx[1 << 2], g_kuiMbCountScan4Idx[0]);
-    nBS[0][2][2] = nBS[0][2][3] = BS_EDGE ((i8x8NnzTab[2] | i8x8NnzTab[3]), iRefs, pCurDqLayer->pMv[LIST_0][iMbXy],
+    nBS[0][2][2] = nBS[0][2][3] = BS_EDGE ((i8x8NnzTab[2] | i8x8NnzTab[3]), iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy],
                                            g_kuiMbCountScan4Idx[3 << 2], g_kuiMbCountScan4Idx[2 << 2]);
 
     //horizontal
-    nBS[1][2][0] = nBS[1][2][1] = BS_EDGE ((i8x8NnzTab[0] | i8x8NnzTab[2]), iRefs, pCurDqLayer->pMv[LIST_0][iMbXy],
+    nBS[1][2][0] = nBS[1][2][1] = BS_EDGE ((i8x8NnzTab[0] | i8x8NnzTab[2]), iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy],
                                            g_kuiMbCountScan4Idx[2 << 2], g_kuiMbCountScan4Idx[0]);
-    nBS[1][2][2] = nBS[1][2][3] = BS_EDGE ((i8x8NnzTab[1] | i8x8NnzTab[3]), iRefs, pCurDqLayer->pMv[LIST_0][iMbXy],
+    nBS[1][2][2] = nBS[1][2][3] = BS_EDGE ((i8x8NnzTab[1] | i8x8NnzTab[3]), iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy],
                                            g_kuiMbCountScan4Idx[3 << 2], g_kuiMbCountScan4Idx[1 << 2]);
   } else {
     uiNnz32b0 = * (uint32_t*) (pNnzTab + 0);
@@ -244,60 +245,61 @@ void static inline DeblockingBSInsideMBNormal (PDeblockingFilter  pFilter, PDqLa
 
     for (int i = 0; i < 3; i++)
       uiBsx4[i] = pNnzTab[i] | pNnzTab[i + 1];
-    nBS[0][1][0] = BS_EDGE (uiBsx4[0], iRefs, pCurDqLayer->pMv[LIST_0][iMbXy], 1, 0);
-    nBS[0][2][0] = BS_EDGE (uiBsx4[1], iRefs, pCurDqLayer->pMv[LIST_0][iMbXy], 2, 1);
-    nBS[0][3][0] = BS_EDGE (uiBsx4[2], iRefs, pCurDqLayer->pMv[LIST_0][iMbXy], 3, 2);
+    nBS[0][1][0] = BS_EDGE (uiBsx4[0], iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy], 1, 0);
+    nBS[0][2][0] = BS_EDGE (uiBsx4[1], iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy], 2, 1);
+    nBS[0][3][0] = BS_EDGE (uiBsx4[2], iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy], 3, 2);
 
     for (int i = 0; i < 3; i++)
       uiBsx4[i] = pNnzTab[4 + i] | pNnzTab[4 + i + 1];
-    nBS[0][1][1] = BS_EDGE (uiBsx4[0], iRefs, pCurDqLayer->pMv[LIST_0][iMbXy], 5, 4);
-    nBS[0][2][1] = BS_EDGE (uiBsx4[1], iRefs, pCurDqLayer->pMv[LIST_0][iMbXy], 6, 5);
-    nBS[0][3][1] = BS_EDGE (uiBsx4[2], iRefs, pCurDqLayer->pMv[LIST_0][iMbXy], 7, 6);
+    nBS[0][1][1] = BS_EDGE (uiBsx4[0], iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy], 5, 4);
+    nBS[0][2][1] = BS_EDGE (uiBsx4[1], iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy], 6, 5);
+    nBS[0][3][1] = BS_EDGE (uiBsx4[2], iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy], 7, 6);
 
     for (int i = 0; i < 3; i++)
       uiBsx4[i] = pNnzTab[8 + i] | pNnzTab[8 + i + 1];
-    nBS[0][1][2] = BS_EDGE (uiBsx4[0], iRefs, pCurDqLayer->pMv[LIST_0][iMbXy], 9, 8);
-    nBS[0][2][2] = BS_EDGE (uiBsx4[1], iRefs, pCurDqLayer->pMv[LIST_0][iMbXy], 10, 9);
-    nBS[0][3][2] = BS_EDGE (uiBsx4[2], iRefs, pCurDqLayer->pMv[LIST_0][iMbXy], 11, 10);
+    nBS[0][1][2] = BS_EDGE (uiBsx4[0], iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy], 9, 8);
+    nBS[0][2][2] = BS_EDGE (uiBsx4[1], iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy], 10, 9);
+    nBS[0][3][2] = BS_EDGE (uiBsx4[2], iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy], 11, 10);
 
     for (int i = 0; i < 3; i++)
       uiBsx4[i] = pNnzTab[12 + i] | pNnzTab[12 + i + 1];
-    nBS[0][1][3] = BS_EDGE (uiBsx4[0], iRefs, pCurDqLayer->pMv[LIST_0][iMbXy], 13, 12);
-    nBS[0][2][3] = BS_EDGE (uiBsx4[1], iRefs, pCurDqLayer->pMv[LIST_0][iMbXy], 14, 13);
-    nBS[0][3][3] = BS_EDGE (uiBsx4[2], iRefs, pCurDqLayer->pMv[LIST_0][iMbXy], 15, 14);
+    nBS[0][1][3] = BS_EDGE (uiBsx4[0], iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy], 13, 12);
+    nBS[0][2][3] = BS_EDGE (uiBsx4[1], iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy], 14, 13);
+    nBS[0][3][3] = BS_EDGE (uiBsx4[2], iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy], 15, 14);
 
     // horizontal
     * (uint32_t*)uiBsx4 = (uiNnz32b0 | uiNnz32b1);
-    nBS[1][1][0] = BS_EDGE (uiBsx4[0], iRefs, pCurDqLayer->pMv[LIST_0][iMbXy], 4, 0);
-    nBS[1][1][1] = BS_EDGE (uiBsx4[1], iRefs, pCurDqLayer->pMv[LIST_0][iMbXy], 5, 1);
-    nBS[1][1][2] = BS_EDGE (uiBsx4[2], iRefs, pCurDqLayer->pMv[LIST_0][iMbXy], 6, 2);
-    nBS[1][1][3] = BS_EDGE (uiBsx4[3], iRefs, pCurDqLayer->pMv[LIST_0][iMbXy], 7, 3);
+    nBS[1][1][0] = BS_EDGE (uiBsx4[0], iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy], 4, 0);
+    nBS[1][1][1] = BS_EDGE (uiBsx4[1], iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy], 5, 1);
+    nBS[1][1][2] = BS_EDGE (uiBsx4[2], iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy], 6, 2);
+    nBS[1][1][3] = BS_EDGE (uiBsx4[3], iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy], 7, 3);
 
     * (uint32_t*)uiBsx4 = (uiNnz32b1 | uiNnz32b2);
-    nBS[1][2][0] = BS_EDGE (uiBsx4[0], iRefs, pCurDqLayer->pMv[LIST_0][iMbXy], 8, 4);
-    nBS[1][2][1] = BS_EDGE (uiBsx4[1], iRefs, pCurDqLayer->pMv[LIST_0][iMbXy], 9, 5);
-    nBS[1][2][2] = BS_EDGE (uiBsx4[2], iRefs, pCurDqLayer->pMv[LIST_0][iMbXy], 10, 6);
-    nBS[1][2][3] = BS_EDGE (uiBsx4[3], iRefs, pCurDqLayer->pMv[LIST_0][iMbXy], 11, 7);
+    nBS[1][2][0] = BS_EDGE (uiBsx4[0], iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy], 8, 4);
+    nBS[1][2][1] = BS_EDGE (uiBsx4[1], iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy], 9, 5);
+    nBS[1][2][2] = BS_EDGE (uiBsx4[2], iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy], 10, 6);
+    nBS[1][2][3] = BS_EDGE (uiBsx4[3], iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy], 11, 7);
 
     * (uint32_t*)uiBsx4 = (uiNnz32b2 | uiNnz32b3);
-    nBS[1][3][0] = BS_EDGE (uiBsx4[0], iRefs, pCurDqLayer->pMv[LIST_0][iMbXy], 12, 8);
-    nBS[1][3][1] = BS_EDGE (uiBsx4[1], iRefs, pCurDqLayer->pMv[LIST_0][iMbXy], 13, 9);
-    nBS[1][3][2] = BS_EDGE (uiBsx4[2], iRefs, pCurDqLayer->pMv[LIST_0][iMbXy], 14, 10);
-    nBS[1][3][3] = BS_EDGE (uiBsx4[3], iRefs, pCurDqLayer->pMv[LIST_0][iMbXy], 15, 11);
+    nBS[1][3][0] = BS_EDGE (uiBsx4[0], iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy], 12, 8);
+    nBS[1][3][1] = BS_EDGE (uiBsx4[1], iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy], 13, 9);
+    nBS[1][3][2] = BS_EDGE (uiBsx4[2], iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy], 14, 10);
+    nBS[1][3][3] = BS_EDGE (uiBsx4[3], iRefs, pCurDqLayer->pDec->pMv[LIST_0][iMbXy], 15, 11);
   }
 }
 
-void static inline DeblockingBSliceBSInsideMBNormal (PDeblockingFilter  pFilter, PDqLayer pCurDqLayer, uint8_t nBS[2][4][4], int8_t* pNnzTab,
+void static inline DeblockingBSliceBSInsideMBNormal (PDeblockingFilter  pFilter, PDqLayer pCurDqLayer,
+    uint8_t nBS[2][4][4], int8_t* pNnzTab,
     int32_t iMbXy) {
   uint32_t uiNnz32b0, uiNnz32b1, uiNnz32b2, uiNnz32b3;
-  void *iRefs[LIST_A][MB_BLOCK4x4_NUM];
+  void* iRefs[LIST_A][MB_BLOCK4x4_NUM];
 
   ENFORCE_STACK_ALIGN_1D (uint8_t, uiBsx4, 4, 4);
   int8_t i8x8NnzTab[4];
   int l;
 
   for (l = 0; l < LIST_A; l++) {
-    int8_t* iRefIdx = pCurDqLayer->pRefIndex[l][iMbXy];
+    int8_t* iRefIdx = pCurDqLayer->pDec->pRefIndex[l][iMbXy];
     int i;
     /* Look up each reference picture based on indices */
     for (i = 0; i < MB_BLOCK4x4_NUM; i++) {
@@ -321,7 +323,7 @@ void static inline DeblockingBSliceBSInsideMBNormal (PDeblockingFilter  pFilter,
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][iIndex] && iRefs[listIdx][iNeigborIndex]) {
         nBS[0][2][0] = nBS[0][2][1] = BS_EDGE ((i8x8NnzTab[0] | i8x8NnzTab[1]), iRefs[listIdx],
-                                               pCurDqLayer->pMv[listIdx][iMbXy],
+                                               pCurDqLayer->pDec->pMv[listIdx][iMbXy],
                                                iIndex, iNeigborIndex);
         break;
       }
@@ -332,7 +334,7 @@ void static inline DeblockingBSliceBSInsideMBNormal (PDeblockingFilter  pFilter,
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][iIndex] && iRefs[listIdx][iNeigborIndex]) {
         nBS[0][2][2] = nBS[0][2][3] = BS_EDGE ((i8x8NnzTab[2] | i8x8NnzTab[3]), iRefs[listIdx],
-                                               pCurDqLayer->pMv[listIdx][iMbXy],
+                                               pCurDqLayer->pDec->pMv[listIdx][iMbXy],
                                                iIndex, iNeigborIndex);
         break;
       }
@@ -345,7 +347,7 @@ void static inline DeblockingBSliceBSInsideMBNormal (PDeblockingFilter  pFilter,
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][iIndex] && iRefs[listIdx][iNeigborIndex]) {
         nBS[1][2][0] = nBS[1][2][1] = BS_EDGE ((i8x8NnzTab[0] | i8x8NnzTab[2]), iRefs[listIdx],
-                                               pCurDqLayer->pMv[listIdx][iMbXy],
+                                               pCurDqLayer->pDec->pMv[listIdx][iMbXy],
                                                iIndex, iNeigborIndex);
         break;
       }
@@ -357,7 +359,7 @@ void static inline DeblockingBSliceBSInsideMBNormal (PDeblockingFilter  pFilter,
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][iIndex] && iRefs[listIdx][iNeigborIndex]) {
         nBS[1][2][2] = nBS[1][2][3] = BS_EDGE ((i8x8NnzTab[1] | i8x8NnzTab[3]), iRefs[listIdx],
-                                               pCurDqLayer->pMv[listIdx][iMbXy],
+                                               pCurDqLayer->pDec->pMv[listIdx][iMbXy],
                                                iIndex, iNeigborIndex);
         break;
       }
@@ -373,21 +375,21 @@ void static inline DeblockingBSliceBSInsideMBNormal (PDeblockingFilter  pFilter,
     nBS[0][1][0] = 1;
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][1] && iRefs[listIdx][0]) {
-        nBS[0][1][0] = BS_EDGE (uiBsx4[0], iRefs[listIdx], pCurDqLayer->pMv[listIdx][iMbXy], 1, 0);
+        nBS[0][1][0] = BS_EDGE (uiBsx4[0], iRefs[listIdx], pCurDqLayer->pDec->pMv[listIdx][iMbXy], 1, 0);
         break;
       }
     }
     nBS[0][2][0] = 1;
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][2] && iRefs[listIdx][1]) {
-        nBS[0][2][0] = BS_EDGE (uiBsx4[1], iRefs[listIdx], pCurDqLayer->pMv[listIdx][iMbXy], 2, 1);
+        nBS[0][2][0] = BS_EDGE (uiBsx4[1], iRefs[listIdx], pCurDqLayer->pDec->pMv[listIdx][iMbXy], 2, 1);
         break;
       }
     }
     nBS[0][3][0] = 1;
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][3] && iRefs[listIdx][2]) {
-        nBS[0][3][0] = BS_EDGE (uiBsx4[2], iRefs[listIdx], pCurDqLayer->pMv[listIdx][iMbXy], 3, 2);
+        nBS[0][3][0] = BS_EDGE (uiBsx4[2], iRefs[listIdx], pCurDqLayer->pDec->pMv[listIdx][iMbXy], 3, 2);
         break;
       }
     }
@@ -397,21 +399,21 @@ void static inline DeblockingBSliceBSInsideMBNormal (PDeblockingFilter  pFilter,
     nBS[0][1][1] = 1;
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][5] && iRefs[listIdx][4]) {
-        nBS[0][1][1] = BS_EDGE (uiBsx4[0], iRefs[listIdx], pCurDqLayer->pMv[listIdx][iMbXy], 5, 4);
+        nBS[0][1][1] = BS_EDGE (uiBsx4[0], iRefs[listIdx], pCurDqLayer->pDec->pMv[listIdx][iMbXy], 5, 4);
         break;
       }
     }
     nBS[0][2][1] = 1;
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][6] && iRefs[listIdx][5]) {
-        nBS[0][2][1] = BS_EDGE (uiBsx4[1], iRefs[listIdx], pCurDqLayer->pMv[listIdx][iMbXy], 6, 5);
+        nBS[0][2][1] = BS_EDGE (uiBsx4[1], iRefs[listIdx], pCurDqLayer->pDec->pMv[listIdx][iMbXy], 6, 5);
         break;
       }
     }
     nBS[0][3][1] = 1;
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][7] && iRefs[listIdx][6]) {
-        nBS[0][3][1] = BS_EDGE (uiBsx4[2], iRefs[listIdx], pCurDqLayer->pMv[listIdx][iMbXy], 7, 6);
+        nBS[0][3][1] = BS_EDGE (uiBsx4[2], iRefs[listIdx], pCurDqLayer->pDec->pMv[listIdx][iMbXy], 7, 6);
         break;
       }
     }
@@ -421,21 +423,21 @@ void static inline DeblockingBSliceBSInsideMBNormal (PDeblockingFilter  pFilter,
     nBS[0][1][2] = 1;
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][9] && iRefs[listIdx][8]) {
-        nBS[0][1][2] = BS_EDGE (uiBsx4[0], iRefs[listIdx], pCurDqLayer->pMv[listIdx][iMbXy], 9, 8);
+        nBS[0][1][2] = BS_EDGE (uiBsx4[0], iRefs[listIdx], pCurDqLayer->pDec->pMv[listIdx][iMbXy], 9, 8);
         break;
       }
     }
     nBS[0][2][2] = 1;
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][10] && iRefs[listIdx][9]) {
-        nBS[0][2][2] = BS_EDGE (uiBsx4[1], iRefs[listIdx], pCurDqLayer->pMv[listIdx][iMbXy], 10, 9);
+        nBS[0][2][2] = BS_EDGE (uiBsx4[1], iRefs[listIdx], pCurDqLayer->pDec->pMv[listIdx][iMbXy], 10, 9);
         break;
       }
     }
     nBS[0][3][2] = 1;
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][11] && iRefs[listIdx][10]) {
-        nBS[0][3][2] = BS_EDGE (uiBsx4[2], iRefs[listIdx], pCurDqLayer->pMv[listIdx][iMbXy], 11, 10);
+        nBS[0][3][2] = BS_EDGE (uiBsx4[2], iRefs[listIdx], pCurDqLayer->pDec->pMv[listIdx][iMbXy], 11, 10);
         break;
       }
     }
@@ -445,21 +447,21 @@ void static inline DeblockingBSliceBSInsideMBNormal (PDeblockingFilter  pFilter,
     nBS[0][1][3] = 1;
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][13] && iRefs[listIdx][12]) {
-        nBS[0][1][3] = BS_EDGE (uiBsx4[0], iRefs[listIdx], pCurDqLayer->pMv[listIdx][iMbXy], 13, 12);
+        nBS[0][1][3] = BS_EDGE (uiBsx4[0], iRefs[listIdx], pCurDqLayer->pDec->pMv[listIdx][iMbXy], 13, 12);
         break;
       }
     }
     nBS[0][2][3] = 1;
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][14] && iRefs[listIdx][13]) {
-        nBS[0][2][3] = BS_EDGE (uiBsx4[1], iRefs[listIdx], pCurDqLayer->pMv[listIdx][iMbXy], 14, 13);
+        nBS[0][2][3] = BS_EDGE (uiBsx4[1], iRefs[listIdx], pCurDqLayer->pDec->pMv[listIdx][iMbXy], 14, 13);
         break;
       }
     }
     nBS[0][3][3] = 1;
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][15] && iRefs[listIdx][14]) {
-        nBS[0][3][3] = BS_EDGE (uiBsx4[2], iRefs[listIdx], pCurDqLayer->pMv[listIdx][iMbXy], 15, 14);
+        nBS[0][3][3] = BS_EDGE (uiBsx4[2], iRefs[listIdx], pCurDqLayer->pDec->pMv[listIdx][iMbXy], 15, 14);
         break;
       }
     }
@@ -469,28 +471,28 @@ void static inline DeblockingBSliceBSInsideMBNormal (PDeblockingFilter  pFilter,
     nBS[1][1][0] = 1;
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][4] && iRefs[listIdx][0]) {
-        nBS[1][1][0] = BS_EDGE (uiBsx4[0], iRefs[listIdx], pCurDqLayer->pMv[listIdx][iMbXy], 4, 0);
+        nBS[1][1][0] = BS_EDGE (uiBsx4[0], iRefs[listIdx], pCurDqLayer->pDec->pMv[listIdx][iMbXy], 4, 0);
         break;
       }
     }
     nBS[1][1][1] = 1;
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][5] && iRefs[listIdx][1]) {
-        nBS[1][1][1] = BS_EDGE (uiBsx4[1], iRefs[listIdx], pCurDqLayer->pMv[listIdx][iMbXy], 5, 1);
+        nBS[1][1][1] = BS_EDGE (uiBsx4[1], iRefs[listIdx], pCurDqLayer->pDec->pMv[listIdx][iMbXy], 5, 1);
         break;
       }
     }
     nBS[1][1][2] = 1;
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][6] && iRefs[listIdx][2]) {
-        nBS[1][1][2] = BS_EDGE (uiBsx4[2], iRefs[listIdx], pCurDqLayer->pMv[listIdx][iMbXy], 6, 2);
+        nBS[1][1][2] = BS_EDGE (uiBsx4[2], iRefs[listIdx], pCurDqLayer->pDec->pMv[listIdx][iMbXy], 6, 2);
         break;
       }
     }
     nBS[1][1][3] = 1;
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][7] && iRefs[listIdx][3]) {
-        nBS[1][1][3] = BS_EDGE (uiBsx4[3], iRefs[listIdx], pCurDqLayer->pMv[listIdx][iMbXy], 7, 3);
+        nBS[1][1][3] = BS_EDGE (uiBsx4[3], iRefs[listIdx], pCurDqLayer->pDec->pMv[listIdx][iMbXy], 7, 3);
         break;
       }
     }
@@ -499,28 +501,28 @@ void static inline DeblockingBSliceBSInsideMBNormal (PDeblockingFilter  pFilter,
     nBS[1][2][0] = 1;
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][8] && iRefs[listIdx][4]) {
-        nBS[1][2][0] = BS_EDGE (uiBsx4[0], iRefs[listIdx], pCurDqLayer->pMv[listIdx][iMbXy], 8, 4);
+        nBS[1][2][0] = BS_EDGE (uiBsx4[0], iRefs[listIdx], pCurDqLayer->pDec->pMv[listIdx][iMbXy], 8, 4);
         break;
       }
     }
     nBS[1][2][1] = 1;
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][9] && iRefs[listIdx][5]) {
-        nBS[1][2][1] = BS_EDGE (uiBsx4[1], iRefs[listIdx], pCurDqLayer->pMv[listIdx][iMbXy], 9, 5);
+        nBS[1][2][1] = BS_EDGE (uiBsx4[1], iRefs[listIdx], pCurDqLayer->pDec->pMv[listIdx][iMbXy], 9, 5);
         break;
       }
     }
     nBS[1][2][2] = 1;
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][10] && iRefs[listIdx][6]) {
-        nBS[1][2][2] = BS_EDGE (uiBsx4[2], iRefs[listIdx], pCurDqLayer->pMv[listIdx][iMbXy], 10, 6);
+        nBS[1][2][2] = BS_EDGE (uiBsx4[2], iRefs[listIdx], pCurDqLayer->pDec->pMv[listIdx][iMbXy], 10, 6);
         break;
       }
     }
     nBS[1][2][3] = 1;
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][11] && iRefs[listIdx][7]) {
-        nBS[1][2][3] = BS_EDGE (uiBsx4[3], iRefs[listIdx], pCurDqLayer->pMv[listIdx][iMbXy], 11, 7);
+        nBS[1][2][3] = BS_EDGE (uiBsx4[3], iRefs[listIdx], pCurDqLayer->pDec->pMv[listIdx][iMbXy], 11, 7);
         break;
       }
     }
@@ -529,28 +531,28 @@ void static inline DeblockingBSliceBSInsideMBNormal (PDeblockingFilter  pFilter,
     nBS[1][3][0] = 1;
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][12] && iRefs[listIdx][8]) {
-        nBS[1][3][0] = BS_EDGE (uiBsx4[0], iRefs[listIdx], pCurDqLayer->pMv[listIdx][iMbXy], 12, 8);
+        nBS[1][3][0] = BS_EDGE (uiBsx4[0], iRefs[listIdx], pCurDqLayer->pDec->pMv[listIdx][iMbXy], 12, 8);
         break;
       }
     }
     nBS[1][3][1] = 1;
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][13] && iRefs[listIdx][9]) {
-        nBS[1][3][1] = BS_EDGE (uiBsx4[1], iRefs[listIdx], pCurDqLayer->pMv[listIdx][iMbXy], 13, 9);
+        nBS[1][3][1] = BS_EDGE (uiBsx4[1], iRefs[listIdx], pCurDqLayer->pDec->pMv[listIdx][iMbXy], 13, 9);
         break;
       }
     }
     nBS[1][3][2] = 1;
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][14] && iRefs[listIdx][10]) {
-        nBS[1][3][2] = BS_EDGE (uiBsx4[2], iRefs[listIdx], pCurDqLayer->pMv[listIdx][iMbXy], 14, 10);
+        nBS[1][3][2] = BS_EDGE (uiBsx4[2], iRefs[listIdx], pCurDqLayer->pDec->pMv[listIdx][iMbXy], 14, 10);
         break;
       }
     }
     nBS[1][3][3] = 1;
     for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
       if (iRefs[listIdx][15] && iRefs[listIdx][11]) {
-        nBS[1][3][3] = BS_EDGE (uiBsx4[3], iRefs[listIdx], pCurDqLayer->pMv[listIdx][iMbXy], 15, 11);
+        nBS[1][3][3] = BS_EDGE (uiBsx4[3], iRefs[listIdx], pCurDqLayer->pDec->pMv[listIdx][iMbXy], 15, 11);
         break;
       }
     }
@@ -558,7 +560,8 @@ void static inline DeblockingBSliceBSInsideMBNormal (PDeblockingFilter  pFilter,
 }
 
 
-uint32_t DeblockingBsMarginalMBAvcbase (PDeblockingFilter  pFilter, PDqLayer pCurDqLayer, int32_t iEdge, int32_t iNeighMb, int32_t iMbXy) {
+uint32_t DeblockingBsMarginalMBAvcbase (PDeblockingFilter  pFilter, PDqLayer pCurDqLayer, int32_t iEdge,
+                                        int32_t iNeighMb, int32_t iMbXy) {
   int32_t i, j;
   uint32_t uiBSx4;
   uint8_t* pBS = (uint8_t*) (&uiBSx4);
@@ -566,7 +569,8 @@ uint32_t DeblockingBsMarginalMBAvcbase (PDeblockingFilter  pFilter, PDqLayer pCu
   const uint8_t* pBnIdx     = &g_kuiTableBIdx[iEdge][4];
   const uint8_t* pB8x8Idx   = &g_kuiTableB8x8Idx[iEdge][0];
   const uint8_t* pBn8x8Idx  = &g_kuiTableB8x8Idx[iEdge][8];
-  int8_t (*iRefIdx)[MB_BLOCK4x4_NUM] = pCurDqLayer->pRefIndex[LIST_0];
+  int8_t (*iRefIdx)[MB_BLOCK4x4_NUM] = pCurDqLayer->pDec != NULL ? pCurDqLayer->pDec->pRefIndex[LIST_0] :
+                                       pCurDqLayer->pRefIndex[LIST_0];
 
   if (pCurDqLayer->pTransformSize8x8Flag[iMbXy] && pCurDqLayer->pTransformSize8x8Flag[iNeighMb]) {
     for (i = 0; i < 2; i++) {
@@ -579,8 +583,9 @@ uint32_t DeblockingBsMarginalMBAvcbase (PDeblockingFilter  pFilter, PDqLayer pCu
       } else {
         PPicture ref0, ref1;
         ref0 = (iRefIdx[iMbXy][*pB8x8Idx] > REF_NOT_IN_LIST) ? pFilter->pRefPics[LIST_0][iRefIdx[iMbXy][*pB8x8Idx]] : NULL;
-        ref1 = (iRefIdx[iNeighMb][*pBn8x8Idx] > REF_NOT_IN_LIST) ? pFilter->pRefPics[LIST_0][iRefIdx[iNeighMb][*pBn8x8Idx]] : NULL;
-        pBS[i << 1] = pBS[1 + (i << 1)] = MB_BS_MV (ref0, ref1, pCurDqLayer->pMv[LIST_0], iMbXy, iNeighMb,
+        ref1 = (iRefIdx[iNeighMb][*pBn8x8Idx] > REF_NOT_IN_LIST) ? pFilter->pRefPics[LIST_0][iRefIdx[iNeighMb][*pBn8x8Idx]] :
+               NULL;
+        pBS[i << 1] = pBS[1 + (i << 1)] = MB_BS_MV (ref0, ref1, pCurDqLayer->pDec->pMv[LIST_0], iMbXy, iNeighMb,
                                           *pB8x8Idx, *pBn8x8Idx);
       }
       pB8x8Idx += 4;
@@ -599,7 +604,8 @@ uint32_t DeblockingBsMarginalMBAvcbase (PDeblockingFilter  pFilter, PDqLayer pCu
           PPicture ref0, ref1;
           ref0 = (iRefIdx[iMbXy][*pB8x8Idx] > REF_NOT_IN_LIST) ? pFilter->pRefPics[LIST_0][iRefIdx[iMbXy][*pB8x8Idx]] : NULL;
           ref1 = (iRefIdx[iNeighMb][*pBnIdx] > REF_NOT_IN_LIST) ? pFilter->pRefPics[LIST_0][iRefIdx[iNeighMb][*pBnIdx]] : NULL;
-          pBS[j + (i << 1)] = MB_BS_MV (ref0, ref1, pCurDqLayer->pMv[LIST_0], iMbXy, iNeighMb, *pB8x8Idx,
+          pBS[j + (i << 1)] = MB_BS_MV (ref0, ref1,
+                                        (pCurDqLayer->pDec != NULL ? pCurDqLayer->pDec->pMv[LIST_0] : pCurDqLayer->pMv[LIST_0]), iMbXy, iNeighMb, *pB8x8Idx,
                                         *pBnIdx);
         }
         pBnIdx++;
@@ -618,8 +624,10 @@ uint32_t DeblockingBsMarginalMBAvcbase (PDeblockingFilter  pFilter, PDqLayer pCu
         } else {
           PPicture ref0, ref1;
           ref0 = (iRefIdx[iMbXy][*pBIdx] > REF_NOT_IN_LIST) ? pFilter->pRefPics[LIST_0][iRefIdx[iMbXy][*pBIdx]] : NULL;
-          ref1 = (iRefIdx[iNeighMb][*pBn8x8Idx] > REF_NOT_IN_LIST) ? pFilter->pRefPics[LIST_0][iRefIdx[iNeighMb][*pBn8x8Idx]] : NULL;
-          pBS[j + (i << 1)] = MB_BS_MV (ref0, ref1, pCurDqLayer->pMv[LIST_0], iMbXy, iNeighMb, *pBIdx,
+          ref1 = (iRefIdx[iNeighMb][*pBn8x8Idx] > REF_NOT_IN_LIST) ? pFilter->pRefPics[LIST_0][iRefIdx[iNeighMb][*pBn8x8Idx]] :
+                 NULL;
+          pBS[j + (i << 1)] = MB_BS_MV (ref0, ref1,
+                                        (pCurDqLayer->pDec != NULL ? pCurDqLayer->pDec->pMv[LIST_0] : pCurDqLayer->pMv[LIST_0]), iMbXy, iNeighMb, *pBIdx,
                                         *pBn8x8Idx);
         }
         pBIdx++;
@@ -635,7 +643,8 @@ uint32_t DeblockingBsMarginalMBAvcbase (PDeblockingFilter  pFilter, PDqLayer pCu
         PPicture ref0, ref1;
         ref0 = (iRefIdx[iMbXy][*pBIdx] > REF_NOT_IN_LIST) ? pFilter->pRefPics[LIST_0][iRefIdx[iMbXy][*pBIdx]] : NULL;
         ref1 = (iRefIdx[iNeighMb][*pBnIdx] > REF_NOT_IN_LIST) ? pFilter->pRefPics[LIST_0][iRefIdx[iNeighMb][*pBnIdx]] : NULL;
-        pBS[i] = MB_BS_MV (ref0, ref1, pCurDqLayer->pMv[LIST_0], iMbXy, iNeighMb, *pBIdx, *pBnIdx);
+        pBS[i] = MB_BS_MV (ref0, ref1, (pCurDqLayer->pDec != NULL ? pCurDqLayer->pDec->pMv[LIST_0] : pCurDqLayer->pMv[LIST_0]),
+                           iMbXy, iNeighMb, *pBIdx, *pBnIdx);
       }
       pBIdx++;
       pBnIdx++;
@@ -644,7 +653,8 @@ uint32_t DeblockingBsMarginalMBAvcbase (PDeblockingFilter  pFilter, PDqLayer pCu
 
   return uiBSx4;
 }
-uint32_t DeblockingBSliceBsMarginalMBAvcbase (PDeblockingFilter  pFilter, PDqLayer pCurDqLayer, int32_t iEdge, int32_t iNeighMb, int32_t iMbXy) {
+uint32_t DeblockingBSliceBsMarginalMBAvcbase (PDeblockingFilter  pFilter, PDqLayer pCurDqLayer, int32_t iEdge,
+    int32_t iNeighMb, int32_t iMbXy) {
   int32_t i, j;
   uint32_t uiBSx4;
   uint8_t* pBS = (uint8_t*) (&uiBSx4);
@@ -665,12 +675,12 @@ uint32_t DeblockingBSliceBsMarginalMBAvcbase (PDeblockingFilter  pFilter, PDqLay
       } else {
         pBS[i << 1] = pBS[1 + (i << 1)] = 1;
         for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
-          if (pCurDqLayer->pRefIndex[listIdx][iMbXy][*pB8x8Idx] > REF_NOT_IN_LIST
-              && pCurDqLayer->pRefIndex[listIdx][iMbXy][*pBn8x8Idx] > REF_NOT_IN_LIST) {
-            int8_t (*iRefIdx)[MB_BLOCK4x4_NUM] = pCurDqLayer->pRefIndex[listIdx];
+          if (pCurDqLayer->pDec->pRefIndex[listIdx][iMbXy][*pB8x8Idx] > REF_NOT_IN_LIST
+              && pCurDqLayer->pDec->pRefIndex[listIdx][iMbXy][*pBn8x8Idx] > REF_NOT_IN_LIST) {
+            int8_t (*iRefIdx)[MB_BLOCK4x4_NUM] = pCurDqLayer->pDec->pRefIndex[listIdx];
             ref0 = pFilter->pRefPics[listIdx][iRefIdx[iMbXy][*pB8x8Idx]];
             ref1 = pFilter->pRefPics[listIdx][iRefIdx[iNeighMb][*pBn8x8Idx]];
-            pBS[i << 1] = pBS[1 + (i << 1)] = MB_BS_MV (ref0, ref1, pCurDqLayer->pMv[listIdx], iMbXy, iNeighMb,
+            pBS[i << 1] = pBS[1 + (i << 1)] = MB_BS_MV (ref0, ref1, pCurDqLayer->pDec->pMv[listIdx], iMbXy, iNeighMb,
                                               *pB8x8Idx, *pBn8x8Idx);
             break;
           }
@@ -691,12 +701,12 @@ uint32_t DeblockingBSliceBsMarginalMBAvcbase (PDeblockingFilter  pFilter, PDqLay
         } else {
           pBS[j + (i << 1)] = 1;
           for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
-            if (pCurDqLayer->pRefIndex[listIdx][iMbXy][*pB8x8Idx] > REF_NOT_IN_LIST
-                && pCurDqLayer->pRefIndex[listIdx][iMbXy][*pBnIdx] > REF_NOT_IN_LIST) {
-              int8_t (*iRefIdx)[MB_BLOCK4x4_NUM] = pCurDqLayer->pRefIndex[listIdx];
+            if (pCurDqLayer->pDec->pRefIndex[listIdx][iMbXy][*pB8x8Idx] > REF_NOT_IN_LIST
+                && pCurDqLayer->pDec->pRefIndex[listIdx][iMbXy][*pBnIdx] > REF_NOT_IN_LIST) {
+              int8_t (*iRefIdx)[MB_BLOCK4x4_NUM] = pCurDqLayer->pDec->pRefIndex[listIdx];
               ref0 = pFilter->pRefPics[listIdx][iRefIdx[iMbXy][*pB8x8Idx]];
               ref1 = pFilter->pRefPics[listIdx][iRefIdx[iNeighMb][*pBnIdx]];
-              pBS[j + (i << 1)] = MB_BS_MV (ref0, ref1, pCurDqLayer->pMv[listIdx], iMbXy, iNeighMb, *pB8x8Idx,
+              pBS[j + (i << 1)] = MB_BS_MV (ref0, ref1, pCurDqLayer->pDec->pMv[listIdx], iMbXy, iNeighMb, *pB8x8Idx,
                                             *pBnIdx);
               break;
             }
@@ -718,12 +728,12 @@ uint32_t DeblockingBSliceBsMarginalMBAvcbase (PDeblockingFilter  pFilter, PDqLay
         } else {
           pBS[j + (i << 1)] = 1;
           for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
-            if (pCurDqLayer->pRefIndex[listIdx][iMbXy][*pBIdx] > REF_NOT_IN_LIST
-                && pCurDqLayer->pRefIndex[listIdx][iMbXy][*pBn8x8Idx] > REF_NOT_IN_LIST) {
-              int8_t (*iRefIdx)[MB_BLOCK4x4_NUM] = pCurDqLayer->pRefIndex[listIdx];
+            if (pCurDqLayer->pDec->pRefIndex[listIdx][iMbXy][*pBIdx] > REF_NOT_IN_LIST
+                && pCurDqLayer->pDec->pRefIndex[listIdx][iMbXy][*pBn8x8Idx] > REF_NOT_IN_LIST) {
+              int8_t (*iRefIdx)[MB_BLOCK4x4_NUM] = pCurDqLayer->pDec->pRefIndex[listIdx];
               ref0 = pFilter->pRefPics[listIdx][iRefIdx[iMbXy][*pBIdx]];
               ref1 = pFilter->pRefPics[listIdx][iRefIdx[iNeighMb][*pBn8x8Idx]];
-              pBS[j + (i << 1)] = MB_BS_MV (ref0, ref1, pCurDqLayer->pMv[listIdx], iMbXy, iNeighMb, *pBIdx, *pBn8x8Idx);
+              pBS[j + (i << 1)] = MB_BS_MV (ref0, ref1, pCurDqLayer->pDec->pMv[listIdx], iMbXy, iNeighMb, *pBIdx, *pBn8x8Idx);
               break;
             }
           }
@@ -740,12 +750,12 @@ uint32_t DeblockingBSliceBsMarginalMBAvcbase (PDeblockingFilter  pFilter, PDqLay
       } else {
         pBS[i] = 1;
         for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
-          if (pCurDqLayer->pRefIndex[listIdx][iMbXy][*pBIdx] > REF_NOT_IN_LIST
-              && pCurDqLayer->pRefIndex[listIdx][iMbXy][*pBnIdx] > REF_NOT_IN_LIST) {
-            int8_t (*iRefIdx)[MB_BLOCK4x4_NUM] = pCurDqLayer->pRefIndex[listIdx];
+          if (pCurDqLayer->pDec->pRefIndex[listIdx][iMbXy][*pBIdx] > REF_NOT_IN_LIST
+              && pCurDqLayer->pDec->pRefIndex[listIdx][iMbXy][*pBnIdx] > REF_NOT_IN_LIST) {
+            int8_t (*iRefIdx)[MB_BLOCK4x4_NUM] = pCurDqLayer->pDec->pRefIndex[listIdx];
             ref0 = pFilter->pRefPics[listIdx][iRefIdx[iMbXy][*pBIdx]];
             ref1 = pFilter->pRefPics[listIdx][iRefIdx[iNeighMb][*pBnIdx]];
-            pBS[i] = MB_BS_MV (ref0, ref1, pCurDqLayer->pMv[listIdx], iMbXy, iNeighMb, *pBIdx, *pBnIdx);
+            pBS[i] = MB_BS_MV (ref0, ref1, pCurDqLayer->pDec->pMv[listIdx], iMbXy, iNeighMb, *pBIdx, *pBnIdx);
             break;
           }
         }
@@ -972,7 +982,7 @@ void FilteringEdgeChromaIntraV (SDeblockingFilter* pFilter, uint8_t* pPixCb, uin
 
 
 static void DeblockingInterMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, uint8_t nBS[2][4][4],
-                        int32_t iBoundryFlag) {
+                               int32_t iBoundryFlag) {
   int32_t iMbXyIndex = pCurDqLayer->iMbXyIndex;
   int32_t iMbX = pCurDqLayer->iMbX;
   int32_t iMbY = pCurDqLayer->iMbY;
@@ -1224,7 +1234,8 @@ void WelsDeblockingMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t
   uint8_t nBS[2][4][4] = {{{ 0 }}};
 
   int32_t iMbXyIndex  = pCurDqLayer->iMbXyIndex;
-  uint32_t iCurMbType  = pCurDqLayer->pMbType[iMbXyIndex];
+  uint32_t iCurMbType  = pCurDqLayer->pDec != NULL ? pCurDqLayer->pDec->pMbType[iMbXyIndex] :
+                         pCurDqLayer->pMbType[iMbXyIndex];
   int32_t iMbNb;
 
   PSlice pSlice = &pCurDqLayer->sLayerInfo.sSliceInLayer;
@@ -1242,11 +1253,13 @@ void WelsDeblockingMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t
 
     if (iBoundryFlag & LEFT_FLAG_MASK) {
       iMbNb = iMbXyIndex - 1;
+      uint32_t uiMbType = pCurDqLayer->pDec != NULL ? pCurDqLayer->pDec->pMbType[iMbNb] : pCurDqLayer->pMbType[iMbNb];
       if (bBSlice) {
-        * (uint32_t*)nBS[0][0] = IS_INTRA (pCurDqLayer->pMbType[iMbNb]) ? 0x04040404 : DeblockingBSliceBsMarginalMBAvcbase (
+        * (uint32_t*)nBS[0][0] = IS_INTRA (uiMbType) ? 0x04040404 :
+                                 DeblockingBSliceBsMarginalMBAvcbase (
                                    pFilter, pCurDqLayer, 0, iMbNb, iMbXyIndex);
       } else {
-        * (uint32_t*)nBS[0][0] = IS_INTRA (pCurDqLayer->pMbType[iMbNb]) ? 0x04040404 : DeblockingBsMarginalMBAvcbase (
+        * (uint32_t*)nBS[0][0] = IS_INTRA (uiMbType) ? 0x04040404 : DeblockingBsMarginalMBAvcbase (
                                    pFilter, pCurDqLayer, 0, iMbNb, iMbXyIndex);
       }
     } else {
@@ -1254,11 +1267,13 @@ void WelsDeblockingMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t
     }
     if (iBoundryFlag & TOP_FLAG_MASK) {
       iMbNb = iMbXyIndex - pCurDqLayer->iMbWidth;
+      uint32_t uiMbType = pCurDqLayer->pDec != NULL ? pCurDqLayer->pDec->pMbType[iMbNb] : pCurDqLayer->pMbType[iMbNb];
       if (bBSlice) {
-        * (uint32_t*)nBS[1][0] = IS_INTRA (pCurDqLayer->pMbType[iMbNb]) ? 0x04040404 : DeblockingBSliceBsMarginalMBAvcbase (
+        * (uint32_t*)nBS[1][0] = IS_INTRA (uiMbType) ? 0x04040404 :
+                                 DeblockingBSliceBsMarginalMBAvcbase (
                                    pFilter, pCurDqLayer, 1, iMbNb, iMbXyIndex);
       } else {
-        * (uint32_t*)nBS[1][0] = IS_INTRA (pCurDqLayer->pMbType[iMbNb]) ? 0x04040404 : DeblockingBsMarginalMBAvcbase (
+        * (uint32_t*)nBS[1][0] = IS_INTRA (uiMbType) ? 0x04040404 : DeblockingBsMarginalMBAvcbase (
                                    pFilter, pCurDqLayer, 1, iMbNb, iMbXyIndex);
       }
     } else {
@@ -1358,6 +1373,56 @@ void WelsDeblockingFilterSlice (PWelsDecoderContext pCtx, PDeblockingFilterMbFun
       pCurDqLayer->iMbY  = iNextMbXyIndex / iMbWidth;
       pCurDqLayer->iMbXyIndex = iNextMbXyIndex;
     } while (1);
+  }
+}
+
+/*!
+* \brief   AVC slice init deblocking filtering target layer
+*
+* \in and out param   SDeblockingFilter
+* \in and out param   iFilterIdc
+*
+* \return  NONE
+*/
+void WelsDeblockingInitFilter (PWelsDecoderContext pCtx, SDeblockingFilter& pFilter, int32_t& iFilterIdc) {
+  PDqLayer pCurDqLayer = pCtx->pCurDqLayer;
+  PSliceHeaderExt pSliceHeaderExt = &pCurDqLayer->sLayerInfo.sSliceInLayer.sSliceHeaderExt;
+
+  memset (&pFilter, 0, sizeof (pFilter));
+
+  iFilterIdc = pCurDqLayer->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.uiDisableDeblockingFilterIdc;
+
+  /* Step1: parameters set */
+  pFilter.pCsData[0] = pCtx->pDec->pData[0];
+  pFilter.pCsData[1] = pCtx->pDec->pData[1];
+  pFilter.pCsData[2] = pCtx->pDec->pData[2];
+
+  pFilter.iCsStride[0] = pCtx->pDec->iLinesize[0];
+  pFilter.iCsStride[1] = pCtx->pDec->iLinesize[1];
+
+  pFilter.eSliceType = (EWelsSliceType)pCurDqLayer->sLayerInfo.sSliceInLayer.eSliceType;
+
+  pFilter.iSliceAlphaC0Offset = pSliceHeaderExt->sSliceHeader.iSliceAlphaC0Offset;
+  pFilter.iSliceBetaOffset = pSliceHeaderExt->sSliceHeader.iSliceBetaOffset;
+
+  pFilter.pLoopf = &pCtx->sDeblockingFunc;
+  pFilter.pRefPics[0] = pCtx->sRefPic.pRefList[0];
+  pFilter.pRefPics[1] = pCtx->sRefPic.pRefList[1];
+}
+
+/*!
+* \brief   AVC MB deblocking filtering target layer
+*
+* \param   DqLayer which has the current location of MB to be deblocked.
+*
+* \return  NONE
+*/
+void WelsDeblockingFilterMB (PDqLayer pCurDqLayer, SDeblockingFilter& pFilter, int32_t& iFilterIdc,
+                             PDeblockingFilterMbFunc pDeblockMb) {
+  /* macroblock deblocking */
+  if (0 == iFilterIdc || 2 == iFilterIdc) {
+    int32_t iBoundryFlag = DeblockingAvailableNoInterlayer (pCurDqLayer, iFilterIdc);
+    pDeblockMb (pCurDqLayer, &pFilter, iBoundryFlag);
   }
 }
 /*!
