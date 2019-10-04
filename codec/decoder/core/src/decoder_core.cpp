@@ -2657,7 +2657,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
           if (pLastThreadCtx != NULL) {
             iPrevFrameNum = pCtx->bNewSeqBegin ? 0 : pLastThreadCtx->pCtx->iFrameNum;
           }
-          if (!kbIdrFlag  &&
+          if (pThreadCtx == NULL && !kbIdrFlag  &&
               pSh->iFrameNum != iPrevFrameNum &&
               pSh->iFrameNum != ((iPrevFrameNum + 1) & ((1 << dq_cur->sLayerInfo.pSps->uiLog2MaxFrameNum) -
                                  1))) {
