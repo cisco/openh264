@@ -52,7 +52,7 @@
 #include "measure_time.h"
 #include "d3d9_utils.h"
 
-//#define _USE_READ_PICTURE_ 1
+#define _USE_READ_PICTURE_ 1
 
 using namespace std;
 
@@ -89,14 +89,20 @@ int32_t readPicture (uint8_t* pBuf, const int32_t& iFileSize, const int32_t& buf
     if (has4ByteStartCode || has3ByteStartCode) {
       uint8_t nal_unit_type = has4ByteStartCode ? (ptr[4] & 0x1F) : (ptr[3] & 0x1F);
       if (nal_unit_type == 1) {
-        if (++non_idr_pict_count == 2) {
+         if (++non_idr_pict_count == 1 && idr_pict_count == 1) {
+          return read_bytes;
+        }
+        if (non_idr_pict_count == 2) {
           return read_bytes;
         }
         if (non_idr_pict_count == 1 && sps_count == 1) {
           return read_bytes;
         }
       } else if (nal_unit_type == 5) {
-        if (++idr_pict_count == 2) {
+        if (++idr_pict_count == 1 && non_idr_pict_count == 1) {
+          return read_bytes;
+        }
+        if (idr_pict_count == 2) {
           return read_bytes;
         }
       } else if (nal_unit_type == 7) {
@@ -143,7 +149,6 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
 
   int32_t iBufPos = 0;
   int32_t iFileSize;
-  int32_t i = 0;
   int32_t iLastWidth = 0, iLastHeight = 0;
   int32_t iFrameCount = 0;
   int32_t iEndOfStreamFlag = 0;
@@ -232,6 +237,7 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
 #if defined(_USE_READ_PICTURE_)
       iSliceSize = readPicture (pBuf, iFileSize, iBufPos);
 #else
+      int32_t i = 0;
       for (i = 0; i < iFileSize; i++) {
         if ((pBuf[iBufPos + i] == 0 && pBuf[iBufPos + i + 1] == 0 && pBuf[iBufPos + i + 2] == 0 && pBuf[iBufPos + i + 3] == 1
              && i > 0) || (pBuf[iBufPos + i] == 0 && pBuf[iBufPos + i + 1] == 0 && pBuf[iBufPos + i + 2] == 1 && i > 0)) {
