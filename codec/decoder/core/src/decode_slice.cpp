@@ -1765,9 +1765,6 @@ int32_t WelsDecodeAndConstructSlice (PWelsDecoderContext pCtx) {
                        pCurDqLayer->iMbHeight);
       }
     }
-    if ((iNextMbXyIndex & 1) && (pCurDqLayer->iMbX == pCurDqLayer->iMbWidth - 1)) {
-      SET_EVENT (&pCtx->pDec->pReadyEvent[pCurDqLayer->iMbY]);
-    }
     if (!pCurDqLayer->pMbCorrectlyDecodedFlag[iNextMbXyIndex]) { //already con-ed, overwrite
       pCurDqLayer->pMbCorrectlyDecodedFlag[iNextMbXyIndex] = true;
       pCtx->pDec->iMbEcedPropNum += (pCurDqLayer->pMbRefConcealedFlag[iNextMbXyIndex] ? 1 : 0);
@@ -1784,6 +1781,7 @@ int32_t WelsDecodeAndConstructSlice (PWelsDecoderContext pCtx) {
 
     ++pSlice->iTotalMbInCurSlice;
     if (uiEosFlag) { //end of slice
+      SET_EVENT (&pCtx->pDec->pReadyEvent[pCurDqLayer->iMbY]);
       break;
     }
     if (pSliceHeader->pPps->uiNumSliceGroups > 1) {
@@ -1791,13 +1789,18 @@ int32_t WelsDecodeAndConstructSlice (PWelsDecoderContext pCtx) {
     } else {
       ++iNextMbXyIndex;
     }
+    int32_t iLastMby = iMbY;
+    int32_t iLastMbx = iMbX;
     iMbX = iNextMbXyIndex % pCurDqLayer->iMbWidth;
     iMbY = iNextMbXyIndex / pCurDqLayer->iMbWidth;
     pCurDqLayer->iMbX = iMbX;
     pCurDqLayer->iMbY = iMbY;
     pCurDqLayer->iMbXyIndex = iNextMbXyIndex;
+    if ((iMbY > iLastMby) && (iLastMbx == pCurDqLayer->iMbWidth - 1)) {
+      SET_EVENT (&pCtx->pDec->pReadyEvent[iLastMby]);
+    }
   } while (1);
-
+  SET_EVENT (&pCtx->pDec->pReadyEvent[pCurDqLayer->iMbY]);
   return ERR_NONE;
 }
 
