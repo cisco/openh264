@@ -269,8 +269,10 @@ int32_t WelsMbInterConstruction (PWelsDecoderContext pCtx, PDqLayer pCurDqLayer)
   }
   WelsMbInterSampleConstruction (pCtx, pCurDqLayer, pDstY, pDstCb, pDstCr, iLumaStride, iChromaStride);
 
-  pCtx->sBlockFunc.pWelsSetNonZeroCountFunc (
-    pCurDqLayer->pNzc[pCurDqLayer->iMbXyIndex]); // set all none-zero nzc to 1; dbk can be opti!
+  if (pCtx->pThreadCtx == NULL) {
+    pCtx->sBlockFunc.pWelsSetNonZeroCountFunc (
+      pCurDqLayer->pNzc[pCurDqLayer->iMbXyIndex]); // set all none-zero nzc to 1; dbk can be opti!
+  }
   return ERR_NONE;
 }
 
