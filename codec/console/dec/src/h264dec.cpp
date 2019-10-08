@@ -95,9 +95,6 @@ int32_t readPicture (uint8_t* pBuf, const int32_t& iFileSize, const int32_t& buf
         if (non_idr_pict_count == 2) {
           return read_bytes;
         }
-        if (non_idr_pict_count == 1 && sps_count == 1) {
-          return read_bytes;
-        }
       } else if (nal_unit_type == 5) {
         if (++idr_pict_count == 1 && non_idr_pict_count == 1) {
           return read_bytes;
