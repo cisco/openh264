@@ -2655,9 +2655,9 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
           // Subclause 8.2.5.2 Decoding process for gaps in frame_num
           int32_t iPrevFrameNum = pCtx->pLastDecPicInfo->iPrevFrameNum;
           if (pLastThreadCtx != NULL) {
-            iPrevFrameNum = pCtx->bNewSeqBegin ? 0 : pLastThreadCtx->pCtx->iFrameNum;
+            iPrevFrameNum = pCtx->bNewSeqBegin ? 0 : pLastThreadCtx->pDec->iFrameNum;
           }
-          if (pThreadCtx == NULL && !kbIdrFlag  &&
+          if (!kbIdrFlag  &&
               pSh->iFrameNum != iPrevFrameNum &&
               pSh->iFrameNum != ((iPrevFrameNum + 1) & ((1 << dq_cur->sLayerInfo.pSps->uiLog2MaxFrameNum) -
                                  1))) {
