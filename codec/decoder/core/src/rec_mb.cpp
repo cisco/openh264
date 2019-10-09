@@ -255,6 +255,14 @@ void BaseMC (PWelsDecoderContext pCtx, sMCRefMember* pMCRefMem, const int32_t& l
   if (pCtx->pThreadCtx != NULL && iRefIdx >= 0) {
     // wait for the lines of reference macroblock (3 + 16).
     PPicture pRefPic = pCtx->sRefPic.pRefList[listIdx][iRefIdx];
+    if (pCtx->bNewSeqBegin && (pCtx->iErrorCode & dsRefLost)) {
+      //set event if refpic is lost to prevent from ininite waiting.
+      if (!pRefPic->pReadyEvent[0].isSignaled) {
+        for (uint32_t ln = 0; ln < pCtx->sMb.iMbHeight; ++ln) {
+          SET_EVENT (&pRefPic->pReadyEvent[ln]);
+        }
+      }
+    }
     int32_t offset = (iFullMVy >> 2) + iBlkHeight + 3 + 16;
     if (offset > pCtx->lastReadyHeightOffset[listIdx][iRefIdx]) {
       const int32_t down_line = WELS_MIN (offset >> 4, int32_t (pCtx->sMb.iMbHeight) - 1);
