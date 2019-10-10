@@ -83,7 +83,7 @@ void InitErrorCon (PWelsDecoderContext pCtx) {
 //Do error concealment using frame copy method
 void DoErrorConFrameCopy (PWelsDecoderContext pCtx) {
   PPicture pDstPic = pCtx->pDec;
-  PPicture pSrcPic = pCtx->pPreviousDecodedPictureInDpb;
+  PPicture pSrcPic = pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb;
   uint32_t uiHeightInPixelY = (pCtx->pSps->iMbHeight) << 4;
   int32_t iStrideY = pDstPic->iLinesize[0];
   int32_t iStrideUV = pDstPic->iLinesize[1];
@@ -109,7 +109,7 @@ void DoErrorConSliceCopy (PWelsDecoderContext pCtx) {
   int32_t iMbWidth = (int32_t) pCtx->pSps->iMbWidth;
   int32_t iMbHeight = (int32_t) pCtx->pSps->iMbHeight;
   PPicture pDstPic = pCtx->pDec;
-  PPicture pSrcPic = pCtx->pPreviousDecodedPictureInDpb;
+  PPicture pSrcPic = pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb;
   if ((pCtx->pParam->eEcActiveIdc == ERROR_CON_SLICE_COPY) && (pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt.bIdrFlag))
     pSrcPic = NULL; //no cross IDR method, should fill in data instead of copy
 
@@ -266,40 +266,40 @@ void GetAvilInfoFromCorrectMb (PWelsDecoderContext pCtx) {
   for (int32_t iMbY = 0; iMbY < iMbHeight; ++iMbY) {
     for (int32_t iMbX = 0; iMbX < iMbWidth; ++iMbX) {
       iMbXyIndex = iMbY * iMbWidth + iMbX;
-      if (pMbCorrectlyDecodedFlag[iMbXyIndex] && IS_INTER (pCurDqLayer->pMbType[iMbXyIndex])) {
-        uint32_t iMBType = pCurDqLayer->pMbType[iMbXyIndex];
+      if (pMbCorrectlyDecodedFlag[iMbXyIndex] && IS_INTER (pCurDqLayer->pDec->pMbType[iMbXyIndex])) {
+        uint32_t iMBType = pCurDqLayer->pDec->pMbType[iMbXyIndex];
         switch (iMBType) {
         case MB_TYPE_SKIP:
         case MB_TYPE_16x16:
-          iRefIdx = pCurDqLayer->pRefIndex[0][iMbXyIndex][0];
-          pCtx->iECMVs[iRefIdx][0] += pCurDqLayer->pMv[0][iMbXyIndex][0][0];
-          pCtx->iECMVs[iRefIdx][1] += pCurDqLayer->pMv[0][iMbXyIndex][0][1];
+          iRefIdx = pCurDqLayer->pDec->pRefIndex[0][iMbXyIndex][0];
+          pCtx->iECMVs[iRefIdx][0] += pCurDqLayer->pDec->pMv[0][iMbXyIndex][0][0];
+          pCtx->iECMVs[iRefIdx][1] += pCurDqLayer->pDec->pMv[0][iMbXyIndex][0][1];
           pCtx->pECRefPic[iRefIdx] = pCtx->sRefPic.pRefList[LIST_0][iRefIdx];
           iInterMbCorrectNum[iRefIdx]++;
           break;
         case MB_TYPE_16x8:
-          iRefIdx = pCurDqLayer->pRefIndex[0][iMbXyIndex][0];
-          pCtx->iECMVs[iRefIdx][0] += pCurDqLayer->pMv[0][iMbXyIndex][0][0];
-          pCtx->iECMVs[iRefIdx][1] += pCurDqLayer->pMv[0][iMbXyIndex][0][1];
+          iRefIdx = pCurDqLayer->pDec->pRefIndex[0][iMbXyIndex][0];
+          pCtx->iECMVs[iRefIdx][0] += pCurDqLayer->pDec->pMv[0][iMbXyIndex][0][0];
+          pCtx->iECMVs[iRefIdx][1] += pCurDqLayer->pDec->pMv[0][iMbXyIndex][0][1];
           pCtx->pECRefPic[iRefIdx] = pCtx->sRefPic.pRefList[LIST_0][iRefIdx];
           iInterMbCorrectNum[iRefIdx]++;
 
-          iRefIdx = pCurDqLayer->pRefIndex[0][iMbXyIndex][8];
-          pCtx->iECMVs[iRefIdx][0] += pCurDqLayer->pMv[0][iMbXyIndex][8][0];
-          pCtx->iECMVs[iRefIdx][1] += pCurDqLayer->pMv[0][iMbXyIndex][8][1];
+          iRefIdx = pCurDqLayer->pDec->pRefIndex[0][iMbXyIndex][8];
+          pCtx->iECMVs[iRefIdx][0] += pCurDqLayer->pDec->pMv[0][iMbXyIndex][8][0];
+          pCtx->iECMVs[iRefIdx][1] += pCurDqLayer->pDec->pMv[0][iMbXyIndex][8][1];
           pCtx->pECRefPic[iRefIdx] = pCtx->sRefPic.pRefList[LIST_0][iRefIdx];
           iInterMbCorrectNum[iRefIdx]++;
           break;
         case MB_TYPE_8x16:
-          iRefIdx = pCurDqLayer->pRefIndex[0][iMbXyIndex][0];
-          pCtx->iECMVs[iRefIdx][0] += pCurDqLayer->pMv[0][iMbXyIndex][0][0];
-          pCtx->iECMVs[iRefIdx][1] += pCurDqLayer->pMv[0][iMbXyIndex][0][1];
+          iRefIdx = pCurDqLayer->pDec->pRefIndex[0][iMbXyIndex][0];
+          pCtx->iECMVs[iRefIdx][0] += pCurDqLayer->pDec->pMv[0][iMbXyIndex][0][0];
+          pCtx->iECMVs[iRefIdx][1] += pCurDqLayer->pDec->pMv[0][iMbXyIndex][0][1];
           pCtx->pECRefPic[iRefIdx] = pCtx->sRefPic.pRefList[LIST_0][iRefIdx];
           iInterMbCorrectNum[iRefIdx]++;
 
-          iRefIdx = pCurDqLayer->pRefIndex[0][iMbXyIndex][2];
-          pCtx->iECMVs[iRefIdx][0] += pCurDqLayer->pMv[0][iMbXyIndex][2][0];
-          pCtx->iECMVs[iRefIdx][1] += pCurDqLayer->pMv[0][iMbXyIndex][2][1];
+          iRefIdx = pCurDqLayer->pDec->pRefIndex[0][iMbXyIndex][2];
+          pCtx->iECMVs[iRefIdx][0] += pCurDqLayer->pDec->pMv[0][iMbXyIndex][2][0];
+          pCtx->iECMVs[iRefIdx][1] += pCurDqLayer->pDec->pMv[0][iMbXyIndex][2][1];
           pCtx->pECRefPic[iRefIdx] = pCtx->sRefPic.pRefList[LIST_0][iRefIdx];
           iInterMbCorrectNum[iRefIdx]++;
           break;
@@ -311,39 +311,39 @@ void GetAvilInfoFromCorrectMb (PWelsDecoderContext pCtx) {
           for (i = 0; i < 4; i++) {
             iSubMBType = pCurDqLayer->pSubMbType[iMbXyIndex][i];
             iIIdx = ((i >> 1) << 3) + ((i & 1) << 1);
-            iRefIdx = pCurDqLayer->pRefIndex[0][iMbXyIndex][iIIdx];
+            iRefIdx = pCurDqLayer->pDec->pRefIndex[0][iMbXyIndex][iIIdx];
             pCtx->pECRefPic[iRefIdx] = pCtx->sRefPic.pRefList[LIST_0][iRefIdx];
             switch (iSubMBType) {
             case SUB_MB_TYPE_8x8:
-              pCtx->iECMVs[iRefIdx][0] += pCurDqLayer->pMv[0][iMbXyIndex][iIIdx][0];
-              pCtx->iECMVs[iRefIdx][1] += pCurDqLayer->pMv[0][iMbXyIndex][iIIdx][1];
+              pCtx->iECMVs[iRefIdx][0] += pCurDqLayer->pDec->pMv[0][iMbXyIndex][iIIdx][0];
+              pCtx->iECMVs[iRefIdx][1] += pCurDqLayer->pDec->pMv[0][iMbXyIndex][iIIdx][1];
               iInterMbCorrectNum[iRefIdx]++;
 
               break;
             case SUB_MB_TYPE_8x4:
-              pCtx->iECMVs[iRefIdx][0] += pCurDqLayer->pMv[0][iMbXyIndex][iIIdx][0];
-              pCtx->iECMVs[iRefIdx][1] += pCurDqLayer->pMv[0][iMbXyIndex][iIIdx][1];
+              pCtx->iECMVs[iRefIdx][0] += pCurDqLayer->pDec->pMv[0][iMbXyIndex][iIIdx][0];
+              pCtx->iECMVs[iRefIdx][1] += pCurDqLayer->pDec->pMv[0][iMbXyIndex][iIIdx][1];
 
 
-              pCtx->iECMVs[iRefIdx][0] += pCurDqLayer->pMv[0][iMbXyIndex][iIIdx + 4][0];
-              pCtx->iECMVs[iRefIdx][1] += pCurDqLayer->pMv[0][iMbXyIndex][iIIdx + 4][1];
+              pCtx->iECMVs[iRefIdx][0] += pCurDqLayer->pDec->pMv[0][iMbXyIndex][iIIdx + 4][0];
+              pCtx->iECMVs[iRefIdx][1] += pCurDqLayer->pDec->pMv[0][iMbXyIndex][iIIdx + 4][1];
               iInterMbCorrectNum[iRefIdx] += 2;
 
               break;
             case SUB_MB_TYPE_4x8:
-              pCtx->iECMVs[iRefIdx][0] += pCurDqLayer->pMv[0][iMbXyIndex][iIIdx][0];
-              pCtx->iECMVs[iRefIdx][1] += pCurDqLayer->pMv[0][iMbXyIndex][iIIdx][1];
+              pCtx->iECMVs[iRefIdx][0] += pCurDqLayer->pDec->pMv[0][iMbXyIndex][iIIdx][0];
+              pCtx->iECMVs[iRefIdx][1] += pCurDqLayer->pDec->pMv[0][iMbXyIndex][iIIdx][1];
 
 
-              pCtx->iECMVs[iRefIdx][0] += pCurDqLayer->pMv[0][iMbXyIndex][iIIdx + 1][0];
-              pCtx->iECMVs[iRefIdx][1] += pCurDqLayer->pMv[0][iMbXyIndex][iIIdx + 1][1];
+              pCtx->iECMVs[iRefIdx][0] += pCurDqLayer->pDec->pMv[0][iMbXyIndex][iIIdx + 1][0];
+              pCtx->iECMVs[iRefIdx][1] += pCurDqLayer->pDec->pMv[0][iMbXyIndex][iIIdx + 1][1];
               iInterMbCorrectNum[iRefIdx] += 2;
               break;
             case SUB_MB_TYPE_4x4: {
               for (j = 0; j < 4; j++) {
                 iJIdx = ((j >> 1) << 2) + (j & 1);
-                pCtx->iECMVs[iRefIdx][0] += pCurDqLayer->pMv[0][iMbXyIndex][iIIdx + iJIdx][0];
-                pCtx->iECMVs[iRefIdx][1] += pCurDqLayer->pMv[0][iMbXyIndex][iIIdx + iJIdx][1];
+                pCtx->iECMVs[iRefIdx][0] += pCurDqLayer->pDec->pMv[0][iMbXyIndex][iIIdx + iJIdx][0];
+                pCtx->iECMVs[iRefIdx][1] += pCurDqLayer->pDec->pMv[0][iMbXyIndex][iIIdx + iJIdx][1];
               }
               iInterMbCorrectNum[iRefIdx] += 4;
             }
@@ -372,7 +372,7 @@ void DoErrorConSliceMVCopy (PWelsDecoderContext pCtx) {
   int32_t iMbWidth = (int32_t) pCtx->pSps->iMbWidth;
   int32_t iMbHeight = (int32_t) pCtx->pSps->iMbHeight;
   PPicture pDstPic = pCtx->pDec;
-  PPicture pSrcPic = pCtx->pPreviousDecodedPictureInDpb;
+  PPicture pSrcPic = pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb;
 
   bool* pMbCorrectlyDecodedFlag = pCtx->pCurDqLayer->pMbCorrectlyDecodedFlag;
   int32_t iMbXyIndex;

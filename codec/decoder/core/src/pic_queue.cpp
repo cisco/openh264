@@ -168,6 +168,7 @@ PPicture PrefetchPic (PPicBuff pPicBuf) {
   }
   if (pPic != NULL) {
     pPicBuf->iCurrentIdx = iPicIdx;
+    pPic->iPicBuffIdx = iPicIdx;
     return pPic;
   }
   for (iPicIdx = 0 ; iPicIdx <= pPicBuf->iCurrentIdx ; ++iPicIdx) {
@@ -179,6 +180,9 @@ PPicture PrefetchPic (PPicBuff pPicBuf) {
   }
 
   pPicBuf->iCurrentIdx = iPicIdx;
+  if (pPic != NULL) {
+    pPic->iPicBuffIdx = iPicIdx;
+  }
   return pPic;
 }
 

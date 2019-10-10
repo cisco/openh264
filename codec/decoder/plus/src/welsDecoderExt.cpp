@@ -257,6 +257,10 @@ int32_t CWelsDecoder::InitDecoder (const SDecodingParam* pParam) {
            VERSION_NUMBER, (int32_t)pParam->bParseOnly);
 
   //reset decoder context
+  memset (&m_sDecoderStatistics, 0, sizeof (SDecoderStatistics));
+  memset (&m_sLastDecPicInfo, 0, sizeof (SWelsLastDecPicInfo));
+  memset (&m_sVlcTable, 0, sizeof (SVlcTable));
+  WelsDecoderLastDecPicInfoDefaults (m_sLastDecPicInfo);
   if (m_pDecContext) //free
     UninitDecoder();
   m_pDecContext = (PWelsDecoderContext)WelsMallocz (sizeof (SWelsDecoderContext), "m_pDecContext");
@@ -267,7 +271,11 @@ int32_t CWelsDecoder::InitDecoder (const SDecodingParam* pParam) {
   WELS_VERIFY_RETURN_PROC_IF (cmMallocMemeError, (NULL == m_pDecContext->pMemAlign), UninitDecoder())
 
   //fill in default value into context
+  m_pDecContext->pLastDecPicInfo = &m_sLastDecPicInfo;
+  m_pDecContext->pDecoderStatistics = &m_sDecoderStatistics;
+  m_pDecContext->pVlcTable = &m_sVlcTable;
   WelsDecoderDefaults (m_pDecContext, &m_pWelsTrace->m_sLogCtx);
+  WelsDecoderSpsPpsDefaults (m_pDecContext->sSpsPpsCtx);
 
   //check param and update decoder context
   m_pDecContext->pParam = (SDecodingParam*)m_pDecContext->pMemAlign->WelsMallocz (sizeof (SDecodingParam),
@@ -364,7 +372,7 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
     return cmInitParaError;
   } else if (eOptID == DECODER_OPTION_STATISTICS_LOG_INTERVAL) {
     if (pOption) {
-      m_pDecContext->sDecoderStatistics.iStatisticsLogInterval = (* ((unsigned int*)pOption));
+      m_pDecContext->pDecoderStatistics->iStatisticsLogInterval = (* ((unsigned int*)pOption));
       return cmResultSuccess;
     }
   } else if (eOptID == DECODER_OPTION_GET_SAR_INFO) {
@@ -432,19 +440,19 @@ long CWelsDecoder::GetOption (DECODER_OPTION eOptID, void* pOption) {
   } else if (DECODER_OPTION_GET_STATISTICS == eOptID) { // get decoder statistics info for real time debugging
     SDecoderStatistics* pDecoderStatistics = (static_cast<SDecoderStatistics*> (pOption));
 
-    memcpy (pDecoderStatistics, &m_pDecContext->sDecoderStatistics, sizeof (SDecoderStatistics));
+    memcpy (pDecoderStatistics, m_pDecContext->pDecoderStatistics, sizeof (SDecoderStatistics));
 
-    if (m_pDecContext->sDecoderStatistics.uiDecodedFrameCount != 0) { //not original status
+    if (m_pDecContext->pDecoderStatistics->uiDecodedFrameCount != 0) { //not original status
       pDecoderStatistics->fAverageFrameSpeedInMs = (float) (m_pDecContext->dDecTime) /
-          (m_pDecContext->sDecoderStatistics.uiDecodedFrameCount);
+          (m_pDecContext->pDecoderStatistics->uiDecodedFrameCount);
       pDecoderStatistics->fActualAverageFrameSpeedInMs = (float) (m_pDecContext->dDecTime) /
-          (m_pDecContext->sDecoderStatistics.uiDecodedFrameCount + m_pDecContext->sDecoderStatistics.uiFreezingIDRNum +
-           m_pDecContext->sDecoderStatistics.uiFreezingNonIDRNum);
+          (m_pDecContext->pDecoderStatistics->uiDecodedFrameCount + m_pDecContext->pDecoderStatistics->uiFreezingIDRNum +
+           m_pDecContext->pDecoderStatistics->uiFreezingNonIDRNum);
     }
     return cmResultSuccess;
   } else if (eOptID == DECODER_OPTION_STATISTICS_LOG_INTERVAL) {
     if (pOption) {
-      iVal = m_pDecContext->sDecoderStatistics.iStatisticsLogInterval;
+      iVal = m_pDecContext->pDecoderStatistics->iStatisticsLogInterval;
       * ((unsigned int*)pOption) = iVal;
       return cmResultSuccess;
     }
@@ -626,30 +634,30 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
       //TODO after dec status updated
       m_pDecContext->iErrorCode |= dsDataErrorConcealed;
 
-      m_pDecContext->sDecoderStatistics.uiDecodedFrameCount++;
-      if (m_pDecContext->sDecoderStatistics.uiDecodedFrameCount == 0) { //exceed max value of uint32_t
-        ResetDecStatNums (&m_pDecContext->sDecoderStatistics);
-        m_pDecContext->sDecoderStatistics.uiDecodedFrameCount++;
+      m_pDecContext->pDecoderStatistics->uiDecodedFrameCount++;
+      if (m_pDecContext->pDecoderStatistics->uiDecodedFrameCount == 0) { //exceed max value of uint32_t
+        ResetDecStatNums (m_pDecContext->pDecoderStatistics);
+        m_pDecContext->pDecoderStatistics->uiDecodedFrameCount++;
       }
       int32_t iMbConcealedNum = m_pDecContext->iMbEcedNum + m_pDecContext->iMbEcedPropNum;
-      m_pDecContext->sDecoderStatistics.uiAvgEcRatio = m_pDecContext->iMbNum == 0 ?
-          (m_pDecContext->sDecoderStatistics.uiAvgEcRatio * m_pDecContext->sDecoderStatistics.uiEcFrameNum) : ((
-                m_pDecContext->sDecoderStatistics.uiAvgEcRatio * m_pDecContext->sDecoderStatistics.uiEcFrameNum) + ((
+      m_pDecContext->pDecoderStatistics->uiAvgEcRatio = m_pDecContext->iMbNum == 0 ?
+          (m_pDecContext->pDecoderStatistics->uiAvgEcRatio * m_pDecContext->pDecoderStatistics->uiEcFrameNum) : ((
+                m_pDecContext->pDecoderStatistics->uiAvgEcRatio * m_pDecContext->pDecoderStatistics->uiEcFrameNum) + ((
                       iMbConcealedNum * 100) / m_pDecContext->iMbNum));
-      m_pDecContext->sDecoderStatistics.uiAvgEcPropRatio = m_pDecContext->iMbNum == 0 ?
-          (m_pDecContext->sDecoderStatistics.uiAvgEcPropRatio * m_pDecContext->sDecoderStatistics.uiEcFrameNum) : ((
-                m_pDecContext->sDecoderStatistics.uiAvgEcPropRatio * m_pDecContext->sDecoderStatistics.uiEcFrameNum) + ((
+      m_pDecContext->pDecoderStatistics->uiAvgEcPropRatio = m_pDecContext->iMbNum == 0 ?
+          (m_pDecContext->pDecoderStatistics->uiAvgEcPropRatio * m_pDecContext->pDecoderStatistics->uiEcFrameNum) : ((
+                m_pDecContext->pDecoderStatistics->uiAvgEcPropRatio * m_pDecContext->pDecoderStatistics->uiEcFrameNum) + ((
                       m_pDecContext->iMbEcedPropNum * 100) / m_pDecContext->iMbNum));
-      m_pDecContext->sDecoderStatistics.uiEcFrameNum += (iMbConcealedNum == 0 ? 0 : 1);
-      m_pDecContext->sDecoderStatistics.uiAvgEcRatio = m_pDecContext->sDecoderStatistics.uiEcFrameNum == 0 ? 0 :
-          m_pDecContext->sDecoderStatistics.uiAvgEcRatio / m_pDecContext->sDecoderStatistics.uiEcFrameNum;
-      m_pDecContext->sDecoderStatistics.uiAvgEcPropRatio = m_pDecContext->sDecoderStatistics.uiEcFrameNum == 0 ? 0 :
-          m_pDecContext->sDecoderStatistics.uiAvgEcPropRatio / m_pDecContext->sDecoderStatistics.uiEcFrameNum;
+      m_pDecContext->pDecoderStatistics->uiEcFrameNum += (iMbConcealedNum == 0 ? 0 : 1);
+      m_pDecContext->pDecoderStatistics->uiAvgEcRatio = m_pDecContext->pDecoderStatistics->uiEcFrameNum == 0 ? 0 :
+          m_pDecContext->pDecoderStatistics->uiAvgEcRatio / m_pDecContext->pDecoderStatistics->uiEcFrameNum;
+      m_pDecContext->pDecoderStatistics->uiAvgEcPropRatio = m_pDecContext->pDecoderStatistics->uiEcFrameNum == 0 ? 0 :
+          m_pDecContext->pDecoderStatistics->uiAvgEcPropRatio / m_pDecContext->pDecoderStatistics->uiEcFrameNum;
     }
     iEnd = WelsTime();
     m_pDecContext->dDecTime += (iEnd - iStart) / 1e3;
 
-    OutputStatisticsLog (m_pDecContext->sDecoderStatistics);
+    OutputStatisticsLog (*m_pDecContext->pDecoderStatistics);
 
 #ifdef  _PICTURE_REORDERING_
     ReorderPicturesInDisplay (ppDst, pDstInfo);
@@ -661,13 +669,13 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
 
   if (pDstInfo->iBufferStatus == 1) {
 
-    m_pDecContext->sDecoderStatistics.uiDecodedFrameCount++;
-    if (m_pDecContext->sDecoderStatistics.uiDecodedFrameCount == 0) { //exceed max value of uint32_t
-      ResetDecStatNums (&m_pDecContext->sDecoderStatistics);
-      m_pDecContext->sDecoderStatistics.uiDecodedFrameCount++;
+    m_pDecContext->pDecoderStatistics->uiDecodedFrameCount++;
+    if (m_pDecContext->pDecoderStatistics->uiDecodedFrameCount == 0) { //exceed max value of uint32_t
+      ResetDecStatNums (m_pDecContext->pDecoderStatistics);
+      m_pDecContext->pDecoderStatistics->uiDecodedFrameCount++;
     }
 
-    OutputStatisticsLog (m_pDecContext->sDecoderStatistics);
+    OutputStatisticsLog (*m_pDecContext->pDecoderStatistics);
   }
   iEnd = WelsTime();
   m_pDecContext->dDecTime += (iEnd - iStart) / 1e3;
@@ -761,19 +769,22 @@ void CWelsDecoder::OutputStatisticsLog (SDecoderStatistics& sDecoderStatistics) 
 
 DECODING_STATE CWelsDecoder::ReorderPicturesInDisplay (unsigned char** ppDst, SBufferInfo* pDstInfo) {
   DECODING_STATE iRet = dsErrorFree;
-  if (pDstInfo->iBufferStatus == 1 && m_pDecContext->pSps->uiProfileIdc != 66
-      && m_pDecContext->pSps->uiProfileIdc != 83) {
+  if (pDstInfo->iBufferStatus == 0) {
+    return iRet;
+  }
+  ++m_pDecContext->uiDecodingTimeStamp;
+  if (m_pDecContext->pSps->uiProfileIdc != 66 && m_pDecContext->pSps->uiProfileIdc != 83) {
     /*if (m_pDecContext->pSliceHeader->iPicOrderCntLsb == 0) {
       m_LastWrittenPOC = 0;
       return dsErrorFree;
     }
-    if (m_iNumOfPicts == 0 && m_pDecContext->pPreviousDecodedPictureInDpb->bNewSeqBegin
+    if (m_iNumOfPicts == 0 && m_pDecContext->pLastDecPicInfo->pPreviousDecodedPictureInDpb->bNewSeqBegin
         && m_pDecContext->eSliceType != I_SLICE) {
       m_LastWrittenPOC = m_pDecContext->pSliceHeader->iPicOrderCntLsb;
       return dsErrorFree;
     }*/
-    if (m_iNumOfPicts && m_pDecContext->pPreviousDecodedPictureInDpb
-        && m_pDecContext->pPreviousDecodedPictureInDpb->bNewSeqBegin) {
+    if (m_iNumOfPicts && m_pDecContext->pLastDecPicInfo->pPreviousDecodedPictureInDpb
+        && m_pDecContext->pLastDecPicInfo->pPreviousDecodedPictureInDpb->bNewSeqBegin) {
       m_iLastGOPRemainPicts = m_iNumOfPicts;
       for (int32_t i = 0; i <= m_iLargestBufferedPicIndex; ++i) {
         if (m_sPictInfoList[i].iPOC > sIMinInt32) {
@@ -807,7 +818,8 @@ DECODING_STATE CWelsDecoder::ReorderPicturesInDisplay (unsigned char** ppDst, SB
         m_sPictInfoList[i].pData[1] = ppDst[1];
         m_sPictInfoList[i].pData[2] = ppDst[2];
         m_sPictInfoList[i].iPOC = m_pDecContext->pSliceHeader->iPicOrderCntLsb;
-        m_sPictInfoList[i].iPicBuffIdx = m_pDecContext->pPicBuff->iCurrentIdx;
+        m_sPictInfoList[i].uiDecodingTimeStamp = m_pDecContext->uiDecodingTimeStamp;
+        m_sPictInfoList[i].iPicBuffIdx = m_pDecContext->pLastDecPicInfo->pPreviousDecodedPictureInDpb->iPicBuffIdx;
         m_pDecContext->pPicBuff->ppPic[m_sPictInfoList[i].iPicBuffIdx]->bAvailableFlag = false;
         m_sPictInfoList[i].bLastGOP = false;
         pDstInfo->iBufferStatus = 0;
@@ -955,10 +967,10 @@ DECODING_STATE CWelsDecoder::DecodeParser (const unsigned char* kpSrc,
     memcpy (pDstInfo, m_pDecContext->pParserBsInfo, sizeof (SParserBsInfo));
 
     if (m_pDecContext->iErrorCode == ERR_NONE) { //update statistics: decoding frame count
-      m_pDecContext->sDecoderStatistics.uiDecodedFrameCount++;
-      if (m_pDecContext->sDecoderStatistics.uiDecodedFrameCount == 0) { //exceed max value of uint32_t
-        ResetDecStatNums (&m_pDecContext->sDecoderStatistics);
-        m_pDecContext->sDecoderStatistics.uiDecodedFrameCount++;
+      m_pDecContext->pDecoderStatistics->uiDecodedFrameCount++;
+      if (m_pDecContext->pDecoderStatistics->uiDecodedFrameCount == 0) { //exceed max value of uint32_t
+        ResetDecStatNums (m_pDecContext->pDecoderStatistics);
+        m_pDecContext->pDecoderStatistics->uiDecodedFrameCount++;
       }
     }
   }
