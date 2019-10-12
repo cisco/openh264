@@ -129,6 +129,34 @@ int32_t ParseSliceHeaderSyntaxs (PWelsDecoderContext pCtx, PBitStringAux pBs, co
  */
 bool PrefetchNalHeaderExtSyntax (PWelsDecoderContext pCtx, PNalUnit const kpDst, PNalUnit const kpSrc);
 
+/*
+* WelsDecodeInitAccessUnitStart
+* check and (re)allocate picture buffers on new sequence begin
+*  bit_len:    size in bit length of data
+*  buf_len:    size in byte length of data
+*  coded_au:   mark an Access Unit decoding finished
+* return:
+*  0 - success; otherwise returned error_no defined in error_no.h
+*/
+int32_t WelsDecodeInitAccessUnitStart (PWelsDecoderContext pCtx, SBufferInfo* pDstInfo);
+/*
+* AllocPicBuffOnNewSeqBegin
+* check and (re)allocate picture buffers on new sequence begin
+* return:
+*  0 - success; otherwise returned error_no defined in error_no.h
+*/
+int32_t AllocPicBuffOnNewSeqBegin (PWelsDecoderContext pCtx);
+
+/*
+* InitConstructAccessUnit
+* Init before constructing an access unit for given input bitstream, maybe partial NAL Unit, one or more Units are involved to
+* joint a collective access unit.
+* parameter\
+*  SBufferInfo:    Buffer info
+* return:
+*  0 - success; otherwise returned error_no defined in error_no.h
+*/
+int32_t InitConstructAccessUnit (PWelsDecoderContext pCtx, SBufferInfo* pDstInfo);
 
 /*
  * ConstructAccessUnit

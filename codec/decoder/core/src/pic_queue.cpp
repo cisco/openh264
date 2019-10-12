@@ -121,6 +121,15 @@ PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const
                               int8_t) * MB_BLOCK4x4_NUM, "pCtx->sMb.pRefIndex[]");
   pPic->pRefIndex[LIST_1] = (int8_t (*)[16])pMa->WelsMallocz (uiMbCount * sizeof (
                               int8_t) * MB_BLOCK4x4_NUM, "pCtx->sMb.pRefIndex[]");
+  if (pCtx->pThreadCtx != NULL) {
+    pPic->pReadyEvent = (SWelsDecEvent*)pMa->WelsMallocz (uiMbHeight * sizeof (SWelsDecEvent), "pPic->pReadyEvent");
+    for (uint32_t i = 0; i < uiMbHeight; ++i) {
+      CREATE_EVENT (&pPic->pReadyEvent[i], 1, 0, NULL);
+    }
+  } else {
+    pPic->pReadyEvent = NULL;
+  }
+
   return pPic;
 }
 
@@ -146,6 +155,14 @@ void FreePicture (PPicture pPic, CMemoryAlign* pMa) {
         pMa->WelsFree (pPic->pRefIndex[listIdx], "pPic->pRefIndex[]");
         pPic->pRefIndex[listIdx] = NULL;
       }
+    }
+    if (pPic->pReadyEvent != NULL) {
+      uint32_t uiMbHeight = (pPic->iHeightInPixel + 15) >> 4;
+      for (uint32_t i = 0; i < uiMbHeight; ++i) {
+        CLOSE_EVENT (&pPic->pReadyEvent[i]);
+      }
+      pMa->WelsFree (pPic->pReadyEvent, "pPic->pReadyEvent");
+      pPic->pReadyEvent = NULL;
     }
     pMa->WelsFree (pPic, "pPic");
     pPic = NULL;
@@ -182,6 +199,20 @@ PPicture PrefetchPic (PPicBuff pPicBuf) {
   pPicBuf->iCurrentIdx = iPicIdx;
   if (pPic != NULL) {
     pPic->iPicBuffIdx = iPicIdx;
+  }
+  return pPic;
+}
+
+PPicture PrefetchPicForThread (PPicBuff pPicBuf) {
+  PPicture pPic = NULL;
+
+  if (pPicBuf->iCapacity == 0) {
+    return NULL;
+  }
+  pPic = pPicBuf->ppPic[pPicBuf->iCurrentIdx];
+  pPic->iPicBuffIdx = pPicBuf->iCurrentIdx;
+  if (++pPicBuf->iCurrentIdx >= pPicBuf->iCapacity) {
+    pPicBuf->iCurrentIdx = 0;
   }
   return pPic;
 }

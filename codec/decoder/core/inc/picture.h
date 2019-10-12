@@ -37,6 +37,7 @@
 #include "typedefs.h"
 #include "wels_common_defs.h"
 #include "wels_const_common.h"
+#include "wels_decoder_thread.h"
 
 using namespace WelsCommon;
 
@@ -96,6 +97,7 @@ struct SPicture {
   int16_t (*pMv[LIST_A])[MB_BLOCK4x4_NUM][MV_A]; // used for direct mode
   int8_t (*pRefIndex[LIST_A])[MB_BLOCK4x4_NUM]; //used for direct mode
   struct SPicture* pRefPic[LIST_A][17];  //ref pictures used for direct mode
+  SWelsDecEvent* pReadyEvent;  //MB line ready event
 
 };// "Picture" declaration is comflict with Mac system
 
