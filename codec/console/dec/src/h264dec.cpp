@@ -52,6 +52,7 @@
 #include "measure_time.h"
 #include "d3d9_utils.h"
 
+#define _USE_READ_PICTURE_ 1
 
 using namespace std;
 
@@ -68,6 +69,56 @@ int    g_iDecodedFrameNum = 0;
 #define fprintf(a, ...) LOGI(__VA_ARGS__)
 #endif
 //using namespace WelsDec;
+
+int32_t readPicture (uint8_t* pBuf, const int32_t& iFileSize, const int32_t& bufPos) {
+  int32_t bytes_available = iFileSize - bufPos;
+  if (bytes_available < 4) {
+    return bytes_available;
+  }
+  uint8_t* ptr = pBuf + bufPos;
+  int32_t read_bytes = 0;
+  int32_t sps_count = 0;
+  int32_t non_idr_pict_count = 0;
+  int32_t idr_pict_count = 0;
+  while (read_bytes < bytes_available - 4) {
+    bool has4ByteStartCode = ptr[0] == 0 && ptr[1] == 0 && ptr[2] == 0 && ptr[3] == 1;
+    bool has3ByteStartCode = false;
+    if (!has4ByteStartCode) {
+      has3ByteStartCode = ptr[0] == 0 && ptr[1] == 0 && ptr[2] == 1;
+    }
+    if (has4ByteStartCode || has3ByteStartCode) {
+      uint8_t nal_unit_type = has4ByteStartCode ? (ptr[4] & 0x1F) : (ptr[3] & 0x1F);
+      if (nal_unit_type == 1) {
+        if (++non_idr_pict_count == 1 && idr_pict_count == 1) {
+          return read_bytes;
+        }
+        if (non_idr_pict_count == 2) {
+          return read_bytes;
+        }
+      } else if (nal_unit_type == 5) {
+        if (++idr_pict_count == 1 && non_idr_pict_count == 1) {
+          return read_bytes;
+        }
+        if (idr_pict_count == 2) {
+          return read_bytes;
+        }
+      } else if (nal_unit_type == 7) {
+        if ((++sps_count == 1) && (non_idr_pict_count == 1 || idr_pict_count == 1)) {
+          return read_bytes;
+        }
+      }
+      if (read_bytes >= bytes_available - 4) {
+        return bytes_available;
+      }
+      read_bytes += 4;
+      ptr += 4;
+    } else {
+      ++ptr;
+      ++read_bytes;
+    }
+  }
+  return bytes_available;
+}
 
 void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, const char* kpOuputFileName,
                          int32_t& iWidth, int32_t& iHeight, const char* pOptionFileName, const char* pLengthFileName,
@@ -95,7 +146,6 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
 
   int32_t iBufPos = 0;
   int32_t iFileSize;
-  int32_t i = 0;
   int32_t iLastWidth = 0, iLastHeight = 0;
   int32_t iFrameCount = 0;
   int32_t iEndOfStreamFlag = 0;
@@ -181,6 +231,10 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
         goto label_exit;
       iSliceSize = static_cast<int32_t> (pInfo[2]);
     } else {
+#if defined(_USE_READ_PICTURE_)
+      iSliceSize = readPicture (pBuf, iFileSize, iBufPos);
+#else
+      int i = 0;
       for (i = 0; i < iFileSize; i++) {
         if ((pBuf[iBufPos + i] == 0 && pBuf[iBufPos + i + 1] == 0 && pBuf[iBufPos + i + 2] == 0 && pBuf[iBufPos + i + 3] == 1
              && i > 0) || (pBuf[iBufPos + i] == 0 && pBuf[iBufPos + i + 1] == 0 && pBuf[iBufPos + i + 2] == 1 && i > 0)) {
@@ -188,6 +242,7 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
         }
       }
       iSliceSize = i;
+#endif
     }
     if (iSliceSize < 4) { //too small size, no effective data, ignore
       iBufPos += iSliceSize;
@@ -209,6 +264,8 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
     pDecoder->GetOption (DECODER_OPTION_VCL_NAL, &iFeedbackVclNalInAu);
     int32_t iFeedbackTidInAu;
     pDecoder->GetOption (DECODER_OPTION_TEMPORAL_ID, &iFeedbackTidInAu);
+    int32_t iThreadCount = 1;
+    pDecoder->GetOption (DECODER_OPTION_NUM_OF_THREADS, &iThreadCount);
 //~end for
 
     iStart = WelsTime();
@@ -488,6 +545,9 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
   if (iLevelSetting >= 0) {
     pDecoder->SetOption (DECODER_OPTION_TRACE_LEVEL, &iLevelSetting);
   }
+
+  int32_t iThreadCount = 1;
+  pDecoder->SetOption (DECODER_OPTION_NUM_OF_THREADS, &iThreadCount);
 
   if (pDecoder->Initialize (&sDecParam)) {
     printf ("Decoder initialization failed.\n");

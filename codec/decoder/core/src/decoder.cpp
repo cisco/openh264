@@ -52,6 +52,7 @@
 #include "decode_slice.h"
 #include "error_concealment.h"
 #include "memory_align.h"
+#include "wels_decoder_thread.h"
 
 namespace WelsDec {
 
@@ -75,7 +76,7 @@ static int32_t CreatePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, cons
     return ERR_INFO_OUT_OF_MEMORY;
   }
 
-  pPicBuf->ppPic = (PPicture*)pMa->WelsMallocz (kiSize * sizeof (PPicture), "PPicture*");
+  pPicBuf->ppPic = (PPicture*)pMa->WelsMallocz (MAX_REF_PIC_COUNT * sizeof (PPicture), "PPicture*");
 
   if (NULL == pPicBuf->ppPic) {
     pPicBuf->iCapacity = 0;
@@ -84,12 +85,15 @@ static int32_t CreatePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, cons
   }
 
   for (iPicIdx = 0; iPicIdx < kiSize; ++ iPicIdx) {
-    PPicture pPic = AllocPicture (pCtx, kiPicWidth, kiPicHeight);
-    if (NULL == pPic) {
-      // init capacity first for free memory
-      pPicBuf->iCapacity = iPicIdx;
-      DestroyPicBuff (&pPicBuf, pMa);
-      return ERR_INFO_OUT_OF_MEMORY;
+    PPicture pPic = NULL;
+    if (iPicIdx < kiSize) {
+      pPic = AllocPicture (pCtx, kiPicWidth, kiPicHeight);
+      if (NULL == pPic) {
+        // init capacity first for free memory
+        pPicBuf->iCapacity = iPicIdx;
+        DestroyPicBuff (&pPicBuf, pMa);
+        return ERR_INFO_OUT_OF_MEMORY;
+      }
     }
     pPicBuf->ppPic[iPicIdx] = pPic;
   }
@@ -321,12 +325,12 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
 
   pCtx->pPicBuff          = NULL;
 
-  pCtx->sSpsPpsCtx.bAvcBasedFlag             = true;
+  //pCtx->sSpsPpsCtx.bAvcBasedFlag             = true;
   pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb = NULL;
   pCtx->pDecoderStatistics->iAvgLumaQp = -1;
   pCtx->pDecoderStatistics->iStatisticsLogInterval = 1000;
   pCtx->bUseScalingList = false;
-  pCtx->sSpsPpsCtx.iSpsErrorIgnored = 0;
+  /*pCtx->sSpsPpsCtx.iSpsErrorIgnored = 0;
   pCtx->sSpsPpsCtx.iSubSpsErrorIgnored = 0;
   pCtx->sSpsPpsCtx.iPpsErrorIgnored = 0;
   pCtx->sSpsPpsCtx.iPPSInvalidNum = 0;
@@ -335,6 +339,7 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   pCtx->sSpsPpsCtx.iSPSLastInvalidId = -1;
   pCtx->sSpsPpsCtx.iSubSPSInvalidNum = 0;
   pCtx->sSpsPpsCtx.iSubSPSLastInvalidId = -1;
+  */
   pCtx->iFeedbackNalRefIdc = -1; //initialize
   pCtx->pLastDecPicInfo->iPrevPicOrderCntMsb = 0;
   pCtx->pLastDecPicInfo->iPrevPicOrderCntLsb = 0;
@@ -372,10 +377,38 @@ void WelsDecoderLastDecPicInfoDefaults (SWelsLastDecPicInfo& sLastDecPicInfo) {
   sLastDecPicInfo.bLastHasMmco5 = false;
 }
 
+/*!
+* \brief   copy SpsPps from one Ctx to another ctx for threaded code
+*/
+void CopySpsPps (PWelsDecoderContext pFromCtx, PWelsDecoderContext pToCtx) {
+  pToCtx->sSpsPpsCtx = pFromCtx->sSpsPpsCtx;
+  PAccessUnit pFromCurAu = pFromCtx->pAccessUnitList;
+  PSps pTmpLayerSps[MAX_LAYER_NUM];
+  for (int i = 0; i < MAX_LAYER_NUM; i++) {
+    pTmpLayerSps[i] = NULL;
+  }
+  // track the layer sps for the current au
+  for (unsigned int i = pFromCurAu->uiStartPos; i <= pFromCurAu->uiEndPos; i++) {
+    uint32_t uiDid = pFromCurAu->pNalUnitsList[i]->sNalHeaderExt.uiDependencyId;
+    pTmpLayerSps[uiDid] = pFromCurAu->pNalUnitsList[i]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps;
+    for (unsigned int j = 0; j < MAX_SPS_COUNT + 1; ++j) {
+      if (&pFromCtx->sSpsPpsCtx.sSpsBuffer[j] == pTmpLayerSps[uiDid]) {
+        pTmpLayerSps[uiDid] = &pToCtx->sSpsPpsCtx.sSpsBuffer[j];
+        break;
+      }
+    }
+  }
+  for (int i = 0; i < MAX_LAYER_NUM; i++) {
+    if (pTmpLayerSps[i] != NULL) {
+      pToCtx->sSpsPpsCtx.pActiveLayerSps[i] = pTmpLayerSps[i];
+    }
+  }
+}
 
 /*
  *  destory_mb_blocks
  */
+
 
 /*
  *  get size of reference picture list in target layer incoming, = (iNumRefFrames
@@ -387,6 +420,9 @@ static inline int32_t GetTargetRefListSize (PWelsDecoderContext pCtx) {
     iNumRefFrames = MAX_REF_PIC_COUNT + 2;
   } else {
     iNumRefFrames = pCtx->pSps->iNumRefFrames + 2;
+    if (pCtx->pThreadCtx != NULL) {
+      iNumRefFrames = MAX_REF_PIC_COUNT + 1;
+    }
   }
 
 #ifdef LONG_TERM_REF
@@ -428,8 +464,9 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
                          && kiPicHeight == pCtx->iImgHeightInPixel) && (!bNeedChangePicQueue)) // have same scaled buffer
 
   // sync update pRefList
-  WelsResetRefPic (pCtx); // added to sync update ref list due to pictures are free
-
+  if (pCtx->pThreadCtx == NULL) {
+    WelsResetRefPic (pCtx); // added to sync update ref list due to pictures are free
+  }
   if (pCtx->bHaveGotMemory && (kiPicWidth == pCtx->iImgWidthInPixel && kiPicHeight == pCtx->iImgHeightInPixel)
       && pCtx->pPicBuff != NULL && pCtx->pPicBuff->iCapacity != iPicQueueSize) {
     // currently only active for LIST_0 due to have no B frames
@@ -503,6 +540,17 @@ void WelsFreeDynamicMemory (PWelsDecoderContext pCtx) {
   PPicBuff* pPicBuff = &pCtx->pPicBuff;
   if (NULL != pPicBuff && NULL != *pPicBuff) {
     DestroyPicBuff (pPicBuff, pMa);
+  }
+  if (pCtx->pThreadCtx != NULL) {
+    //prevent from double destruction of PPicBuff
+    PWelsDecoderThreadCTX pThreadCtx = (PWelsDecoderThreadCTX) (pCtx->pThreadCtx);
+    int32_t threadCount = pThreadCtx->sThreadInfo.uiThrMaxNum;
+    int32_t  id = pThreadCtx->sThreadInfo.uiThrNum;
+    for (int32_t i = 0; i < threadCount; ++i) {
+      if (pThreadCtx[i - id].pCtx != NULL) {
+        pThreadCtx[i - id].pCtx->pPicBuff = NULL;
+      }
+    }
   }
 
   if (pCtx->pTempDec) {
@@ -746,7 +794,11 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
             }
             CheckAndFinishLastPic (pCtx, ppDst, pDstBufInfo);
             if (pCtx->bAuReadyFlag && pCtx->pAccessUnitList->uiAvailUnitsNum != 0) {
-              ConstructAccessUnit (pCtx, ppDst, pDstBufInfo);
+              if (pCtx->pThreadCtx == NULL) {
+                ConstructAccessUnit (pCtx, ppDst, pDstBufInfo);
+              } else {
+                pCtx->pAccessUnitList->uiAvailUnitsNum = 1;
+              }
             }
           }
           DecodeFinishUpdate (pCtx);
@@ -804,7 +856,11 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
       }
       CheckAndFinishLastPic (pCtx, ppDst, pDstBufInfo);
       if (pCtx->bAuReadyFlag && pCtx->pAccessUnitList->uiAvailUnitsNum != 0) {
-        ConstructAccessUnit (pCtx, ppDst, pDstBufInfo);
+        if (pCtx->pThreadCtx == NULL) {
+          ConstructAccessUnit (pCtx, ppDst, pDstBufInfo);
+        } else {
+          pCtx->pAccessUnitList->uiAvailUnitsNum = 1;
+        }
       }
     }
     DecodeFinishUpdate (pCtx);
