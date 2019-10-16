@@ -47,6 +47,7 @@ extern "C" {
 #endif//__cplusplus
 
 #define PADDING_LENGTH 32 // reference extension
+#define CHROMA_PADDING_LENGTH 16 // chroma reference extension
 
 #if defined(X86_ASM)
 void ExpandPictureLuma_sse2 (uint8_t* pDst,
@@ -89,6 +90,10 @@ typedef struct TagExpandPicFunc {
   PExpandPictureFunc pfExpandChromaPicture[2];
 } SExpandPicFunc;
 
+void PadMBLuma_c (uint8_t*& pDst, const int32_t& kiStride, const int32_t& kiPicW, const int32_t& kiPicH,
+                  const int32_t& kiMbX, const int32_t& kiMbY, const int32_t& kiMBWidth, const int32_t& kiMBHeight);
+void PadMBChroma_c (uint8_t*& pDst, const int32_t& kiStride, const int32_t& kiPicW, const int32_t& kiPicH,
+                    const int32_t& kiMbX, const int32_t& kiMbY, const int32_t& kiMBWidth, const int32_t& kiMBHeight);
 
 void ExpandReferencingPicture (uint8_t* pData[3], int32_t iWidth, int32_t iHeight, int32_t iStride[3],
                                PExpandPictureFunc pExpLuma, PExpandPictureFunc pExpChrom[2]);

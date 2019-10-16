@@ -52,6 +52,7 @@
 #include "decode_slice.h"
 #include "error_concealment.h"
 #include "memory_align.h"
+#include "wels_decoder_thread.h"
 
 namespace WelsDec {
 
@@ -321,12 +322,12 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
 
   pCtx->pPicBuff          = NULL;
 
-  pCtx->sSpsPpsCtx.bAvcBasedFlag             = true;
+  //pCtx->sSpsPpsCtx.bAvcBasedFlag             = true;
   pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb = NULL;
   pCtx->pDecoderStatistics->iAvgLumaQp = -1;
   pCtx->pDecoderStatistics->iStatisticsLogInterval = 1000;
   pCtx->bUseScalingList = false;
-  pCtx->sSpsPpsCtx.iSpsErrorIgnored = 0;
+  /*pCtx->sSpsPpsCtx.iSpsErrorIgnored = 0;
   pCtx->sSpsPpsCtx.iSubSpsErrorIgnored = 0;
   pCtx->sSpsPpsCtx.iPpsErrorIgnored = 0;
   pCtx->sSpsPpsCtx.iPPSInvalidNum = 0;
@@ -335,6 +336,7 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   pCtx->sSpsPpsCtx.iSPSLastInvalidId = -1;
   pCtx->sSpsPpsCtx.iSubSPSInvalidNum = 0;
   pCtx->sSpsPpsCtx.iSubSPSLastInvalidId = -1;
+  */
   pCtx->iFeedbackNalRefIdc = -1; //initialize
   pCtx->pLastDecPicInfo->iPrevPicOrderCntMsb = 0;
   pCtx->pLastDecPicInfo->iPrevPicOrderCntLsb = 0;
@@ -372,6 +374,33 @@ void WelsDecoderLastDecPicInfoDefaults (SWelsLastDecPicInfo& sLastDecPicInfo) {
   sLastDecPicInfo.bLastHasMmco5 = false;
 }
 
+/*!
+* \brief   copy SpsPps from one Ctx to another ctx for threaded code
+*/
+void CopySpsPps (PWelsDecoderContext pFromCtx, PWelsDecoderContext pToCtx) {
+  pToCtx->sSpsPpsCtx = pFromCtx->sSpsPpsCtx;
+  PAccessUnit pFromCurAu = pFromCtx->pAccessUnitList;
+  PSps pTmpLayerSps[MAX_LAYER_NUM];
+  for (int i = 0; i < MAX_LAYER_NUM; i++) {
+    pTmpLayerSps[i] = NULL;
+  }
+  // track the layer sps for the current au
+  for (unsigned int i = pFromCurAu->uiStartPos; i <= pFromCurAu->uiEndPos; i++) {
+    uint32_t uiDid = pFromCurAu->pNalUnitsList[i]->sNalHeaderExt.uiDependencyId;
+    pTmpLayerSps[uiDid] = pFromCurAu->pNalUnitsList[i]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps;
+    for (unsigned int j = 0; j < MAX_SPS_COUNT + 1; ++j) {
+      if (&pFromCtx->sSpsPpsCtx.sSpsBuffer[j] == pTmpLayerSps[uiDid]) {
+        pTmpLayerSps[uiDid] = &pToCtx->sSpsPpsCtx.sSpsBuffer[j];
+        break;
+      }
+    }
+  }
+  for (int i = 0; i < MAX_LAYER_NUM; i++) {
+    if (pTmpLayerSps[i] != NULL) {
+      pToCtx->sSpsPpsCtx.pActiveLayerSps[i] = pTmpLayerSps[i];
+    }
+  }
+}
 
 /*
  *  destory_mb_blocks
