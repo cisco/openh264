@@ -85,6 +85,8 @@ struct SPicture {
   int32_t     iSpsId; //against mosaic caused by cross-IDR interval reference.
   int32_t     iPpsId;
   unsigned long long uiTimeStamp;
+  uint32_t    uiDecodingTimeStamp; //represent relative decoding time stamps
+  int32_t     iPicBuffIdx;
   bool bNewSeqBegin;
   int32_t iMbEcedNum;
   int32_t iMbEcedPropNum;

@@ -148,48 +148,50 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
   ++ (*pConsumedBytes);
 
   if (! (IS_SEI_NAL (pNalUnitHeader->eNalUnitType) || IS_SPS_NAL (pNalUnitHeader->eNalUnitType)
-         || IS_AU_DELIMITER_NAL (pNalUnitHeader->eNalUnitType) || pCtx->bSpsExistAheadFlag)) {
-    if (pCtx->bPrintFrameErrorTraceFlag && pCtx->iSpsErrorIgnored == 0) {
+         || IS_AU_DELIMITER_NAL (pNalUnitHeader->eNalUnitType) || pCtx->sSpsPpsCtx.bSpsExistAheadFlag)) {
+    if (pCtx->bPrintFrameErrorTraceFlag && pCtx->sSpsPpsCtx.iSpsErrorIgnored == 0) {
       WelsLog (pLogCtx, WELS_LOG_WARNING,
                "parse_nal(), no exist Sequence Parameter Sets ahead of sequence when try to decode NAL(type:%d).",
                pNalUnitHeader->eNalUnitType);
     } else {
-      pCtx->iSpsErrorIgnored++;
+      pCtx->sSpsPpsCtx.iSpsErrorIgnored++;
     }
-    pCtx->sDecoderStatistics.iSpsNoExistNalNum++;
+    pCtx->pDecoderStatistics->iSpsNoExistNalNum++;
     pCtx->iErrorCode = dsNoParamSets;
     return NULL;
   }
-  pCtx->iSpsErrorIgnored = 0;
+  pCtx->sSpsPpsCtx.iSpsErrorIgnored = 0;
   if (! (IS_SEI_NAL (pNalUnitHeader->eNalUnitType) || IS_PARAM_SETS_NALS (pNalUnitHeader->eNalUnitType)
-         || IS_AU_DELIMITER_NAL (pNalUnitHeader->eNalUnitType) || pCtx->bPpsExistAheadFlag)) {
-    if (pCtx->bPrintFrameErrorTraceFlag && pCtx->iPpsErrorIgnored == 0) {
+         || IS_AU_DELIMITER_NAL (pNalUnitHeader->eNalUnitType) || pCtx->sSpsPpsCtx.bPpsExistAheadFlag)) {
+    if (pCtx->bPrintFrameErrorTraceFlag && pCtx->sSpsPpsCtx.iPpsErrorIgnored == 0) {
       WelsLog (pLogCtx, WELS_LOG_WARNING,
                "parse_nal(), no exist Picture Parameter Sets ahead of sequence when try to decode NAL(type:%d).",
                pNalUnitHeader->eNalUnitType);
     } else {
-      pCtx->iPpsErrorIgnored++;
+      pCtx->sSpsPpsCtx.iPpsErrorIgnored++;
     }
-    pCtx->sDecoderStatistics.iPpsNoExistNalNum++;
+    pCtx->pDecoderStatistics->iPpsNoExistNalNum++;
     pCtx->iErrorCode = dsNoParamSets;
     return NULL;
   }
-  pCtx->iPpsErrorIgnored = 0;
-  if ((IS_VCL_NAL_AVC_BASE (pNalUnitHeader->eNalUnitType) && ! (pCtx->bSpsExistAheadFlag || pCtx->bPpsExistAheadFlag)) ||
-      (IS_NEW_INTRODUCED_SVC_NAL (pNalUnitHeader->eNalUnitType) && ! (pCtx->bSpsExistAheadFlag || pCtx->bSubspsExistAheadFlag
-          || pCtx->bPpsExistAheadFlag))) {
-    if (pCtx->bPrintFrameErrorTraceFlag && pCtx->iSubSpsErrorIgnored == 0) {
+  pCtx->sSpsPpsCtx.iPpsErrorIgnored = 0;
+  if ((IS_VCL_NAL_AVC_BASE (pNalUnitHeader->eNalUnitType) && ! (pCtx->sSpsPpsCtx.bSpsExistAheadFlag
+       || pCtx->sSpsPpsCtx.bPpsExistAheadFlag)) ||
+      (IS_NEW_INTRODUCED_SVC_NAL (pNalUnitHeader->eNalUnitType) && ! (pCtx->sSpsPpsCtx.bSpsExistAheadFlag
+          || pCtx->sSpsPpsCtx.bSubspsExistAheadFlag
+          || pCtx->sSpsPpsCtx.bPpsExistAheadFlag))) {
+    if (pCtx->bPrintFrameErrorTraceFlag && pCtx->sSpsPpsCtx.iSubSpsErrorIgnored == 0) {
       WelsLog (pLogCtx, WELS_LOG_WARNING,
                "ParseNalHeader(), no exist Parameter Sets ahead of sequence when try to decode slice(type:%d).",
                pNalUnitHeader->eNalUnitType);
     } else {
-      pCtx->iSubSpsErrorIgnored++;
+      pCtx->sSpsPpsCtx.iSubSpsErrorIgnored++;
     }
-    pCtx->sDecoderStatistics.iSubSpsNoExistNalNum++;
+    pCtx->pDecoderStatistics->iSubSpsNoExistNalNum++;
     pCtx->iErrorCode    |= dsNoParamSets;
     return NULL;
   }
-  pCtx->iSubSpsErrorIgnored = 0;
+  pCtx->sSpsPpsCtx.iSubSpsErrorIgnored = 0;
 
   switch (pNalUnitHeader->eNalUnitType) {
   case NAL_UNIT_AU_DELIMITER:
@@ -201,7 +203,7 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
     break;
 
   case NAL_UNIT_PREFIX:
-    pCurNal = &pCtx->sPrefixNal;
+    pCurNal = &pCtx->sSpsPpsCtx.sPrefixNal;
     pCurNal->uiTimeStamp = pCtx->uiTimeStamp;
 
     if (iNalSize < NAL_UNIT_HEADER_EXT_SIZE) {
@@ -365,9 +367,9 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
         memcpy (pSavedData->pCurPos + iStartDeltaByte, pSrcNal, iActualLen);
         pSavedData->pCurPos += iStartDeltaByte + iActualLen;
       }
-      if (NAL_UNIT_PREFIX == pCtx->sPrefixNal.sNalHeaderExt.sNalUnitHeader.eNalUnitType) {
-        if (pCtx->sPrefixNal.sNalData.sPrefixNal.bPrefixNalCorrectFlag) {
-          PrefetchNalHeaderExtSyntax (pCtx, pCurNal, &pCtx->sPrefixNal);
+      if (NAL_UNIT_PREFIX == pCtx->sSpsPpsCtx.sPrefixNal.sNalHeaderExt.sNalUnitHeader.eNalUnitType) {
+        if (pCtx->sSpsPpsCtx.sPrefixNal.sNalData.sPrefixNal.bPrefixNalCorrectFlag) {
+          PrefetchNalHeaderExtSyntax (pCtx, pCurNal, &pCtx->sSpsPpsCtx.sPrefixNal);
         }
       }
 
@@ -496,8 +498,8 @@ bool CheckAccessUnitBoundary (PWelsDecoderContext pCtx, const PNalUnit kpCurNal,
   const PNalUnitHeaderExt kpCurNalHeaderExt = &kpCurNal->sNalHeaderExt;
   const SSliceHeader* kpLastSliceHeader = &kpLastNal->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader;
   const SSliceHeader* kpCurSliceHeader = &kpCurNal->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader;
-  if (pCtx->pActiveLayerSps[kpCurNalHeaderExt->uiDependencyId] != NULL
-      && pCtx->pActiveLayerSps[kpCurNalHeaderExt->uiDependencyId] != kpSps) {
+  if (pCtx->sSpsPpsCtx.pActiveLayerSps[kpCurNalHeaderExt->uiDependencyId] != NULL
+      && pCtx->sSpsPpsCtx.pActiveLayerSps[kpCurNalHeaderExt->uiDependencyId] != kpSps) {
     return true; // the active sps changed, new sequence begins, so the current au is ready
   }
 
@@ -548,8 +550,8 @@ bool CheckAccessUnitBoundary (PWelsDecoderContext pCtx, const PNalUnit kpCurNal,
 
 bool CheckNextAuNewSeq (PWelsDecoderContext pCtx, const PNalUnit kpCurNal, const PSps kpSps) {
   const PNalUnitHeaderExt kpCurNalHeaderExt = &kpCurNal->sNalHeaderExt;
-  if (pCtx->pActiveLayerSps[kpCurNalHeaderExt->uiDependencyId] != NULL
-      && pCtx->pActiveLayerSps[kpCurNalHeaderExt->uiDependencyId] != kpSps)
+  if (pCtx->sSpsPpsCtx.pActiveLayerSps[kpCurNalHeaderExt->uiDependencyId] != NULL
+      && pCtx->sSpsPpsCtx.pActiveLayerSps[kpCurNalHeaderExt->uiDependencyId] != kpSps)
     return true;
   if (kpCurNalHeaderExt->bIdrFlag)
     return true;
@@ -620,7 +622,7 @@ int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t 
         return iErr;
       }
     }
-    iErr = ParsePps (pCtx, &pCtx->sPpsBuffer[0], pBs, pSrcNal, kSrcNalLen);
+    iErr = ParsePps (pCtx, &pCtx->sSpsPpsCtx.sPpsBuffer[0], pBs, pSrcNal, kSrcNalLen);
     if (ERR_NONE != iErr) { // modified for pps invalid, 12/1/2009
       if (pCtx->pParam->eEcActiveIdc == ERROR_CON_DISABLE)
         pCtx->iErrorCode |= dsNoParamSets;
@@ -629,7 +631,7 @@ int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t 
       return iErr;
     }
 
-    pCtx->bPpsExistAheadFlag = true;
+    pCtx->sSpsPpsCtx.bPpsExistAheadFlag = true;
 
     break;
 
@@ -683,7 +685,7 @@ int32_t ParseRefBasePicMarking (PBitStringAux pBs, PRefBasePicMarking pRefBasePi
 }
 
 int32_t ParsePrefixNalUnit (PWelsDecoderContext pCtx, PBitStringAux pBs) {
-  PNalUnit pCurNal = &pCtx->sPrefixNal;
+  PNalUnit pCurNal = &pCtx->sSpsPpsCtx.sPrefixNal;
   uint32_t uiCode;
 
   if (pCurNal->sNalHeaderExt.sNalUnitHeader.uiNalRefIdc != 0) {
@@ -834,12 +836,12 @@ const SLevelLimits* GetLevelLimits (int32_t iLevelIdx, bool bConstraint3) {
 
 bool CheckSpsActive (PWelsDecoderContext pCtx, PSps pSps, bool bUseSubsetFlag) {
   for (int i = 0; i < MAX_LAYER_NUM; i++) {
-    if (pCtx->pActiveLayerSps[i] == pSps)
+    if (pCtx->sSpsPpsCtx.pActiveLayerSps[i] == pSps)
       return true;
   }
   // Pre-active, will be used soon
   if (bUseSubsetFlag) {
-    if (pSps->iMbWidth > 0 && pSps->iMbHeight > 0 && pCtx->bSubspsAvailFlags[pSps->iSpsId]) {
+    if (pSps->iMbWidth > 0 && pSps->iMbHeight > 0 && pCtx->sSpsPpsCtx.bSubspsAvailFlags[pSps->iSpsId]) {
       if (pCtx->iTotalNumMbRec > 0) {
         return true;
       }
@@ -857,7 +859,7 @@ bool CheckSpsActive (PWelsDecoderContext pCtx, PSps pSps, bool bUseSubsetFlag) {
       }
     }
   } else {
-    if (pSps->iMbWidth > 0 && pSps->iMbHeight > 0 && pCtx->bSpsAvailFlags[pSps->iSpsId]) {
+    if (pSps->iMbWidth > 0 && pSps->iMbHeight > 0 && pCtx->sSpsPpsCtx.bSpsAvailFlags[pSps->iSpsId]) {
       if (pCtx->iTotalNumMbRec > 0) {
         return true;
       }
@@ -1251,57 +1253,57 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
 
 
   if (PRO_SCALABLE_BASELINE == uiProfileIdc || PRO_SCALABLE_HIGH == uiProfileIdc)
-    pCtx->bAvcBasedFlag = false;
+    pCtx->sSpsPpsCtx.bAvcBasedFlag = false;
 
   *pPicWidth  = pSps->iMbWidth << 4;
   *pPicHeight = pSps->iMbHeight << 4;
   PSps pTmpSps = NULL;
   if (kbUseSubsetFlag) {
-    pTmpSps = &pCtx->sSubsetSpsBuffer[iSpsId].sSps;
+    pTmpSps = &pCtx->sSpsPpsCtx.sSubsetSpsBuffer[iSpsId].sSps;
   } else {
-    pTmpSps = &pCtx->sSpsBuffer[iSpsId];
+    pTmpSps = &pCtx->sSpsPpsCtx.sSpsBuffer[iSpsId];
   }
   if (CheckSpsActive (pCtx, pTmpSps, kbUseSubsetFlag)) {
     // we are overwriting the active sps, copy a temp buffer
     if (kbUseSubsetFlag) {
-      if (memcmp (&pCtx->sSubsetSpsBuffer[iSpsId], pSubsetSps, sizeof (SSubsetSps)) != 0) {
+      if (memcmp (&pCtx->sSpsPpsCtx.sSubsetSpsBuffer[iSpsId], pSubsetSps, sizeof (SSubsetSps)) != 0) {
         if (pCtx->pAccessUnitList->uiAvailUnitsNum > 0) {
-          memcpy (&pCtx->sSubsetSpsBuffer[MAX_SPS_COUNT], pSubsetSps, sizeof (SSubsetSps));
+          memcpy (&pCtx->sSpsPpsCtx.sSubsetSpsBuffer[MAX_SPS_COUNT], pSubsetSps, sizeof (SSubsetSps));
           pCtx->bAuReadyFlag = true;
           pCtx->pAccessUnitList->uiEndPos = pCtx->pAccessUnitList->uiAvailUnitsNum - 1;
-          pCtx->iOverwriteFlags |= OVERWRITE_SUBSETSPS;
+          pCtx->sSpsPpsCtx.iOverwriteFlags |= OVERWRITE_SUBSETSPS;
         } else if ((pCtx->pSps != NULL) && (pCtx->pSps->iSpsId == pSubsetSps->sSps.iSpsId)) {
-          memcpy (&pCtx->sSubsetSpsBuffer[MAX_SPS_COUNT], pSubsetSps, sizeof (SSubsetSps));
-          pCtx->iOverwriteFlags |= OVERWRITE_SUBSETSPS;
+          memcpy (&pCtx->sSpsPpsCtx.sSubsetSpsBuffer[MAX_SPS_COUNT], pSubsetSps, sizeof (SSubsetSps));
+          pCtx->sSpsPpsCtx.iOverwriteFlags |= OVERWRITE_SUBSETSPS;
         } else {
-          memcpy (&pCtx->sSubsetSpsBuffer[iSpsId], pSubsetSps, sizeof (SSubsetSps));
+          memcpy (&pCtx->sSpsPpsCtx.sSubsetSpsBuffer[iSpsId], pSubsetSps, sizeof (SSubsetSps));
         }
       }
     } else {
-      if (memcmp (&pCtx->sSpsBuffer[iSpsId], pSps, sizeof (SSps)) != 0) {
+      if (memcmp (&pCtx->sSpsPpsCtx.sSpsBuffer[iSpsId], pSps, sizeof (SSps)) != 0) {
         if (pCtx->pAccessUnitList->uiAvailUnitsNum > 0) {
-          memcpy (&pCtx->sSpsBuffer[MAX_SPS_COUNT], pSps, sizeof (SSps));
-          pCtx->iOverwriteFlags |= OVERWRITE_SPS;
+          memcpy (&pCtx->sSpsPpsCtx.sSpsBuffer[MAX_SPS_COUNT], pSps, sizeof (SSps));
+          pCtx->sSpsPpsCtx.iOverwriteFlags |= OVERWRITE_SPS;
           pCtx->bAuReadyFlag = true;
           pCtx->pAccessUnitList->uiEndPos = pCtx->pAccessUnitList->uiAvailUnitsNum - 1;
         } else if ((pCtx->pSps != NULL) && (pCtx->pSps->iSpsId == pSps->iSpsId)) {
-          memcpy (&pCtx->sSpsBuffer[MAX_SPS_COUNT], pSps, sizeof (SSps));
-          pCtx->iOverwriteFlags |= OVERWRITE_SPS;
+          memcpy (&pCtx->sSpsPpsCtx.sSpsBuffer[MAX_SPS_COUNT], pSps, sizeof (SSps));
+          pCtx->sSpsPpsCtx.iOverwriteFlags |= OVERWRITE_SPS;
         } else {
-          memcpy (&pCtx->sSpsBuffer[iSpsId], pSps, sizeof (SSps));
+          memcpy (&pCtx->sSpsPpsCtx.sSpsBuffer[iSpsId], pSps, sizeof (SSps));
         }
       }
     }
   }
   // Not overwrite active sps, just copy to final place
   else if (kbUseSubsetFlag) {
-    memcpy (&pCtx->sSubsetSpsBuffer[iSpsId], pSubsetSps, sizeof (SSubsetSps));
-    pCtx->bSubspsAvailFlags[iSpsId] = true;
-    pCtx->bSubspsExistAheadFlag = true;
+    memcpy (&pCtx->sSpsPpsCtx.sSubsetSpsBuffer[iSpsId], pSubsetSps, sizeof (SSubsetSps));
+    pCtx->sSpsPpsCtx.bSubspsAvailFlags[iSpsId] = true;
+    pCtx->sSpsPpsCtx.bSubspsExistAheadFlag = true;
   } else {
-    memcpy (&pCtx->sSpsBuffer[iSpsId], pSps, sizeof (SSps));
-    pCtx->bSpsAvailFlags[iSpsId] = true;
-    pCtx->bSpsExistAheadFlag = true;
+    memcpy (&pCtx->sSpsPpsCtx.sSpsBuffer[iSpsId], pSps, sizeof (SSps));
+    pCtx->sSpsPpsCtx.bSpsAvailFlags[iSpsId] = true;
+    pCtx->sSpsPpsCtx.bSpsExistAheadFlag = true;
   }
   return ERR_NONE;
 }
@@ -1421,8 +1423,8 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
     WELS_READ_VERIFY (BsGetOneBit (pBsAux, &uiCode)); //pic_scaling_matrix_present_flag
     pPps->bPicScalingMatrixPresentFlag = !!uiCode;
     if (pPps->bPicScalingMatrixPresentFlag) {
-      if (pCtx->bSpsAvailFlags[pPps->iSpsId]) {
-        WELS_READ_VERIFY (ParseScalingList (&pCtx->sSpsBuffer[pPps->iSpsId], pBsAux, 1, pPps->bTransform8x8ModeFlag,
+      if (pCtx->sSpsPpsCtx.bSpsAvailFlags[pPps->iSpsId]) {
+        WELS_READ_VERIFY (ParseScalingList (&pCtx->sSpsPpsCtx.sSpsBuffer[pPps->iSpsId], pBsAux, 1, pPps->bTransform8x8ModeFlag,
                                             pPps->bPicScalingListPresentFlag, pPps->iScalingList4x4, pPps->iScalingList8x8));
       } else {
         WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
@@ -1440,16 +1442,16 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
 
   if (pCtx->pPps != NULL && pCtx->pPps->iPpsId == pPps->iPpsId) {
     if (memcmp (pCtx->pPps, pPps, sizeof (*pPps)) != 0) {
-      memcpy (&pCtx->sPpsBuffer[MAX_PPS_COUNT], pPps, sizeof (SPps));
-      pCtx->iOverwriteFlags |= OVERWRITE_PPS;
+      memcpy (&pCtx->sSpsPpsCtx.sPpsBuffer[MAX_PPS_COUNT], pPps, sizeof (SPps));
+      pCtx->sSpsPpsCtx.iOverwriteFlags |= OVERWRITE_PPS;
       if (pCtx->pAccessUnitList->uiAvailUnitsNum > 0) {
         pCtx->bAuReadyFlag = true;
         pCtx->pAccessUnitList->uiEndPos = pCtx->pAccessUnitList->uiAvailUnitsNum - 1;
       }
     }
   } else {
-    memcpy (&pCtx->sPpsBuffer[uiPpsId], pPps, sizeof (SPps));
-    pCtx->bPpsAvailFlags[uiPpsId] = true;
+    memcpy (&pCtx->sSpsPpsCtx.sPpsBuffer[uiPpsId], pPps, sizeof (SPps));
+    pCtx->sSpsPpsCtx.bPpsAvailFlags[uiPpsId] = true;
   }
   if (pCtx->pParam->bParseOnly) {
     if (kSrcNalLen >= SPS_PPS_BS_SIZE - 4) { //pps bs exceeds

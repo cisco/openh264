@@ -110,8 +110,8 @@ void UpdateP16x8RefIdxCabac (PDqLayer pCurDqLayer, int8_t pRefIndex[LIST_A][30],
   const uint8_t iCacheIdx = g_kuiCache30ScanIdx[iPartIdx];
   const uint8_t iCacheIdx6 = 6 + iCacheIdx;
   //mb
-  ST32 (&pCurDqLayer->pRefIndex[iListIdx][iMbXy][iScan4Idx ], iRef4Bytes);
-  ST32 (&pCurDqLayer->pRefIndex[iListIdx][iMbXy][iScan4Idx4], iRef4Bytes);
+  ST32 (&pCurDqLayer->pDec->pRefIndex[iListIdx][iMbXy][iScan4Idx ], iRef4Bytes);
+  ST32 (&pCurDqLayer->pDec->pRefIndex[iListIdx][iMbXy][iScan4Idx4], iRef4Bytes);
   //cache
   ST32 (&pRefIndex[iListIdx][iCacheIdx ], iRef4Bytes);
   ST32 (&pRefIndex[iListIdx][iCacheIdx6], iRef4Bytes);
@@ -129,8 +129,8 @@ void UpdateP8x16RefIdxCabac (PDqLayer pCurDqLayer, int8_t pRefIndex[LIST_A][30],
     const uint8_t iScan4Idx4 = 4 + iScan4Idx;
     const uint8_t iCacheIdx6 = 6 + iCacheIdx;
     //mb
-    ST16 (&pCurDqLayer->pRefIndex[iListIdx][iMbXy][iScan4Idx ], iRef2Bytes);
-    ST16 (&pCurDqLayer->pRefIndex[iListIdx][iMbXy][iScan4Idx4], iRef2Bytes);
+    ST16 (&pCurDqLayer->pDec->pRefIndex[iListIdx][iMbXy][iScan4Idx ], iRef2Bytes);
+    ST16 (&pCurDqLayer->pDec->pRefIndex[iListIdx][iMbXy][iScan4Idx4], iRef2Bytes);
     //cache
     ST16 (&pRefIndex[iListIdx][iCacheIdx ], iRef2Bytes);
     ST16 (&pRefIndex[iListIdx][iCacheIdx6], iRef2Bytes);
@@ -141,8 +141,10 @@ void UpdateP8x8RefIdxCabac (PDqLayer pCurDqLayer, int8_t pRefIndex[LIST_A][30], 
                             const int8_t iListIdx) {
   int32_t iMbXy = pCurDqLayer->iMbXyIndex;
   const uint8_t iScan4Idx = g_kuiScan4[iPartIdx];
-  pCurDqLayer->pRefIndex[iListIdx][iMbXy][iScan4Idx] = pCurDqLayer->pRefIndex[iListIdx][iMbXy][iScan4Idx + 1] =
-        pCurDqLayer->pRefIndex[iListIdx][iMbXy][iScan4Idx + 4] = pCurDqLayer->pRefIndex[iListIdx][iMbXy][iScan4Idx + 5] = iRef;
+  pCurDqLayer->pDec->pRefIndex[iListIdx][iMbXy][iScan4Idx] = pCurDqLayer->pDec->pRefIndex[iListIdx][iMbXy][iScan4Idx + 1]
+      =
+        pCurDqLayer->pDec->pRefIndex[iListIdx][iMbXy][iScan4Idx + 4] = pCurDqLayer->pDec->pRefIndex[iListIdx][iMbXy][iScan4Idx +
+            5] = iRef;
 }
 
 void UpdateP8x8DirectCabac (PDqLayer pCurDqLayer, int32_t iPartIdx) {
@@ -476,7 +478,7 @@ int32_t ParseIntraPredModeChromaCabac (PWelsDecoderContext pCtx, uint8_t uiNeigh
   uint32_t uiCode;
   int32_t iIdxA, iIdxB, iCtxInc;
   int8_t* pChromaPredMode = pCtx->pCurDqLayer->pChromaPredMode;
-  uint32_t* pMbType = pCtx->pCurDqLayer->pMbType;
+  uint32_t* pMbType = pCtx->pCurDqLayer->pDec->pMbType;
   int32_t iLeftAvail     = uiNeighAvail & 0x04;
   int32_t iTopAvail      = uiNeighAvail & 0x01;
 
@@ -532,7 +534,7 @@ int32_t ParseInterPMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pN
   pRefCount[0] = pSliceHeader->uiRefCount[0];
   pRefCount[1] = pSliceHeader->uiRefCount[1];
 
-  switch (pCurDqLayer->pMbType[iMbXy]) {
+  switch (pCurDqLayer->pDec->pMbType[iMbXy]) {
   case MB_TYPE_16x16: {
     iPartIdx = 0;
     WELS_READ_VERIFY (ParseRefIdxCabac (pCtx, pNeighAvail, pNonZeroCount, pRefIndex, 0, LIST_0, iPartIdx, pRefCount[0], 0,
@@ -677,8 +679,8 @@ int32_t ParseInterPMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pN
         if (SUB_MB_TYPE_8x8 == uiSubMbType) {
           ST32 ((pMv + 2), LD32 (pMv));
           ST32 ((pMvd + 2), LD32 (pMvd));
-          ST64 (pCurDqLayer->pMv[0][iMbXy][iScan4Idx], LD64 (pMv));
-          ST64 (pCurDqLayer->pMv[0][iMbXy][iScan4Idx + 4], LD64 (pMv));
+          ST64 (pCurDqLayer->pDec->pMv[0][iMbXy][iScan4Idx], LD64 (pMv));
+          ST64 (pCurDqLayer->pDec->pMv[0][iMbXy][iScan4Idx + 4], LD64 (pMv));
           ST64 (pCurDqLayer->pMvd[0][iMbXy][iScan4Idx], LD64 (pMvd));
           ST64 (pCurDqLayer->pMvd[0][iMbXy][iScan4Idx + 4], LD64 (pMvd));
           ST64 (pMotionVector[0][iCacheIdx  ], LD64 (pMv));
@@ -688,13 +690,13 @@ int32_t ParseInterPMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pN
         } else if (SUB_MB_TYPE_8x4 == uiSubMbType) {
           ST32 ((pMv + 2), LD32 (pMv));
           ST32 ((pMvd + 2), LD32 (pMvd));
-          ST64 (pCurDqLayer->pMv[0][iMbXy][iScan4Idx  ], LD64 (pMv));
+          ST64 (pCurDqLayer->pDec->pMv[0][iMbXy][iScan4Idx  ], LD64 (pMv));
           ST64 (pCurDqLayer->pMvd[0][iMbXy][iScan4Idx  ], LD64 (pMvd));
           ST64 (pMotionVector[0][iCacheIdx  ], LD64 (pMv));
           ST64 (pMvdCache[0][iCacheIdx  ], LD64 (pMvd));
         } else if (SUB_MB_TYPE_4x8 == uiSubMbType) {
-          ST32 (pCurDqLayer->pMv[0][iMbXy][iScan4Idx  ], LD32 (pMv));
-          ST32 (pCurDqLayer->pMv[0][iMbXy][iScan4Idx + 4], LD32 (pMv));
+          ST32 (pCurDqLayer->pDec->pMv[0][iMbXy][iScan4Idx  ], LD32 (pMv));
+          ST32 (pCurDqLayer->pDec->pMv[0][iMbXy][iScan4Idx + 4], LD32 (pMv));
           ST32 (pCurDqLayer->pMvd[0][iMbXy][iScan4Idx  ], LD32 (pMvd));
           ST32 (pCurDqLayer->pMvd[0][iMbXy][iScan4Idx + 4], LD32 (pMvd));
           ST32 (pMotionVector[0][iCacheIdx  ], LD32 (pMv));
@@ -702,7 +704,7 @@ int32_t ParseInterPMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pN
           ST32 (pMvdCache[0][iCacheIdx  ], LD32 (pMvd));
           ST32 (pMvdCache[0][iCacheIdx + 6], LD32 (pMvd));
         } else {  //SUB_MB_TYPE_4x4
-          ST32 (pCurDqLayer->pMv[0][iMbXy][iScan4Idx  ], LD32 (pMv));
+          ST32 (pCurDqLayer->pDec->pMv[0][iMbXy][iScan4Idx  ], LD32 (pMv));
           ST32 (pCurDqLayer->pMvd[0][iMbXy][iScan4Idx  ], LD32 (pMvd));
           ST32 (pMotionVector[0][iCacheIdx  ], LD32 (pMv));
           ST32 (pMvdCache[0][iCacheIdx  ], LD32 (pMvd));
@@ -734,7 +736,7 @@ int32_t ParseInterBMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pN
   pRefCount[0] = pSliceHeader->uiRefCount[0];
   pRefCount[1] = pSliceHeader->uiRefCount[1];
 
-  MbType mbType = pCurDqLayer->pMbType[iMbXy];
+  MbType mbType = pCurDqLayer->pDec->pMbType[iMbXy];
 
   if (IS_DIRECT (mbType)) {
 
@@ -1030,8 +1032,8 @@ int32_t ParseInterBMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pN
           if (IS_SUB_8x8 (subMbType)) { //MB_TYPE_8x8
             ST32 ((pMv + 2), LD32 (pMv));
             ST32 ((pMvd + 2), LD32 (pMvd));
-            ST64 (pCurDqLayer->pMv[listIdx][iMbXy][iScan4Idx], LD64 (pMv));
-            ST64 (pCurDqLayer->pMv[listIdx][iMbXy][iScan4Idx + 4], LD64 (pMv));
+            ST64 (pCurDqLayer->pDec->pMv[listIdx][iMbXy][iScan4Idx], LD64 (pMv));
+            ST64 (pCurDqLayer->pDec->pMv[listIdx][iMbXy][iScan4Idx + 4], LD64 (pMv));
             ST64 (pCurDqLayer->pMvd[listIdx][iMbXy][iScan4Idx], LD64 (pMvd));
             ST64 (pCurDqLayer->pMvd[listIdx][iMbXy][iScan4Idx + 4], LD64 (pMvd));
             ST64 (pMotionVector[listIdx][iCacheIdx], LD64 (pMv));
@@ -1039,13 +1041,13 @@ int32_t ParseInterBMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pN
             ST64 (pMvdCache[listIdx][iCacheIdx], LD64 (pMvd));
             ST64 (pMvdCache[listIdx][iCacheIdx + 6], LD64 (pMvd));
           } else if (IS_SUB_4x4 (subMbType)) { //MB_TYPE_4x4
-            ST32 (pCurDqLayer->pMv[listIdx][iMbXy][iScan4Idx], LD32 (pMv));
+            ST32 (pCurDqLayer->pDec->pMv[listIdx][iMbXy][iScan4Idx], LD32 (pMv));
             ST32 (pCurDqLayer->pMvd[listIdx][iMbXy][iScan4Idx], LD32 (pMvd));
             ST32 (pMotionVector[listIdx][iCacheIdx], LD32 (pMv));
             ST32 (pMvdCache[listIdx][iCacheIdx], LD32 (pMvd));
           } else if (IS_SUB_4x8 (subMbType)) { //MB_TYPE_4x8 5, 7, 9
-            ST32 (pCurDqLayer->pMv[listIdx][iMbXy][iScan4Idx], LD32 (pMv));
-            ST32 (pCurDqLayer->pMv[listIdx][iMbXy][iScan4Idx + 4], LD32 (pMv));
+            ST32 (pCurDqLayer->pDec->pMv[listIdx][iMbXy][iScan4Idx], LD32 (pMv));
+            ST32 (pCurDqLayer->pDec->pMv[listIdx][iMbXy][iScan4Idx + 4], LD32 (pMv));
             ST32 (pCurDqLayer->pMvd[listIdx][iMbXy][iScan4Idx], LD32 (pMvd));
             ST32 (pCurDqLayer->pMvd[listIdx][iMbXy][iScan4Idx + 4], LD32 (pMvd));
             ST32 (pMotionVector[listIdx][iCacheIdx], LD32 (pMv));
@@ -1055,7 +1057,7 @@ int32_t ParseInterBMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pN
           } else { //MB_TYPE_8x4 4, 6, 8
             ST32 ((pMv + 2), LD32 (pMv));
             ST32 ((pMvd + 2), LD32 (pMvd));
-            ST64 (pCurDqLayer->pMv[listIdx][iMbXy][iScan4Idx], LD64 (pMv));
+            ST64 (pCurDqLayer->pDec->pMv[listIdx][iMbXy][iScan4Idx], LD64 (pMv));
             ST64 (pCurDqLayer->pMvd[listIdx][iMbXy][iScan4Idx], LD64 (pMvd));
             ST64 (pMotionVector[listIdx][iCacheIdx], LD64 (pMv));
             ST64 (pMvdCache[listIdx][iCacheIdx], LD64 (pMvd));
@@ -1077,7 +1079,7 @@ int32_t ParseRefIdxCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail,
   uint32_t uiCode;
   int32_t iIdxA = 0, iIdxB = 0;
   int32_t iCtxInc = 0;
-  int8_t* pRefIdxInMB = pCtx->pCurDqLayer->pRefIndex[iListIdx][pCtx->pCurDqLayer->iMbXyIndex];
+  int8_t* pRefIdxInMB = pCtx->pCurDqLayer->pDec->pRefIndex[iListIdx][pCtx->pCurDqLayer->iMbXyIndex];
   int8_t* pDirect = pCtx->pCurDqLayer->pDirect[pCtx->pCurDqLayer->iMbXyIndex];
   if (iZOrderIdx == 0) {
     iIdxB = (pNeighAvail->iTopAvail && pNeighAvail->iTopType != MB_TYPE_INTRA_PCM
@@ -1270,7 +1272,7 @@ int32_t ParseCbfInfoCabac (PWelsNeighAvail pNeighAvail, uint8_t* pNzcCache, int3
   int32_t iTopBlkXy = iCurrBlkXy - pCtx->pCurDqLayer->iMbWidth; //default value: MB neighboring
   int32_t iLeftBlkXy = iCurrBlkXy - 1; //default value: MB neighboring
   uint16_t* pCbfDc = pCtx->pCurDqLayer->pCbfDc;
-  uint32_t* pMbType = pCtx->pCurDqLayer->pMbType;
+  uint32_t* pMbType = pCtx->pCurDqLayer->pDec->pMbType;
   int32_t iCtxInc;
   uiCbfBit = 0;
   nA = nB = (int8_t)!!IS_INTRA (pMbType[iCurrBlkXy]);
@@ -1493,12 +1495,12 @@ int32_t ParseIPCMInfoCabac (PWelsDecoderContext pCtx) {
   int32_t i;
   PWelsCabacDecEngine pCabacDecEngine = pCtx->pCabacDecEngine;
   SBitStringAux* pBsAux = pCtx->pCurDqLayer->pBitStringAux;
-  SDqLayer* pCurLayer = pCtx->pCurDqLayer;
-  int32_t iDstStrideLuma = pCurLayer->pDec->iLinesize[0];
-  int32_t iDstStrideChroma = pCurLayer->pDec->iLinesize[1];
-  int32_t iMbX = pCurLayer->iMbX;
-  int32_t iMbY = pCurLayer->iMbY;
-  int32_t iMbXy = pCurLayer->iMbXyIndex;
+  SDqLayer* pCurDqLayer = pCtx->pCurDqLayer;
+  int32_t iDstStrideLuma = pCurDqLayer->pDec->iLinesize[0];
+  int32_t iDstStrideChroma = pCurDqLayer->pDec->iLinesize[1];
+  int32_t iMbX = pCurDqLayer->iMbX;
+  int32_t iMbY = pCurDqLayer->iMbY;
+  int32_t iMbXy = pCurDqLayer->iMbXyIndex;
 
   int32_t iMbOffsetLuma = (iMbX + iMbY * iDstStrideLuma) << 4;
   int32_t iMbOffsetChroma = (iMbX + iMbY * iDstStrideChroma) << 3;
@@ -1509,7 +1511,7 @@ int32_t ParseIPCMInfoCabac (PWelsDecoderContext pCtx) {
 
   uint8_t* pPtrSrc;
 
-  pCurLayer->pMbType[iMbXy] = MB_TYPE_INTRA_PCM;
+  pCurDqLayer->pDec->pMbType[iMbXy] = MB_TYPE_INTRA_PCM;
   RestoreCabacDecEngineToBS (pCabacDecEngine, pBsAux);
   intX_t iBytesLeft = pBsAux->pEndBuf - pBsAux->pCurBuf;
   if (iBytesLeft < 384) {
@@ -1536,9 +1538,9 @@ int32_t ParseIPCMInfoCabac (PWelsDecoderContext pCtx) {
 
   pBsAux->pCurBuf += 384;
 
-  pCurLayer->pLumaQp[iMbXy] = 0;
-  pCurLayer->pChromaQp[iMbXy][0] = pCurLayer->pChromaQp[iMbXy][1] = 0;
-  memset (pCurLayer->pNzc[iMbXy], 16, sizeof (pCurLayer->pNzc[iMbXy]));
+  pCurDqLayer->pLumaQp[iMbXy] = 0;
+  pCurDqLayer->pChromaQp[iMbXy][0] = pCurDqLayer->pChromaQp[iMbXy][1] = 0;
+  memset (pCurDqLayer->pNzc[iMbXy], 16, sizeof (pCurDqLayer->pNzc[iMbXy]));
 
   //step 4: cabac engine init
   WELS_READ_VERIFY (InitReadBits (pBsAux, 1));

@@ -192,7 +192,7 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
 
   int32_t iPrevPicIdx = -1;
   for (iPrevPicIdx = 0; iPrevPicIdx < kiOldSize; ++iPrevPicIdx) {
-    if (pCtx->pPreviousDecodedPictureInDpb == pPicOldBuf->ppPic[iPrevPicIdx]) {
+    if (pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb == pPicOldBuf->ppPic[iPrevPicIdx]) {
       break;
     }
   }
@@ -308,7 +308,7 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   pCtx->bFreezeOutput = true;
 
   pCtx->iFrameNum                 = -1;
-  pCtx->iPrevFrameNum             = -1;
+  pCtx->pLastDecPicInfo->iPrevFrameNum             = -1;
   pCtx->iErrorCode                = ERR_NONE;
 
   pCtx->pDec                      = NULL;
@@ -321,30 +321,61 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
 
   pCtx->pPicBuff          = NULL;
 
-  pCtx->bAvcBasedFlag             = true;
-  pCtx->pPreviousDecodedPictureInDpb = NULL;
-  pCtx->sDecoderStatistics.iAvgLumaQp = -1;
-  pCtx->sDecoderStatistics.iStatisticsLogInterval = 1000;
+  pCtx->sSpsPpsCtx.bAvcBasedFlag             = true;
+  pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb = NULL;
+  pCtx->pDecoderStatistics->iAvgLumaQp = -1;
+  pCtx->pDecoderStatistics->iStatisticsLogInterval = 1000;
   pCtx->bUseScalingList = false;
-  pCtx->iSpsErrorIgnored = 0;
-  pCtx->iSubSpsErrorIgnored = 0;
-  pCtx->iPpsErrorIgnored = 0;
-  pCtx->iPPSInvalidNum = 0;
-  pCtx->iPPSLastInvalidId = -1;
-  pCtx->iSPSInvalidNum = 0;
-  pCtx->iSPSLastInvalidId = -1;
-  pCtx->iSubSPSInvalidNum = 0;
-  pCtx->iSubSPSLastInvalidId = -1;
+  pCtx->sSpsPpsCtx.iSpsErrorIgnored = 0;
+  pCtx->sSpsPpsCtx.iSubSpsErrorIgnored = 0;
+  pCtx->sSpsPpsCtx.iPpsErrorIgnored = 0;
+  pCtx->sSpsPpsCtx.iPPSInvalidNum = 0;
+  pCtx->sSpsPpsCtx.iPPSLastInvalidId = -1;
+  pCtx->sSpsPpsCtx.iSPSInvalidNum = 0;
+  pCtx->sSpsPpsCtx.iSPSLastInvalidId = -1;
+  pCtx->sSpsPpsCtx.iSubSPSInvalidNum = 0;
+  pCtx->sSpsPpsCtx.iSubSPSLastInvalidId = -1;
   pCtx->iFeedbackNalRefIdc = -1; //initialize
-  pCtx->iPrevPicOrderCntMsb = 0;
-  pCtx->iPrevPicOrderCntLsb = 0;
+  pCtx->pLastDecPicInfo->iPrevPicOrderCntMsb = 0;
+  pCtx->pLastDecPicInfo->iPrevPicOrderCntLsb = 0;
 
 }
 
 /*
+* fill data fields in SPS and PPS default for decoder context
+*/
+void WelsDecoderSpsPpsDefaults (SWelsDecoderSpsPpsCTX& sSpsPpsCtx) {
+  sSpsPpsCtx.bSpsExistAheadFlag = false;
+  sSpsPpsCtx.bSubspsExistAheadFlag = false;
+  sSpsPpsCtx.bPpsExistAheadFlag = false;
+  sSpsPpsCtx.bAvcBasedFlag = true;
+  sSpsPpsCtx.iSpsErrorIgnored = 0;
+  sSpsPpsCtx.iSubSpsErrorIgnored = 0;
+  sSpsPpsCtx.iPpsErrorIgnored = 0;
+  sSpsPpsCtx.iPPSInvalidNum = 0;
+  sSpsPpsCtx.iPPSLastInvalidId = -1;
+  sSpsPpsCtx.iSPSInvalidNum = 0;
+  sSpsPpsCtx.iSPSLastInvalidId = -1;
+  sSpsPpsCtx.iSubSPSInvalidNum = 0;
+  sSpsPpsCtx.iSubSPSLastInvalidId = -1;
+  sSpsPpsCtx.iSeqId = -1;
+}
+
+/*
+* fill last decoded picture info
+*/
+void WelsDecoderLastDecPicInfoDefaults (SWelsLastDecPicInfo& sLastDecPicInfo) {
+  sLastDecPicInfo.iPrevPicOrderCntMsb = 0;
+  sLastDecPicInfo.iPrevPicOrderCntLsb = 0;
+  sLastDecPicInfo.pPreviousDecodedPictureInDpb = NULL;
+  sLastDecPicInfo.iPrevFrameNum = -1;
+  sLastDecPicInfo.bLastHasMmco5 = false;
+}
+
+
+/*
  *  destory_mb_blocks
  */
-
 
 /*
  *  get size of reference picture list in target layer incoming, = (iNumRefFrames
@@ -429,7 +460,7 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
     }
 
 
-    pCtx->pPreviousDecodedPictureInDpb = NULL;
+    pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb = NULL;
 
     // currently only active for LIST_0 due to have no B frames
     iErr = CreatePicBuff (pCtx, &pCtx->pPicBuff, iPicQueueSize, kiPicWidth, kiPicHeight);
@@ -500,7 +531,7 @@ int32_t WelsOpenDecoder (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   InitDecFuncs (pCtx, pCtx->uiCpuFlag);
 
   // vlc tables
-  InitVlcTable (&pCtx->sVlcTable);
+  InitVlcTable (pCtx->pVlcTable);
 
   // static memory
   iRet = WelsInitStaticMemory (pCtx);
@@ -1088,7 +1119,7 @@ void UpdateDecStatFreezingInfo (const bool kbIdrFlag, SDecoderStatistics* pDecSt
 void UpdateDecStatNoFreezingInfo (PWelsDecoderContext pCtx) {
   PDqLayer pCurDq = pCtx->pCurDqLayer;
   PPicture pPic = pCtx->pDec;
-  SDecoderStatistics* pDecStat = &pCtx->sDecoderStatistics;
+  SDecoderStatistics* pDecStat = pCtx->pDecoderStatistics;
 
   if (pDecStat->iAvgLumaQp == -1) //first correct frame received
     pDecStat->iAvgLumaQp = 0;
@@ -1130,7 +1161,7 @@ void UpdateDecStatNoFreezingInfo (PWelsDecoderContext pCtx) {
 //update decoder statistics information
 void UpdateDecStat (PWelsDecoderContext pCtx, const bool kbOutput) {
   if (pCtx->bFreezeOutput)
-    UpdateDecStatFreezingInfo (pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt.bIdrFlag, &pCtx->sDecoderStatistics);
+    UpdateDecStatFreezingInfo (pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt.bIdrFlag, pCtx->pDecoderStatistics);
   else if (kbOutput)
     UpdateDecStatNoFreezingInfo (pCtx);
 }

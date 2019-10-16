@@ -113,6 +113,7 @@ class CWelsDecoder : public ISVCDecoder {
     SBufferInfo             sBufferInfo;
     int32_t                 iPOC;
     int32_t                 iPicBuffIdx;
+    uint32_t                uiDecodingTimeStamp;
     bool                    bLastGOP;
     unsigned char*          pData[3];
   } SPictInfo, *PPictInfo;
@@ -127,6 +128,9 @@ class CWelsDecoder : public ISVCDecoder {
   int32_t                 m_iLastGOPRemainPicts;
   int32_t                 m_LastWrittenPOC;
   int32_t                 m_iLargestBufferedPicIndex;
+  SVlcTable               m_sVlcTable;
+  SWelsLastDecPicInfo     m_sLastDecPicInfo;
+  SDecoderStatistics      m_sDecoderStatistics;// For real time debugging
 
   int32_t InitDecoder (const SDecodingParam* pParam);
   void UninitDecoder (void);
