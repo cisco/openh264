@@ -19,6 +19,7 @@ cpp_sources = [
   'core/src/pic_queue.cpp',
   'core/src/rec_mb.cpp',
   'plus/src/welsDecoderExt.cpp',
+  'core/src/wels_decoder_thread.cpp',
 ]
 
 asm_sources = [

@@ -155,6 +155,11 @@ class DecoderParseSyntaxTest : public ::testing::Test {
   SDecodingParam m_sDecParam;
   SBufferInfo m_sBufferInfo;
   SParserBsInfo m_sParserBsInfo;
+  SWelsDecoderSpsPpsCTX   m_sDecoderSpsPpsCTX;
+  SWelsLastDecPicInfo     m_sLastDecPicInfo;
+  SDecoderStatistics      m_sDecoderStatistics;
+  SVlcTable               m_sVlcTable;
+
   uint8_t* m_pData[3];
   unsigned char m_szBuffer[BUF_SIZE]; //for mocking packet
   int m_iBufLength; //record the valid data in m_szBuffer
@@ -168,6 +173,11 @@ int32_t DecoderParseSyntaxTest::Init() {
   memset (&m_sBufferInfo, 0, sizeof (SBufferInfo));
   memset (&m_sDecParam, 0, sizeof (SDecodingParam));
   memset (&m_sParserBsInfo, 0, sizeof (SParserBsInfo));
+  memset (&m_sDecoderSpsPpsCTX, 0, sizeof (SWelsDecoderSpsPpsCTX));
+  memset (&m_sLastDecPicInfo, 0, sizeof (SWelsLastDecPicInfo));
+  memset (&m_sDecoderStatistics, 0, sizeof (SDecoderStatistics));
+  memset (&m_sVlcTable, 0, sizeof (SVlcTable));
+
   m_sDecParam.pFileNameRestructed = NULL;
   m_sDecParam.uiCpuLoad = rand() % 100;
   m_sDecParam.uiTargetDqLayer = rand() % 100;
@@ -193,6 +203,10 @@ int32_t DecoderParseSyntaxTest::Init() {
     m_pCtx = NULL;
     return ERR_MALLOC_FAILED;
   }
+  m_pCtx->pLastDecPicInfo = &m_sLastDecPicInfo;
+  m_pCtx->pDecoderStatistics = &m_sDecoderStatistics;
+  m_pCtx->pVlcTable = &m_sVlcTable;
+  WelsDecoderSpsPpsDefaults (m_pCtx->sSpsPpsCtx);
   CM_RETURN eRet = (CM_RETURN)Initialize (&m_sDecParam, m_pCtx, &m_pWelsTrace->m_sLogCtx);
   return (int32_t)eRet;
 }
@@ -377,23 +391,23 @@ void DecoderParseSyntaxTest::TestScalingList() {
   iRet = Init();
   ASSERT_EQ (iRet, ERR_NONE);
   ASSERT_TRUE (DecodeBs ("res/BA_MW_D.264", CorrectDec));
-  ASSERT_TRUE (m_pCtx->sSpsBuffer[0].bSeqScalingMatrixPresentFlag == false);
-  EXPECT_EQ (0, memcmp (iScalingListZero, m_pCtx->sSpsBuffer[0].iScalingList4x4, 6 * 16 * sizeof (uint8_t)));
-  ASSERT_TRUE (m_pCtx->sPpsBuffer[0].bPicScalingMatrixPresentFlag == false);
-  EXPECT_EQ (0, memcmp (iScalingListZero, m_pCtx->sPpsBuffer[0].iScalingList4x4, 6 * 16 * sizeof (uint8_t)));
+  ASSERT_TRUE (m_pCtx->sSpsPpsCtx.sSpsBuffer[0].bSeqScalingMatrixPresentFlag == false);
+  EXPECT_EQ (0, memcmp (iScalingListZero, m_pCtx->sSpsPpsCtx.sSpsBuffer[0].iScalingList4x4, 6 * 16 * sizeof (uint8_t)));
+  ASSERT_TRUE (m_pCtx->sSpsPpsCtx.sPpsBuffer[0].bPicScalingMatrixPresentFlag == false);
+  EXPECT_EQ (0, memcmp (iScalingListZero, m_pCtx->sSpsPpsCtx.sPpsBuffer[0].iScalingList4x4, 6 * 16 * sizeof (uint8_t)));
   Uninit();
   //Scalinglist value just written into sps and pps
   iRet = Init();
   ASSERT_EQ (iRet, ERR_NONE);
   ASSERT_TRUE (DecodeBs ("res/test_scalinglist_jm.264", CorrectDec));
-  ASSERT_TRUE (m_pCtx->sSpsBuffer[0].bSeqScalingMatrixPresentFlag);
+  ASSERT_TRUE (m_pCtx->sSpsPpsCtx.sSpsBuffer[0].bSeqScalingMatrixPresentFlag);
   for (int i = 0; i < 6; i++) {
-    EXPECT_EQ (0, memcmp (iScalingList[i], m_pCtx->sSpsBuffer[0].iScalingList4x4[i], 16 * sizeof (uint8_t)));
+    EXPECT_EQ (0, memcmp (iScalingList[i], m_pCtx->sSpsPpsCtx.sSpsBuffer[0].iScalingList4x4[i], 16 * sizeof (uint8_t)));
   }
 
-  ASSERT_TRUE (m_pCtx->sPpsBuffer[0].bPicScalingMatrixPresentFlag == true);
+  ASSERT_TRUE (m_pCtx->sSpsPpsCtx.sPpsBuffer[0].bPicScalingMatrixPresentFlag == true);
   for (int i = 0; i < 6; i++) {
-    EXPECT_EQ (0, memcmp (iScalingListPPS[i], m_pCtx->sPpsBuffer[0].iScalingList4x4[i], 16 * sizeof (uint8_t)));
+    EXPECT_EQ (0, memcmp (iScalingListPPS[i], m_pCtx->sSpsPpsCtx.sPpsBuffer[0].iScalingList4x4[i], 16 * sizeof (uint8_t)));
   }
   Uninit();
 }

@@ -59,6 +59,17 @@ int32_t DecoderConfigParam (PWelsDecoderContext pCtx, const SDecodingParam* kpPa
  */
 void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx);
 
+/*
+* fill last decoded picture info
+*/
+void WelsDecoderLastDecPicInfoDefaults (SWelsLastDecPicInfo& sLastDecPicInfo);
+
+/*!
+* \brief   fill data fields in SPS and PPS default for decoder context
+*/
+void WelsDecoderSpsPpsDefaults (SWelsDecoderSpsPpsCTX& sSpsPpsCtx);
+
+
 /*!
  *************************************************************************************
  * \brief   Initialize Wels decoder parameters and memory

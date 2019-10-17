@@ -140,20 +140,24 @@ static int32_t WelsCheckAndRecoverForFutureDecoding (PWelsDecoderContext pCtx) {
                               || (ERROR_CON_SLICE_COPY_CROSS_IDR_FREEZE_RES_CHANGE == pCtx->pParam->eEcActiveIdc)
                               || (ERROR_CON_SLICE_MV_COPY_CROSS_IDR == pCtx->pParam->eEcActiveIdc)
                               || (ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE == pCtx->pParam->eEcActiveIdc))
-                             && (NULL != pCtx->pPreviousDecodedPictureInDpb);
-        bCopyPrevious = bCopyPrevious && (pRef->iWidthInPixel == pCtx->pPreviousDecodedPictureInDpb->iWidthInPixel)
-                        && (pRef->iHeightInPixel == pCtx->pPreviousDecodedPictureInDpb->iHeightInPixel);
+                             && (NULL != pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb);
+        bCopyPrevious = bCopyPrevious
+                        && (pRef->iWidthInPixel == pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb->iWidthInPixel)
+                        && (pRef->iHeightInPixel == pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb->iHeightInPixel);
 
         if (!bCopyPrevious) {
           memset (pRef->pData[0], 128, pRef->iLinesize[0] * pRef->iHeightInPixel);
           memset (pRef->pData[1], 128, pRef->iLinesize[1] * pRef->iHeightInPixel / 2);
           memset (pRef->pData[2], 128, pRef->iLinesize[2] * pRef->iHeightInPixel / 2);
-        } else if (pRef == pCtx->pPreviousDecodedPictureInDpb) {
+        } else if (pRef == pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb) {
           WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "WelsInitRefList()::EC memcpy overlap.");
         } else {
-          memcpy (pRef->pData[0], pCtx->pPreviousDecodedPictureInDpb->pData[0], pRef->iLinesize[0] * pRef->iHeightInPixel);
-          memcpy (pRef->pData[1], pCtx->pPreviousDecodedPictureInDpb->pData[1], pRef->iLinesize[1] * pRef->iHeightInPixel / 2);
-          memcpy (pRef->pData[2], pCtx->pPreviousDecodedPictureInDpb->pData[2], pRef->iLinesize[2] * pRef->iHeightInPixel / 2);
+          memcpy (pRef->pData[0], pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb->pData[0],
+                  pRef->iLinesize[0] * pRef->iHeightInPixel);
+          memcpy (pRef->pData[1], pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb->pData[1],
+                  pRef->iLinesize[1] * pRef->iHeightInPixel / 2);
+          memcpy (pRef->pData[2], pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb->pData[2],
+                  pRef->iLinesize[2] * pRef->iHeightInPixel / 2);
         }
         pRef->iFrameNum = 0;
         pRef->iFramePoc = 0;
@@ -577,7 +581,7 @@ int32_t WelsMarkAsRef (PWelsDecoderContext pCtx) {
         }
       }
 
-      if (pCtx->bLastHasMmco5) {
+      if (pCtx->pLastDecPicInfo->bLastHasMmco5) {
         pCtx->pDec->iFrameNum = 0;
         pCtx->pDec->iFramePoc = 0;
       }
@@ -684,7 +688,7 @@ static int32_t MMCOProcess (PWelsDecoderContext pCtx, uint32_t uiMmcoType,
     break;
   case MMCO_RESET:
     WelsResetRefPic (pCtx);
-    pCtx->bLastHasMmco5 = true;
+    pCtx->pLastDecPicInfo->bLastHasMmco5 = true;
     break;
   case MMCO_LONG:
     if (iLongTermFrameIdx > pRefPic->iMaxLongTermFrameIdx) {
