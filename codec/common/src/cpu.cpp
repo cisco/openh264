@@ -310,7 +310,26 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
 #elif defined(mips)
 /* for loongson */
 uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
-#if defined(HAVE_MMI)
+#if defined(__linux__)
+  int flags = 0;
+  FILE* f = fopen ("/proc/cpuinfo", "r");
+
+  if (!f) {
+    return flags;
+  }
+
+  char buf[200];
+  while (fgets (buf, sizeof (buf), f)) {
+    if (!strncmp (buf, "ASEs implemented", strlen ("ASEs implemented"))) {
+      // mmi code depends on ext also
+      if (strstr (buf, " loongson-mmi ") || strstr (buf, " loongson-ext "))
+        flags |= WELS_CPU_MMI;
+      break;
+    }
+  }
+  fclose (f);
+  return flags;
+#elif defined(HAVE_MMI)
   return WELS_CPU_MMI;
 #else
   return 0;
