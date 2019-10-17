@@ -30,14 +30,16 @@ CFLAGS += -DHAVE_NEON_AARCH64
 endif
 endif
 
-#for loongson
+#for mips
 ifneq ($(filter mips mips64, $(ARCH)),)
 ifeq ($(USE_ASM), Yes)
 ASM_ARCH = mips
 ASMFLAGS += -I$(SRC_PATH)codec/common/mips/
-LOONGSON3A = $(shell g++ -dM -E - < /dev/null | grep '_MIPS_TUNE ' | cut -f 3 -d " ")
-ifeq ($(LOONGSON3A), "loongson3a")
+#only enable mmi for 64-bit system
+ifneq ($(filter mips64, $(ARCH)),)
 CFLAGS += -DHAVE_MMI
+#tell the assembler to accept mmi instructions
+CFLAGS += -Wa,-mloongson-mmi,-mloongson-ext
 endif
 endif
 endif
