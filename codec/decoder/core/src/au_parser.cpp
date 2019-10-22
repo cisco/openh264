@@ -608,7 +608,7 @@ int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t 
         pCtx->iErrorCode |= dsBitstreamError;
       return iErr;
     }
-
+    pCtx->bHasNewSps = true;
     break;
 
   case NAL_UNIT_PPS:
@@ -628,11 +628,12 @@ int32_t ParseNonVclNal (PWelsDecoderContext pCtx, uint8_t* pRbsp, const int32_t 
         pCtx->iErrorCode |= dsNoParamSets;
       else
         pCtx->iErrorCode |= dsBitstreamError;
+      pCtx->bHasNewSps = false;
       return iErr;
     }
 
     pCtx->sSpsPpsCtx.bPpsExistAheadFlag = true;
-
+    ++ (pCtx->sSpsPpsCtx.iSeqId);
     break;
 
   case NAL_UNIT_SEI:

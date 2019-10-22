@@ -2212,6 +2212,89 @@ void DecodeFinishUpdate (PWelsDecoderContext pCtx) {
 }
 
 /*
+* WelsDecodeInitAccessUnitStart
+* check and (re)allocate picture buffers on new sequence begin
+*  bit_len:    size in bit length of data
+*  buf_len:    size in byte length of data
+*  coded_au:   mark an Access Unit decoding finished
+* return:
+*  0 - success; otherwise returned error_no defined in error_no.h
+*/
+int32_t WelsDecodeInitAccessUnitStart (PWelsDecoderContext pCtx, SBufferInfo* pDstInfo) {
+  int32_t iErr = ERR_NONE;
+  PAccessUnit pCurAu = pCtx->pAccessUnitList;
+  pCtx->bAuReadyFlag = false;
+  pCtx->pLastDecPicInfo->bLastHasMmco5 = false;
+  bool bTmpNewSeqBegin = CheckNewSeqBeginAndUpdateActiveLayerSps (pCtx);
+  pCtx->bNewSeqBegin = pCtx->bNewSeqBegin || bTmpNewSeqBegin;
+  iErr = WelsDecodeAccessUnitStart (pCtx);
+  GetVclNalTemporalId (pCtx);
+
+  if (ERR_NONE != iErr) {
+    ForceResetCurrentAccessUnit (pCtx->pAccessUnitList);
+    if (!pCtx->pParam->bParseOnly)
+      pDstInfo->iBufferStatus = 0;
+    pCtx->bNewSeqBegin = pCtx->bNewSeqBegin || pCtx->bNextNewSeqBegin;
+    pCtx->bNextNewSeqBegin = false; // reset it
+    if (pCtx->bNewSeqBegin)
+      ResetActiveSPSForEachLayer (pCtx);
+    return iErr;
+  }
+
+  pCtx->pSps = pCurAu->pNalUnitsList[pCurAu->uiStartPos]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps;
+  pCtx->pPps = pCurAu->pNalUnitsList[pCurAu->uiStartPos]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pPps;
+
+  return iErr;
+}
+
+/*
+* AllocPicBuffOnNewSeqBegin
+* check and (re)allocate picture buffers on new sequence begin
+* return:
+*  0 - success; otherwise returned error_no defined in error_no.h
+*/
+int32_t AllocPicBuffOnNewSeqBegin (PWelsDecoderContext pCtx) {
+  //try to allocate or relocate DPB memory only when new sequence is coming.
+  if (pCtx->pThreadCtx == NULL) {
+    WelsResetRefPic (pCtx); //clear ref pPic when IDR NAL
+  }
+  int32_t iErr = SyncPictureResolutionExt (pCtx, pCtx->pSps->iMbWidth, pCtx->pSps->iMbHeight);
+
+  if (ERR_NONE != iErr) {
+    WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "sync picture resolution ext failed,  the error is %d", iErr);
+    return iErr;
+  }
+
+  return iErr;
+}
+
+/*
+* InitConstructAccessUnit
+* Init before constructing an access unit for given input bitstream, maybe partial NAL Unit, one or more Units are involved to
+* joint a collective access unit.
+* parameter\
+*  SBufferInfo:    Buffer info
+* return:
+*  0 - success; otherwise returned error_no defined in error_no.h
+*/
+int32_t InitConstructAccessUnit (PWelsDecoderContext pCtx, SBufferInfo* pDstInfo) {
+  int32_t iErr = ERR_NONE;
+
+  iErr = WelsDecodeInitAccessUnitStart (pCtx, pDstInfo);
+  if (ERR_NONE != iErr) {
+    return iErr;
+  }
+  if (pCtx->bNewSeqBegin) {
+    iErr = AllocPicBuffOnNewSeqBegin (pCtx);
+    if (ERR_NONE != iErr) {
+      return iErr;
+    }
+  }
+
+  return iErr;
+}
+
+/*
  * ConstructAccessUnit
  * construct an access unit for given input bitstream, maybe partial NAL Unit, one or more Units are involved to
  * joint a collective access unit.

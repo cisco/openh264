@@ -245,7 +245,7 @@ void DoMbECMvCopy (PWelsDecoderContext pCtx, PPicture pDec, PPicture pRef, int32
     }
     iMVs[0] = iFullMVx - (iMbXInPix << 2);
     iMVs[1] = iFullMVy - (iMbYInPix << 2);
-    BaseMC (pMCRefMem, iMbXInPix, iMbYInPix, &pCtx->sMcFunc, 16, 16, iMVs);
+    BaseMC (pCtx, pMCRefMem, -1, -1, iMbXInPix, iMbYInPix, &pCtx->sMcFunc, 16, 16, iMVs);
   }
   return;
 }

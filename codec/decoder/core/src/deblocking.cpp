@@ -1377,6 +1377,55 @@ void WelsDeblockingFilterSlice (PWelsDecoderContext pCtx, PDeblockingFilterMbFun
 }
 
 /*!
+* \brief   AVC slice init deblocking filtering target layer
+*
+* \in and out param   SDeblockingFilter
+* \in and out param   iFilterIdc
+*
+* \return  NONE
+*/
+void WelsDeblockingInitFilter (PWelsDecoderContext pCtx, SDeblockingFilter& pFilter, int32_t& iFilterIdc) {
+  PDqLayer pCurDqLayer = pCtx->pCurDqLayer;
+  PSliceHeaderExt pSliceHeaderExt = &pCurDqLayer->sLayerInfo.sSliceInLayer.sSliceHeaderExt;
+
+  memset (&pFilter, 0, sizeof (pFilter));
+
+  iFilterIdc = pCurDqLayer->sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.uiDisableDeblockingFilterIdc;
+
+  /* Step1: parameters set */
+  pFilter.pCsData[0] = pCtx->pDec->pData[0];
+  pFilter.pCsData[1] = pCtx->pDec->pData[1];
+  pFilter.pCsData[2] = pCtx->pDec->pData[2];
+
+  pFilter.iCsStride[0] = pCtx->pDec->iLinesize[0];
+  pFilter.iCsStride[1] = pCtx->pDec->iLinesize[1];
+
+  pFilter.eSliceType = (EWelsSliceType)pCurDqLayer->sLayerInfo.sSliceInLayer.eSliceType;
+
+  pFilter.iSliceAlphaC0Offset = pSliceHeaderExt->sSliceHeader.iSliceAlphaC0Offset;
+  pFilter.iSliceBetaOffset = pSliceHeaderExt->sSliceHeader.iSliceBetaOffset;
+
+  pFilter.pLoopf = &pCtx->sDeblockingFunc;
+  pFilter.pRefPics[0] = pCtx->sRefPic.pRefList[0];
+  pFilter.pRefPics[1] = pCtx->sRefPic.pRefList[1];
+}
+
+/*!
+* \brief   AVC MB deblocking filtering target layer
+*
+* \param   DqLayer which has the current location of MB to be deblocked.
+*
+* \return  NONE
+*/
+void WelsDeblockingFilterMB (PDqLayer pCurDqLayer, SDeblockingFilter& pFilter, int32_t& iFilterIdc,
+                             PDeblockingFilterMbFunc pDeblockMb) {
+  /* macroblock deblocking */
+  if (0 == iFilterIdc || 2 == iFilterIdc) {
+    int32_t iBoundryFlag = DeblockingAvailableNoInterlayer (pCurDqLayer, iFilterIdc);
+    pDeblockMb (pCurDqLayer, &pFilter, iBoundryFlag);
+  }
+}
+/*!
  * \brief   deblocking module initialize
  *
  * \param   pf

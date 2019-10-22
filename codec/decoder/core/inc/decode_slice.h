@@ -58,6 +58,7 @@ int32_t WelsDecodeMbCabacBSliceBaseMode0 (PWelsDecoderContext pCtx, PWelsNeighAv
 int32_t WelsTargetSliceConstruction (PWelsDecoderContext pCtx); //construction based on slice
 
 int32_t WelsDecodeSlice (PWelsDecoderContext pCtx, bool bFirstSliceInLayer, PNalUnit pNalCur);
+int32_t WelsDecodeAndConstructSlice (PWelsDecoderContext pCtx);
 
 int32_t WelsTargetMbConstruction (PWelsDecoderContext pCtx);
 

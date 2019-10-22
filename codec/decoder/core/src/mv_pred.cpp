@@ -315,6 +315,14 @@ int32_t GetColocatedMb (PWelsDecoderContext pCtx, MbType& mbType, SubMbType& sub
   mbType = GetMbType (pCurDqLayer)[iMbXy];
 
   PPicture colocPic = pCtx->sRefPic.pRefList[LIST_1][0];
+  if (pCtx->pThreadCtx != NULL) {
+    if (16 * pCurDqLayer->iMbY > pCtx->lastReadyHeightOffset[1][0]) {
+      if (colocPic->pReadyEvent[pCurDqLayer->iMbY].isSignaled != 1) {
+        WAIT_EVENT (&colocPic->pReadyEvent[pCurDqLayer->iMbY], WELS_DEC_THREAD_WAIT_INFINITE);
+      }
+      pCtx->lastReadyHeightOffset[1][0] = 16 * pCurDqLayer->iMbY;
+    }
+  }
 
   if (colocPic == NULL) {
     SLogContext* pLogCtx = & (pCtx->sLogCtx);
