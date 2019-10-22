@@ -119,9 +119,9 @@ for file in sfiles:
         armfiles.append(file)
 mipsfiles = []
 for file in cfiles:
-  c = file.split('/')
-  if 'mips' in c:
-    mipsfiles.append(file)
+    c = file.split('/')
+    if 'mips' in c:
+        mipsfiles.append(file)
 cfiles = [x for x in cfiles if x not in mipsfiles]
 
 
@@ -181,15 +181,34 @@ if len(arm64files) > 0:
     f.write("OBJS += $(%s_OBJSARM64)\n\n"%(PREFIX))
 
 if len(mipsfiles) > 0:
-  f.write("%s_ASM_MIPS_SRCS=\\\n"%(PREFIX))
-  for c in mipsfiles:
-    f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, c))
-  f.write("\n")
-  f.write("%s_OBJSMIPS += $(%s_ASM_MIPS_SRCS:.c=.$(OBJ))\n"%(PREFIX, PREFIX))
-  f.write("ifeq ($(ASM_ARCH), mips)\n")
-  f.write("%s_OBJS += $(%s_OBJSMIPS)\n"%(PREFIX,PREFIX))
-  f.write("endif\n")
-  f.write("OBJS += $(%s_OBJSMIPS)\n\n"%(PREFIX))
+    mmifiles = []
+    for file in mipsfiles:
+        if '_mmi' in file:
+            mmifiles.append(file)
+    f.write("%s_ASM_MIPS_MMI_SRCS=\\\n"%(PREFIX))
+    for c in mmifiles:
+        f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, c))
+    f.write("\n")
+    f.write("%s_OBJSMIPS_MMI += $(%s_ASM_MIPS_MMI_SRCS:.c=.$(OBJ))\n\n"%(PREFIX, PREFIX))
+    msafiles = []
+    for file in mipsfiles:
+        if '_msa' in file:
+            msafiles.append(file)
+    f.write("%s_ASM_MIPS_MSA_SRCS=\\\n"%(PREFIX))
+    for c in msafiles:
+        f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, c))
+    f.write("\n")
+    f.write("%s_OBJSMIPS_MSA += $(%s_ASM_MIPS_MSA_SRCS:.c=.$(OBJ))\n"%(PREFIX, PREFIX))
+    f.write("ifeq ($(ASM_ARCH), mips)\n")
+    f.write("ifeq ($(ENABLE_MMI), Yes)\n")
+    f.write("%s_OBJS += $(%s_OBJSMIPS_MMI)\n"%(PREFIX,PREFIX))
+    f.write("endif\n")
+    f.write("ifeq ($(ENABLE_MSA), Yes)\n")
+    f.write("%s_OBJS += $(%s_OBJSMIPS_MSA)\n"%(PREFIX,PREFIX))
+    f.write("endif\n")
+    f.write("endif\n")
+    f.write("OBJS += $(%s_OBJSMIPS_MMI)\n"%(PREFIX))
+    f.write("OBJS += $(%s_OBJSMIPS_MSA)\n\n"%(PREFIX))
 
 f.write("OBJS += $(%s_OBJS)\n\n"%(PREFIX))
 write_cpp_rule_pattern(f)
