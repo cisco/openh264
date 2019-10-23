@@ -54,6 +54,7 @@ typedef struct TagPicBuff {
 
 PPicture PrefetchPic (PPicBuff pPicBuff);  // To get current node applicable
 PPicture PrefetchPicForThread (PPicBuff pPicBuff); // To get current node applicable in the case of threaded mode
+PPicture PrefetchLastPicForThread (PPicBuff pPicBuff); // To get last node applicable in the case of threaded mode
 
 } // namespace WelsDec
 

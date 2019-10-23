@@ -1736,9 +1736,8 @@ int32_t WelsDecodeAndConstructSlice (PWelsDecoderContext pCtx) {
     if (!pCurDqLayer->pMbCorrectlyDecodedFlag[iNextMbXyIndex]) { //already con-ed, overwrite
       pCurDqLayer->pMbCorrectlyDecodedFlag[iNextMbXyIndex] = true;
       pCtx->pDec->iMbEcedPropNum += (pCurDqLayer->pMbRefConcealedFlag[iNextMbXyIndex] ? 1 : 0);
-      ++pCtx->iTotalNumMbRec;
     }
-
+    ++pCtx->iTotalNumMbRec;
     if (pCtx->iTotalNumMbRec > iTotalMbTargetLayer) {
       WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING,
                "WelsTargetSliceConstruction():::pCtx->iTotalNumMbRec:%d, iTotalMbTargetLayer:%d",

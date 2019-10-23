@@ -276,6 +276,7 @@ typedef struct tagSWelsLastDecPicInfo {
   PPicture          pPreviousDecodedPictureInDpb; //pointer to previously decoded picture in DPB for error concealment
   int32_t           iPrevFrameNum;// frame number of previous frame well decoded for non-truncated mode yet
   bool              bLastHasMmco5;
+  uint32_t          uiDecodingTimeStamp; //represent relative decoding time stamps
 } SWelsLastDecPicInfo, *PWelsLastDecPicInfo;
 
 /*
@@ -517,6 +518,7 @@ typedef struct tagSWelsDecThreadCtx {
   PPicture pDec;
   SWelsDecEvent sImageReady;
   SWelsDecEvent sSliceDecodeStart;
+  SWelsDecEvent sSliceDecodeFinsh;
 } SWelsDecoderThreadCTX, *PWelsDecoderThreadCTX;
 
 static inline void ResetActiveSPSForEachLayer (PWelsDecoderContext pCtx) {

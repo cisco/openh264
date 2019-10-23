@@ -217,4 +217,18 @@ PPicture PrefetchPicForThread (PPicBuff pPicBuf) {
   return pPic;
 }
 
+PPicture PrefetchLastPicForThread (PPicBuff pPicBuf) {
+  PPicture pPic = NULL;
+
+  if (pPicBuf->iCapacity == 0) {
+    return NULL;
+  }
+  if (pPicBuf->iCurrentIdx == 0) {
+    pPic = pPicBuf->ppPic[pPicBuf->iCapacity - 1];
+  } else {
+    pPic = pPicBuf->ppPic[pPicBuf->iCurrentIdx - 1];
+  }
+  return pPic;
+}
+
 } // namespace WelsDec
