@@ -109,25 +109,11 @@ class CWelsDecoder : public ISVCDecoder {
   virtual long EXTAPI SetOption (DECODER_OPTION eOptID, void* pOption);
   virtual long EXTAPI GetOption (DECODER_OPTION eOptID, void* pOption);
 
-  typedef struct tagPictInfo {
-    SBufferInfo             sBufferInfo;
-    int32_t                 iPOC;
-    int32_t                 iPicBuffIdx;
-    uint32_t                uiDecodingTimeStamp;
-    bool                    bLastGOP;
-    unsigned char*          pData[3];
-  } SPictInfo, *PPictInfo;
-
  private:
   PWelsDecoderContext     m_pDecContext;
   welsCodecTrace*         m_pWelsTrace;
   SPictInfo               m_sPictInfoList[16];
-  int32_t                 m_iPictInfoIndex;
-  int32_t                 m_iMinPOC;
-  int32_t                 m_iNumOfPicts;
-  int32_t                 m_iLastGOPRemainPicts;
-  int32_t                 m_LastWrittenPOC;
-  int32_t                 m_iLargestBufferedPicIndex;
+  SPictReoderingStatus    m_sReoderingStatus;
   SVlcTable               m_sVlcTable;
   SWelsLastDecPicInfo     m_sLastDecPicInfo;
   SDecoderStatistics      m_sDecoderStatistics;// For real time debugging
@@ -135,7 +121,6 @@ class CWelsDecoder : public ISVCDecoder {
   int32_t InitDecoder (const SDecodingParam* pParam);
   void UninitDecoder (void);
   int32_t ResetDecoder();
-  void ResetReorderingPictureBuffers();
 
   void OutputStatisticsLog (SDecoderStatistics& sDecoderStatistics);
   DECODING_STATE ReorderPicturesInDisplay (unsigned char** ppDst, SBufferInfo* pDstInfo);

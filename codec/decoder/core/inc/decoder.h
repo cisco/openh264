@@ -172,7 +172,11 @@ void UpdateDecStatNoFreezingInfo (PWelsDecoderContext pCtx);
 //update decoder statistics information
 void UpdateDecStat (PWelsDecoderContext pCtx, const bool kbOutput);
 //Destroy picutre buffer
-void DestroyPicBuff (PPicBuff* ppPicBuf, CMemoryAlign* pMa);
+void DestroyPicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, CMemoryAlign* pMa);
+//reset picture reodering buffer list
+void ResetReorderingPictureBuffers (PPictReoderingStatus pPictReoderingStatus, PPictInfo pPictInfo,
+                                    const bool& bFullReset);
+
 #ifdef __cplusplus
 }
 #endif//__cplusplus

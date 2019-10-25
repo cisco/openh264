@@ -88,6 +88,7 @@ struct SPicture {
   unsigned long long uiTimeStamp;
   uint32_t    uiDecodingTimeStamp; //represent relative decoding time stamps
   int32_t     iPicBuffIdx;
+  EWelsSliceType  eSliceType;
   bool bNewSeqBegin;
   int32_t iMbEcedNum;
   int32_t iMbEcedPropNum;
