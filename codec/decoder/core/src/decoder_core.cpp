@@ -2555,7 +2555,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
       pCtx->pDec->iFrameNum = pSh->iFrameNum;
       pCtx->pDec->iFramePoc = pSh->iPicOrderCntLsb; // still can not obtain correct, because current do not support POCtype 2
       pCtx->pDec->bIdrFlag = pNalCur->sNalHeaderExt.bIdrFlag;
-
+      pCtx->pDec->eSliceType = pSh->eSliceType;
       memcpy (&pLayerInfo.sSliceInLayer.sSliceHeaderExt, pShExt, sizeof (SSliceHeaderExt)); //confirmed_safe_unsafe_usage
       pLayerInfo.sSliceInLayer.bSliceHeaderExtFlag      = pNalCur->sNalData.sVclNal.bSliceHeaderExtFlag;
       pLayerInfo.sSliceInLayer.eSliceType               = pSh->eSliceType;

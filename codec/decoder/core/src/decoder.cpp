@@ -62,6 +62,7 @@ extern void FreePicture (PPicture pPic, CMemoryAlign* pMa);
 
 static int32_t CreatePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, const int32_t kiSize,
                               const int32_t kiPicWidth, const int32_t kiPicHeight) {
+
   PPicBuff pPicBuf = NULL;
   int32_t iPicIdx = 0;
   if (kiSize <= 0 || kiPicWidth <= 0 || kiPicHeight <= 0) {
@@ -80,7 +81,7 @@ static int32_t CreatePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, cons
 
   if (NULL == pPicBuf->ppPic) {
     pPicBuf->iCapacity = 0;
-    DestroyPicBuff (&pPicBuf, pMa);
+    DestroyPicBuff (pCtx, &pPicBuf, pMa);
     return ERR_INFO_OUT_OF_MEMORY;
   }
 
@@ -89,7 +90,7 @@ static int32_t CreatePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, cons
     if (NULL == pPic) {
       // init capacity first for free memory
       pPicBuf->iCapacity = iPicIdx;
-      DestroyPicBuff (&pPicBuf, pMa);
+      DestroyPicBuff (pCtx, &pPicBuf, pMa);
       return ERR_INFO_OUT_OF_MEMORY;
     }
     pPicBuf->ppPic[iPicIdx] = pPic;
@@ -123,7 +124,7 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
 
   if (NULL == pPicNewBuf->ppPic) {
     pPicNewBuf->iCapacity = 0;
-    DestroyPicBuff (&pPicNewBuf, pMa);
+    DestroyPicBuff (pCtx, &pPicNewBuf, pMa);
     return ERR_INFO_OUT_OF_MEMORY;
   }
 
@@ -133,7 +134,7 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
     if (NULL == pPic) {
       // Set maximum capacity as the new malloc memory at the tail
       pPicNewBuf->iCapacity = iPicIdx;
-      DestroyPicBuff (&pPicNewBuf, pMa);
+      DestroyPicBuff (pCtx, &pPicNewBuf, pMa);
       return ERR_INFO_OUT_OF_MEMORY;
     }
     pPicNewBuf->ppPic[iPicIdx] = pPic;
@@ -187,7 +188,7 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
 
   if (NULL == pPicNewBuf->ppPic) {
     pPicNewBuf->iCapacity = 0;
-    DestroyPicBuff (&pPicNewBuf, pMa);
+    DestroyPicBuff (pCtx, &pPicNewBuf, pMa);
     return ERR_INFO_OUT_OF_MEMORY;
   }
 
@@ -254,8 +255,10 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   return ERR_NONE;
 }
 
-void DestroyPicBuff (PPicBuff* ppPicBuf, CMemoryAlign* pMa) {
+void DestroyPicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, CMemoryAlign* pMa) {
   PPicBuff pPicBuf = NULL;
+
+  ResetReorderingPictureBuffers (pCtx->pPictReoderingStatus, pCtx->pPictInfoList, false);
 
   if (NULL == ppPicBuf || NULL == *ppPicBuf)
     return;
@@ -283,6 +286,24 @@ void DestroyPicBuff (PPicBuff* ppPicBuf, CMemoryAlign* pMa) {
 
   pPicBuf = NULL;
   *ppPicBuf = NULL;
+}
+
+//reset picture reodering buffer list
+void ResetReorderingPictureBuffers (PPictReoderingStatus pPictReoderingStatus, PPictInfo pPictInfo,
+                                    const bool& fullReset) {
+  if (pPictReoderingStatus != NULL && pPictInfo != NULL) {
+    int32_t pictInfoListCount = fullReset ? 16 : (pPictReoderingStatus->iLargestBufferedPicIndex + 1);
+    pPictReoderingStatus->iPictInfoIndex = 0;
+    pPictReoderingStatus->iMinPOC = IMinInt32;
+    pPictReoderingStatus->iNumOfPicts = 0;
+    pPictReoderingStatus->iLastGOPRemainPicts = 0;
+    pPictReoderingStatus->iLastWrittenPOC = IMinInt32;
+    pPictReoderingStatus->iLargestBufferedPicIndex = 0;
+    for (int32_t i = 0; i < pictInfoListCount; ++i) {
+      pPictInfo[i].bLastGOP = false;
+      pPictInfo[i].iPOC = IMinInt32;
+    }
+  }
 }
 
 /*
@@ -485,7 +506,7 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
     // for Recycled_Pic_Queue
     PPicBuff* ppPic = &pCtx->pPicBuff;
     if (NULL != ppPic && NULL != *ppPic) {
-      DestroyPicBuff (ppPic, pMa);
+      DestroyPicBuff (pCtx, ppPic, pMa);
     }
 
 
@@ -531,7 +552,7 @@ void WelsFreeDynamicMemory (PWelsDecoderContext pCtx) {
 
   PPicBuff* pPicBuff = &pCtx->pPicBuff;
   if (NULL != pPicBuff && NULL != *pPicBuff) {
-    DestroyPicBuff (pPicBuff, pMa);
+    DestroyPicBuff (pCtx, pPicBuff, pMa);
   }
 
   if (pCtx->pTempDec) {

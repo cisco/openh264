@@ -80,14 +80,17 @@ static void SetUnRef (PPicture pRef) {
     pRef->uiSpatialId = -1;
     pRef->iSpsId = -1;
     pRef->bIsComplete = false;
+
+    if (pRef->eSliceType == I_SLICE) {
+      return;
+    }
+    int32_t lists = pRef->eSliceType == P_SLICE ? 1 : 2;
     for (int32_t i = 0; i < MAX_DPB_COUNT; ++i) {
-      if (pRef->pRefPic[LIST_0][i] != NULL) {
-        pRef->pRefPic[LIST_0][i]->bAvailableFlag = true;
-        pRef->pRefPic[LIST_0][i] = NULL;
-      }
-      if (pRef->pRefPic[LIST_1][i] != NULL) {
-        pRef->pRefPic[LIST_1][i]->bAvailableFlag = true;
-        pRef->pRefPic[LIST_1][i] = NULL;
+      for (int32_t list = 0; list < lists; ++list) {
+        if (pRef->pRefPic[list][i] != NULL) {
+          pRef->pRefPic[list][i]->bAvailableFlag = true;
+          pRef->pRefPic[list][i] = NULL;
+        }
       }
     }
   }
@@ -189,6 +192,7 @@ static int32_t WelsCheckAndRecoverForFutureDecoding (PWelsDecoderContext pCtx) {
         pRef->iFrameNum = 0;
         pRef->iFramePoc = 0;
         pRef->uiTemporalId = pRef->uiQualityId = 0;
+        pRef->eSliceType = pCtx->eSliceType;
         ExpandReferencingPicture (pRef->pData, pRef->iWidthInPixel, pRef->iHeightInPixel, pRef->iLinesize,
                                   pCtx->sExpandPicFunc.pfExpandLumaPicture, pCtx->sExpandPicFunc.pfExpandChromaPicture);
         AddShortTermToList (&pCtx->sRefPic, pRef);
