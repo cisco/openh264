@@ -57,6 +57,12 @@
 #define HW_NCPU_NAME "hw.ncpu"
 #endif
 #endif
+#ifdef ANDROID_NDK
+#include <cpu-features.h>
+#endif
+#ifdef __ANDROID__
+#include <android/api-level.h>
+#endif
 
 #include "wels_decoder_thread.h"
 #include <stdio.h>

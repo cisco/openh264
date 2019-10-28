@@ -89,6 +89,7 @@ struct SPicture {
   uint32_t    uiDecodingTimeStamp; //represent relative decoding time stamps
   int32_t     iPicBuffIdx;
   EWelsSliceType  eSliceType;
+  bool        bIsUngroupedMultiSlice; //multi-slice picture with each each slice group contains one slice.
   bool bNewSeqBegin;
   int32_t iMbEcedNum;
   int32_t iMbEcedPropNum;
