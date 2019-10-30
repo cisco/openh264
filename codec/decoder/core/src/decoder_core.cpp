@@ -2606,6 +2606,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
     pCtx->pDec->uiDecodingTimeStamp = pCtx->uiDecodingTimeStamp;
     if (pThreadCtx != NULL) {
       pThreadCtx->iPicBuffIdx = pCtx->pDec->iPicBuffIdx;
+      pCtx->pCurDqLayer->pMbCorrectlyDecodedFlag = pCtx->pDec->pMbCorrectlyDecodedFlag;
     }
 
     if (pCtx->iTotalNumMbRec == 0) { //Picture start to decode
