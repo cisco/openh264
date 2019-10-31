@@ -393,6 +393,7 @@ void WelsDecoderLastDecPicInfoDefaults (SWelsLastDecPicInfo& sLastDecPicInfo) {
   sLastDecPicInfo.pPreviousDecodedPictureInDpb = NULL;
   sLastDecPicInfo.iPrevFrameNum = -1;
   sLastDecPicInfo.bLastHasMmco5 = false;
+  sLastDecPicInfo.uiDecodingTimeStamp = 0;
 }
 
 /*!
@@ -437,6 +438,9 @@ static inline int32_t GetTargetRefListSize (PWelsDecoderContext pCtx) {
     iNumRefFrames = MAX_REF_PIC_COUNT + 2;
   } else {
     iNumRefFrames = pCtx->pSps->iNumRefFrames + 2;
+    if (pCtx->pThreadCtx != NULL) {
+      iNumRefFrames = MAX_REF_PIC_COUNT + 1;
+    }
   }
 
 #ifdef LONG_TERM_REF
@@ -478,7 +482,9 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
                          && kiPicHeight == pCtx->iImgHeightInPixel) && (!bNeedChangePicQueue)) // have same scaled buffer
 
   // sync update pRefList
-  WelsResetRefPic (pCtx); // added to sync update ref list due to pictures are free
+  if (pCtx->pThreadCtx == NULL) {
+    WelsResetRefPic (pCtx); // added to sync update ref list due to pictures are free
+  }
 
   if (pCtx->bHaveGotMemory && (kiPicWidth == pCtx->iImgWidthInPixel && kiPicHeight == pCtx->iImgHeightInPixel)
       && pCtx->pPicBuff != NULL && pCtx->pPicBuff->iCapacity != iPicQueueSize) {
@@ -553,6 +559,17 @@ void WelsFreeDynamicMemory (PWelsDecoderContext pCtx) {
   PPicBuff* pPicBuff = &pCtx->pPicBuff;
   if (NULL != pPicBuff && NULL != *pPicBuff) {
     DestroyPicBuff (pCtx, pPicBuff, pMa);
+  }
+  if (pCtx->pThreadCtx != NULL) {
+    //prevent from double destruction of PPicBuff
+    PWelsDecoderThreadCTX pThreadCtx = (PWelsDecoderThreadCTX) (pCtx->pThreadCtx);
+    int32_t threadCount = pThreadCtx->sThreadInfo.uiThrMaxNum;
+    int32_t  id = pThreadCtx->sThreadInfo.uiThrNum;
+    for (int32_t i = 0; i < threadCount; ++i) {
+      if (pThreadCtx[i - id].pCtx != NULL) {
+        pThreadCtx[i - id].pCtx->pPicBuff = NULL;
+      }
+    }
   }
 
   if (pCtx->pTempDec) {
@@ -796,7 +813,11 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
             }
             CheckAndFinishLastPic (pCtx, ppDst, pDstBufInfo);
             if (pCtx->bAuReadyFlag && pCtx->pAccessUnitList->uiAvailUnitsNum != 0) {
-              ConstructAccessUnit (pCtx, ppDst, pDstBufInfo);
+              if (pCtx->pThreadCtx == NULL) {
+                ConstructAccessUnit (pCtx, ppDst, pDstBufInfo);
+              } else {
+                pCtx->pAccessUnitList->uiAvailUnitsNum = 1;
+              }
             }
           }
           DecodeFinishUpdate (pCtx);
@@ -852,9 +873,15 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
       if (IS_PARAM_SETS_NALS (pCtx->sCurNalHead.eNalUnitType)) {
         iRet = ParseNonVclNal (pCtx, pNalPayload, iDstIdx - iConsumedBytes, pSrcNal - 3, iSrcIdx + 3);
       }
-      CheckAndFinishLastPic (pCtx, ppDst, pDstBufInfo);
+      if (pCtx->pThreadCtx == NULL) {
+        CheckAndFinishLastPic (pCtx, ppDst, pDstBufInfo);
+      }
       if (pCtx->bAuReadyFlag && pCtx->pAccessUnitList->uiAvailUnitsNum != 0) {
-        ConstructAccessUnit (pCtx, ppDst, pDstBufInfo);
+        if (pCtx->pThreadCtx == NULL) {
+          ConstructAccessUnit (pCtx, ppDst, pDstBufInfo);
+        } else {
+          pCtx->pAccessUnitList->uiAvailUnitsNum = 1;
+        }
       }
     }
     DecodeFinishUpdate (pCtx);

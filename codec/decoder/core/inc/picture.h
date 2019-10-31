@@ -89,11 +89,13 @@ struct SPicture {
   uint32_t    uiDecodingTimeStamp; //represent relative decoding time stamps
   int32_t     iPicBuffIdx;
   EWelsSliceType  eSliceType;
+  bool        bIsUngroupedMultiSlice; //multi-slice picture with each each slice group contains one slice.
   bool bNewSeqBegin;
   int32_t iMbEcedNum;
   int32_t iMbEcedPropNum;
   int32_t iMbNum;
 
+  bool*    pMbCorrectlyDecodedFlag;
   uint32_t*  pMbType; // mb type used for direct mode
   int16_t (*pMv[LIST_A])[MB_BLOCK4x4_NUM][MV_A]; // used for direct mode
   int8_t (*pRefIndex[LIST_A])[MB_BLOCK4x4_NUM]; //used for direct mode
