@@ -2614,6 +2614,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         memset (pCtx->sMb.pSliceIdc[i], 0xff, (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (int32_t)));
       memset (pCtx->pCurDqLayer->pMbCorrectlyDecodedFlag, 0, pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight * sizeof (bool));
       memset (pCtx->pCurDqLayer->pMbRefConcealedFlag, 0, pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight * sizeof (bool));
+      memset (pCtx->pDec->pRefPic[LIST_0], 0, sizeof (PPicture) * MAX_DPB_COUNT);
+      memset (pCtx->pDec->pRefPic[LIST_1], 0, sizeof (PPicture) * MAX_DPB_COUNT);
       pCtx->pDec->iMbNum = pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight;
       pCtx->pDec->iMbEcedNum = 0;
       pCtx->pDec->iMbEcedPropNum = 0;
