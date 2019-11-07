@@ -502,12 +502,16 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
 
       iVal = * ((int*)pOption); // boolean value for whether enabled End Of Stream flag
 
+      if (pDecContext == NULL) return dsInitialOptExpected;
+
       pDecContext->bEndOfStreamFlag = iVal ? true : false;
 
       return cmResultSuccess;
     } else if (eOptID == DECODER_OPTION_ERROR_CON_IDC) { // Indicate error concealment status
       if (pOption == NULL)
         return cmInitParaError;
+
+      if (pDecContext == NULL) return dsInitialOptExpected;
 
       iVal = * ((int*)pOption); // int value for error concealment idc
       iVal = WELS_CLIP3 (iVal, (int32_t)ERROR_CON_DISABLE, (int32_t)ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE);
@@ -550,6 +554,7 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
       return cmInitParaError;
     } else if (eOptID == DECODER_OPTION_STATISTICS_LOG_INTERVAL) {
       if (pOption) {
+        if (pDecContext == NULL) return dsInitialOptExpected;
         pDecContext->pDecoderStatistics->iStatisticsLogInterval = (* ((unsigned int*)pOption));
         return cmResultSuccess;
       }
