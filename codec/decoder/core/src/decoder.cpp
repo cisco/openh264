@@ -192,6 +192,8 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
     return ERR_INFO_OUT_OF_MEMORY;
   }
 
+  ResetReorderingPictureBuffers (pCtx->pPictReoderingStatus, pCtx->pPictInfoList, false);
+
   int32_t iPrevPicIdx = -1;
   for (iPrevPicIdx = 0; iPrevPicIdx < kiOldSize; ++iPrevPicIdx) {
     if (pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb == pPicOldBuf->ppPic[iPrevPicIdx]) {
