@@ -106,12 +106,14 @@ PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const
   pPic->iWidthInPixel  = kiPicWidth;
   pPic->iHeightInPixel = kiPicHeight;
   pPic->iFrameNum      = -1;
-  pPic->bAvailableFlag = true;
+  pPic->iRefCount = 0;
 
   uint32_t uiMbWidth = (kiPicWidth + 15) >> 4;
   uint32_t uiMbHeight = (kiPicHeight + 15) >> 4;
   uint32_t uiMbCount = uiMbWidth * uiMbHeight;
+
   pPic->pMbCorrectlyDecodedFlag = (bool*)pMa->WelsMallocz (uiMbCount * sizeof (bool), "pPic->pMbCorrectlyDecodedFlag");
+
   pPic->pMbType = (uint32_t*)pMa->WelsMallocz (uiMbCount * sizeof (uint32_t), "pPic->pMbType");
   pPic->pMv[LIST_0] = (int16_t (*)[16][2])pMa->WelsMallocz (uiMbCount * sizeof (
                         int16_t) * MV_A * MB_BLOCK4x4_NUM, "pPic->pMv[]");
@@ -182,8 +184,8 @@ PPicture PrefetchPic (PPicBuff pPicBuf) {
   }
 
   for (iPicIdx = pPicBuf->iCurrentIdx + 1; iPicIdx < pPicBuf->iCapacity ; ++iPicIdx) {
-    if (pPicBuf->ppPic[iPicIdx] != NULL && pPicBuf->ppPic[iPicIdx]->bAvailableFlag
-        && !pPicBuf->ppPic[iPicIdx]->bUsedAsRef) {
+    if (pPicBuf->ppPic[iPicIdx] != NULL && !pPicBuf->ppPic[iPicIdx]->bUsedAsRef
+        && pPicBuf->ppPic[iPicIdx]->iRefCount <= 0) {
       pPic = pPicBuf->ppPic[iPicIdx];
       break;
     }
@@ -194,8 +196,8 @@ PPicture PrefetchPic (PPicBuff pPicBuf) {
     return pPic;
   }
   for (iPicIdx = 0 ; iPicIdx <= pPicBuf->iCurrentIdx ; ++iPicIdx) {
-    if (pPicBuf->ppPic[iPicIdx] != NULL && pPicBuf->ppPic[iPicIdx]->bAvailableFlag
-        && !pPicBuf->ppPic[iPicIdx]->bUsedAsRef) {
+    if (pPicBuf->ppPic[iPicIdx] != NULL && !pPicBuf->ppPic[iPicIdx]->bUsedAsRef
+        && pPicBuf->ppPic[iPicIdx]->iRefCount <= 0) {
       pPic = pPicBuf->ppPic[iPicIdx];
       break;
     }

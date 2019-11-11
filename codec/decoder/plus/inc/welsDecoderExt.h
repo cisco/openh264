@@ -120,6 +120,7 @@ class CWelsDecoder : public ISVCDecoder {
   bool                    m_bIsBaseline;
   int32_t                 m_iCpuCount;
   int32_t                 m_iThreadCount;
+  int32_t                 m_iCtxCount;
   PPicBuff                m_pPicBuff;
   bool                    m_bParamSetsLostFlag;
   bool                    m_bFreezeOutput;

@@ -252,7 +252,7 @@ void BaseMC (PWelsDecoderContext pCtx, sMCRefMember* pMCRefMem, const int32_t& l
   iFullMVy = WELS_CLIP3 (iFullMVy, ((-PADDING_LENGTH + 2) * (1 << 2)),
                          ((pMCRefMem->iPicHeight + PADDING_LENGTH - 19) * (1 << 2)));
 
-  if (pCtx->pThreadCtx != NULL && iRefIdx >= 0) {
+  if (GetThreadCount (pCtx) > 1 && iRefIdx >= 0) {
     // wait for the lines of reference macroblock (3 + 16).
     PPicture pRefPic = pCtx->sRefPic.pRefList[listIdx][iRefIdx];
     if (pCtx->bNewSeqBegin && (pCtx->iErrorCode & dsRefLost)) {

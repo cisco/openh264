@@ -80,6 +80,7 @@ static void SetUnRef (PPicture pRef) {
     pRef->uiSpatialId = -1;
     pRef->iSpsId = -1;
     pRef->bIsComplete = false;
+    pRef->iRefCount = 0;
 
     if (pRef->eSliceType == I_SLICE) {
       return;
@@ -88,7 +89,7 @@ static void SetUnRef (PPicture pRef) {
     for (int32_t i = 0; i < MAX_DPB_COUNT; ++i) {
       for (int32_t list = 0; list < lists; ++list) {
         if (pRef->pRefPic[list][i] != NULL) {
-          pRef->pRefPic[list][i]->bAvailableFlag = true;
+          pRef->pRefPic[list][i]->iRefCount = 0;
           pRef->pRefPic[list][i] = NULL;
         }
       }
@@ -781,8 +782,8 @@ static PPicture WelsDelShortFromList (PRefPic pRefPic, int32_t iFrameNum) {
   for (i = 0; i < pRefPic->uiShortRefCount[LIST_0]; i++) {
     if (pRefPic->pShortRefList[LIST_0][i]->iFrameNum == iFrameNum) {
       iMoveSize = pRefPic->uiShortRefCount[LIST_0] - i - 1;
-      pRefPic->pShortRefList[LIST_0][i]->bUsedAsRef = false;
       pPic = pRefPic->pShortRefList[LIST_0][i];
+      pPic->bUsedAsRef = false;
       pRefPic->pShortRefList[LIST_0][i] = NULL;
       if (iMoveSize > 0) {
         memmove (&pRefPic->pShortRefList[LIST_0][i], &pRefPic->pShortRefList[LIST_0][i + 1],

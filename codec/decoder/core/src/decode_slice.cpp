@@ -236,7 +236,7 @@ int32_t WelsMbInterConstruction (PWelsDecoderContext pCtx, PDqLayer pCurDqLayer)
   }
   WelsMbInterSampleConstruction (pCtx, pCurDqLayer, pDstY, pDstCb, pDstCr, iLumaStride, iChromaStride);
 
-  if (pCtx->pThreadCtx == NULL) {
+  if (GetThreadCount (pCtx) <= 1) {
     pCtx->sBlockFunc.pWelsSetNonZeroCountFunc (
       pCurDqLayer->pNzc[pCurDqLayer->iMbXyIndex]); // set all none-zero nzc to 1; dbk can be opti!
   }
@@ -1365,7 +1365,7 @@ int32_t WelsDecodeMbCabacPSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uin
 
     pCurDqLayer->pInterPredictionDoneFlag[iMbXy] = 0;
     memset (pCurDqLayer->pDec->pRefIndex[0][iMbXy], 0, sizeof (int8_t) * 16);
-    bool bIsPending = pCtx->pThreadCtx != NULL;
+    bool bIsPending = GetThreadCount (pCtx) > 1;
     pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || ! (ppRefPic[0] && (ppRefPic[0]->bIsComplete
                             || bIsPending));
     //predict mv
@@ -1421,7 +1421,7 @@ int32_t WelsDecodeMbCabacBSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uin
 
   memset (pCurDqLayer->pDirect[iMbXy], 0, sizeof (int8_t) * 16);
 
-  bool bIsPending = pCtx->pThreadCtx != NULL;
+  bool bIsPending = GetThreadCount (pCtx) > 1;
 
   if (uiCode) {
     int16_t pMv[LIST_A][2] = { {0, 0}, { 0, 0 } };
@@ -1696,7 +1696,7 @@ int32_t WelsDecodeAndConstructSlice (PWelsDecoderContext pCtx) {
 
   SDeblockingFilter pFilter;
   int32_t iFilterIdc = 1;
-  if (pCtx->pThreadCtx && pSliceHeader->uiDisableDeblockingFilterIdc != 1) {
+  if (pSliceHeader->uiDisableDeblockingFilterIdc != 1) {
     WelsDeblockingInitFilter (pCtx, pFilter, iFilterIdc);
   }
 
@@ -1764,11 +1764,15 @@ int32_t WelsDecodeAndConstructSlice (PWelsDecoderContext pCtx) {
     pCurDqLayer->iMbX = iMbX;
     pCurDqLayer->iMbY = iMbY;
     pCurDqLayer->iMbXyIndex = iNextMbXyIndex;
-    if ((iMbY > iLastMby) && (iLastMbx == pCurDqLayer->iMbWidth - 1)) {
-      SET_EVENT (&pCtx->pDec->pReadyEvent[iLastMby]);
+    if (GetThreadCount (pCtx) > 1) {
+      if ((iMbY > iLastMby) && (iLastMbx == pCurDqLayer->iMbWidth - 1)) {
+        SET_EVENT (&pCtx->pDec->pReadyEvent[iLastMby]);
+      }
     }
   } while (1);
-  SET_EVENT (&pCtx->pDec->pReadyEvent[pCurDqLayer->iMbY]);
+  if (GetThreadCount (pCtx) > 1) {
+    SET_EVENT (&pCtx->pDec->pReadyEvent[pCurDqLayer->iMbY]);
+  }
   return ERR_NONE;
 }
 
@@ -2467,7 +2471,7 @@ int32_t WelsDecodeMbCavlcPSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uin
 
     pCurDqLayer->pInterPredictionDoneFlag[iMbXy] = 0;
     memset (pCurDqLayer->pDec->pRefIndex[0][iMbXy], 0, sizeof (int8_t) * 16);
-    bool bIsPending = pCtx->pThreadCtx != NULL;
+    bool bIsPending = GetThreadCount (pCtx) > 1;
     pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || ! (ppRefPic[0] && (ppRefPic[0]->bIsComplete
                             || bIsPending));
     //predict iMv
@@ -2564,7 +2568,7 @@ int32_t WelsDecodeMbCavlcBSlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uin
     pCurDqLayer->pInterPredictionDoneFlag[iMbXy] = 0;
     memset (pCurDqLayer->pDec->pRefIndex[LIST_0][iMbXy], 0, sizeof (int8_t) * 16);
     memset (pCurDqLayer->pDec->pRefIndex[LIST_1][iMbXy], 0, sizeof (int8_t) * 16);
-    bool bIsPending = pCtx->pThreadCtx != NULL;
+    bool bIsPending = GetThreadCount (pCtx) > 1;
     pCtx->bMbRefConcealed = pCtx->bRPLRError || pCtx->bMbRefConcealed || ! (ppRefPicL0[0] && (ppRefPicL0[0]->bIsComplete
                             || bIsPending)) || ! (ppRefPicL1[0] && (ppRefPicL1[0]->bIsComplete || bIsPending));
 

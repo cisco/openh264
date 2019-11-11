@@ -283,7 +283,7 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
         goto label_exit;
       iSliceSize = static_cast<int32_t> (pInfo[2]);
     } else {
-      if (iThreadCount > 1) {
+      if (iThreadCount >= 1) {
         uint8_t* uSpsPtr = NULL;
         int32_t iSpsByteCount = 0;
         iSliceSize = readPicture (pBuf, iFileSize, iBufPos, uSpsPtr, iSpsByteCount);
@@ -577,7 +577,7 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
     pDecoder->SetOption (DECODER_OPTION_TRACE_LEVEL, &iLevelSetting);
   }
 
-  int32_t iThreadCount = 1;
+  int32_t iThreadCount = 0;
   pDecoder->SetOption (DECODER_OPTION_NUM_OF_THREADS, &iThreadCount);
 
   if (pDecoder->Initialize (&sDecParam)) {
