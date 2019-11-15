@@ -2495,6 +2495,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
                              pLastThreadCtx->iPicBuffIdx);
     }
   }
+  int32_t iThreadCount = GetThreadCount (pCtx);
   int32_t iPpsId = 0;
   int32_t iRet = ERR_NONE;
 
@@ -2542,7 +2543,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
       }
     }
     bool isNewFrame = true;
-    if (GetThreadCount (pCtx) > 1) {
+    if (iThreadCount > 1) {
       isNewFrame = pCtx->pDec == NULL;
     }
     if (pCtx->pDec == NULL) {
@@ -2578,7 +2579,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
       if (pThreadCtx != NULL) {
         pCtx->pDec->bIsUngroupedMultiSlice = false;
         pThreadCtx->pDec = pCtx->pDec;
-        if (GetThreadCount (pCtx) > 1) ++pCtx->pDec->iRefCount;
+        if (iThreadCount > 1) ++pCtx->pDec->iRefCount;
         uint32_t uiMbHeight = (pCtx->pDec->iHeightInPixel + 15) >> 4;
         for (uint32_t i = 0; i < uiMbHeight; ++i) {
           RESET_EVENT (&pCtx->pDec->pReadyEvent[i]);
@@ -2729,7 +2730,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         if (pSh->eSliceType == B_SLICE && !pSh->iDirectSpatialMvPredFlag)
           ComputeColocatedTemporalScaling (pCtx);
 
-        if (GetThreadCount (pCtx) > 1) {
+        if (iThreadCount > 1) {
           memset (&pCtx->lastReadyHeightOffset[0][0], -1, LIST_A * MAX_REF_PIC_COUNT * sizeof (int16_t));
           SET_EVENT (&pThreadCtx->sSliceDecodeStart);
           iRet = WelsDecodeAndConstructSlice (pCtx);
@@ -2751,14 +2752,14 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
           }
         }
 
-        if (GetThreadCount (pCtx) <= 1 && bReconstructSlice) {
+        if (iThreadCount <= 1 && bReconstructSlice) {
           if ((iRet = WelsDecodeConstructSlice (pCtx, pNalCur)) != ERR_NONE) {
             pCtx->pDec->bIsComplete = false; // reconstruction error, directly set the flag false
             return iRet;
           }
         }
         if (bAllRefComplete && pCtx->eSliceType != I_SLICE) {
-          if (GetThreadCount (pCtx) <= 1) {
+          if (iThreadCount <= 1) {
             if (pCtx->sRefPic.uiRefCount[LIST_0] > 0) {
               bAllRefComplete &= CheckRefPicturesComplete (pCtx);
             } else {
@@ -2815,18 +2816,22 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         }
       }
 
-      if (GetThreadCount (pCtx) > 1 && pCtx->uiDecodingTimeStamp > 1 && pCtx->pLastDecPicInfo->uiDecodingTimeStamp > 0) {
-        while (pCtx->uiDecodingTimeStamp > pCtx->pLastDecPicInfo->uiDecodingTimeStamp + 1) {
-          WelsSleep (1);
+      if (iThreadCount >= 1) {
+        int32_t  id = pThreadCtx->sThreadInfo.uiThrNum;
+        for (int32_t i = 0; i < iThreadCount; ++i) {
+          if (i != id) {
+            if (pThreadCtx[i - id].sSliceDecodeStart.isSignaled) {
+              while (pThreadCtx[i - id].pCtx->uiDecodingTimeStamp < pCtx->uiDecodingTimeStamp) {
+                WelsSleep (1);
+              }
+            }
+          }
         }
-      }
-
-      if (GetThreadCount (pCtx) >= 1) {
         pCtx->pLastDecPicInfo->uiDecodingTimeStamp = pCtx->uiDecodingTimeStamp;
       }
       iRet = DecodeFrameConstruction (pCtx, ppDst, pDstInfo);
       if (iRet) {
-        if (GetThreadCount (pCtx) > 1) {
+        if (iThreadCount > 1) {
           SET_EVENT (&pThreadCtx->sSliceDecodeFinsh);
         }
         return iRet;
@@ -2834,7 +2839,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
 
       pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb = pCtx->pDec; //store latest decoded picture for EC
       pCtx->bUsedAsRef = pCtx->uiNalRefIdc > 0;
-      if (GetThreadCount (pCtx) <= 1) {
+      if (iThreadCount <= 1) {
         if (pCtx->bUsedAsRef) {
           for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
             uint32_t i = 0;
@@ -2857,7 +2862,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
                                       pCtx->pDec->iLinesize,
                                       pCtx->sExpandPicFunc.pfExpandLumaPicture, pCtx->sExpandPicFunc.pfExpandChromaPicture);
         }
-      } else if (GetThreadCount (pCtx) > 1) {
+      } else if (iThreadCount > 1) {
         SET_EVENT (&pThreadCtx->sImageReady);
       }
       pCtx->pDec = NULL; //after frame decoding, always set to NULL
@@ -2868,10 +2873,9 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
       pCtx->pLastDecPicInfo->iPrevFrameNum = pSh->iFrameNum;
     if (pCtx->pLastDecPicInfo->bLastHasMmco5)
       pCtx->pLastDecPicInfo->iPrevFrameNum = 0;
-    if (GetThreadCount (pCtx) > 1) {
-      int32_t threadCount = pThreadCtx->sThreadInfo.uiThrMaxNum;
+    if (iThreadCount > 1) {
       int32_t  id = pThreadCtx->sThreadInfo.uiThrNum;
-      for (int32_t i = 0; i < threadCount; ++i) {
+      for (int32_t i = 0; i < iThreadCount; ++i) {
         if (pThreadCtx[i - id].pCtx != NULL) {
           unsigned long long uiTimeStamp = pThreadCtx[i - id].pCtx->uiTimeStamp;
           if (uiTimeStamp > 0 && pThreadCtx[i - id].pCtx->sSpsPpsCtx.iSeqId > pCtx->sSpsPpsCtx.iSeqId) {
@@ -2886,7 +2890,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
       }
     }
   }
-  if (GetThreadCount (pCtx) > 1) {
+  if (iThreadCount > 1) {
     SET_EVENT (&pThreadCtx->sSliceDecodeFinsh);
   }
   return ERR_NONE;

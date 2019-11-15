@@ -916,9 +916,11 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
 DECODING_STATE CWelsDecoder::FlushFrame (unsigned char** ppDst,
     SBufferInfo* pDstInfo) {
   bool bEndOfStreamFlag = true;
-  for (int32_t j = 0; j < m_iCtxCount; ++j) {
-    if (!m_pDecThrCtx[j].pCtx->bEndOfStreamFlag) {
-      bEndOfStreamFlag = false;
+  if (m_iThreadCount <= 1) {
+    for (int32_t j = 0; j < m_iCtxCount; ++j) {
+      if (!m_pDecThrCtx[j].pCtx->bEndOfStreamFlag) {
+        bEndOfStreamFlag = false;
+      }
     }
   }
   if (bEndOfStreamFlag && m_sReoderingStatus.iNumOfPicts > 0) {
