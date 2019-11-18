@@ -1083,7 +1083,7 @@ int32_t ParseInterInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][M
   iRefCount[0] = pSliceHeader->uiRefCount[0];
   iRefCount[1] = pSliceHeader->uiRefCount[1];
 
-  bool bIsPending = pCtx->pThreadCtx != NULL;
+  bool bIsPending = GetThreadCount (pCtx) > 1;
 
   switch (pCurDqLayer->pDec->pMbType[iMbXy]) {
   case MB_TYPE_16x16: {
@@ -1348,7 +1348,7 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
   iRefCount[0] = pSliceHeader->uiRefCount[0];
   iRefCount[1] = pSliceHeader->uiRefCount[1];
 
-  bool bIsPending = pCtx->pThreadCtx != NULL;
+  bool bIsPending = GetThreadCount (pCtx) > 1;
 
   MbType mbType = pCurDqLayer->pDec->pMbType[iMbXy];
   if (IS_DIRECT (mbType)) {

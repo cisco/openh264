@@ -550,6 +550,14 @@ static inline void ResetActiveSPSForEachLayer (PWelsDecoderContext pCtx) {
     }
   }
 }
+static inline int32_t GetThreadCount (PWelsDecoderContext pCtx) {
+  int32_t iThreadCount = 0;
+  if (pCtx->pThreadCtx != NULL) {
+    PWelsDecoderThreadCTX pThreadCtx = (PWelsDecoderThreadCTX)pCtx->pThreadCtx;
+    iThreadCount = pThreadCtx->sThreadInfo.uiThrMaxNum;
+  }
+  return iThreadCount;
+}
 //#ifdef __cplusplus
 //}
 //#endif//__cplusplus

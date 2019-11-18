@@ -151,8 +151,7 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   for (int32_t i = 0; i < pPicNewBuf->iCapacity; i++) {
     pPicNewBuf->ppPic[i]->bUsedAsRef = false;
     pPicNewBuf->ppPic[i]->bIsLongRef = false;
-    pPicNewBuf->ppPic[i]->uiRefCount = 0;
-    pPicNewBuf->ppPic[i]->bAvailableFlag = true;
+    pPicNewBuf->ppPic[i]->iRefCount = 0;
     pPicNewBuf->ppPic[i]->bIsComplete = false;
   }
 // remove old PicBuf
@@ -240,8 +239,7 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   for (int32_t i = 0; i < pPicNewBuf->iCapacity; i++) {
     pPicNewBuf->ppPic[i]->bUsedAsRef = false;
     pPicNewBuf->ppPic[i]->bIsLongRef = false;
-    pPicNewBuf->ppPic[i]->uiRefCount = 0;
-    pPicNewBuf->ppPic[i]->bAvailableFlag = true;
+    pPicNewBuf->ppPic[i]->iRefCount = 0;
     pPicNewBuf->ppPic[i]->bIsComplete = false;
   }
   // remove old PicBuf
@@ -440,7 +438,7 @@ static inline int32_t GetTargetRefListSize (PWelsDecoderContext pCtx) {
     iNumRefFrames = MAX_REF_PIC_COUNT + 2;
   } else {
     iNumRefFrames = pCtx->pSps->iNumRefFrames + 2;
-    if (pCtx->pThreadCtx != NULL) {
+    if (GetThreadCount (pCtx) > 1) {
       iNumRefFrames = MAX_REF_PIC_COUNT + 1;
     }
   }
@@ -484,7 +482,7 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
                          && kiPicHeight == pCtx->iImgHeightInPixel) && (!bNeedChangePicQueue)) // have same scaled buffer
 
   // sync update pRefList
-  if (pCtx->pThreadCtx == NULL) {
+  if (GetThreadCount (pCtx) <= 1) {
     WelsResetRefPic (pCtx); // added to sync update ref list due to pictures are free
   }
 
@@ -562,7 +560,7 @@ void WelsFreeDynamicMemory (PWelsDecoderContext pCtx) {
   if (NULL != pPicBuff && NULL != *pPicBuff) {
     DestroyPicBuff (pCtx, pPicBuff, pMa);
   }
-  if (pCtx->pThreadCtx != NULL) {
+  if (GetThreadCount (pCtx) > 1) {
     //prevent from double destruction of PPicBuff
     PWelsDecoderThreadCTX pThreadCtx = (PWelsDecoderThreadCTX) (pCtx->pThreadCtx);
     int32_t threadCount = pThreadCtx->sThreadInfo.uiThrMaxNum;

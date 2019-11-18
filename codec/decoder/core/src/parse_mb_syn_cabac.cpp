@@ -535,7 +535,7 @@ int32_t ParseInterPMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pN
   pRefCount[0] = pSliceHeader->uiRefCount[0];
   pRefCount[1] = pSliceHeader->uiRefCount[1];
 
-  bool bIsPending = pCtx->pThreadCtx != NULL;
+  bool bIsPending = GetThreadCount (pCtx) > 1;
 
   switch (pCurDqLayer->pDec->pMbType[iMbXy]) {
   case MB_TYPE_16x16: {
@@ -741,7 +741,7 @@ int32_t ParseInterBMotionInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pN
 
   MbType mbType = pCurDqLayer->pDec->pMbType[iMbXy];
 
-  bool bIsPending = pCtx->pThreadCtx != NULL;
+  bool bIsPending = GetThreadCount (pCtx) > 1;
 
   if (IS_DIRECT (mbType)) {
 
