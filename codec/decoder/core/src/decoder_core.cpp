@@ -220,6 +220,9 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
   ppDst[0] = ppDst[0] + pCtx->sFrameCrop.iTopOffset * 2 * pPic->iLinesize[0] + pCtx->sFrameCrop.iLeftOffset * 2;
   ppDst[1] = ppDst[1] + pCtx->sFrameCrop.iTopOffset  * pPic->iLinesize[1] + pCtx->sFrameCrop.iLeftOffset;
   ppDst[2] = ppDst[2] + pCtx->sFrameCrop.iTopOffset  * pPic->iLinesize[1] + pCtx->sFrameCrop.iLeftOffset;
+  for (int i = 0; i < 3; ++i) {
+    pDstInfo->pDst[i] = ppDst[i];
+  }
   pDstInfo->iBufferStatus = 1;
   if (GetThreadCount (pCtx) > 1 && pPic->bIsComplete == false) {
     pPic->bIsComplete = true;
