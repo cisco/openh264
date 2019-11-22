@@ -944,9 +944,9 @@ DECODING_STATE CWelsDecoder::FlushFrame (unsigned char** ppDst,
 #endif
 #endif
     memcpy (pDstInfo, &m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].sBufferInfo, sizeof (SBufferInfo));
-    ppDst[0] = m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].pData[0];
-    ppDst[1] = m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].pData[1];
-    ppDst[2] = m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].pData[2];
+    ppDst[0] = pDstInfo->pDst[0];
+    ppDst[1] = pDstInfo->pDst[1];
+    ppDst[2] = pDstInfo->pDst[2];
     m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPOC = IMinInt32;
     PPicBuff pPicBuff = m_iThreadCount <= 1 ? m_pDecThrCtx[0].pCtx->pPicBuff : m_pPicBuff;
     if (m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPicBuffIdx < pPicBuff->iCapacity) {
@@ -1046,9 +1046,6 @@ void CWelsDecoder::BufferingReadyPicture (PWelsDecoderContext pCtx, unsigned cha
   for (int32_t i = 0; i < 16; ++i) {
     if (m_sPictInfoList[i].iPOC == IMinInt32) {
       memcpy (&m_sPictInfoList[i].sBufferInfo, pDstInfo, sizeof (SBufferInfo));
-      m_sPictInfoList[i].pData[0] = ppDst[0];
-      m_sPictInfoList[i].pData[1] = ppDst[1];
-      m_sPictInfoList[i].pData[2] = ppDst[2];
       m_sPictInfoList[i].iPOC = pCtx->pSliceHeader->iPicOrderCntLsb;
       m_sPictInfoList[i].uiDecodingTimeStamp = pCtx->uiDecodingTimeStamp;
       m_sPictInfoList[i].iPicBuffIdx = pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb->iPicBuffIdx;
@@ -1090,9 +1087,9 @@ void CWelsDecoder::ReleaseBufferedReadyPicture (PWelsDecoderContext pCtx, unsign
 #endif
 #endif
     memcpy (pDstInfo, &m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].sBufferInfo, sizeof (SBufferInfo));
-    ppDst[0] = m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].pData[0];
-    ppDst[1] = m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].pData[1];
-    ppDst[2] = m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].pData[2];
+    ppDst[0] = pDstInfo->pDst[0];
+    ppDst[1] = pDstInfo->pDst[1];
+    ppDst[2] = pDstInfo->pDst[2];
     m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPOC = IMinInt32;
     PPicture pPic = pPicBuff->ppPic[m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPicBuffIdx];
     --pPic->iRefCount;
@@ -1123,9 +1120,9 @@ void CWelsDecoder::ReleaseBufferedReadyPicture (PWelsDecoderContext pCtx, unsign
     }
     if (uiDecodingTimeStamp > 0) {
       memcpy (pDstInfo, &m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].sBufferInfo, sizeof (SBufferInfo));
-      ppDst[0] = m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].pData[0];
-      ppDst[1] = m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].pData[1];
-      ppDst[2] = m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].pData[2];
+      ppDst[0] = pDstInfo->pDst[0];
+      ppDst[1] = pDstInfo->pDst[1];
+      ppDst[2] = pDstInfo->pDst[2];
       m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPOC = IMinInt32;
       PPicture pPic = pPicBuff->ppPic[m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPicBuffIdx];
       --pPic->iRefCount;
@@ -1164,9 +1161,9 @@ void CWelsDecoder::ReleaseBufferedReadyPicture (PWelsDecoderContext pCtx, unsign
 #endif
 #endif
       memcpy (pDstInfo, &m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].sBufferInfo, sizeof (SBufferInfo));
-      ppDst[0] = m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].pData[0];
-      ppDst[1] = m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].pData[1];
-      ppDst[2] = m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].pData[2];
+      ppDst[0] = pDstInfo->pDst[0];
+      ppDst[1] = pDstInfo->pDst[1];
+      ppDst[2] = pDstInfo->pDst[2];
       m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPOC = IMinInt32;
       PPicture pPic = pPicBuff->ppPic[m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPicBuffIdx];
       --pPic->iRefCount;

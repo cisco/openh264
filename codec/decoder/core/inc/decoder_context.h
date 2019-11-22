@@ -286,7 +286,6 @@ typedef struct tagPictInfo {
   int32_t                 iPicBuffIdx;
   uint32_t                uiDecodingTimeStamp;
   bool                    bLastGOP;
-  unsigned char*          pData[3];
 } SPictInfo, *PPictInfo;
 
 typedef struct tagPictReoderingStatus {

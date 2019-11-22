@@ -145,9 +145,9 @@ void FlushFrames (ISVCDecoder* pDecoder, int64_t& iTotal, FILE* pYuvFile, FILE* 
     sDstBufInfo.iBufferStatus = 1;
     pDecoder->FlushFrame (pData, &sDstBufInfo);
     if (sDstBufInfo.iBufferStatus == 1) {
-      pDst[0] = pData[0];
-      pDst[1] = pData[1];
-      pDst[2] = pData[2];
+      pDst[0] = sDstBufInfo.pDst[0];
+      pDst[1] = sDstBufInfo.pDst[1];
+      pDst[2] = sDstBufInfo.pDst[2];
     }
     int64_t iEnd = WelsTime();
     iTotal += iEnd - iStart;
@@ -346,9 +346,9 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
     }
 
     if (sDstBufInfo.iBufferStatus == 1) {
-      pDst[0] = pData[0];
-      pDst[1] = pData[1];
-      pDst[2] = pData[2];
+      pDst[0] = sDstBufInfo.pDst[0];
+      pDst[1] = sDstBufInfo.pDst[1];
+      pDst[2] = sDstBufInfo.pDst[2];
     }
     iEnd    = WelsTime();
     iTotal += iEnd - iStart;
@@ -378,9 +378,9 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
       sDstBufInfo.uiInBsTimeStamp = uiTimeStamp;
       pDecoder->DecodeFrame2 (NULL, 0, pData, &sDstBufInfo);
       if (sDstBufInfo.iBufferStatus == 1) {
-        pDst[0] = pData[0];
-        pDst[1] = pData[1];
-        pDst[2] = pData[2];
+        pDst[0] = sDstBufInfo.pDst[0];
+        pDst[1] = sDstBufInfo.pDst[1];
+        pDst[2] = sDstBufInfo.pDst[2];
       }
       iEnd    = WelsTime();
       iTotal += iEnd - iStart;
