@@ -127,6 +127,7 @@ class CWelsDecoder : public ISVCDecoder {
   int32_t                 m_DecCtxActiveCount;
   PWelsDecoderThreadCTX   m_pDecThrCtx;
   PWelsDecoderThreadCTX   m_pLastDecThrCtx;
+  int32_t                 m_iLastBufferedIdx;
   WELS_MUTEX              m_csDecoder;
   SWelsDecEvent           m_sBufferingEvent;
   SWelsDecEvent           m_sReleaseBufferEvent;
