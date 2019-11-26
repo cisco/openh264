@@ -52,7 +52,6 @@ class BaseThreadDecoderTest {
   BufferedData buf[16];
   SBufferInfo sBufInfo;
   uint8_t* pData[3];
-  uint8_t* pDst[3];
   uint64_t uiTimeStamp;
   FILE* pYuvFile;
   bool bEnableYuvDumpTest;
