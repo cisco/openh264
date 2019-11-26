@@ -113,7 +113,7 @@ static const FileParam kFileParamArray[] = {
   {"res/MPS_MW_A.264", "b0fce28218e678d89f464810f88b143ada49dd06"},
   //{"res/MR1_BT_A.h264", "eebd1d7cdb67df5b8688b1ce18f6acae129b32e6 d20e96f9ecc2e24c13eb25b1c786da53eb716327"}, three hash values temp disabled
   {"res/MR1_MW_A.264", "14d8ddb12ed711444039329db29c496b079680ba"},
-  {"res/MR2_MW_A.264", "6d332a653fe3b923eb3af8f3695d46ce2a1d4b2c 14a38e41f4dbf924b8eff6e96aad77394c8aabcd"},
+  {"res/MR2_MW_A.264", "6d332a653fe3b923eb3af8f3695d46ce2a1d4b2c e379caa57c0c60ca6d6091c19815c7422e3c59c7 14a38e41f4dbf924b8eff6e96aad77394c8aabcd"},
   //{"res/MR2_TANDBERG_E.264", "74d618bc7d9d41998edf4c85d51aa06111db6609"}, //DPB buffer is too small
   {"res/NL1_Sony_D.jsv", "e401e30669938443c2f02522fd4d5aa1382931a0"},
   {"res/NLMQ1_JVC_C.264", "f3265c6ddf8db1b2bf604d8a2954f75532e28cda a86ec7a843e93f44aaee2619a7932c6c5c8d233f"},
