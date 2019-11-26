@@ -1,5 +1,6 @@
 test_sources = [
   'BaseDecoderTest.cpp',
+  'BaseThreadDecoderTest.cpp',
   'BaseEncoderTest.cpp',
   'cpp_interface_test.cpp',
   'DataGenerator.cpp',
@@ -7,6 +8,7 @@ test_sources = [
   'decode_encode_test.cpp',
   'decoder_ec_test.cpp',
   'decoder_test.cpp',
+  'thread_decoder_test.cpp',
   'encode_decode_api_test.cpp',
   'encode_options_test.cpp',
   'encoder_test.cpp',
