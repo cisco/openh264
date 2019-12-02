@@ -142,7 +142,6 @@ void FlushFrames (ISVCDecoder* pDecoder, int64_t& iTotal, FILE* pYuvFile, FILE* 
     pData[2] = NULL;
     memset (&sDstBufInfo, 0, sizeof (SBufferInfo));
     sDstBufInfo.uiInBsTimeStamp = uiTimeStamp;
-    sDstBufInfo.iBufferStatus = 1;
     pDecoder->FlushFrame (pData, &sDstBufInfo);
     if (sDstBufInfo.iBufferStatus == 1) {
       pDst[0] = sDstBufInfo.pDst[0];

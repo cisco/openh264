@@ -538,7 +538,7 @@ typedef struct tagSWelsDecThreadCtx {
   PPicture pDec;
   SWelsDecEvent sImageReady;
   SWelsDecEvent sSliceDecodeStart;
-  SWelsDecEvent sSliceDecodeFinsh;
+  SWelsDecEvent sSliceDecodeFinish;
   int32_t       iPicBuffIdx; //picBuff Index
 } SWelsDecoderThreadCTX, *PWelsDecoderThreadCTX;
 
