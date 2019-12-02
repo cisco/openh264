@@ -95,6 +95,7 @@ struct SPicture {
   int32_t iMbNum;
 
   bool*    pMbCorrectlyDecodedFlag;
+  int8_t (*pNzc)[24];
   uint32_t*  pMbType; // mb type used for direct mode
   int16_t (*pMv[LIST_A])[MB_BLOCK4x4_NUM][MV_A]; // used for direct mode
   int8_t (*pRefIndex[LIST_A])[MB_BLOCK4x4_NUM]; //used for direct mode
