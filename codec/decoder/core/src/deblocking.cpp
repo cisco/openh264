@@ -576,7 +576,7 @@ uint32_t DeblockingBsMarginalMBAvcbase (PDeblockingFilter  pFilter, PDqLayer pCu
     for (i = 0; i < 2; i++) {
       uint8_t uiNzc = 0;
       for (j = 0; uiNzc == 0 && j < 4; j++) {
-        uiNzc |= (pCurDqLayer->pNzc[iMbXy][* (pB8x8Idx + j)] | pCurDqLayer->pNzc[iNeighMb][* (pBn8x8Idx + j)]);
+        uiNzc |= (GetPNzc (pCurDqLayer, iMbXy)[* (pB8x8Idx + j)] | GetPNzc (pCurDqLayer, iNeighMb)[* (pBn8x8Idx + j)]);
       }
       if (uiNzc) {
         pBS[i << 1] = pBS[1 + (i << 1)] = 2;
@@ -595,10 +595,10 @@ uint32_t DeblockingBsMarginalMBAvcbase (PDeblockingFilter  pFilter, PDqLayer pCu
     for (i = 0; i < 2; i++) {
       uint8_t uiNzc = 0;
       for (j = 0; uiNzc == 0 && j < 4; j++) {
-        uiNzc |= pCurDqLayer->pNzc[iMbXy][* (pB8x8Idx + j)];
+        uiNzc |= GetPNzc (pCurDqLayer, iMbXy)[* (pB8x8Idx + j)];
       }
       for (j = 0; j < 2; j++) {
-        if (uiNzc | pCurDqLayer->pNzc[iNeighMb][*pBnIdx]) {
+        if (uiNzc | GetPNzc (pCurDqLayer, iNeighMb)[*pBnIdx]) {
           pBS[j + (i << 1)] = 2;
         } else {
           PPicture ref0, ref1;
@@ -616,10 +616,10 @@ uint32_t DeblockingBsMarginalMBAvcbase (PDeblockingFilter  pFilter, PDqLayer pCu
     for (i = 0; i < 2; i++) {
       uint8_t uiNzc = 0;
       for (j = 0; uiNzc == 0 && j < 4; j++) {
-        uiNzc |= pCurDqLayer->pNzc[iNeighMb][* (pBn8x8Idx + j)];
+        uiNzc |= GetPNzc (pCurDqLayer, iNeighMb)[* (pBn8x8Idx + j)];
       }
       for (j = 0; j < 2; j++) {
-        if (uiNzc | pCurDqLayer->pNzc[iMbXy][*pBIdx]) {
+        if (uiNzc | GetPNzc (pCurDqLayer, iMbXy)[*pBIdx]) {
           pBS[j + (i << 1)] = 2;
         } else {
           PPicture ref0, ref1;
@@ -637,7 +637,7 @@ uint32_t DeblockingBsMarginalMBAvcbase (PDeblockingFilter  pFilter, PDqLayer pCu
   } else {
     // only 4x4 transform
     for (i = 0; i < 4; i++) {
-      if (pCurDqLayer->pNzc[iMbXy][*pBIdx] | pCurDqLayer->pNzc[iNeighMb][*pBnIdx]) {
+      if (GetPNzc (pCurDqLayer, iMbXy)[*pBIdx] | GetPNzc (pCurDqLayer, iNeighMb)[*pBnIdx]) {
         pBS[i] = 2;
       } else {
         PPicture ref0, ref1;
@@ -668,7 +668,7 @@ uint32_t DeblockingBSliceBsMarginalMBAvcbase (PDeblockingFilter  pFilter, PDqLay
     for (i = 0; i < 2; i++) {
       uint8_t uiNzc = 0;
       for (j = 0; uiNzc == 0 && j < 4; j++) {
-        uiNzc |= (pCurDqLayer->pNzc[iMbXy][* (pB8x8Idx + j)] | pCurDqLayer->pNzc[iNeighMb][* (pBn8x8Idx + j)]);
+        uiNzc |= (GetPNzc (pCurDqLayer, iMbXy)[* (pB8x8Idx + j)] | GetPNzc (pCurDqLayer, iNeighMb)[* (pBn8x8Idx + j)]);
       }
       if (uiNzc) {
         pBS[i << 1] = pBS[1 + (i << 1)] = 2;
@@ -693,10 +693,10 @@ uint32_t DeblockingBSliceBsMarginalMBAvcbase (PDeblockingFilter  pFilter, PDqLay
     for (i = 0; i < 2; i++) {
       uint8_t uiNzc = 0;
       for (j = 0; uiNzc == 0 && j < 4; j++) {
-        uiNzc |= pCurDqLayer->pNzc[iMbXy][* (pB8x8Idx + j)];
+        uiNzc |= GetPNzc (pCurDqLayer, iMbXy)[* (pB8x8Idx + j)];
       }
       for (j = 0; j < 2; j++) {
-        if (uiNzc | pCurDqLayer->pNzc[iNeighMb][*pBnIdx]) {
+        if (uiNzc | GetPNzc (pCurDqLayer, iNeighMb)[*pBnIdx]) {
           pBS[j + (i << 1)] = 2;
         } else {
           pBS[j + (i << 1)] = 1;
@@ -720,10 +720,10 @@ uint32_t DeblockingBSliceBsMarginalMBAvcbase (PDeblockingFilter  pFilter, PDqLay
     for (i = 0; i < 2; i++) {
       uint8_t uiNzc = 0;
       for (j = 0; uiNzc == 0 && j < 4; j++) {
-        uiNzc |= pCurDqLayer->pNzc[iNeighMb][* (pBn8x8Idx + j)];
+        uiNzc |= GetPNzc (pCurDqLayer, iNeighMb)[* (pBn8x8Idx + j)];
       }
       for (j = 0; j < 2; j++) {
-        if (uiNzc | pCurDqLayer->pNzc[iMbXy][*pBIdx]) {
+        if (uiNzc | GetPNzc (pCurDqLayer, iMbXy)[*pBIdx]) {
           pBS[j + (i << 1)] = 2;
         } else {
           pBS[j + (i << 1)] = 1;
@@ -745,7 +745,7 @@ uint32_t DeblockingBSliceBsMarginalMBAvcbase (PDeblockingFilter  pFilter, PDqLay
   } else {
     // only 4x4 transform
     for (i = 0; i < 4; i++) {
-      if (pCurDqLayer->pNzc[iMbXy][*pBIdx] | pCurDqLayer->pNzc[iNeighMb][*pBnIdx]) {
+      if (GetPNzc (pCurDqLayer, iMbXy)[*pBIdx] | GetPNzc (pCurDqLayer, iNeighMb)[*pBnIdx]) {
         pBS[i] = 2;
       } else {
         pBS[i] = 1;
@@ -1286,16 +1286,16 @@ void WelsDeblockingMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t
     } else {
       if (IS_INTER_16x16 (iCurMbType)) {
         if (!pCurDqLayer->pTransformSize8x8Flag[pCurDqLayer->iMbXyIndex]) {
-          DeblockingBSInsideMBAvsbase (pCurDqLayer->pNzc[iMbXyIndex], nBS, 1);
+          DeblockingBSInsideMBAvsbase (GetPNzc (pCurDqLayer, iMbXyIndex), nBS, 1);
         } else {
-          DeblockingBSInsideMBAvsbase8x8 (pCurDqLayer->pNzc[iMbXyIndex], nBS, 1);
+          DeblockingBSInsideMBAvsbase8x8 (GetPNzc (pCurDqLayer, iMbXyIndex), nBS, 1);
         }
       } else {
 
         if (bBSlice) {
-          DeblockingBSliceBSInsideMBNormal (pFilter, pCurDqLayer, nBS, pCurDqLayer->pNzc[iMbXyIndex], iMbXyIndex);
+          DeblockingBSliceBSInsideMBNormal (pFilter, pCurDqLayer, nBS, GetPNzc (pCurDqLayer, iMbXyIndex), iMbXyIndex);
         } else {
-          DeblockingBSInsideMBNormal (pFilter, pCurDqLayer, nBS, pCurDqLayer->pNzc[iMbXyIndex], iMbXyIndex);
+          DeblockingBSInsideMBNormal (pFilter, pCurDqLayer, nBS, GetPNzc (pCurDqLayer, iMbXyIndex), iMbXyIndex);
         }
       }
     }
