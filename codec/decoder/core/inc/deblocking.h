@@ -105,6 +105,13 @@ int32_t DeblockingAvailableNoInterlayer (PDqLayer pCurDqLayer, int32_t iFilterId
 
 void WelsDeblockingMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t iBoundryFlag);
 
+inline int8_t* GetPNzc (PDqLayer pCurDqLayer, int32_t iMbXy) {
+  if (pCurDqLayer->pDec != NULL && pCurDqLayer->pDec->pNzc != NULL) {
+    return pCurDqLayer->pDec->pNzc[iMbXy];
+  }
+  return pCurDqLayer->pNzc[iMbXy];
+}
+
 } // namespace WelsDec
 
 #endif //WELS_DEBLOCKING_H__
