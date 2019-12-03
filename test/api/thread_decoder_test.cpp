@@ -139,7 +139,7 @@ static const FileParam kFileParamArray[] = {
   {"res/test_vd_1d.264", "15d8beaf991f9e5d56a854cdafc0a7abdd5bec69"},
   {"res/test_vd_rc.264", "cd6ef57fc884e5ecd9867591b01e35e3f091b8d0"},
   {"res/Cisco_Men_whisper_640x320_CABAC_Bframe_9.264", "7df59855104a319b44a7611dd6c37b1670bf74c9 f5593d374e8f68b1c882d407d961d80cf10ba737"},
-  {"res/Cisco_Men_whisper_640x320_CAVLC_Bframe_9.264", "0d77e3c53f46d8962cd95b975e76d0f32613da0f"},
+  {"res/Cisco_Men_whisper_640x320_CAVLC_Bframe_9.264", "0d77e3c53f46d8962cd95b975e76d0f32613da0f 67eec8abb0b22ff0f00d06c769b8a2e44cec33cf"},
   {"res/Cisco_Adobe_PDF_sample_a_1024x768_CAVLC_Bframe_9.264", "6cac61a6b58bba59b8e9944b18aba2df20efeca2"},
   {"res/VID_1280x544_cabac_temporal_direct.264", "e8ee8dd56ec5df1338f3c21ed8690d074c7ec03f"},
   {"res/VID_1280x720_cabac_temporal_direct.264", "1efa6aec8c5f953c53d713c31999420fdbd10b22"},
