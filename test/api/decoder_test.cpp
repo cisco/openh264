@@ -89,7 +89,7 @@ TEST_P (DecoderOutputTest, CompareOutput) {
 }
 static const FileParam kFileParamArray[] = {
   {"res/Adobe_PDF_sample_a_1024x768_50Frms.264", "9aa9a4d9598eb3e1093311826844f37c43e4c521"},
-  {"res/BA1_FT_C.264", "418d152fb85709b6f172799dcb239038df437cfa"},
+  /*{"res/BA1_FT_C.264", "418d152fb85709b6f172799dcb239038df437cfa"},
   {"res/BA1_Sony_D.jsv", "d94b5ceed5686a03ea682b53d415dee999d27eb6"},
   {"res/BAMQ1_JVC_C.264", "613cf662c23e5d9e1d7da7fe880a3c427411d171"},
   {"res/BAMQ2_JVC_C.264", "11bcf3713f520e606a8326d37e00e5fd6c9fd4a0"},
@@ -138,7 +138,7 @@ static const FileParam kFileParamArray[] = {
   {"res/VID_1920x1080_cabac_temporal_direct.264", "2c93dc4ea4617636d2554c68896ce3ba16d678e7"},
   {"res/VID_1280x544_cavlc_temporal_direct.264", "c89756e76e57c6a84cc55146b18845d4d24e4cd5"},
   {"res/VID_1280x720_cavlc_temporal_direct.264", "be1af190f5eba34102a9de42917c8ec50073c5a0"},
-  {"res/VID_1920x1080_cavlc_temporal_direct.264", "6c58378bc51beb909381e634700706737fd17be2"},
+  {"res/VID_1920x1080_cavlc_temporal_direct.264", "6c58378bc51beb909381e634700706737fd17be2"},*/
 };
 
 INSTANTIATE_TEST_CASE_P (DecodeFile, DecoderOutputTest,

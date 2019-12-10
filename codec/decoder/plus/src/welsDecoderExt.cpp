@@ -1118,12 +1118,14 @@ void CWelsDecoder::ReleaseBufferedReadyPicture (PWelsDecoderContext pCtx, unsign
       }
     }
     m_sReoderingStatus.iLastWrittenPOC = m_sReoderingStatus.iMinPOC;
-#if defined (_DEBUG)
-#ifdef _MOTION_VECTOR_DUMP_
-    fprintf (stderr, "Output POC: #%d uiDecodingTimeStamp=%d\n", m_sReoderingStatus.iLastWrittenPOC,
+//#if defined (_DEBUG)
+//#ifdef _MOTION_VECTOR_DUMP_
+    if (pCtx == NULL) {
+      fprintf (stderr, "Output POC: #%d uiDecodingTimeStamp=%d\n", m_sReoderingStatus.iLastWrittenPOC,
              m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].uiDecodingTimeStamp);
-#endif
-#endif
+    }
+//#endif
+//#endif
     memcpy (pDstInfo, &m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].sBufferInfo, sizeof (SBufferInfo));
     ppDst[0] = pDstInfo->pDst[0];
     ppDst[1] = pDstInfo->pDst[1];
@@ -1159,12 +1161,14 @@ void CWelsDecoder::ReleaseBufferedReadyPicture (PWelsDecoderContext pCtx, unsign
       }
     }
     if (uiDecodingTimeStamp > 0) {
-#if defined (_DEBUG)
-#ifdef _MOTION_VECTOR_DUMP_
-      fprintf (stderr, "Output POC: #%d uiDecodingTimeStamp=%d\n", m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPOC,
+//#if defined (_DEBUG)
+//#ifdef _MOTION_VECTOR_DUMP_
+      if (pCtx == NULL) {
+        fprintf (stderr, "Output POC: #%d uiDecodingTimeStamp=%d\n", m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPOC,
                uiDecodingTimeStamp);
-#endif
-#endif
+      }
+//#endif
+//#endif
       memcpy (pDstInfo, &m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].sBufferInfo, sizeof (SBufferInfo));
       ppDst[0] = pDstInfo->pDst[0];
       ppDst[1] = pDstInfo->pDst[1];
@@ -1202,12 +1206,14 @@ void CWelsDecoder::ReleaseBufferedReadyPicture (PWelsDecoderContext pCtx, unsign
                    || m_sReoderingStatus.iMinPOC < iLastPOC;
     if (isReady) {
       m_sReoderingStatus.iLastWrittenPOC = m_sReoderingStatus.iMinPOC;
-#if defined (_DEBUG)
-#ifdef _MOTION_VECTOR_DUMP_
-      fprintf (stderr, "Output POC: #%d uiDecodingTimeStamp=%d\n", m_sReoderingStatus.iLastWrittenPOC,
+//#if defined (_DEBUG)
+//#ifdef _MOTION_VECTOR_DUMP_
+      if (pCtx == NULL) {
+        fprintf (stderr, "Output POC: #%d uiDecodingTimeStamp=%d\n", m_sReoderingStatus.iLastWrittenPOC,
                m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].uiDecodingTimeStamp);
-#endif
-#endif
+      }
+//#endif
+//#endif
       memcpy (pDstInfo, &m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].sBufferInfo, sizeof (SBufferInfo));
       ppDst[0] = pDstInfo->pDst[0];
       ppDst[1] = pDstInfo->pDst[1];
