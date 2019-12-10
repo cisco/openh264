@@ -26,6 +26,8 @@ before_script:
   - cd ${WorkingDir}
 
 env:
+  - TASK=UnitTest;      TestParameter=""
+  - TASK=BinaryCompare; TestParameter=BA_MW_D.264
 matrix:
   exclude:
     - compiler: clang
