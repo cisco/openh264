@@ -22,13 +22,10 @@ install:
 before_script:
   - WorkingDir=`pwd`
   - cd test/encoder_binary_comparison
+  - ./run_PrepareAllTestData.sh 64
   - cd ${WorkingDir}
 
 env:
-  - TASK=UnitTest;      TestParameter=""
-  - TASK=BinaryCompare; TestParameter=BA_MW_D.264
-  - TASK=BinaryCompare; TestParameter=Zhling_1280x720.264
-  - TASK=BinaryCompare; TestParameter=Adobe_PDF_sample_a_1024x768_50Frms.264
 matrix:
   exclude:
     - compiler: clang
