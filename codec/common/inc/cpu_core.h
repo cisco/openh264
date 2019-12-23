@@ -86,6 +86,7 @@
 
 /* For loongson */
 #define WELS_CPU_MMI        0x00000001  /* mmi */
+#define WELS_CPU_MSA        0x00000002  /* msa */
 
 /*
  *  Interfaces for CPU core feature detection as below
