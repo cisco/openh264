@@ -125,6 +125,7 @@ pkg_install_dir = '@0@/pkgconfig'.format(get_option('libdir'))
 foreach t : ['', '-static']
   pkgconf = configuration_data()
   pkgconf.set('prefix', join_paths(get_option('prefix')))
+  pkgconf.set('libdir', '${prefix}/@0@'.format(get_option('libdir')))
   pkgconf.set('VERSION', meson.project_version())
   if t == '-static'
     do_install = false
