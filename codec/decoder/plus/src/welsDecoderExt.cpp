@@ -363,6 +363,7 @@ void CWelsDecoder::UninitDecoderCtx (PWelsDecoderContext& pCtx) {
 
       pCtx = NULL;
     }
+    if (m_iCtxCount <= 1) m_pDecThrCtx[0].pCtx = NULL;
   }
 }
 
@@ -408,7 +409,7 @@ int32_t CWelsDecoder::InitDecoderCtx (PWelsDecoderContext& pCtx, const SDecoding
   int32_t iCacheLineSize = 16;   // on chip cache line size in byte
   pCtx->pMemAlign = new CMemoryAlign (iCacheLineSize);
   WELS_VERIFY_RETURN_PROC_IF (cmMallocMemeError, (NULL == pCtx->pMemAlign), UninitDecoderCtx (pCtx))
-
+  if (m_iCtxCount <= 1) m_pDecThrCtx[0].pCtx = pCtx;
   //fill in default value into context
   pCtx->pLastDecPicInfo = &m_sLastDecPicInfo;
   pCtx->pDecoderStatistics = &m_sDecoderStatistics;

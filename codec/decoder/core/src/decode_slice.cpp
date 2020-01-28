@@ -1719,16 +1719,12 @@ int32_t WelsDecodeAndConstructSlice (PWelsDecoderContext pCtx) {
 
       return ERR_INFO_MB_RECON_FAIL;
     }
-    int8_t pNzc[24];
+    memcpy (pCtx->pDec->pNzc[pCurDqLayer->iMbXyIndex], pCurDqLayer->pNzc[pCurDqLayer->iMbXyIndex], 24);
     if (pCtx->eSliceType != I_SLICE) {
-      memcpy (pNzc, pCurDqLayer->pNzc[pCurDqLayer->iMbXyIndex], 24);
       pCtx->sBlockFunc.pWelsSetNonZeroCountFunc (
-        pCurDqLayer->pNzc[pCurDqLayer->iMbXyIndex]); // set all none-zero nzc to 1; dbk can be opti!
+        pCtx->pDec->pNzc[pCurDqLayer->iMbXyIndex]); // set all none-zero nzc to 1; dbk can be opti!
     }
     WelsDeblockingFilterMB (pCurDqLayer, pFilter, iFilterIdc, pDeblockMb);
-    if (pCtx->eSliceType != I_SLICE) {
-      memcpy (pCurDqLayer->pNzc[pCurDqLayer->iMbXyIndex], pNzc, 24);
-    }
     if (pCtx->uiNalRefIdc > 0) {
       if (pCurDqLayer->iMbX == 0 || pCurDqLayer->iMbX == pCurDqLayer->iMbWidth - 1 || pCurDqLayer->iMbY == 0
           || pCurDqLayer->iMbY == pCurDqLayer->iMbHeight - 1) {
