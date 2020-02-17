@@ -1,5 +1,5 @@
 prefix=@prefix@
-libdir=${prefix}/lib
+libdir=@libdir@
 includedir=${prefix}/include
 
 Name: OpenH264
