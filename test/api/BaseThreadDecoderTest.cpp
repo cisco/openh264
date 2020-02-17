@@ -175,7 +175,6 @@ int32_t BaseThreadDecoderTest::SetUp() {
   decParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
   decParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
   int iThreadCount = (rand() % 2) + 2;
-  fprintf (stderr, "iThreadCount=%d\n", iThreadCount);
   decoder_->SetOption (DECODER_OPTION_NUM_OF_THREADS, &iThreadCount);
 
   rv = decoder_->Initialize (&decParam);
