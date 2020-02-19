@@ -804,7 +804,7 @@ TEST (DecoderDeblocking, DeblockingBsMarginalMBAvcbase) {
   // Dummy picture list pointers to 1..MAX_DPB_COUNT
   // the pointer values don't need to be valid, just different
   for (i = 0; i < MAX_DPB_COUNT; i++)
-    iFilterPics[0][i] = iFilterPics[1][i] = (PPicture) (iFilterPics + i);
+    iFilterPics[0][i] = iFilterPics[1][i] = (PPicture) (iFilterPics[0] + i);
 
   sFilter.pRefPics[0] = iFilterPics[0];
   sFilter.pRefPics[1] = iFilterPics[1];
