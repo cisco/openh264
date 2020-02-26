@@ -49,6 +49,7 @@ CFLAGS += -isystem $(NDKROOT)/sysroot/usr/include -isystem $(NDKROOT)/sysroot/us
 CXXFLAGS += -fno-rtti -fno-exceptions
 LDFLAGS += --sysroot=$(SYSROOT)
 SHLDFLAGS = -Wl,--no-undefined -Wl,-z,relro -Wl,-z,now -Wl,-soname,lib$(PROJECT_NAME).so
+UTSHLDFLAGS = -Wl,-soname,libut.so
 
 ifeq ($(NDK_TOOLCHAIN_VERSION), clang)
   HOST_OS = $(shell uname -s | tr [A-Z] [a-z])
@@ -70,8 +71,10 @@ ifeq ($(NDK_TOOLCHAIN_VERSION), clang)
 
   CFLAGS += -target $(TARGET_NAME)
   LDFLAGS += -target $(TARGET_NAME) -gcc-toolchain $(GCC_TOOLCHAIN_PATH)
-  LDFLAGS += -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libunwind.a
 endif
+
+# background reading: https://android.googlesource.com/platform/ndk/+/master/docs/BuildSystemMaintainers.md#unwinding
+LDFLAGS += -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libunwind.a
 
 ifneq ($(findstring /,$(CXX)),$(findstring \,$(CXX)))
 ifneq ($(CXX),$(wildcard $(CXX)))
@@ -81,10 +84,18 @@ endif
 endif
 endif
 
+ifeq ($(NDK_TOOLCHAIN_VERSION), clang)
+STL_INCLUDES = \
+    -I$(NDKROOT)/sources/cxx-stl/llvm-libc++/include \
+    -I$(NDKROOT)/sources/cxx-stl/llvm-libc++abi/include
+STL_LIB = \
+    $(NDKROOT)/sources/cxx-stl/llvm-libc++/libs/$(APP_ABI)/libc++_static.a
+else
 STL_INCLUDES = \
     -I$(NDKROOT)/sources/cxx-stl/stlport/stlport
 STL_LIB = \
     $(NDKROOT)/sources/cxx-stl/stlport/libs/$(APP_ABI)/libstlport_static.a
+endif
 
 GTEST_INCLUDES = $(STL_INCLUDES)
 CODEC_UNITTEST_INCLUDES = $(STL_INCLUDES)
