@@ -1,6 +1,12 @@
 
 Releases
 -----------
+v2.1.0
+------
+- Experimentally support for multi-thread decoding(default disabled,and may result in random problems if enabled)
+- Assembly optimization for loongson platform
+- Update meson version to 5
+- Some minor bug fixes
 
 v2.0.0
 ------
