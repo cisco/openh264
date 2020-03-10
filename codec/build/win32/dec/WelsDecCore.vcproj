@@ -982,6 +982,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\common\src\WelsThreadLib.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\decoder\core\src\wels_decoder_thread.cpp"
 				>
 			</File>
