@@ -18,14 +18,32 @@ cpp_sources = [
   'src/vaacalc/vaacalculation.cpp',
 ]
 
-asm_sources = [
-  'src/x86/denoisefilter.asm',
-  'src/x86/downsample_bilinear.asm',
-  'src/x86/vaa.asm',
-]
-
-objs_asm = asm_gen.process(asm_sources)
+objs_asm = []
+if ['x86', 'x86_64'].contains(cpu_family)
+  asm_sources = [
+    'src/x86/denoisefilter.asm',
+    'src/x86/downsample_bilinear.asm',
+    'src/x86/vaa.asm',
+  ]
+  objs_asm = asm_gen.process(asm_sources)
+elif cpu_family == 'arm'
+  cpp_sources += [
+    'src/arm/adaptive_quantization.S',
+    'src/arm/down_sample_neon.S',
+    'src/arm/pixel_sad_neon.S',
+    'src/arm/vaa_calc_neon.S',
+  ]
+elif cpu_family == 'aarch64'
+  cpp_sources += [
+	'src/arm64/adaptive_quantization_aarch64_neon.S',
+	'src/arm64/down_sample_aarch64_neon.S',
+	'src/arm64/pixel_sad_aarch64_neon.S',
+	'src/arm64/vaa_calc_aarch64_neon.S',
+  ]
+else
+  error('Unsupported cpu family @0@'.format(cpu_family))
+endif
 
 libprocessing = static_library('processing', cpp_sources, objs_asm,
-  include_directories: [inc, processing_inc],
+  include_directories: [inc, processing_inc, casm_inc],
   dependencies: deps)

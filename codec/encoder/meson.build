@@ -33,19 +33,41 @@ cpp_sources = [
   'plus/src/welsEncoderExt.cpp',
 ]
 
-asm_sources = [
-  'core/x86/coeff.asm',
-  'core/x86/dct.asm',
-  'core/x86/intra_pred.asm',
-  'core/x86/matrix_transpose.asm',
-  'core/x86/memzero.asm',
-  'core/x86/quant.asm',
-  'core/x86/sample_sc.asm',
-  'core/x86/score.asm',
-]
-
-objs_asm = asm_gen.process(asm_sources)
+objs_asm = []
+if ['x86', 'x86_64'].contains(cpu_family)
+  asm_sources = [
+    'core/x86/coeff.asm',
+    'core/x86/dct.asm',
+    'core/x86/intra_pred.asm',
+    'core/x86/matrix_transpose.asm',
+    'core/x86/memzero.asm',
+    'core/x86/quant.asm',
+    'core/x86/sample_sc.asm',
+    'core/x86/score.asm',
+  ]
+  objs_asm = asm_gen.process(asm_sources)
+elif cpu_family == 'arm'
+  cpp_sources += [
+    'core/arm/intra_pred_neon.S',
+    'core/arm/intra_pred_sad_3_opt_neon.S',
+    'core/arm/memory_neon.S',
+    'core/arm/pixel_neon.S',
+    'core/arm/reconstruct_neon.S',
+    'core/arm/svc_motion_estimation.S',
+  ]
+elif cpu_family == 'aarch64'
+  cpp_sources += [
+    'core/arm64/intra_pred_aarch64_neon.S',
+    'core/arm64/intra_pred_sad_3_opt_aarch64_neon.S',
+    'core/arm64/memory_aarch64_neon.S',
+    'core/arm64/pixel_aarch64_neon.S',
+    'core/arm64/reconstruct_aarch64_neon.S',
+    'core/arm64/svc_motion_estimation_aarch64_neon.S',
+  ]
+else
+  error('Unsupported cpu family @0@'.format(cpu_family))
+endif
 
 libencoder = static_library('encoder', cpp_sources, objs_asm,
-  include_directories: [inc, processing_inc, encoder_inc],
+  include_directories: [inc, processing_inc, encoder_inc, casm_inc],
   dependencies: deps)
