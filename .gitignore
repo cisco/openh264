@@ -57,3 +57,6 @@ codec/build/iOS/dec/welsdec/build/
 # editor files
 *~
 
+#prefab
+/openh264.aar
+/aar/
