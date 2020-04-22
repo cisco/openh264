@@ -781,9 +781,9 @@ const uint32_t kiFrameNum = 100; //DO NOT CHANGE!
 const char* const pHashStr[][2] = { //DO NOT CHANGE!
   // Allow for different output depending on whether averaging is done
   // vertically or horizontally first when downsampling.
-  { "caaaa3352ab8614e3a35836f5d7c9a528294e953", "326cc236e9ba5277aedc5cf0865dd4cbd2f89fe0" },
-  { "2dc97661e94515d9947a344127062f82814afc2a", "72f36bb33d190979be88077c6166a09767dd2992" },
-  { "106ec96a90412aabea5c0cfa6bfc654a0b5db33e", "998c2947bccf140bde1e43e29376614038eb7c71" }
+  { "d5fb6d72f8cc0ea4b037e883598c162fd32b475d", "0fc7e06d0d766ac911730da2aa9e953bc858a161" },
+  { "2dc97661e94515d9947a344127062f82814afc2a", "1d47de674c9c44d8292ee00fa053a42bb9383614" },
+  { "86bf890aef2abe24abe40ebe3d9ec76a25ddebe7", "43eaac708413c109ca120c5d570176f1c9b4036c" }
 };
 
 class DecodeParseAPI : public ::testing::TestWithParam<EncodeDecodeFileParamBase>, public EncodeDecodeTestBase {
