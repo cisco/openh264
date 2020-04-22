@@ -485,15 +485,20 @@ SECTION .note.GNU-stack noalloc noexec nowrite progbits ; Mark the stack as non-
 %endmacro
 
 %macro WELS_EXTERN 1
-    %ifndef WELS_PRIVATE_EXTERN
-        %define WELS_PRIVATE_EXTERN
-    %endif
     ALIGN 16, nop
     %ifdef PREFIX
-        global _%1 WELS_PRIVATE_EXTERN
+        %ifdef WELS_PRIVATE_EXTERN
+            global _%1: WELS_PRIVATE_EXTERN
+        %else
+            global _%1
+        %endif
         %define %1 _%1
     %else
-        global %1 WELS_PRIVATE_EXTERN
+        %ifdef WELS_PRIVATE_EXTERN
+            global %1: WELS_PRIVATE_EXTERN
+        %else
+            global %1
+        %endif
     %endif
     %1:
 %endmacro
