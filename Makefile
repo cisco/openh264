@@ -36,7 +36,7 @@ STATIC_LDFLAGS=-lstdc++
 STRIP ?= strip
 
 SHAREDLIB_MAJORVERSION=6
-FULL_VERSION := 2.1.0
+FULL_VERSION := 2.1.1
 
 ifeq (,$(wildcard $(SRC_PATH)gmp-api))
 HAVE_GMP_API=No
