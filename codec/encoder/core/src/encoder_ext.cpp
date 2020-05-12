@@ -374,12 +374,12 @@ int32_t ParamValidation (SLogContext* pLogCtx, SWelsSvcCodingParam* pCfg) {
                  pCfg->bEnableFrameSkip);
     if ((pCfg->iMaxQp <= 0) || (pCfg->iMinQp <= 0)) {
       if (pCfg->iUsageType == SCREEN_CONTENT_REAL_TIME) {
-        WelsLog (pLogCtx, WELS_LOG_WARNING, "Change QP Range from(%d,%d) to (%d,%d)", pCfg->iMinQp, pCfg->iMaxQp, MIN_SCREEN_QP,
+        WelsLog (pLogCtx, WELS_LOG_INFO, "Change QP Range from(%d,%d) to (%d,%d)", pCfg->iMinQp, pCfg->iMaxQp, MIN_SCREEN_QP,
                  MAX_SCREEN_QP);
         pCfg->iMinQp = MIN_SCREEN_QP;
         pCfg->iMaxQp = MAX_SCREEN_QP;
       } else {
-        WelsLog (pLogCtx, WELS_LOG_WARNING, "Change QP Range from(%d,%d) to (%d,%d)", pCfg->iMinQp, pCfg->iMaxQp,
+        WelsLog (pLogCtx, WELS_LOG_INFO, "Change QP Range from(%d,%d) to (%d,%d)", pCfg->iMinQp, pCfg->iMaxQp,
                  GOM_MIN_QP_MODE, MAX_LOW_BR_QP);
         pCfg->iMinQp = GOM_MIN_QP_MODE;
         pCfg->iMaxQp = MAX_LOW_BR_QP;
