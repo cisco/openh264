@@ -111,12 +111,15 @@ clean_Android:
 endif
 
 COMMON_INCLUDES += -I$(NDKROOT)/sources/android/cpufeatures
-COMMON_OBJS += $(COMMON_SRCDIR)/src/cpu-features.$(OBJ)
+COMMON_OBJS += ./libndk_compat.so
 
-COMMON_CFLAGS += \
-	-Dandroid_getCpuIdArm=wels_getCpuIdArm -Dandroid_setCpuArm=wels_setCpuArm \
-	-Dandroid_getCpuCount=wels_getCpuCount -Dandroid_getCpuFamily=wels_getCpuFamily \
-	-Dandroid_getCpuFeatures=wels_getCpuFeatures -Dandroid_setCpu=wels_setCpu \
+.PHONY: ./libndk_compat.so
+./libndk_compat.so: ./cpu_features/android-$(APP_ABI)/ndk_compat/libndk_compat.so
+	cp $< $@
 
-codec/common/src/cpu-features.$(OBJ): $(NDKROOT)/sources/android/cpufeatures/cpu-features.c
-	$(QUIET_CC)$(CC) $(CFLAGS) $(INCLUDES) $(COMMON_CFLAGS) $(COMMON_INCLUDES) -c $(CXX_O) $<
+./cpu_features/android-$(APP_ABI)/ndk_compat/libndk_compat.so:
+	cmake -B./cpu_features/android-$(APP_ABI) -H./cpu_features -DANDROID_ABI=$(APP_ABI) -DANDROID_PLATFORM=$(TARGET) -DCMAKE_TOOLCHAIN_FILE=$(NDKROOT)/build/cmake/android.toolchain.cmake -DBUILD_SHARED_LIBS=ON
+	$(MAKE) -C ./cpu_features/android-$(APP_ABI)/ndk_compat ndk_compat
+
+clean_Android:
+	-$(MAKE) -C ./cpu_features/android-$(APP_ABI)/ndk_compat clean

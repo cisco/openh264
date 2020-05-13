@@ -374,7 +374,7 @@ endif
 endif
 endif
 
--include $(OBJS:.$(OBJ)=.d)
+-include $(filter %.d, $(OBJS:.$(OBJ)=.d))
 
 OBJDIRS = $(sort $(dir $(OBJS)))
 
