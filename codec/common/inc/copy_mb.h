@@ -82,6 +82,13 @@ void WelsCopy16x8NotAligned_mmi (uint8_t* Dst, int32_t  iStrideD, uint8_t* Src, 
 void WelsCopy16x16_mmi (uint8_t* Dst, int32_t  iStrideD, uint8_t* Src, int32_t  iStrideS);
 void WelsCopy16x16NotAligned_mmi (uint8_t* Dst, int32_t  iStrideD, uint8_t* Src, int32_t  iStrideS);
 #endif//HAVE_MMI
+
+#if defined (HAVE_MSA)
+void WelsCopy8x8_msa (uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrideS);
+void WelsCopy8x16_msa (uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrideS);
+void WelsCopy16x8_msa (uint8_t* Dst, int32_t  iStrideD, uint8_t* Src, int32_t  iStrideS);
+void WelsCopy16x16_msa (uint8_t* Dst, int32_t  iStrideD, uint8_t* Src, int32_t  iStrideS);
+#endif//HAVE_MSA
 #if defined(__cplusplus)
 }
 #endif//__cplusplus
