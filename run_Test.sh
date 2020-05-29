@@ -92,3 +92,4 @@ TestType=$1
 TestBitStream=$2
 runMain  ${TestType}  ${TestBitStream}
 
+
