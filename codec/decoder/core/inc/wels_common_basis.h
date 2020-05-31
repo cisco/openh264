@@ -275,7 +275,7 @@ static const SPartMbInfo g_ksInterBMbTypeInfo[] = {
   { MB_TYPE_8x8   | MB_TYPE_P0L0 | MB_TYPE_P0L1 | MB_TYPE_P1L0 | MB_TYPE_P1L1,  4, 4 }    //B_8x8
 };
 
-//Table 7.17 – Sub-macroblock types in B macroblocks.
+//Table 7.17 Sub-macroblock types in B macroblocks.
 static const SPartMbInfo g_ksInterPSubMbTypeInfo[4] = {
   {SUB_MB_TYPE_8x8, 1, 2},
   {SUB_MB_TYPE_8x4, 2, 2},
@@ -283,7 +283,7 @@ static const SPartMbInfo g_ksInterPSubMbTypeInfo[4] = {
   {SUB_MB_TYPE_4x4, 4, 1},
 };
 
-//Table 7.18 – Sub-macroblock types in B macroblocks.
+//Table 7.18 Sub-macroblock types in B macroblocks.
 static const SPartMbInfo g_ksInterBSubMbTypeInfo[] = {
   { MB_TYPE_DIRECT,                               1, 2 }, //B_Direct_8x8
   { SUB_MB_TYPE_8x8 | MB_TYPE_P0L0,                 1, 2 }, //B_L0_8x8
