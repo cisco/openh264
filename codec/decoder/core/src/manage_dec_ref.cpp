@@ -394,7 +394,10 @@ int32_t WelsReorderRefList (PWelsDecoderContext pCtx) {
   for (int32_t listIdx = 0; listIdx < ListCount; ++listIdx) {
     PPicture pPic = NULL;
     PPicture* ppRefList = pCtx->sRefPic.pRefList[listIdx];
-    int32_t iMaxRefIdx = pCtx->iPicQueueNumber;
+    int32_t  iMaxRefIdx = pCtx->iPicQueueNumber;
+    if (iMaxRefIdx >= MAX_REF_PIC_COUNT) {
+      iMaxRefIdx = MAX_REF_PIC_COUNT - 1;
+    }
     int32_t iRefCount = pSliceHeader->uiRefCount[listIdx];
     int32_t iPredFrameNum = pSliceHeader->iFrameNum;
     int32_t iMaxPicNum = 1 << pSliceHeader->pSps->uiLog2MaxFrameNum;
