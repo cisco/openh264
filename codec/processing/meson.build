@@ -19,7 +19,7 @@ cpp_sources = [
 ]
 
 objs_asm = []
-if ['x86', 'x86_64'].contains(cpu_family)
+if cpu_family in ['x86', 'x86_64']
   asm_sources = [
     'src/x86/denoisefilter.asm',
     'src/x86/downsample_bilinear.asm',
@@ -27,19 +27,29 @@ if ['x86', 'x86_64'].contains(cpu_family)
   ]
   objs_asm = asm_gen.process(asm_sources)
 elif cpu_family == 'arm'
-  cpp_sources += [
+  asm_sources = [
     'src/arm/adaptive_quantization.S',
     'src/arm/down_sample_neon.S',
     'src/arm/pixel_sad_neon.S',
     'src/arm/vaa_calc_neon.S',
   ]
+  if system == 'windows'
+    objs_asm = asm_gen.process(asm_sources)
+  else
+    cpp_sources += asm_sources
+  endif
 elif cpu_family == 'aarch64'
-  cpp_sources += [
+  asm_sources = [
 	'src/arm64/adaptive_quantization_aarch64_neon.S',
 	'src/arm64/down_sample_aarch64_neon.S',
 	'src/arm64/pixel_sad_aarch64_neon.S',
 	'src/arm64/vaa_calc_aarch64_neon.S',
   ]
+  if system == 'windows'
+    objs_asm = asm_gen.process(asm_sources)
+  else
+    cpp_sources += asm_sources
+  endif
 else
   error('Unsupported cpu family @0@'.format(cpu_family))
 endif

@@ -34,7 +34,7 @@ cpp_sources = [
 ]
 
 objs_asm = []
-if ['x86', 'x86_64'].contains(cpu_family)
+if cpu_family in ['x86', 'x86_64']
   asm_sources = [
     'core/x86/coeff.asm',
     'core/x86/dct.asm',
@@ -47,7 +47,7 @@ if ['x86', 'x86_64'].contains(cpu_family)
   ]
   objs_asm = asm_gen.process(asm_sources)
 elif cpu_family == 'arm'
-  cpp_sources += [
+  asm_sources = [
     'core/arm/intra_pred_neon.S',
     'core/arm/intra_pred_sad_3_opt_neon.S',
     'core/arm/memory_neon.S',
@@ -55,8 +55,13 @@ elif cpu_family == 'arm'
     'core/arm/reconstruct_neon.S',
     'core/arm/svc_motion_estimation.S',
   ]
+  if system == 'windows'
+    objs_asm = asm_gen.process(asm_sources)
+  else
+    cpp_sources += asm_sources
+  endif
 elif cpu_family == 'aarch64'
-  cpp_sources += [
+  asm_sources = [
     'core/arm64/intra_pred_aarch64_neon.S',
     'core/arm64/intra_pred_sad_3_opt_aarch64_neon.S',
     'core/arm64/memory_aarch64_neon.S',
@@ -64,6 +69,11 @@ elif cpu_family == 'aarch64'
     'core/arm64/reconstruct_aarch64_neon.S',
     'core/arm64/svc_motion_estimation_aarch64_neon.S',
   ]
+  if system == 'windows'
+    objs_asm = asm_gen.process(asm_sources)
+  else
+    cpp_sources += asm_sources
+  endif
 else
   error('Unsupported cpu family @0@'.format(cpu_family))
 endif
