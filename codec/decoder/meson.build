@@ -22,13 +22,27 @@ cpp_sources = [
   'core/src/wels_decoder_thread.cpp',
 ]
 
-asm_sources = [
-  'core/x86/dct.asm',
-  'core/x86/intra_pred.asm',
-]
-
-objs_asm = asm_gen.process(asm_sources)
+objs_asm = []
+if ['x86', 'x86_64'].contains(cpu_family)
+  asm_sources = [
+    'core/x86/dct.asm',
+    'core/x86/intra_pred.asm',
+  ]
+  objs_asm = asm_gen.process(asm_sources)
+elif cpu_family == 'arm'
+  cpp_sources += [
+    'core/arm/block_add_neon.S',
+    'core/arm/intra_pred_neon.S',
+  ]
+elif cpu_family == 'aarch64'
+  cpp_sources += [
+    'core/arm64/block_add_aarch64_neon.S',
+    'core/arm64/intra_pred_aarch64_neon.S',
+  ]
+else
+  error('Unsupported cpu family @0@'.format(cpu_family))
+endif
 
 libdecoder = static_library('decoder', cpp_sources, objs_asm,
-  include_directories: [inc, decoder_inc],
+  include_directories: [inc, decoder_inc, casm_inc],
   dependencies: deps)
