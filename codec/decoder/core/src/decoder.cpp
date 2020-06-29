@@ -813,7 +813,7 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
             }
             CheckAndFinishLastPic (pCtx, ppDst, pDstBufInfo);
             if (pCtx->bAuReadyFlag && pCtx->pAccessUnitList->uiAvailUnitsNum != 0) {
-              if (pCtx->pThreadCtx == NULL) {
+              if (GetThreadCount (pCtx) <= 1) {
                 ConstructAccessUnit (pCtx, ppDst, pDstBufInfo);
               } else {
                 pCtx->pAccessUnitList->uiAvailUnitsNum = 1;
@@ -873,11 +873,11 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
       if (IS_PARAM_SETS_NALS (pCtx->sCurNalHead.eNalUnitType)) {
         iRet = ParseNonVclNal (pCtx, pNalPayload, iDstIdx - iConsumedBytes, pSrcNal - 3, iSrcIdx + 3);
       }
-      if (pCtx->pThreadCtx == NULL) {
+      if (GetThreadCount (pCtx) <= 1) {
         CheckAndFinishLastPic (pCtx, ppDst, pDstBufInfo);
       }
       if (pCtx->bAuReadyFlag && pCtx->pAccessUnitList->uiAvailUnitsNum != 0) {
-        if (pCtx->pThreadCtx == NULL) {
+        if (GetThreadCount (pCtx) <= 1) {
           ConstructAccessUnit (pCtx, ppDst, pDstBufInfo);
         } else {
           pCtx->pAccessUnitList->uiAvailUnitsNum = 1;
