@@ -2338,7 +2338,7 @@ int32_t InitConstructAccessUnit (PWelsDecoderContext pCtx, SBufferInfo* pDstInfo
  */
 int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo) {
   int32_t iErr = ERR_NONE;
-  if (pCtx->pThreadCtx == NULL) {
+  if (GetThreadCount (pCtx) <= 1) {
     iErr = InitConstructAccessUnit (pCtx, pDstInfo);
     if (ERR_NONE != iErr) {
       return iErr;
@@ -2550,7 +2550,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
       isNewFrame = pCtx->pDec == NULL;
     }
     if (pCtx->pDec == NULL) {
-      if (pLastThreadCtx != NULL) {
+      if (pLastThreadCtx != NULL && iIdx == 0) {
         pLastThreadCtx->pDec->bUsedAsRef = pLastThreadCtx->pCtx->uiNalRefIdc > 0;
         if (pLastThreadCtx->pDec->bUsedAsRef) {
           for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
@@ -2686,7 +2686,19 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
             if (pCtx->bNewSeqBegin) {
               iPrevFrameNum = 0;
             } else if (pLastThreadCtx->pDec != NULL) {
-              iPrevFrameNum = pLastThreadCtx->pDec->iFrameNum;
+              if (pLastThreadCtx->pDec->uiTimeStamp == pCtx->uiTimeStamp - 1) {
+                iPrevFrameNum = pLastThreadCtx->pDec->iFrameNum;
+                if (iPrevFrameNum == -1) iPrevFrameNum = pLastThreadCtx->pCtx->iFrameNum;
+              } else {
+                int32_t  id = pThreadCtx->sThreadInfo.uiThrNum;
+                for (int32_t i = 0; i < iThreadCount; ++i) {
+                  if (pThreadCtx[i - id].pCtx->uiTimeStamp == pCtx->uiTimeStamp - 1) {
+                    if (pThreadCtx[i - id].pDec != NULL) iPrevFrameNum = pThreadCtx[i - id].pDec->iFrameNum;
+                    if (iPrevFrameNum == -1) iPrevFrameNum = pThreadCtx[i - id].pCtx->iFrameNum;
+                    break;
+                  }
+                }
+              }
             } else {
               iPrevFrameNum = pCtx->bNewSeqBegin ? 0 : pLastThreadCtx->pCtx->iFrameNum;
             }
@@ -2734,8 +2746,10 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
           ComputeColocatedTemporalScaling (pCtx);
 
         if (iThreadCount > 1) {
-          memset (&pCtx->lastReadyHeightOffset[0][0], -1, LIST_A * MAX_REF_PIC_COUNT * sizeof (int16_t));
-          SET_EVENT (&pThreadCtx->sSliceDecodeStart);
+          if (iIdx == 0) {
+            memset (&pCtx->lastReadyHeightOffset[0][0], -1, LIST_A * MAX_REF_PIC_COUNT * sizeof (int16_t));
+            SET_EVENT (&pThreadCtx->sSliceDecodeStart);
+          }
           iRet = WelsDecodeAndConstructSlice (pCtx);
         } else {
           iRet = WelsDecodeSlice (pCtx, bFreshSliceAvailable, pNalCur);
