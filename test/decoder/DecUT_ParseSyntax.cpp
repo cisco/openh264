@@ -279,10 +279,11 @@ bool DecoderParseSyntaxTest::DecodeBs (const char* sFileName, EDecCase eDecCase)
     iRet |= DecodeFrame (pBuf + iBufPos, iSliceSize, m_pData, &m_sBufferInfo, m_pCtx);
     iBufPos += iSliceSize;
   }
-  if (eDecCase == CorrectDec)
+  if (eDecCase == CorrectDec) {
     EXPECT_TRUE (iRet == dsErrorFree);
-  else if (eDecCase == ErrorDec)
+  } else if (eDecCase == ErrorDec) {
     EXPECT_TRUE ((iRet & (dsBitstreamError | dsRefLost | dsDataErrorConcealed)) != 0) << "iRet = " << iRet;
+  }
 
   fclose (pH264File);
   if (pBuf) {
@@ -347,15 +348,18 @@ bool DecoderParseSyntaxTest::ParseBs (const char* sFileName, EDecCase eDecCase) 
     memset (&m_sParserBsInfo, 0, sizeof (SParserBsInfo));
     iRet |= m_pDec->DecodeParser (pBuf + iBufPos, iSliceSize, &m_sParserBsInfo);
     iRet |= m_pDec->DecodeParser (NULL, 0, &m_sParserBsInfo);
-    if (eDecCase == CorrectParseOnly)
+    if (eDecCase == CorrectParseOnly) {
       EXPECT_TRUE (iRet == dsErrorFree || iRet == dsFramePending);
+    }
+
     iBufPos += iSliceSize;
     ++iSliceIndex;
     if (iSliceIndex == 4)
       break;
   }
-  if (eDecCase == ErrorDec)
+  if (eDecCase == ErrorDec) {
     EXPECT_TRUE ((iRet & (dsBitstreamError | dsRefLost | dsDataErrorConcealed)) != 0) << iRet;
+  }
 
   fclose (pH264File);
   if (pBuf) {
