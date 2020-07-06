@@ -1374,6 +1374,13 @@ DECODING_STATE CWelsDecoder::ParseAccessUnit (SWelsDecoderThreadCTX& sThreadCtx)
       sThreadCtx.pCtx->iImgHeightInPixel = m_pLastDecThrCtx->pCtx->iImgHeightInPixel;
     }
   }
+
+  //if threadCount > 1, then each thread must contain exact one complete frame.
+  if (GetThreadCount (sThreadCtx.pCtx) > 1) {
+    sThreadCtx.pCtx->pAccessUnitList->uiAvailUnitsNum = 0;
+    sThreadCtx.pCtx->pAccessUnitList->uiActualUnitsNum = 0;
+  }
+
   int32_t iRet = DecodeFrame2WithCtx (sThreadCtx.pCtx, sThreadCtx.kpSrc, sThreadCtx.kiSrcLen, sThreadCtx.ppDst,
                                       &sThreadCtx.sDstInfo);
 
