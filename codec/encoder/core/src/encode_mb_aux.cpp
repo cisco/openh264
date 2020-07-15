@@ -464,7 +464,7 @@ int32_t WelsHadamardQuant2x2Skip_AArch64_neon (int16_t* pRes, int16_t iFF,  int1
 void WelsInitEncodingFuncs (SWelsFuncPtrList* pFuncList, uint32_t  uiCpuFlag) {
   pFuncList->pfCopy8x8Aligned           = WelsCopy8x8_c;
   pFuncList->pfCopy16x16Aligned         =
-    pFuncList->pfCopy16x16NotAligned    = WelsCopy16x16_c;
+  pFuncList->pfCopy16x16NotAligned      = WelsCopy16x16_c;
   pFuncList->pfCopy16x8NotAligned       = WelsCopy16x8_c;
   pFuncList->pfCopy8x16Aligned          = WelsCopy8x16_c;
   pFuncList->pfCopy4x4           = WelsCopy4x4_c;
@@ -612,5 +612,16 @@ void WelsInitEncodingFuncs (SWelsFuncPtrList* pFuncList, uint32_t  uiCpuFlag) {
     pFuncList->pfDctFourT4              = WelsDctFourT4_mmi;
   }
 #endif//HAVE_MMI
+
+#if defined(HAVE_MSA)
+  if (uiCpuFlag & WELS_CPU_MSA) {
+    pFuncList->pfCopy8x8Aligned         = WelsCopy8x8_msa;
+    pFuncList->pfCopy8x16Aligned        = WelsCopy8x16_msa;
+
+    pFuncList->pfCopy16x16Aligned       =
+    pFuncList->pfCopy16x16NotAligned    = WelsCopy16x16_msa;
+    pFuncList->pfCopy16x8NotAligned     = WelsCopy16x8_msa;
+  }
+#endif
 }
 }
