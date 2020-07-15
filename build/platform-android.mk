@@ -8,6 +8,7 @@ SHLDFLAGS =
 ifdef ANDROID_NDK_ROOT
   NDKROOT = $(ANDROID_NDK_ROOT)
 endif
+ANDROID_SDK_TOOLS = $(ANDROID_HOME)/tools/
 NDK_TOOLCHAIN_VERSION = clang
 NDKLEVEL = $(TARGET:android-%=%)
 SUPPORTED_NDK_RELEASES = 20 21
@@ -79,7 +80,7 @@ LDFLAGS += -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libunwind.a
 ifneq ($(findstring /,$(CXX)),$(findstring \,$(CXX)))
 ifneq ($(CXX),$(wildcard $(CXX)))
 ifneq ($(CXX).exe,$(wildcard $(CXX).exe))
-$(error Compiler not found, bad NDKROOT or ARCH?)
+$(error Compiler not found, bad NDKROOT or ARCH? $(CXX))
 endif
 endif
 endif
@@ -93,18 +94,26 @@ MODULE_LDFLAGS = $(STL_LIB)
 ifeq (./,$(SRC_PATH))
 binaries: decdemo encdemo
 
+NDK_BUILD = $(NDKROOT)/ndk-build APP_ABI=$(APP_ABI) APP_PLATFORM=$(TARGET) NDK_TOOLCHAIN_VERSION=$(NDK_TOOLCHAIN_VERSION) V=$(V:Yes=1)
+
 decdemo: libraries
-	cd ./codec/build/android/dec && $(NDKROOT)/ndk-build -B NDK_TOOLCHAIN_VERSION=$(NDK_TOOLCHAIN_VERSION) APP_ABI=$(APP_ABI) APP_PLATFORM=$(TARGET) && android update project -t $(TARGET) -p . && ant debug
+	$(NDK_BUILD) -C codec/build/android/dec -B
+	./gradlew test-dec:assembleDebug
 
 encdemo: libraries
-	cd ./codec/build/android/enc && $(NDKROOT)/ndk-build -B NDK_TOOLCHAIN_VERSION=$(NDK_TOOLCHAIN_VERSION) APP_ABI=$(APP_ABI) APP_PLATFORM=$(TARGET) && android update project -t $(TARGET) -p . && ant debug
+	$(NDK_BUILD) -C codec/build/android/enc -B
+	./gradlew test-enc:assembleDebug
 
 clean_Android: clean_Android_dec clean_Android_enc
 
 clean_Android_dec:
-	-cd ./codec/build/android/dec && $(NDKROOT)/ndk-build APP_ABI=$(APP_ABI) clean && ant clean
+	-$(NDK_BUILD) -C codec/build/android/dec clean
+	-./gradlew test-dec:clean
+
 clean_Android_enc:
-	-cd ./codec/build/android/enc && $(NDKROOT)/ndk-build APP_ABI=$(APP_ABI) clean && ant clean
+	-$(NDK_BUILD) -C codec/build/android/enc clean
+	-./gradlew test-enc:clean
+
 else
 clean_Android:
 	@:
