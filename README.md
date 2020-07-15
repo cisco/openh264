@@ -58,23 +58,21 @@ To build the arm assembly for Windows Phone, gas-preprocessor is required. It ca
 
 For Android Builds
 ------------------
-To build for android platform, You need to install android sdk and ndk. You also need to export `**ANDROID_SDK**/tools` to PATH. On Linux, this can be done by
+To build for android platform, You need to install android sdk and ndk.
 
-    export PATH=**ANDROID_SDK**/tools:$PATH
+The codec demo apps can be built by
 
-The codec and demo can be built by
+    make OS=android ANDROID_HOME=**ANDROID_SDK** NDKROOT=**ANDROID_NDK** TARGET=**ANDROID_TARGET**
 
-    make OS=android NDKROOT=**ANDROID_NDK** TARGET=**ANDROID_TARGET**
-
-Valid `**ANDROID_TARGET**` can be found in `**ANDROID_SDK**/platforms`, such as `android-12`.
+Valid `**ANDROID_TARGET**` can be found in `**ANDROID_SDK**/platforms`, such as `android-21`.
 You can also set `ARCH`, `NDKLEVEL` according to your device and NDK version.
-`ARCH` specifies the architecture of android device. Currently `arm`, `arm64`, `x86` and `x86_64` are supported, the default is `arm`. (`mips` and `mips64` can also be used, but there's no specific optimization for those architectures.)
-`NDKLEVEL` specifies android api level, the default is 12. Available possibilities can be found in `**ANDROID_NDK**/platforms`, such as `android-21` (strip away the `android-` prefix).
+`ARCH` specifies the architecture of android device. Currently `arm`, `arm64`, `x86` and `x86_64` are supported, the default is `arm`. (`mips` and `mips64` can also be used,  but there's no specific optimization for those architectures.)
 
 By default these commands build for the `armeabi-v7a` ABI. To build for the other android
 ABIs, add `ARCH=arm64`, `ARCH=x86`, `ARCH=x86_64`, `ARCH=mips` or `ARCH=mips64`.
 To build for the older `armeabi` ABI (which has armv5te as baseline), add `APP_ABI=armeabi` (`ARCH=arm` is implicit).
 To build for 64-bit ABI, such as `arm64`, explicitly set `NDKLEVEL` to 21 or higher.
+To build fir 32 or 64-bit `mips`, you need NDK r16 or earlier.
 
 For iOS Builds
 --------------
