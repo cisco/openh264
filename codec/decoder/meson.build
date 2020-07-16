@@ -23,22 +23,32 @@ cpp_sources = [
 ]
 
 objs_asm = []
-if ['x86', 'x86_64'].contains(cpu_family)
+if cpu_family in ['x86', 'x86_64']
   asm_sources = [
     'core/x86/dct.asm',
     'core/x86/intra_pred.asm',
   ]
   objs_asm = asm_gen.process(asm_sources)
 elif cpu_family == 'arm'
-  cpp_sources += [
+  asm_sources = [
     'core/arm/block_add_neon.S',
     'core/arm/intra_pred_neon.S',
   ]
+  if system == 'windows'
+    objs_asm = asm_gen.process(asm_sources)
+  else
+    cpp_sources += asm_sources
+  endif
 elif cpu_family == 'aarch64'
-  cpp_sources += [
+  asm_sources = [
     'core/arm64/block_add_aarch64_neon.S',
     'core/arm64/intra_pred_aarch64_neon.S',
   ]
+  if system == 'windows'
+    objs_asm = asm_gen.process(asm_sources)
+  else
+    cpp_sources += asm_sources
+  endif
 else
   error('Unsupported cpu family @0@'.format(cpu_family))
 endif
