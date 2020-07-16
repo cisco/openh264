@@ -35,7 +35,7 @@ CCASFLAGS=$(CFLAGS)
 STATIC_LDFLAGS=-lstdc++
 STRIP ?= strip
 
-SHAREDLIB_MAJORVERSION=5
+SHAREDLIB_MAJORVERSION=6
 FULL_VERSION := 2.1.0
 
 ifeq (,$(wildcard $(SRC_PATH)gmp-api))
@@ -374,7 +374,7 @@ endif
 endif
 endif
 
--include $(OBJS:.$(OBJ)=.d)
+-include $(filter %.d, $(OBJS:.$(OBJ)=.d))
 
 OBJDIRS = $(sort $(dir $(OBJS)))
 

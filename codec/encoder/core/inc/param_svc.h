@@ -365,7 +365,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
       uiIntraPeriod = ((uiIntraPeriod + uiGopSize - 1) / uiGopSize) * uiGopSize;
 
     if (((pCodingParam.iNumRefFrame != AUTO_REF_PIC_COUNT)
-         && ((pCodingParam.iNumRefFrame > MAX_REF_PIC_COUNT) || (pCodingParam.iNumRefFrame < MIN_REF_PIC_COUNT)))
+         && !((pCodingParam.iNumRefFrame > MAX_REF_PIC_COUNT) || (pCodingParam.iNumRefFrame < MIN_REF_PIC_COUNT)))
         || ((iNumRefFrame != AUTO_REF_PIC_COUNT) && (pCodingParam.iNumRefFrame == AUTO_REF_PIC_COUNT))) {
       iNumRefFrame  = pCodingParam.iNumRefFrame;
     }
