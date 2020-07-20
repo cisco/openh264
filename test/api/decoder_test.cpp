@@ -76,9 +76,9 @@ TEST_P (DecoderOutputTest, CompareOutput) {
   FileParam p = GetParam();
 #if defined(ANDROID_NDK)
   std::string filename = std::string ("/sdcard/") + p.fileName;
-  ASSERT_TRUE ( DecodeFile (filename.c_str(), this));
+  ASSERT_TRUE (DecodeFile (filename.c_str(), this));
 #else
-  ASSERT_TRUE (DecodeFile(p.fileName, this));
+  ASSERT_TRUE (DecodeFile (p.fileName, this));
 #endif
 
   unsigned char digest[SHA_DIGEST_LENGTH];
@@ -130,15 +130,15 @@ static const FileParam kFileParamArray[] = {
   {"res/test_scalinglist_jm.264", "f690a3af2896a53360215fb5d35016bfd41499b3"},
   {"res/test_vd_1d.264", "5827d2338b79ff82cd091c707823e466197281d3"},
   {"res/test_vd_rc.264", "eea02e97bfec89d0418593a8abaaf55d02eaa1ca"},
-  {"res/Cisco_Men_whisper_640x320_CABAC_Bframe_9.264", "88b8864a69cee7656202bc54d2ffa8b7b6f1f6c5"},
-  {"res/Cisco_Men_whisper_640x320_CAVLC_Bframe_9.264", "270a500d2f91c9e2c8ffabc03f62e0dc0b3a24ed"},
-  {"res/Cisco_Adobe_PDF_sample_a_1024x768_CAVLC_Bframe_9.264", "d3b2b986178ce3eafa806cd984543d0da830f408"},
-  {"res/VID_1280x544_cabac_temporal_direct.264", "8d946d46a8cb248269c4294203397daed8dace1d"},
-  {"res/VID_1280x720_cabac_temporal_direct.264", "419faadd8362918e6d908addd3e92fddb925624a"},
-  {"res/VID_1920x1080_cabac_temporal_direct.264", "2c93dc4ea4617636d2554c68896ce3ba16d678e7"},
-  {"res/VID_1280x544_cavlc_temporal_direct.264", "c89756e76e57c6a84cc55146b18845d4d24e4cd5"},
-  {"res/VID_1280x720_cavlc_temporal_direct.264", "be1af190f5eba34102a9de42917c8ec50073c5a0"},
-  {"res/VID_1920x1080_cavlc_temporal_direct.264", "6c58378bc51beb909381e634700706737fd17be2"},
+  {"res/Cisco_Men_whisper_640x320_CABAC_Bframe_9.264", "931ba1caf075e7b47445c1f4410ade77a46048f6"},
+  {"res/Cisco_Men_whisper_640x320_CAVLC_Bframe_9.264", "9819c0345abdd4faedbaf8f8c4dadb7749515e4d"},
+  {"res/Cisco_Adobe_PDF_sample_a_1024x768_CAVLC_Bframe_9.264", "9d758d9e6f4dead0d7b361f3ddf2ee009d0ea190"},
+  {"res/VID_1280x544_cabac_temporal_direct.264", "b7f04399f38a90c866f0b518d1dd93c823d5d91f"},
+  {"res/VID_1280x720_cabac_temporal_direct.264", "dabc1d0d44921a5c72ed2d4fde1d602465249c97"},
+  {"res/VID_1920x1080_cabac_temporal_direct.264", "6e719adb650cee4ca99a45242685d261257c04cc"},
+  {"res/VID_1280x544_cavlc_temporal_direct.264", "33bfa44b4a3c87fe28354cace1d4b99a03d2967d"},
+  {"res/VID_1280x720_cavlc_temporal_direct.264", "4face6b5d73a378b6e564a831b49311c230158e4"},
+  {"res/VID_1920x1080_cavlc_temporal_direct.264", "b35dc99604ea2a1fda5b84d1b9098cb7565dec8f"},
 };
 
 INSTANTIATE_TEST_CASE_P (DecodeFile, DecoderOutputTest,
