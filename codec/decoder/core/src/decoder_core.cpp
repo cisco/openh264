@@ -2525,26 +2525,6 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
     SLayerInfo pLayerInfo;
     PSliceHeaderExt pShExt = NULL;
     PSliceHeader pSh = NULL;
-
-    if (pLastThreadCtx != NULL) {
-      pSh = &pNalCur->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader;
-      if (pSh->iFirstMbInSlice == 0) {
-        if (pLastThreadCtx->pCtx->pDec != NULL && pLastThreadCtx->pCtx->pDec->bIsUngroupedMultiSlice) {
-          WAIT_EVENT (&pLastThreadCtx->sSliceDecodeFinish, WELS_DEC_THREAD_WAIT_INFINITE);
-        }
-        pCtx->pDec = NULL;
-        pCtx->iTotalNumMbRec = 0;
-      } else if (pLastThreadCtx->pCtx->pDec != NULL) {
-        if (pSh->iFrameNum == pLastThreadCtx->pCtx->pDec->iFrameNum
-            && pSh->iPicOrderCntLsb == pLastThreadCtx->pCtx->pDec->iFramePoc) {
-          WAIT_EVENT (&pLastThreadCtx->sSliceDecodeFinish, WELS_DEC_THREAD_WAIT_INFINITE);
-          pCtx->pDec = pLastThreadCtx->pCtx->pDec;
-          pCtx->pDec->bIsUngroupedMultiSlice = true;
-          pCtx->sRefPic = pLastThreadCtx->pCtx->sRefPic;
-          pCtx->iTotalNumMbRec = pLastThreadCtx->pCtx->iTotalNumMbRec;
-        }
-      }
-    }
     bool isNewFrame = true;
     if (iThreadCount > 1) {
       isNewFrame = pCtx->pDec == NULL;
@@ -2580,7 +2560,6 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         return ERR_INFO_REF_COUNT_OVERFLOW;
       }
       if (pThreadCtx != NULL) {
-        pCtx->pDec->bIsUngroupedMultiSlice = false;
         pThreadCtx->pDec = pCtx->pDec;
         if (iThreadCount > 1) ++pCtx->pDec->iRefCount;
         uint32_t uiMbHeight = (pCtx->pDec->iHeightInPixel + 15) >> 4;
@@ -2683,25 +2662,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
           // Subclause 8.2.5.2 Decoding process for gaps in frame_num
           int32_t iPrevFrameNum = pCtx->pLastDecPicInfo->iPrevFrameNum;
           if (pLastThreadCtx != NULL) {
-            if (pCtx->bNewSeqBegin) {
-              iPrevFrameNum = 0;
-            } else if (pLastThreadCtx->pDec != NULL) {
-              if (pLastThreadCtx->pDec->uiTimeStamp == pCtx->uiTimeStamp - 1) {
-                iPrevFrameNum = pLastThreadCtx->pDec->iFrameNum;
-                if (iPrevFrameNum == -1) iPrevFrameNum = pLastThreadCtx->pCtx->iFrameNum;
-              } else {
-                int32_t  id = pThreadCtx->sThreadInfo.uiThrNum;
-                for (int32_t i = 0; i < iThreadCount; ++i) {
-                  if (pThreadCtx[i - id].pCtx->uiTimeStamp == pCtx->uiTimeStamp - 1) {
-                    if (pThreadCtx[i - id].pDec != NULL) iPrevFrameNum = pThreadCtx[i - id].pDec->iFrameNum;
-                    if (iPrevFrameNum == -1) iPrevFrameNum = pThreadCtx[i - id].pCtx->iFrameNum;
-                    break;
-                  }
-                }
-              }
-            } else {
-              iPrevFrameNum = pCtx->bNewSeqBegin ? 0 : pLastThreadCtx->pCtx->iFrameNum;
-            }
+            iPrevFrameNum = pCtx->bNewSeqBegin ? 0 : GetPrevFrameNum (pCtx);
           }
           if (!kbIdrFlag  &&
               pSh->iFrameNum != iPrevFrameNum &&

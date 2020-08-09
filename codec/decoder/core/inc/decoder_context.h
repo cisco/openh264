@@ -557,6 +557,25 @@ static inline int32_t GetThreadCount (PWelsDecoderContext pCtx) {
   }
   return iThreadCount;
 }
+//GetPrevFrameNum only applies when thread count >= 2
+static inline int32_t GetPrevFrameNum (PWelsDecoderContext pCtx) {
+  if (pCtx->uiDecodingTimeStamp > 0) {
+    PWelsDecoderThreadCTX pThreadCtx = (PWelsDecoderThreadCTX)pCtx->pThreadCtx;
+    int32_t iThreadCount = int32_t (pThreadCtx->sThreadInfo.uiThrMaxNum);
+    int32_t  uiThrNum = int32_t (pThreadCtx->sThreadInfo.uiThrNum);
+    for (int32_t i = 0; i < iThreadCount; ++i) {
+      int32_t id = i - uiThrNum;
+      if (id != 0 && pThreadCtx[id].pCtx->uiDecodingTimeStamp == pCtx->uiDecodingTimeStamp - 1) {
+        if (pThreadCtx[id].pCtx->pDec != NULL) {
+          int32_t iFrameNum = pThreadCtx[id].pCtx->pDec->iFrameNum;
+          if (iFrameNum >= 0) return iFrameNum;
+        }
+        return pThreadCtx[id].pCtx->iFrameNum;
+      }
+    }
+  }
+  return pCtx->pLastDecPicInfo->iPrevFrameNum;
+}
 //#ifdef __cplusplus
 //}
 //#endif//__cplusplus
