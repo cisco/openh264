@@ -70,7 +70,7 @@ namespace WelsDec {
 
 #define IN_MB_BS_MV_DIFF(iMV_A, iMV_B, iMbXy, iIndex, iNeighIndex) \
 (\
-    (( WELS_ABS( iMV_A[iMbXy][iIndex][0] - iMV_B[iMbXy][iNeighIndex][0] ) >= 4 ) | \
+    (( WELS_ABS( iMV_A[iMbXy][iIndex][0] - iMV_B[iMbXy][iNeighIndex][0] ) >= 4 ) || \
     ( WELS_ABS( iMV_A[iMbXy][iIndex][1] - iMV_B[iMbXy][iNeighIndex][1] )  >= 4 )) \
 )
 
@@ -107,10 +107,10 @@ namespace WelsDec {
   ((refs[LIST_0][iIndex] == refs[LIST_1][iNeigborIndex]) && (refs[LIST_1][iIndex] == refs[LIST_0][iNeigborIndex]))) ? \
   ((refs[LIST_0][iIndex] != refs[LIST_1][iIndex]) ? \
   ((refs[LIST_0][iIndex] == refs[LIST_0][iNeigborIndex]) ? \
-  (IN_MB_BS_MV_DIFF (mv[LIST_0], mv[LIST_0], iMbXy, iIndex, iNeigborIndex) | IN_MB_BS_MV_DIFF (mv[LIST_1], mv[LIST_1], iMbXy, iIndex, iNeigborIndex)) : \
-  (IN_MB_BS_MV_DIFF (mv[LIST_0], mv[LIST_1], iMbXy, iIndex, iNeigborIndex) | IN_MB_BS_MV_DIFF (mv[LIST_1], mv[LIST_0], iMbXy, iIndex, iNeigborIndex))) : \
-  ((IN_MB_BS_MV_DIFF (mv[LIST_0], mv[LIST_0], iMbXy, iIndex, iNeigborIndex) | IN_MB_BS_MV_DIFF (mv[LIST_1], mv[LIST_1], iMbXy, iIndex, iNeigborIndex)) && \
-  (IN_MB_BS_MV_DIFF (mv[LIST_0], mv[LIST_1], iMbXy, iIndex, iNeigborIndex) | IN_MB_BS_MV_DIFF (mv[LIST_1], mv[LIST_0], iMbXy, iIndex, iNeigborIndex)))) : 1 \
+  (IN_MB_BS_MV_DIFF (mv[LIST_0], mv[LIST_0], iMbXy, iIndex, iNeigborIndex) || IN_MB_BS_MV_DIFF (mv[LIST_1], mv[LIST_1], iMbXy, iIndex, iNeigborIndex)) : \
+  (IN_MB_BS_MV_DIFF (mv[LIST_0], mv[LIST_1], iMbXy, iIndex, iNeigborIndex) || IN_MB_BS_MV_DIFF (mv[LIST_1], mv[LIST_0], iMbXy, iIndex, iNeigborIndex))) : \
+  ((IN_MB_BS_MV_DIFF (mv[LIST_0], mv[LIST_0], iMbXy, iIndex, iNeigborIndex) || IN_MB_BS_MV_DIFF (mv[LIST_1], mv[LIST_1], iMbXy, iIndex, iNeigborIndex)) && \
+  (IN_MB_BS_MV_DIFF (mv[LIST_0], mv[LIST_1], iMbXy, iIndex, iNeigborIndex) || IN_MB_BS_MV_DIFF (mv[LIST_1], mv[LIST_0], iMbXy, iIndex, iNeigborIndex)))) : 1 \
 )
 #else
 #define IN_SMB_EDGE_MV(refs, mv, iMbXy, iIndex, iNeigborIndex) \
@@ -119,10 +119,10 @@ namespace WelsDec {
   ((refs[LIST_0][iIndex] == refs[LIST_1][iNeigborIndex]) && (refs[LIST_1][iIndex] == refs[LIST_0][iNeigborIndex]))) ? \
   ((refs[LIST_0][iIndex] != refs[LIST_1][iIndex]) ? \
   ((refs[LIST_0][iIndex] == refs[LIST_0][iNeigborIndex]) ? \
-  (IN_MB_BS_MV_DIFF (mv[LIST_0], mv[LIST_0], iMbXy, iIndex, iNeigborIndex) | IN_MB_BS_MV_DIFF (mv[LIST_1], mv[LIST_1], iMbXy, iIndex, iNeigborIndex)) : \
-  (IN_MB_BS_MV_DIFF (mv[LIST_0], mv[LIST_1], iMbXy, iIndex, iNeigborIndex) | IN_MB_BS_MV_DIFF (mv[LIST_1], mv[LIST_0], iMbXy, iIndex, iNeigborIndex))) : \
-  ((IN_MB_BS_MV_DIFF (mv[LIST_0], mv[LIST_0], iMbXy, iIndex, iNeigborIndex) | IN_MB_BS_MV_DIFF (mv[LIST_1], mv[LIST_1], iMbXy, iIndex, iNeigborIndex)) && \
-  (IN_MB_BS_MV_DIFF (mv[LIST_0], mv[LIST_1], iMbXy, iIndex, iNeigborIndex) | IN_MB_BS_MV_DIFF (mv[LIST_1], mv[LIST_0], iMbXy, iIndex, iNeigborIndex)))) : 1 \
+  (IN_MB_BS_MV_DIFF (mv[LIST_0], mv[LIST_0], iMbXy, iIndex, iNeigborIndex) || IN_MB_BS_MV_DIFF (mv[LIST_1], mv[LIST_1], iMbXy, iIndex, iNeigborIndex)) : \
+  (IN_MB_BS_MV_DIFF (mv[LIST_0], mv[LIST_1], iMbXy, iIndex, iNeigborIndex) || IN_MB_BS_MV_DIFF (mv[LIST_1], mv[LIST_0], iMbXy, iIndex, iNeigborIndex))) : \
+  ((IN_MB_BS_MV_DIFF (mv[LIST_0], mv[LIST_0], iMbXy, iIndex, iNeigborIndex) || IN_MB_BS_MV_DIFF (mv[LIST_1], mv[LIST_1], iMbXy, iIndex, iNeigborIndex)) && \
+  (IN_MB_BS_MV_DIFF (mv[LIST_0], mv[LIST_1], iMbXy, iIndex, iNeigborIndex) || IN_MB_BS_MV_DIFF (mv[LIST_1], mv[LIST_0], iMbXy, iIndex, iNeigborIndex)))) : 1 \
 )
 #endif
 
