@@ -1386,6 +1386,9 @@ DECODING_STATE CWelsDecoder::ParseAccessUnit (SWelsDecoderThreadCTX& sThreadCtx)
   } else if (bPicBuffChanged) {
     InitialDqLayersContext (sThreadCtx.pCtx, sThreadCtx.pCtx->pSps->iMbWidth << 4, sThreadCtx.pCtx->pSps->iMbHeight << 4);
   }
+  if (!sThreadCtx.pCtx->bNewSeqBegin && m_pLastDecThrCtx != NULL) {
+    sThreadCtx.pCtx->sFrameCrop = m_pLastDecThrCtx->pCtx->pSps->sFrameCrop;
+  }
   m_bParamSetsLostFlag = sThreadCtx.pCtx->bNewSeqBegin ? false : sThreadCtx.pCtx->bParamSetsLostFlag;
   m_bFreezeOutput = sThreadCtx.pCtx->bNewSeqBegin ? false : sThreadCtx.pCtx->bFreezeOutput;
   return (DECODING_STATE)iErr;
