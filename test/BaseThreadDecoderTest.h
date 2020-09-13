@@ -40,7 +40,6 @@ class BaseThreadDecoderTest {
   bool ThreadDecodeFile (const char* fileName, Callback* cbk);
 
   bool Open (const char* fileName);
-  bool DecodeNextFrame (Callback* cbk);
   ISVCDecoder* decoder_;
 
  private:
@@ -48,8 +47,6 @@ class BaseThreadDecoderTest {
   void FlushFrame (Callback* cbk);
 
   std::ifstream file_;
-  BufferedData buf_;
-  BufferedData buf[16];
   SBufferInfo sBufInfo;
   uint8_t* pData[3];
   uint64_t uiTimeStamp;
