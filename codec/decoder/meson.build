@@ -34,7 +34,7 @@ elif cpu_family == 'arm'
     'core/arm/block_add_neon.S',
     'core/arm/intra_pred_neon.S',
   ]
-  if system == 'windows'
+  if use_asm_gen
     objs_asm = asm_gen.process(asm_sources)
   else
     cpp_sources += asm_sources
@@ -44,7 +44,7 @@ elif cpu_family == 'aarch64'
     'core/arm64/block_add_aarch64_neon.S',
     'core/arm64/intra_pred_aarch64_neon.S',
   ]
-  if system == 'windows'
+  if use_asm_gen
     objs_asm = asm_gen.process(asm_sources)
   else
     cpp_sources += asm_sources

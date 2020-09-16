@@ -106,16 +106,17 @@ elif system == 'windows'
     asm_args += ['-DWIN64']
     asm_inc = join_paths(meson.current_source_dir(), 'codec', 'common', 'x86', '')
   elif cpu_family == 'arm'
-    if cpp.get_argument_syntax() != 'msvc'
-      error('Windows ARM is currently only supported with Visual Studio-like compilers')
+    if cpp.get_argument_syntax() == 'msvc'
+      asm_format = 'armasm'
+      asm_args += ['-nologo', '-DHAVE_NEON', '-ignore', '4509']
+      asm_cmds = ['armasm']
+    else
+      asm_format = 'clang'
+      asm_args += ['-DHAVE_NEON', '-mimplicit-it=always']
+      asm_cmds = cpp.cmd_array()
     endif
-    asm_format = 'armasm'
-    asm_args += ['-nologo', '-DHAVE_NEON', '-ignore', '4509']
     asm_inc = join_paths(meson.current_source_dir(), 'codec', 'common', 'arm', '')
   elif cpu_family == 'aarch64'
-    if cpp.get_argument_syntax() != 'msvc'
-      error('Windows ARM64 is currently only supported with Visual Studio-like compilers')
-    endif
     asm_format = 'armasm'
     asm_args += ['-nologo', '-DHAVE_NEON_AARCH64']
     asm_inc = join_paths(meson.current_source_dir(), 'codec', 'common', 'arm64', '')
@@ -126,9 +127,11 @@ else
   error('FIXME: Unhandled system @0@'.format(system))
 endif
 
+use_asm_gen = false
 if cpu_family in ['x86', 'x86_64']
   nasm = find_program('nasm')
 
+  use_asm_gen = true
   asm_gen = generator(nasm,
     output : '@BASENAME@.o',
     arguments : [
@@ -137,29 +140,38 @@ if cpu_family in ['x86', 'x86_64']
       '@INPUT@',
       '-o', '@OUTPUT@'] + asm_args)
 elif system == 'windows'
-  gasprep = find_program('gas-preprocessor.pl')
   if  cpu_family == 'arm'
+    # For ARM, gas-preprocessor is needed for converting the asm to be
+    # buildable as thumb even with Clang.
+    use_asm_gen = true
+    gasprep = find_program('gas-preprocessor.pl')
     asm_gen = generator(gasprep,
       output : '@BASENAME@.obj',
       arguments : [
         '-as-type', asm_format,
         '-force-thumb',
-        '--',
-        'armasm',
+        '--'
+        ] + asm_cmds + [
         '-I' + asm_inc] + asm_args + [
         '@INPUT@',
         '-c', '-o', '@OUTPUT@'])
   elif cpu_family == 'aarch64'
-    asm_gen = generator(gasprep,
-      output : '@BASENAME@.obj',
-      arguments : [
-        '-as-type', asm_format,
-        '-arch', 'aarch64',
-        '--',
-        'armasm64',
-        '-I' + asm_inc] + asm_args + [
-        '@INPUT@',
-        '-c', '-o', '@OUTPUT@'])
+    # For ARM64, Clang can build the assembly as-is without needing to use
+    # either gas-preprocessor or armasm64.
+    if cpp.get_argument_syntax() == 'msvc'
+      use_asm_gen = true
+      gasprep = find_program('gas-preprocessor.pl')
+      asm_gen = generator(gasprep,
+        output : '@BASENAME@.obj',
+        arguments : [
+          '-as-type', asm_format,
+          '-arch', 'aarch64',
+          '--',
+          'armasm64',
+          '-I' + asm_inc] + asm_args + [
+          '@INPUT@',
+          '-c', '-o', '@OUTPUT@'])
+    endif
   else
     # Windows only supports x86, x86_64, arm, arm64
     error('unreachable code')
