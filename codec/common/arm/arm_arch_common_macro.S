@@ -50,16 +50,22 @@ mov pc, lr
 .endm
 #else
 
+#ifdef __ELF__
 .section .note.GNU-stack,"",%progbits // Mark stack as non-executable
+#endif
 .text
+#ifdef __ELF__
 .arch armv7-a
 .fpu neon
+#endif
 
 .macro WELS_ASM_FUNC_BEGIN funcName
 .align 2
 .arm
 .global \funcName
+#ifdef __ELF__
 .type \funcName, %function
+#endif
 #ifndef __clang__
 .func \funcName
 #endif
