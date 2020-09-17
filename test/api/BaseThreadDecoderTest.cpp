@@ -277,7 +277,7 @@ bool BaseThreadDecoderTest::ThreadDecodeFile (const char* fileName, Callback* cb
   memset (&sBufInfo, 0, sizeof (SBufferInfo));
   int32_t bufPos = 0;
   int32_t bytesConsumed = 0;
-  int32_t fileSize = buf.Length();
+  int32_t fileSize = (int32_t)buf.Length();
   while (bytesConsumed < fileSize) {
     int32_t frameSize = ReadFrame (buf.data(), fileSize, bufPos);
     if (::testing::Test::HasFatalFailure()) {
