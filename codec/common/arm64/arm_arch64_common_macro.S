@@ -45,13 +45,17 @@ ret
 .endm
 #else
 
+#ifdef __ELF__
 .section .note.GNU-stack,"",%progbits // Mark stack as non-executable
+#endif
 .text
 
 .macro WELS_ASM_AARCH64_FUNC_BEGIN funcName
 .align 2
 .global \funcName
+#ifdef __ELF__
 .type \funcName, %function
+#endif
 #ifndef __clang__
 .func \funcName
 #endif

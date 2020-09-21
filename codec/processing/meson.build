@@ -33,7 +33,7 @@ elif cpu_family == 'arm'
     'src/arm/pixel_sad_neon.S',
     'src/arm/vaa_calc_neon.S',
   ]
-  if system == 'windows'
+  if use_asm_gen
     objs_asm = asm_gen.process(asm_sources)
   else
     cpp_sources += asm_sources
@@ -45,7 +45,7 @@ elif cpu_family == 'aarch64'
 	'src/arm64/pixel_sad_aarch64_neon.S',
 	'src/arm64/vaa_calc_aarch64_neon.S',
   ]
-  if system == 'windows'
+  if use_asm_gen
     objs_asm = asm_gen.process(asm_sources)
   else
     cpp_sources += asm_sources
