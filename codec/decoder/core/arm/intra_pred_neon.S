@@ -126,6 +126,7 @@ WELS_ASM_FUNC_END
 
 
 
+.align 3
 //The table for SIMD instruction {(8,7,6,5,4,3,2,1) * 5}
 CONST0_GET_I16X16_LUMA_PRED_PLANE: .long 0x191e2328, 0x050a0f14
 
