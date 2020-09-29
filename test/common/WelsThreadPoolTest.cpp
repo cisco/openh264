@@ -14,7 +14,7 @@
 
 uint32_t CSimpleTask::id = 0;
 
-void* OneCallingFunc() {
+WELS_THREAD_ROUTINE_TYPE OneCallingFunc(void *) {
   CThreadPoolTest cThreadPoolTest;
   CSimpleTask* aTasks[TEST_TASK_NUM];
   CWelsThreadPool* pThreadPool = (CWelsThreadPool::AddReference());
@@ -44,7 +44,7 @@ void* OneCallingFunc() {
 
 
 TEST (CThreadPoolTest, CThreadPoolTest) {
-  OneCallingFunc();
+  OneCallingFunc(NULL);
 
   int iRet = CWelsThreadPool::SetThreadNum (8);
   EXPECT_EQ (0, iRet);
@@ -81,12 +81,12 @@ TEST (CThreadPoolTest, CThreadPoolTestMulti) {
   int i = 0;
   WELS_THREAD_ERROR_CODE rc;
   for (i = 0; i < iCallingNum; i++) {
-    rc = WelsThreadCreate (& (mThreadID[i]), (LPWELS_THREAD_ROUTINE)OneCallingFunc, NULL, 0);
+    rc = WelsThreadCreate (& (mThreadID[i]), OneCallingFunc, NULL, 0);
     ASSERT_TRUE (rc == WELS_THREAD_ERROR_OK);
     WelsSleep (1);
   }
   for (i = iCallingNum; i < iCallingNum * 2; i++) {
-    rc = WelsThreadCreate (& (mThreadID[i]), (LPWELS_THREAD_ROUTINE)OneCallingFunc, NULL, 0);
+    rc = WelsThreadCreate (& (mThreadID[i]), OneCallingFunc, NULL, 0);
     ASSERT_TRUE (rc == WELS_THREAD_ERROR_OK);
     WelsSleep (1);
     WelsThreadJoin (mThreadID[i]);
@@ -95,7 +95,7 @@ TEST (CThreadPoolTest, CThreadPoolTestMulti) {
     WelsThreadJoin (mThreadID[i]);
   }
   for (i = iCallingNum * 2; i < iCallingNum * 3; i++) {
-    rc = WelsThreadCreate (& (mThreadID[i]), (LPWELS_THREAD_ROUTINE)OneCallingFunc, NULL, 0);
+    rc = WelsThreadCreate (& (mThreadID[i]), OneCallingFunc, NULL, 0);
     ASSERT_TRUE (rc == WELS_THREAD_ERROR_OK);
     WelsSleep (1);
     WelsThreadJoin (mThreadID[i]);
