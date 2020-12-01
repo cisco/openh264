@@ -74,6 +74,12 @@
 #define WELS_CPU_AVX2       0x00000000  /* !AVX2 */
 #endif
 
+#define WELS_CPU_AVX512F    0x00080000  /* AVX512F */
+#define WELS_CPU_AVX512CD   0x00100000  /* AVX512CD */
+#define WELS_CPU_AVX512DQ   0x00200000  /* AVX512DQ */
+#define WELS_CPU_AVX512BW   0x00400000  /* AVX512BW */
+#define WELS_CPU_AVX512VL   0x00800000  /* AVX512VL */
+
 #define WELS_CPU_CACHELINE_16    0x10000000    /* CacheLine Size 16 */
 #define WELS_CPU_CACHELINE_32    0x20000000    /* CacheLine Size 32 */
 #define WELS_CPU_CACHELINE_64    0x40000000    /* CacheLine Size 64 */
