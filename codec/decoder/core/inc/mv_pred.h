@@ -44,6 +44,10 @@
 #include "dec_frame.h"
 #include "decoder_context.h"
 
+#define RETURN_ERR_IF_NULL(pRefPic0) \
+if ( pRefPic0 == NULL) \
+  return GENERATE_ERROR_NO(ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_REF_INDEX)
+
 namespace WelsDec {
 
 /*!
