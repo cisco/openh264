@@ -76,9 +76,9 @@ TEST_P (DecoderOutputTest, CompareOutput) {
   FileParam p = GetParam();
 #if defined(ANDROID_NDK)
   std::string filename = std::string ("/sdcard/") + p.fileName;
-  ASSERT_TRUE (DecodeFile (filename.c_str(), this));
+  ASSERT_TRUE ( DecodeFile (filename.c_str(), this));
 #else
-  ASSERT_TRUE (DecodeFile (p.fileName, this));
+  ASSERT_TRUE (DecodeFile(p.fileName, this));
 #endif
 
   unsigned char digest[SHA_DIGEST_LENGTH];
@@ -131,14 +131,14 @@ static const FileParam kFileParamArray[] = {
   {"res/test_vd_1d.264", "5827d2338b79ff82cd091c707823e466197281d3"},
   {"res/test_vd_rc.264", "eea02e97bfec89d0418593a8abaaf55d02eaa1ca"},
   {"res/Cisco_Men_whisper_640x320_CABAC_Bframe_9.264", "931ba1caf075e7b47445c1f4410ade77a46048f6"},
-  {"res/Cisco_Men_whisper_640x320_CAVLC_Bframe_9.264", "9819c0345abdd4faedbaf8f8c4dadb7749515e4d"},
-  {"res/Cisco_Adobe_PDF_sample_a_1024x768_CAVLC_Bframe_9.264", "9d758d9e6f4dead0d7b361f3ddf2ee009d0ea190"},
+  {"res/Cisco_Men_whisper_640x320_CAVLC_Bframe_9.264", "ff501efe475fda239ab6acab81d958ea06dc61dd"},
+  {"res/Cisco_Adobe_PDF_sample_a_1024x768_CAVLC_Bframe_9.264", "01d9ddef71ea2e33d4686a38a7726b8d949af31c"},
   {"res/VID_1280x544_cabac_temporal_direct.264", "b7f04399f38a90c866f0b518d1dd93c823d5d91f"},
   {"res/VID_1280x720_cabac_temporal_direct.264", "dabc1d0d44921a5c72ed2d4fde1d602465249c97"},
   {"res/VID_1920x1080_cabac_temporal_direct.264", "6e719adb650cee4ca99a45242685d261257c04cc"},
-  {"res/VID_1280x544_cavlc_temporal_direct.264", "33bfa44b4a3c87fe28354cace1d4b99a03d2967d"},
-  {"res/VID_1280x720_cavlc_temporal_direct.264", "4face6b5d73a378b6e564a831b49311c230158e4"},
-  {"res/VID_1920x1080_cavlc_temporal_direct.264", "b35dc99604ea2a1fda5b84d1b9098cb7565dec8f"},
+  {"res/VID_1280x544_cavlc_temporal_direct.264", "f1ad1c6b05a6fd5f2fc67db8c3d0dcd0248c16e2"},
+  {"res/VID_1280x720_cavlc_temporal_direct.264", "d2bc970528b5498a80f56b0e1fce051fa2969205"},
+  {"res/VID_1920x1080_cavlc_temporal_direct.264", "abfea849e52b51e8013a36f4772d5480e8d49bf5"},
 };
 
 INSTANTIATE_TEST_CASE_P (DecodeFile, DecoderOutputTest,
