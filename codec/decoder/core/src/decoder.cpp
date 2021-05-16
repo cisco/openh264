@@ -305,6 +305,7 @@ void ResetReorderingPictureBuffers (PPictReoderingStatus pPictReoderingStatus, P
       pPictInfo[i].iPOC = IMinInt32;
     }
     pPictInfo->sBufferInfo.iBufferStatus = 0;
+		pPictReoderingStatus->bHasBSlice = false;
   }
 }
 
