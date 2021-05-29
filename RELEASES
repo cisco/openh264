@@ -20,6 +20,11 @@ v2.0.0
 - Remove check for working compiler in NDK
 - Bug fixes
 
+v1.8.1
+------
+- Fix decoding failure when H.264 video coming from Safari 12, see https://bugzilla.mozilla.org/show_bug.cgi?id=1492038
+- Fix GMP plugin deadlock, see https://bugzilla.mozilla.org/show_bug.cgi?id=1397539
+
 v1.8.0
 ------
 - Add meson build for Linux/Windows platform
