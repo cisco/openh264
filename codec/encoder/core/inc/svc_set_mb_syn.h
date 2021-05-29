@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	svc_set_mb_syn.h
+ * \file    svc_set_mb_syn.h
  *
- * \brief	Seting all syntax elements of mb and encoding residual with cavlc and cabac
+ * \brief   Seting all syntax elements of mb and encoding residual with cavlc and cabac
  *
- * \date	2009.8.12 Created
+ * \date    2009.8.12 Created
  *
  *************************************************************************************
  */
@@ -62,7 +62,9 @@ void WelsInitSliceCabac(sWelsEncCtx* pEncCtx,SSlice* pSlice);
 void WelsCabacInit(void *pCtx);
 void WelsWriteSliceEndSyn(SSlice *pSlice,bool bEntropyCodingModeFlag);
 //for Base Layer CAVLC writing
-int32_t WelsSpatialWriteMbSyn (void* Ctx, SSlice* pSlice, SMB* pCurMb);
-int32_t WelsSpatialWriteMbSynCabac (void* pCtx, SSlice* pSlice, SMB* pCurMb);
+int32_t WelsSpatialWriteMbSyn (sWelsEncCtx* Ctx, SSlice* pSlice, SMB* pCurMb);
+int32_t WelsSpatialWriteMbSynCabac (sWelsEncCtx* pCtx, SSlice* pSlice, SMB* pCurMb);
+int32_t GetBsPosCavlc(SSlice *pSlice);
+int32_t GetBsPosCabac(SSlice *pSlice);
 }
 #endif

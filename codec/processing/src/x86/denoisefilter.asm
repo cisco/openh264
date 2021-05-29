@@ -44,7 +44,11 @@
 ;***********************************************************************
 ; Constant
 ;***********************************************************************
+%ifdef X86_32_PICASM
+SECTION .text align=16
+%else
 SECTION .rodata align=16
+%endif
 
 sse2_32 times 8 dw 32
 sse2_20 times 8 dw 20
@@ -147,7 +151,7 @@ SECTION .text
     movdqa      %2, %1
     psrldq      %2, 2
     punpcklbw   %2, %4
-    pmullw      %2, [sse2_20]
+    pmullw      %2, [pic(sse2_20)]
     paddw       %3, %2
 
     movdqa      %2, %1
@@ -184,7 +188,13 @@ WELS_EXTERN BilateralLumaFilter8_sse2
 
     movq        xmm6,   [r0]
     punpcklbw   xmm6,   xmm7
+%ifdef X86_32_PICASM
+    pcmpeqw     xmm3,   xmm3
+    psrlw       xmm3,   15
+    psllw       xmm3,   5
+%else
     movdqa      xmm3,   [sse2_32]
+%endif
     pxor        xmm4,   xmm4        ; nTotWeight
     pxor        xmm5,   xmm5        ; nSum
 
@@ -235,6 +245,7 @@ WELS_EXTERN WaverageChromaFilter8_sse2
 
     %assign push_num 1
 
+    INIT_X86_32_PIC r4
     LOAD_2_PARA
 
     mov     r3, r1
@@ -266,6 +277,7 @@ WELS_EXTERN WaverageChromaFilter8_sse2
     movq        [r0 + 2],       xmm3
 
 
+    DEINIT_X86_32_PIC
     pop r3
 
     %assign push_num 0

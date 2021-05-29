@@ -85,7 +85,7 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
   /*
    * return: 0 - success; otherwise - failed;
    */
-  virtual int EXTAPI ForceIntraFrame (bool bIDR);
+  virtual int EXTAPI ForceIntraFrame (bool bIDR,int32_t iLayerId = -1);
 
   /************************************************************************
    * InDataFormat, IDRInterval, SVC Encode Param, Frame Rate, Bitrate,..
@@ -98,34 +98,32 @@ class CWelsH264SVCEncoder : public ISVCEncoder {
 
  private:
   int InitializeInternal (SWelsSvcCodingParam* argv);
-  void CheckProfileSetting (int32_t iLayer, EProfileIdc uiProfileIdc);
-  void CheckLevelSetting (int32_t iLayer, ELevelIdc uiLevelIdc);
-  void CheckReferenceNumSetting (int32_t iNumRef);
   void TraceParamInfo(SEncParamExt *pParam);
-  void UpdateStatistics(const int64_t kiCurrentFrameTs, EVideoFrameType eFrameType,  const int32_t kiCurrentFrameSize, const int64_t kiCurrentFrameMs);
+  void LogStatistics (const int64_t kiCurrentFrameTs,int32_t iMaxDid);
+  void UpdateStatistics(SFrameBSInfo* pBsInfo, const int64_t kiCurrentFrameMs);
 
-  sWelsEncCtx*	m_pEncContext;
+  sWelsEncCtx*      m_pEncContext;
 
-  welsCodecTrace*			m_pWelsTrace;
-  int32_t						m_iMaxPicWidth;
-  int32_t						m_iMaxPicHeight;
+  welsCodecTrace*   m_pWelsTrace;
+  int32_t           m_iMaxPicWidth;
+  int32_t           m_iMaxPicHeight;
 
-  int32_t						m_iCspInternal;
-  bool					m_bInitialFlag;
+  int32_t           m_iCspInternal;
+  bool              m_bInitialFlag;
 
 #ifdef OUTPUT_BIT_STREAM
-  FILE*				m_pFileBs;
-  FILE*               m_pFileBsSize;
-  bool				m_bSwitch;
-  int32_t					m_iSwitchTimes;
+  FILE*             m_pFileBs;
+  FILE*             m_pFileBsSize;
+  bool              m_bSwitch;
+  int32_t           m_iSwitchTimes;
 #endif//OUTPUT_BIT_STREAM
 
 #ifdef REC_FRAME_COUNT
-  int32_t		m_uiCountFrameNum;
+  int32_t           m_uiCountFrameNum;
 #endif//REC_FRAME_COUNT
 
   void    InitEncoder (void);
-  void    DumpSrcPicture (const uint8_t* pSrc);
+  void    DumpSrcPicture (const SSourcePicture*  pSrcPic, const int iUsageType);
 };
 }
 #endif // !defined(WELS_PLUS_WELSENCODEREXT_H)

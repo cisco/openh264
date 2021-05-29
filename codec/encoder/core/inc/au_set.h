@@ -29,12 +29,12 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	au_set.h
+ * \file    au_set.h
  *
- * \brief	Interfaces introduced in Access Unit level based writer
+ * \brief   Interfaces introduced in Access Unit level based writer
  *
- * \date	05/18/2009 Created
- *			05/21/2009 Added init_sps and init_pps
+ * \date    05/18/2009 Created
+ *          05/21/2009 Added init_sps and init_pps
  *
  *************************************************************************************
  */
@@ -42,22 +42,22 @@
 #ifndef WELS_ACCESS_UNIT_WRITER_H__
 #define WELS_ACCESS_UNIT_WRITER_H__
 
-#include "bit_stream.h"
 #include "parameter_sets.h"
+#include "paraset_strategy.h"
 #include "param_svc.h"
 #include "utils.h"
 namespace WelsEnc {
 /*!
  *************************************************************************************
- * \brief	to write Sequence Parameter Set (SPS)
+ * \brief   to write Sequence Parameter Set (SPS)
  *
- * \param 	pSps     	SWelsSPS to be wrote
- * \param	bs_aux		bitstream writer auxiliary
+ * \param   pSps        SWelsSPS to be wrote
+ * \param   bs_aux      bitstream writer auxiliary
  *
- * \return	0 - successed
- *		    1 - failed
+ * \return  0 - successed
+ *          1 - failed
  *
- * \note	Call it in case EWelsNalUnitType is SPS.
+ * \note    Call it in case EWelsNalUnitType is SPS.
  *************************************************************************************
  */
 
@@ -66,15 +66,15 @@ int32_t WelsWriteSpsNal (SWelsSPS* pSps, SBitStringAux* pBitStringAux, int32_t* 
 
 /*!
  *************************************************************************************
- * \brief	to write SubSet Sequence Parameter Set
+ * \brief   to write SubSet Sequence Parameter Set
  *
- * \param 	sub_sps		subset pSps parsed
- * \param	bs_aux		bitstream writer auxiliary
+ * \param   sub_sps     subset pSps parsed
+ * \param   bs_aux      bitstream writer auxiliary
  *
- * \return	0 - successed
- *		    1 - failed
+ * \return  0 - successed
+ *          1 - failed
  *
- * \note	Call it in case EWelsNalUnitType is SubSet SPS.
+ * \note    Call it in case EWelsNalUnitType is SubSet SPS.
  *************************************************************************************
  */
 int32_t WelsWriteSubsetSpsSyntax (SSubsetSps* pSubsetSps, SBitStringAux* pBitStringAux , int32_t* pSpsIdDelta);
@@ -82,57 +82,58 @@ int32_t WelsWriteSubsetSpsSyntax (SSubsetSps* pSubsetSps, SBitStringAux* pBitStr
 
 /*!
  *************************************************************************************
- * \brief	to write Picture Parameter Set (PPS)
+ * \brief   to write Picture Parameter Set (PPS)
  *
- * \param 	pPps     	pPps
- * \param	bs_aux		bitstream writer auxiliary
+ * \param   pPps        pPps
+ * \param   bs_aux      bitstream writer auxiliary
  *
- * \return	0 - successed
- *		    1 - failed
+ * \return  0 - successed
+ *          1 - failed
  *
- * \note	Call it in case EWelsNalUnitType is PPS.
+ * \note    Call it in case EWelsNalUnitType is PPS.
  *************************************************************************************
  */
-int32_t WelsWritePpsSyntax (SWelsPPS* pPps, SBitStringAux* pBitStringAux, SParaSetOffset* sPSOVector);
+int32_t WelsWritePpsSyntax (SWelsPPS* pPps, SBitStringAux* pBitStringAux, IWelsParametersetStrategy* pParametersetStrategy);
 
 /*!
- * \brief	initialize pSps based on configurable parameters in svc
- * \param	pSps				SWelsSPS*
- * \param   pLayerParam     SSpatialLayerConfig  dependency layer parameter
- * \param	pLayerParamInternal		SSpatialLayerInternal*, internal dependency layer parameter
- * \param	iSpsId			SPS Id
- * \return	0 - successful
- *			1 - failed
+ * \brief   initialize pSps based on configurable parameters in svc
+ * \param   pSps                SWelsSPS*
+ * \param   pLayerParam         SSpatialLayerConfig  dependency layer parameter
+ * \param   pLayerParamInternal SSpatialLayerInternal*, internal dependency layer parameter
+ * \param   iSpsId              SPS Id
+ * \return  0 - successful
+ *          1 - failed
  */
 int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialLayerInternal* pLayerParamInternal,
                      const uint32_t kuiIntraPeriod, const int32_t kiNumRefFrame,
                      const uint32_t kiSpsId, const bool kbEnableFrameCropping, bool bEnableRc,
-                     const int32_t kiDlayerCount);
+                     const int32_t kiDlayerCount,bool bSVCBaselayer);
 
 /*!
- * \brief	initialize subset pSps based on configurable parameters in svc
- * \param	pSubsetSps		SSubsetSps*
- * \param   pLayerParam     SSpatialLayerConfig  dependency layer parameter
- * \param	pLayerParamInternal		SSpatialLayerInternal*, internal dependency layer parameter
- * \param	kiSpsId			SPS Id
- * \return	0 - successful
- *			1 - failed
+ * \brief   initialize subset pSps based on configurable parameters in svc
+ * \param   pSubsetSps          SSubsetSps*
+ * \param   pLayerParam         SSpatialLayerConfig  dependency layer parameter
+ * \param   pLayerParamInternal SSpatialLayerInternal*, internal dependency layer parameter
+ * \param   kiSpsId             SPS Id
+ * \return  0 - successful
+ *          1 - failed
  */
 int32_t WelsInitSubsetSps (SSubsetSps* pSubsetSps, SSpatialLayerConfig* pLayerParam,
                            SSpatialLayerInternal* pLayerParamInternal,
                            const uint32_t kuiIntraPeriod, const int32_t kiNumRefFrame,
-                           const uint32_t kiSpsId, const bool kbEnableFrameCropping, bool bEnableRc);
+                           const uint32_t kiSpsId, const bool kbEnableFrameCropping, bool bEnableRc,
+                           const int32_t kiDlayerCount);
 
 /*!
- * \brief	initialize pPps based on configurable parameters and pSps(subset pSps) in svc
- * \param	pPps							SWelsPPS*
- * \param	pSps							SWelsSPS*
- * \param	pSubsetSps					SSubsetSps*
- * \param   kbDeblockingFilterPresentFlag			bool
- * \param	kiPpsId						PPS Id
- * \param	kbUsingSubsetSps					bool
- * \return	0 - successful
- *			1 - failed
+ * \brief   initialize pPps based on configurable parameters and pSps(subset pSps) in svc
+ * \param   pPps                            SWelsPPS*
+ * \param   pSps                            SWelsSPS*
+ * \param   pSubsetSps                      SSubsetSps*
+ * \param   kbDeblockingFilterPresentFlag   bool
+ * \param   kiPpsId                         PPS Id
+ * \param   kbUsingSubsetSps                bool
+ * \return  0 - successful
+ *          1 - failed
  */
 int32_t WelsInitPps (SWelsPPS* pPps,
                      SWelsSPS* pSps,
@@ -141,7 +142,11 @@ int32_t WelsInitPps (SWelsPPS* pPps,
                      const bool kbDeblockingFilterPresentFlag,
                      const bool kbUsingSubsetSps,
                      const bool kbEntropyCodingModeFlag);
-int32_t WelsCheckRefFrameLimitation (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam);
-int32_t WelsAdjustLevel( SSpatialLayerConfig* pSpatialLayer);
+
+int32_t WelsCheckRefFrameLimitationNumRefFirst (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam);
+int32_t WelsCheckRefFrameLimitationLevelIdcFirst (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam);
+
+int32_t WelsAdjustLevel (SSpatialLayerConfig* pSpatialLayer,const SLevelLimits *pCurLevel);
+
 }
 #endif//WELS_ACCESS_UNIT_PARSER_H__

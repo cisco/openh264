@@ -28,9 +28,9 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	    :  vaacalculation.h
+ * \file        :  vaacalculation.h
  *
- * \brief	    :  pVaa calculation class of wels video processor class
+ * \brief       :  pVaa calculation class of wels video processor class
  *
  * \date        :  2011/03/18
  *
@@ -75,55 +75,70 @@ typedef void (VAACalcSadSsdFunc) (const uint8_t* pCurData, const uint8_t* pRefDa
                                   int32_t* pFrameSad, int32_t* pSad8x8, int32_t* pSum16x16, int32_t* pSumSquare16x16, int32_t* pSsd16x16);
 
 
-typedef VAACalcSadBgdFunc*		 PVAACalcSadBgdFunc;
-typedef VAACalcSadSsdBgdFunc*	 PVAACalcSadSsdBgdFunc;
-typedef VAACalcSadFunc*			 PVAACalcSadFunc;
-typedef VAACalcSadVarFunc*		 PVAACalcSadVarFunc;
-typedef VAACalcSadSsdFunc*		 PVAACalcSadSsdFunc;
+typedef VAACalcSadBgdFunc*       PVAACalcSadBgdFunc;
+typedef VAACalcSadSsdBgdFunc*    PVAACalcSadSsdBgdFunc;
+typedef VAACalcSadFunc*          PVAACalcSadFunc;
+typedef VAACalcSadVarFunc*       PVAACalcSadVarFunc;
+typedef VAACalcSadSsdFunc*       PVAACalcSadSsdFunc;
 
 typedef  struct TagVaaFuncs {
-  PVAACalcSadBgdFunc		pfVAACalcSadBgd;
-  PVAACalcSadSsdBgdFunc	pfVAACalcSadSsdBgd;
-  PVAACalcSadFunc			pfVAACalcSad;
-  PVAACalcSadVarFunc		pfVAACalcSadVar;
-  PVAACalcSadSsdFunc		pfVAACalcSadSsd;
+  PVAACalcSadBgdFunc    pfVAACalcSadBgd;
+  PVAACalcSadSsdBgdFunc pfVAACalcSadSsdBgd;
+  PVAACalcSadFunc       pfVAACalcSad;
+  PVAACalcSadVarFunc    pfVAACalcSadVar;
+  PVAACalcSadSsdFunc    pfVAACalcSadSsd;
 } SVaaFuncs;
 
 
-VAACalcSadBgdFunc		VAACalcSadBgd_c;
-VAACalcSadSsdBgdFunc	VAACalcSadSsdBgd_c;
-VAACalcSadFunc			    VAACalcSad_c;
-VAACalcSadVarFunc		VAACalcSadVar_c;
-VAACalcSadSsdFunc		VAACalcSadSsd_c;
+VAACalcSadBgdFunc       VAACalcSadBgd_c;
+VAACalcSadSsdBgdFunc    VAACalcSadSsdBgd_c;
+VAACalcSadFunc          VAACalcSad_c;
+VAACalcSadVarFunc       VAACalcSadVar_c;
+VAACalcSadSsdFunc       VAACalcSadSsd_c;
 
 
 #ifdef X86_ASM
 WELSVP_EXTERN_C_BEGIN
-VAACalcSadBgdFunc		VAACalcSadBgd_sse2;
-VAACalcSadSsdBgdFunc	VAACalcSadSsdBgd_sse2;
-VAACalcSadFunc			    VAACalcSad_sse2;
-VAACalcSadVarFunc		VAACalcSadVar_sse2;
-VAACalcSadSsdFunc		VAACalcSadSsd_sse2;
+VAACalcSadBgdFunc       VAACalcSadBgd_sse2;
+VAACalcSadSsdBgdFunc    VAACalcSadSsdBgd_sse2;
+VAACalcSadFunc          VAACalcSad_sse2;
+VAACalcSadVarFunc       VAACalcSadVar_sse2;
+VAACalcSadSsdFunc       VAACalcSadSsd_sse2;
+VAACalcSadBgdFunc       VAACalcSadBgd_avx2;
+VAACalcSadSsdBgdFunc    VAACalcSadSsdBgd_avx2;
+VAACalcSadFunc          VAACalcSad_avx2;
+VAACalcSadVarFunc       VAACalcSadVar_avx2;
+VAACalcSadSsdFunc       VAACalcSadSsd_avx2;
 WELSVP_EXTERN_C_END
 #endif
 
 #ifdef HAVE_NEON
 WELSVP_EXTERN_C_BEGIN
-VAACalcSadBgdFunc		VAACalcSadBgd_neon;
-VAACalcSadSsdBgdFunc	VAACalcSadSsdBgd_neon;
-VAACalcSadFunc			    VAACalcSad_neon;
-VAACalcSadVarFunc		VAACalcSadVar_neon;
-VAACalcSadSsdFunc		VAACalcSadSsd_neon;
+VAACalcSadBgdFunc       VAACalcSadBgd_neon;
+VAACalcSadSsdBgdFunc    VAACalcSadSsdBgd_neon;
+VAACalcSadFunc          VAACalcSad_neon;
+VAACalcSadVarFunc       VAACalcSadVar_neon;
+VAACalcSadSsdFunc       VAACalcSadSsd_neon;
 WELSVP_EXTERN_C_END
 #endif
 
 #ifdef HAVE_NEON_AARCH64
 WELSVP_EXTERN_C_BEGIN
-VAACalcSadBgdFunc		VAACalcSadBgd_AArch64_neon;
-VAACalcSadSsdBgdFunc	VAACalcSadSsdBgd_AArch64_neon;
-VAACalcSadFunc			    VAACalcSad_AArch64_neon;
-VAACalcSadVarFunc		VAACalcSadVar_AArch64_neon;
-VAACalcSadSsdFunc		VAACalcSadSsd_AArch64_neon;
+VAACalcSadBgdFunc       VAACalcSadBgd_AArch64_neon;
+VAACalcSadSsdBgdFunc    VAACalcSadSsdBgd_AArch64_neon;
+VAACalcSadFunc          VAACalcSad_AArch64_neon;
+VAACalcSadVarFunc       VAACalcSadVar_AArch64_neon;
+VAACalcSadSsdFunc       VAACalcSadSsd_AArch64_neon;
+WELSVP_EXTERN_C_END
+#endif
+
+#ifdef HAVE_MMI
+WELSVP_EXTERN_C_BEGIN
+VAACalcSadBgdFunc       VAACalcSadBgd_mmi;
+VAACalcSadSsdBgdFunc    VAACalcSadSsdBgd_mmi;
+VAACalcSadFunc          VAACalcSad_mmi;
+VAACalcSadVarFunc       VAACalcSadVar_mmi;
+VAACalcSadSsdFunc       VAACalcSadSsd_mmi;
 WELSVP_EXTERN_C_END
 #endif
 

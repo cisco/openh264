@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	md.h
+ * \file    md.h
  *
- * \brief	mode decision
+ * \brief   mode decision
  *
- * \date	2009.5.14 Created
+ * \date    2009.5.14 Created
  *
  *************************************************************************************
  */
@@ -84,32 +84,35 @@ extern const int8_t g_kiMapModeIntraChroma[7];
 
 // if we want keep total sizeof(SWelsMD) <= 256, we maybe need to seperate three member of SWelsME.
 typedef struct TagWelsMD {
-int32_t			iLambda;
-uint16_t*		pMvdCost;
+int32_t         iLambda;
+uint16_t*       pMvdCost;
 
-int32_t			iCostLuma;
-int32_t			iCostChroma;//satd+lambda(best_pred_mode) //i_sad_chroma;
-int32_t			iSadPredMb;
+int32_t         iCostLuma;
+int32_t         iCostChroma;//satd+lambda(best_pred_mode) //i_sad_chroma;
+int32_t         iSadPredMb;
 
-uint8_t			uiRef; //uiRefIndex appointed by Encoder, used for MC
-bool			bMdUsingSad;
-uint16_t		uiReserved;
+uint8_t         uiRef; //uiRefIndex appointed by Encoder, used for MC
+bool            bMdUsingSad;
+uint16_t        uiReserved;
 
-int32_t			iCostSkipMb;
-int32_t			iSadPredSkip;
+int32_t         iCostSkipMb;
+int32_t         iSadPredSkip;
 
-int32_t			iMbPixX;		// pixel position of MB in horizontal axis
-int32_t			iMbPixY;		// pixel position of MB in vertical axis
-int32_t			iBlock8x8StaticIdc[4];
+int32_t         iMbPixX;                // pixel position of MB in horizontal axis
+int32_t         iMbPixY;                // pixel position of MB in vertical axis
+int32_t         iBlock8x8StaticIdc[4];
 
 //NO B frame in our Wels, we can ignore list1
 
 struct {
-  SWelsME			sMe16x16;		//adjust each SWelsME for 8 D-word!
-  SWelsME			sMe8x8[4];
-  SWelsME			sMe16x8[2];
-  SWelsME			sMe8x16[2];
-//		SMVUnitXY		i_mvbs[MB_BLOCK8x8_NUM];	//scaled MVB
+  SWelsME       sMe16x16;               //adjust each SWelsME for 8 D-word!
+  SWelsME       sMe8x8[4];
+  SWelsME       sMe16x8[2];
+  SWelsME       sMe8x16[2];
+  SWelsME       sMe4x4[4][4];
+  SWelsME       sMe8x4[4][2];
+  SWelsME       sMe4x8[4][2];
+//  SMVUnitXY     i_mvbs[MB_BLOCK8x8_NUM];        //scaled MVB
 } sMe;
 
 } SWelsMD;
@@ -122,6 +125,7 @@ uint8_t* pHalfPixHV;
 uint8_t* pQuarPixBest;
 uint8_t* pQuarPixTmp;
 
+PCopyFunc pfCopyBlockByMode;
 } SMeRefinePointer;
 
 void FillNeighborCacheIntra (SMbCache* pMbCache, SMB* pCurMb, int32_t iMbWidth/*, bool constrained_intra_pred_flag*/);

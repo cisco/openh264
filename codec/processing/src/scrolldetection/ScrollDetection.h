@@ -28,9 +28,9 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	        :  ScrollDectection.h
+ * \file         :  ScrollDectection.h
  *
- * \brief	    :  scroll detection class of wels video processor class
+ * \brief        :  scroll detection class of wels video processor class
  *
  * \date         :  2011/04/26
  *

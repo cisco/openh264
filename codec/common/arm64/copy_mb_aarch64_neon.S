@@ -30,84 +30,9 @@
  *
  */
 
-#ifdef  HAVE_NEON_AARCH64
-.text
+#ifdef HAVE_NEON_AARCH64
 #include "arm_arch64_common_macro.S"
 
-#ifdef __APPLE__
-.macro LOAD_ALIGNED_DATA_WITH_STRIDE
-//  {   //  input: $0~$3, src*, src_stride
-    ld1 {$0.d}[0], [$4], $5
-    ld1 {$1.d}[0], [$4], $5
-    ld1 {$2.d}[0], [$4], $5
-    ld1 {$3.d}[0], [$4], $5
-//  }
-.endm
-
-.macro STORE_ALIGNED_DATA_WITH_STRIDE
-//  {   //  input: $0~$3, dst*, dst_stride
-    st1 {$0.d}[0], [$4], $5
-    st1 {$1.d}[0], [$4], $5
-    st1 {$2.d}[0], [$4], $5
-    st1 {$3.d}[0], [$4], $5
-//  }
-.endm
-
-.macro LOAD_UNALIGNED_DATA_WITH_STRIDE
-//  {   //  input: $0~$3, src*, src_stride
-    ld1 {$0.8b}, [$4], $5
-    ld1 {$1.8b}, [$4], $5
-    ld1 {$2.8b}, [$4], $5
-    ld1 {$3.8b}, [$4], $5
-//  }
-.endm
-
-.macro STORE_UNALIGNED_DATA_WITH_STRIDE
-//  {   //  input: $0~$3, dst*, dst_stride
-    st1 {$0.8b}, [$4], $5
-    st1 {$1.8b}, [$4], $5
-    st1 {$2.8b}, [$4], $5
-    st1 {$3.8b}, [$4], $5
-//  }
-.endm
-
-.macro LOAD16_ALIGNED_DATA_WITH_STRIDE
-//  {   //  input: $0~$3, src*, src_stride
-    ld1 {$0.2d}, [$4], $5
-    ld1 {$1.2d}, [$4], $5
-    ld1 {$2.2d}, [$4], $5
-    ld1 {$3.2d}, [$4], $5
-//  }
-.endm
-
-.macro STORE16_ALIGNED_DATA_WITH_STRIDE
-//  {   //  input: $0~$3, dst*, dst_stride
-    st1 {$0.2d}, [$4], $5
-    st1 {$1.2d}, [$4], $5
-    st1 {$2.2d}, [$4], $5
-    st1 {$3.2d}, [$4], $5
-//  }
-.endm
-
-.macro LOAD16_UNALIGNED_DATA_WITH_STRIDE
-//  {   //  input: $0~$3, src*, src_stride
-    ld1 {$0.16b}, [$4], $5
-    ld1 {$1.16b}, [$4], $5
-    ld1 {$2.16b}, [$4], $5
-    ld1 {$3.16b}, [$4], $5
-//  }
-.endm
-
-.macro STORE16_UNALIGNED_DATA_WITH_STRIDE
-//  {   //  input: $0~$3, dst*, dst_stride
-    st1 {$0.16b}, [$4], $5
-    st1 {$1.16b}, [$4], $5
-    st1 {$2.16b}, [$4], $5
-    st1 {$3.16b}, [$4], $5
-//  }
-.endm
-
-#else
 .macro LOAD_ALIGNED_DATA_WITH_STRIDE arg0, arg1, arg2, arg3, arg4, arg5
 //  {   //  input: $0~$3, src*, src_stride
     ld1 {\arg0\().d}[0], [\arg4], \arg5
@@ -180,11 +105,10 @@
 //  }
 .endm
 
-#endif
-
-
+//void WelsCopy8x8_AArch64_neon (uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrideS);
 WELS_ASM_AARCH64_FUNC_BEGIN WelsCopy8x8_AArch64_neon
-
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
     LOAD_UNALIGNED_DATA_WITH_STRIDE v0, v1, v2, v3, x2, x3
 
     STORE_UNALIGNED_DATA_WITH_STRIDE    v0, v1, v2, v3, x0, x1
@@ -197,7 +121,8 @@ WELS_ASM_AARCH64_FUNC_END
 
 
 WELS_ASM_AARCH64_FUNC_BEGIN WelsCopy16x16_AArch64_neon
-
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
     LOAD16_ALIGNED_DATA_WITH_STRIDE   v0, v1, v2, v3, x2, x3
 
     STORE16_ALIGNED_DATA_WITH_STRIDE  v0, v1, v2, v3, x0, x1
@@ -218,7 +143,8 @@ WELS_ASM_AARCH64_FUNC_END
 
 
 WELS_ASM_AARCH64_FUNC_BEGIN WelsCopy16x16NotAligned_AArch64_neon
-
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
     LOAD16_UNALIGNED_DATA_WITH_STRIDE v0, v1, v2, v3, x2, x3
 
     STORE16_UNALIGNED_DATA_WITH_STRIDE    v0, v1, v2, v3, x0, x1
@@ -239,7 +165,8 @@ WELS_ASM_AARCH64_FUNC_END
 
 
 WELS_ASM_AARCH64_FUNC_BEGIN WelsCopy16x8NotAligned_AArch64_neon
-
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
     LOAD16_UNALIGNED_DATA_WITH_STRIDE v0, v1, v2, v3, x2, x3
 
     STORE16_UNALIGNED_DATA_WITH_STRIDE    v0, v1, v2, v3, x0, x1
@@ -252,7 +179,8 @@ WELS_ASM_AARCH64_FUNC_END
 
 
 WELS_ASM_AARCH64_FUNC_BEGIN WelsCopy8x16_AArch64_neon
-
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
     LOAD_UNALIGNED_DATA_WITH_STRIDE v0, v1, v2, v3, x2, x3
 
     STORE_UNALIGNED_DATA_WITH_STRIDE    v0, v1, v2, v3, x0, x1

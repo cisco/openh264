@@ -29,7 +29,7 @@ TEST_F (DecoderCapabilityTest, JustInit) {
   EXPECT_EQ (sDecCap.iMaxCpb, 20000);
   EXPECT_EQ (sDecCap.iMaxDpb, 20480);
   EXPECT_EQ (sDecCap.iMaxBr, 20000);
-  EXPECT_EQ (sDecCap.bRedPicCap, 0);
+  EXPECT_EQ (sDecCap.bRedPicCap, false);
 }
 
 
@@ -76,9 +76,9 @@ TEST_P (DecoderOutputTest, CompareOutput) {
   FileParam p = GetParam();
 #if defined(ANDROID_NDK)
   std::string filename = std::string ("/sdcard/") + p.fileName;
-  DecodeFile (filename.c_str(), this);
+  ASSERT_TRUE ( DecodeFile (filename.c_str(), this));
 #else
-  DecodeFile (p.fileName, this);
+  ASSERT_TRUE (DecodeFile(p.fileName, this));
 #endif
 
   unsigned char digest[SHA_DIGEST_LENGTH];
@@ -88,9 +88,7 @@ TEST_P (DecoderOutputTest, CompareOutput) {
   }
 }
 static const FileParam kFileParamArray[] = {
-  {"res/test_vd_1d.264", "5827d2338b79ff82cd091c707823e466197281d3"},
-  {"res/test_vd_rc.264", "eea02e97bfec89d0418593a8abaaf55d02eaa1ca"},
-  {"res/Static.264", "91dd4a7a796805b2cd015cae8fd630d96c663f42"},
+  {"res/Adobe_PDF_sample_a_1024x768_50Frms.264", "9aa9a4d9598eb3e1093311826844f37c43e4c521"},
   {"res/BA1_FT_C.264", "418d152fb85709b6f172799dcb239038df437cfa"},
   {"res/BA1_Sony_D.jsv", "d94b5ceed5686a03ea682b53d415dee999d27eb6"},
   {"res/BAMQ1_JVC_C.264", "613cf662c23e5d9e1d7da7fe880a3c427411d171"},
@@ -113,6 +111,7 @@ static const FileParam kFileParamArray[] = {
   {"res/NLMQ1_JVC_C.264", "f3265c6ddf8db1b2bf604d8a2954f75532e28cda"},
   {"res/NLMQ2_JVC_C.264", "350ae86ef9ba09390d63a09b7f9ff54184109ca8"},
   {"res/NRF_MW_E.264", "20732198c04cd2591350a361e4510892f6eed3f0"},
+  {"res/QCIF_2P_I_allIPCM.264", "8724c0866ebdba7ebb7209a0c0c3ae3ae38a0240"},
   {"res/SVA_BA1_B.264", "c4543b24823b16c424c673616c36c7f537089b2d"},
   {"res/SVA_BA2_D.264", "98ff2d67860462d8d8bcc9352097c06cc401d97e"},
   {"res/SVA_Base_B.264", "91f514d81cd33de9f6fbf5dbefdb189cc2e7ecf4"},
@@ -120,11 +119,26 @@ static const FileParam kFileParamArray[] = {
   {"res/SVA_FM1_E.264", "fad08c4ff7cf2307b6579853d0f4652fc26645d3"},
   {"res/SVA_NL1_B.264", "6d63f72a0c0d833b1db0ba438afff3b4180fb3e6"},
   {"res/SVA_NL2_E.264", "70453ef8097c94dd190d6d2d1d5cb83c67e66238"},
+  {"res/SarVui.264", "98ff2d67860462d8d8bcc9352097c06cc401d97e"},
+  {"res/Static.264", "91dd4a7a796805b2cd015cae8fd630d96c663f42"},
+  {"res/Zhling_1280x720.264", "ad99f5eaa2d73ae3840e7da67313de8cfc866ce6"},
+  {"res/sps_subsetsps_bothVUI.264", "d3a47032eb5dcc1963343a68e9bea12435bf1e4c"},
   {"res/test_cif_I_CABAC_PCM.264", "95fdf21470d3bbcf95505abb2164042063a79d98"},
   {"res/test_cif_I_CABAC_slice.264", "19121bc67f2b13fb8f030504fc0827e1ac6d0fdb"},
   {"res/test_cif_P_CABAC_slice.264", "521bbd0ba2422369b724c7054545cf107a56f959"},
   {"res/test_qcif_cabac.264", "587d1d05943f3cd416bf69469975fdee05361e69"},
-  {"res/QCIF_2P_I_allIPCM.264", "8724c0866ebdba7ebb7209a0c0c3ae3ae38a0240"}
+  {"res/test_scalinglist_jm.264", "f690a3af2896a53360215fb5d35016bfd41499b3"},
+  {"res/test_vd_1d.264", "5827d2338b79ff82cd091c707823e466197281d3"},
+  {"res/test_vd_rc.264", "eea02e97bfec89d0418593a8abaaf55d02eaa1ca"},
+  {"res/Cisco_Men_whisper_640x320_CABAC_Bframe_9.264", "88b8864a69cee7656202bc54d2ffa8b7b6f1f6c5"},
+  {"res/Cisco_Men_whisper_640x320_CAVLC_Bframe_9.264", "270a500d2f91c9e2c8ffabc03f62e0dc0b3a24ed"},
+  {"res/Cisco_Adobe_PDF_sample_a_1024x768_CAVLC_Bframe_9.264", "d3b2b986178ce3eafa806cd984543d0da830f408"},
+  {"res/VID_1280x544_cabac_temporal_direct.264", "8d946d46a8cb248269c4294203397daed8dace1d"},
+  {"res/VID_1280x720_cabac_temporal_direct.264", "419faadd8362918e6d908addd3e92fddb925624a"},
+  {"res/VID_1920x1080_cabac_temporal_direct.264", "2c93dc4ea4617636d2554c68896ce3ba16d678e7"},
+  {"res/VID_1280x544_cavlc_temporal_direct.264", "c89756e76e57c6a84cc55146b18845d4d24e4cd5"},
+  {"res/VID_1280x720_cavlc_temporal_direct.264", "be1af190f5eba34102a9de42917c8ec50073c5a0"},
+  {"res/VID_1920x1080_cavlc_temporal_direct.264", "6c58378bc51beb909381e634700706737fd17be2"},
 };
 
 INSTANTIATE_TEST_CASE_P (DecodeFile, DecoderOutputTest,

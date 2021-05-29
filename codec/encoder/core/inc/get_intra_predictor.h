@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	get_intra_predictor.h
+ * \file    get_intra_predictor.h
  *
- * \brief	interfaces for get intra predictor about 16x16, 4x4, chroma.
+ * \brief   interfaces for get intra predictor about 16x16, 4x4, chroma.
  *
- * \date	4/2/2009 Created
+ * \date    4/2/2009 Created
  *
  *************************************************************************************
  */
@@ -153,6 +153,16 @@ void WelsIChromaPredDc_AArch64_neon (uint8_t* pPred, uint8_t* pRef, const int32_
 void WelsIChromaPredPlane_AArch64_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 void WelsIChromaPredDcTop_AArch64_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 #endif//HAVE_NEON_AARCH64
+
+#if defined(HAVE_MMI)
+void WelsI16x16LumaPredDc_mmi (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+void WelsI16x16LumaPredPlane_mmi (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+
+void WelsIChromaPredH_mmi (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+void WelsIChromaPredV_mmi (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+void WelsIChromaPredDc_mmi (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+void WelsIChromaPredPlane_mmi (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+#endif//HAVE_MMI
 #if defined(__cplusplus)
 }
 #endif//__cplusplus

@@ -30,8 +30,7 @@
  *
  */
 
-#ifdef  HAVE_NEON
-.text
+#ifdef HAVE_NEON
 #include "arm_arch_common_macro.S"
 
 
@@ -73,8 +72,8 @@ WELS_ASM_FUNC_END
 WELS_ASM_FUNC_BEGIN SumOf8x8BlockOfFrame_neon
 //(uint8_t* pRefPicture, const int32_t kiWidth, const int32_t kiHeight,const int32_t kiRefStride,uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[])
     stmdb sp!, {r4-r12}
-    ldr	r5, [sp, #40] //pTimesOfFeatureValue
-    ldr	r4, [sp, #36] //pFeatureOfBlock
+    ldr r5, [sp, #40] //pTimesOfFeatureValue
+    ldr r4, [sp, #36] //pFeatureOfBlock
 
     mov r8, r0
     mov r6, r1
@@ -159,8 +158,8 @@ WELS_ASM_FUNC_END
 WELS_ASM_FUNC_BEGIN SumOf16x16BlockOfFrame_neon
 //(uint8_t* pRefPicture, const int32_t kiWidth, const int32_t kiHeight,const int32_t kiRefStride,uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[])
     stmdb sp!, {r4-r12}
-    ldr	r5, [sp, #40] //pTimesOfFeatureValue
-    ldr	r4, [sp, #36] //pFeatureOfBlock
+    ldr r5, [sp, #40] //pTimesOfFeatureValue
+    ldr r4, [sp, #36] //pFeatureOfBlock
 
     mov r8, r0
     mov r6, r1
@@ -239,7 +238,7 @@ WELS_ASM_FUNC_END
 WELS_ASM_FUNC_BEGIN InitializeHashforFeature_neon
 // (uint32_t* pTimesOfFeatureValue, uint16_t* pBuf, const int32_t kiListSize, uint16_t** pLocationOfFeature, uint16_t** pFeatureValuePointerList);
     stmdb sp!, {r4-r7}
-    ldr	r4, [sp, #16] //pFeatureValuePointerList
+    ldr r4, [sp, #16] //pFeatureValuePointerList
     bic r5, r2, #3
 _hash_assign_loop_x4:
     vld1.64 {q0}, [r0]!
@@ -273,8 +272,8 @@ _hash_assign_with_copy_x4:
     vst1.64 {q2}, [r4]!
 
 _assign_next:
-	subs r5, r5, #4
-	bne _hash_assign_loop_x4
+    subs r5, r5, #4
+    bne _hash_assign_loop_x4
 
     and r5, r2, #3
     cmp r5, #0
@@ -300,7 +299,7 @@ mx_x_offset_x4: .short 0x00, 0x04, 0x08, 0x0c, 0x00, 0x00, 0x00, 0x00
 WELS_ASM_FUNC_BEGIN FillQpelLocationByFeatureValue_neon
 // void  (uint16_t* pFeatureOfBlock, const int32_t kiWidth, const int32_t kiHeight, uint16_t** pFeatureValuePointerList)
     stmdb sp!, {r4-r8}
-    vpush		{q4-q7}
+    vpush {q4-q7}
     adr r7, mv_x_inc_x4
     vld1.64 {q7}, [r7]
     adr r7, mv_y_inc_x4
@@ -361,7 +360,7 @@ _hash_width_loop:
     subs r2, #1
     bne _hash_height_loop
 
-    vpop		{q4-q7}
+    vpop {q4-q7}
     ldmia sp!, {r4-r8}
 WELS_ASM_FUNC_END
 #endif

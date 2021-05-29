@@ -32,6 +32,8 @@
 
 #ifdef __APPLE__
 
+.text
+
 .macro WELS_ASM_AARCH64_FUNC_BEGIN
 .align 2
 .globl _$0
@@ -50,21 +52,21 @@ ret
 .align 2
 .global \funcName
 .type \funcName, %function
+#ifndef __clang__
 .func \funcName
+#endif
 \funcName:
 .endm
 
 .macro WELS_ASM_AARCH64_FUNC_END
 ret
+#ifndef __clang__
 .endfunc
-.endm
-
-.macro mov.16b arg0, arg1
-    mov \arg0\().16b, \arg1\().16b
-.endm
-
-.macro mov.8b arg0, arg1
-    mov \arg0\().8b, \arg1\().8b
+#endif
 .endm
 
 #endif
+
+.macro SIGN_EXTENSION arg0, arg1
+  sxtw \arg0, \arg1
+.endm

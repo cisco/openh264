@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	macros.h
+ * \file    macros.h
  *
- * \brief	MACRO based tool utilization
+ * \brief   MACRO based tool utilization
  *
- * \date	3/13/2009 Created
+ * \date    3/13/2009 Created
  *
  *************************************************************************************
  */
@@ -55,22 +55,22 @@
 * auxiliary var: _nm ## _tEmP
 */
 #define ENFORCE_STACK_ALIGN_1D(_tp, _nm, _sz, _al) \
-	_tp _nm ## _tEmP[(_sz)+(_al)-1]; \
-	_tp *_nm = _nm ## _tEmP + ((_al)-1) - (((uintptr_t)(_nm ## _tEmP + ((_al)-1)) & ((_al)-1))/sizeof(_tp));
+    _tp _nm ## _tEmP[(_sz)+(_al)-1]; \
+    _tp *_nm = _nm ## _tEmP + ((_al)-1) - (((uintptr_t)(_nm ## _tEmP + ((_al)-1)) & ((_al)-1))/sizeof(_tp));
 
 
 #define ENFORCE_STACK_ALIGN_2D(_tp, _nm, _cx, _cy, _al) \
-	assert( ((_al) && !((_al) & ((_al) - 1))) && ((_al) >= sizeof(_tp)) ); /*_al should be power-of-2 and >= sizeof(_tp)*/\
-	_tp _nm ## _tEmP[(_cx)*(_cy)+(_al)/sizeof(_tp)-1]; \
-	_tp *_nm ## _tEmP_al = _nm ## _tEmP + ((_al)/sizeof(_tp)-1); \
-	_nm ## _tEmP_al -= (((uintptr_t)_nm ## _tEmP_al & ((_al)-1))/sizeof(_tp)); \
-	_tp (*_nm)[(_cy)] = (_tp (*)[(_cy)])_nm ## _tEmP_al;
+    assert( ((_al) && !((_al) & ((_al) - 1))) && ((_al) >= sizeof(_tp)) ); /*_al should be power-of-2 and >= sizeof(_tp)*/\
+    _tp _nm ## _tEmP[(_cx)*(_cy)+(_al)/sizeof(_tp)-1]; \
+    _tp *_nm ## _tEmP_al = _nm ## _tEmP + ((_al)/sizeof(_tp)-1); \
+    _nm ## _tEmP_al -= (((uintptr_t)_nm ## _tEmP_al & ((_al)-1))/sizeof(_tp)); \
+    _tp (*_nm)[(_cy)] = (_tp (*)[(_cy)])_nm ## _tEmP_al;
 
 
 #if defined(_MSC_VER)
 
 #if(_MSC_VER < 1700)
-#define inline	__inline
+#define inline __inline
 #endif
 
 #define ALIGNED_DECLARE( type, var, n ) __declspec(align(n)) type var
@@ -81,58 +81,61 @@
 #endif//_MSC_VER
 
 
-#ifndef	WELS_ALIGN
-#define WELS_ALIGN(x, n)	(((x)+(n)-1)&~((n)-1))
+#ifndef WELS_ALIGN
+#define WELS_ALIGN(x, n) (((x)+(n)-1)&~((n)-1))
 #endif//WELS_ALIGN
 
 
 #if 1 // Alternative implementation of WELS_MAX and WELS_MIN
 #ifndef WELS_MAX
-#define WELS_MAX(x, y)	((x) > (y) ? (x) : (y))
+#define WELS_MAX(x, y) ((x) > (y) ? (x) : (y))
 #endif//WELS_MAX
 
 #ifndef WELS_MIN
-#define WELS_MIN(x, y)	((x) < (y) ? (x) : (y))
+#define WELS_MIN(x, y) ((x) < (y) ? (x) : (y))
 #endif//WELS_MIN
+#ifndef WELS_MIN_POSITIVE
+#define WELS_MIN_POSITIVE(x, y) (x >= 0 && y >= 0) ? WELS_MIN(x, y) : WELS_MAX(x, y);
+#endif//WELS_MIN_POSITIVE
 #else // Alternative implementation of WELS_MAX and WELS_MIN
 #ifndef WELS_MAX
-#define WELS_MAX(x, y)	((x) - (((x)-(y))&(((x)-(y))>>31)))
+#define WELS_MAX(x, y) ((x) - (((x)-(y))&(((x)-(y))>>31)))
 #endif//WELS_MAX
 
 #ifndef WELS_MIN
-#define WELS_MIN(x, y)	((y) + (((x)-(y))&(((x)-(y))>>31)))
+#define WELS_MIN(x, y) ((y) + (((x)-(y))&(((x)-(y))>>31)))
 #endif//WELS_MIN
 #endif // Alternative implementation of WELS_MAX and WELS_MIN
 
 
 #ifndef WELS_CEIL
-#define WELS_CEIL(x)	ceil(x)	// FIXME: low complexity instead of math library used
+#define WELS_CEIL(x) ceil(x) // FIXME: low complexity instead of math library used
 #endif//WELS_CEIL
 
 #ifndef WELS_FLOOR
-#define WELS_FLOOR(x)	floor(x)	// FIXME: low complexity instead of math library used
+#define WELS_FLOOR(x) floor(x)        // FIXME: low complexity instead of math library used
 #endif//WELS_FLOOR
 
 #ifndef WELS_ROUND
-#define WELS_ROUND(x)	((int32_t)(0.5+(x)))
+#define WELS_ROUND(x) ((int32_t)(0.5+(x)))
 #endif//WELS_ROUND
 
 #ifndef WELS_ROUND64
-#define WELS_ROUND64(x)	((int64_t)(0.5+(x)))
+#define WELS_ROUND64(x) ((int64_t)(0.5+(x)))
 #endif//WELS_ROUND
 
 #ifndef WELS_DIV_ROUND
-#define WELS_DIV_ROUND(x,y)	((int32_t)((y)==0?((x)/((y)+1)):(((y)/2+(x))/(y))))
+#define WELS_DIV_ROUND(x,y) ((int32_t)((y)==0?((x)/((y)+1)):(((y)/2+(x))/(y))))
 #endif//WELS_DIV_ROUND
 
 #ifndef WELS_DIV_ROUND64
-#define WELS_DIV_ROUND64(x,y)	((int64_t)((y)==0?((x)/((y)+1)):(((y)/2+(x))/(y))))
+#define WELS_DIV_ROUND64(x,y) ((int64_t)((y)==0?((x)/((y)+1)):(((y)/2+(x))/(y))))
 #endif//WELS_DIV_ROUND64
 
-#define WELS_NON_ZERO_COUNT_AVERAGE(nC,nA,nB) {		\
-    nC = nA + nB + 1;                      \
-	nC >>= (uint8_t)( nA != -1 && nB != -1);        \
-	nC += (uint8_t)(nA == -1 && nB == -1);           \
+#define WELS_NON_ZERO_COUNT_AVERAGE(nC,nA,nB) {         \
+  nC = nA + nB + 1;                                     \
+  nC >>= (uint8_t)( nA != -1 && nB != -1);              \
+  nC += (uint8_t)(nA == -1 && nB == -1);                \
 }
 
 static inline int32_t CeilLog2 (int32_t i) {
@@ -152,14 +155,14 @@ static inline int32_t WelsMedian (int32_t iX,  int32_t iY, int32_t iZ) {
   int32_t iMin = iX, iMax = iX;
 
   if (iY < iMin)
-    iMin	= iY;
+    iMin = iY;
   else
     iMax = iY;
 
   if (iZ < iMin)
-    iMin	= iZ;
+    iMin = iZ;
   else if (iZ > iMax)
-    iMax	= iZ;
+    iMax = iZ;
 
   return (iX + iY + iZ) - (iMin + iMax);
 }
@@ -189,7 +192,11 @@ static inline uint8_t WelsClip1 (int32_t iX) {
 #define WELS_SIGN(iX) ((int32_t)(iX) >> 31)
 #endif //WELS_SIGN
 #ifndef WELS_ABS
+#if 1
+#define WELS_ABS(iX) ((iX)>0 ? (iX) : -(iX))
+#else
 #define WELS_ABS(iX) ((WELS_SIGN(iX) ^ (int32_t)(iX)) - WELS_SIGN(iX))
+#endif
 #endif //WELS_ABS
 
 // WELS_CLIP3
@@ -197,43 +204,56 @@ static inline uint8_t WelsClip1 (int32_t iX) {
 #define WELS_CLIP3(iX, iY, iZ) ((iX) < (iY) ? (iY) : ((iX) > (iZ) ? (iZ) : (iX)))
 #endif //WELS_CLIP3
 
+template<typename T> T WelsClip3(T iX, T iY, T iZ) {
+  if (iX < iY)
+    return iY;
+  if (iX > iZ)
+    return iZ;
+  return iX;
+}
+
+#define DISALLOW_COPY_AND_ASSIGN(cclass) \
+private:	\
+cclass(const cclass &);	\
+cclass& operator=(const cclass &);
+
 /*
  * Description: to check variable validation and return the specified result
- *	iResult:	value to be checked
- *	iExpected:	the expected value
+ *  iResult:    value to be checked
+ *  iExpected:  the expected value
  */
 #ifndef WELS_VERIFY_RETURN_IFNEQ
 #define WELS_VERIFY_RETURN_IFNEQ(iResult, iExpected) \
-	if ( iResult != iExpected ){ \
-		return iResult; \
-	}
+  if (iResult != iExpected) {                        \
+    return iResult;                                  \
+  }
 #endif//#if WELS_VERIFY_RETURN_IF
 
 /*
  * Description: to check variable validation and return the specified result
- *	iResult:	value to be return
- *	bCaseIf:	negative condition to be verified
+ *  iResult:    value to be return
+ *  bCaseIf:    negative condition to be verified
  */
 #ifndef WELS_VERIFY_RETURN_IF
 #define WELS_VERIFY_RETURN_IF(iResult, bCaseIf) \
-	if ( bCaseIf ){ \
-		return iResult; \
-	}
+  if (bCaseIf) {                                \
+    return iResult;                             \
+  }
 #endif//#if WELS_VERIFY_RETURN_IF
 
 /*
- *	Description: to check variable validation and return the specified result
- *		with correspoinding process advance.
- *	 result:	value to be return
- *	 case_if:	negative condition to be verified
- *	 proc:		process need perform
+ *  Description: to check variable validation and return the specified result
+ *      with correspoinding process advance.
+ *   result:    value to be return
+ *   case_if:   negative condition to be verified
+ *   proc:      process need perform
  */
 #ifndef WELS_VERIFY_RETURN_PROC_IF
 #define WELS_VERIFY_RETURN_PROC_IF(iResult, bCaseIf, fProc) \
-	if ( bCaseIf ){ \
-		fProc;	\
-		return iResult;	\
-	}
+  if (bCaseIf) {                                            \
+    fProc;                                                  \
+    return iResult;                                         \
+  }
 #endif//#if WELS_VERIFY_RETURN_PROC_IF
 
 static inline int32_t WELS_LOG2 (uint32_t v) {
@@ -245,7 +265,7 @@ static inline int32_t WELS_LOG2 (uint32_t v) {
 
 }
 
-#define CLIP3_QP_0_51(q)		WELS_CLIP3(q, 0, 51)	// ((q) < (0) ? (0) : ((q) > (51) ? (51) : (q)))
+#define CLIP3_QP_0_51(q) WELS_CLIP3(q, 0, 51) // ((q) < (0) ? (0) : ((q) > (51) ? (51) : (q)))
 #define   CALC_BI_STRIDE(width,bitcount)  ((((width * bitcount) + 31) & ~31) >> 3)
 
 

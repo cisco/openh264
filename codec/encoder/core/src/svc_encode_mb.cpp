@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file		encode_mb.c
+ * \file    encode_mb.c
  *
- * \brief		Implementaion for pCurMb encoding
+ * \brief   Implementaion for pCurMb encoding
  *
- * \date		05/19/2009 Created
+ * \date    05/19/2009 Created
  *************************************************************************************
  */
 
@@ -45,25 +45,25 @@
 
 namespace WelsEnc {
 void WelsDctMb (int16_t* pRes, uint8_t* pEncMb, int32_t iEncStride, uint8_t* pBestPred, PDctFunc pfDctFourT4) {
-  pfDctFourT4 (pRes,			    pEncMb,							    iEncStride, pBestPred,			16);
-  pfDctFourT4 (pRes + 64,		pEncMb + 8,						    iEncStride, pBestPred + 8,		16);
-  pfDctFourT4 (pRes + 128,	pEncMb + 8 * iEncStride,		iEncStride, pBestPred + 128,	16);
-  pfDctFourT4 (pRes + 192,	pEncMb + 8 * iEncStride + 8,	iEncStride, pBestPred + 136,	16);
+  pfDctFourT4 (pRes,       pEncMb,                      iEncStride, pBestPred,       16);
+  pfDctFourT4 (pRes + 64,  pEncMb + 8,                  iEncStride, pBestPred + 8,   16);
+  pfDctFourT4 (pRes + 128, pEncMb + 8 * iEncStride,     iEncStride, pBestPred + 128, 16);
+  pfDctFourT4 (pRes + 192, pEncMb + 8 * iEncStride + 8, iEncStride, pBestPred + 136, 16);
 }
 
 void WelsEncRecI16x16Y (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache) {
   ENFORCE_STACK_ALIGN_1D (int16_t, aDctT4Dc, 16, 16)
-  SWelsFuncPtrList* pFuncList	= pEncCtx->pFuncList;
-  SDqLayer* pCurDqLayer	    = pEncCtx->pCurDqLayer;
-  const int32_t kiEncStride	        = pCurDqLayer->iEncStride[0];
-  int16_t* pRes				     	= pMbCache->pCoeffLevel;
-  uint8_t* pPred				        = pMbCache->SPicData.pCsMb[0];
-  const int32_t kiRecStride     	= pCurDqLayer->iCsStride[0];
-  int16_t* pBlock				        = pMbCache->pDct->iLumaBlock[0];
-  uint8_t* pBestPred		    	= pMbCache->pMemPredLuma;
-  const uint8_t* kpNoneZeroCountIdx	= &g_kuiMbCountScan4Idx[0];
-  uint8_t i, uiQp						    = pCurMb->uiLumaQp;
-  uint32_t uiNoneZeroCount, uiNoneZeroCountMbAc				= 0, uiCountI16x16Dc;
+  SWelsFuncPtrList* pFuncList   = pEncCtx->pFuncList;
+  SDqLayer* pCurDqLayer         = pEncCtx->pCurDqLayer;
+  const int32_t kiEncStride     = pCurDqLayer->iEncStride[0];
+  int16_t* pRes                 = pMbCache->pCoeffLevel;
+  uint8_t* pPred                = pMbCache->SPicData.pCsMb[0];
+  const int32_t kiRecStride     = pCurDqLayer->iCsStride[0];
+  int16_t* pBlock               = pMbCache->pDct->iLumaBlock[0];
+  uint8_t* pBestPred            = pMbCache->pMemPredLuma;
+  const uint8_t* kpNoneZeroCountIdx = &g_kuiMbCountScan4Idx[0];
+  uint8_t i, uiQp               = pCurMb->uiLumaQp;
+  uint32_t uiNoneZeroCount, uiNoneZeroCountMbAc = 0, uiCountI16x16Dc;
 
   const int16_t* pMF = g_kiQuantMF[uiQp];
   const int16_t* pFF = g_iQuantIntraFF[uiQp];
@@ -77,7 +77,7 @@ void WelsEncRecI16x16Y (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache) {
 
   for (i = 0; i < 4; i++) {
     pFuncList->pfQuantizationFour4x4 (pRes, pFF,  pMF);
-    pFuncList->pfScan4x4Ac (pBlock,		pRes);
+    pFuncList->pfScan4x4Ac (pBlock,      pRes);
     pFuncList->pfScan4x4Ac (pBlock + 16, pRes + 16);
     pFuncList->pfScan4x4Ac (pBlock + 32, pRes + 32);
     pFuncList->pfScan4x4Ac (pBlock + 48, pRes + 48);
@@ -87,7 +87,7 @@ void WelsEncRecI16x16Y (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache) {
   pRes -= 256;
   pBlock -= 256;
 
-  for (i = 0; i < 16; i++)	{
+  for (i = 0; i < 16; i++) {
     uiNoneZeroCount = pFuncList->pfGetNoneZeroCount (pBlock);
     pCurMb->pNonZeroCount[*kpNoneZeroCountIdx++] = uiNoneZeroCount;
     uiNoneZeroCountMbAc += uiNoneZeroCount;
@@ -126,21 +126,21 @@ void WelsEncRecI16x16Y (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache) {
     pRes[224] = aDctT4Dc[14];
     pRes[240] = aDctT4Dc[15];
 
-    pFuncList->pfIDctFourT4 (pPred,					              kiRecStride, pBestPred,		       16, pRes);
-    pFuncList->pfIDctFourT4 (pPred + 8,				          kiRecStride, pBestPred + 8,	   16, pRes + 64);
-    pFuncList->pfIDctFourT4 (pPred + kiRecStride * 8,	      kiRecStride, pBestPred + 128,  16, pRes + 128);
+    pFuncList->pfIDctFourT4 (pPred,                       kiRecStride, pBestPred,        16, pRes);
+    pFuncList->pfIDctFourT4 (pPred + 8,                   kiRecStride, pBestPred + 8,    16, pRes + 64);
+    pFuncList->pfIDctFourT4 (pPred + kiRecStride * 8,     kiRecStride, pBestPred + 128,  16, pRes + 128);
     pFuncList->pfIDctFourT4 (pPred + kiRecStride * 8 + 8, kiRecStride, pBestPred + 136,  16, pRes + 192);
   } else if (uiCountI16x16Dc > 0) {
-    pFuncList->pfIDctI16x16Dc (pPred,	kiRecStride, pBestPred,	16, aDctT4Dc);
+    pFuncList->pfIDctI16x16Dc (pPred, kiRecStride, pBestPred, 16, aDctT4Dc);
   } else {
     pFuncList->pfCopy16x16Aligned (pPred, kiRecStride, pBestPred, 16);
   }
 }
 void WelsEncRecI4x4Y (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, uint8_t uiI4x4Idx) {
-  SWelsFuncPtrList* pFuncList	= pEncCtx->pFuncList;
-  SDqLayer* pCurDqLayer		= pEncCtx->pCurDqLayer;
-  int32_t iEncStride			= pCurDqLayer->iEncStride[0];
-  uint8_t uiQp					= pCurMb->uiLumaQp;
+  SWelsFuncPtrList* pFuncList   = pEncCtx->pFuncList;
+  SDqLayer* pCurDqLayer         = pEncCtx->pCurDqLayer;
+  int32_t iEncStride            = pCurDqLayer->iEncStride[0];
+  uint8_t uiQp                  = pCurMb->uiLumaQp;
 
   int16_t* pResI4x4 = pMbCache->pCoeffLevel;
   uint8_t* pPredI4x4;
@@ -174,25 +174,25 @@ void WelsEncRecI4x4Y (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, uin
     pFuncList->pfDequantization4x4 (pResI4x4, g_kuiDequantCoeff[uiQp]);
     pFuncList->pfIDctT4 (pPredI4x4, iRecStride, pBestPred, 4, pResI4x4);
   } else
-    WelsCopy4x4 (pPredI4x4, iRecStride, pBestPred, 4);
+    pFuncList->pfCopy4x4 (pPredI4x4, iRecStride, pBestPred, 4);
 }
 
 void WelsEncInterY (SWelsFuncPtrList* pFuncList, SMB* pCurMb, SMbCache* pMbCache) {
-  PQuantizationMaxFunc pfQuantizationFour4x4Max	= pFuncList->pfQuantizationFour4x4Max;
-  PSetMemoryZero pfSetMemZeroSize8				        = pFuncList->pfSetMemZeroSize8;
-  PSetMemoryZero pfSetMemZeroSize64			        = pFuncList->pfSetMemZeroSize64;
-  PScanFunc pfScan4x4			                                    = pFuncList->pfScan4x4;
-  PCalculateSingleCtrFunc pfCalculateSingleCtr4x4		= pFuncList->pfCalculateSingleCtr4x4;
-  PGetNoneZeroCountFunc pfGetNoneZeroCount	    = pFuncList->pfGetNoneZeroCount;
-  PDeQuantizationFunc pfDequantizationFour4x4		= pFuncList->pfDequantizationFour4x4;
-  int16_t* pRes					                                    = pMbCache->pCoeffLevel;
-  int32_t iSingleCtrMb		= 0, iSingleCtr8x8[4];
-  int16_t* pBlock				= pMbCache->pDct->iLumaBlock[0];
-  uint8_t uiQp					= pCurMb->uiLumaQp;
+  PQuantizationMaxFunc pfQuantizationFour4x4Max         = pFuncList->pfQuantizationFour4x4Max;
+  PSetMemoryZero pfSetMemZeroSize8                      = pFuncList->pfSetMemZeroSize8;
+  PSetMemoryZero pfSetMemZeroSize64                     = pFuncList->pfSetMemZeroSize64;
+  PScanFunc pfScan4x4                                   = pFuncList->pfScan4x4;
+  PCalculateSingleCtrFunc pfCalculateSingleCtr4x4       = pFuncList->pfCalculateSingleCtr4x4;
+  PGetNoneZeroCountFunc pfGetNoneZeroCount              = pFuncList->pfGetNoneZeroCount;
+  PDeQuantizationFunc pfDequantizationFour4x4           = pFuncList->pfDequantizationFour4x4;
+  int16_t* pRes = pMbCache->pCoeffLevel;
+  int32_t iSingleCtrMb = 0, iSingleCtr8x8[4];
+  int16_t* pBlock = pMbCache->pDct->iLumaBlock[0];
+  uint8_t uiQp = pCurMb->uiLumaQp;
   const int16_t* pMF = g_kiQuantMF[uiQp];
   const int16_t* pFF = g_kiQuantInterFF[uiQp];
   int16_t aMax[16];
-  int32_t i, j, iNoneZeroCountMbDcAc	= 0, iNoneZeroCount = 0;
+  int32_t i, j, iNoneZeroCountMbDcAc = 0, iNoneZeroCount = 0;
 
   for (i = 0; i < 4; i++) {
     pfQuantizationFour4x4Max (pRes, pFF,  pMF, aMax + (i << 2));
@@ -220,7 +220,7 @@ void WelsEncInterY (SWelsFuncPtrList* pFuncList, SMB* pCurMb, SMbCache* pMbCache
 
   if (iSingleCtrMb < 6) {  //from JVT-O079
     iNoneZeroCountMbDcAc = 0;
-    pfSetMemZeroSize64 (pRes,  768);	// confirmed_safe_unsafe_usage
+    pfSetMemZeroSize64 (pRes,  768); // confirmed_safe_unsafe_usage
   } else {
     const uint8_t* kpNoneZeroCountIdx = g_kuiMbCountScan4Idx;
     for (i = 0; i < 4; i++) {
@@ -233,8 +233,8 @@ void WelsEncInterY (SWelsFuncPtrList* pFuncList, SMB* pCurMb, SMbCache* pMbCache
         }
         pfDequantizationFour4x4 (pRes, g_kuiDequantCoeff[uiQp]);
         pCurMb->uiCbp |= 1 << i;
-      } else {	// set zero for an 8x8 pBlock
-        pfSetMemZeroSize64 (pRes, 128);	// confirmed_safe_unsafe_usage
+      } else { // set zero for an 8x8 pBlock
+        pfSetMemZeroSize64 (pRes, 128); // confirmed_safe_unsafe_usage
         kpNoneZeroCountIdx += 4;
         pBlock += 64;
       }
@@ -244,22 +244,22 @@ void WelsEncInterY (SWelsFuncPtrList* pFuncList, SMB* pCurMb, SMbCache* pMbCache
 }
 
 void    WelsEncRecUV (SWelsFuncPtrList* pFuncList, SMB* pCurMb, SMbCache* pMbCache, int16_t* pRes, int32_t iUV) {
-  PQuantizationHadamardFunc pfQuantizationHadamard2x2		= pFuncList->pfQuantizationHadamard2x2;
-  PQuantizationMaxFunc pfQuantizationFour4x4Max	= pFuncList->pfQuantizationFour4x4Max;
-  PSetMemoryZero pfSetMemZeroSize8				        = pFuncList->pfSetMemZeroSize8;
-  PSetMemoryZero pfSetMemZeroSize64				    = pFuncList->pfSetMemZeroSize64;
-  PScanFunc pfScan4x4Ac		                                	= pFuncList->pfScan4x4Ac;
-  PCalculateSingleCtrFunc pfCalculateSingleCtr4x4		= pFuncList->pfCalculateSingleCtr4x4;
-  PGetNoneZeroCountFunc pfGetNoneZeroCount	    = pFuncList->pfGetNoneZeroCount;
-  PDeQuantizationFunc pfDequantizationFour4x4		= pFuncList->pfDequantizationFour4x4;
-  const int32_t kiInterFlag				                            = !IS_INTRA (pCurMb->uiMbType);
-  const uint8_t	kiQp                                                   = pCurMb->uiChromaQp;
-  uint8_t i, uiNoneZeroCount, uiNoneZeroCountMbAc	= 0, uiNoneZeroCountMbDc = 0;
-  uint8_t uiNoneZeroCountOffset	                            = (iUV - 1) << 1;	//UV==1 or 2
-  uint8_t uiSubMbIdx				                                = 16 + ((iUV - 1) << 2);			//uiSubMbIdx == 16 or 20
-  int16_t* iChromaDc			= pMbCache->pDct->iChromaDc[iUV - 1], *pBlock = pMbCache->pDct->iChromaBlock[ (iUV - 1) << 2];
+  PQuantizationHadamardFunc pfQuantizationHadamard2x2   = pFuncList->pfQuantizationHadamard2x2;
+  PQuantizationMaxFunc pfQuantizationFour4x4Max         = pFuncList->pfQuantizationFour4x4Max;
+  PSetMemoryZero pfSetMemZeroSize8                      = pFuncList->pfSetMemZeroSize8;
+  PSetMemoryZero pfSetMemZeroSize64                     = pFuncList->pfSetMemZeroSize64;
+  PScanFunc pfScan4x4Ac                                 = pFuncList->pfScan4x4Ac;
+  PCalculateSingleCtrFunc pfCalculateSingleCtr4x4       = pFuncList->pfCalculateSingleCtr4x4;
+  PGetNoneZeroCountFunc pfGetNoneZeroCount              = pFuncList->pfGetNoneZeroCount;
+  PDeQuantizationFunc pfDequantizationFour4x4           = pFuncList->pfDequantizationFour4x4;
+  const int32_t kiInterFlag                             = !IS_INTRA (pCurMb->uiMbType);
+  const uint8_t kiQp                                    = pCurMb->uiChromaQp;
+  uint8_t i, uiNoneZeroCount, uiNoneZeroCountMbAc       = 0, uiNoneZeroCountMbDc = 0;
+  uint8_t uiNoneZeroCountOffset                         = (iUV - 1) << 1;   //UV==1 or 2
+  uint8_t uiSubMbIdx                                    = 16 + ((iUV - 1) << 2); //uiSubMbIdx == 16 or 20
+  int16_t* iChromaDc = pMbCache->pDct->iChromaDc[iUV - 1], *pBlock = pMbCache->pDct->iChromaBlock[ (iUV - 1) << 2];
   int16_t aDct2x2[4], j, aMax[4];
-  int32_t iSingleCtr8x8		= 0;
+  int32_t iSingleCtr8x8 = 0;
   const int16_t* pMF = g_kiQuantMF[kiQp];
   const int16_t* pFF = g_kiQuantInterFF[ (!kiInterFlag) * 6 + kiQp];
 
@@ -285,8 +285,8 @@ void    WelsEncRecUV (SWelsFuncPtrList* pFuncList, SMB* pCurMb, SMbCache* pMbCac
   }
   pRes -= 64;
 
-  if (iSingleCtr8x8 < 7) {	//from JVT-O079
-    pfSetMemZeroSize64 (pRes, 128);	// confirmed_safe_unsafe_usage
+  if (iSingleCtr8x8 < 7) { //from JVT-O079
+    pfSetMemZeroSize64 (pRes, 128); // confirmed_safe_unsafe_usage
     ST16 (&pCurMb->pNonZeroCount[16 + uiNoneZeroCountOffset], 0);
     ST16 (&pCurMb->pNonZeroCount[20 + uiNoneZeroCountOffset], 0);
   } else {
@@ -307,26 +307,26 @@ void    WelsEncRecUV (SWelsFuncPtrList* pFuncList, SMB* pCurMb, SMbCache* pMbCac
     WelsDequantIHadamard2x2Dc (aDct2x2, g_kuiDequantCoeff[kiQp][0]);
     if (2 != (pCurMb->uiCbp >> 4))
       pCurMb->uiCbp |= (0x01 << 4) ;
-    pRes[0]	= aDct2x2[0];
-    pRes[16]	= aDct2x2[1];
-    pRes[32]	= aDct2x2[2];
-    pRes[48]	= aDct2x2[3];
+    pRes[0]  = aDct2x2[0];
+    pRes[16] = aDct2x2[1];
+    pRes[32] = aDct2x2[2];
+    pRes[48] = aDct2x2[3];
   }
 }
 
 
 void    WelsRecPskip (SDqLayer* pCurLayer, SWelsFuncPtrList* pFuncList, SMB* pCurMb, SMbCache* pMbCache) {
-  int32_t* iRecStride	= pCurLayer->iCsStride;
-  uint8_t** pCsMb		= &pMbCache->SPicData.pCsMb[0];
+  int32_t* iRecStride   = pCurLayer->iCsStride;
+  uint8_t** pCsMb       = &pMbCache->SPicData.pCsMb[0];
 
-  pFuncList->pfCopy16x16Aligned (pCsMb[0],	*iRecStride++,	pMbCache->pSkipMb,		16);
-  pFuncList->pfCopy8x8Aligned (pCsMb[1],	*iRecStride++,	pMbCache->pSkipMb + 256,	8);
-  pFuncList->pfCopy8x8Aligned (pCsMb[2],	*iRecStride,	pMbCache->pSkipMb + 320,	8);
-  pFuncList->pfSetMemZeroSize8 (pCurMb->pNonZeroCount,	24);
+  pFuncList->pfCopy16x16Aligned (pCsMb[0],  *iRecStride++,  pMbCache->pSkipMb,       16);
+  pFuncList->pfCopy8x8Aligned (pCsMb[1],    *iRecStride++,  pMbCache->pSkipMb + 256, 8);
+  pFuncList->pfCopy8x8Aligned (pCsMb[2],    *iRecStride,    pMbCache->pSkipMb + 320, 8);
+  pFuncList->pfSetMemZeroSize8 (pCurMb->pNonZeroCount,  24);
 }
 
 bool WelsTryPYskip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache) {
-  int32_t iSingleCtrMb	= 0;
+  int32_t iSingleCtrMb = 0;
   int16_t* pRes = pMbCache->pCoeffLevel;
   const uint8_t kuiQp = pCurMb->uiLumaQp;
 
@@ -339,12 +339,12 @@ bool WelsTryPYskip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache) {
     pEncCtx->pFuncList->pfQuantizationFour4x4Max (pRes, pFF,  pMF, (int16_t*)aMax);
 
     for (j = 0; j < 4; j++) {
-      if (aMax[j] > 1) return false;	// iSingleCtrMb += 9, can't be P_SKIP
+      if (aMax[j] > 1) return false; // iSingleCtrMb += 9, can't be P_SKIP
       else if (aMax[j] == 1) {
         pEncCtx->pFuncList->pfScan4x4 (pBlock, pRes); //
         iSingleCtrMb += pEncCtx->pFuncList->pfCalculateSingleCtr4x4 (pBlock);
       }
-      if (iSingleCtrMb >= 6) 	return false; //from JVT-O079
+      if (iSingleCtrMb >= 6) return false; //from JVT-O079
       pRes += 16;
       pBlock += 16;
     }
@@ -370,7 +370,7 @@ bool    WelsTryPUVskip (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, i
     pEncCtx->pFuncList->pfQuantizationFour4x4Max (pRes, pFF,  pMF, (int16_t*)aMax);
 
     for (j = 0; j < 4; j++) {
-      if (aMax[j] > 1)		return false;	// iSingleCtrMb += 9, can't be P_SKIP
+      if (aMax[j] > 1) return false;   // iSingleCtrMb += 9, can't be P_SKIP
       else if (aMax[j] == 1) {
         pEncCtx->pFuncList->pfScan4x4Ac (pBlock, pRes);
         iSingleCtrMb += pEncCtx->pFuncList->pfCalculateSingleCtr4x4 (pBlock);

@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	set_mb_syn_cavlc.h
+ * \file    set_mb_syn_cavlc.h
  *
- * \brief	Seting all syntax elements of mb and decoding residual with cavlc
+ * \brief   Seting all syntax elements of mb and decoding residual with cavlc
  *
- * \date	05/19/2009 Created
+ * \date    05/19/2009 Created
  *
  *************************************************************************************
  */
@@ -42,7 +42,6 @@
 #define SET_MB_SYN_CAVLC_H_
 
 #include "typedefs.h"
-#include "bit_stream.h"
 #include "wels_func_ptr_def.h"
 
 namespace WelsEnc {
@@ -76,9 +75,13 @@ int32_t  WriteBlockResidualCavlc (SWelsFuncPtrList* pFuncList, int16_t* pCoffLev
 extern "C" {
 #endif//__cplusplus
 
+int32_t CavlcParamCal_c (int16_t* pCoffLevel, uint8_t* pRun, int16_t* pLevel, int32_t* pTotalCoeffs ,
+                         int32_t iEndIdx);
 #ifdef  X86_ASM
 int32_t CavlcParamCal_sse2 (int16_t* pCoffLevel, uint8_t* pRun, int16_t* pLevel, int32_t* pTotalCoeffs ,
                             int32_t iEndIdx);
+int32_t CavlcParamCal_sse42 (int16_t* pCoffLevel, uint8_t* pRun, int16_t* pLevel, int32_t* pTotalCoeffs ,
+                             int32_t iEndIdx);
 #endif
 
 #if defined(__cplusplus)

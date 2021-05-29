@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	encoder.h
+ * \file    encoder.h
  *
- * \brief	core encoder
+ * \brief   core encoder
  *
- * \date	5/14/2009
+ * \date    5/14/2009
  *
  *************************************************************************************
  */
@@ -44,68 +44,71 @@
 
 namespace WelsEnc {
 /*!
- * \brief	request specific memory for SVC
- * \param	pEncCtx		sWelsEncCtx*
- * \return	successful - 0; otherwise none 0 for failed
+ * \brief   request specific memory for SVC
+ * \param   pEncCtx     sWelsEncCtx*
+ * \return  successful - 0; otherwise none 0 for failed
  */
-int32_t RequestMemorySvc (sWelsEncCtx** ppCtx);
+int32_t RequestMemorySvc (sWelsEncCtx** ppCtx, SExistingParasetList* pExistingParasetList);
 
 /*!
- * \brief	free memory	in SVC core encoder
- * \param	pEncCtx		sWelsEncCtx**
- * \return	none
+ * \brief   free memory in SVC core encoder
+ * \param   pEncCtx     sWelsEncCtx**
+ * \return  none
  */
 void FreeMemorySvc (sWelsEncCtx** ppCtx);
 
 /*!
- * \brief	 allocate or reallocate the output bs buffer
- * \return:		successful - 0; otherwise none 0 for failed
+ * \brief    allocate or reallocate the output bs buffer
+ * \return:  successful - 0; otherwise none 0 for failed
  */
 int32_t AllocateBsOutputBuffer (CMemoryAlign* pMa, const int32_t iNeededLen, int32_t iOrigLen, const char* kpTag,
                                 uint8_t*& pOutputBuffer);
 //TODO: to finish this function and call it
 
 /*!
- * \brief	initialize function pointers that potentially used in Wels encoding
- * \param	pEncCtx		sWelsEncCtx*
- * \return	successful - 0; otherwise none 0 for failed
+ * \brief   initialize function pointers that potentially used in Wels encoding
+ * \param   pEncCtx     sWelsEncCtx*
+ * \return  successful - 0; otherwise none 0 for failed
  */
 int32_t InitFunctionPointers (sWelsEncCtx* pEncCtx, SWelsSvcCodingParam* _param, uint32_t  uiCpuFlag);
 
 ///*!
-// * \brief	decide frame type (IDR/P frame)
-// * \param	uiFrameType	frame type output
-// * \param	frame_idx	frame index elapsed currently
-// * \param	idr			IDR interval
-// * \return	successful - 0; otherwise none 0 for failed
+// * \brief decide frame type (IDR/P frame)
+// * \param uiFrameType frame type output
+// * \param frame_idx   frame index elapsed currently
+// * \param idr         IDR interval
+// * \return    successful - 0; otherwise none 0 for failed
 // */
 /*!
- * \brief	initialize frame coding
+ * \brief   initialize frame coding
  */
-void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType);
+void InitFrameCoding (sWelsEncCtx* pEncCtx, const EVideoFrameType keFrameType, const int32_t kiDidx);
+void LoadBackFrameNum (sWelsEncCtx* pEncCtx, const int32_t kiDidx);
 
-EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum);
-
+EVideoFrameType DecideFrameType (sWelsEncCtx* pEncCtx, const int8_t kiSpatialNum, const int32_t kiDidx,
+                                 bool bSkipFrameFlag);
+void InitBitStream (sWelsEncCtx* pEncCtx);
 int32_t GetTemporalLevel (SSpatialLayerInternal* fDlp, const int32_t kiFrameNum, const int32_t kiGopSize);
 /*!
- * \brief	Dump reconstruction for dependency layer
+ * \brief   Dump reconstruction for dependency layer
  */
 
-extern "C" void DumpDependencyRec (SPicture* pSrcPic, const char* kpFileName, const int8_t kiDid, bool bAppend, SDqLayer* pDqLayer);
+extern "C" void DumpDependencyRec (SPicture* pSrcPic, const char* kpFileName, const int8_t kiDid, bool bAppend,
+                                   SDqLayer* pDqLayer, bool bSimulCastAVC);
 
 /*!
- * \brief	Dump the reconstruction pictures
+ * \brief   Dump the reconstruction pictures
  */
 void DumpRecFrame (SPicture* pSrcPic, const char* kpFileName, const int8_t kiDid, bool bAppend, SDqLayer* pDqLayer);
 
 
 /*!
- * \brief	encode overall slices pData in a frame
- * \param	pEncCtx			sWelsEncCtx*, encoder context
- * \param	count_slice_num		count number of slices in a frame
- * \param	eNalType			EWelsNalUnitType for a frame
- * \param	nal_idc				EWelsNalRefIdc for a frame
- * \return	successful - 0; otherwise none 0 for failed
+ * \brief   encode overall slices pData in a frame
+ * \param   pEncCtx             sWelsEncCtx*, encoder context
+ * \param   count_slice_num     count number of slices in a frame
+ * \param   eNalType            EWelsNalUnitType for a frame
+ * \param   nal_idc             EWelsNalRefIdc for a frame
+ * \return  successful - 0; otherwise none 0 for failed
  */
 int32_t EncodeFrame (sWelsEncCtx* pEncCtx,
                      const int32_t kiSliceNumCount,
@@ -116,7 +119,7 @@ int32_t EncodeFrame (sWelsEncCtx* pEncCtx,
 /**********************************************************************************
  * memzero Function
 ***********************************************************************************/
-void WelsSetMemZero_c (void* pDst, int32_t iSize);	// confirmed_safe_unsafe_usage
+void WelsSetMemZero_c (void* pDst, int32_t iSize); // confirmed_safe_unsafe_usage
 
 #if defined(__cplusplus)
 extern "C" {

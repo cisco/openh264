@@ -28,20 +28,21 @@ class BaseDecoderTest {
   };
 
   BaseDecoderTest();
-  void SetUp();
+  int32_t SetUp();
   void TearDown();
-  void DecodeFile (const char* fileName, Callback* cbk);
+  bool DecodeFile (const char* fileName, Callback* cbk);
 
   bool Open (const char* fileName);
   bool DecodeNextFrame (Callback* cbk);
   ISVCDecoder* decoder_;
 
  private:
-  void DecodeFrame (const uint8_t* src, int sliceSize, Callback* cbk);
+  void DecodeFrame (const uint8_t* src, size_t sliceSize, Callback* cbk);
+  void FlushFrame (Callback* cbk);
 
   std::ifstream file_;
   BufferedData buf_;
-  enum {
+  enum {\
     OpenFile,
     Decoding,
     EndOfStream,

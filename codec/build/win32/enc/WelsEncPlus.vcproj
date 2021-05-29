@@ -72,7 +72,7 @@
 				LinkIncremental="2"
 				ModuleDefinitionFile="..\..\..\encoder\plus\src\wels_enc_export.def"
 				GenerateDebugInformation="true"
-				RandomizedBaseAddress="1"
+				RandomizedBaseAddress="2"
 				DataExecutionPrevention="2"
 				ImportLibrary="$(OutDir)\welsenc.lib"
 				TargetMachine="1"
@@ -154,7 +154,7 @@
 				LinkIncremental="2"
 				ModuleDefinitionFile="..\..\..\encoder\plus\src\wels_enc_export.def"
 				GenerateDebugInformation="true"
-				RandomizedBaseAddress="1"
+				RandomizedBaseAddress="2"
 				DataExecutionPrevention="2"
 				ImportLibrary="$(OutDir)\welsenc.lib"
 				TargetMachine="17"
@@ -239,7 +239,7 @@
 				LinkIncremental="1"
 				ModuleDefinitionFile="..\..\..\encoder\plus\src\wels_enc_export.def"
 				GenerateDebugInformation="true"
-				RandomizedBaseAddress="1"
+				RandomizedBaseAddress="2"
 				DataExecutionPrevention="2"
 				ImportLibrary="$(OutDir)\welsenc.lib"
 				TargetMachine="1"
@@ -324,7 +324,7 @@
 				LinkIncremental="1"
 				ModuleDefinitionFile="..\..\..\encoder\plus\src\wels_enc_export.def"
 				GenerateDebugInformation="true"
-				RandomizedBaseAddress="1"
+				RandomizedBaseAddress="2"
 				DataExecutionPrevention="2"
 				ImportLibrary="$(OutDir)\welsenc.lib"
 				TargetMachine="17"
@@ -395,7 +395,7 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
 			<File
-				RelativePath="..\..\..\encoder\plus\res\welsenc.rc"
+				RelativePath="..\..\..\..\openh264.rc"
 				>
 			</File>
 		</Filter>

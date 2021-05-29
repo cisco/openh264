@@ -29,10 +29,10 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \brief	Tool kits for decoder
- *		( malloc, realloc, free, log output and PSNR calculation and so on )
+ * \brief   Tool kits for decoder
+ *          ( malloc, realloc, free, log output and PSNR calculation and so on )
  *
- * \date	03/10/2009 Created
+ * \date    03/10/2009 Created
  *
  *************************************************************************************
  */
@@ -42,11 +42,10 @@
 #include <stdarg.h>
 #include "typedefs.h"
 
-#define MAX_LOG_SIZE	1024
-#define MAX_WIDTH      (4096)
-#define MAX_HEIGHT     (2304)//MAX_FS_LEVEL51 (36864); MAX_FS_LEVEL51*256/4096 = 2304
+#define MAX_LOG_SIZE    1024
+#define MAX_MBS_PER_FRAME 36864 //in accordance with max level support in Rec
 /*
- *	Function pointer declaration for various tool sets
+ *  Function pointer declaration for various tool sets
  */
 // wels log output
 typedef void (*PWelsLogCallbackFunc) (void* pCtx, const int32_t iLevel, const char* kpFmt, va_list argv);
@@ -54,6 +53,7 @@ typedef void (*PWelsLogCallbackFunc) (void* pCtx, const int32_t iLevel, const ch
 typedef struct TagLogContext {
   PWelsLogCallbackFunc pfLog;
   void* pLogCtx;
+  void* pCodecInstance;
 } SLogContext;
 
 
@@ -66,22 +66,22 @@ extern void WelsLog (SLogContext* pCtx, int32_t iLevel, const char* kpFmt, ...);
 #endif
 
 /*
- *	PSNR calculation routines
+ *  PSNR calculation routines
  */
 /*!
  *************************************************************************************
- * \brief	PSNR calculation utilization in Wels
+ * \brief   PSNR calculation utilization in Wels
  *
- * \param	kpTarPic		target picture to be calculated in Picture pData format
- * \param	kiTarStride	stride of target picture pData pBuffer
- * \param 	kpRefPic		base referencing picture samples
- * \param	kiRefStride	stride of reference picture pData pBuffer
- * \param	kiWidth		picture iWidth in pixel
- * \param	kiHeight		picture iHeight in pixel
+ * \param   kpTarPic    target picture to be calculated in Picture pData format
+ * \param   kiTarStride stride of target picture pData pBuffer
+ * \param   kpRefPic    base referencing picture samples
+ * \param   kiRefStride stride of reference picture pData pBuffer
+ * \param   kiWidth     picture iWidth in pixel
+ * \param   kiHeight    picture iHeight in pixel
  *
- * \return	actual PSNR result;
+ * \return  actual PSNR result;
  *
- * \note	N/A
+ * \note    N/A
  *************************************************************************************
  */
 float WelsCalcPsnr (const void* kpTarPic,

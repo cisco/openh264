@@ -28,11 +28,11 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	cabac_decoder.h
+ * \file    cabac_decoder.h
  *
- * \brief	Interfaces introduced for cabac decoder
+ * \brief   Interfaces introduced for cabac decoder
  *
- * \date	10/10/2014 Created
+ * \date    10/10/2014 Created
  *
  *************************************************************************************
  */
@@ -80,7 +80,7 @@ static const uint8_t g_kRenormTable256[256] = {
 
 
 //1. CABAC context initialization
-void WelsCabacGlobalInit(PWelsDecoderContext pCabacCtx);
+void WelsCabacGlobalInit (PWelsDecoderContext pCabacCtx);
 void WelsCabacContextInit (PWelsDecoderContext  pCtx, uint8_t eSliceType, int32_t iCabacInitIdc, int32_t iQp);
 
 //2. decoding Engine initialization

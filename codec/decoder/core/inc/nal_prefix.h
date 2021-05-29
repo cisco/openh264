@@ -30,7 +30,7 @@
  *
  */
 
-//nal_prefix.h	-	definitions for NAL Unit Header(/Ext) and PrefixNALUnit
+//nal_prefix.h  -       definitions for NAL Unit Header(/Ext) and PrefixNALUnit
 #ifndef WELS_NAL_UNIT_PREFIX_H__
 #define WELS_NAL_UNIT_PREFIX_H__
 
@@ -42,43 +42,13 @@ namespace WelsDec {
 
 ///////////////////////////////////NAL Unit prefix/headers///////////////////////////////////
 
-/* NAL Unix Header in AVC, refer to Page 56 in JVT X201wcm */
-typedef struct TagNalUnitHeader {
-uint8_t		    uiForbiddenZeroBit;
-uint8_t		    uiNalRefIdc;
-EWelsNalUnitType    eNalUnitType;
-uint8_t		    uiReservedOneByte;		// only padding usage
-} SNalUnitHeader, *PNalUnitHeader;
-
-/* NAL Unit Header in scalable extension syntax, refer to Page 390 in JVT X201wcm */
-typedef struct TagNalUnitHeaderExt {
-SNalUnitHeader	sNalUnitHeader;
-
-//	uint8_t		reserved_one_bit;
-bool		bIdrFlag;
-uint8_t		uiPriorityId;
-int8_t		iNoInterLayerPredFlag;	// change as int8_t to support 3 values probably in encoder
-uint8_t		uiDependencyId;
-
-uint8_t		uiQualityId;
-uint8_t		uiTemporalId;
-bool		bUseRefBasePicFlag;
-bool		bDiscardableFlag;
-
-bool		bOutputFlag;
-uint8_t		uiReservedThree2Bits;
-// Derived variable(s)
-uint8_t		uiLayerDqId;
-bool		bNalExtFlag;
-} SNalUnitHeaderExt, *PNalUnitHeaderExt;
-
 /* Prefix NAL Unix syntax, refer to Page 392 in JVT X201wcm */
 typedef struct TagPrefixNalUnit {
-SRefBasePicMarking	sRefPicBaseMarking;
-bool		bStoreRefBasePicFlag;
-bool		bPrefixNalUnitAdditionalExtFlag;
-bool		bPrefixNalUnitExtFlag;
-bool          bPrefixNalCorrectFlag;
+  SRefBasePicMarking sRefPicBaseMarking;
+  bool               bStoreRefBasePicFlag;
+  bool               bPrefixNalUnitAdditionalExtFlag;
+  bool               bPrefixNalUnitExtFlag;
+  bool               bPrefixNalCorrectFlag;
 } SPrefixNalUnit, *PPrefixNalUnit;
 
 } // namespace WelsDec

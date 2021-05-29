@@ -31,10 +31,11 @@
  */
 
 #ifdef HAVE_NEON_AARCH64
-.text
 #include "arm_arch64_common_macro.S"
-
+//int32_t WelsProcessingSampleSad8x8_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t);
 WELS_ASM_AARCH64_FUNC_BEGIN WelsProcessingSampleSad8x8_AArch64_neon
+    SIGN_EXTENSION x1, w1
+    SIGN_EXTENSION x3, w3
     ld1     {v0.8b}, [x0], x1
     ld1     {v1.8b}, [x2], x3
     uabdl   v2.8h, v0.8b, v1.8b

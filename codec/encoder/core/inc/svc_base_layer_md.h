@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	svc_base_layer_md.h
+ * \file    svc_base_layer_md.h
  *
- * \brief	mode decision
+ * \brief   mode decision
  *
- * \date	2009.08.10 Created
+ * \date    2009.08.10 Created
  *
  *************************************************************************************
  */
@@ -48,30 +48,33 @@ void WelsMdIntraInit (sWelsEncCtx* pEncCtx, SMB* pCurMb, SMbCache* pMbCache, con
 int32_t WelsMdI16x16 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SMbCache* pMbCache, int32_t iLambda);
 int32_t WelsMdIntraChroma (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SMbCache* pMbCache, int32_t iLambda);
 
-int32_t WelsMdI4x4 (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache);
-int32_t WelsMdI4x4Fast (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache);
+int32_t WelsMdI4x4 (sWelsEncCtx* pEnc, SWelsMD* pMd, SMB* pCurMb, SMbCache* pMbCache);
+int32_t WelsMdI4x4Fast (sWelsEncCtx* pEnc, SWelsMD* pMd, SMB* pCurMb, SMbCache* pMbCache);
 
-int32_t WelsMdIntraFinePartition (void* pEncCtx, void* pWelsMd, SMB* pCurMb, SMbCache* pMbCache);
-int32_t WelsMdIntraFinePartitionVaa (void* pEncCtx, void* pWelsMd, SMB* pCurMb, SMbCache* pMbCache);
+int32_t WelsMdIntraFinePartition (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCache* pMbCache);
+int32_t WelsMdIntraFinePartitionVaa (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCache* pMbCache);
 
 void WelsMdIntraMb (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCache* pMbCache);
 
-void WelsMdBackgroundMbEnc (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache, SSlice* pSlice, bool bSkipMbFlag);
-bool WelsMdPSkipEnc (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache);
+void WelsMdBackgroundMbEnc (sWelsEncCtx* pEnc, SWelsMD* pMd, SMB* pCurMb, SMbCache* pMbCache, SSlice* pSlice, bool bSkipMbFlag);
+bool WelsMdPSkipEnc (sWelsEncCtx* pEnc, SWelsMD* pMd, SMB* pCurMb, SMbCache* pMbCache);
 int32_t WelsMdP16x16 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pWelsMd, SSlice* pSlice, SMB* pCurMb);
 
 int32_t WelsMdP16x8 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pWelsMd, SSlice* pSlice);
 int32_t WelsMdP8x16 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pWelsMd, SSlice* pSlice);
 int32_t WelsMdP8x8 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pWelsMd, SSlice* pSlice);
+int32_t WelsMdP4x4 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pWelsMd, SSlice* pSlice, const int32_t ki8x8Idx);
+int32_t WelsMdP8x4 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pWelsMd, SSlice* pSlice, const int32_t ki8x8Idx);
+int32_t WelsMdP4x8 (SWelsFuncPtrList* pFunc, SDqLayer* pCurDqLayer, SWelsMD* pWelsMd, SSlice* pSlice, const int32_t ki8x8Idx);
 /*static*/  void WelsMdInterInit (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* pCurMb, const int32_t kiSliceFirstMbXY);
-/*static*/ void WelsMdInterFinePartition (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, int32_t bestCost);
-/*static*/ void WelsMdInterFinePartitionVaa (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb, int32_t bestCost);
-/*static*/ void WelsMdInterFinePartitionVaaOnScreen (void* pEnc, void* pMd, SSlice* pSlice, SMB* pCurMb,
+/*static*/ void WelsMdInterFinePartition (sWelsEncCtx* pEnc, SWelsMD* pMd, SSlice* pSlice, SMB* pCurMb, int32_t bestCost);
+/*static*/ void WelsMdInterFinePartitionVaa (sWelsEncCtx* pEnc, SWelsMD* pMd, SSlice* pSlice, SMB* pCurMb, int32_t bestCost);
+/*static*/ void WelsMdInterFinePartitionVaaOnScreen (sWelsEncCtx* pEnc, SWelsMD* pMd, SSlice* pSlice, SMB* pCurMb,
     int32_t bestCost);
 void WelsMdInterMbRefinement (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCache* pMbCache);
-bool WelsMdFirstIntraMode (void* pEnc, void* pMd, SMB* pCurMb, SMbCache* pMbCache);
-//bool svc_md_first_intra_mode_constrained(void* pEnc, void* pMd, SMB* pCurMb, SMbCache *pMbCache);
-void WelsMdInterMb (void* pEncCtx, void* pWelsMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pUnused);
+bool WelsMdFirstIntraMode (sWelsEncCtx* pEnc, SWelsMD* pMd, SMB* pCurMb, SMbCache* pMbCache);
+//bool svc_md_first_intra_mode_constrained(sWelsEncCtx* pEnc, SWelsMD* pMd, SMB* pCurMb, SMbCache *pMbCache);
+void WelsMdInterMb (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* pSlice, SMB* pCurMb, SMbCache* pUnused);
 
 //both used in BL and EL
 //void wels_md_inter_init ( SWelsMD* pMd, const uint8_t ref_idx, const bool is_highest_dlayer_flag );

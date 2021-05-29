@@ -30,11 +30,11 @@
  *
  */
 
-#ifdef  HAVE_NEON_AARCH64
-.text
+#ifdef HAVE_NEON_AARCH64
 #include "arm_arch64_common_macro.S"
-
+//int32_t SumOf8x8SingleBlock_AArch64_neon (uint8_t* pRef, const int32_t kiRefStride);
 WELS_ASM_AARCH64_FUNC_BEGIN SumOf8x8SingleBlock_AArch64_neon
+    SIGN_EXTENSION x1,w1
     ld1 {v0.d}[0], [x0], x1
     ld1 {v0.d}[1], [x0], x1
     ld1 {v1.d}[0], [x0], x1
@@ -51,7 +51,9 @@ WELS_ASM_AARCH64_FUNC_BEGIN SumOf8x8SingleBlock_AArch64_neon
     mov    x0, v0.d[0]
 WELS_ASM_AARCH64_FUNC_END
 
+//int32_t SumOf16x16SingleBlock_AArch64_neon (uint8_t* pRef, const int32_t kiRefStride);
 WELS_ASM_AARCH64_FUNC_BEGIN SumOf16x16SingleBlock_AArch64_neon
+    SIGN_EXTENSION x1,w1
     ld1 {v0.16b}, [x0], x1
     uaddlp v0.8h, v0.16b
 .rept 15
@@ -62,11 +64,17 @@ WELS_ASM_AARCH64_FUNC_BEGIN SumOf16x16SingleBlock_AArch64_neon
     mov    x0, v0.d[0]
 WELS_ASM_AARCH64_FUNC_END
 
+//void SumOf8x8BlockOfFrame_AArch64_neon (uint8_t* pRefPicture, const int32_t kiWidth, const int32_t kiHeight,
+//                               const int32_t kiRefStride,
+//                                uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[]);
 WELS_ASM_AARCH64_FUNC_BEGIN SumOf8x8BlockOfFrame_AArch64_neon
 //(uint8_t* pRefPicture, const int32_t kiWidth, const int32_t kiHeight,const int32_t kiRefStride,uint16_t* pFeatureOfBlock, uint32_t pTimesOfFeatureValue[])
     //x5: pTimesOfFeatureValue
     //x4: pFeatureOfBlock
 
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x2,w2
+    SIGN_EXTENSION x3,w3
     mov x8, x0
     mov x6, x1
     add x8, x8, x6
@@ -148,6 +156,9 @@ WELS_ASM_AARCH64_FUNC_BEGIN SumOf16x16BlockOfFrame_AArch64_neon
     //x5: pTimesOfFeatureValue
     //x4: pFeatureOfBlock
 
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x2,w2
+    SIGN_EXTENSION x3,w3
     mov x8, x0
     mov x6, x1
     add x8, x8, x6
@@ -220,6 +231,7 @@ WELS_ASM_AARCH64_FUNC_END
 
 WELS_ASM_AARCH64_FUNC_BEGIN InitializeHashforFeature_AArch64_neon
 // (uint32_t* pTimesOfFeatureValue, uint16_t* pBuf, const int32_t kiListSize, uint16_t** pLocationOfFeature, uint16_t** pFeatureValuePointerList);
+    SIGN_EXTENSION x2,w2
     mov x9, #3
     bic x5, x2, x9
     mov x8, #0
@@ -252,8 +264,8 @@ _hash_assign_with_copy_x4:
     st1 {v2.16b, v3.16b}, [x4], #32
 
 _assign_next:
-	subs x5, x5, #4
-	cbnz x5, _hash_assign_loop_x4
+    subs x5, x5, #4
+    cbnz x5, _hash_assign_loop_x4
 
     and x5, x2, x9
     cbz x5, _hash_assign_end
@@ -281,14 +293,15 @@ WELS_ASM_AARCH64_FUNC_BEGIN FillQpelLocationByFeatureValue_AArch64_neon
     ldr q7, mv_x_inc_x4
     ldr q6, mv_y_inc_x4
     ldr q5, mx_x_offset_x4
-
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x2,w2
     eor v4.16b, v4.16b, v4.16b
     eor v3.16b, v3.16b, v3.16b
     dup v16.2d, x3 // v8->v16
 
 _hash_height_loop:
     mov x7, x1
-    mov.16b v2, v5 //mx_x_offset_x4
+    mov v2.16b, v5.16b //mx_x_offset_x4
 
 _hash_width_loop:
     ld1 {v0.d}[0], [x0], #8

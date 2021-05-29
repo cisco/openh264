@@ -36,6 +36,8 @@
 
 #ifdef __APPLE__
 
+.text
+
 .macro WELS_ASM_FUNC_BEGIN
 .align 2
 .arm
@@ -50,19 +52,25 @@ mov pc, lr
 
 .section .note.GNU-stack,"",%progbits // Mark stack as non-executable
 .text
+.arch armv7-a
+.fpu neon
 
 .macro WELS_ASM_FUNC_BEGIN funcName
 .align 2
 .arm
 .global \funcName
 .type \funcName, %function
+#ifndef __clang__
 .func \funcName
+#endif
 \funcName:
 .endm
 
 .macro WELS_ASM_FUNC_END
 mov pc, lr
+#ifndef __clang__
 .endfunc
+#endif
 .endm
 #endif
 

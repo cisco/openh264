@@ -30,251 +30,9 @@
  *
  */
 
-#ifdef  HAVE_NEON_AARCH64
-.text
+#ifdef HAVE_NEON_AARCH64
 #include "arm_arch64_common_macro.S"
 
-#ifdef __APPLE__
-.macro ZERO_COUNT_IN_2_QUARWORD
-//  {   //  input:  coef_0 (identy to $3 $4), coef_1(identy to $5 $6), mask_q
-    cmeq    $0.8h, $0.8h, #0
-    cmeq    $1.8h, $1.8h, #0
-    uzp1    $0.16b, $0.16b, $1.16b
-    ushr    $0.16b, $0.16b, 7
-    addv    $2, $0.16b
-//  }
-.endm
-
-.macro NEWQUANT_COEF_EACH_16BITS    // if coef <= 0, - coef; else , coef;
-//  {   //  input:  coef, ff (dst), mf
-    eor     $3.16b, $3.16b, $3.16b          // init 0 , and keep 0;
-    saba    $1.8h, $0.8h, $3.8h      // f + abs(coef - 0)
-    smull   $4.4s, $1.4h, $2.4h
-    smull2  $5.4s, $1.8h, $2.8h
-    shrn    $1.4h, $4.4s, #16
-    shrn2   $1.8h, $5.4s, #16
-
-    cmgt    $4.8h, $0.8h, #0      // if true, location of coef == 11111111
-    bif     $3.16b, $1.16b, $4.16b      // if (x<0) reserved part; else keep 0 untouched
-    shl     $3.8h, $3.8h, #1
-    sub     $1.8h, $1.8h, $3.8h      // if x > 0, -= 0; else x-= 2x
-//  }
-.endm
-
-.macro NEWQUANT_COEF_EACH_16BITS_MAX    // if coef <= 0, - coef; else , coef;
-//  {   //  input:  coef, ff (dst), mf
-    eor     $3.16b, $3.16b, $3.16b          // init 0 , and keep 0;
-    saba    $1.8h, $0.8h, $3.8h      // f + abs(coef - 0)
-    smull   $4.4s, $1.4h, $2.4h
-    smull2  $5.4s, $1.8h, $2.8h
-    shrn    $1.4h, $4.4s, #16
-    shrn2   $1.8h, $5.4s, #16
-
-    cmgt    $4.8h, $0.8h, #0      // if true, location of coef == 11111111
-    bif     $3.16b, $1.16b, $4.16b      // if (x<0) reserved part; else keep 0 untouched
-    shl     $3.8h, $3.8h, #1
-    mov.16b $6, $1
-    sub     $1.8h, $1.8h, $3.8h      // if x > 0, -= 0; else x-= 2x
-//  }
-.endm
-
-.macro QUANT_DUALWORD_COEF_EACH_16BITS  // if coef <= 0, - coef; else , coef;
-//  {   //  input:  coef, ff (dst), mf
-    saba    $1.8h, $0.8h, $3.8h      // f + abs(coef - 0)
-    smull   $4.4s, $1.4h, $2.4h
-    shrn    $1.4h, $4.4s, #16
-
-    cmgt    $4.8h, $0.8h, #0      // if true, location of coef == 11111111
-    bif     $3.16b, $1.16b, $4.16b      // if (x<0) reserved part; else keep 0 untouched
-    shl     $3.8h, $3.8h, #1
-    sub     $1.8h, $1.8h, $3.8h      // if x > 0, -= 0; else x-= 2x
-//  }
-.endm
-
-.macro SELECT_MAX_IN_ABS_COEF
-//  {   //  input:  coef_0, coef_1, coef_2, coef_3, max_q (identy to follow two)
-    umax    $0.8h, $0.8h, $1.8h
-    umaxv   $4, $0.8h
-    umax    $2.8h, $2.8h, $3.8h
-    umaxv   $5, $2.8h
-//  }
-.endm
-
-.macro HDM_QUANT_2x2_TOTAL_16BITS
-//  {   //  input: src_d[0][16][32][48], dst_d[0][16][32][48], working
-    sshr  $1.2d, $0.2d, #32
-    add   $2.4h, $0.4h, $1.4h      // [0] = rs[0] + rs[32];[1] = rs[16] + rs[48];
-    sub   $1.4h, $0.4h, $1.4h      // [0] = rs[0] - rs[32];[1] = rs[16] - rs[48];
-    zip1  $1.4h, $2.4h, $1.4h
-//  }
-.endm
-
-
-.macro DC_ZERO_COUNT_IN_DUALWORD
-//  {   //  input:  coef, dst_d, working_d (all 0x01)
-    cmeq    $0.4h, $0.4h, #0
-    and     $0.8b, $0.8b, $2.8b
-    addv    $1, $0.4h
-//  }
-.endm
-
-.macro IHDM_4x4_TOTAL_16BITS
-//  {   //  input: each src_d[0]~[3](dst), working_q0, working_q1
-    uzp2  $1.4s, $0.4s, $0.4s
-    uzp1  $0.4s, $0.4s, $0.4s
-    add   $2.8h, $0.8h, $1.8h      // [0] = rs[0] + rs[2];[1] = rs[1] + rs[3];[2] = rs[4] + rs[6];[3] = rs[5] + rs[7];
-    sub   $1.8h, $0.8h, $1.8h      // [0] = rs[0] - rs[2];[1] = rs[1] - rs[3];[2] = rs[4] - rs[6];[3] = rs[5] - rs[7];
-    zip1  $2.8h, $2.8h, $1.8h      // [0] = rs[0] + rs[2]; [1] = rs[0] - rs[2]; ... [2]; [3]
-
-    uzp2  $1.4s, $2.4s, $2.4s
-    uzp1  $0.4s, $2.4s, $2.4s
-    add   $2.8h, $0.8h, $1.8h      // [0] = rs[0] + rs[2];[1] = rs[1] + rs[3];[2] = rs[4] + rs[6];[3] = rs[5] + rs[7];
-    sub   $1.8h, $0.8h, $1.8h      // [0] = rs[0] - rs[2];[1] = rs[1] - rs[3];[2] = rs[4] - rs[6];[3] = rs[5] - rs[7];
-    rev32 $1.4h, $1.4h             // [0] = rs[1] - rs[3];[1] = rs[0] - rs[2];[2] = rs[5] - rs[7];[3] = rs[4] - rs[6];
-    zip1  $0.4s, $2.4s, $1.4s
-//  }
-.endm
-
-.macro MATRIX_TRANSFORM_EACH_16BITS_2x8_OUT2
-//  {   //  input & output: src_d[0]~[3];[0 1 2 3]+[4 5 6 7]+[8 9 10 11]+[12 13 14 15]
-    uzp1 $2.4s, $0.4s, $1.4s   //[0 1 4 5]+[8 9 12 13]
-    uzp2 $3.4s, $0.4s, $1.4s   //[2 3 6 7]+[10 11 14 15]
-
-    uzp1 $0.8h, $2.8h, $3.8h   //[0 4 8 12]+[2 6 10 14]
-    uzp2 $2.8h, $2.8h, $3.8h   //[1 5 9 13]+[3 7 11 15]
-    zip2 $1.2d, $0.2d, $2.2d   //[2 6 10 14]+[3 7 11 15]
-    zip1 $0.2d, $0.2d, $2.2d   //[0 4 8 12]+[1 5 9 13]
-//  }
-.endm
-
-.macro MATRIX_TRANSFORM_EACH_16BITS_OUT4
-//  {   //  input & output: src_d[0]~[3];[0 4 8 12],[1 5 9 13],[2 6 10 14],[3 7 11 15]
-    trn1 $4.8h, v0.8h, v1.8h
-    trn2 $5.8h, v0.8h, v1.8h
-    trn1 $6.8h, v2.8h, v3.8h
-    trn2 $7.8h, v2.8h, v3.8h
-
-    trn1 $0.4s, v4.4s, v6.4s
-    trn2 $2.4s, v4.4s, v6.4s
-    trn1 $1.4s, v5.4s, v7.4s
-    trn2 $3.4s, v5.4s, v7.4s
-//  }
-.endm
-
-.macro MATRIX_TRANSFORM_EACH_16BITS_4x4_OUT2
-//  {   //  input & output: src_d[0]~[3];[0 1 2 3],[4 5 6 7],[8 9 10 11],[12 13 14 15]
-    mov  $0.d[1], $1.d[0]  //[0 1 2 3]+[4 5 6 7]
-    mov  $2.d[1], $3.d[0]  //[8 9 10 11]+[12 13 14 15]
-    uzp1 $1.4s, $0.4s, $2.4s   //[0 1 4 5]+[8 9 12 13]
-    uzp2 $3.4s, $0.4s, $2.4s   //[2 3 6 7]+[10 11 14 15]
-
-    uzp1 $0.8h, $1.8h, $3.8h   //[0 4 8 12]+[2 6 10 14]
-    uzp2 $2.8h, $1.8h, $3.8h   //[1 5 9 13]+[3 7 11 15]
-    zip2 $1.2d, $0.2d, $2.2d   //[2 6 10 14]+[3 7 11 15]
-    zip1 $0.2d, $0.2d, $2.2d   //[0 4 8 12]+[1 5 9 13]
-//  }
-.endm
-
-.macro LOAD_4x4_DATA_FOR_DCT
-    ld1   {$0.s}[0], [$2], $3
-    ld1   {$0.s}[1], [$2], $3
-    ld1   {$0.s}[2], [$2], $3
-    ld1   {$0.s}[3], [$2]
-
-    ld1   {$1.s}[0], [$4], $5
-    ld1   {$1.s}[1], [$4], $5
-    ld1   {$1.s}[2], [$4], $5
-    ld1   {$1.s}[3], [$4]
-.endm
-
-.macro DCT_ROW_TRANSFORM_TOTAL_16BITS
-//  {   //  input: src_d[0]~[3], working: [4]~[7]
-    add     $4.8h, $0.8h, $3.8h   //int16 s[0] = data[i] + data[i3];
-    sub     $7.8h, $0.8h, $3.8h   //int16 s[3] = data[i] - data[i3];
-    add     $5.8h, $1.8h, $2.8h   //int16 s[1] = data[i1] + data[i2];
-    sub     $6.8h, $1.8h, $2.8h   //int16 s[2] = data[i1] - data[i2];
-
-    add     $0.8h, $4.8h, $5.8h   //int16 dct[i ] = s[0] + s[1];
-    sub     $2.8h, $4.8h, $5.8h   //int16 dct[i2] = s[0] - s[1];
-    shl     $1.8h, $7.8h, #1
-    shl     $3.8h, $6.8h, #1
-    add     $1.8h, $1.8h, $6.8h   //int16 dct[i1] = (s[3] << 1) + s[2];
-    sub     $3.8h, $7.8h, $3.8h   //int16 dct[i3] = s[3] - (s[2] << 1);
-//  }
-.endm
-
-.macro LOAD_8x4_DATA_FOR_DCT
-//  {   //  input: $0~$3, src1*, src2*; untouched r2:src1_stride &r4:src2_stride
-    ld1   {$0.d}[0], [$8], x2
-    ld1   {$1.d}[0], [$8], x2
-    ld1   {$2.d}[0], [$8], x2
-    ld1   {$3.d}[0], [$8], x2
-
-    ld1   {$4.d}[0], [$9], x4
-    ld1   {$5.d}[0], [$9], x4
-    ld1   {$6.d}[0], [$9], x4
-    ld1   {$7.d}[0], [$9], x4
-//  }
-.endm
-
-.macro ROW_TRANSFORM_1_STEP_TOTAL_16BITS
-//  {   //  input: src_d[0]~[3], output: e_d[0]~[3];
-    add   $4.8h, $0.8h, $2.8h          //int16 e[i][0] = src[0] + src[2];
-    sub   $5.8h, $0.8h, $2.8h          //int16 e[i][1] = src[0] - src[2];
-    sshr  $6.8h, $1.8h, #1
-    sshr  $7.8h, $3.8h, #1
-    sub   $6.8h, $6.8h, $3.8h          //int16 e[i][2] = (src[1]>>1)-src[3];
-    add   $7.8h, $1.8h, $7.8h          //int16 e[i][3] = src[1] + (src[3]>>1);
-//  }
-.endm
-
-.macro TRANSFORM_TOTAL_16BITS   // both row & col transform used
-//  {   //  output: f_q[0]~[3], input: e_q[0]~[3];
-    add   $0.8h, $4.8h, $7.8h          //int16 f[i][0] = e[i][0] + e[i][3];
-    add   $1.8h, $5.8h, $6.8h          //int16 f[i][1] = e[i][1] + e[i][2];
-    sub   $2.8h, $5.8h, $6.8h          //int16 f[i][2] = e[i][1] - e[i][2];
-    sub   $3.8h, $4.8h, $7.8h          //int16 f[i][3] = e[i][0] - e[i][3];
-//  }
-.endm
-
-.macro ROW_TRANSFORM_0_STEP
-//  {   //  input: src_d[0]~[3], output: e_q[0]~[3];
-    saddl   $4.4s, $0.4h, $2.4h          //int32 e[i][0] = src[0] + src[2];
-    ssubl   $5.4s, $0.4h, $2.4h          //int32 e[i][1] = src[0] - src[2];
-    ssubl   $6.4s, $1.4h, $3.4h          //int32 e[i][2] = src[1] - src[3];
-    saddl   $7.4s, $1.4h, $3.4h          //int32 e[i][3] = src[1] + src[3];
-//  }
-.endm
-
-.macro COL_TRANSFORM_0_STEP
-//  {   //  input: src_q[0]~[3], output: e_q[0]~[3];
-    add     $4.4s, $0.4s, $2.4s          //int32 e[0][j] = f[0][j] + f[2][j];
-    sub     $5.4s, $0.4s, $2.4s          //int32 e[1][j] = f[0][j] - f[2][j];
-    sub     $6.4s, $1.4s, $3.4s          //int32 e[2][j] = (f[1][j]>>1) - f[3][j];
-    add     $7.4s, $1.4s, $3.4s          //int32 e[3][j] = f[1][j] + (f[3][j]>>1);
-//  }
-.endm
-
-.macro TRANSFORM_4BYTES // both row & col transform used
-//  {   //  output: f_q[0]~[3], input: e_q[0]~[3];
-    add     $0.4s, $4.4s, $7.4s          //int16 f[i][0] = e[i][0] + e[i][3];
-    add     $1.4s, $5.4s, $6.4s          //int16 f[i][1] = e[i][1] + e[i][2];
-    sub     $2.4s, $5.4s, $6.4s          //int16 f[i][2] = e[i][1] - e[i][2];
-    sub     $3.4s, $4.4s, $7.4s          //int16 f[i][3] = e[i][0] - e[i][3];
-//  }
-.endm
-
-.macro MB_PRED_8BITS_ADD_DCT_16BITS_CLIP
-//  {   //  input: pred_d[0](output), dct_q0/1, working_q0/1;
-    uxtl      $3.8h, $0.8b
-    uxtl2     $4.8h, $0.16b
-    add       $3.8h, $3.8h, $1.8h
-    add       $4.8h, $4.8h, $2.8h
-    sqxtun    $0.8b, $3.8h
-    sqxtun2   $0.16b,$4.8h
-//  }
-.endm
-#else
 .macro ZERO_COUNT_IN_2_QUARWORD arg0, arg1, arg2
 //  {   //  input:  coef_0 (identy to \arg3\() \arg4\()), coef_1(identy to \arg5\() \arg6\()), mask_q
     cmeq    \arg0\().8h, \arg0\().8h, #0
@@ -519,7 +277,6 @@
     sqxtun2   \arg0\().16b,\arg4\().8h
 //  }
 .endm
-#endif
 
 WELS_ASM_AARCH64_FUNC_BEGIN WelsGetNoneZeroCount_AArch64_neon
     ld1     {v0.8h, v1.8h}, [x0]
@@ -533,7 +290,7 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsQuant4x4_AArch64_neon
     ld1     {v2.8h}, [x1]
     ld1     {v0.8h, v1.8h}, [x0]
     ld1     {v3.8h}, [x2]
-    mov.16b v4, v2
+    mov     v4.16b, v2.16b
     NEWQUANT_COEF_EACH_16BITS   v0, v2, v3, v5, v6, v7
     st1     {v2.8h}, [x0], #16
     NEWQUANT_COEF_EACH_16BITS   v1, v4, v3, v5, v6, v7
@@ -545,7 +302,7 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsQuant4x4Dc_AArch64_neon
     ld1     {v0.8h, v1.8h}, [x0]
     dup     v2.8h, w1      // even ff range [0, 768]
     dup     v3.8h, w2
-    mov.16b v4, v2
+    mov     v4.16b, v2.16b
     NEWQUANT_COEF_EACH_16BITS   v0, v2, v3, v5, v6, v7
     st1     {v2.8h}, [x0], #16
     NEWQUANT_COEF_EACH_16BITS   v1, v4, v3, v5, v6, v7
@@ -559,10 +316,10 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsQuantFour4x4_AArch64_neon
 
 .rept 4
     ld1     {v0.8h, v1.8h}, [x0], #32
-    mov.16b v4, v2
+    mov     v4.16b, v2.16b
     NEWQUANT_COEF_EACH_16BITS   v0, v4, v3, v5, v6, v7
     st1     {v4.8h}, [x1], #16
-    mov.16b v4, v2
+    mov     v4.16b, v2.16b
     NEWQUANT_COEF_EACH_16BITS   v1, v4, v3, v5, v6, v7
     st1     {v4.8h}, [x1], #16
 .endr
@@ -575,36 +332,36 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsQuantFour4x4Max_AArch64_neon
     mov     x1, x0
 
     ld1     {v0.8h, v1.8h}, [x0], #32
-    mov.16b v4, v2
+    mov     v4.16b, v2.16b
     NEWQUANT_COEF_EACH_16BITS_MAX   v0, v4, v3, v5, v6, v7, v16
     st1     {v4.8h}, [x1], #16
-    mov.16b v4, v2
+    mov     v4.16b, v2.16b
     NEWQUANT_COEF_EACH_16BITS_MAX   v1, v4, v3, v5, v6, v7, v17
     st1     {v4.8h}, [x1], #16   // then 1st 16 elem in v16  & v17
 
     ld1     {v0.8h, v1.8h}, [x0], #32
-    mov.16b v4, v2
+    mov     v4.16b, v2.16b
     NEWQUANT_COEF_EACH_16BITS_MAX   v0, v4, v3, v5, v6, v7, v18
     st1     {v4.8h}, [x1], #16
-    mov.16b v4, v2
+    mov     v4.16b, v2.16b
     NEWQUANT_COEF_EACH_16BITS_MAX   v1, v4, v3, v5, v6, v7, v19
     st1     {v4.8h}, [x1], #16   // then 2st 16 elem in v18 & v19
 
     SELECT_MAX_IN_ABS_COEF  v16, v17, v18, v19, h20, h21
 
     ld1     {v0.8h, v1.8h}, [x0], #32
-    mov.16b v4, v2
+    mov     v4.16b, v2.16b
     NEWQUANT_COEF_EACH_16BITS_MAX   v0, v4, v3, v5, v6, v7, v16
     st1     {v4.8h}, [x1], #16
-    mov.16b v4, v2
+    mov     v4.16b, v2.16b
     NEWQUANT_COEF_EACH_16BITS_MAX   v1, v4, v3, v5, v6, v7, v17
     st1     {v4.8h}, [x1], #16   // then 1st 16 elem in v16  & v17
 
     ld1     {v0.8h, v1.8h}, [x0], #32
-    mov.16b v4, v2
+    mov     v4.16b, v2.16b
     NEWQUANT_COEF_EACH_16BITS_MAX   v0, v4, v3, v5, v6, v7, v18
     st1     {v4.8h}, [x1], #16
-    mov.16b v4, v2
+    mov     v4.16b, v2.16b
     NEWQUANT_COEF_EACH_16BITS_MAX   v1, v4, v3, v5, v6, v7, v19
     st1     {v4.8h}, [x1], #16   // then 2st 16 elem in v18 & v19
 
@@ -712,7 +469,10 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsDequantIHadamard4x4_AArch64_neon
     st1    {v0.16b, v1.16b}, [x0]
 WELS_ASM_AARCH64_FUNC_END
 
+//void WelsDctT4_AArch64_neon (int16_t* pDct,  uint8_t* pPixel1, int32_t iStride1, uint8_t* pPixel2, int32_t iStride2);
 WELS_ASM_AARCH64_FUNC_BEGIN WelsDctT4_AArch64_neon
+    SIGN_EXTENSION x2, w2
+    SIGN_EXTENSION x4, w4
     LOAD_4x4_DATA_FOR_DCT   v0, v1, x1, x2, x3, x4
     usubl  v2.8h, v0.8b, v1.8b
     usubl2 v4.8h, v0.16b, v1.16b
@@ -733,8 +493,10 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsDctT4_AArch64_neon
     st4       {v0.d, v1.d, v2.d, v3.d}[0], [x0]
 WELS_ASM_AARCH64_FUNC_END
 
-
+//void WelsDctFourT4_AArch64_neon (int16_t* pDct,  uint8_t* pPixel1, int32_t iStride1, uint8_t* pPixel2, int32_t iStride2);
 WELS_ASM_AARCH64_FUNC_BEGIN WelsDctFourT4_AArch64_neon
+    SIGN_EXTENSION x2,w2
+    SIGN_EXTENSION x4,w4
 .rept 2
     LOAD_8x4_DATA_FOR_DCT   v0, v1, v2, v3, v4, v5, v6, v7, x1, x3
     usubl    v0.8h, v0.8b, v4.8b
@@ -761,8 +523,10 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsDctFourT4_AArch64_neon
     st1     {v6.16b, v7.16b}, [x0], #32
 .endr
 WELS_ASM_AARCH64_FUNC_END
-
+//void WelsIDctT4Rec_AArch64_neon (uint8_t* pRec, int32_t iStride, uint8_t* pPrediction, int32_t iPredStride, int16_t* pDct)
 WELS_ASM_AARCH64_FUNC_BEGIN WelsIDctT4Rec_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
     ld1     {v16.s}[0], [x2], x3
     ld1     {v16.s}[1], [x2], x3
     ld1     {v16.s}[2], [x2], x3
@@ -795,8 +559,10 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsIDctT4Rec_AArch64_neon
     st1     {v1.s}[0],[x0],x1
     st1     {v1.s}[1],[x0],x1
 WELS_ASM_AARCH64_FUNC_END
-
+//void WelsIDctFourT4Rec_AArch64_neon (uint8_t* pRec, int32_t iStride, uint8_t* pPrediction, int32_t iPredStride, int16_t* pDct);
 WELS_ASM_AARCH64_FUNC_BEGIN WelsIDctFourT4Rec_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
 .rept 2
     ld1     {v16.d}[0], [x2], x3
     ld1     {v16.d}[1], [x2], x3
@@ -887,7 +653,11 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsHadamardT4Dc_AArch64_neon
     st1       {v4.16b, v5.16b}, [x0]  //store
 WELS_ASM_AARCH64_FUNC_END
 
+//void WelsIDctRecI16x16Dc_AArch64_neon (uint8_t* pRec, int32_t iStride, uint8_t* pPrediction, int32_t iPredStride,
+//                int16_t* pDctDc);
 WELS_ASM_AARCH64_FUNC_BEGIN WelsIDctRecI16x16Dc_AArch64_neon
+    SIGN_EXTENSION x1,w1
+    SIGN_EXTENSION x3,w3
     ld1       {v16.16b,v17.16b}, [x4]
     srshr     v16.8h, v16.8h, #6
     srshr     v17.8h, v17.8h, #6

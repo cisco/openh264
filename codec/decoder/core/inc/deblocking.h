@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	deblocking.h
+ * \file    deblocking.h
  *
- * \brief	Interfaces introduced in frame deblocking filtering
+ * \brief   Interfaces introduced in frame deblocking filtering
  *
- * \date	05/14/2009 Created
+ * \date    05/14/2009 Created
  *
  *************************************************************************************
  */
@@ -46,45 +46,71 @@
 namespace WelsDec {
 
 /*!
- * \brief	deblocking module initialize
+ * \brief   deblocking module initialize
  *
- * \param	pf
+ * \param   pf
  *          cpu
  *
- * \return	NONE
+ * \return  NONE
  */
 
 void  DeblockingInit (PDeblockingFunc pDeblockingFunc,  int32_t iCpu);
 
 
 /*!
- * \brief	deblocking filtering target slice
+ * \brief   deblocking filtering target slice
  *
- * \param	dec			Wels decoder context
+ * \param   dec         Wels decoder context
  *
- * \return	NONE
+ * \return  NONE
  */
 void WelsDeblockingFilterSlice (PWelsDecoderContext pCtx, PDeblockingFilterMbFunc pDeblockMb);
 
 /*!
- * \brief	pixel deblocking filtering
+* \brief   AVC slice init deblocking filtering target layer
+*
+* \in and out param   SDeblockingFilter
+* \in and out param   iFilterIdc
+*
+* \return  NONE
+*/
+void WelsDeblockingInitFilter (PWelsDecoderContext pCtx, SDeblockingFilter& pFilter, int32_t& iFilterIdc);
+
+/*!
+* \brief   AVC MB deblocking filtering target layer
+*
+* \param   DqLayer which has the current location of MB to be deblocked.
+*
+* \return  NONE
+*/
+void WelsDeblockingFilterMB (PDqLayer pCurDqLayer, SDeblockingFilter& pFilter, int32_t& iFilterIdc,
+                             PDeblockingFilterMbFunc pDeblockMb);
+
+/*!
+ * \brief   pixel deblocking filtering
  *
- * \param	filter			      deblocking filter
- * \param	pix	                  pixel value
- * \param	stride	              frame stride
- * \param	bs	                  boundary strength
+ * \param   filter                deblocking filter
+ * \param   pix                   pixel value
+ * \param   stride                frame stride
+ * \param   bs                    boundary strength
  *
- * \return	NONE
+ * \return  NONE
  */
 
-uint32_t DeblockingBsMarginalMBAvcbase (PDqLayer pCurDqLayer, int32_t iEdge, int32_t iNeighMb, int32_t iMbXy);
+uint32_t DeblockingBsMarginalMBAvcbase (PDeblockingFilter  pFilter, PDqLayer pCurDqLayer, int32_t iEdge,
+                                        int32_t iNeighMb, int32_t iMbXy);
+uint32_t DeblockingBSliceBsMarginalMBAvcbase (PDqLayer pCurDqLayer, int32_t iEdge, int32_t iNeighMb, int32_t iMbXy);
 
 int32_t DeblockingAvailableNoInterlayer (PDqLayer pCurDqLayer, int32_t iFilterIdc);
 
-void DeblockingIntraMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t iBoundryFlag);
-void DeblockingInterMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, uint8_t nBS[2][4][4], int32_t iBoundryFlag);
-
 void WelsDeblockingMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t iBoundryFlag);
+
+inline int8_t* GetPNzc (PDqLayer pCurDqLayer, int32_t iMbXy) {
+  if (pCurDqLayer->pDec != NULL && pCurDqLayer->pDec->pNzc != NULL) {
+    return pCurDqLayer->pDec->pNzc[iMbXy];
+  }
+  return pCurDqLayer->pNzc[iMbXy];
+}
 
 } // namespace WelsDec
 

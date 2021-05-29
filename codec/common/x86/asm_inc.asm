@@ -60,9 +60,9 @@
 ; Macros
 ;***********************************************************************
 
-DEFAULT REL
-
 %ifdef WIN64 ; Windows x64 ;************************************
+
+DEFAULT REL
 
 BITS 64
 
@@ -78,6 +78,19 @@ BITS 64
 %define arg10 [rsp + push_num*8 + 80]
 %define arg11 [rsp + push_num*8 + 88]
 %define arg12 [rsp + push_num*8 + 96]
+
+%define arg1d ecx
+%define arg2d edx
+%define arg3d r8d
+%define arg4d r9d
+%define arg5d arg5
+%define arg6d arg6
+%define arg7d arg7
+%define arg8d arg8
+%define arg9d arg9
+%define arg10d arg10
+%define arg11d arg11
+%define arg12d arg12
 
 %define r0 rcx
 %define r1 rdx
@@ -100,6 +113,7 @@ BITS 64
 %define r1w  dx
 %define r2w  r8w
 %define r3w  r9w
+%define r4w  ax
 %define r6w  r11w
 
 %define r0b  cl
@@ -113,6 +127,8 @@ BITS 64
 %define  retrd          eax
 
 %elifdef UNIX64 ; Unix x64 ;************************************
+
+DEFAULT REL
 
 BITS 64
 
@@ -132,6 +148,19 @@ SECTION .note.GNU-stack noalloc noexec nowrite progbits ; Mark the stack as non-
 %define arg10 [rsp + push_num*8 + 32]
 %define arg11 [rsp + push_num*8 + 40]
 %define arg12 [rsp + push_num*8 + 48]
+
+%define arg1d edi
+%define arg2d esi
+%define arg3d edx
+%define arg4d ecx
+%define arg5d r8d
+%define arg6d r9d
+%define arg7d arg7
+%define arg8d arg8
+%define arg9d arg9
+%define arg10d arg10
+%define arg11d arg11
+%define arg12d arg12
 
 %define r0 rdi
 %define r1 rsi
@@ -154,6 +183,7 @@ SECTION .note.GNU-stack noalloc noexec nowrite progbits ; Mark the stack as non-
 %define r1w  si
 %define r2w  dx
 %define r3w  cx
+%define r4w  r8w
 %define r6w  r10w
 
 %define r0b  dil
@@ -187,6 +217,19 @@ SECTION .note.GNU-stack noalloc noexec nowrite progbits ; Mark the stack as non-
 %define arg11 [esp + push_num*4 + 44]
 %define arg12 [esp + push_num*4 + 48]
 
+%define arg1d arg1
+%define arg2d arg2
+%define arg3d arg3
+%define arg4d arg4
+%define arg5d arg5
+%define arg6d arg6
+%define arg7d arg7
+%define arg8d arg8
+%define arg9d arg9
+%define arg10d arg10
+%define arg11d arg11
+%define arg12d arg12
+
 %define r0 eax
 %define r1 ecx
 %define r2 edx
@@ -208,6 +251,7 @@ SECTION .note.GNU-stack noalloc noexec nowrite progbits ; Mark the stack as non-
 %define r1w cx
 %define r2w dx
 %define r3w bx
+%define r4w si
 %define r6w bp
 
 %define r0b al
@@ -434,13 +478,22 @@ SECTION .note.GNU-stack noalloc noexec nowrite progbits ; Mark the stack as non-
     %endif
 %endmacro
 
+%macro ZERO_EXTENSION 1
+    %ifndef X86_32
+        mov dword %1, %1
+    %endif
+%endmacro
+
 %macro WELS_EXTERN 1
-    ALIGN 16
+    %ifndef WELS_PRIVATE_EXTERN
+        %define WELS_PRIVATE_EXTERN
+    %endif
+    ALIGN 16, nop
     %ifdef PREFIX
-        global _%1
+        global _%1 WELS_PRIVATE_EXTERN
         %define %1 _%1
     %else
-        global %1
+        global %1 WELS_PRIVATE_EXTERN
     %endif
     %1:
 %endmacro
@@ -603,8 +656,83 @@ SECTION .note.GNU-stack noalloc noexec nowrite progbits ; Mark the stack as non-
     packuswb %1,%1
 %endmacro
 
+%macro WELS_DW1_VEX 1
+    vpcmpeqw %1, %1, %1
+    vpsrlw   %1, %1, 15
+%endmacro
+
+%macro WELS_DW32_VEX 1
+    vpcmpeqw %1, %1, %1
+    vpsrlw   %1, %1, 15
+    vpsllw   %1, %1,  5
+%endmacro
+
+%macro WELS_DW32767_VEX 1
+    vpcmpeqw %1, %1, %1
+    vpsrlw   %1, %1,  1
+%endmacro
 
 
+;***********************************************************************
+; Utility macros for X86_32 PIC support
+;***********************************************************************
 
+; Used internally by other macros.
+%macro INIT_X86_32_PIC_ 2
+%ifdef X86_32_PICASM
+    %xdefine pic_ptr %1
+    %xdefine pic_ptr_preserve %2
+  %if pic_ptr_preserve
+    %assign push_num push_num+1
+    push            pic_ptr
+  %endif
+    call            %%get_pc
+%%pic_refpoint:
+    jmp             %%pic_init_done
+%%get_pc:
+    mov             pic_ptr, [esp]
+    ret
+%%pic_init_done:
+    %define pic(data_addr) (pic_ptr+(data_addr)-%%pic_refpoint)
+%else
+    %define pic(data_addr) (data_addr)
+%endif
+%endmacro
 
+; Get program counter and define a helper macro "pic(addr)" to convert absolute
+; addresses to program counter-relative addresses if X86_32_PICASM is defined.
+; Otherwise define "pic(addr)" as an identity function.
+; %1=register to store PC/EIP in.
+%macro INIT_X86_32_PIC 1
+    INIT_X86_32_PIC_ %1, 1
+%endmacro
 
+; Equivalent as above, but without preserving the value of the register argument.
+%macro INIT_X86_32_PIC_NOPRESERVE 1
+    INIT_X86_32_PIC_ %1, 0
+%endmacro
+
+; Clean up after INIT_X86_32_PIC.
+; Restore the register used to hold PC/EIP if applicable, and undefine defines.
+%macro DEINIT_X86_32_PIC 0
+%ifdef X86_32_PICASM
+  %if pic_ptr_preserve
+    pop             pic_ptr
+    %assign push_num push_num-1
+  %endif
+    %undef pic_ptr
+    %undef pic_ptr_preserve
+%endif
+    %undef pic
+%endmacro
+
+; Equivalent as above, but without undefining. Useful for functions with
+; multiple epilogues.
+%macro DEINIT_X86_32_PIC_KEEPDEF 0
+%ifdef X86_32_PICASM
+  %if pic_ptr_preserve
+    pop             pic_ptr
+    %assign push_num push_num-1
+  %endif
+%endif
+%endmacro

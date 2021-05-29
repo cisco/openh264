@@ -6,13 +6,28 @@
 #include <gtest/gtest.h>
 #include "../sha1.h"
 
-static void CompareHash (const unsigned char* digest, const char* hashStr) {
-  char hashStrCmp[SHA_DIGEST_LENGTH * 2 + 1];
-  for (int i = 0; i < SHA_DIGEST_LENGTH; ++i) {
-    sprintf (&hashStrCmp[i * 2], "%.2x", digest[i]);
+static void ToHashStr (char* dst, const unsigned char* src, size_t src_len) {
+  for (size_t i = 0; i < src_len; ++i) {
+    sprintf (&dst[i * 2], "%.2x", src[i]);
   }
-  hashStrCmp[SHA_DIGEST_LENGTH * 2] = '\0';
+  dst[src_len * 2] = '\0';
+}
+
+inline void CompareHash (const unsigned char* digest, const char* hashStr) {
+  char hashStrCmp[SHA_DIGEST_LENGTH * 2 + 1];
+  ToHashStr (hashStrCmp, digest, SHA_DIGEST_LENGTH);
   EXPECT_STREQ (hashStr, hashStrCmp);
+}
+
+inline void CompareHashAnyOf (const unsigned char* digest, const char* const hashStr[], size_t nHashStr) {
+  char hashStrCmp[SHA_DIGEST_LENGTH * 2 + 1];
+  ToHashStr (hashStrCmp, digest, SHA_DIGEST_LENGTH);
+  for (size_t i = 0; i < nHashStr && hashStr[i]; ++i) {
+    if (0 == strcmp (hashStr[i], hashStrCmp))
+      return;
+  }
+  // No match found. Compare to first hash so as to produce a grepable failure.
+  EXPECT_STREQ (hashStr[0], hashStrCmp);
 }
 
 #endif //__HASHFUNCTIONS_H__

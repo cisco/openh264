@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	slice_segment.h
+ * \file    slice_segment.h
  *
- * \brief	SSlice segment routine (Single slice/multiple slice/fmo arrangement exclusive)
+ * \brief   SSlice segment routine (Single slice/multiple slice/fmo arrangement exclusive)
  *
- * \date	2/4/2009 Created
+ * \date    2/4/2009 Created
  *
  *************************************************************************************
  */
@@ -48,6 +48,8 @@
 #include "codec_app_def.h"
 #include "set_mb_syn_cabac.h"
 
+using namespace WelsCommon;
+
 namespace WelsEnc {
 
 
@@ -56,138 +58,142 @@ namespace WelsEnc {
 // in case MT and PACKING_ONE_SLICE_PER_LAYER, MAX_SLICES_NUM should not be exceeding MAX_LAYER_NUM_OF_FRAME
 // for AVC cases, maximal resolution we can support up to (?x1024) for SM_ROWMB_SLICE slice mode
 // fine solution for MAX_SLICES_NUM, need us use the variable instead of MACRO for any resolution combining any multiple-slice mode adaptive
-#define SAVED_NALUNIT_NUM			( (MAX_SPATIAL_LAYER_NUM*MAX_QUALITY_LAYER_NUM) + 1 + MAX_SPATIAL_LAYER_NUM ) // SPS/PPS + SEI/SSEI + PADDING_NAL
-#define MAX_SLICES_NUM				( ( MAX_NAL_UNITS_IN_LAYER - SAVED_NALUNIT_NUM ) / 3 )	// Also MAX_SLICES_NUM need constrained by implementation: uiSliceIdc allocated in SSliceCtx.pOverallMbMap need a byte range as expected
-#define AVERSLICENUM_CONSTRAINT		(MAX_SLICES_NUM)			// used in sNalList initialization,
+#define SAVED_NALUNIT_NUM                       ( (MAX_SPATIAL_LAYER_NUM*MAX_QUALITY_LAYER_NUM) + 1 + MAX_SPATIAL_LAYER_NUM ) // SPS/PPS + SEI/SSEI + PADDING_NAL
+#define MAX_SLICES_NUM                          ( ( MAX_NAL_UNITS_IN_LAYER - SAVED_NALUNIT_NUM ) / 3 )  // Also MAX_SLICES_NUM need constrained by implementation: uiSliceIdc allocated in SSliceCtx.pOverallMbMap need a byte range as expected
+#define AVERSLICENUM_CONSTRAINT         (MAX_SLICES_NUM)                        // used in sNalList initialization,
 
-#define MIN_NUM_MB_PER_SLICE		48							// (128/16 * 96/16), addressing the lowest resolution for multiple slicing is 128x96 above
+#define MIN_NUM_MB_PER_SLICE                    48                                                      // (128/16 * 96/16), addressing the lowest resolution for multiple slicing is 128x96 above
 
-#define DEFAULT_MAXPACKETSIZE_CONSTRAINT	(1200)		//in bytes
-//#define MINPACKETSIZE_CONSTRAINT			(1200)
+#define DEFAULT_MAXPACKETSIZE_CONSTRAINT        (1200)          //in bytes
+//#define MINPACKETSIZE_CONSTRAINT                (1200)
 
-#define AVER_MARGIN_BYTES						( 100 ) //in bytes
-#define JUMPPACKETSIZE_CONSTRAINT(max_byte)			( max_byte - AVER_MARGIN_BYTES ) //in bytes
-#define JUMPPACKETSIZE_JUDGE(len,mb_idx,max_byte)	 ( (len) > JUMPPACKETSIZE_CONSTRAINT(max_byte) ) //( (mb_idx+1)%40/*16slice for compare*/ == 0 )	//
+#define AVER_MARGIN_BYTES                       ( 100 ) //in bytes
+#define JUMPPACKETSIZE_CONSTRAINT(max_byte)             ( max_byte - AVER_MARGIN_BYTES ) //in bytes
+#define JUMPPACKETSIZE_JUDGE(len,mb_idx,max_byte)       ( (len) > JUMPPACKETSIZE_CONSTRAINT(max_byte) ) //( (mb_idx+1)%40/*16slice for compare*/ == 0 )        //
 //cur_mb_idx is for early tests, can be omit in optimization
-
+typedef struct TagSlice      SSlice;
+typedef struct TagDqLayer    SDqLayer;
+typedef struct TagWelsEncCtx sWelsEncCtx;
 /*!
- * \brief	SSlice context
+ * \brief   SSlice context
  */
 /* Single/multiple slices */
 typedef struct SlicepEncCtx_s {
-SliceModeEnum		uiSliceMode;			/* 0: single slice in frame; 1: multiple slices in frame; */
-int16_t			iMbWidth;			/* width of picture size in mb */
-int16_t			iMbHeight;			/* height of picture size in mb */
-int16_t			iSliceNumInFrame;	/* count number of slices in frame; */
-int32_t			iMbNumInFrame;	/* count number of MBs in frame */
-uint16_t*			pOverallMbMap;	/* overall MB map in frame, store virtual slice idc; */
-int16_t*			pFirstMbInSlice;	/* first MB address top-left based in every slice respectively; */
-int32_t*			pCountMbNumInSlice;	/* count number of MBs in every slice respectively; */
-uint32_t		uiSliceSizeConstraint;/*in byte*/
-int32_t			iMaxSliceNumConstraint;/*maximal number of slices constraint*/
+SliceModeEnum           uiSliceMode;            /* 0: single slice in frame; 1: multiple slices in frame; */
+int16_t                 iMbWidth;               /* width of picture size in mb */
+int16_t                 iMbHeight;              /* height of picture size in mb */
+int32_t                 iSliceNumInFrame;       /* count number of slices in frame; */
+int32_t                 iMbNumInFrame;          /* count number of MBs in frame */
+uint16_t*               pOverallMbMap;          /* overall MB map in frame, store virtual slice idc; */
+uint32_t                uiSliceSizeConstraint;  /* in byte */
+int32_t                 iMaxSliceNumConstraint; /* maximal number of slices constraint */
+
 } SSliceCtx;
 
 
 typedef struct TagDynamicSlicingStack {
-int32_t		iStartPos;
-int32_t		iCurrentPos;
+int32_t         iStartPos;
+int32_t         iCurrentPos;
 
-uint8_t*	pBsStackBufPtr;	// current writing position
-uint32_t    uiBsStackCurBits;
-int32_t		iBsStackLeftBits;
+uint8_t*        pBsStackBufPtr; // current writing position
+uint32_t        uiBsStackCurBits;
+int32_t         iBsStackLeftBits;
 
-SCabacCtx  sStoredCabac;
-int32_t		iMbSkipRunStack;
-uint8_t   uiLastMbQp;
+SCabacCtx       sStoredCabac;
+int32_t         iMbSkipRunStack;
+uint8_t         uiLastMbQp;
+uint8_t*        pRestoreBuffer;
 } SDynamicSlicingStack;
 
 /*!
- * \brief	Initialize Wels SSlice context (Single/multiple slices and FMO)
+ * \brief   Initialize Wels SSlice context (Single/multiple slices and FMO)
  *
- * \param	pSliceCtx		SSlice context to be initialized
- * \param	bFmoUseFlag	flag of using fmo
- * \param	iMbWidth		MB width
- * \param	iMbHeight		MB height
- * \param	uiSliceMode		slice mode
- * \param	mul_slice_arg	argument for multiple slice if it is applicable
- * \param	pPpsArg			argument for pPps parameter
+ * \param   pCurDq          current layer which its SSlice context will be initialized
+ * \param   bFmoUseFlag     flag of using fmo
+ * \param   iMbWidth        MB width
+ * \param   iMbHeight       MB height
+ * \param   uiSliceMode     slice mode
+ * \param   mul_slice_arg   argument for multiple slice if it is applicable
+ * \param   pPpsArg         argument for pPps parameter
  *
- * \return	0 - successful; none 0 - failed;
+ * \return  0 - successful; none 0 - failed;
  */
-int32_t InitSlicePEncCtx (SSliceCtx* pSliceCtx,
+int32_t InitSlicePEncCtx (SDqLayer* pCurDq,
                           CMemoryAlign* pMa,
                           bool bFmoUseFlag,
                           int32_t iMbWidth,
                           int32_t iMbHeight,
-                          SSliceConfig* pMulSliceOption,
+                          SSliceArgument* pSliceArgument,
                           void* pPpsArg);
 
 
 /*!
- * \brief	Uninitialize Wels SSlice context (Single/multiple slices and FMO)
+ * \brief   Uninitialize Wels SSlice context (Single/multiple slices and FMO)
  *
- * \param	pSliceCtx		SSlice context to be initialized
+ * \param   pCurDq       curent layer which its SSlice context will be initialized
  *
- * \return	NONE;
+ * \return  NONE;
  */
-void UninitSlicePEncCtx (SSliceCtx* pSliceCtx, CMemoryAlign* pMa);
+void UninitSlicePEncCtx (SDqLayer* pCurDq, CMemoryAlign* pMa);
 
 /*!
- * \brief	Get slice idc for given iMbXY (apply in Single/multiple slices and FMO)
+ * \brief   Get slice idc for given iMbXY (apply in Single/multiple slices and FMO)
  *
- * \param	pSliceCtx		SSlice context
- * \param	kiMbXY			MB xy index
+ * \param   pCurDq    current layer info
+ * \param   kiMbXY    MB xy index
  *
- * \return	uiSliceIdc - successful; (uint8_t)(-1) - failed;
+ * \return  uiSliceIdc - successful; (uint8_t)(-1) - failed;
  */
-uint16_t WelsMbToSliceIdc (SSliceCtx* pSliceCtx, const int16_t kiMbXY);
+uint16_t WelsMbToSliceIdc (SDqLayer* pCurDq, const int32_t kiMbXY);
 
 /*!
- * \brief	Get first mb in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
+ * \brief   Get first mb in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
  *
- * \param	pSliceCtx		SSlice context
- * \param	kiSliceIdc		slice idc
+ * \param   pCurLayer       current layer
+ * \param   kiSliceIdc      slice idc
  *
- * \return	first_mb - successful; -1 - failed;
+ * \return  first_mb - successful; -1 - failed;
  */
-int32_t WelsGetFirstMbOfSlice (SSliceCtx* pSliceCtx, const int32_t kiSliceIdc);
+int32_t WelsGetFirstMbOfSlice (SDqLayer* pCurLayer, const int32_t kiSliceIdc);
 
 /*!
- * \brief	Get successive mb to be processed in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
+ * \brief   Get successive mb to be processed in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
  *
- * \param	pSliceCtx		SSlice context
- * \param	kiMbXY			MB xy index
+ * \param   pCurDq       current layer info
+ * \param   kiMbXY       MB xy index
  *
- * \return	next_mb - successful; -1 - failed;
+ * \return  next_mb - successful; -1 - failed;
  */
-int32_t WelsGetNextMbOfSlice (SSliceCtx* pSliceCtx, const int16_t kiMbXY);
+int32_t WelsGetNextMbOfSlice (SDqLayer* pCurDq, const int32_t kiMbXY);
 
 /*!
- * \brief	Get previous mb to be processed in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
+ * \brief   Get previous mb to be processed in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
  *
- * \param	pSliceCtx		SSlice context
- * \param	kiMbXY			MB xy index
+ * \param   pCurDq          current layer info
+ * \param   kiMbXY          MB xy index
  *
- * \return	prev_mb - successful; -1 - failed;
+ * \return  prev_mb - successful; -1 - failed;
  */
-int32_t WelsGetPrevMbOfSlice (SSliceCtx* pSliceCtx, const int16_t kiMbXY);
+int32_t WelsGetPrevMbOfSlice (SDqLayer* pCurDq, const int32_t kiMbXY);
 
 /*!
- * \brief	Get number of mb in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
+ * \brief   Get number of mb in slice/slice_group: uiSliceIdc (apply in Single/multiple slices and FMO)
  *
- * \param	pSliceCtx		SSlice context
- * \param	kiSliceIdc		slice/slice_group idc
+ * \param   pCurDq          current layer info
+ * \param   pSlice          slice which request slice num
+ * \param   kiSliceIdc      slice/slice_group idc
  *
- * \return	count_num_of_mb - successful; -1 - failed;
+ * \return  count_num_of_mb - successful; -1 - failed;
  */
-int32_t WelsGetNumMbInSlice (SSliceCtx* pSliceCtx, const int32_t kiSliceIdc);
+int32_t WelsGetNumMbInSlice (SDqLayer* pCurDq, SSlice* pSlice, const int32_t kuiSliceIdc);
 
 /*!
- *	Get slice count for multiple slice segment
+ *  Get slice count for multiple slice segment
  *
  */
-int32_t GetInitialSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, SSliceConfig* pMso);
-int32_t GetCurrentSliceNum (const SSliceCtx* kpSliceCtx);
+int32_t GetInitialSliceNum (SSliceArgument* pSliceArgument);
+int32_t GetCurrentSliceNum (const SDqLayer* pCurDq);
+SSlice* GetSliceByIndex(sWelsEncCtx* pCtx, const int32_t kiSliceIdc);
 
 //checking valid para
 int32_t DynamicMaxSliceNumConstraint (uint32_t uiMaximumNum, int32_t uiConsumedNum, uint32_t uiDulplicateTimes);
@@ -200,7 +206,7 @@ bool GomValidCheckSliceNum (const int32_t kiMbWidth, const int32_t kiMbHeight, u
 bool GomValidCheckSliceMbNum (const int32_t kiMbWidth, const int32_t kiMbHeight,  SSliceArgument* pSliceArg);
 //end of checking valid para
 
-int32_t DynamicAdjustSlicePEncCtxAll (SSliceCtx* pSliceCtx,
+int32_t DynamicAdjustSlicePEncCtxAll (SDqLayer* pCurDq,
                                       int32_t* pRunLength);
 }
 #endif//WELS_SLICE_SEGMENT_H__

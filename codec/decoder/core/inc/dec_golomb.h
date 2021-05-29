@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	golomb.h
+ * \file    golomb.h
  *
- * \brief	Exponential Golomb entropy coding/decoding routine
+ * \brief   Exponential Golomb entropy coding/decoding routine
  *
- * \date	03/13/2009 Created
+ * \date    03/13/2009 Created
  *
  *************************************************************************************
  */
@@ -58,20 +58,20 @@ namespace WelsDec {
   if (iReadBytes > iAllowedBytes+1) { \
     return ERR_INFO_READ_OVERFLOW; \
   } \
-	iCurBits |= ((uint32_t)((pBufPtr[0] << 8) | pBufPtr[1])) << (iLeftBits); \
-	iLeftBits -= 16; \
-	pBufPtr +=2; \
+  iCurBits |= ((uint32_t)((pBufPtr[0] << 8) | pBufPtr[1])) << (iLeftBits); \
+  iLeftBits -= 16; \
+  pBufPtr +=2; \
 }
 #define NEED_BITS(iCurBits, pBufPtr, iLeftBits, iAllowedBytes, iReadBytes) { \
-	if( iLeftBits > 0 ) { \
-	GET_WORD(iCurBits, pBufPtr, iLeftBits, iAllowedBytes, iReadBytes); \
-	} \
+  if (iLeftBits > 0) { \
+    GET_WORD(iCurBits, pBufPtr, iLeftBits, iAllowedBytes, iReadBytes); \
+  } \
 }
 #define UBITS(iCurBits, iNumBits) (iCurBits>>(32-(iNumBits)))
 #define DUMP_BITS(iCurBits, pBufPtr, iLeftBits, iNumBits, iAllowedBytes, iReadBytes) { \
-	iCurBits <<= (iNumBits); \
-	iLeftBits += (iNumBits); \
-	NEED_BITS(iCurBits, pBufPtr, iLeftBits, iAllowedBytes, iReadBytes); \
+  iCurBits <<= (iNumBits); \
+  iLeftBits += (iNumBits); \
+  NEED_BITS(iCurBits, pBufPtr, iLeftBits, iAllowedBytes, iReadBytes); \
 }
 
 static inline int32_t BsGetBits (PBitStringAux pBs, int32_t iNumBits, uint32_t* pCode) {
@@ -84,12 +84,14 @@ static inline int32_t BsGetBits (PBitStringAux pBs, int32_t iNumBits, uint32_t* 
 }
 
 /*
- *	Exponential Golomb codes decoding routines
+ *  Exponential Golomb codes decoding routines
  */
 
 // for data sharing cross modules and try to reduce size of binary generated, 12/10/2009
 extern const uint8_t g_kuiIntra4x4CbpTable[48];
+extern const uint8_t g_kuiIntra4x4CbpTable400[16];
 extern const uint8_t g_kuiInterCbpTable[48];
+extern const uint8_t g_kuiInterCbpTable400[16];
 
 extern const uint8_t g_kuiLeadingZeroTable[256];
 
@@ -120,7 +122,7 @@ static inline uint32_t GetPrefixBits (uint32_t uiValue) {
 }
 
 /*
- *	Read one bit from bit stream followed
+ *  Read one bit from bit stream followed
  */
 static inline uint32_t BsGetOneBit (PBitStringAux pBs, uint32_t* pCode) {
   return (BsGetBits (pBs, 1, pCode));
@@ -177,13 +179,13 @@ static inline uint32_t BsGetUe (PBitStringAux pBs, uint32_t* pCode) {
     DUMP_BITS (pBs->uiCurBits, pBs->pCurBuf, pBs->iLeftBits, iLeadingZeroBits, iAllowedBytes, iReadBytes);
   }
 
-  *pCode = ((1 << iLeadingZeroBits) - 1 + iValue);
+  *pCode = ((1u << iLeadingZeroBits) - 1 + iValue);
   return ERR_NONE;
 }
 
 
 /*
- *	Read signed exp golomb codes
+ *  Read signed exp golomb codes
  */
 static inline int32_t BsGetSe (PBitStringAux pBs, int32_t* pCode) {
   uint32_t uiCodeNum;
@@ -214,7 +216,7 @@ static inline int32_t BsGetTe0 (PBitStringAux pBs, int32_t iRange, uint32_t* pCo
 }
 
 /*
- *	Get number of trailing bits
+ *  Get number of trailing bits
  */
 static inline int32_t BsGetTrailingBits (uint8_t* pBuf) {
 // TODO
@@ -230,6 +232,18 @@ static inline int32_t BsGetTrailingBits (uint8_t* pBuf) {
 
   return 0;
 }
+
+/*
+ *      Check whether there is more rbsp data for processing
+ */
+static inline bool CheckMoreRBSPData (PBitStringAux pBsAux) {
+  if ((pBsAux->iBits - ((pBsAux->pCurBuf - pBsAux->pStartBuf - 2) << 3) - pBsAux->iLeftBits) > 1) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 //define macros to check syntax elements
 #define WELS_CHECK_SE_BOTH_ERROR(val, lower_bound, upper_bound, syntax_name, ret_code) do {\
 if ((val < lower_bound) || (val > upper_bound)) {\
@@ -322,6 +336,9 @@ if (val > upper_bound) {\
 
 // From Level 5.2
 #define MAX_MB_SIZE 36864
+// for aspect_ratio_idc
+#define EXTENDED_SAR 255
+
 } // namespace WelsDec
 
 #endif//WELS_EXPONENTIAL_GOLOMB_ENTROPY_CODING_H__

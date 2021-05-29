@@ -44,6 +44,10 @@
 ;*********************************************************************************************/
 %include "asm_inc.asm"
 
+%ifdef __NASM_VER__
+    %use smartalign
+%endif
+
 ;***********************************************************************
 ; Macros and other preprocessor constants
 ;***********************************************************************
@@ -68,6 +72,8 @@ WELS_EXTERN WelsCopy16x16_sse2
     %assign  push_num 2
     LOAD_4_PARA
     PUSH_XMM 8
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
 
     lea r4, [r1+2*r1]   ;ebx, [eax+2*eax]   ; x3
     lea r5, [r3+2*r3]   ;edx, [ecx+2*ecx]   ; x3
@@ -132,6 +138,8 @@ WELS_EXTERN WelsCopy16x16NotAligned_sse2
     %assign  push_num 2
     LOAD_4_PARA
     PUSH_XMM 8
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
 
     lea r4, [r1+2*r1]   ;ebx, [eax+2*eax]   ; x3
     lea r5, [r3+2*r3]   ;edx, [ecx+2*ecx]   ; x3
@@ -196,6 +204,8 @@ WELS_EXTERN WelsCopy16x8NotAligned_sse2
     %assign  push_num 2
     LOAD_4_PARA
     PUSH_XMM 8
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
 
     lea r4, [r1+2*r1]   ;ebx, [eax+2*eax]   ; x3
     lea r5, [r3+2*r3]   ;edx, [ecx+2*ecx]   ; x3
@@ -235,6 +245,8 @@ WELS_EXTERN WelsCopy16x8NotAligned_sse2
 WELS_EXTERN WelsCopy8x16_mmx
     %assign  push_num 0
     LOAD_4_PARA
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
 
     movq mm0, [r2]
     movq mm1, [r2+r3]
@@ -300,6 +312,8 @@ WELS_EXTERN WelsCopy8x8_mmx
     push r4
     %assign  push_num 1
     LOAD_4_PARA
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
     lea r4, [r3+2*r3]   ;edx, [ebx+2*ebx]
 
     ; to prefetch next loop
@@ -492,56 +506,51 @@ ALIGN 4
     LOAD_7_PARA_POP
     ret
 
-;*******************************************************************************
-;  void McCopyWidthEq4_mmx( uint8_t *pSrc, int iSrcStride,
-;                          uint8_t *pDst, int iDstStride, int iHeight )
-;*******************************************************************************
-WELS_EXTERN McCopyWidthEq4_mmx
-    push    r5
-    %assign  push_num 1
-    LOAD_5_PARA
-
-    SIGN_EXTENSION  r1, r1d
-    SIGN_EXTENSION  r3, r3d
-    SIGN_EXTENSION  r4, r4d
-
-ALIGN 4
-.height_loop:
-    mov r5d, [r0]
-    mov [r2], r5d
-
-    add r0, r1
-    add r2, r3
-    dec r4
-    jnz .height_loop
-    WELSEMMS
-    LOAD_5_PARA_POP
-    pop    r5
-    ret
+; load_instr=%1 store_instr=%2 p_dst=%3 i_dststride=%4 p_src=%5 i_srcstride=%6 cnt=%7 r_tmp=%8,%9 mm_tmp=%10,%11
+%macro CopyStrided4N 11
+    lea             %8, [3 * %6]
+    lea             %9, [3 * %4]
+ALIGN 32
+%%loop:
+    %1              %10, [%5]
+    %1              %11, [%5 + %6]
+    %2              [%3], %10
+    %2              [%3 + %4], %11
+    %1              %10, [%5 + 2 * %6]
+    %1              %11, [%5 + %8]
+    %2              [%3 + 2 * %4], %10
+    %2              [%3 + %9], %11
+    lea             %5, [%5 + 4 * %6]
+    lea             %3, [%3 + 4 * %4]
+    sub             %7, 4
+    jg              %%loop
+%endmacro
 
 ;*******************************************************************************
 ;   void McCopyWidthEq8_mmx( uint8_t *pSrc, int iSrcStride,
-;                           uint8_t *pDst, int iDstStride, int iHeight )
+;                            uint8_t *pDst, int iDstStride, int iHeight )
 ;*******************************************************************************
 WELS_EXTERN McCopyWidthEq8_mmx
     %assign  push_num 0
+%ifdef X86_32
+    push            r5
+    push            r6
+    %assign  push_num 2
+%endif
     LOAD_5_PARA
 
     SIGN_EXTENSION  r1, r1d
     SIGN_EXTENSION  r3, r3d
     SIGN_EXTENSION  r4, r4d
 
-ALIGN 4
-.height_loop:
-    movq mm0, [r0]
-    movq [r2], mm0
-    add r0, r1
-    add r2, r3
-    dec r4
-    jnz .height_loop
+    CopyStrided4N   movq, movq, r2, r3, r0, r1, r4, r5, r6, mm0, mm1
 
     WELSEMMS
     LOAD_5_PARA_POP
+%ifdef X86_32
+    pop             r6
+    pop             r5
+%endif
     ret
 
 
@@ -578,4 +587,29 @@ ALIGN 4
     jnz     .height_loop
 
     LOAD_5_PARA_POP
+    ret
+
+
+;*******************************************************************************
+;   void McCopyWidthEq16_sse3( uint8_t *pSrc, int iSrcStride, uint8_t *pDst, int iDstStride, int iHeight )
+;*******************************************************************************
+WELS_EXTERN McCopyWidthEq16_sse3
+    %assign push_num 0
+%ifdef X86_32
+    push            r5
+    push            r6
+    %assign push_num 2
+%endif
+    LOAD_5_PARA
+    SIGN_EXTENSION  r1, r1d
+    SIGN_EXTENSION  r3, r3d
+    SIGN_EXTENSION  r4, r4d
+
+    CopyStrided4N   lddqu, MOVDQ, r2, r3, r0, r1, r4, r5, r6, xmm0, xmm1
+
+    LOAD_5_PARA_POP
+%ifdef X86_32
+    pop             r6
+    pop             r5
+%endif
     ret

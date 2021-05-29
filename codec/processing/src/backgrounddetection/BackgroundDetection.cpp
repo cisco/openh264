@@ -39,16 +39,16 @@ WELSVP_NAMESPACE_BEGIN
 #define BGD_OU_SIZE         (1<<LOG2_BGD_OU_SIZE)
 #define BGD_OU_SIZE_UV      (BGD_OU_SIZE>>1)
 #define BGD_THD_SAD         (2*BGD_OU_SIZE*BGD_OU_SIZE)
-#define	BGD_THD_ASD_UV      (4*BGD_OU_SIZE_UV)
+#define BGD_THD_ASD_UV      (4*BGD_OU_SIZE_UV)
 #define LOG2_MB_SIZE        (4)
 #define OU_SIZE_IN_MB       (BGD_OU_SIZE >> 4)
 #define Q_FACTOR            (8)
 #define BGD_DELTA_QP_THD    (3)
 
-#define OU_LEFT		(0x01)
-#define OU_RIGHT	(0x02)
-#define OU_TOP		(0x04)
-#define OU_BOTTOM	(0x08)
+#define OU_LEFT         (0x01)
+#define OU_RIGHT        (0x02)
+#define OU_TOP          (0x04)
+#define OU_BOTTOM       (0x08)
 
 CBackgroundDetection::CBackgroundDetection (int32_t iCpuFlag) {
   m_eMethod = METHOD_BACKGROUND_DETECTION;
@@ -107,16 +107,16 @@ EResult CBackgroundDetection::Set (int32_t iType, void* pParam) {
 }
 
 inline SBackgroundOU* CBackgroundDetection::AllocateOUArrayMemory (int32_t iWidth, int32_t iHeight) {
-  int32_t	iMaxOUWidth	= (BGD_OU_SIZE - 1 + iWidth) >> LOG2_BGD_OU_SIZE;
-  int32_t	iMaxOUHeight	= (BGD_OU_SIZE - 1 + iHeight) >> LOG2_BGD_OU_SIZE;
+  int32_t       iMaxOUWidth     = (BGD_OU_SIZE - 1 + iWidth) >> LOG2_BGD_OU_SIZE;
+  int32_t       iMaxOUHeight    = (BGD_OU_SIZE - 1 + iHeight) >> LOG2_BGD_OU_SIZE;
   return (SBackgroundOU*)WelsMalloc (iMaxOUWidth * iMaxOUHeight * sizeof (SBackgroundOU));
 }
 
 void CBackgroundDetection::GetOUParameters (SVAACalcResult* sVaaCalcInfo, int32_t iMbIndex, int32_t iMbWidth,
     SBackgroundOU* pBgdOU) {
-  int32_t	iSubSD[4];
-  uint8_t	iSubMAD[4];
-  int32_t	iSubSAD[4];
+  int32_t       iSubSD[4];
+  uint8_t       iSubMAD[4];
+  int32_t       iSubSAD[4];
 
   uint8_t (*pMad8x8)[4];
   int32_t (*pSad8x8)[4];
@@ -141,9 +141,9 @@ void CBackgroundDetection::GetOUParameters (SVAACalcResult* sVaaCalcInfo, int32_
   iSubMAD[2] = pMad8x8[iMbIndex][2];
   iSubMAD[3] = pMad8x8[iMbIndex][3];
 
-  pBgdOU->iSD	= iSubSD[0] + iSubSD[1] + iSubSD[2] + iSubSD[3];
-  pBgdOU->iSAD	= iSubSAD[0] + iSubSAD[1] + iSubSAD[2] + iSubSAD[3];
-  pBgdOU->iSD	= WELS_ABS (pBgdOU->iSD);
+  pBgdOU->iSD   = iSubSD[0] + iSubSD[1] + iSubSD[2] + iSubSD[3];
+  pBgdOU->iSAD  = iSubSAD[0] + iSubSAD[1] + iSubSAD[2] + iSubSAD[3];
+  pBgdOU->iSD   = WELS_ABS (pBgdOU->iSD);
 
   // get the max absolute difference (MAD) of OU and min value of the MAD of sub-blocks of OU
   pBgdOU->iMAD = WELS_MAX (WELS_MAX (iSubMAD[0], iSubMAD[1]), WELS_MAX (iSubMAD[2], iSubMAD[3]));
@@ -155,9 +155,9 @@ void CBackgroundDetection::GetOUParameters (SVAACalcResult* sVaaCalcInfo, int32_
 }
 
 void CBackgroundDetection::ForegroundBackgroundDivision (vBGDParam* pBgdParam) {
-  int32_t iPicWidthInOU	= pBgdParam->iBgdWidth  >> LOG2_BGD_OU_SIZE;
-  int32_t iPicHeightInOU	= pBgdParam->iBgdHeight >> LOG2_BGD_OU_SIZE;
-  int32_t iPicWidthInMb	= (15 + pBgdParam->iBgdWidth) >> 4;
+  int32_t iPicWidthInOU         = pBgdParam->iBgdWidth  >> LOG2_BGD_OU_SIZE;
+  int32_t iPicHeightInOU        = pBgdParam->iBgdHeight >> LOG2_BGD_OU_SIZE;
+  int32_t iPicWidthInMb         = (15 + pBgdParam->iBgdWidth) >> 4;
 
   SBackgroundOU* pBackgroundOU = pBgdParam->pOU_array;
 
@@ -187,8 +187,8 @@ void CBackgroundDetection::ForegroundBackgroundDivision (vBGDParam* pBgdParam) {
   }
 }
 inline int32_t CBackgroundDetection::CalculateAsdChromaEdge (uint8_t* pOriRef, uint8_t* pOriCur, int32_t iStride) {
-  int32_t	ASD = 0;
-  int32_t	idx;
+  int32_t ASD = 0;
+  int32_t idx;
   for (idx = 0; idx < BGD_OU_SIZE_UV; idx++) {
     ASD += *pOriCur - *pOriRef;
     pOriRef += iStride;
@@ -199,16 +199,16 @@ inline int32_t CBackgroundDetection::CalculateAsdChromaEdge (uint8_t* pOriRef, u
 
 inline bool CBackgroundDetection::ForegroundDilation23Luma (SBackgroundOU* pBackgroundOU,
     SBackgroundOU* pOUNeighbours[]) {
-  SBackgroundOU* pOU_L	= pOUNeighbours[0];
-  SBackgroundOU* pOU_R	= pOUNeighbours[1];
-  SBackgroundOU* pOU_U	= pOUNeighbours[2];
-  SBackgroundOU* pOU_D	= pOUNeighbours[3];
+  SBackgroundOU* pOU_L = pOUNeighbours[0];
+  SBackgroundOU* pOU_R = pOUNeighbours[1];
+  SBackgroundOU* pOU_U = pOUNeighbours[2];
+  SBackgroundOU* pOU_D = pOUNeighbours[3];
 
   if (pBackgroundOU->iMAD > pBackgroundOU->iMinSubMad << 1) {
     int32_t iMaxNbrForegroundMad;
     int32_t iMaxNbrBackgroundMad;
-    int32_t	aBackgroundMad[4];
-    int32_t	aForegroundMad[4];
+    int32_t aBackgroundMad[4];
+    int32_t aForegroundMad[4];
 
     aForegroundMad[0] = (pOU_L->iBackgroundFlag - 1) & pOU_L->iMAD;
     aForegroundMad[1] = (pOU_R->iBackgroundFlag - 1) & pOU_R->iMAD;
@@ -232,9 +232,9 @@ inline bool CBackgroundDetection::ForegroundDilation23Luma (SBackgroundOU* pBack
 
 inline bool CBackgroundDetection::ForegroundDilation23Chroma (int8_t iNeighbourForegroundFlags,
     int32_t iStartSamplePos, int32_t iPicStrideUV, vBGDParam* pBgdParam) {
-  static const int8_t kaOUPos[4]	= {OU_LEFT, OU_RIGHT, OU_TOP, OU_BOTTOM};
-  int32_t	aEdgeOffset[4]	= {0, BGD_OU_SIZE_UV - 1, 0, iPicStrideUV* (BGD_OU_SIZE_UV - 1)};
-  int32_t	iStride[4]		= {iPicStrideUV, iPicStrideUV, 1, 1};
+  static const int8_t kaOUPos[4]        = {OU_LEFT, OU_RIGHT, OU_TOP, OU_BOTTOM};
+  int32_t       aEdgeOffset[4]          = {0, BGD_OU_SIZE_UV - 1, 0, iPicStrideUV* (BGD_OU_SIZE_UV - 1)};
+  int32_t       iStride[4]              = {iPicStrideUV, iPicStrideUV, 1, 1};
 
   // V component first, high probability because V stands for red color and human skin colors have more weight on this component
   for (int32_t i = 0; i < 4; i++) {
@@ -261,9 +261,9 @@ inline bool CBackgroundDetection::ForegroundDilation23Chroma (int8_t iNeighbourF
 }
 
 inline void CBackgroundDetection::ForegroundDilation (SBackgroundOU* pBackgroundOU, SBackgroundOU* pOUNeighbours[],
-    vBGDParam* pBgdParam, int32_t	iChromaSampleStartPos) {
-  int32_t iPicStrideUV	= pBgdParam->iStride[1];
-  int32_t iSumNeighBackgroundFlags	= pOUNeighbours[0]->iBackgroundFlag + pOUNeighbours[1]->iBackgroundFlag +
+    vBGDParam* pBgdParam, int32_t iChromaSampleStartPos) {
+  int32_t iPicStrideUV = pBgdParam->iStride[1];
+  int32_t iSumNeighBackgroundFlags = pOUNeighbours[0]->iBackgroundFlag + pOUNeighbours[1]->iBackgroundFlag +
                                       pOUNeighbours[2]->iBackgroundFlag + pOUNeighbours[3]->iBackgroundFlag;
 
   if (pBackgroundOU->iSAD > BGD_OU_SIZE * Q_FACTOR) {
@@ -278,7 +278,7 @@ inline void CBackgroundDetection::ForegroundDilation (SBackgroundOU* pBackground
 
       // chroma component check
       if (pBackgroundOU->iBackgroundFlag == 1) {
-        int8_t	iNeighbourForegroundFlags = !pOUNeighbours[0]->iBackgroundFlag | ((!pOUNeighbours[1]->iBackgroundFlag) << 1)
+        int8_t iNeighbourForegroundFlags = (!pOUNeighbours[0]->iBackgroundFlag) | ((!pOUNeighbours[1]->iBackgroundFlag) << 1)
                                             | ((!pOUNeighbours[2]->iBackgroundFlag) << 2) | ((!pOUNeighbours[3]->iBackgroundFlag) << 3);
         pBackgroundOU->iBackgroundFlag = !ForegroundDilation23Chroma (iNeighbourForegroundFlags, iChromaSampleStartPos,
                                          iPicStrideUV, pBgdParam);
@@ -291,9 +291,9 @@ inline void CBackgroundDetection::ForegroundDilation (SBackgroundOU* pBackground
 }
 inline void CBackgroundDetection::BackgroundErosion (SBackgroundOU* pBackgroundOU, SBackgroundOU* pOUNeighbours[]) {
   if (pBackgroundOU->iMaxDiffSubSd <= (BGD_OU_SIZE * Q_FACTOR)) { //BGD_OU_SIZE*BGD_OU_SIZE>>2
-    int32_t	iSumNeighBackgroundFlags = pOUNeighbours[0]->iBackgroundFlag + pOUNeighbours[1]->iBackgroundFlag +
+    int32_t iSumNeighBackgroundFlags = pOUNeighbours[0]->iBackgroundFlag + pOUNeighbours[1]->iBackgroundFlag +
                                        pOUNeighbours[2]->iBackgroundFlag + pOUNeighbours[3]->iBackgroundFlag;
-    int32_t	sumNbrBGsad = (pOUNeighbours[0]->iSAD & (-pOUNeighbours[0]->iBackgroundFlag)) + (pOUNeighbours[2]->iSAD &
+    int32_t sumNbrBGsad = (pOUNeighbours[0]->iSAD & (-pOUNeighbours[0]->iBackgroundFlag)) + (pOUNeighbours[2]->iSAD &
                           (-pOUNeighbours[2]->iBackgroundFlag))
                           + (pOUNeighbours[1]->iSAD & (-pOUNeighbours[1]->iBackgroundFlag)) + (pOUNeighbours[3]->iSAD &
                               (-pOUNeighbours[3]->iBackgroundFlag));
@@ -318,10 +318,10 @@ inline void CBackgroundDetection::SetBackgroundMbFlag (int8_t* pBackgroundMbFlag
 inline void CBackgroundDetection::UpperOUForegroundCheck (SBackgroundOU* pCurOU, int8_t* pBackgroundMbFlag,
     int32_t iPicWidthInOU, int32_t iPicWidthInMb) {
   if (pCurOU->iSAD > BGD_OU_SIZE * Q_FACTOR) {
-    SBackgroundOU*	pOU_L = pCurOU - 1;
-    SBackgroundOU*	pOU_R = pCurOU + 1;
-    SBackgroundOU*	pOU_U = pCurOU - iPicWidthInOU;
-    SBackgroundOU*	pOU_D = pCurOU + iPicWidthInOU;
+    SBackgroundOU* pOU_L = pCurOU - 1;
+    SBackgroundOU* pOU_R = pCurOU + 1;
+    SBackgroundOU* pOU_U = pCurOU - iPicWidthInOU;
+    SBackgroundOU* pOU_D = pCurOU + iPicWidthInOU;
     if (pOU_L->iBackgroundFlag + pOU_R->iBackgroundFlag + pOU_U->iBackgroundFlag + pOU_D->iBackgroundFlag <= 1) {
       SetBackgroundMbFlag (pBackgroundMbFlag, iPicWidthInMb, 0);
       pCurOU->iBackgroundFlag = 0;
@@ -330,21 +330,21 @@ inline void CBackgroundDetection::UpperOUForegroundCheck (SBackgroundOU* pCurOU,
 }
 
 void CBackgroundDetection::ForegroundDilationAndBackgroundErosion (vBGDParam* pBgdParam) {
-  int32_t iPicStrideUV		= pBgdParam->iStride[1];
-  int32_t iPicWidthInOU	= pBgdParam->iBgdWidth  >> LOG2_BGD_OU_SIZE;
-  int32_t iPicHeightInOU	= pBgdParam->iBgdHeight >> LOG2_BGD_OU_SIZE;
-  int32_t iOUStrideUV		= iPicStrideUV << (LOG2_BGD_OU_SIZE - 1);
-  int32_t iPicWidthInMb	= (15 + pBgdParam->iBgdWidth) >> 4;
+  int32_t iPicStrideUV          = pBgdParam->iStride[1];
+  int32_t iPicWidthInOU         = pBgdParam->iBgdWidth  >> LOG2_BGD_OU_SIZE;
+  int32_t iPicHeightInOU        = pBgdParam->iBgdHeight >> LOG2_BGD_OU_SIZE;
+  int32_t iOUStrideUV           = iPicStrideUV << (LOG2_BGD_OU_SIZE - 1);
+  int32_t iPicWidthInMb         = (15 + pBgdParam->iBgdWidth) >> 4;
 
   SBackgroundOU* pBackgroundOU = pBgdParam->pOU_array;
-  int8_t*	pVaaBackgroundMbFlag   = (int8_t*)pBgdParam->pBackgroundMbFlag;
-  SBackgroundOU*	pOUNeighbours[4];//0: left; 1: right; 2: top; 3: bottom
+  int8_t*        pVaaBackgroundMbFlag = (int8_t*)pBgdParam->pBackgroundMbFlag;
+  SBackgroundOU* pOUNeighbours[4];//0: left; 1: right; 2: top; 3: bottom
 
-  pOUNeighbours[2]	= pBackgroundOU;//top OU
+  pOUNeighbours[2]      = pBackgroundOU;//top OU
   for (int32_t j = 0; j < iPicHeightInOU; j ++) {
     int8_t* pRowSkipFlag = pVaaBackgroundMbFlag;
-    pOUNeighbours[0]	= pBackgroundOU;//left OU
-    pOUNeighbours[3]	= pBackgroundOU + (iPicWidthInOU & ((j == iPicHeightInOU - 1) - 1)); //bottom OU
+    pOUNeighbours[0]    = pBackgroundOU;//left OU
+    pOUNeighbours[3]    = pBackgroundOU + (iPicWidthInOU & ((j == iPicHeightInOU - 1) - 1)); //bottom OU
     for (int32_t i = 0; i < iPicWidthInOU; i++) {
       pOUNeighbours[1] = pBackgroundOU + (i < iPicWidthInOU - 1); //right OU
 
@@ -367,7 +367,7 @@ void CBackgroundDetection::ForegroundDilationAndBackgroundErosion (vBGDParam* pB
       pOUNeighbours[3]++;
       pBackgroundOU++;
     }
-    pOUNeighbours[2]	= pBackgroundOU - iPicWidthInOU;
+    pOUNeighbours[2]      = pBackgroundOU - iPicWidthInOU;
     pVaaBackgroundMbFlag += OU_SIZE_IN_MB * iPicWidthInMb;
   }
 }

@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	au_set.c
+ * \file    au_set.c
  *
- * \brief	Interfaces introduced in Access Unit level based writer
+ * \brief   Interfaces introduced in Access Unit level based writer
  *
- * \date	05/18/2009 Created
+ * \date    05/18/2009 Created
  *
  *************************************************************************************
  */
@@ -65,7 +65,7 @@ static inline int32_t WelsCheckLevelLimitation (const SWelsSPS* kpSps, const SLe
     return 0;
   if (kpLevelLimit->uiMaxDPBMbs < uiNumRefFrames * uiPicInMBs)
     return 0;
-  if (iTargetBitRate
+  if ((iTargetBitRate != UNSPECIFIED_BIT_RATE)
       && ((int32_t) kpLevelLimit->uiMaxBR  * 1200) < iTargetBitRate)    //RC enabled, considering bitrate constraint
     return 0;
   //add more checks here if needed in future
@@ -73,80 +73,215 @@ static inline int32_t WelsCheckLevelLimitation (const SWelsSPS* kpSps, const SLe
   return 1;
 
 }
-int32_t WelsAdjustLevel (SSpatialLayerConfig* pSpatialLayer) {
-  int32_t iLevel = (int32_t)pSpatialLayer->uiLevelIdc;
+int32_t WelsAdjustLevel (SSpatialLayerConfig* pSpatialLayer, const SLevelLimits* pCurLevel) {
   int32_t iMaxBitrate = pSpatialLayer->iMaxSpatialBitrate;
-  while (iLevel <= LEVEL_5_2) {
-    int32_t iLevelMaxBitrate = g_ksLevelLimits[pSpatialLayer->uiLevelIdc - 1].uiMaxBR * CpbBrNalFactor;
-    if (iMaxBitrate < iLevelMaxBitrate) {
-      pSpatialLayer->uiLevelIdc = (ELevelIdc)iLevel;
+  do {
+    if (iMaxBitrate <= (int32_t) (pCurLevel->uiMaxBR * CpbBrNalFactor)) {
+      pSpatialLayer->uiLevelIdc = pCurLevel->uiLevelIdc;
       return 0;
     }
-    iLevel++;
-  }
+    pCurLevel++;
+  } while (pCurLevel->uiLevelIdc != LEVEL_5_2);
   return 1;
 }
-int32_t WelsCheckRefFrameLimitation (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam) {
+
+static int32_t WelsCheckNumRefSetting (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam, bool bStrictCheck) {
+  // validate LTR num
+  int32_t iCurrentSupportedLtrNum = (pParam->iUsageType == CAMERA_VIDEO_REAL_TIME) ? LONG_TERM_REF_NUM :
+                                    LONG_TERM_REF_NUM_SCREEN;
+  if ((pParam->bEnableLongTermReference) && (iCurrentSupportedLtrNum != pParam->iLTRRefNum)) {
+    WelsLog (pLogCtx, WELS_LOG_WARNING, "iLTRRefNum(%d) does not equal to currently supported %d, will be reset",
+             pParam->iLTRRefNum, iCurrentSupportedLtrNum);
+    pParam->iLTRRefNum = iCurrentSupportedLtrNum;
+  } else if (!pParam->bEnableLongTermReference) {
+    pParam->iLTRRefNum = 0;
+  }
+
+  //TODO: here is a fix needed here, the most reasonable value should be:
+  //        iCurrentStrNum = WELS_MAX (1, WELS_LOG2 (pParam->uiGopSize));
+  //      but reference list updating need to be changed
+  int32_t iCurrentStrNum = ((pParam->iUsageType == SCREEN_CONTENT_REAL_TIME && pParam->bEnableLongTermReference)
+                            ? (WELS_MAX (1, WELS_LOG2 (pParam->uiGopSize)))
+                            : (WELS_MAX (1, (pParam->uiGopSize >> 1))));
+  int32_t iNeededRefNum = (pParam->uiIntraPeriod != 1) ? (iCurrentStrNum + pParam->iLTRRefNum) : 0;
+
+  iNeededRefNum = WELS_CLIP3 (iNeededRefNum,
+                              MIN_REF_PIC_COUNT,
+                              (pParam->iUsageType == CAMERA_VIDEO_REAL_TIME) ? MAX_REFERENCE_PICTURE_COUNT_NUM_CAMERA :
+                              MAX_REFERENCE_PICTURE_COUNT_NUM_SCREEN);
+  // to adjust default or invalid input, in case pParam->iNumRefFrame do not have a valid value for the next step
+  if (pParam->iNumRefFrame == AUTO_REF_PIC_COUNT) {
+    pParam->iNumRefFrame = iNeededRefNum;
+  } else if (pParam->iNumRefFrame < iNeededRefNum) {
+    WelsLog (pLogCtx, WELS_LOG_WARNING,
+             "iNumRefFrame(%d) setting does not support the temporal and LTR setting, will be reset to %d",
+             pParam->iNumRefFrame, iNeededRefNum);
+    if (bStrictCheck) {
+      return ENC_RETURN_UNSUPPORTED_PARA;
+    }
+    pParam->iNumRefFrame = iNeededRefNum;
+  }
+
+  // after adjustment, do the following:
+  // if the setting is larger than needed, we will use the needed, and write the max into sps and for memory to wait for further expanding
+  if (pParam->iMaxNumRefFrame < pParam->iNumRefFrame) {
+    pParam->iMaxNumRefFrame = pParam->iNumRefFrame;
+  }
+  pParam->iNumRefFrame = iNeededRefNum;
+
+  return ENC_RETURN_SUCCESS;
+}
+
+int32_t WelsCheckRefFrameLimitationNumRefFirst (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam) {
+
+  if (WelsCheckNumRefSetting (pLogCtx, pParam, true)) {
+    // we take num-ref as the honored setting but it conflicts with temporal and LTR
+    return ENC_RETURN_UNSUPPORTED_PARA;
+  }
+  return ENC_RETURN_SUCCESS;
+}
+int32_t WelsCheckRefFrameLimitationLevelIdcFirst (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam) {
+  if ((pParam->iNumRefFrame == AUTO_REF_PIC_COUNT) || (pParam->iMaxNumRefFrame == AUTO_REF_PIC_COUNT)) {
+    //no need to do the checking
+    return ENC_RETURN_SUCCESS;
+  }
+
+  WelsCheckNumRefSetting (pLogCtx, pParam, false);
+
   int32_t i = 0;
-  int32_t iRefFrame = 1;
+  int32_t iRefFrame;
   //get the number of reference frame according to level limitation.
   for (i = 0; i < pParam->iSpatialLayerNum; ++ i) {
     SSpatialLayerConfig* pSpatialLayer = &pParam->sSpatialLayers[i];
-    uint32_t uiPicInMBs = ((pSpatialLayer->iVideoHeight + 15) >> 4) * ((pSpatialLayer->iVideoWidth + 15) >> 4);
     if (pSpatialLayer->uiLevelIdc == LEVEL_UNKNOWN) {
-      pSpatialLayer->uiLevelIdc = LEVEL_5_0;
-      WelsLog (pLogCtx, WELS_LOG_WARNING, "change level to level5.0");
+      continue;
     }
+
+    uint32_t uiPicInMBs = ((pSpatialLayer->iVideoHeight + 15) >> 4) * ((pSpatialLayer->iVideoWidth + 15) >> 4);
     iRefFrame = g_ksLevelLimits[pSpatialLayer->uiLevelIdc - 1].uiMaxDPBMbs / uiPicInMBs;
-    if (iRefFrame < pParam->iMaxNumRefFrame)
+
+    //check iMaxNumRefFrame
+    if (iRefFrame < pParam->iMaxNumRefFrame) {
+      WelsLog (pLogCtx, WELS_LOG_WARNING, "iMaxNumRefFrame(%d) adjusted to %d because of limitation from uiLevelIdc=%d",
+               pParam->iMaxNumRefFrame, iRefFrame, pSpatialLayer->uiLevelIdc);
       pParam->iMaxNumRefFrame = iRefFrame;
-    if (pParam->iMaxNumRefFrame < 1) {
-      pParam->iMaxNumRefFrame = 1;
-      WelsLog (pLogCtx, WELS_LOG_ERROR, "error Level setting (%d)", pSpatialLayer->uiLevelIdc);
-      return ENC_RETURN_UNSUPPORTED_PARA;
+
+      //check iNumRefFrame
+      if (iRefFrame < pParam->iNumRefFrame) {
+        WelsLog (pLogCtx, WELS_LOG_WARNING, "iNumRefFrame(%d) adjusted to %d because of limitation from uiLevelIdc=%d",
+                 pParam->iNumRefFrame, iRefFrame, pSpatialLayer->uiLevelIdc);
+        pParam->iNumRefFrame = iRefFrame;
+      }
+    } else {
+      //because it is level first now, so adjust max-ref
+      WelsLog (pLogCtx, WELS_LOG_INFO,
+               "iMaxNumRefFrame(%d) adjusted to %d because of uiLevelIdc=%d -- under level-idc first strategy ",
+               pParam->iMaxNumRefFrame, iRefFrame, pSpatialLayer->uiLevelIdc);
+      pParam->iMaxNumRefFrame = iRefFrame;
     }
   }
 
   return ENC_RETURN_SUCCESS;
 }
-static inline int32_t WelsGetLevelIdc (const SWelsSPS* kpSps, float fFrameRate, int32_t iTargetBitRate) {
+
+static inline ELevelIdc WelsGetLevelIdc (const SWelsSPS* kpSps, float fFrameRate, int32_t iTargetBitRate) {
   int32_t iOrder;
   for (iOrder = 0; iOrder < LEVEL_NUMBER; iOrder++) {
     if (WelsCheckLevelLimitation (kpSps, & (g_ksLevelLimits[iOrder]), fFrameRate, iTargetBitRate)) {
-      return (int32_t) (g_ksLevelLimits[iOrder].uiLevelIdc);
+      return (g_ksLevelLimits[iOrder].uiLevelIdc);
     }
   }
-  return 51; //final decision: select the biggest level
+  return LEVEL_5_1; //final decision: select the biggest level
 }
 
+int32_t WelsWriteVUI (SWelsSPS* pSps, SBitStringAux* pBitStringAux) {
+  SBitStringAux* pLocalBitStringAux = pBitStringAux;
+  assert (pSps != NULL && pBitStringAux != NULL);
+
+  BsWriteOneBit (pLocalBitStringAux, pSps->bAspectRatioPresent); //aspect_ratio_info_present_flag
+  if (pSps->bAspectRatioPresent) {
+    BsWriteBits (pLocalBitStringAux, 8, pSps->eAspectRatio); // aspect_ratio_idc
+    if (pSps->eAspectRatio == ASP_EXT_SAR) {
+      BsWriteBits (pLocalBitStringAux, 16, pSps->sAspectRatioExtWidth); // sar_width
+      BsWriteBits (pLocalBitStringAux, 16, pSps->sAspectRatioExtHeight); // sar_height
+    }
+  }
+  BsWriteOneBit (pLocalBitStringAux, false); //overscan_info_present_flag
+
+  // See codec_app_def.h and parameter_sets.h for more info about members bVideoSignalTypePresent through uiColorMatrix.
+  BsWriteOneBit (pLocalBitStringAux, pSps->bVideoSignalTypePresent); //video_signal_type_present_flag
+  if (pSps->bVideoSignalTypePresent) {
+    //write video signal type info to header
+
+    BsWriteBits (pLocalBitStringAux, 3, pSps->uiVideoFormat);
+    BsWriteOneBit (pLocalBitStringAux, pSps->bFullRange);
+    BsWriteOneBit (pLocalBitStringAux, pSps->bColorDescriptionPresent);
+
+    if (pSps->bColorDescriptionPresent) {
+      //write color description info to header
+
+      BsWriteBits (pLocalBitStringAux, 8, pSps->uiColorPrimaries);
+      BsWriteBits (pLocalBitStringAux, 8, pSps->uiTransferCharacteristics);
+      BsWriteBits (pLocalBitStringAux, 8, pSps->uiColorMatrix);
+
+    }//write color description info to header
+
+  }//write video signal type info to header
+
+  BsWriteOneBit (pLocalBitStringAux, false); //chroma_loc_info_present_flag
+  BsWriteOneBit (pLocalBitStringAux, false); //timing_info_present_flag
+  BsWriteOneBit (pLocalBitStringAux, false); //nal_hrd_parameters_present_flag
+  BsWriteOneBit (pLocalBitStringAux, false); //vcl_hrd_parameters_present_flag
+  BsWriteOneBit (pLocalBitStringAux, false); //pic_struct_present_flag
+  BsWriteOneBit (pLocalBitStringAux, true); //bitstream_restriction_flag
+
+  //
+  BsWriteOneBit (pLocalBitStringAux, true); //motion_vectors_over_pic_boundaries_flag
+  BsWriteUE (pLocalBitStringAux, 0); //max_bytes_per_pic_denom
+  BsWriteUE (pLocalBitStringAux, 0); //max_bits_per_mb_denom
+  BsWriteUE (pLocalBitStringAux, 16); //log2_max_mv_length_horizontal
+  BsWriteUE (pLocalBitStringAux, 16); //log2_max_mv_length_vertical
+
+  BsWriteUE (pLocalBitStringAux, 0); //max_num_reorder_frames
+  BsWriteUE (pLocalBitStringAux, pSps->iNumRefFrames); //max_dec_frame_buffering
+
+  return 0;
+}
 
 /*!
  *************************************************************************************
- * \brief	to set Sequence Parameter Set (SPS)
+ * \brief   to set Sequence Parameter Set (SPS)
  *
- * \param 	pSps 	SWelsSPS to be wrote, update iSpsId dependency
- * \param	pBitStringAux		bitstream writer auxiliary
+ * \param   pSps            SWelsSPS to be wrote, update iSpsId dependency
+ * \param   pBitStringAux   bitstream writer auxiliary
  *
- * \return	0 - successed
- *	    	1 - failed
+ * \return  0 - successed
+ *          1 - failed
  *
- * \note	Call it in case EWelsNalUnitType is SPS.
+ * \note    Call it in case EWelsNalUnitType is SPS.
  *************************************************************************************
  */
-int32_t WelsWriteSpsSyntax (SWelsSPS* pSps, SBitStringAux* pBitStringAux, int32_t* pSpsIdDelta) {
+int32_t WelsWriteSpsSyntax (SWelsSPS* pSps, SBitStringAux* pBitStringAux, int32_t* pSpsIdDelta, bool bBaseLayer) {
   SBitStringAux* pLocalBitStringAux = pBitStringAux;
 
   assert (pSps != NULL && pBitStringAux != NULL);
 
   BsWriteBits (pLocalBitStringAux, 8, pSps->uiProfileIdc);
 
-  BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet0Flag);	// bConstraintSet0Flag
-  BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet1Flag);	// bConstraintSet1Flag
-  BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet2Flag);	// bConstraintSet2Flag
-  BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet3Flag);	// bConstraintSet3Flag
-  BsWriteBits (pLocalBitStringAux, 4, 0);							// reserved_zero_4bits, equal to 0
-  BsWriteBits (pLocalBitStringAux, 8, pSps->iLevelIdc);				// iLevelIdc
-  BsWriteUE (pLocalBitStringAux, pSps->uiSpsId + pSpsIdDelta[pSps->uiSpsId]);					     // seq_parameter_set_id
+  BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet0Flag);        // bConstraintSet0Flag
+  BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet1Flag);        // bConstraintSet1Flag
+  BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet2Flag);        // bConstraintSet2Flag
+  BsWriteOneBit (pLocalBitStringAux, pSps->bConstraintSet3Flag);        // bConstraintSet3Flag
+  if (PRO_HIGH == pSps->uiProfileIdc || PRO_EXTENDED == pSps->uiProfileIdc ||
+      PRO_MAIN == pSps->uiProfileIdc) {
+    BsWriteOneBit (pLocalBitStringAux, 1);        // bConstraintSet4Flag: If profile_idc is equal to 77, 88, or 100, constraint_set4_flag equal to 1 indicates that the value of frame_mbs_only_flag is equal to 1. constraint_set4_flag equal to 0 indicates that the value of frame_mbs_only_flag may or may not be equal to 1.
+    BsWriteOneBit (pLocalBitStringAux, 1);        // bConstraintSet5Flag: If profile_idc is equal to 77, 88, or 100, constraint_set5_flag equal to 1 indicates that B slice types are not present in the coded video sequence. constraint_set5_flag equal to 0 indicates that B slice types may or may not be present in the coded video sequence.
+    BsWriteBits (pLocalBitStringAux, 2, 0);                               // reserved_zero_2bits, equal to 0
+  } else {
+    BsWriteBits (pLocalBitStringAux, 4, 0);                               // reserved_zero_4bits, equal to 0
+  }
+  BsWriteBits (pLocalBitStringAux, 8, pSps->iLevelIdc);                 // iLevelIdc
+  BsWriteUE (pLocalBitStringAux, pSps->uiSpsId + pSpsIdDelta[pSps->uiSpsId]);        // seq_parameter_set_id
 
   if (PRO_SCALABLE_BASELINE == pSps->uiProfileIdc || PRO_SCALABLE_HIGH == pSps->uiProfileIdc ||
       PRO_HIGH == pSps->uiProfileIdc || PRO_HIGH10 == pSps->uiProfileIdc ||
@@ -159,33 +294,36 @@ int32_t WelsWriteSpsSyntax (SWelsSPS* pSps, SBitStringAux* pBitStringAux, int32_
     BsWriteOneBit (pLocalBitStringAux, 0); //seq_scaling_matrix_present_flag
   }
 
-  BsWriteUE (pLocalBitStringAux, pSps->uiLog2MaxFrameNum - 4);	// log2_max_frame_num_minus4
-  BsWriteUE (pLocalBitStringAux, 0/*pSps->uiPocType*/);		     // pic_order_cnt_type
-  BsWriteUE (pLocalBitStringAux, pSps->iLog2MaxPocLsb - 4);	// log2_max_pic_order_cnt_lsb_minus4
+  BsWriteUE (pLocalBitStringAux, pSps->uiLog2MaxFrameNum - 4);  // log2_max_frame_num_minus4
+  BsWriteUE (pLocalBitStringAux, 0/*pSps->uiPocType*/);         // pic_order_cnt_type
+  BsWriteUE (pLocalBitStringAux, pSps->iLog2MaxPocLsb - 4);     // log2_max_pic_order_cnt_lsb_minus4
 
-  BsWriteUE (pLocalBitStringAux, pSps->iNumRefFrames);		// max_num_ref_frames
-  BsWriteOneBit (pLocalBitStringAux, true/*pSps->bGapsInFrameNumValueAllowedFlag*/);	// bGapsInFrameNumValueAllowedFlag
-  BsWriteUE (pLocalBitStringAux, pSps->iMbWidth - 1);		// pic_width_in_mbs_minus1
-  BsWriteUE (pLocalBitStringAux, pSps->iMbHeight - 1);		// pic_height_in_map_units_minus1
-  BsWriteOneBit (pLocalBitStringAux, true/*pSps->bFrameMbsOnlyFlag*/);	// bFrameMbsOnlyFlag
+  BsWriteUE (pLocalBitStringAux, pSps->iNumRefFrames);          // max_num_ref_frames
+  BsWriteOneBit (pLocalBitStringAux, pSps->bGapsInFrameNumValueAllowedFlag); //gaps_in_frame_numvalue_allowed_flag
+  BsWriteUE (pLocalBitStringAux, pSps->iMbWidth - 1);           // pic_width_in_mbs_minus1
+  BsWriteUE (pLocalBitStringAux, pSps->iMbHeight - 1);          // pic_height_in_map_units_minus1
+  BsWriteOneBit (pLocalBitStringAux, true/*pSps->bFrameMbsOnlyFlag*/);  // bFrameMbsOnlyFlag
 
-  BsWriteOneBit (pLocalBitStringAux, 0/*pSps->bDirect8x8InferenceFlag*/);	// direct_8x8_inference_flag
-  BsWriteOneBit (pLocalBitStringAux, pSps->bFrameCroppingFlag);	// bFrameCroppingFlag
+  BsWriteOneBit (pLocalBitStringAux, 0/*pSps->bDirect8x8InferenceFlag*/);       // direct_8x8_inference_flag
+  BsWriteOneBit (pLocalBitStringAux, pSps->bFrameCroppingFlag); // bFrameCroppingFlag
   if (pSps->bFrameCroppingFlag) {
-    BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropLeft);	// frame_crop_left_offset
-    BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropRight);	// frame_crop_right_offset
-    BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropTop);	// frame_crop_top_offset
-    BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropBottom);	// frame_crop_bottom_offset
+    BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropLeft);         // frame_crop_left_offset
+    BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropRight);        // frame_crop_right_offset
+    BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropTop);          // frame_crop_top_offset
+    BsWriteUE (pLocalBitStringAux, pSps->sFrameCrop.iCropBottom);       // frame_crop_bottom_offset
   }
-
-  BsWriteOneBit (pLocalBitStringAux, 0/*pSps->bVuiParamPresentFlag*/);	// vui_parameters_present_flag
-
+  if (bBaseLayer) {
+    BsWriteOneBit (pLocalBitStringAux, true);   // vui_parameters_present_flag
+    WelsWriteVUI (pSps, pBitStringAux);
+  } else {
+    BsWriteOneBit (pLocalBitStringAux, false);
+  }
   return 0;
 }
 
 
 int32_t WelsWriteSpsNal (SWelsSPS* pSps, SBitStringAux* pBitStringAux, int32_t* pSpsIdDelta) {
-  WelsWriteSpsSyntax (pSps, pBitStringAux, pSpsIdDelta);
+  WelsWriteSpsSyntax (pSps, pBitStringAux, pSpsIdDelta, true);
 
   BsRbspTrailingBits (pBitStringAux);
 
@@ -194,22 +332,22 @@ int32_t WelsWriteSpsNal (SWelsSPS* pSps, SBitStringAux* pBitStringAux, int32_t* 
 
 /*!
  *************************************************************************************
- * \brief	to write SubSet Sequence Parameter Set
+ * \brief   to write SubSet Sequence Parameter Set
  *
- * \param 	sub_sps		subset pSps parsed
- * \param	pBitStringAux		bitstream writer auxiliary
+ * \param   sub_sps         subset pSps parsed
+ * \param   pBitStringAux   bitstream writer auxiliary
  *
- * \return	0 - successed
- *		    1 - failed
+ * \return  0 - successed
+ *          1 - failed
  *
- * \note	Call it in case EWelsNalUnitType is SubSet SPS.
+ * \note    Call it in case EWelsNalUnitType is SubSet SPS.
  *************************************************************************************
  */
 
 int32_t WelsWriteSubsetSpsSyntax (SSubsetSps* pSubsetSps, SBitStringAux* pBitStringAux , int32_t* pSpsIdDelta) {
   SWelsSPS* pSps = &pSubsetSps->pSps;
 
-  WelsWriteSpsSyntax (pSps, pBitStringAux, pSpsIdDelta);
+  WelsWriteSpsSyntax (pSps, pBitStringAux, pSpsIdDelta, false);
 
   if (pSps->uiProfileIdc == PRO_SCALABLE_BASELINE || pSps->uiProfileIdc == PRO_SCALABLE_HIGH) {
     SSpsSvcExt* pSubsetSpsExt = &pSubsetSps->sSpsSvcExt;
@@ -243,40 +381,23 @@ int32_t WelsWriteSubsetSpsSyntax (SSubsetSps* pSubsetSps, SBitStringAux* pBitStr
 
 /*!
  *************************************************************************************
- * \brief	to write Picture Parameter Set (PPS)
+ * \brief   to write Picture Parameter Set (PPS)
  *
- * \param 	pPps     	pPps
- * \param	pBitStringAux		bitstream writer auxiliary
+ * \param   pPps            pPps
+ * \param   pBitStringAux   bitstream writer auxiliary
  *
- * \return	0 - successed
- *	    	1 - failed
+ * \return  0 - successed
+ *          1 - failed
  *
- * \note	Call it in case EWelsNalUnitType is PPS.
+ * \note    Call it in case EWelsNalUnitType is PPS.
  *************************************************************************************
  */
-int32_t WelsWritePpsSyntax (SWelsPPS* pPps, SBitStringAux* pBitStringAux, SParaSetOffset* sPSOVector) {
+int32_t WelsWritePpsSyntax (SWelsPPS* pPps, SBitStringAux* pBitStringAux,
+                            IWelsParametersetStrategy* pParametersetStrategy) {
   SBitStringAux* pLocalBitStringAux = pBitStringAux;
 
-  bool bUsedSubset    =  sPSOVector->bPpsIdMappingIntoSubsetsps[pPps->iPpsId];
-  int32_t iParameterSetType = (bUsedSubset ? PARA_SET_TYPE_SUBSETSPS : PARA_SET_TYPE_AVCSPS);
-
-  BsWriteUE (pLocalBitStringAux, pPps->iPpsId +
-             sPSOVector->sParaSetOffsetVariable[PARA_SET_TYPE_PPS].iParaSetIdDelta[pPps->iPpsId]);
-  BsWriteUE (pLocalBitStringAux, pPps->iSpsId +
-             sPSOVector->sParaSetOffsetVariable[iParameterSetType].iParaSetIdDelta[pPps->iSpsId]);
-
-#if _DEBUG
-  //SParaSetOffset use, 110421
-  if (sPSOVector->bEnableSpsPpsIdAddition) {
-    const int32_t kiTmpSpsIdInBs = pPps->iSpsId +
-                                   sPSOVector->sParaSetOffsetVariable[iParameterSetType].iParaSetIdDelta[pPps->iSpsId];
-    const int32_t tmp_pps_id_in_bs = pPps->iPpsId +
-                                     sPSOVector->sParaSetOffsetVariable[PARA_SET_TYPE_PPS].iParaSetIdDelta[pPps->iPpsId];
-    assert (MAX_SPS_COUNT > kiTmpSpsIdInBs);
-    assert (MAX_PPS_COUNT > tmp_pps_id_in_bs);
-    assert (sPSOVector->sParaSetOffsetVariable[iParameterSetType].bUsedParaSetIdInBs[kiTmpSpsIdInBs]);
-  }
-#endif
+  BsWriteUE (pLocalBitStringAux, pPps->iPpsId + pParametersetStrategy->GetPpsIdOffset (pPps->iPpsId));
+  BsWriteUE (pLocalBitStringAux, pPps->iSpsId + pParametersetStrategy->GetSpsIdOffset (pPps->iPpsId, pPps->iSpsId));
 
   BsWriteOneBit (pLocalBitStringAux, pPps->bEntropyCodingModeFlag);
   BsWriteOneBit (pLocalBitStringAux, false/*pPps->bPicOrderPresentFlag*/);
@@ -360,52 +481,72 @@ static inline bool WelsGetPaddingOffset (int32_t iActualWidth, int32_t iActualHe
 int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialLayerInternal* pLayerParamInternal,
                      const uint32_t kuiIntraPeriod, const int32_t kiNumRefFrame,
                      const uint32_t kuiSpsId, const bool kbEnableFrameCropping, bool bEnableRc,
-                     const int32_t kiDlayerCount) {
+                     const int32_t kiDlayerCount, bool bSVCBaselayer) {
   memset (pSps, 0, sizeof (SWelsSPS));
-
-  pSps->uiSpsId		= kuiSpsId;
-  pSps->iMbWidth	= (pLayerParam->iVideoWidth + 15) >> 4;
-  pSps->iMbHeight	= (pLayerParam->iVideoHeight + 15) >> 4;
+  pSps->uiSpsId         = kuiSpsId;
+  pSps->iMbWidth        = (pLayerParam->iVideoWidth + 15) >> 4;
+  pSps->iMbHeight       = (pLayerParam->iVideoHeight + 15) >> 4;
 
   //max value of both iFrameNum and POC are 2^16-1, in our encoder, iPOC=2*iFrameNum, so max of iFrameNum should be 2^15-1.--
   pSps->uiLog2MaxFrameNum = 15;//16;
-  pSps->iLog2MaxPocLsb	= 1 + pSps->uiLog2MaxFrameNum;
+  pSps->iLog2MaxPocLsb = 1 + pSps->uiLog2MaxFrameNum;
 
-  pSps->iNumRefFrames	= kiNumRefFrame;	/* min pRef size when fifo pRef operation*/
+  pSps->iNumRefFrames = kiNumRefFrame;        /* min pRef size when fifo pRef operation*/
 
   if (kbEnableFrameCropping) {
     // TODO: get frame_crop_left_offset, frame_crop_right_offset, frame_crop_top_offset, frame_crop_bottom_offset
     pSps->bFrameCroppingFlag = WelsGetPaddingOffset (pLayerParamInternal->iActualWidth, pLayerParamInternal->iActualHeight,
                                pLayerParam->iVideoWidth, pLayerParam->iVideoHeight, pSps->sFrameCrop);
   } else {
-    pSps->bFrameCroppingFlag	= false;
+    pSps->bFrameCroppingFlag = false;
   }
-
-  pSps->uiProfileIdc	= pLayerParam->uiProfileIdc ? pLayerParam->uiProfileIdc : PRO_BASELINE;
-
-  if (bEnableRc)  //fixed QP condition
-    pSps->iLevelIdc	= WelsGetLevelIdc (pSps, pLayerParamInternal->fOutputFrameRate, pLayerParam->iSpatialBitrate);
-  else
-    pSps->iLevelIdc  = WelsGetLevelIdc (pSps, pLayerParamInternal->fOutputFrameRate,
-                                        0); // Set tar_br = 0 to remove the bitrate constraint; a better way is to set actual tar_br as 0
-
-  //for Scalable Baseline, Scalable High, and Scalable High Intra profiles.If level_idc is equal to 9, the indicated level is level 1b.
-  //for the Baseline, Constrained Baseline, Main, and Extended profiles,If level_idc is equal to 11 and constraint_set3_flag is equal to 1, the indicated level is level 1b.
-  if ((pSps->iLevelIdc == 9) &&
-      ((pSps->uiProfileIdc == PRO_BASELINE) || (pSps->uiProfileIdc == PRO_MAIN) || (pSps->uiProfileIdc == PRO_EXTENDED))) {
-    pSps->iLevelIdc = 11;
-    pSps->bConstraintSet3Flag = true;
-  }
-
+  pSps->uiProfileIdc = pLayerParam->uiProfileIdc ? pLayerParam->uiProfileIdc : PRO_BASELINE;
   if (pLayerParam->uiProfileIdc == PRO_BASELINE) {
     pSps->bConstraintSet0Flag = true;
   }
   if (pLayerParam->uiProfileIdc <= PRO_MAIN) {
     pSps->bConstraintSet1Flag = true;
   }
-  if (kiDlayerCount > 1) {
+  if ((kiDlayerCount > 1) && bSVCBaselayer) {
     pSps->bConstraintSet2Flag = true;
   }
+
+  ELevelIdc uiLevel = WelsGetLevelIdc (pSps, pLayerParamInternal->fOutputFrameRate, pLayerParam->iSpatialBitrate);
+  //update level
+  //for Scalable Baseline, Scalable High, and Scalable High Intra profiles.If level_idc is equal to 9, the indicated level is level 1b.
+  //for the Baseline, Constrained Baseline, Main, and Extended profiles,If level_idc is equal to 11 and constraint_set3_flag is equal to 1, the indicated level is level 1b.
+  if ((uiLevel == LEVEL_1_B) &&
+      ((pSps->uiProfileIdc == PRO_BASELINE) || (pSps->uiProfileIdc == PRO_MAIN) || (pSps->uiProfileIdc == PRO_EXTENDED))) {
+    uiLevel = LEVEL_1_1;
+    pSps->bConstraintSet3Flag = true;
+  }
+  if ((pLayerParam->uiLevelIdc == LEVEL_UNKNOWN) || (pLayerParam->uiLevelIdc < uiLevel)) {
+    pLayerParam->uiLevelIdc = uiLevel;
+  }
+  pSps->iLevelIdc = pLayerParam->uiLevelIdc;
+
+  //bGapsInFrameNumValueAllowedFlag is false when only spatial layer number and temporal layer number is 1, and ltr is 0.
+  if ((kiDlayerCount == 1) && (pSps->iNumRefFrames == 1))
+    pSps->bGapsInFrameNumValueAllowedFlag = false;
+  else
+    pSps->bGapsInFrameNumValueAllowedFlag = true;
+
+  pSps->bVuiParamPresentFlag = true;
+
+  pSps->bAspectRatioPresent = pLayerParam->bAspectRatioPresent;
+  pSps->eAspectRatio = pLayerParam->eAspectRatio;
+  pSps->sAspectRatioExtWidth = pLayerParam->sAspectRatioExtWidth;
+  pSps->sAspectRatioExtHeight = pLayerParam->sAspectRatioExtHeight;
+
+  // See codec_app_def.h and parameter_sets.h for more info about members bVideoSignalTypePresent through uiColorMatrix.
+  pSps->bVideoSignalTypePresent =   pLayerParam->bVideoSignalTypePresent;
+  pSps->uiVideoFormat =             pLayerParam->uiVideoFormat;
+  pSps->bFullRange =                pLayerParam->bFullRange;
+  pSps->bColorDescriptionPresent =  pLayerParam->bColorDescriptionPresent;
+  pSps->uiColorPrimaries =          pLayerParam->uiColorPrimaries;
+  pSps->uiTransferCharacteristics = pLayerParam->uiTransferCharacteristics;
+  pSps->uiColorMatrix =             pLayerParam->uiColorMatrix;
+
   return 0;
 }
 
@@ -413,20 +554,20 @@ int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialL
 int32_t WelsInitSubsetSps (SSubsetSps* pSubsetSps, SSpatialLayerConfig* pLayerParam,
                            SSpatialLayerInternal* pLayerParamInternal,
                            const uint32_t kuiIntraPeriod, const int32_t kiNumRefFrame,
-                           const uint32_t kuiSpsId, const bool kbEnableFrameCropping, bool bEnableRc) {
+                           const uint32_t kuiSpsId, const bool kbEnableFrameCropping, bool bEnableRc,
+                           const int32_t kiDlayerCount) {
   SWelsSPS* pSps = &pSubsetSps->pSps;
 
   memset (pSubsetSps, 0, sizeof (SSubsetSps));
 
   WelsInitSps (pSps, pLayerParam, pLayerParamInternal, kuiIntraPeriod, kiNumRefFrame, kuiSpsId, kbEnableFrameCropping,
-               bEnableRc, 1);
+               bEnableRc, kiDlayerCount, false);
 
-  pSps->uiProfileIdc	= (pLayerParam->uiProfileIdc >= PRO_SCALABLE_BASELINE) ? pLayerParam->uiProfileIdc :
-                        PRO_SCALABLE_BASELINE;
+  pSps->uiProfileIdc = pLayerParam->uiProfileIdc ;
 
-  pSubsetSps->sSpsSvcExt.iExtendedSpatialScalability	= 0;	/* ESS is 0 in default */
-  pSubsetSps->sSpsSvcExt.bAdaptiveTcoeffLevelPredFlag	= false;
-  pSubsetSps->sSpsSvcExt.bSeqTcoeffLevelPredFlag	= false;
+  pSubsetSps->sSpsSvcExt.iExtendedSpatialScalability    = 0;    /* ESS is 0 in default */
+  pSubsetSps->sSpsSvcExt.bAdaptiveTcoeffLevelPredFlag   = false;
+  pSubsetSps->sSpsSvcExt.bSeqTcoeffLevelPredFlag        = false;
   pSubsetSps->sSpsSvcExt.bSliceHeaderRestrictionFlag = true;
 
   return 0;
@@ -446,26 +587,26 @@ int32_t WelsInitPps (SWelsPPS* pPps,
     assert (pSps != NULL);
     if (NULL == pSps)
       return 1;
-    pUsedSps	= pSps;
+    pUsedSps = pSps;
   } else {
     assert (pSubsetSps != NULL);
     if (NULL == pSubsetSps)
       return 1;
-    pUsedSps	= &pSubsetSps->pSps;
+    pUsedSps = &pSubsetSps->pSps;
   }
 
   /* fill picture parameter set syntax */
-  pPps->iPpsId		= kuiPpsId;
-  pPps->iSpsId		= pUsedSps->uiSpsId;
+  pPps->iPpsId = kuiPpsId;
+  pPps->iSpsId = pUsedSps->uiSpsId;
   pPps->bEntropyCodingModeFlag = kbEntropyCodingModeFlag;
 #if !defined(DISABLE_FMO_FEATURE)
-  pPps->uiNumSliceGroups =  1;	//param->qos_param.sliceGroupCount;
+  pPps->uiNumSliceGroups = 1; //param->qos_param.sliceGroupCount;
   if (pPps->uiNumSliceGroups > 1) {
-    pPps->uiSliceGroupMapType = 0;	//param->qos_param.sliceGroupType;
+    pPps->uiSliceGroupMapType = 0; //param->qos_param.sliceGroupType;
     if (pPps->uiSliceGroupMapType == 0) {
       uint32_t uiGroup = 0;
       while (uiGroup < pPps->uiNumSliceGroups) {
-        pPps->uiRunLength[uiGroup]	= 25;
+        pPps->uiRunLength[uiGroup] = 25;
         ++ uiGroup;
       }
     } else if (pPps->uiSliceGroupMapType == 2) {
@@ -482,11 +623,11 @@ int32_t WelsInitPps (SWelsPPS* pPps,
   }
 #endif//!DISABLE_FMO_FEATURE
 
-  pPps->iPicInitQp							= 26;
-  pPps->iPicInitQs							= 26;
+  pPps->iPicInitQp = 26;
+  pPps->iPicInitQs = 26;
 
-  pPps->uiChromaQpIndexOffset					= 0;
-  pPps->bDeblockingFilterControlPresentFlag	= kbDeblockingFilterPresentFlag;
+  pPps->uiChromaQpIndexOffset                   = 0;
+  pPps->bDeblockingFilterControlPresentFlag     = kbDeblockingFilterPresentFlag;
 
   return 0;
 }

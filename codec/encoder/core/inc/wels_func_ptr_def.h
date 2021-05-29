@@ -44,12 +44,16 @@
 #include "expand_pic.h"
 #include "rc.h"
 #include "IWelsVP.h"
+#include "mc.h"
 
 namespace WelsEnc {
 
+typedef struct TagWelsEncCtx sWelsEncCtx;
 typedef struct TagWelsFuncPointerList SWelsFuncPtrList;
+typedef struct TagVAAFrameInfo SVAAFrameInfo;
 
 typedef struct TagWelsME SWelsME;
+typedef struct TagWelsMD SWelsMD;
 
 typedef void (*PSetMemoryZero) (void* pDst, int32_t iSize);
 typedef void (*PDctFunc) (int16_t* pDct, uint8_t* pSample1, int32_t iStride1, uint8_t* pSample2, int32_t iStride2);
@@ -71,25 +75,6 @@ typedef int32_t (*PQuantizationSkipFunc) (int16_t* pDct, int16_t iFF,  int16_t i
 typedef int32_t (*PQuantizationHadamardFunc) (int16_t* pRes, const int16_t kiFF, int16_t iMF, int16_t* pDct,
     int16_t* pBlock);
 
-typedef void (*PWelsMcFunc) (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                             SMVUnitXY mv, int32_t iWidth, int32_t iHeight);
-
-typedef void (*PWelsLumaHalfpelMcFunc) (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                                        int32_t iWidth, int32_t iHeight);
-typedef void (*PWelsLumaQuarpelMcFunc) (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
-                                        int32_t iHeight);
-typedef void (*PWelsSampleAveragingFunc) (uint8_t*, int32_t, const uint8_t*, int32_t, const uint8_t*, int32_t, int32_t);
-
-typedef struct TagMcFunc {
-  PWelsLumaHalfpelMcFunc      pfLumaHalfpelHor;
-  PWelsLumaHalfpelMcFunc      pfLumaHalfpelVer;
-  PWelsLumaHalfpelMcFunc      pfLumaHalfpelCen;
-  PWelsMcFunc                         pfChromaMc;
-
-  PWelsLumaQuarpelMcFunc      pfLumaQuarpelMc[16];
-  PWelsSampleAveragingFunc    pfSampleAveraging[2];
-} SMcFunc;
-
 typedef void (*PLumaDeblockingLT4Func) (uint8_t* iSampleY, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* iTc);
 typedef void (*PLumaDeblockingEQ4Func) (uint8_t* iSampleY, int32_t iStride, int32_t iAlpha, int32_t iBeta);
 typedef void (*PChromaDeblockingLT4Func) (uint8_t* iSampleCb, uint8_t* iSampleCr, int32_t iStride, int32_t iAlpha,
@@ -98,6 +83,7 @@ typedef void (*PChromaDeblockingEQ4Func) (uint8_t* iSampleCb, uint8_t* iSampleCr
     int32_t iBeta);
 typedef void (*PDeblockingBSCalc) (SWelsFuncPtrList* pFunc, SMB* pCurMb, uint8_t uiBS[2][4][4], Mb_Type uiCurMbType,
                                    int32_t iMbStride, int32_t iLeftFlag, int32_t iTopFlag);
+typedef void (*PDeblockingFilterSlice) (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc, SSlice* pSlice);
 
 typedef struct tagDeblockingFunc {
   PLumaDeblockingLT4Func    pfLumaDeblockingLT4Ver;
@@ -111,30 +97,32 @@ typedef struct tagDeblockingFunc {
   PChromaDeblockingEQ4Func  pfChromaDeblockingEQ4Hor;
 
   PDeblockingBSCalc         pfDeblockingBSCalc;
+
+  PDeblockingFilterSlice    pfDeblockingFilterSlice;
 } DeblockingFunc;
 
 typedef  void (*PSetNoneZeroCountZeroFunc) (int8_t* pNonZeroCount);
 
-typedef int32_t (*PIntraFineMdFunc) (void* pEncCtx, void* pWelsMd, SMB* pCurMb, SMbCache* pMbCache);
-typedef void (*PInterFineMdFunc) (void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb, int32_t bestCost);
-typedef bool (*PInterMdFirstIntraModeFunc) (void* pEncCtx, void* pWelsMd, SMB* pCurMb, SMbCache* pMbCache);
+typedef int32_t (*PIntraFineMdFunc) (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCache* pMbCache);
+typedef void (*PInterFineMdFunc) (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* slice, SMB* pCurMb, int32_t bestCost);
+typedef bool (*PInterMdFirstIntraModeFunc) (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SMB* pCurMb, SMbCache* pMbCache);
 
 typedef void (*PFillInterNeighborCacheFunc) (SMbCache* pMbCache, SMB* pCurMb, int32_t iMbWidth, int8_t* pVaaBgMbFlag);
 typedef void (*PAccumulateSadFunc) (uint32_t* pSumDiff, int32_t* pGomForegroundBlockNum, int32_t* iSad8x8,
                                     int8_t* pVaaBgMbFlag);//for RC
-typedef bool (*PDynamicSlicingStepBackFunc) (void* pEncCtx, void* pSlice, SSliceCtx* pSliceCtx, SMB* pCurMb,
+typedef bool (*PDynamicSlicingStepBackFunc) (sWelsEncCtx* pEncCtx, SSlice* pSlice, SSliceCtx* pSliceCtx, SMB* pCurMb,
     SDynamicSlicingStack* pDynamicSlicingStack); // 2010.8.17
 
-typedef bool (*PInterMdBackgroundDecisionFunc) (void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb,
+typedef bool (*PInterMdBackgroundDecisionFunc) (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* slice, SMB* pCurMb,
     SMbCache* pMbCache, bool* pKeepPskip);
-typedef void (*PInterMdBackgroundInfoUpdateFunc) (SDqLayer* pCurLayer,  SMB* pCurMb, const bool bFlag,
+typedef void (*PMdBackgroundInfoUpdateFunc) (SDqLayer* pCurLayer,  SMB* pCurMb, const bool bFlag,
     const int32_t kiRefPictureType);
 
-typedef bool (*PInterMdScrollingPSkipDecisionFunc) (void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb,
+typedef bool (*PInterMdScrollingPSkipDecisionFunc) (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* slice, SMB* pCurMb,
     SMbCache* pMbCache);
-typedef void (*PSetScrollingMv) (void* pVaa, void* pMd);
+typedef void (*PSetScrollingMv) (SVAAFrameInfo* pVaa, SWelsMD* pMd);
 
-typedef void (*PInterMdFunc) (void* pEncCtx, void* pWelsMd, SSlice* slice, SMB* pCurMb, SMbCache* pMbCache);
+typedef void (*PInterMdFunc) (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* slice, SMB* pCurMb, SMbCache* pMbCache);
 
 typedef int32_t (*PSampleSadSatdCostFunc) (uint8_t*, int32_t, uint8_t*, int32_t);
 typedef void (*PSample4SadCostFunc) (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*);
@@ -145,13 +133,13 @@ typedef int32_t (*PIntraPred8x8Combined3Func) (uint8_t*, int32_t, uint8_t*, int3
     uint8_t*, uint8_t*);
 
 typedef uint32_t (*PSampleSadHor8Func) (uint8_t*, int32_t, uint8_t*, int32_t, uint16_t*, int32_t*);
-typedef void (*PMotionSearchFunc) (SWelsFuncPtrList* pFuncList, void* pCurDqLayer, void* pMe,
-                                   void* pSlice);
+typedef void (*PMotionSearchFunc) (SWelsFuncPtrList* pFuncList, SDqLayer* pCurDqLayer, SWelsME* pMe,
+                                   SSlice* pSlice);
 typedef void (*PSearchMethodFunc) (SWelsFuncPtrList* pFuncList, SWelsME* pMe, SSlice* pSlice, const int32_t kiEncStride,
                                    const int32_t kiRefStride);
-typedef void (*PCalculateSatdFunc) (PSampleSadSatdCostFunc pSatd, void* vpMe, const int32_t kiEncStride,
+typedef void (*PCalculateSatdFunc) (PSampleSadSatdCostFunc pSatd, SWelsME* pMe, const int32_t kiEncStride,
                                     const int32_t kiRefStride);
-typedef bool (*PCheckDirectionalMv) (PSampleSadSatdCostFunc pSad, void* vpMe,
+typedef bool (*PCheckDirectionalMv) (PSampleSadSatdCostFunc pSad, SWelsME* pMe,
                                      const SMVUnitXY ksMinMv, const SMVUnitXY ksMaxMv, const int32_t kiEncStride, const int32_t kiRefStride,
                                      int32_t& iBestSadCost);
 typedef void (*PLineFullSearchFunc) (SWelsFuncPtrList* pFuncList, SWelsME* pMe,
@@ -170,7 +158,7 @@ typedef void (*PCalculateBlockFeatureOfFrame) (uint8_t* pRef, const int32_t kiWi
 typedef int32_t (*PCalculateSingleBlockFeature) (uint8_t* pRef, const int32_t kiRefStride);
 typedef void (*PUpdateFMESwitch) (SDqLayer* pCurLayer);
 
-#define     MAX_BLOCK_TYPE 5 // prev 7
+#define     MAX_BLOCK_TYPE BLOCK_SIZE_ALL
 typedef struct TagSampleDealingFunc {
   PSampleSadSatdCostFunc            pfSampleSad[MAX_BLOCK_TYPE];
   PSampleSadSatdCostFunc            pfSampleSatd[MAX_BLOCK_TYPE];
@@ -193,17 +181,19 @@ typedef int32_t (*PGetVarianceFromIntraVaaFunc) (uint8_t* pSampelY, const int32_
 typedef uint8_t (*PGetMbSignFromInterVaaFunc) (int32_t* pSad8x8);
 typedef void (*PUpdateMbMvFunc) (SMVUnitXY* pMvUnit, const SMVUnitXY ksMv);
 
-typedef bool (*PBuildRefListFunc) (void* pCtx, const int32_t iPOC, int32_t iBestLtrRefIdx);
-typedef void (*PMarkPicFunc) (void* pCtx);
-typedef bool (*PUpdateRefListFunc) (void* pCtx);
-typedef void (*PEndofUpdateRefListFunc) (void* pCtx);
-typedef void (*PAfterBuildRefListFunc) (void* pCtx);
+typedef bool (*PBuildRefListFunc) (sWelsEncCtx* pCtx, const int32_t iPOC, int32_t iBestLtrRefIdx);
+typedef void (*PMarkPicFunc) (sWelsEncCtx* pCtx);
+typedef bool (*PUpdateRefListFunc) (sWelsEncCtx* pCtx);
+typedef void (*PEndofUpdateRefListFunc) (sWelsEncCtx* pCtx);
+typedef void (*PAfterBuildRefListFunc) (sWelsEncCtx* pCtx);
 
 typedef  int32_t (*PCavlcParamCalFunc) (int16_t* pCoff, uint8_t* pRun, int16_t* pLevel, int32_t* pTotalCoeffs,
                                         int32_t iEndIdx);
-typedef int32_t (*PWelsSpatialWriteMbSyn) (void* pCtx, SSlice* pSlice, SMB* pCurMb);
+typedef int32_t (*PWelsSpatialWriteMbSyn) (sWelsEncCtx* pCtx, SSlice* pSlice, SMB* pCurMb);
 typedef void (*PStashMBStatus) (SDynamicSlicingStack* pDss, SSlice* pSlice, int32_t iMbSkipRun);
 typedef int32_t (*PStashPopMBStatus) (SDynamicSlicingStack* pDss, SSlice* pSlice);
+typedef int32_t (*PGetBsPosition)(SSlice *pSlice);
+class IWelsParametersetStrategy;
 
 struct TagWelsFuncPointerList {
   SExpandPicFunc sExpandPicFunc;
@@ -219,7 +209,7 @@ struct TagWelsFuncPointerList {
   PInterMdFunc                           pfInterMd;
 
   PInterMdBackgroundDecisionFunc          pfInterMdBackgroundDecision;
-  PInterMdBackgroundInfoUpdateFunc      pfInterMdBackgroundInfoUpdate;
+  PMdBackgroundInfoUpdateFunc      pfMdBackgroundInfoUpdate;
 
   PInterMdScrollingPSkipDecisionFunc pfSCDPSkipDecision;
   PSetScrollingMv pfSetScrollingMv;
@@ -230,7 +220,7 @@ struct TagWelsFuncPointerList {
   PGetIntraPredFunc     pfGetLumaI4x4Pred[I4_PRED_A];
   PGetIntraPredFunc     pfGetChromaPred[C_PRED_A];
 
-  PSampleSadHor8Func	pfSampleSadHor8[2];	// 1: for 16x16 square; 0: for 8x8 square
+  PSampleSadHor8Func    pfSampleSadHor8[2];     // 1: for 16x16 square; 0: for 8x8 square
   PMotionSearchFunc
   pfMotionSearch[BLOCK_STATIC_IDC_ALL]; //svc_encode_slice.c svc_mode_decision.c svc_enhance_layer_md.c svc_base_layer_md.c
   PSearchMethodFunc pfSearchMethod[BLOCK_SIZE_ALL];
@@ -250,8 +240,10 @@ struct TagWelsFuncPointerList {
   PCopyFunc      pfCopy8x8Aligned;    //svc_encode_slice.c svc_mode_decision.c svc_base_layer_md.c md.c
   PCopyFunc    pfCopy16x8NotAligned;  //for MeRefineFracPixel 16x8 based
   PCopyFunc    pfCopy8x16Aligned;    //for MeRefineFracPixel 8x16 based
+  PCopyFunc      pfCopy4x4;    //not sure if aligned or not, need further tune
+  PCopyFunc      pfCopy8x4;    //not sure if aligned or not, need further tune
+  PCopyFunc      pfCopy4x8;    //not sure if aligned or not, need further tune
 
-  //svc_encode_mb.c encode_mb_aux.c
   PDctFunc          pfDctT4;
   PDctFunc                pfDctFourT4;
 
@@ -294,16 +286,13 @@ struct TagWelsFuncPointerList {
   PSetMemoryZero        pfSetMemZeroSize64Aligned16;      // for size is times of 64, and address is align to 16
   PSetMemoryZero        pfSetMemZeroSize64;      // for size is times of 64, and don't know address is align to 16 or not
 
-  PBuildRefListFunc     pBuildRefList;
-  PMarkPicFunc          pMarkPic;
-  PUpdateRefListFunc    pUpdateRefList;
-  PEndofUpdateRefListFunc    pEndofUpdateRefList;
-  PAfterBuildRefListFunc    pAfterBuildRefList;
-
   PCavlcParamCalFunc    pfCavlcParamCal;
   PWelsSpatialWriteMbSyn pfWelsSpatialWriteMbSyn;
+  PGetBsPosition pfGetBsPosition;
   PStashMBStatus pfStashMBStatus;
   PStashPopMBStatus pfStashPopMBStatus;
+
+  IWelsParametersetStrategy* pParametersetStrategy;
 };
 
 }  //end of namespace WelsEnc {

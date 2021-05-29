@@ -101,58 +101,58 @@ ALIGNED_DECLARE (const int16_t, g_kiQuantInterFF[58][8], 16) = {
 
 
 ALIGNED_DECLARE (const int16_t, g_kiQuantMF[52][8], 16) = {
-  /* 0*/	{26214, 16132, 26214, 16132, 16132, 10486, 16132, 10486 },
-  /* 1*/	{23832, 14980, 23832, 14980, 14980,  9320, 14980,  9320 },
-  /* 2*/	{20164, 13108, 20164, 13108, 13108,  8388, 13108,  8388 },
-  /* 3*/	{18724, 11650, 18724, 11650, 11650,  7294, 11650,  7294 },
-  /* 4*/	{16384, 10486, 16384, 10486, 10486,  6710, 10486,  6710 },
-  /* 5*/	{14564,  9118, 14564,  9118,  9118,  5786,  9118,  5786 },
-  /* 6*/	{13107,  8066, 13107,  8066,  8066,  5243,  8066,  5243 },
-  /* 7*/	{11916,  7490, 11916,  7490,  7490,  4660,  7490,  4660 },
-  /* 8*/	{10082,  6554, 10082,  6554,  6554,  4194,  6554,  4194 },
-  /* 9*/	{ 9362,  5825,  9362,  5825,  5825,  3647,  5825,  3647 },
-  /*10*/	{ 8192,  5243,  8192,  5243,  5243,  3355,  5243,  3355 },
-  /*11*/	{ 7282,  4559,  7282,  4559,  4559,  2893,  4559,  2893 },
-  /*12*/	{ 6554,  4033,  6554,  4033,  4033,  2622,  4033,  2622 },
-  /*13*/	{ 5958,  3745,  5958,  3745,  3745,  2330,  3745,  2330 },
-  /*14*/	{ 5041,  3277,  5041,  3277,  3277,  2097,  3277,  2097 },
-  /*15*/	{ 4681,  2913,  4681,  2913,  2913,  1824,  2913,  1824 },
-  /*16*/	{ 4096,  2622,  4096,  2622,  2622,  1678,  2622,  1678 },
-  /*17*/	{ 3641,  2280,  3641,  2280,  2280,  1447,  2280,  1447 },
-  /*18*/	{ 3277,  2017,  3277,  2017,  2017,  1311,  2017,  1311 },
-  /*19*/	{ 2979,  1873,  2979,  1873,  1873,  1165,  1873,  1165 },
-  /*20*/	{ 2521,  1639,  2521,  1639,  1639,  1049,  1639,  1049 },
-  /*21*/	{ 2341,  1456,  2341,  1456,  1456,   912,  1456,   912 },
-  /*22*/	{ 2048,  1311,  2048,  1311,  1311,   839,  1311,   839 },
-  /*23*/	{ 1821,  1140,  1821,  1140,  1140,   723,  1140,   723 },
-  /*24*/	{ 1638,  1008,  1638,  1008,  1008,   655,  1008,   655 },
-  /*25*/	{ 1490,   936,  1490,   936,   936,   583,   936,   583 },
-  /*26*/	{ 1260,   819,  1260,   819,   819,   524,   819,   524 },
-  /*27*/	{ 1170,   728,  1170,   728,   728,   456,   728,   456 },
-  /*28*/	{ 1024,   655,  1024,   655,   655,   419,   655,   419 },
-  /*29*/	{  910,   570,   910,   570,   570,   362,   570,   362 },
-  /*30*/	{  819,   504,   819,   504,   504,   328,   504,   328 },
-  /*31*/	{  745,   468,   745,   468,   468,   291,   468,   291 },
-  /*32*/	{  630,   410,   630,   410,   410,   262,   410,   262 },
-  /*33*/	{  585,   364,   585,   364,   364,   228,   364,   228 },
-  /*34*/	{  512,   328,   512,   328,   328,   210,   328,   210 },
-  /*35*/	{  455,   285,   455,   285,   285,   181,   285,   181 },
-  /*36*/	{  410,   252,   410,   252,   252,   164,   252,   164 },
-  /*37*/	{  372,   234,   372,   234,   234,   146,   234,   146 },
-  /*38*/	{  315,   205,   315,   205,   205,   131,   205,   131 },
-  /*39*/	{  293,   182,   293,   182,   182,   114,   182,   114 },
-  /*40*/	{  256,   164,   256,   164,   164,   105,   164,   105 },
-  /*41*/	{  228,   142,   228,   142,   142,    90,   142,    90 },
-  /*42*/	{  205,   126,   205,   126,   126,    82,   126,    82 },
-  /*43*/	{  186,   117,   186,   117,   117,    73,   117,    73 },
-  /*44*/	{  158,   102,   158,   102,   102,    66,   102,    66 },
-  /*45*/	{  146,    91,   146,    91,    91,    57,    91,    57 },
-  /*46*/	{  128,    82,   128,    82,    82,    52,    82,    52 },
-  /*47*/	{  114,    71,   114,    71,    71,    45,    71,    45 },
-  /*48*/	{  102,    63,   102,    63,    63,    41,    63,    41 },
-  /*49*/	{   93,    59,    93,    59,    59,    36,    59,    36 },
-  /*50*/	{   79,    51,    79,    51,    51,    33,    51,    33 },
-  /*51*/	{   73,    46,    73,    46,    46,    28,    46,    28 }
+  /* 0*/        {26214, 16132, 26214, 16132, 16132, 10486, 16132, 10486 },
+  /* 1*/        {23832, 14980, 23832, 14980, 14980,  9320, 14980,  9320 },
+  /* 2*/        {20164, 13108, 20164, 13108, 13108,  8388, 13108,  8388 },
+  /* 3*/        {18724, 11650, 18724, 11650, 11650,  7294, 11650,  7294 },
+  /* 4*/        {16384, 10486, 16384, 10486, 10486,  6710, 10486,  6710 },
+  /* 5*/        {14564,  9118, 14564,  9118,  9118,  5786,  9118,  5786 },
+  /* 6*/        {13107,  8066, 13107,  8066,  8066,  5243,  8066,  5243 },
+  /* 7*/        {11916,  7490, 11916,  7490,  7490,  4660,  7490,  4660 },
+  /* 8*/        {10082,  6554, 10082,  6554,  6554,  4194,  6554,  4194 },
+  /* 9*/        { 9362,  5825,  9362,  5825,  5825,  3647,  5825,  3647 },
+  /*10*/        { 8192,  5243,  8192,  5243,  5243,  3355,  5243,  3355 },
+  /*11*/        { 7282,  4559,  7282,  4559,  4559,  2893,  4559,  2893 },
+  /*12*/        { 6554,  4033,  6554,  4033,  4033,  2622,  4033,  2622 },
+  /*13*/        { 5958,  3745,  5958,  3745,  3745,  2330,  3745,  2330 },
+  /*14*/        { 5041,  3277,  5041,  3277,  3277,  2097,  3277,  2097 },
+  /*15*/        { 4681,  2913,  4681,  2913,  2913,  1824,  2913,  1824 },
+  /*16*/        { 4096,  2622,  4096,  2622,  2622,  1678,  2622,  1678 },
+  /*17*/        { 3641,  2280,  3641,  2280,  2280,  1447,  2280,  1447 },
+  /*18*/        { 3277,  2017,  3277,  2017,  2017,  1311,  2017,  1311 },
+  /*19*/        { 2979,  1873,  2979,  1873,  1873,  1165,  1873,  1165 },
+  /*20*/        { 2521,  1639,  2521,  1639,  1639,  1049,  1639,  1049 },
+  /*21*/        { 2341,  1456,  2341,  1456,  1456,   912,  1456,   912 },
+  /*22*/        { 2048,  1311,  2048,  1311,  1311,   839,  1311,   839 },
+  /*23*/        { 1821,  1140,  1821,  1140,  1140,   723,  1140,   723 },
+  /*24*/        { 1638,  1008,  1638,  1008,  1008,   655,  1008,   655 },
+  /*25*/        { 1490,   936,  1490,   936,   936,   583,   936,   583 },
+  /*26*/        { 1260,   819,  1260,   819,   819,   524,   819,   524 },
+  /*27*/        { 1170,   728,  1170,   728,   728,   456,   728,   456 },
+  /*28*/        { 1024,   655,  1024,   655,   655,   419,   655,   419 },
+  /*29*/        {  910,   570,   910,   570,   570,   362,   570,   362 },
+  /*30*/        {  819,   504,   819,   504,   504,   328,   504,   328 },
+  /*31*/        {  745,   468,   745,   468,   468,   291,   468,   291 },
+  /*32*/        {  630,   410,   630,   410,   410,   262,   410,   262 },
+  /*33*/        {  585,   364,   585,   364,   364,   228,   364,   228 },
+  /*34*/        {  512,   328,   512,   328,   328,   210,   328,   210 },
+  /*35*/        {  455,   285,   455,   285,   285,   181,   285,   181 },
+  /*36*/        {  410,   252,   410,   252,   252,   164,   252,   164 },
+  /*37*/        {  372,   234,   372,   234,   234,   146,   234,   146 },
+  /*38*/        {  315,   205,   315,   205,   205,   131,   205,   131 },
+  /*39*/        {  293,   182,   293,   182,   182,   114,   182,   114 },
+  /*40*/        {  256,   164,   256,   164,   164,   105,   164,   105 },
+  /*41*/        {  228,   142,   228,   142,   142,    90,   142,    90 },
+  /*42*/        {  205,   126,   205,   126,   126,    82,   126,    82 },
+  /*43*/        {  186,   117,   186,   117,   117,    73,   117,    73 },
+  /*44*/        {  158,   102,   158,   102,   102,    66,   102,    66 },
+  /*45*/        {  146,    91,   146,    91,    91,    57,    91,    57 },
+  /*46*/        {  128,    82,   128,    82,    82,    52,    82,    52 },
+  /*47*/        {  114,    71,   114,    71,    71,    45,    71,    45 },
+  /*48*/        {  102,    63,   102,    63,    63,    41,    63,    41 },
+  /*49*/        {   93,    59,    93,    59,    59,    36,    59,    36 },
+  /*50*/        {   79,    51,    79,    51,    51,    33,    51,    33 },
+  /*51*/        {   73,    46,    73,    46,    46,    28,    46,    28 }
 };
 
 /****************************************************************************
@@ -160,7 +160,7 @@ ALIGNED_DECLARE (const int16_t, g_kiQuantMF[52][8], 16) = {
  ****************************************************************************/
 #define WELS_ABS_LC(a) ((iSign ^ (int32_t)(a)) - iSign)
 #define NEW_QUANT(pDct, iFF, iMF) (((iFF)+ WELS_ABS_LC(pDct))*(iMF)) >>16
-#define WELS_NEW_QUANT(pDct,iFF,iMF)	WELS_ABS_LC(NEW_QUANT(pDct, iFF, iMF))
+#define WELS_NEW_QUANT(pDct,iFF,iMF) WELS_ABS_LC(NEW_QUANT(pDct, iFF, iMF))
 void WelsQuant4x4_c (int16_t* pDct, const int16_t* pFF,  const int16_t* pMF) {
   int32_t i, j, iSign;
   for (i = 0; i < 16; i += 4) {
@@ -283,24 +283,24 @@ void WelsHadamardT4Dc_c (int16_t* pLumaDc, int16_t* pDct) {
 
   for (i = 0 ; i < 16 ; i += 4) {
     iIdx = ((i & 0x08) << 4) + ((i & 0x04) << 3);
-    s[0] = pDct[iIdx ]	+ pDct[iIdx + 80];
-    s[3] = pDct[iIdx ]	- pDct[iIdx + 80];
-    s[1] = pDct[iIdx + 16]	+ pDct[iIdx + 64];
-    s[2] = pDct[iIdx + 16]	- pDct[iIdx + 64];
+    s[0] = pDct[iIdx ]     + pDct[iIdx + 80];
+    s[3] = pDct[iIdx ]     - pDct[iIdx + 80];
+    s[1] = pDct[iIdx + 16] + pDct[iIdx + 64];
+    s[2] = pDct[iIdx + 16] - pDct[iIdx + 64];
 
-    p[i  ] = s[0] + s[1];
+    p[i  ]   = s[0] + s[1];
     p[i + 2] = s[0] - s[1];
     p[i + 1] = s[3] + s[2];
     p[i + 3] = s[3] - s[2];
   }
 
   for (i = 0 ; i < 4 ; i ++) {
-    s[0] = p[i ]	+ p[i + 12];
-    s[3] = p[i ]	- p[i + 12];
-    s[1] = p[i + 4]	+ p[i + 8];
-    s[2] = p[i + 4]	- p[i + 8];
+    s[0] = p[i ]    + p[i + 12];
+    s[3] = p[i ]    - p[i + 12];
+    s[1] = p[i + 4] + p[i + 8];
+    s[2] = p[i + 4] - p[i + 8];
 
-    pLumaDc[i  ] = WELS_CLIP3 ((s[0] + s[1] + 1) >> 1, -32768, 32767);
+    pLumaDc[i  ]    = WELS_CLIP3 ((s[0] + s[1] + 1) >> 1, -32768, 32767);
     pLumaDc[i + 8 ] = WELS_CLIP3 ((s[0] - s[1] + 1) >> 1, -32768, 32767);
     pLumaDc[i + 4 ] = WELS_CLIP3 ((s[3] + s[2] + 1) >> 1, -32768, 32767);
     pLumaDc[i + 12] = WELS_CLIP3 ((s[3] - s[2] + 1) >> 1, -32768, 32767);
@@ -331,27 +331,27 @@ void WelsDctT4_c (int16_t* pDct, uint8_t* pPixel1, int32_t iStride1, uint8_t* pP
     s[1] = pData[kiI1] + pData[kiI2];
     s[2] = pData[kiI1] - pData[kiI2];
 
-    pDct[i ] = s[0] + s[1];
+    pDct[i ]   = s[0] + s[1];
     pDct[kiI2] = s[0] - s[1];
-    pDct[kiI1] = (s[3] << 1) + s[2];
-    pDct[kiI3] = s[3] - (s[2] << 1);
+    pDct[kiI1] = (s[3] * (1 << 1)) + s[2];
+    pDct[kiI3] = s[3] - (s[2] * (1 << 1));
   }
 
   /* vertical transform */
   for (i = 0 ; i < 4 ; i ++) {
-    const int32_t kiI4	= 4 + i;
-    const int32_t kiI8	= 8 + i;
-    const int32_t kiI12	= 12 + i;
+    const int32_t kiI4  = 4 + i;
+    const int32_t kiI8  = 8 + i;
+    const int32_t kiI12 = 12 + i;
 
     s[0] = pDct[i ] + pDct[kiI12];
     s[3] = pDct[i ] - pDct[kiI12];
     s[1] = pDct[kiI4] + pDct[kiI8 ];
     s[2] = pDct[kiI4] - pDct[kiI8 ];
 
-    pDct[i  ] = s[0] + s[1];
+    pDct[i  ]   = s[0] + s[1];
     pDct[kiI8 ] = s[0] - s[1];
-    pDct[kiI4 ] = (s[3] << 1) + s[2];
-    pDct[kiI12] = s[3] - (s[2] << 1);
+    pDct[kiI4 ] = (s[3] * (1 << 1)) + s[2];
+    pDct[kiI12] = s[3] - (s[2] * (1 << 1));
   }
 }
 
@@ -359,9 +359,9 @@ void WelsDctFourT4_c (int16_t* pDct, uint8_t* pPixel1, int32_t iStride1, uint8_t
   int32_t stride_1 = iStride1 << 2;
   int32_t stride_2 = iStride2 << 2;
 
-  WelsDctT4_c (pDct,      &pPixel1[0],          iStride1, &pPixel2[0],          iStride2);
-  WelsDctT4_c (pDct + 16, &pPixel1[4],          iStride1, &pPixel2[4],          iStride2);
-  WelsDctT4_c (pDct + 32, &pPixel1[stride_1  ], iStride1, &pPixel2[stride_2  ], iStride2);
+  WelsDctT4_c (pDct,      &pPixel1[0],            iStride1, &pPixel2[0],            iStride2);
+  WelsDctT4_c (pDct + 16, &pPixel1[4],            iStride1, &pPixel2[4],            iStride2);
+  WelsDctT4_c (pDct + 32, &pPixel1[stride_1    ], iStride1, &pPixel2[stride_2    ], iStride2);
   WelsDctT4_c (pDct + 48, &pPixel1[stride_1 + 4], iStride1, &pPixel2[stride_2 + 4], iStride2);
 }
 
@@ -449,126 +449,168 @@ int32_t WelsGetNoneZeroCount_c (int16_t* pLevel) {
   return (16 - iCnt);
 }
 
-#ifdef	HAVE_NEON
+#ifdef HAVE_NEON
 int32_t WelsHadamardQuant2x2Skip_neon (int16_t* pRes, int16_t iFF,  int16_t iMF) {
   int16_t iThreshold = ((1 << 16) - 1) / iMF - iFF;
   return WelsHadamardQuant2x2SkipKernel_neon (pRes, iThreshold);
 }
 #endif
-#ifdef	HAVE_NEON_AARCH64
+#ifdef HAVE_NEON_AARCH64
 int32_t WelsHadamardQuant2x2Skip_AArch64_neon (int16_t* pRes, int16_t iFF,  int16_t iMF) {
   int16_t iThreshold = ((1 << 16) - 1) / iMF - iFF;
   return WelsHadamardQuant2x2SkipKernel_AArch64_neon (pRes, iThreshold);
 }
 #endif
 void WelsInitEncodingFuncs (SWelsFuncPtrList* pFuncList, uint32_t  uiCpuFlag) {
-  pFuncList->pfCopy8x8Aligned			= WelsCopy8x8_c;
-  pFuncList->pfCopy16x16Aligned		=
-    pFuncList->pfCopy16x16NotAligned	= WelsCopy16x16_c;
-  pFuncList->pfCopy16x8NotAligned		= WelsCopy16x8_c;
-  pFuncList->pfCopy8x16Aligned		= WelsCopy8x16_c;
+  pFuncList->pfCopy8x8Aligned           = WelsCopy8x8_c;
+  pFuncList->pfCopy16x16Aligned         =
+    pFuncList->pfCopy16x16NotAligned    = WelsCopy16x16_c;
+  pFuncList->pfCopy16x8NotAligned       = WelsCopy16x8_c;
+  pFuncList->pfCopy8x16Aligned          = WelsCopy8x16_c;
+  pFuncList->pfCopy4x4           = WelsCopy4x4_c;
+  pFuncList->pfCopy8x4           = WelsCopy8x4_c;
+  pFuncList->pfCopy4x8           = WelsCopy4x8_c;
+  pFuncList->pfQuantizationHadamard2x2          = WelsHadamardQuant2x2_c;
+  pFuncList->pfQuantizationHadamard2x2Skip      = WelsHadamardQuant2x2Skip_c;
+  pFuncList->pfTransformHadamard4x4Dc           = WelsHadamardT4Dc_c;
 
-  pFuncList->pfQuantizationHadamard2x2		= WelsHadamardQuant2x2_c;
-  pFuncList->pfQuantizationHadamard2x2Skip	= WelsHadamardQuant2x2Skip_c;
-  pFuncList->pfTransformHadamard4x4Dc			= WelsHadamardT4Dc_c;
+  pFuncList->pfDctT4                    = WelsDctT4_c;
+  pFuncList->pfDctFourT4                = WelsDctFourT4_c;
 
-  pFuncList->pfDctT4					= WelsDctT4_c;
-  pFuncList->pfDctFourT4   			= WelsDctFourT4_c;
+  pFuncList->pfScan4x4                  = WelsScan4x4DcAc_c;
+  pFuncList->pfScan4x4Ac                = WelsScan4x4Ac_c;
+  pFuncList->pfCalculateSingleCtr4x4    = WelsCalculateSingleCtr4x4_c;
 
-  pFuncList->pfScan4x4				= WelsScan4x4DcAc_c;
-  pFuncList->pfScan4x4Ac				= WelsScan4x4Ac_c;
-  pFuncList->pfCalculateSingleCtr4x4	= WelsCalculateSingleCtr4x4_c;
+  pFuncList->pfGetNoneZeroCount         = WelsGetNoneZeroCount_c;
 
-  pFuncList->pfGetNoneZeroCount		= WelsGetNoneZeroCount_c;
-
-  pFuncList->pfQuantization4x4		= WelsQuant4x4_c;
-  pFuncList->pfQuantizationDc4x4		= WelsQuant4x4Dc_c;
-  pFuncList->pfQuantizationFour4x4	= WelsQuantFour4x4_c;
-  pFuncList->pfQuantizationFour4x4Max	= WelsQuantFour4x4Max_c;
+  pFuncList->pfQuantization4x4          = WelsQuant4x4_c;
+  pFuncList->pfQuantizationDc4x4        = WelsQuant4x4Dc_c;
+  pFuncList->pfQuantizationFour4x4      = WelsQuantFour4x4_c;
+  pFuncList->pfQuantizationFour4x4Max   = WelsQuantFour4x4Max_c;
 
 #if defined(X86_ASM)
   if (uiCpuFlag & WELS_CPU_MMXEXT) {
 
-    pFuncList->pfQuantizationHadamard2x2		= WelsHadamardQuant2x2_mmx;
-    pFuncList->pfQuantizationHadamard2x2Skip	= WelsHadamardQuant2x2Skip_mmx;
+    pFuncList->pfQuantizationHadamard2x2        = WelsHadamardQuant2x2_mmx;
+    pFuncList->pfQuantizationHadamard2x2Skip    = WelsHadamardQuant2x2Skip_mmx;
 
-    pFuncList->pfDctT4					= WelsDctT4_mmx;
+    pFuncList->pfDctT4                  = WelsDctT4_mmx;
 
-    pFuncList->pfCopy8x8Aligned			= WelsCopy8x8_mmx;
-    pFuncList->pfCopy8x16Aligned		= WelsCopy8x16_mmx;
+    pFuncList->pfCopy8x8Aligned         = WelsCopy8x8_mmx;
+    pFuncList->pfCopy8x16Aligned        = WelsCopy8x16_mmx;
   }
   if (uiCpuFlag & WELS_CPU_SSE2) {
-    pFuncList->pfGetNoneZeroCount		= WelsGetNoneZeroCount_sse2;
-    pFuncList->pfTransformHadamard4x4Dc	= WelsHadamardT4Dc_sse2;
+    pFuncList->pfGetNoneZeroCount       = WelsGetNoneZeroCount_sse2;
+    pFuncList->pfTransformHadamard4x4Dc = WelsHadamardT4Dc_sse2;
 
-    pFuncList->pfQuantization4x4		= WelsQuant4x4_sse2;
-    pFuncList->pfQuantizationDc4x4		= WelsQuant4x4Dc_sse2;
-    pFuncList->pfQuantizationFour4x4	= WelsQuantFour4x4_sse2;
-    pFuncList->pfQuantizationFour4x4Max	= WelsQuantFour4x4Max_sse2;
+    pFuncList->pfQuantization4x4        = WelsQuant4x4_sse2;
+    pFuncList->pfQuantizationDc4x4      = WelsQuant4x4Dc_sse2;
+    pFuncList->pfQuantizationFour4x4    = WelsQuantFour4x4_sse2;
+    pFuncList->pfQuantizationFour4x4Max = WelsQuantFour4x4Max_sse2;
 
-    pFuncList->pfCopy16x16Aligned		= WelsCopy16x16_sse2;
-    pFuncList->pfCopy16x16NotAligned	= WelsCopy16x16NotAligned_sse2;
-    pFuncList->pfCopy16x8NotAligned		= WelsCopy16x8NotAligned_sse2;
+    pFuncList->pfCopy16x16Aligned       = WelsCopy16x16_sse2;
+    pFuncList->pfCopy16x16NotAligned    = WelsCopy16x16NotAligned_sse2;
+    pFuncList->pfCopy16x8NotAligned     = WelsCopy16x8NotAligned_sse2;
 
-    pFuncList->pfScan4x4				= WelsScan4x4DcAc_sse2;
-    pFuncList->pfScan4x4Ac				= WelsScan4x4Ac_sse2;
-    pFuncList->pfCalculateSingleCtr4x4	= WelsCalculateSingleCtr4x4_sse2;
+    pFuncList->pfScan4x4                = WelsScan4x4DcAc_sse2;
+    pFuncList->pfScan4x4Ac              = WelsScan4x4Ac_sse2;
+    pFuncList->pfCalculateSingleCtr4x4  = WelsCalculateSingleCtr4x4_sse2;
 
-    pFuncList->pfDctFourT4				= WelsDctFourT4_sse2;
+    pFuncList->pfDctT4                  = WelsDctT4_sse2;
+    pFuncList->pfDctFourT4              = WelsDctFourT4_sse2;
   }
 //#ifndef MACOS
   if (uiCpuFlag & WELS_CPU_SSSE3) {
-    pFuncList->pfScan4x4				= WelsScan4x4DcAc_ssse3;
+    pFuncList->pfScan4x4                = WelsScan4x4DcAc_ssse3;
   }
+  if (uiCpuFlag & WELS_CPU_SSE42) {
+    pFuncList->pfGetNoneZeroCount       = WelsGetNoneZeroCount_sse42;
+  }
+#if defined(HAVE_AVX2)
+  if (uiCpuFlag & WELS_CPU_AVX2) {
+    pFuncList->pfDctT4                  = WelsDctT4_avx2;
+    pFuncList->pfDctFourT4              = WelsDctFourT4_avx2;
 
+    pFuncList->pfQuantization4x4        = WelsQuant4x4_avx2;
+    pFuncList->pfQuantizationDc4x4      = WelsQuant4x4Dc_avx2;
+    pFuncList->pfQuantizationFour4x4    = WelsQuantFour4x4_avx2;
+    pFuncList->pfQuantizationFour4x4Max = WelsQuantFour4x4Max_avx2;
+  }
+#endif
 //#endif//MACOS
 
 #endif//X86_ASM
 
 #if defined(HAVE_NEON)
   if (uiCpuFlag & WELS_CPU_NEON) {
-    pFuncList->pfQuantizationHadamard2x2		= WelsHadamardQuant2x2_neon;
-    pFuncList->pfQuantizationHadamard2x2Skip	= WelsHadamardQuant2x2Skip_neon;
-    pFuncList->pfDctT4					= WelsDctT4_neon;
-    pFuncList->pfCopy8x8Aligned			= WelsCopy8x8_neon;
-    pFuncList->pfCopy8x16Aligned		= WelsCopy8x16_neon;
+    pFuncList->pfQuantizationHadamard2x2        = WelsHadamardQuant2x2_neon;
+    pFuncList->pfQuantizationHadamard2x2Skip    = WelsHadamardQuant2x2Skip_neon;
+    pFuncList->pfDctT4                          = WelsDctT4_neon;
+    pFuncList->pfCopy8x8Aligned                 = WelsCopy8x8_neon;
+    pFuncList->pfCopy8x16Aligned                = WelsCopy8x16_neon;
 
-    pFuncList->pfGetNoneZeroCount		= WelsGetNoneZeroCount_neon;
-    pFuncList->pfTransformHadamard4x4Dc	= WelsHadamardT4Dc_neon;
+    pFuncList->pfGetNoneZeroCount       = WelsGetNoneZeroCount_neon;
+    pFuncList->pfTransformHadamard4x4Dc = WelsHadamardT4Dc_neon;
 
-    pFuncList->pfQuantization4x4		= WelsQuant4x4_neon;
-    pFuncList->pfQuantizationDc4x4		= WelsQuant4x4Dc_neon;
-    pFuncList->pfQuantizationFour4x4	= WelsQuantFour4x4_neon;
-    pFuncList->pfQuantizationFour4x4Max	= WelsQuantFour4x4Max_neon;
+    pFuncList->pfQuantization4x4        = WelsQuant4x4_neon;
+    pFuncList->pfQuantizationDc4x4      = WelsQuant4x4Dc_neon;
+    pFuncList->pfQuantizationFour4x4    = WelsQuantFour4x4_neon;
+    pFuncList->pfQuantizationFour4x4Max = WelsQuantFour4x4Max_neon;
 
-    pFuncList->pfCopy16x16Aligned		= WelsCopy16x16_neon;
-    pFuncList->pfCopy16x16NotAligned	= WelsCopy16x16NotAligned_neon;
-    pFuncList->pfCopy16x8NotAligned		= WelsCopy16x8NotAligned_neon;
-    pFuncList->pfDctFourT4				= WelsDctFourT4_neon;
+    pFuncList->pfCopy16x16Aligned       = WelsCopy16x16_neon;
+    pFuncList->pfCopy16x16NotAligned    = WelsCopy16x16NotAligned_neon;
+    pFuncList->pfCopy16x8NotAligned     = WelsCopy16x8NotAligned_neon;
+    pFuncList->pfDctFourT4              = WelsDctFourT4_neon;
   }
 #endif
 
 #if defined(HAVE_NEON_AARCH64)
   if (uiCpuFlag & WELS_CPU_NEON) {
-    pFuncList->pfQuantizationHadamard2x2		= WelsHadamardQuant2x2_AArch64_neon;
-    pFuncList->pfQuantizationHadamard2x2Skip	= WelsHadamardQuant2x2Skip_AArch64_neon;
-    pFuncList->pfDctT4					= WelsDctT4_AArch64_neon;
-    pFuncList->pfCopy8x8Aligned			= WelsCopy8x8_AArch64_neon;
-    pFuncList->pfCopy8x16Aligned		= WelsCopy8x16_AArch64_neon;
+    pFuncList->pfQuantizationHadamard2x2        = WelsHadamardQuant2x2_AArch64_neon;
+    pFuncList->pfQuantizationHadamard2x2Skip    = WelsHadamardQuant2x2Skip_AArch64_neon;
+    pFuncList->pfDctT4                          = WelsDctT4_AArch64_neon;
+    pFuncList->pfCopy8x8Aligned                 = WelsCopy8x8_AArch64_neon;
+    pFuncList->pfCopy8x16Aligned                = WelsCopy8x16_AArch64_neon;
 
-    pFuncList->pfGetNoneZeroCount		= WelsGetNoneZeroCount_AArch64_neon;
-    pFuncList->pfTransformHadamard4x4Dc	= WelsHadamardT4Dc_AArch64_neon;
+    pFuncList->pfGetNoneZeroCount       = WelsGetNoneZeroCount_AArch64_neon;
+    pFuncList->pfTransformHadamard4x4Dc = WelsHadamardT4Dc_AArch64_neon;
 
-    pFuncList->pfQuantization4x4		= WelsQuant4x4_AArch64_neon;
-    pFuncList->pfQuantizationDc4x4		= WelsQuant4x4Dc_AArch64_neon;
-    pFuncList->pfQuantizationFour4x4	= WelsQuantFour4x4_AArch64_neon;
-    pFuncList->pfQuantizationFour4x4Max	= WelsQuantFour4x4Max_AArch64_neon;
+    pFuncList->pfQuantization4x4        = WelsQuant4x4_AArch64_neon;
+    pFuncList->pfQuantizationDc4x4      = WelsQuant4x4Dc_AArch64_neon;
+    pFuncList->pfQuantizationFour4x4    = WelsQuantFour4x4_AArch64_neon;
+    pFuncList->pfQuantizationFour4x4Max = WelsQuantFour4x4Max_AArch64_neon;
 
-    pFuncList->pfCopy16x16Aligned		= WelsCopy16x16_AArch64_neon;
-    pFuncList->pfCopy16x16NotAligned	= WelsCopy16x16NotAligned_AArch64_neon;
-    pFuncList->pfCopy16x8NotAligned		= WelsCopy16x8NotAligned_AArch64_neon;
-    pFuncList->pfDctFourT4				= WelsDctFourT4_AArch64_neon;
+    pFuncList->pfCopy16x16Aligned       = WelsCopy16x16_AArch64_neon;
+    pFuncList->pfCopy16x16NotAligned    = WelsCopy16x16NotAligned_AArch64_neon;
+    pFuncList->pfCopy16x8NotAligned     = WelsCopy16x8NotAligned_AArch64_neon;
+    pFuncList->pfDctFourT4              = WelsDctFourT4_AArch64_neon;
   }
 #endif
+
+#if defined(HAVE_MMI)
+  if (uiCpuFlag & WELS_CPU_MMI) {
+    pFuncList->pfCopy8x8Aligned         = WelsCopy8x8_mmi;
+    pFuncList->pfCopy8x16Aligned        = WelsCopy8x16_mmi;
+
+    pFuncList->pfGetNoneZeroCount       = WelsGetNoneZeroCount_mmi;
+    pFuncList->pfTransformHadamard4x4Dc = WelsHadamardT4Dc_mmi;
+
+    pFuncList->pfQuantization4x4        = WelsQuant4x4_mmi;
+    pFuncList->pfQuantizationDc4x4      = WelsQuant4x4Dc_mmi;
+    pFuncList->pfQuantizationFour4x4    = WelsQuantFour4x4_mmi;
+    pFuncList->pfQuantizationFour4x4Max = WelsQuantFour4x4Max_mmi;
+
+    pFuncList->pfCopy16x16Aligned       = WelsCopy16x16_mmi;
+    pFuncList->pfCopy16x16NotAligned    = WelsCopy16x16NotAligned_mmi;
+    pFuncList->pfCopy16x8NotAligned     = WelsCopy16x8NotAligned_mmi;
+
+    pFuncList->pfScan4x4                = WelsScan4x4DcAc_mmi;
+    pFuncList->pfScan4x4Ac              = WelsScan4x4Ac_mmi;
+    pFuncList->pfCalculateSingleCtr4x4  = WelsCalculateSingleCtr4x4_mmi;
+
+    pFuncList->pfDctT4                  = WelsDctT4_mmi;
+    pFuncList->pfDctFourT4              = WelsDctFourT4_mmi;
+  }
+#endif//HAVE_MMI
 }
 }

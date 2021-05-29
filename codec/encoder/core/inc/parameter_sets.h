@@ -41,119 +41,138 @@ namespace WelsEnc {
 
 /* Sequence Parameter Set, refer to Page 57 in JVT X201wcm */
 typedef struct TagWelsSPS {
-uint32_t	uiSpsId;
-int16_t		iMbWidth;
-int16_t		iMbHeight;
-uint32_t	uiLog2MaxFrameNum;
-//	uint32_t	uiPocType;
+uint32_t        uiSpsId;
+int16_t         iMbWidth;
+int16_t         iMbHeight;
+uint32_t        uiLog2MaxFrameNum;
+// uint32_t        uiPocType;
 /* POC type 0 */
-int32_t		iLog2MaxPocLsb;
+int32_t         iLog2MaxPocLsb;
 /* POC type 1 */
-//	int32_t		iOffsetForNonRefPic;
+// int32_t         iOffsetForNonRefPic;
 
-//	int32_t		iOffsetForTopToBottomField;
-//	int32_t		iNumRefFramesInPocCycle;
-//	int8_t		iOffsetForRefFrame[256];
-SCropOffset	sFrameCrop;
-int16_t		iNumRefFrames;
-//	uint32_t	uiNumUnitsInTick;
-//	uint32_t	uiTimeScale;
+// int32_t         iOffsetForTopToBottomField;
+// int32_t         iNumRefFramesInPocCycle;
+// int8_t          iOffsetForRefFrame[256];
+SCropOffset     sFrameCrop;
+int16_t         iNumRefFrames;
+// uint32_t        uiNumUnitsInTick;
+// uint32_t        uiTimeScale;
 
-uint8_t		uiProfileIdc;
-uint8_t		iLevelIdc;
-//	uint8_t		uiChromaFormatIdc;
-//	uint8_t		uiChromaArrayType;		//support =1
+uint8_t         uiProfileIdc;
+uint8_t         iLevelIdc;
+// uint8_t         uiChromaFormatIdc;
+// uint8_t         uiChromaArrayType;              //support =1
 
-//	uint8_t		uiBitDepthLuma;         //=8, only used in decoder, encoder in general_***; it can be removed when removed general up_sample
-//	uint8_t		uiBitDepthChroma;		//=8
+// uint8_t         uiBitDepthLuma;         //=8, only used in decoder, encoder in general_***; it can be removed when removed general up_sample
+// uint8_t         uiBitDepthChroma;               //=8
 /* TO BE CONTINUE: POC type 1 */
-//	bool		bDeltaPicOrderAlwaysZeroFlag;
-//	bool		bGapsInFrameNumValueAllowedFlag;	//=true
+// bool            bDeltaPicOrderAlwaysZeroFlag;
+bool            bGapsInFrameNumValueAllowedFlag;
 
-//	bool		bFrameMbsOnlyFlag;
-//	bool		bMbaffFlag;	// MB Adapative Frame Field
-//	bool		bDirect8x8InferenceFlag;
-bool		bFrameCroppingFlag;
+// bool            bFrameMbsOnlyFlag;
+// bool            bMbaffFlag;     // MB Adapative Frame Field
+// bool            bDirect8x8InferenceFlag;
+bool            bFrameCroppingFlag;
 
-//	bool		bVuiParamPresentFlag;
-//	bool		bTimingInfoPresentFlag;
-//	bool		bFixedFrameRateFlag;
+bool            bVuiParamPresentFlag;
+// bool            bTimingInfoPresentFlag;
+// bool            bFixedFrameRateFlag;
 
-bool		bConstraintSet0Flag;
-bool		bConstraintSet1Flag;
-bool		bConstraintSet2Flag;
-bool		bConstraintSet3Flag;
-//	bool		bSeparateColorPlaneFlag;  // =false,: only used in decoder, encoder in general_***; it can be removed when removed general up_sample
+// Note: members bVideoSignalTypePresent through uiColorMatrix below are also defined in SSpatialLayerConfig in codec_app_def.h,
+// along with definitions for enumerators EVideoFormatSPS, EColorPrimaries, ETransferCharacteristics, and EColorMatrix.
+bool	bVideoSignalTypePresent;	// false => do not write any of the following information to the header
+uint8_t	uiVideoFormat;				// EVideoFormatSPS; 3 bits in header; 0-5 => component, kpal, ntsc, secam, mac, undef
+bool	bFullRange;					// false => analog video data range [16, 235]; true => full data range [0,255]
+bool	bColorDescriptionPresent;	// false => do not write any of the following three items to the header
+uint8_t	uiColorPrimaries;			// EColorPrimaries; 8 bits in header; 0 - 9 => ???, bt709, undef, ???, bt470m, bt470bg,
+                                    //    smpte170m, smpte240m, film, bt2020
+uint8_t	uiTransferCharacteristics;	// ETransferCharacteristics; 8 bits in header; 0 - 15 => ???, bt709, undef, ???, bt470m, bt470bg, smpte170m,
+                                    //   smpte240m, linear, log100, log316, iec61966-2-4, bt1361e, iec61966-2-1, bt2020-10, bt2020-12
+uint8_t	uiColorMatrix;				// EColorMatrix; 8 bits in header (corresponds to FFmpeg "colorspace"); 0 - 10 => GBR, bt709,
+                                    //   undef, ???, fcc, bt470bg, smpte170m, smpte240m, YCgCo, bt2020nc, bt2020c
+
+bool            bConstraintSet0Flag;
+bool            bConstraintSet1Flag;
+bool            bConstraintSet2Flag;
+bool            bConstraintSet3Flag;
+// bool            bSeparateColorPlaneFlag;  // =false,: only used in decoder, encoder in general_***; it can be removed when removed general up_sample
+
+// aspect ratio in VUI
+bool            bAspectRatioPresent;
+ESampleAspectRatio  eAspectRatio;
+uint16_t            sAspectRatioExtWidth;
+uint16_t            sAspectRatioExtHeight;
 
 } SWelsSPS, *PWelsSPS;
 
 
 /* Sequence Parameter Set SVC extension syntax, refer to Page 391 in JVT X201wcm */
 typedef struct TagSpsSvcExt {
-//	SCropOffset	sSeqScaledRefLayer;
+// SCropOffset     sSeqScaledRefLayer;
 
-uint8_t		iExtendedSpatialScalability;	// ESS
-//	uint8_t		uiChromaPhaseXPlus1Flag;
-//	uint8_t		uiChromaPhaseYPlus1;
-//	uint8_t		uiSeqRefLayerChromaPhaseXPlus1Flag;
-//	uint8_t		uiSeqRefLayerChromaPhaseYPlus1;
-//	bool		bInterLayerDeblockingFilterCtrlPresentFlag;
-bool		bSeqTcoeffLevelPredFlag;
-bool		bAdaptiveTcoeffLevelPredFlag;
-bool		bSliceHeaderRestrictionFlag;
+uint8_t         iExtendedSpatialScalability;    // ESS
+// uint8_t         uiChromaPhaseXPlus1Flag;
+// uint8_t         uiChromaPhaseYPlus1;
+// uint8_t         uiSeqRefLayerChromaPhaseXPlus1Flag;
+// uint8_t         uiSeqRefLayerChromaPhaseYPlus1;
+// bool            bInterLayerDeblockingFilterCtrlPresentFlag;
+bool            bSeqTcoeffLevelPredFlag;
+bool            bAdaptiveTcoeffLevelPredFlag;
+bool            bSliceHeaderRestrictionFlag;
 } SSpsSvcExt, *PSpsSvcExt;
 
 /* Subset sequence parameter set syntax, refer to Page 391 in JVT X201wcm */
 typedef struct TagSubsetSps {
-SWelsSPS		pSps;
-SSpsSvcExt	sSpsSvcExt;
+SWelsSPS                pSps;
+SSpsSvcExt      sSpsSvcExt;
 
-//	bool		bSvcVuiParamPresentFlag;
-//	bool		bAdditionalExtension2Flag;
-//	bool		bAdditionalExtension2DataFlag;
+// bool            bSvcVuiParamPresentFlag;
+// bool            bAdditionalExtension2Flag;
+// bool            bAdditionalExtension2DataFlag;
 } SSubsetSps, *PSubsetSps;
 
 /* Picture parameter set syntax, refer to Page 59 in JVT X201wcm */
 typedef struct TagWelsPPS {
-uint32_t	iSpsId;
-uint32_t	iPpsId;
+uint32_t        iSpsId;
+uint32_t        iPpsId;
 
 #if !defined(DISABLE_FMO_FEATURE)
-uint32_t	uiNumSliceGroups;
-uint32_t	uiSliceGroupMapType;
+uint32_t        uiNumSliceGroups;
+uint32_t        uiSliceGroupMapType;
 /* uiSliceGroupMapType = 0 */
-uint32_t	uiRunLength[MAX_SLICEGROUP_IDS];
+uint32_t        uiRunLength[MAX_SLICEGROUP_IDS];
 /* uiSliceGroupMapType = 2 */
-uint32_t	uiTopLeft[MAX_SLICEGROUP_IDS];
-uint32_t	uiBottomRight[MAX_SLICEGROUP_IDS];
+uint32_t        uiTopLeft[MAX_SLICEGROUP_IDS];
+uint32_t        uiBottomRight[MAX_SLICEGROUP_IDS];
 /* uiSliceGroupMapType = 3, 4 or 5 */
 /* uiSliceGroupMapType = 3, 4 or 5 */
-bool		bSliceGroupChangeDirectionFlag;
-uint32_t	uiSliceGroupChangeRate;
+bool            bSliceGroupChangeDirectionFlag;
+uint32_t        uiSliceGroupChangeRate;
 /* uiSliceGroupMapType = 6 */
-uint32_t	uiPicSizeInMapUnits;
-uint32_t	uiSliceGroupId[MAX_SLICEGROUP_IDS];
+uint32_t        uiPicSizeInMapUnits;
+uint32_t        uiSliceGroupId[MAX_SLICEGROUP_IDS];
 #endif//!DISABLE_FMO_FEATURE
 
-//	uint32_t	uiNumRefIdxL0Active;
-//	uint32_t	uiNumRefIdxL1Active;
+// uint32_t        uiNumRefIdxL0Active;
+// uint32_t        uiNumRefIdxL1Active;
 
-int8_t		iPicInitQp;
-int8_t		iPicInitQs;
-uint8_t		uiChromaQpIndexOffset;
+int8_t          iPicInitQp;
+int8_t          iPicInitQs;
+uint8_t         uiChromaQpIndexOffset;
 
 /* potential application for High profile */
-//	int32_t		iSecondChromaQpIndexOffset;
-//	/* potential application for High profile */
+// int32_t         iSecondChromaQpIndexOffset;
+// /* potential application for High profile */
 
-//	bool		bPicOrderPresentFlag;
+// bool            bPicOrderPresentFlag;
 bool    bEntropyCodingModeFlag;
-bool		bDeblockingFilterControlPresentFlag;
+bool            bDeblockingFilterControlPresentFlag;
 
-//	bool		bConstainedIntraPredFlag;
-//	bool		bRedundantPicCntPresentFlag;
-//	bool		bWeightedPredFlag;
-//	uint8_t		uiWeightedBiPredIdc;
+// bool            bConstainedIntraPredFlag;
+// bool            bRedundantPicCntPresentFlag;
+// bool            bWeightedPredFlag;
+// uint8_t         uiWeightedBiPredIdc;
 
 } SWelsPPS, *PWelsPPPS;
 

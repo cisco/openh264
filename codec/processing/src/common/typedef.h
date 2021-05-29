@@ -28,9 +28,9 @@
  *     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *     POSSIBILITY OF SUCH DAMAGE.
  *
- * \file	    :  typedef.h
+ * \file        :  typedef.h
  *
- * \brief	    :  basic type definition
+ * \brief       :  basic type definition
  *
  * \date        :  2011/01/04
  *

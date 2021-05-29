@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	slice_multi_threading.c
+ * \file    slice_multi_threading.c
  *
- * \brief	slice based multiple threading
+ * \brief   slice based multiple threading
  *
- * \date	04/16/2010 Created
+ * \date    04/16/2010 Created
  *
  *************************************************************************************
  */
@@ -51,39 +51,28 @@
 #include "WelsThreadLib.h"
 
 namespace WelsEnc {
-void UpdateMbListNeighborParallel (SSliceCtx* pSliceCtx,
+void UpdateMbListNeighborParallel (SDqLayer* pCurDq,
                                    SMB* pMbList,
                                    const int32_t kiSliceIdc);
 
-void CalcSliceComplexRatio (void* pRatio, SSliceCtx* pSliceCtx, uint32_t* pSliceConsume);
+void CalcSliceComplexRatio (SDqLayer* pCurDq);
 
-int32_t NeedDynamicAdjust (void* pConsumeTime, const int32_t kiSliceNum);
+int32_t NeedDynamicAdjust (SSlice** ppSliceInLayer, const int32_t iSliceNum);
 
 void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
                            SDqLayer* pCurDqLayer,
-                           void* pComplexRatio,
                            int32_t iCurDid);
 
 int32_t RequestMtResource (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pParam, const int32_t kiCountBsLen,
-                           const int32_t kiTargetSpatialBsSize);
+                           const int32_t kiTargetSpatialBsSize, bool bDynamicSlice);
 
 void ReleaseMtResource (sWelsEncCtx** ppCtx);
 
 int32_t AppendSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, const int32_t kiSliceCount);
-int32_t WriteSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, uint8_t* pFrameBsBuffer, const int32_t iSliceIdx,
-                             int32_t& iSliceSize);
 
 #if !defined(_WIN32)
 WELS_THREAD_ROUTINE_TYPE UpdateMbListThreadProc (void* arg);
 #endif//!_WIN32
-
-WELS_THREAD_ROUTINE_TYPE CodingSliceThreadProc (void* arg);
-
-int32_t CreateSliceThreads (sWelsEncCtx* pCtx);
-
-int32_t FiredSliceThreads (sWelsEncCtx* pCtx, SSliceThreadPrivateData* pPriData, WELS_EVENT* pEventsList,
-                           WELS_EVENT* pMasterEventsList, SLayerBSInfo* pLayerBsInfo,
-                           const uint32_t kuiNumThreads/*, int32_t *iLayerNum*/, SSliceCtx* pSliceCtx, const bool kbIsDynamicSlicingMode);
 
 int32_t DynamicDetectCpuCores();
 
@@ -100,6 +89,8 @@ void TrackSliceComplexities (sWelsEncCtx* pCtx, const int32_t kiCurDid);
 void TrackSliceConsumeTime (sWelsEncCtx* pCtx, int32_t* pDidList, const int32_t kiSpatialNum);
 #endif//defined(MT_DEBUG)
 
+void SetOneSliceBsBufferUnderMultithread(sWelsEncCtx* pCtx, const int32_t kiThreadIdx, SSlice* pSlice);
+int32_t WriteSliceBs (sWelsEncCtx* pCtx,SWelsSliceBs* pSliceBs,const int32_t iSliceIdx,int32_t& iSliceSize);
 }
 
 #endif//SVC_SLICE_MULTIPLE_THREADING_H__

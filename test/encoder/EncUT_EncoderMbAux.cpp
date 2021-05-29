@@ -1,7 +1,10 @@
 #include <gtest/gtest.h>
+#include "cpu.h"
 #include "ls_defines.h"
 #include "encode_mb_aux.h"
 #include "wels_common_basis.h"
+#include <algorithm>
+#include <cstddef>
 
 using namespace WelsEnc;
 
@@ -63,6 +66,39 @@ TEST (EncodeMbAuxTest, WelsScan4x4DcAc_sse2) {
   for (int i = 0; i < 32; i++)
     iDct[i] = (rand() & 32767) - 16384;
   WelsScan4x4DcAc_sse2 (iLevelA, iDct);
+  WelsScan4x4DcAc_c (iLevelB, iDct);
+  for (int i = 0; i < 16; i++)
+    EXPECT_EQ (iLevelA[i], iLevelB[i]);
+  FREE_MEMORY (iLevelA);
+  FREE_MEMORY (iLevelB);
+  FREE_MEMORY (iDct);
+}
+#endif
+#ifdef HAVE_MMI
+TEST (EncodeMbAuxTest, WelsScan4x4Ac_mmi) {
+  CMemoryAlign cMemoryAlign (0);
+  ALLOC_MEMORY (int16_t, iLevelA, 16);
+  ALLOC_MEMORY (int16_t, iLevelB, 16);
+  ALLOC_MEMORY (int16_t, iDct, 16);
+  for (int i = 0; i < 16; i++) {
+    iDct[i] = rand() % 256 + 1;
+  }
+  WelsScan4x4Ac_c (iLevelA, iDct);
+  WelsScan4x4Ac_mmi (iLevelB, iDct);
+  for (int j = 0; j < 16; j++)
+    EXPECT_EQ (iLevelA[j], iLevelB[j]);
+  FREE_MEMORY (iLevelA);
+  FREE_MEMORY (iLevelB);
+  FREE_MEMORY (iDct);
+}
+TEST (EncodeMbAuxTest, WelsScan4x4DcAc_mmi) {
+  CMemoryAlign cMemoryAlign (0);
+  ALLOC_MEMORY (int16_t, iLevelA, 32);
+  ALLOC_MEMORY (int16_t, iLevelB, 32);
+  ALLOC_MEMORY (int16_t, iDct, 32);
+  for (int i = 0; i < 32; i++)
+    iDct[i] = (rand() & 32767) - 16384;
+  WelsScan4x4DcAc_mmi (iLevelA, iDct);
   WelsScan4x4DcAc_c (iLevelB, iDct);
   for (int i = 0; i < 16; i++)
     EXPECT_EQ (iLevelA[i], iLevelB[i]);
@@ -144,65 +180,80 @@ static void Sub8x8DctAnchor (int16_t iDct[4][4][4], uint8_t* pPix1, uint8_t* pPi
   Sub4x4DctAnchor (iDct[2], &pPix1[4 * FENC_STRIDE + 0], &pPix2[4 * FDEC_STRIDE + 0]);
   Sub4x4DctAnchor (iDct[3], &pPix1[4 * FENC_STRIDE + 4], &pPix2[4 * FDEC_STRIDE + 4]);
 }
-TEST (EncodeMbAuxTest, WelsDctT4_c) {
+static void TestDctT4 (PDctFunc func) {
   int16_t iDctRef[4][4];
-  uint8_t uiPix1[16 * FENC_STRIDE], uiPix2[16 * FDEC_STRIDE];
-  int16_t iDct[16];
-  for (int i = 0; i < 4; i++)
-    for (int j = 0; j < 4; j++)
-      uiPix1[i * FENC_STRIDE + j] = uiPix2[i * FDEC_STRIDE + j] = rand() & 255;
+  CMemoryAlign cMemoryAlign (0);
+  ALLOC_MEMORY (uint8_t, uiPix1, 16 * FENC_STRIDE);
+  ALLOC_MEMORY (uint8_t, uiPix2, 16 * FDEC_STRIDE);
+  ALLOC_MEMORY (int16_t, iDct, 16);
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      uiPix1[i * FENC_STRIDE + j] = rand() & 255;
+      uiPix2[i * FDEC_STRIDE + j] = rand() & 255;
+    }
+  }
   Sub4x4DctAnchor (iDctRef, uiPix1, uiPix2);
-  WelsDctT4_c (iDct, uiPix1, FENC_STRIDE, uiPix2, FDEC_STRIDE);
+  func (iDct, uiPix1, FENC_STRIDE, uiPix2, FDEC_STRIDE);
   for (int i = 0; i < 4; i++)
     for (int j = 0; j < 4; j++)
       EXPECT_EQ (iDctRef[j][i], iDct[i * 4 + j]);
+  FREE_MEMORY (uiPix1);
+  FREE_MEMORY (uiPix2);
+  FREE_MEMORY (iDct);
 }
-TEST (EncodeMbAuxTest, WelsDctFourT4_c) {
+static void TestDctFourT4 (PDctFunc func) {
   int16_t iDctRef[4][4][4];
-  uint8_t uiPix1[16 * FENC_STRIDE], uiPix2[16 * FDEC_STRIDE];
-  int16_t iDct[16 * 4];
-  for (int i = 0; i < 8; i++)
-    for (int j = 0; j < 8; j++)
-      uiPix1[i * FENC_STRIDE + j] = uiPix2[i * FDEC_STRIDE + j] = rand() & 255;
+  CMemoryAlign cMemoryAlign (0);
+  ALLOC_MEMORY (uint8_t, uiPix1, 16 * FENC_STRIDE);
+  ALLOC_MEMORY (uint8_t, uiPix2, 16 * FDEC_STRIDE);
+  ALLOC_MEMORY (int16_t, iDct, 16 * 4);
+  for (int i = 0; i < 8; i++) {
+    for (int j = 0; j < 8; j++) {
+      uiPix1[i * FENC_STRIDE + j] = rand() & 255;
+      uiPix2[i * FDEC_STRIDE + j] = rand() & 255;
+    }
+  }
   Sub8x8DctAnchor (iDctRef, uiPix1, uiPix2);
-  WelsDctFourT4_c (iDct, uiPix1, FENC_STRIDE, uiPix2, FDEC_STRIDE);
+  func (iDct, uiPix1, FENC_STRIDE, uiPix2, FDEC_STRIDE);
   for (int k = 0; k < 4; k++)
     for (int i = 0; i < 4; i++)
       for (int j = 0; j < 4; j++)
         EXPECT_EQ (iDctRef[k][j][i], iDct[k * 16 + i * 4 + j]);
+  FREE_MEMORY (uiPix1);
+  FREE_MEMORY (uiPix2);
+  FREE_MEMORY (iDct);
+}
+TEST (EncodeMbAuxTest, WelsDctT4_c) {
+  TestDctT4 (WelsDctT4_c);
+}
+TEST (EncodeMbAuxTest, WelsDctFourT4_c) {
+  TestDctFourT4 (WelsDctFourT4_c);
 }
 
 #ifdef X86_ASM
 TEST (EncodeMbAuxTest, WelsDctT4_mmx) {
-  int16_t iDctC[16], iDctM[16];
-  uint8_t uiPix1[16 * FENC_STRIDE], uiPix2[16 * FDEC_STRIDE];
-  for (int i = 0; i < 4; i++)
-    for (int j = 0; j < 4; j++)
-      uiPix1[i * FENC_STRIDE + j] = uiPix2[i * FDEC_STRIDE + j] = rand() & 255;
-  WelsDctT4_c (iDctC, uiPix1, FENC_STRIDE, uiPix2, FDEC_STRIDE);
-  WelsDctT4_mmx (iDctM, uiPix1, FENC_STRIDE, uiPix2, FDEC_STRIDE);
-  for (int i = 0; i < 16; i++)
-    EXPECT_EQ (iDctC[i], iDctM[i]);
+  TestDctT4 (WelsDctT4_mmx);
+}
+
+TEST (EncodeMbAuxTest, WelsDctT4_sse2) {
+  TestDctT4 (WelsDctT4_sse2);
 }
 
 TEST (EncodeMbAuxTest, WelsDctFourT4_sse2) {
-  CMemoryAlign cMemoryAlign (0);
-  ALLOC_MEMORY (uint8_t, uiPix1, 16 * FENC_STRIDE);
-  ALLOC_MEMORY (uint8_t, uiPix2, 16 * FDEC_STRIDE);
-  ALLOC_MEMORY (int16_t, iDctC, 16 * 4);
-  ALLOC_MEMORY (int16_t, iDctS, 16 * 4);
-  for (int i = 0; i < 8; i++)
-    for (int j = 0; j < 8; j++)
-      uiPix1[i * FENC_STRIDE + j] = uiPix2[i * FDEC_STRIDE + j] = rand() & 255;
-  WelsDctFourT4_c (iDctC, uiPix1, FENC_STRIDE, uiPix2, FDEC_STRIDE);
-  WelsDctFourT4_sse2 (iDctS, uiPix1, FENC_STRIDE, uiPix2, FDEC_STRIDE);
-  for (int i = 0; i < 64; i++)
-    EXPECT_EQ (iDctC[i], iDctS[i]);
-  FREE_MEMORY (uiPix1);
-  FREE_MEMORY (uiPix2);
-  FREE_MEMORY (iDctC);
-  FREE_MEMORY (iDctS);
+  TestDctFourT4 (WelsDctFourT4_sse2);
 }
+
+#ifdef HAVE_AVX2
+TEST (EncodeMbAuxTest, WelsDctT4_avx2) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_AVX2)
+    TestDctT4 (WelsDctT4_avx2);
+}
+
+TEST (EncodeMbAuxTest, WelsDctFourT4_avx2) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_AVX2)
+    TestDctFourT4 (WelsDctFourT4_avx2);
+}
+#endif //HAVE_AVX2
 
 TEST (EncodeMbAuxTest, WelsCalculateSingleCtr4x4_sse2) {
   CMemoryAlign cMemoryAlign (0);
@@ -212,6 +263,29 @@ TEST (EncodeMbAuxTest, WelsCalculateSingleCtr4x4_sse2) {
     iDctC[i] = iDctS[i] = (rand() & 65535) - 32768;
   WelsCalculateSingleCtr4x4_c (iDctC);
   WelsCalculateSingleCtr4x4_sse2 (iDctS);
+  for (int i = 0; i < 16; i++)
+    EXPECT_EQ (iDctC[i], iDctS[i]);
+  FREE_MEMORY (iDctC);
+  FREE_MEMORY (iDctS);
+}
+#endif
+#ifdef HAVE_MMI
+TEST (EncodeMbAuxTest, WelsDctT4_mmi) {
+  TestDctT4 (WelsDctT4_mmi);
+}
+
+TEST (EncodeMbAuxTest, WelsDctFourT4_mmi) {
+  TestDctFourT4 (WelsDctFourT4_mmi);
+}
+
+TEST (EncodeMbAuxTest, WelsCalculateSingleCtr4x4_mmi) {
+  CMemoryAlign cMemoryAlign (0);
+  ALLOC_MEMORY (int16_t, iDctC, 16);
+  ALLOC_MEMORY (int16_t, iDctS, 16);
+  for (int i = 0; i < 16; i++)
+    iDctC[i] = iDctS[i] = (rand() & 65535) - 32768;
+  WelsCalculateSingleCtr4x4_c (iDctC);
+  WelsCalculateSingleCtr4x4_mmi (iDctS);
   for (int i = 0; i < 16; i++)
     EXPECT_EQ (iDctC[i], iDctS[i]);
   FREE_MEMORY (iDctC);
@@ -241,7 +315,9 @@ TEST(EncodeMbAuxTest, function) { \
       EXPECT_EQ(ref_dst[i*iDStride+j], dst[i*iDStride+j]); \
 }
 
-GENERATE_UT_FOR_COPY (4, 4, WelsCopy4x4);
+GENERATE_UT_FOR_COPY (4, 4, WelsCopy4x4_c);
+GENERATE_UT_FOR_COPY (8, 4, WelsCopy8x4_c);
+GENERATE_UT_FOR_COPY (4, 8, WelsCopy4x8_c);
 GENERATE_UT_FOR_COPY (8, 8, WelsCopy8x8_c);
 GENERATE_UT_FOR_COPY (8, 16, WelsCopy8x16_c);
 GENERATE_UT_FOR_COPY (16, 8, WelsCopy16x8_c);
@@ -251,66 +327,147 @@ GENERATE_UT_FOR_COPY (16, 8, WelsCopy16x8NotAligned_sse2);
 GENERATE_UT_FOR_COPY (16, 16, WelsCopy16x16NotAligned_sse2);
 GENERATE_UT_FOR_COPY (16, 16, WelsCopy16x16_sse2);
 #endif
-TEST (EncodeMbAuxTest, WelsGetNoneZeroCount_c) {
+#ifdef HAVE_MMI
+GENERATE_UT_FOR_COPY (16, 8, WelsCopy16x8NotAligned_mmi);
+GENERATE_UT_FOR_COPY (16, 16, WelsCopy16x16NotAligned_mmi);
+GENERATE_UT_FOR_COPY (16, 16, WelsCopy16x16_mmi);
+#endif
+
+namespace {
+
+void TestGetNoneZeroCount (PGetNoneZeroCountFunc func) {
   ENFORCE_STACK_ALIGN_1D (int16_t, pLevel, 16, 16);
-  int32_t result = 0;
-  for (int i = 0; i < 16; i++) {
-    pLevel[i] = (rand() & 0x07) - 4;
-    if (pLevel[i]) result ++;
+  const int num_test_runs = 1000;
+  for (int run = 0; run < num_test_runs; run++) {
+    const bool all_zero = run == 0;
+    const bool all_nonzero = run == 1;
+    int result = 0;
+    for (int i = 0; i < 16; i++) {
+      const int r = rand();
+      if (all_zero)
+        pLevel[i] = 0;
+      else if (all_nonzero)
+        pLevel[i] = r % 0xFFFF - 0x8000 ? r % 0xFFFF - 0x8000 : 0x7FFF;
+      else
+        pLevel[i] = (r >> 16 & 1) * ((r & 0xFFFF) - 0x8000);
+      result += pLevel[i] != 0;
+    }
+    const int32_t nnz = func (pLevel);
+    EXPECT_EQ (nnz, result);
   }
-  int32_t nnz = WelsGetNoneZeroCount_c (pLevel);
-  EXPECT_EQ (nnz, result);
+}
+
+} // anon ns.
+
+TEST (EncodeMbAuxTest, WelsGetNoneZeroCount_c) {
+  TestGetNoneZeroCount (WelsGetNoneZeroCount_c);
 }
 #ifdef X86_ASM
 TEST (EncodeMbAuxTest, WelsGetNoneZeroCount_sse2) {
-  ENFORCE_STACK_ALIGN_1D (int16_t, pLevel, 16, 16);
-  int32_t result = 0;
-  for (int i = 0; i < 16; i++) {
-    pLevel[i] = (rand() & 0x07) - 4;
-    if (pLevel[i]) result ++;
-  }
-  int32_t nnz = WelsGetNoneZeroCount_sse2 (pLevel);
-  EXPECT_EQ (nnz, result);
+  TestGetNoneZeroCount (WelsGetNoneZeroCount_sse2);
+}
+TEST (EncodeMbAuxTest, WelsGetNoneZeroCount_sse42) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_SSE42)
+    TestGetNoneZeroCount (WelsGetNoneZeroCount_sse42);
+}
+#endif
+#ifdef HAVE_MMI
+TEST (EncodeMbAuxTest, WelsGetNoneZeroCount_mmi) {
+  TestGetNoneZeroCount (WelsGetNoneZeroCount_mmi);
 }
 #endif
 #define WELS_ABS_LC(a) ((sign ^ (int32_t)(a)) - sign)
 #define NEW_QUANT(pDct, ff, mf) (((ff)+ WELS_ABS_LC(pDct))*(mf)) >>16
-#define WELS_NEW_QUANT(pDct,ff,mf)	WELS_ABS_LC(NEW_QUANT(pDct, ff, mf))
-void WelsQuantFour4x4MaxAnchor (int16_t* pDct, int16_t* ff,  int16_t* mf, int16_t* max) {
-  int32_t i, j, k, sign;
-  int16_t max_abs;
-  for (k = 0; k < 4; k++) {
-    max_abs = 0;
-    for (i = 0; i < 16; i++) {
-      j = i & 0x07;
-      sign = WELS_SIGN (pDct[i]);
-      pDct[i] = NEW_QUANT (pDct[i], ff[j], mf[j]);
-      if (max_abs < pDct[i]) max_abs = pDct[i];
-      pDct[i] = WELS_ABS_LC (pDct[i]);
-    }
-    pDct += 16;
-    max[k] = max_abs;
+#define WELS_NEW_QUANT(pDct,ff,mf) WELS_ABS_LC(NEW_QUANT(pDct, ff, mf))
+namespace {
+int16_t WelsQuant4x4MaxAnchor (int16_t* pDct, int16_t* ff, int16_t* mf) {
+  int16_t max_abs = 0;
+  for (int i = 0; i < 16; i++) {
+    const int j = i & 0x07;
+    const int32_t sign = WELS_SIGN (pDct[i]);
+    pDct[i] = NEW_QUANT (pDct[i], ff[j], mf[j]);
+    max_abs = std::max(max_abs, pDct[i]);
+    pDct[i] = WELS_ABS_LC (pDct[i]);
+  }
+  return max_abs;
+}
+void WelsQuant4x4DcAnchor (int16_t* pDct, int16_t iFF, int16_t iMF) {
+  for (int i = 0; i < 16; i++) {
+    const int32_t sign = WELS_SIGN (pDct[i]);
+    pDct[i] = WELS_NEW_QUANT (pDct[i], iFF, iMF);
   }
 }
-TEST (EncodeMbAuxTest, WelsQuantFour4x4Max_c) {
-  int16_t ff[8], mf[8];
-  int16_t iDctA[64], iMaxA[16];
-  int16_t iDctC[64], iMaxC[16];
-  for (int i = 0; i < 8; i++) {
+void WelsQuantFour4x4Anchor (int16_t* pDct, int16_t* ff,  int16_t* mf) {
+  for (int i = 0; i < 4; i++)
+    WelsQuant4x4MaxAnchor (pDct + 16 * i, ff, mf);
+}
+void WelsQuantFour4x4MaxAnchor (int16_t* pDct, int16_t* ff,  int16_t* mf, int16_t* max) {
+  for (int i = 0; i < 4; i++)
+    max[i] = WelsQuant4x4MaxAnchor (pDct + 16 * i, ff, mf);
+}
+void TestWelsQuant4x4 (PQuantizationFunc func) {
+  const std::size_t f_size = 8;
+  const std::size_t dct_size = 16;
+  CMemoryAlign cMemoryAlign (0);
+  ALLOC_MEMORY (int16_t, ff, f_size);
+  ALLOC_MEMORY (int16_t, mf, f_size);
+  ALLOC_MEMORY (int16_t, iDctC, dct_size);
+  ALLOC_MEMORY (int16_t, iDctS, dct_size);
+  for (std::size_t i = 0; i < f_size; i++) {
     ff[i] = rand() & 32767;
     mf[i] = rand() & 32767;
   }
-  for (int i = 0; i < 64; i++)
-    iDctA[i] = iDctC[i] = (rand() & 65535) - 32767;
-  WelsQuantFour4x4MaxAnchor (iDctA, ff, mf, iMaxA);
-  WelsQuantFour4x4Max_c (iDctC, ff, mf, iMaxC);
-  for (int i = 0; i < 64; i++)
-    EXPECT_EQ (iDctA[i], iDctC[i]);
-  for (int i = 0; i < 4; i++)
-    EXPECT_EQ (iMaxA[i], iMaxC[i]);
+  for (std::size_t i = 0; i < dct_size; i++)
+    iDctC[i] = iDctS[i] = (rand() & 65535) - 32768;
+  WelsQuant4x4MaxAnchor (iDctC, ff, mf);
+  func (iDctS, ff, mf);
+  for (std::size_t i = 0; i < dct_size; i++)
+    EXPECT_EQ (iDctC[i], iDctS[i]);
+  FREE_MEMORY (ff);
+  FREE_MEMORY (mf);
+  FREE_MEMORY (iDctC);
+  FREE_MEMORY (iDctS);
 }
-#ifdef X86_ASM
-TEST (EncodeMbAuxTest, WelsQuantFour4x4Max_sse2) {
+void TestWelsQuant4x4Dc (PQuantizationDcFunc func) {
+  const std::size_t dct_size = 16;
+  const int16_t ff = rand() & 32767;
+  const int16_t mf = rand() & 32767;
+  CMemoryAlign cMemoryAlign (0);
+  ALLOC_MEMORY (int16_t, iDctC, dct_size);
+  ALLOC_MEMORY (int16_t, iDctS, dct_size);
+  for (std::size_t i = 0; i < dct_size; i++)
+    iDctC[i] = iDctS[i] = (rand() & 65535) - 32768;
+  WelsQuant4x4DcAnchor (iDctC, ff, mf);
+  func (iDctS, ff, mf);
+  for (std::size_t i = 0; i < dct_size; i++)
+    EXPECT_EQ (iDctC[i], iDctS[i]);
+  FREE_MEMORY (iDctC);
+  FREE_MEMORY (iDctS);
+}
+void TestWelsQuantFour4x4 (PQuantizationFunc func) {
+  const std::size_t f_size = 8;
+  const std::size_t dct_size = 4 * 16;
+  CMemoryAlign cMemoryAlign (0);
+  ALLOC_MEMORY (int16_t, ff, f_size);
+  ALLOC_MEMORY (int16_t, mf, f_size);
+  ALLOC_MEMORY (int16_t, iDctC, dct_size);
+  ALLOC_MEMORY (int16_t, iDctS, dct_size);
+  for (std::size_t i = 0; i < f_size; i++) {
+    ff[i] = rand() & 32767;
+    mf[i] = rand() & 32767;
+  }
+  for (std::size_t i = 0; i < dct_size; i++)
+    iDctC[i] = iDctS[i] = (rand() & 65535) - 32768;
+  WelsQuantFour4x4Anchor (iDctC, ff, mf);
+  func (iDctS, ff, mf);
+  for (std::size_t i = 0; i < dct_size; i++)
+    EXPECT_EQ (iDctC[i], iDctS[i]);
+  FREE_MEMORY (ff);
+  FREE_MEMORY (mf);
+  FREE_MEMORY (iDctC);
+  FREE_MEMORY (iDctS);
+}
+void TestWelsQuantFour4x4Max (PQuantizationMaxFunc func) {
   CMemoryAlign cMemoryAlign (0);
   ALLOC_MEMORY (int16_t, ff, 8);
   ALLOC_MEMORY (int16_t, mf, 8);
@@ -324,8 +481,8 @@ TEST (EncodeMbAuxTest, WelsQuantFour4x4Max_sse2) {
   }
   for (int i = 0; i < 64; i++)
     iDctC[i] = iDctS[i] = (rand() & 65535) - 32767;
-  WelsQuantFour4x4Max_c (iDctC, ff, mf, iMaxC);
-  WelsQuantFour4x4Max_sse2 (iDctS, ff, mf, iMaxS);
+  WelsQuantFour4x4MaxAnchor (iDctC, ff, mf, iMaxC);
+  func (iDctS, ff, mf, iMaxS);
   for (int i = 0; i < 64; i++)
     EXPECT_EQ (iDctC[i], iDctS[i]);
   for (int i = 0; i < 4; i++)
@@ -337,7 +494,69 @@ TEST (EncodeMbAuxTest, WelsQuantFour4x4Max_sse2) {
   FREE_MEMORY (iMaxC);
   FREE_MEMORY (iMaxS);
 }
+} // anon ns
+TEST (EncodeMbAuxTest, WelsQuant4x4_c) {
+  TestWelsQuant4x4 (WelsQuant4x4_c);
+}
+TEST (EncodeMbAuxTest, WelsQuant4x4Dc_c) {
+  TestWelsQuant4x4Dc (WelsQuant4x4Dc_c);
+}
+TEST (EncodeMbAuxTest, WelsQuantFour4x4_c) {
+  TestWelsQuantFour4x4 (WelsQuantFour4x4_c);
+}
+TEST (EncodeMbAuxTest, WelsQuantFour4x4Max_c) {
+  TestWelsQuantFour4x4Max (WelsQuantFour4x4Max_c);
+}
+#ifdef X86_ASM
+TEST (EncodeMbAuxTest, WelsQuant4x4_sse2) {
+  TestWelsQuant4x4 (WelsQuant4x4_sse2);
+}
+TEST (EncodeMbAuxTest, WelsQuant4x4Dc_sse2) {
+  TestWelsQuant4x4Dc (WelsQuant4x4Dc_sse2);
+}
+TEST (EncodeMbAuxTest, WelsQuantFour4x4_sse2) {
+  TestWelsQuantFour4x4 (WelsQuantFour4x4_sse2);
+}
+TEST (EncodeMbAuxTest, WelsQuantFour4x4Max_sse2) {
+  TestWelsQuantFour4x4Max (WelsQuantFour4x4Max_sse2);
+}
+#ifdef HAVE_AVX2
+TEST (EncodeMbAuxTest, WelsQuant4x4_avx2) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_AVX2)
+    TestWelsQuant4x4 (WelsQuant4x4_avx2);
+}
+TEST (EncodeMbAuxTest, WelsQuant4x4Dc_avx2) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_AVX2)
+    TestWelsQuant4x4Dc (WelsQuant4x4Dc_avx2);
+}
+TEST (EncodeMbAuxTest, WelsQuantFour4x4_avx2) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_AVX2)
+    TestWelsQuantFour4x4 (WelsQuantFour4x4_avx2);
+}
+TEST (EncodeMbAuxTest, WelsQuantFour4x4Max_avx2) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_AVX2)
+    TestWelsQuantFour4x4Max (WelsQuantFour4x4Max_avx2);
+}
+#endif //HAVE_AVX2
 #endif
+#ifdef HAVE_MMI
+TEST (EncodeMbAuxTest, WelsQuant4x4_mmi) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_MMI)
+    TestWelsQuant4x4 (WelsQuant4x4_mmi);
+}
+TEST (EncodeMbAuxTest, WelsQuant4x4Dc_mmi) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_MMI)
+    TestWelsQuant4x4Dc (WelsQuant4x4Dc_mmi);
+}
+TEST (EncodeMbAuxTest, WelsQuantFour4x4_mmi) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_MMI)
+    TestWelsQuantFour4x4 (WelsQuantFour4x4_mmi);
+}
+TEST (EncodeMbAuxTest, WelsQuantFour4x4Max_mmi) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_MMI)
+    TestWelsQuantFour4x4Max (WelsQuantFour4x4Max_mmi);
+}
+#endif //HAVE_MMI
 int32_t WelsHadamardQuant2x2SkipAnchor (int16_t* rs, int16_t ff,  int16_t mf) {
   int16_t pDct[4], s[4];
   int16_t threshold = ((1 << 16) - 1) / mf - ff;
@@ -419,8 +638,8 @@ void WelsHadamardT4DcAnchor (int16_t* pLumaDc, int16_t* pDct) {
   int32_t i, iIdx;
   for (i = 0 ; i < 16 ; i += 4) {
     iIdx = ((i & 0x08) << 4) + ((i & 0x04) << 3);
-    s[0] = pDct[iIdx ]	 + pDct[iIdx + 80];
-    s[3] = pDct[iIdx ]	 - pDct[iIdx + 80];
+    s[0] = pDct[iIdx ]     + pDct[iIdx + 80];
+    s[3] = pDct[iIdx ]     - pDct[iIdx + 80];
     s[1] = pDct[iIdx + 16] + pDct[iIdx + 64];
     s[2] = pDct[iIdx + 16] - pDct[iIdx + 64];
     p[i  ] = s[0] + s[1];
@@ -464,6 +683,23 @@ TEST (EncodeMbAuxTest, WelsHadamardT4Dc_sse2) {
     iDct[i] = (rand() & 32767) - 16384;
   WelsHadamardT4Dc_c (iLumaDcC, iDct);
   WelsHadamardT4Dc_sse2 (iLumaDcS, iDct);
+  for (int i = 0; i < 16; i++)
+    EXPECT_EQ (iLumaDcC[i], iLumaDcS[i]);
+  FREE_MEMORY (iDct);
+  FREE_MEMORY (iLumaDcC);
+  FREE_MEMORY (iLumaDcS);
+}
+#endif
+#ifdef HAVE_MMI
+TEST (EncodeMbAuxTest, WelsHadamardT4Dc_mmi) {
+  CMemoryAlign cMemoryAlign (0);
+  ALLOC_MEMORY (int16_t, iDct, 128 * 16);
+  ALLOC_MEMORY (int16_t, iLumaDcC, 16);
+  ALLOC_MEMORY (int16_t, iLumaDcS, 16);
+  for (int i = 0; i < 128 * 16; i++)
+    iDct[i] = (rand() & 32767) - 16384;
+  WelsHadamardT4Dc_c (iLumaDcC, iDct);
+  WelsHadamardT4Dc_mmi (iLumaDcS, iDct);
   for (int i = 0; i < 16; i++)
     EXPECT_EQ (iLumaDcC[i], iLumaDcS[i]);
   FREE_MEMORY (iDct);

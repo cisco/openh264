@@ -43,16 +43,19 @@ namespace WelsDec {
 
 
 typedef struct TagPicBuff {
-PPicture*      ppPic;
-int32_t        iCapacity;  // capacity size of queue
-int32_t        iCurrentIdx;
+  PPicture*      ppPic;
+  int32_t        iCapacity;  // capacity size of queue
+  int32_t        iCurrentIdx;
 } SPicBuff, *PPicBuff;
 
 /*
- *	Interfaces
+ *  Interfaces
  */
 
 PPicture PrefetchPic (PPicBuff pPicBuff);  // To get current node applicable
+PPicture PrefetchPicForThread (PPicBuff pPicBuff); // To get current node applicable in the case of threaded mode
+PPicture PrefetchLastPicForThread (PPicBuff pPicBuff,
+                                   const int32_t& iLast); // To get last node applicable in the case of threaded mode
 
 } // namespace WelsDec
 

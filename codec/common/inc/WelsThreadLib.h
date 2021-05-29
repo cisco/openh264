@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	WelsThreadLib.h
+ * \file    WelsThreadLib.h
  *
- * \brief	Interfaces introduced in thread programming
+ * \brief   Interfaces introduced in thread programming
  *
- * \date	11/17/2009 Created
+ * \date    11/17/2009 Created
  *
  *************************************************************************************
  */
@@ -47,7 +47,7 @@
 extern "C" {
 #endif
 
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(__CYGWIN__)
 
 #include <windows.h>
 
@@ -60,7 +60,20 @@ typedef    HANDLE                    WELS_EVENT;
 #define    WELS_THREAD_ROUTINE_TYPE         DWORD  WINAPI
 #define    WELS_THREAD_ROUTINE_RETURN(rc)   return (DWORD)rc;
 
-#else	// NON-WINDOWS
+#ifdef WINAPI_FAMILY
+#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+#define WP80
+
+#define InitializeCriticalSection(x) InitializeCriticalSectionEx(x, 0, 0)
+#define GetSystemInfo(x) GetNativeSystemInfo(x)
+#define CreateEvent(attr, reset, init, name) CreateEventEx(attr, name, ((reset) ? CREATE_EVENT_MANUAL_RESET : 0) | ((init) ? CREATE_EVENT_INITIAL_SET : 0), EVENT_ALL_ACCESS)
+#define CreateSemaphore(a, b, c, d) CreateSemaphoreEx(a, b, c, d, 0, SEMAPHORE_ALL_ACCESS)
+#define WaitForSingleObject(a, b) WaitForSingleObjectEx(a, b, FALSE)
+#define WaitForMultipleObjects(a, b, c, d) WaitForMultipleObjectsEx(a, b, c, d, FALSE)
+#endif
+#endif
+
+#else // NON-WINDOWS
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -79,7 +92,12 @@ typedef   pthread_t    WELS_THREAD_HANDLE;
 typedef  void* (*LPWELS_THREAD_ROUTINE) (void*);
 
 typedef   pthread_mutex_t           WELS_MUTEX;
+
+#ifdef __APPLE__
+typedef   pthread_cond_t            WELS_EVENT;
+#else
 typedef   sem_t*                    WELS_EVENT;
+#endif
 
 #define   WELS_THREAD_ROUTINE_TYPE         void *
 #define   WELS_THREAD_ROUTINE_RETURN(rc)   return (void*)(intptr_t)rc;
@@ -93,26 +111,25 @@ typedef  struct _WelsLogicalProcessorInfo {
   int32_t    ProcessorCount;
 } WelsLogicalProcessInfo;
 
-#define    WELS_THREAD_ERROR_OK					0
-#define    WELS_THREAD_ERROR_GENERAL			((uint32_t)(-1))
-#define    WELS_THREAD_ERROR_WAIT_OBJECT_0		0
-#define	   WELS_THREAD_ERROR_WAIT_TIMEOUT		((uint32_t)0x00000102L)
-#define	   WELS_THREAD_ERROR_WAIT_FAILED		WELS_THREAD_ERROR_GENERAL
+#define    WELS_THREAD_ERROR_OK                                 0
+#define    WELS_THREAD_ERROR_GENERAL                    ((uint32_t)(-1))
+#define    WELS_THREAD_ERROR_WAIT_OBJECT_0              0
+#define    WELS_THREAD_ERROR_WAIT_TIMEOUT               ((uint32_t)0x00000102L)
+#define    WELS_THREAD_ERROR_WAIT_FAILED                WELS_THREAD_ERROR_GENERAL
 
 WELS_THREAD_ERROR_CODE    WelsMutexInit (WELS_MUTEX*    mutex);
 WELS_THREAD_ERROR_CODE    WelsMutexLock (WELS_MUTEX*    mutex);
 WELS_THREAD_ERROR_CODE    WelsMutexUnlock (WELS_MUTEX* mutex);
 WELS_THREAD_ERROR_CODE    WelsMutexDestroy (WELS_MUTEX* mutex);
 
-WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT* p_event, const char* event_name);
-WELS_THREAD_ERROR_CODE    WelsEventClose (WELS_EVENT* event, const char* event_name);
-WELS_THREAD_ERROR_CODE    WelsEventSignal (WELS_EVENT* event);
-WELS_THREAD_ERROR_CODE    WelsEventWait (WELS_EVENT* event);
-WELS_THREAD_ERROR_CODE    WelsEventWaitWithTimeOut (WELS_EVENT* event, uint32_t dwMilliseconds);
+WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT* p_event, const char* event_name = NULL);
+WELS_THREAD_ERROR_CODE    WelsEventClose (WELS_EVENT* event, const char* event_name = NULL);
+
+WELS_THREAD_ERROR_CODE    WelsEventSignal (WELS_EVENT* event,WELS_MUTEX *pMutex, int* iCondition);
+WELS_THREAD_ERROR_CODE    WelsEventWait (WELS_EVENT* event,WELS_MUTEX *pMutex, int& iCondition);
+WELS_THREAD_ERROR_CODE    WelsEventWaitWithTimeOut (WELS_EVENT* event, uint32_t dwMilliseconds,WELS_MUTEX *pMutex = NULL);
 WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitSingleBlocking (uint32_t nCount, WELS_EVENT* event_list,
-    WELS_EVENT* master_event = NULL);
-WELS_THREAD_ERROR_CODE    WelsMultipleEventsWaitAllBlocking (uint32_t nCount, WELS_EVENT* event_list,
-    WELS_EVENT* master_event = NULL);
+    WELS_EVENT* master_event = NULL,WELS_MUTEX *pMutex = NULL);
 
 WELS_THREAD_ERROR_CODE    WelsThreadCreate (WELS_THREAD_HANDLE* thread,  LPWELS_THREAD_ROUTINE  routine,
     void* arg, WELS_THREAD_ATTR attr);
@@ -125,6 +142,7 @@ WELS_THREAD_HANDLE        WelsThreadSelf();
 
 WELS_THREAD_ERROR_CODE    WelsQueryLogicalProcessInfo (WelsLogicalProcessInfo* pInfo);
 
+void WelsSleep (uint32_t dwMilliSecond);
 
 #ifdef  __cplusplus
 }

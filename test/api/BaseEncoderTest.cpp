@@ -7,7 +7,7 @@
 
 static int InitWithParam (ISVCEncoder* encoder, SEncParamExt* pEncParamExt) {
 
-  SliceModeEnum eSliceMode = pEncParamExt->sSpatialLayers[0].sSliceCfg.uiSliceMode;
+  SliceModeEnum eSliceMode = pEncParamExt->sSpatialLayers[0].sSliceArgument.uiSliceMode;
   bool bBaseParamFlag      = (SM_SINGLE_SLICE == eSliceMode             && !pEncParamExt->bEnableDenoise
                               && pEncParamExt->iSpatialLayerNum == 1     && !pEncParamExt->bIsLosslessLink
                               && !pEncParamExt->bEnableLongTermReference && !pEncParamExt->iEntropyCodingModeFlag) ? true : false;
@@ -20,7 +20,6 @@ static int InitWithParam (ISVCEncoder* encoder, SEncParamExt* pEncParamExt) {
     param.iPicWidth      = pEncParamExt->iPicWidth;
     param.iPicHeight     = pEncParamExt->iPicHeight;
     param.iTargetBitrate = 5000000;
-
     return encoder->Initialize (&param);
   } else {
     SEncParamExt param;
@@ -36,7 +35,8 @@ static int InitWithParam (ISVCEncoder* encoder, SEncParamExt* pEncParamExt) {
     param.bIsLosslessLink  = pEncParamExt->bIsLosslessLink;
     param.bEnableLongTermReference = pEncParamExt->bEnableLongTermReference;
     param.iEntropyCodingModeFlag   = pEncParamExt->iEntropyCodingModeFlag ? 1 : 0;
-    if (eSliceMode != SM_SINGLE_SLICE && eSliceMode != SM_DYN_SLICE) //SM_DYN_SLICE don't support multi-thread now
+    if (eSliceMode != SM_SINGLE_SLICE
+        && eSliceMode != SM_SIZELIMITED_SLICE) //SM_SIZELIMITED_SLICE don't support multi-thread now
       param.iMultipleThreadIdc = 2;
 
     for (int i = 0; i < param.iSpatialLayerNum; i++) {
@@ -45,14 +45,23 @@ static int InitWithParam (ISVCEncoder* encoder, SEncParamExt* pEncParamExt) {
       param.sSpatialLayers[i].fFrameRate      = pEncParamExt->fMaxFrameRate;
       param.sSpatialLayers[i].iSpatialBitrate = param.iTargetBitrate;
 
-      param.sSpatialLayers[i].sSliceCfg.uiSliceMode = eSliceMode;
-      if (eSliceMode == SM_DYN_SLICE) {
-        param.sSpatialLayers[i].sSliceCfg.sSliceArgument.uiSliceSizeConstraint = 600;
+      param.sSpatialLayers[i].sSliceArgument.uiSliceMode = eSliceMode;
+      if (eSliceMode == SM_SIZELIMITED_SLICE) {
+        param.sSpatialLayers[i].sSliceArgument.uiSliceSizeConstraint = 600;
         param.uiMaxNalSize = 1500;
+        param.iMultipleThreadIdc = 4;
+        param.bUseLoadBalancing = false;
+      }
+      if (eSliceMode == SM_FIXEDSLCNUM_SLICE) {
+        param.sSpatialLayers[i].sSliceArgument.uiSliceNum = 4;
+        param.iMultipleThreadIdc = 4;
+        param.bUseLoadBalancing = false;
+      }
+      if (param.iEntropyCodingModeFlag) {
+        param.sSpatialLayers[i].uiProfileIdc = PRO_MAIN;
       }
     }
     param.iTargetBitrate *= param.iSpatialLayerNum;
-
     return encoder->InitializeExt (&param);
   }
 }
@@ -63,6 +72,9 @@ void BaseEncoderTest::SetUp() {
   int rv = WelsCreateSVCEncoder (&encoder_);
   ASSERT_EQ (0, rv);
   ASSERT_TRUE (encoder_ != NULL);
+
+  unsigned int uiTraceLevel = WELS_LOG_ERROR;
+  encoder_->SetOption (ENCODER_OPTION_TRACE_LEVEL, &uiTraceLevel);
 }
 
 void BaseEncoderTest::TearDown() {
@@ -84,7 +96,7 @@ void BaseEncoderTest::EncodeStream (InputStream* in, SEncParamExt* pEncParamExt,
 
   BufferedData buf;
   buf.SetLength (frameSize);
-  ASSERT_TRUE (buf.Length() == (size_t)frameSize);
+  ASSERT_TRUE (buf.Length() == (size_t)frameSize); //include memory fail (-1) case
 
   SFrameBSInfo info;
   memset (&info, 0, sizeof (SFrameBSInfo));

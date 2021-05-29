@@ -1,4 +1,5 @@
 language: cpp
+dist: xenial
 
 compiler:
   - g++
@@ -6,11 +7,17 @@ compiler:
 
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq nasm g++-4.6-multilib gcc-multilib libc6-dev-i386
+  - sudo apt-get install -qq nasm g++-multilib gcc-multilib libc6-dev-i386 python3-pip python3-setuptools unzip
+  - sudo python3 -m pip install meson==0.47.0
+  - wget https://github.com/ninja-build/ninja/releases/download/v1.8.2/ninja-linux.zip
+  - unzip ninja-linux.zip
+  - export PATH=$PATH:$PWD
 
 install:
   - make gmp-bootstrap
   - make gtest-bootstrap
+  - meson builddir
+  - ninja -C builddir -v
 
 before_script:
   - WorkingDir=`pwd`
@@ -21,18 +28,18 @@ before_script:
 env:
   - TASK=UnitTest;      TestParameter=""
   - TASK=BinaryCompare; TestParameter=BA_MW_D.264
-  - TASK=BinaryCompare; TestParameter=LS_SVA_D.264
-  - TASK=BinaryCompare; TestParameter=CVPCMNL1_SVA_C.264
-
+  - TASK=BinaryCompare; TestParameter=Zhling_1280x720.264
+  - TASK=BinaryCompare; TestParameter=Adobe_PDF_sample_a_1024x768_50Frms.264
 matrix:
   exclude:
     - compiler: clang
       env: TASK=BinaryCompare; TestParameter=BA_MW_D.264
     - compiler: clang
-      env: TASK=BinaryCompare; TestParameter=LS_SVA_D.264
+      env: TASK=BinaryCompare; TestParameter=Zhling_1280x720.264
     - compiler: clang
-      env: TASK=BinaryCompare; TestParameter=CVPCMNL1_SVA_C.264
+      env: TASK=BinaryCompare; TestParameter=Adobe_PDF_sample_a_1024x768_50Frms.264
 script:
   -  echo "currrent test is for ${TASK}"
   -  echo "test parameter is ${TestParameter}"
   -  ./run_Test.sh ${TASK}  ${TestParameter}
+  -  if [ ${TASK} == "UnitTest" ]; then echo "Running meson test suite"; meson test -C builddir -v; fi

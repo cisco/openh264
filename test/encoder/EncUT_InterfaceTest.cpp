@@ -68,7 +68,7 @@ TEST_F (EncInterfaceCallTest, SetOptionLTR) {
 
   BufferedData buf;
   buf.SetLength (frameSize);
-  ASSERT_TRUE (buf.Length() == (size_t)frameSize);
+  ASSERT_TRUE (buf.Length() == (size_t)frameSize); //include memory fail (-1) case
 
   SFrameBSInfo info;
   memset (&info, 0, sizeof (SFrameBSInfo));
@@ -95,7 +95,7 @@ TEST_F (EncInterfaceCallTest, SetOptionLTR) {
     while (fileStream.read (buf.data(), frameSize) == frameSize) {
       ret = encoder_->EncodeFrame (&pic, &info);
       ASSERT_TRUE (ret == cmResultSuccess);
-      if (info.eFrameType != videoFrameTypeSkip && this != NULL) {
+      if (info.eFrameType != videoFrameTypeSkip) {
         this->onEncodeFrame (info);
         iFrameNum++;
       }

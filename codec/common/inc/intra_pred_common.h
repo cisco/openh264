@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	intra_pred_common.h
+ * \file    intra_pred_common.h
  *
- * \brief	interfaces for intra predictor about 16x16.
+ * \brief   interfaces for intra predictor about 16x16.
  *
- * \date	4/2/2014 Created
+ * \date    4/2/2014 Created
  *
  *************************************************************************************
  */
@@ -67,6 +67,11 @@ void WelsI16x16LumaPredH_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiSt
 void WelsI16x16LumaPredV_AArch64_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 void WelsI16x16LumaPredH_AArch64_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 #endif//HAVE_NEON_AARCH64
+
+#if defined(HAVE_MMI)
+void WelsI16x16LumaPredV_mmi (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+void WelsI16x16LumaPredH_mmi (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+#endif//HAVE_MMI
 #if defined(__cplusplus)
 }
 #endif//__cplusplus

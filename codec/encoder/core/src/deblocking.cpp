@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	deblocking.c
+ * \file    deblocking.c
  *
- * \brief	Interfaces introduced in frame deblocking filtering
+ * \brief   Interfaces introduced in frame deblocking filtering
  *
- * \date	08/03/2009 Created
+ * \date    08/03/2009 Created
  *
  *************************************************************************************
  */
@@ -48,25 +48,25 @@ namespace WelsEnc {
 #define g_kiTc0Table(x)   g_kiTc0Table[(x)]
 
 #define MB_BS_MV(sCurMv, sNeighMv, uiBIdx, uiBnIdx) \
-	(\
-	( WELS_ABS( sCurMv[uiBIdx].iMvX - sNeighMv[uiBnIdx].iMvX ) >= 4 ) ||\
-	( WELS_ABS( sCurMv[uiBIdx].iMvY - sNeighMv[uiBnIdx].iMvY ) >= 4 )\
-	)
+  (\
+  ( WELS_ABS( sCurMv[uiBIdx].iMvX - sNeighMv[uiBnIdx].iMvX ) >= 4 ) ||\
+  ( WELS_ABS( sCurMv[uiBIdx].iMvY - sNeighMv[uiBnIdx].iMvY ) >= 4 )\
+  )
 
 #define SMB_EDGE_MV(uiRefIndex, sMotionVector, uiBIdx, uiBnIdx) \
-	(\
-	!!((WELS_ABS(sMotionVector[uiBIdx].iMvX - sMotionVector[uiBnIdx].iMvX) &(~3)) | (WELS_ABS(sMotionVector[uiBIdx].iMvY - sMotionVector[uiBnIdx].iMvY) &(~3)))\
-	)
+  (\
+  !!((WELS_ABS(sMotionVector[uiBIdx].iMvX - sMotionVector[uiBnIdx].iMvX) &(~3)) | (WELS_ABS(sMotionVector[uiBIdx].iMvY - sMotionVector[uiBnIdx].iMvY) &(~3)))\
+  )
 
 #define BS_EDGE(bsx1, uiRefIndex, sMotionVector, uiBIdx, uiBnIdx) \
-	( (bsx1|SMB_EDGE_MV(uiRefIndex, sMotionVector, uiBIdx, uiBnIdx))<<(bsx1?1:0))
+  ( (bsx1|SMB_EDGE_MV(uiRefIndex, sMotionVector, uiBIdx, uiBnIdx))<<(bsx1?1:0))
 
 #define GET_ALPHA_BETA_FROM_QP(QP, iAlphaOffset, iBetaOffset, iIdexA, iAlpha, iBeta) \
 {\
-	iIdexA = (QP + iAlphaOffset);\
-	iIdexA = CLIP3_QP_0_51(iIdexA);\
-	iAlpha = g_kuiAlphaTable(iIdexA);\
-	iBeta  = g_kiBetaTable((CLIP3_QP_0_51(QP + iBetaOffset)));\
+  iIdexA = (QP + iAlphaOffset);\
+  iIdexA = CLIP3_QP_0_51(iIdexA);\
+  iAlpha = g_kuiAlphaTable(iIdexA);\
+  iBeta  = g_kiBetaTable((CLIP3_QP_0_51(QP + iBetaOffset)));\
 }
 
 static const uint8_t g_kuiAlphaTable[52 + 12] = { //this table refers to Table 8-16 in H.264/AVC standard
@@ -117,10 +117,10 @@ static const uint8_t g_kuiTableBIdx[2][8] = {
 
 #define TC0_TBL_LOOKUP(iTc, iIdexA, pBS, bchroma) \
 {\
-	iTc[0] = g_kiTc0Table(iIdexA)[pBS[0]] + bchroma;\
-	iTc[1] = g_kiTc0Table(iIdexA)[pBS[1]] + bchroma;\
-	iTc[2] = g_kiTc0Table(iIdexA)[pBS[2]] + bchroma;\
-	iTc[3] = g_kiTc0Table(iIdexA)[pBS[3]] + bchroma;\
+  iTc[0] = g_kiTc0Table(iIdexA)[pBS[0]] + bchroma;\
+  iTc[1] = g_kiTc0Table(iIdexA)[pBS[1]] + bchroma;\
+  iTc[2] = g_kiTc0Table(iIdexA)[pBS[2]] + bchroma;\
+  iTc[3] = g_kiTc0Table(iIdexA)[pBS[3]] + bchroma;\
 }
 
 void inline DeblockingBSInsideMBAvsbase (int8_t* pNnzTab, uint8_t uiBS[2][4][4], int32_t iLShiftFactor) {
@@ -364,8 +364,8 @@ void DeblockingInterMb (DeblockingFunc* pfDeblocking, SMB* pCurMb, SDeblockingFi
   int32_t iMbX = pCurMb->iMbX;
   int32_t iMbY = pCurMb->iMbY;
 
-  bool bLeftBsValid[2] = { (iMbX > 0), ((iMbX > 0) && (pCurMb->uiSliceIdc == (pCurMb - 1)->uiSliceIdc))};
-  bool bTopBsValid[2]  = { (iMbY > 0), ((iMbY > 0) && (pCurMb->uiSliceIdc == (pCurMb - iMbStride)->uiSliceIdc))};
+  bool bLeftBsValid[2] = { (iMbX > 0), ((iMbX > 0)&& (pCurMb->uiSliceIdc == (pCurMb - 1)->uiSliceIdc))};
+  bool bTopBsValid[2]  = { (iMbY > 0), ((iMbY > 0)&& (pCurMb->uiSliceIdc == (pCurMb - iMbStride)->uiSliceIdc))};
 
   int32_t iLeftFlag = bLeftBsValid[pFilter->uiFilterIdc];
   int32_t iTopFlag  = bTopBsValid[pFilter->uiFilterIdc];
@@ -450,8 +450,8 @@ void FilteringEdgeLumaHV (DeblockingFunc* pfDeblocking, SMB* pCurMb, SDeblocking
   int32_t iMbX = pCurMb->iMbX;
   int32_t iMbY = pCurMb->iMbY;
 
-  bool bLeftBsValid[2] = { (iMbX > 0), ((iMbX > 0) && (pCurMb->uiSliceIdc == (pCurMb - 1)->uiSliceIdc))};
-  bool bTopBsValid[2]  = { (iMbY > 0), ((iMbY > 0) && (pCurMb->uiSliceIdc == (pCurMb - iMbStride)->uiSliceIdc))};
+  bool bLeftBsValid[2] = { (iMbX > 0), ((iMbX > 0)&& (pCurMb->uiSliceIdc == (pCurMb - 1)->uiSliceIdc))};
+  bool bTopBsValid[2]  = { (iMbY > 0), ((iMbY > 0)&& (pCurMb->uiSliceIdc == (pCurMb - iMbStride)->uiSliceIdc))};
 
   int32_t iLeftFlag = bLeftBsValid[pFilter->uiFilterIdc];
   int32_t iTopFlag  = bTopBsValid[pFilter->uiFilterIdc];
@@ -505,8 +505,8 @@ void FilteringEdgeChromaHV (DeblockingFunc* pfDeblocking, SMB* pCurMb, SDeblocki
   int32_t iMbX = pCurMb->iMbX;
   int32_t iMbY = pCurMb->iMbY;
 
-  bool bLeftBsValid[2] = { (iMbX > 0), ((iMbX > 0) && (pCurMb->uiSliceIdc == (pCurMb - 1)->uiSliceIdc))};
-  bool bTopBsValid[2]  = { (iMbY > 0), ((iMbY > 0) && (pCurMb->uiSliceIdc == (pCurMb - iMbStride)->uiSliceIdc))};
+  bool bLeftBsValid[2] = { (iMbX > 0), ((iMbX > 0)&& (pCurMb->uiSliceIdc == (pCurMb - 1)->uiSliceIdc))};
+  bool bTopBsValid[2]  = { (iMbY > 0), ((iMbY > 0)&& (pCurMb->uiSliceIdc == (pCurMb - iMbStride)->uiSliceIdc))};
 
   int32_t iLeftFlag = bLeftBsValid[pFilter->uiFilterIdc];
   int32_t iTopFlag  = bTopBsValid[pFilter->uiFilterIdc];
@@ -634,8 +634,8 @@ void DeblockingMbAvcbase (SWelsFuncPtrList* pFunc, SMB* pCurMb, SDeblockingFilte
   int32_t iMbX = pCurMb->iMbX;
   int32_t iMbY = pCurMb->iMbY;
 
-  bool bLeftBsValid[2] = { (iMbX > 0), ((iMbX > 0) && (pCurMb->uiSliceIdc == (pCurMb - 1)->uiSliceIdc))};
-  bool bTopBsValid[2]  = { (iMbY > 0), ((iMbY > 0) && (pCurMb->uiSliceIdc == (pCurMb - iMbStride)->uiSliceIdc))};
+  bool bLeftBsValid[2] = { (iMbX > 0), ((iMbX > 0)&& (pCurMb->uiSliceIdc == (pCurMb - 1)->uiSliceIdc))};
+  bool bTopBsValid[2]  = { (iMbY > 0), ((iMbY > 0)&& (pCurMb->uiSliceIdc == (pCurMb - iMbStride)->uiSliceIdc))};
 
   int32_t iLeftFlag = bLeftBsValid[pFilter->uiFilterIdc];
   int32_t iTopFlag  = bTopBsValid[pFilter->uiFilterIdc];
@@ -655,10 +655,10 @@ void DeblockingMbAvcbase (SWelsFuncPtrList* pFunc, SMB* pCurMb, SDeblockingFilte
 
 void  DeblockingFilterFrameAvcbase (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc) {
   int32_t i, j;
-  const int32_t kiMbWidth	= pCurDq->iMbWidth;
-  const int32_t kiMbHeight	= pCurDq->iMbHeight;
-  SMB* pCurrentMbBlock	= pCurDq->sMbDataP;
-  SSliceHeaderExt* sSliceHeaderExt = &pCurDq->sLayerInfo.pSliceInLayer[0].sSliceHeaderExt;
+  const int32_t kiMbWidth   = pCurDq->iMbWidth;
+  const int32_t kiMbHeight  = pCurDq->iMbHeight;
+  SMB* pCurrentMbBlock      = pCurDq->sMbDataP;
+  SSliceHeaderExt* sSliceHeaderExt = &pCurDq->ppSliceInLayer[0]->sSliceHeaderExt;
   SDeblockingFilter pFilter;
 
   /* Step1: parameters set */
@@ -690,15 +690,14 @@ void  DeblockingFilterFrameAvcbase (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc) {
   }
 }
 
-void DeblockingFilterSliceAvcbase (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc, const int32_t kiSliceIdx) {
-  SSliceCtx* pSliceCtx			= pCurDq->pSliceEncCtx;
-  SMB* pMbList							= pCurDq->sMbDataP;
-  SSliceHeaderExt* sSliceHeaderExt	= &pCurDq->sLayerInfo.pSliceInLayer[kiSliceIdx].sSliceHeaderExt;
+void DeblockingFilterSliceAvcbase (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc, SSlice* pSlice) {
+  SMB* pMbList                          = pCurDq->sMbDataP;
+  SSliceHeaderExt* sSliceHeaderExt      = &pSlice->sSliceHeaderExt;
   SMB* pCurrentMbBlock;
 
-  const int32_t kiMbWidth				= pCurDq->iMbWidth;
-  const int32_t kiMbHeight				= pCurDq->iMbHeight;
-  const int32_t kiTotalNumMb			= kiMbWidth * kiMbHeight;
+  const int32_t kiMbWidth               = pCurDq->iMbWidth;
+  const int32_t kiMbHeight              = pCurDq->iMbHeight;
+  const int32_t kiTotalNumMb            = kiMbWidth * kiMbHeight;
   int32_t iCurMbIdx = 0, iNextMbIdx = 0, iNumMbFiltered = 0;
 
   /* Step1: parameters set */
@@ -712,13 +711,13 @@ void DeblockingFilterSliceAvcbase (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc, co
   pFilter.iCsStride[1] = pCurDq->pDecPic->iLineSize[1];
   pFilter.iCsStride[2] = pCurDq->pDecPic->iLineSize[2];
   pFilter.iSliceAlphaC0Offset = sSliceHeaderExt->sSliceHeader.iSliceAlphaC0Offset;
-  pFilter.iSliceBetaOffset     = sSliceHeaderExt->sSliceHeader.iSliceBetaOffset;
-  pFilter.iMbStride             = kiMbWidth;
+  pFilter.iSliceBetaOffset    = sSliceHeaderExt->sSliceHeader.iSliceBetaOffset;
+  pFilter.iMbStride           = kiMbWidth;
 
   iNextMbIdx  = sSliceHeaderExt->sSliceHeader.iFirstMbInSlice;
 
   for (; ;) {
-    iCurMbIdx	= iNextMbIdx;
+    iCurMbIdx       = iNextMbIdx;
     pCurrentMbBlock = &pMbList[ iCurMbIdx ];
 
     pFilter.pCsData[0] = pCurDq->pDecPic->pData[0] + ((pCurrentMbBlock->iMbX + pCurrentMbBlock->iMbY * pFilter.iCsStride[0])
@@ -731,7 +730,7 @@ void DeblockingFilterSliceAvcbase (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc, co
     DeblockingMbAvcbase (pFunc, pCurrentMbBlock, &pFilter);
 
     ++iNumMbFiltered;
-    iNextMbIdx = WelsGetNextMbOfSlice (pSliceCtx, iCurMbIdx);
+    iNextMbIdx = WelsGetNextMbOfSlice (pCurDq, iCurMbIdx);
     //whether all of MB in current slice filtered or not
     if (iNextMbIdx == -1 || iNextMbIdx >= kiTotalNumMb || iNumMbFiltered >= kiTotalNumMb) {
       break;
@@ -739,124 +738,128 @@ void DeblockingFilterSliceAvcbase (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc, co
   }
 }
 
+void DeblockingFilterSliceAvcbaseNull (SDqLayer* pCurDq, SWelsFuncPtrList* pFunc, SSlice* pSlice) {
+}
+
 void PerformDeblockingFilter (sWelsEncCtx* pEnc) {
-  const int32_t kiCurDid				= pEnc->uiDependencyId;
-  SWelsSvcCodingParam* pSvcParam	= pEnc->pSvcParam;
-  SSpatialLayerConfig* pSpatialLayer = &pSvcParam->sSpatialLayers[kiCurDid];
-  SDqLayer* pCurLayer					= pEnc->pCurDqLayer;
+  SDqLayer* pCurLayer = pEnc->pCurDqLayer;
+  SSlice* pSlice      = NULL;
 
   if (pCurLayer->iLoopFilterDisableIdc == 0) {
     DeblockingFilterFrameAvcbase (pCurLayer, pEnc->pFuncList);
   } else if (pCurLayer->iLoopFilterDisableIdc == 2) {
-    int32_t iSliceCount			= 0;
-    int32_t iSliceIdx			= 0;
+    int32_t iSliceCount = 0;
+    int32_t iSliceIdx   = 0;
 
-    if (SM_DYN_SLICE != pSpatialLayer->sSliceCfg.uiSliceMode) {
-      iSliceCount	= GetCurrentSliceNum (pCurLayer->pSliceEncCtx);
-      do {
-        DeblockingFilterSliceAvcbase (pCurLayer, pEnc->pFuncList, iSliceIdx);
-        ++ iSliceIdx;
-      } while (iSliceIdx < iSliceCount);
-    } else {	// for dynamic slicing mode
-      const int32_t kiNumPicPartition	= pEnc->iActiveThreadsNum; //pSvcParam->iCountThreadsNum;
-      int32_t iPartitionIdx			= 0;
-
-      while (iPartitionIdx < kiNumPicPartition) {
-        iSliceCount	= pCurLayer->pNumSliceCodedOfPartition[iPartitionIdx];
-        iSliceIdx	= iPartitionIdx;
-        do {
-          DeblockingFilterSliceAvcbase (pCurLayer, pEnc->pFuncList, iSliceIdx);
-          iSliceIdx += kiNumPicPartition;
-        } while (iSliceIdx < iSliceCount);
-        ++ iPartitionIdx;
-      }
-    }
+    iSliceCount = GetCurrentSliceNum (pCurLayer);
+    do {
+      pSlice = pCurLayer->ppSliceInLayer[iSliceIdx];
+      assert (NULL != pSlice);
+      DeblockingFilterSliceAvcbase (pCurLayer, pEnc->pFuncList, pSlice);
+      ++ iSliceIdx;
+    } while (iSliceIdx < iSliceCount);
   }
 }
 
-void WelsNonZeroCount_c (int8_t* pNonZeroCount) {
-  int32_t i;
-
-  for (i = 0; i < 24; i++) {
-    pNonZeroCount[i] = !!pNonZeroCount[i];
-  }
-}
 void WelsBlockFuncInit (PSetNoneZeroCountZeroFunc* pfSetNZCZero,  int32_t iCpu) {
   *pfSetNZCZero = WelsNonZeroCount_c;
-#ifdef	HAVE_NEON
+#ifdef HAVE_NEON
   if (iCpu & WELS_CPU_NEON) {
     *pfSetNZCZero = WelsNonZeroCount_neon;
   }
 #endif
-#ifdef	HAVE_NEON_AARCH64
+#ifdef HAVE_NEON_AARCH64
   if (iCpu & WELS_CPU_NEON) {
     *pfSetNZCZero = WelsNonZeroCount_AArch64_neon;
+  }
+#endif
+#if defined(X86_ASM)
+  if (iCpu & WELS_CPU_SSE2) {
+    *pfSetNZCZero = WelsNonZeroCount_sse2;
+  }
+#endif
+#if defined(HAVE_MMI)
+  if (iCpu & WELS_CPU_MMI) {
+    *pfSetNZCZero = WelsNonZeroCount_mmi;
   }
 #endif
 }
 
 void  DeblockingInit (DeblockingFunc*   pFunc,  int32_t iCpu) {
-  pFunc->pfLumaDeblockingLT4Ver		= DeblockLumaLt4V_c;
-  pFunc->pfLumaDeblockingEQ4Ver		= DeblockLumaEq4V_c;
-  pFunc->pfLumaDeblockingLT4Hor		= DeblockLumaLt4H_c;
-  pFunc->pfLumaDeblockingEQ4Hor		= DeblockLumaEq4H_c;
+  pFunc->pfLumaDeblockingLT4Ver     = DeblockLumaLt4V_c;
+  pFunc->pfLumaDeblockingEQ4Ver     = DeblockLumaEq4V_c;
+  pFunc->pfLumaDeblockingLT4Hor     = DeblockLumaLt4H_c;
+  pFunc->pfLumaDeblockingEQ4Hor     = DeblockLumaEq4H_c;
 
-  pFunc->pfChromaDeblockingLT4Ver	= DeblockChromaLt4V_c;
-  pFunc->pfChromaDeblockingEQ4Ver	= DeblockChromaEq4V_c;
-  pFunc->pfChromaDeblockingLT4Hor	= DeblockChromaLt4H_c;
-  pFunc->pfChromaDeblockingEQ4Hor	= DeblockChromaEq4H_c;
+  pFunc->pfChromaDeblockingLT4Ver   = DeblockChromaLt4V_c;
+  pFunc->pfChromaDeblockingEQ4Ver   = DeblockChromaEq4V_c;
+  pFunc->pfChromaDeblockingLT4Hor   = DeblockChromaLt4H_c;
+  pFunc->pfChromaDeblockingEQ4Hor   = DeblockChromaEq4H_c;
 
-  pFunc->pfDeblockingBSCalc             = DeblockingBSCalc_c;
+  pFunc->pfDeblockingBSCalc         = DeblockingBSCalc_c;
 
 
 #ifdef X86_ASM
   if (iCpu & WELS_CPU_SSSE3) {
-    pFunc->pfLumaDeblockingLT4Ver	= DeblockLumaLt4V_ssse3;
-    pFunc->pfLumaDeblockingEQ4Ver	= DeblockLumaEq4V_ssse3;
-    pFunc->pfLumaDeblockingLT4Hor       = DeblockLumaLt4H_ssse3;
-    pFunc->pfLumaDeblockingEQ4Hor       = DeblockLumaEq4H_ssse3;
-    pFunc->pfChromaDeblockingLT4Ver	= DeblockChromaLt4V_ssse3;
-    pFunc->pfChromaDeblockingEQ4Ver	= DeblockChromaEq4V_ssse3;
-    pFunc->pfChromaDeblockingLT4Hor	= DeblockChromaLt4H_ssse3;
-    pFunc->pfChromaDeblockingEQ4Hor	= DeblockChromaEq4H_ssse3;
+    pFunc->pfLumaDeblockingLT4Ver   = DeblockLumaLt4V_ssse3;
+    pFunc->pfLumaDeblockingEQ4Ver   = DeblockLumaEq4V_ssse3;
+    pFunc->pfLumaDeblockingLT4Hor   = DeblockLumaLt4H_ssse3;
+    pFunc->pfLumaDeblockingEQ4Hor   = DeblockLumaEq4H_ssse3;
+    pFunc->pfChromaDeblockingLT4Ver = DeblockChromaLt4V_ssse3;
+    pFunc->pfChromaDeblockingEQ4Ver = DeblockChromaEq4V_ssse3;
+    pFunc->pfChromaDeblockingLT4Hor = DeblockChromaLt4H_ssse3;
+    pFunc->pfChromaDeblockingEQ4Hor = DeblockChromaEq4H_ssse3;
   }
 #endif
 
 #if defined(HAVE_NEON)
   if (iCpu & WELS_CPU_NEON) {
-    pFunc->pfLumaDeblockingLT4Ver		= DeblockLumaLt4V_neon;
-    pFunc->pfLumaDeblockingEQ4Ver		= DeblockLumaEq4V_neon;
-    pFunc->pfLumaDeblockingLT4Hor		= DeblockLumaLt4H_neon;
-    pFunc->pfLumaDeblockingEQ4Hor		= DeblockLumaEq4H_neon;
+    pFunc->pfLumaDeblockingLT4Ver   = DeblockLumaLt4V_neon;
+    pFunc->pfLumaDeblockingEQ4Ver   = DeblockLumaEq4V_neon;
+    pFunc->pfLumaDeblockingLT4Hor   = DeblockLumaLt4H_neon;
+    pFunc->pfLumaDeblockingEQ4Hor   = DeblockLumaEq4H_neon;
 
-    pFunc->pfChromaDeblockingLT4Ver     = DeblockChromaLt4V_neon;
-    pFunc->pfChromaDeblockingEQ4Ver     = DeblockChromaEq4V_neon;
-    pFunc->pfChromaDeblockingLT4Hor     = DeblockChromaLt4H_neon;
-    pFunc->pfChromaDeblockingEQ4Hor     = DeblockChromaEq4H_neon;
+    pFunc->pfChromaDeblockingLT4Ver = DeblockChromaLt4V_neon;
+    pFunc->pfChromaDeblockingEQ4Ver = DeblockChromaEq4V_neon;
+    pFunc->pfChromaDeblockingLT4Hor = DeblockChromaLt4H_neon;
+    pFunc->pfChromaDeblockingEQ4Hor = DeblockChromaEq4H_neon;
 
 #if defined(SINGLE_REF_FRAME)
-    pFunc->pfDeblockingBSCalc           = DeblockingBSCalc_neon;
+    pFunc->pfDeblockingBSCalc       = DeblockingBSCalc_neon;
 #endif
   }
 #endif
 
 #if defined(HAVE_NEON_AARCH64)
   if (iCpu & WELS_CPU_NEON) {
-    pFunc->pfLumaDeblockingLT4Ver		= DeblockLumaLt4V_AArch64_neon;
-    pFunc->pfLumaDeblockingEQ4Ver		= DeblockLumaEq4V_AArch64_neon;
-    pFunc->pfLumaDeblockingLT4Hor		= DeblockLumaLt4H_AArch64_neon;
-    pFunc->pfLumaDeblockingEQ4Hor		= DeblockLumaEq4H_AArch64_neon;
+    pFunc->pfLumaDeblockingLT4Ver   = DeblockLumaLt4V_AArch64_neon;
+    pFunc->pfLumaDeblockingEQ4Ver   = DeblockLumaEq4V_AArch64_neon;
+    pFunc->pfLumaDeblockingLT4Hor   = DeblockLumaLt4H_AArch64_neon;
+    pFunc->pfLumaDeblockingEQ4Hor   = DeblockLumaEq4H_AArch64_neon;
 
-    pFunc->pfChromaDeblockingLT4Ver     = DeblockChromaLt4V_AArch64_neon;
-    pFunc->pfChromaDeblockingEQ4Ver     = DeblockChromaEq4V_AArch64_neon;
-    pFunc->pfChromaDeblockingLT4Hor     = DeblockChromaLt4H_AArch64_neon;
-    pFunc->pfChromaDeblockingEQ4Hor     = DeblockChromaEq4H_AArch64_neon;
+    pFunc->pfChromaDeblockingLT4Ver = DeblockChromaLt4V_AArch64_neon;
+    pFunc->pfChromaDeblockingEQ4Ver = DeblockChromaEq4V_AArch64_neon;
+    pFunc->pfChromaDeblockingLT4Hor = DeblockChromaLt4H_AArch64_neon;
+    pFunc->pfChromaDeblockingEQ4Hor = DeblockChromaEq4H_AArch64_neon;
 
 #if defined(SINGLE_REF_FRAME)
-    pFunc->pfDeblockingBSCalc           = DeblockingBSCalc_AArch64_neon;
+    pFunc->pfDeblockingBSCalc       = DeblockingBSCalc_AArch64_neon;
 #endif
   }
 #endif
+
+#if defined(HAVE_MMI)
+  if (iCpu & WELS_CPU_MMI) {
+    pFunc->pfLumaDeblockingLT4Ver   = DeblockLumaLt4V_mmi;
+    pFunc->pfLumaDeblockingEQ4Ver   = DeblockLumaEq4V_mmi;
+    pFunc->pfLumaDeblockingLT4Hor   = DeblockLumaLt4H_mmi;
+    pFunc->pfLumaDeblockingEQ4Hor   = DeblockLumaEq4H_mmi;
+    pFunc->pfChromaDeblockingLT4Ver = DeblockChromaLt4V_mmi;
+    pFunc->pfChromaDeblockingEQ4Ver = DeblockChromaEq4V_mmi;
+    pFunc->pfChromaDeblockingLT4Hor = DeblockChromaLt4H_mmi;
+    pFunc->pfChromaDeblockingEQ4Hor = DeblockChromaEq4H_mmi;
+  }
+#endif//HAVE_MMI
 }
 
 

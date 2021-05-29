@@ -49,11 +49,11 @@ void DyadicBilinearDownsampler_c (uint8_t* pDst, const int32_t kiDstStride,
                                   const int32_t kiSrcWidth, const int32_t kiSrcHeight)
 
 {
-  uint8_t* pDstLine	= pDst;
-  uint8_t* pSrcLine	= pSrc;
-  const int32_t kiSrcStridex2	= kiSrcStride << 1;
-  const int32_t kiDstWidth		= kiSrcWidth >> 1;
-  const int32_t kiDstHeight	= kiSrcHeight >> 1;
+  uint8_t* pDstLine     = pDst;
+  uint8_t* pSrcLine     = pSrc;
+  const int32_t kiSrcStridex2   = kiSrcStride << 1;
+  const int32_t kiDstWidth      = kiSrcWidth  >> 1;
+  const int32_t kiDstHeight     = kiSrcHeight >> 1;
 
   for (int32_t j = 0; j < kiDstHeight; j ++) {
     for (int32_t i = 0; i < kiDstWidth; i ++) {
@@ -63,8 +63,55 @@ void DyadicBilinearDownsampler_c (uint8_t* pDst, const int32_t kiDstStride,
 
       pDstLine[i] = (uint8_t) ((kiTempRow1 + kiTempRow2 + 1) >> 1);
     }
-    pDstLine	+= kiDstStride;
-    pSrcLine	+= kiSrcStridex2;
+    pDstLine    += kiDstStride;
+    pSrcLine    += kiSrcStridex2;
+  }
+}
+
+void DyadicBilinearQuarterDownsampler_c (uint8_t* pDst, const int32_t kiDstStride,
+    uint8_t* pSrc, const int32_t kiSrcStride,
+    const int32_t kiSrcWidth, const int32_t kiSrcHeight)
+
+{
+  uint8_t* pDstLine     = pDst;
+  uint8_t* pSrcLine     = pSrc;
+  const int32_t kiSrcStridex4   = kiSrcStride << 2;
+  const int32_t kiDstWidth      = kiSrcWidth  >> 2;
+  const int32_t kiDstHeight     = kiSrcHeight >> 2;
+
+  for (int32_t j = 0; j < kiDstHeight; j ++) {
+    for (int32_t i = 0; i < kiDstWidth; i ++) {
+      const int32_t kiSrcX = i << 2;
+      const int32_t kiTempRow1 = (pSrcLine[kiSrcX] + pSrcLine[kiSrcX + 1] + 1) >> 1;
+      const int32_t kiTempRow2 = (pSrcLine[kiSrcX + kiSrcStride] + pSrcLine[kiSrcX + kiSrcStride + 1] + 1) >> 1;
+
+      pDstLine[i] = (uint8_t) ((kiTempRow1 + kiTempRow2 + 1) >> 1);
+    }
+    pDstLine    += kiDstStride;
+    pSrcLine    += kiSrcStridex4;
+  }
+}
+
+void DyadicBilinearOneThirdDownsampler_c (uint8_t* pDst, const int32_t kiDstStride,
+    uint8_t* pSrc, const int32_t kiSrcStride,
+    const int32_t kiSrcWidth, const int32_t kiDstHeight)
+
+{
+  uint8_t* pDstLine     = pDst;
+  uint8_t* pSrcLine     = pSrc;
+  const int32_t kiSrcStridex3   = kiSrcStride * 3;
+  const int32_t kiDstWidth      = kiSrcWidth / 3;
+
+  for (int32_t j = 0; j < kiDstHeight; j ++) {
+    for (int32_t i = 0; i < kiDstWidth; i ++) {
+      const int32_t kiSrcX = i * 3;
+      const int32_t kiTempRow1 = (pSrcLine[kiSrcX] + pSrcLine[kiSrcX + 1] + 1) >> 1;
+      const int32_t kiTempRow2 = (pSrcLine[kiSrcX + kiSrcStride] + pSrcLine[kiSrcX + kiSrcStride + 1] + 1) >> 1;
+
+      pDstLine[i] = (uint8_t) ((kiTempRow1 + kiTempRow2 + 1) >> 1);
+    }
+    pDstLine    += kiDstStride;
+    pSrcLine    += kiSrcStridex3;
   }
 }
 
@@ -110,7 +157,7 @@ void GeneralBilinearFastDownsampler_c (uint8_t* pDst, const int32_t kiDstStride,
       x += 1;
       x >>= 1;
       //x = (((__int64)(SCALE_BIG - 1 - iFu))*(SCALE_BIG - 1 - fv)*a + ((__int64)iFu)*(SCALE_BIG - 1 -fv)*b + ((__int64)(SCALE_BIG - 1 -iFu))*fv*c +
-      //		 ((__int64)iFu)*fv*d + (1 << (2*SCALE_BIT_BIG-1)) ) >> (2*SCALE_BIT_BIG);
+      // ((__int64)iFu)*fv*d + (1 << (2*SCALE_BIT_BIG-1)) ) >> (2*SCALE_BIT_BIG);
       x = WELS_CLAMP (x, 0, 255);
       *pByDst++ = (uint8_t)x;
 
@@ -200,58 +247,54 @@ void GeneralBilinearAccurateDownsampler_c (uint8_t* pDst, const int32_t kiDstStr
   }
 }
 
-
-#ifdef X86_ASM
-void GeneralBilinearFastDownsamplerWrap_sse2 (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth,
+#if defined(X86_ASM) || defined(HAVE_NEON) || defined(HAVE_NEON_AARCH64)
+static void GeneralBilinearDownsamplerWrap (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth,
     const int32_t kiDstHeight,
-    uint8_t* pSrc, const int32_t kiSrcStride, const int32_t kiSrcWidth, const int32_t kiSrcHeight) {
-  const int32_t kiScaleBitWidth = 16, kiScaleBitHeight = 15;
+    uint8_t* pSrc, const int32_t kiSrcStride, const int32_t kiSrcWidth, const int32_t kiSrcHeight,
+    const int32_t kiScaleBitWidth, const int32_t kiScaleBitHeight,
+    void (*func) (uint8_t* pDst, int32_t iDstStride, int32_t iDstWidth, int32_t iDstHeight,
+                  uint8_t* pSrc, int32_t iSrcStride, uint32_t uiScaleX, uint32_t uiScaleY)) {
   const uint32_t kuiScaleWidth = (1 << kiScaleBitWidth), kuiScaleHeight = (1 << kiScaleBitHeight);
 
   uint32_t uiScalex = WELS_ROUND ((float)kiSrcWidth / (float)kiDstWidth * kuiScaleWidth);
   uint32_t uiScaley = WELS_ROUND ((float)kiSrcHeight / (float)kiDstHeight * kuiScaleHeight);
 
-  GeneralBilinearFastDownsampler_sse2 (pDst, kiDstStride, kiDstWidth, kiDstHeight,
-                                       pSrc, kiSrcStride, uiScalex, uiScaley);
+  func (pDst, kiDstStride, kiDstWidth, kiDstHeight, pSrc, kiSrcStride, uiScalex, uiScaley);
 }
 
-void GeneralBilinearAccurateDownsamplerWrap_sse2 (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth,
-    const int32_t kiDstHeight,
-    uint8_t* pSrc, const int32_t kiSrcStride, const int32_t kiSrcWidth, const int32_t kiSrcHeight) {
-  const int32_t kiScaleBit = 15;
-  const uint32_t kuiScale = (1 << kiScaleBit);
+#define DEFINE_GENERAL_BILINEAR_FAST_DOWNSAMPLER_WRAP(suffix) \
+  void GeneralBilinearFastDownsamplerWrap_ ## suffix ( \
+      uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth, const int32_t kiDstHeight, \
+      uint8_t* pSrc, const int32_t kiSrcStride, const int32_t kiSrcWidth, const int32_t kiSrcHeight) { \
+    GeneralBilinearDownsamplerWrap (pDst, kiDstStride, kiDstWidth, kiDstHeight, \
+        pSrc, kiSrcStride, kiSrcWidth, kiSrcHeight, 16, 15, GeneralBilinearFastDownsampler_ ## suffix); \
+  }
 
-  uint32_t uiScalex = WELS_ROUND ((float)kiSrcWidth / (float)kiDstWidth * kuiScale);
-  uint32_t uiScaley = WELS_ROUND ((float)kiSrcHeight / (float)kiDstHeight * kuiScale);
+#define DEFINE_GENERAL_BILINEAR_ACCURATE_DOWNSAMPLER_WRAP(suffix) \
+  void GeneralBilinearAccurateDownsamplerWrap_ ## suffix ( \
+      uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth, const int32_t kiDstHeight, \
+      uint8_t* pSrc, const int32_t kiSrcStride, const int32_t kiSrcWidth, const int32_t kiSrcHeight) { \
+    GeneralBilinearDownsamplerWrap (pDst, kiDstStride, kiDstWidth, kiDstHeight, \
+        pSrc, kiSrcStride, kiSrcWidth, kiSrcHeight, 15, 15, GeneralBilinearAccurateDownsampler_ ## suffix); \
+  }
+#endif
 
-  GeneralBilinearAccurateDownsampler_sse2 (pDst, kiDstStride, kiDstWidth, kiDstHeight,
-      pSrc, kiSrcStride, uiScalex, uiScaley);
-}
+#ifdef X86_ASM
+DEFINE_GENERAL_BILINEAR_FAST_DOWNSAMPLER_WRAP (sse2)
+DEFINE_GENERAL_BILINEAR_ACCURATE_DOWNSAMPLER_WRAP (sse2)
+DEFINE_GENERAL_BILINEAR_FAST_DOWNSAMPLER_WRAP (ssse3)
+DEFINE_GENERAL_BILINEAR_ACCURATE_DOWNSAMPLER_WRAP (sse41)
+#ifdef HAVE_AVX2
+DEFINE_GENERAL_BILINEAR_FAST_DOWNSAMPLER_WRAP (avx2)
+DEFINE_GENERAL_BILINEAR_ACCURATE_DOWNSAMPLER_WRAP (avx2)
+#endif
 #endif //X86_ASM
 
 #ifdef HAVE_NEON
-void GeneralBilinearAccurateDownsamplerWrap_neon (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth,
-    const int32_t kiDstHeight,
-    uint8_t* pSrc, const int32_t kiSrcStride, const int32_t kiSrcWidth, const int32_t kiSrcHeight) {
-  const int32_t kiScaleBit = 15;
-  const uint32_t kuiScale = (1 << kiScaleBit);
-  uint32_t uiScalex = WELS_ROUND ((float)kiSrcWidth / (float)kiDstWidth * kuiScale);
-  uint32_t uiScaley = WELS_ROUND ((float)kiSrcHeight / (float)kiDstHeight * kuiScale);
-  GeneralBilinearAccurateDownsampler_neon (pDst, kiDstStride, kiDstWidth, kiDstHeight, pSrc, kiSrcStride, uiScalex,
-      uiScaley);
-}
+DEFINE_GENERAL_BILINEAR_ACCURATE_DOWNSAMPLER_WRAP (neon)
 #endif
 
 #ifdef HAVE_NEON_AARCH64
-void GeneralBilinearAccurateDownsamplerWrap_AArch64_neon (uint8_t* pDst, const int32_t kiDstStride,
-    const int32_t kiDstWidth, const int32_t kiDstHeight,
-    uint8_t* pSrc, const int32_t kiSrcStride, const int32_t kiSrcWidth, const int32_t kiSrcHeight) {
-  const int32_t kiScaleBit = 15;
-  const uint32_t kuiScale = (1 << kiScaleBit);
-  uint32_t uiScalex = WELS_ROUND ((float)kiSrcWidth / (float)kiDstWidth * kuiScale);
-  uint32_t uiScaley = WELS_ROUND ((float)kiSrcHeight / (float)kiDstHeight * kuiScale);
-  GeneralBilinearAccurateDownsampler_AArch64_neon (pDst, kiDstStride, kiDstWidth, kiDstHeight, pSrc, kiSrcStride,
-      uiScalex, uiScaley);
-}
+DEFINE_GENERAL_BILINEAR_ACCURATE_DOWNSAMPLER_WRAP (AArch64_neon)
 #endif
 WELSVP_NAMESPACE_END

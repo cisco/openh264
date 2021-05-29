@@ -17,7 +17,7 @@ bool YUVPixelDataGenerator (uint8_t* pPointer, int32_t iWidth, int32_t iHeight, 
   const int32_t kiFrameSize = SRC_FRAME_WIDTH * SRC_FRAME_HEIGHT;
   BufferedData sBuf;
   sBuf.SetLength (kiFrameSize);
-  if (sBuf.Length() != (size_t)kiFrameSize) {
+  if (sBuf.Length() != (size_t)kiFrameSize) { //include memory fail (-1) case
     return false;
   }
 

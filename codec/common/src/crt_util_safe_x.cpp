@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	crt_utils_safe_x.cpp
+ * \file    crt_utils_safe_x.cpp
  *
- * \brief	common tool/function utilization
+ * \brief   common tool/function utilization
  *
- * \date	03/10/2009 Created
+ * \date    03/10/2009 Created
  *
  *************************************************************************************
  */
@@ -54,11 +54,11 @@
 #endif //_WIN32
 
 #include "macros.h"
-#include "crt_util_safe_x.h"	// Safe CRT routines like utils for cross platforms
+#include "crt_util_safe_x.h" // Safe CRT routines like utils for cross platforms
 
-#if  defined(_WIN32) && defined(_MSC_VER)
+#if defined(_WIN32) && defined(_MSC_VER)
 
-#if  defined(_MSC_VER) && (_MSC_VER>=1500)
+#if defined(_MSC_VER) && (_MSC_VER>=1500)
 
 int32_t WelsSnprintf (char* pBuffer,  int32_t iSizeOfBuffer, const char* kpFormat, ...) {
   va_list  pArgPtr;
@@ -242,9 +242,11 @@ int32_t WelsStrftime (char* pBuffer, int32_t iSize, const char* kpFormat, const 
 #endif
 
 
-char* WelsStrcat (char* pDest, int32_t iSizeInBytes, const char* kpSrc) {
-  int32_t iCurLen = (int32_t)strlen (pDest);
-  return WelsStrncpy (pDest + iCurLen, iSizeInBytes - iCurLen, kpSrc);
+char* WelsStrcat (char* pDest, uint32_t uiSizeInBytes, const char* kpSrc) {
+  uint32_t uiCurLen = (uint32_t) strlen (pDest);
+  if (uiSizeInBytes > uiCurLen)
+    return WelsStrncpy (pDest + uiCurLen, uiSizeInBytes - uiCurLen, kpSrc);
+  return pDest;
 }
 
 int32_t WelsFwrite (const void* kpBuffer, int32_t iSize, int32_t iCount, WelsFileHandle* pFp) {

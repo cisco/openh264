@@ -39,11 +39,11 @@ void Write2File (FILE* pFp, unsigned char* pData[3], int iStride[2], int iWidth,
 #ifdef ENABLE_DISPLAY_MODULE
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define IDM_ABOUT						104
-#define IDM_EXIT						105
-#define IDI_TESTSHARESURFACE	        107
-#define IDI_SMALL						108
-#define IDC_TESTSHARESURFACE	        109
+#define IDM_ABOUT                       104
+#define IDM_EXIT                        105
+#define IDI_TESTSHARESURFACE            107
+#define IDI_SMALL                       108
+#define IDC_TESTSHARESURFACE            109
 
 #define NV12_FORMAT  MAKEFOURCC('N','V','1','2')
 
@@ -336,7 +336,7 @@ HRESULT CD3D9ExUtils::Render (void* pDst[3], SBufferInfo* pInfo) {
       || m_nHeight != pInfo->UsrData.sSystemBuffer.iHeight) {
     m_nWidth = pInfo->UsrData.sSystemBuffer.iWidth;
     m_nHeight = pInfo->UsrData.sSystemBuffer.iHeight;
-    MoveWindow(m_hWnd,0,0,pInfo->UsrData.sSystemBuffer.iWidth,pInfo->UsrData.sSystemBuffer.iHeight,true);
+    MoveWindow (m_hWnd, 0, 0, pInfo->UsrData.sSystemBuffer.iWidth, pInfo->UsrData.sSystemBuffer.iHeight, true);
     SAFE_RELEASE (m_lpD3D9RawSurfaceShare);
     SAFE_RELEASE (m_lpD3D9Device);
   }
@@ -465,18 +465,18 @@ HRESULT InitWindow (HWND* hWnd) {
   const TCHAR kszWindowClass[] = TEXT ("Wels Decoder Class");
 
   WNDCLASSEX sWndClassEx = {0};
-  sWndClassEx.cbSize          = sizeof (WNDCLASSEX);
-  sWndClassEx.style			= CS_HREDRAW | CS_VREDRAW;
-  sWndClassEx.lpfnWndProc	    = (WNDPROC)WndProc;
-  sWndClassEx.cbClsExtra		= 0;
-  sWndClassEx.cbWndExtra		= 0;
-  sWndClassEx.hInstance		= GetModuleHandle (NULL);
-  sWndClassEx.hIcon			= LoadIcon (sWndClassEx.hInstance, (LPCTSTR)IDI_TESTSHARESURFACE);
-  sWndClassEx.hCursor		    = LoadCursor (NULL, IDC_ARROW);
-  sWndClassEx.hbrBackground	= (HBRUSH) (COLOR_WINDOW + 1);
-  sWndClassEx.lpszMenuName	= (LPCSTR)IDC_TESTSHARESURFACE;
-  sWndClassEx.lpszClassName	= kszWindowClass;
-  sWndClassEx.hIconSm		    = LoadIcon (sWndClassEx.hInstance, (LPCTSTR)IDI_SMALL);
+  sWndClassEx.cbSize            = sizeof (WNDCLASSEX);
+  sWndClassEx.style             = CS_HREDRAW | CS_VREDRAW;
+  sWndClassEx.lpfnWndProc       = (WNDPROC)WndProc;
+  sWndClassEx.cbClsExtra        = 0;
+  sWndClassEx.cbWndExtra        = 0;
+  sWndClassEx.hInstance         = GetModuleHandle (NULL);
+  sWndClassEx.hIcon             = LoadIcon (sWndClassEx.hInstance, (LPCTSTR)IDI_TESTSHARESURFACE);
+  sWndClassEx.hCursor           = LoadCursor (NULL, IDC_ARROW);
+  sWndClassEx.hbrBackground     = (HBRUSH) (COLOR_WINDOW + 1);
+  sWndClassEx.lpszMenuName      = (LPCSTR)IDC_TESTSHARESURFACE;
+  sWndClassEx.lpszClassName     = kszWindowClass;
+  sWndClassEx.hIconSm           = LoadIcon (sWndClassEx.hInstance, (LPCTSTR)IDI_SMALL);
 
   if (!RegisterClassEx (&sWndClassEx))
     return E_FAIL;
@@ -605,23 +605,17 @@ int CUtils::CheckOS() {
   OSVERSIONINFOEX osvi;
   ZeroMemory (&osvi, sizeof (OSVERSIONINFOEX));
   osvi.dwOSVersionInfoSize = sizeof (OSVERSIONINFOEX);
+  osvi.dwPlatformId = VER_PLATFORM_WIN32_NT;
+  osvi.dwMajorVersion = 6; // Vista
+  DWORDLONG condmask = VerSetConditionMask (VerSetConditionMask (0, VER_MAJORVERSION, VER_GREATER_EQUAL),
+                       VER_PLATFORMID, VER_EQUAL);
 
-  if (!GetVersionEx ((OSVERSIONINFO*) &osvi)) {
-    osvi.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
-    if (! GetVersionEx ((OSVERSIONINFO*) &osvi))
-      return iType;
-  }
-
-  switch (osvi.dwPlatformId) {
-  case VER_PLATFORM_WIN32_NT:
-    if (osvi.dwMajorVersion >= 6)
-      iType = OS_VISTA_UPPER;
-    else if (osvi.dwMajorVersion == 5)
+  if (VerifyVersionInfo (&osvi, VER_MAJORVERSION | VER_PLATFORMID, condmask)) {
+    iType = OS_VISTA_UPPER;
+  } else {
+    osvi.dwMajorVersion = 5; // XP/2000
+    if (VerifyVersionInfo (&osvi, VER_MAJORVERSION | VER_PLATFORMID, condmask))
       iType = OS_XP;
-    break;
-
-  default:
-    break;
   }
 #endif
 

@@ -80,7 +80,7 @@ typedef enum {
 typedef enum {
   cmResultSuccess,          ///< successful
   cmInitParaError,          ///< parameters are invalid
-  cmUnkonwReason,
+  cmUnknownReason,
   cmMallocMemeError,        ///< malloc a memory error
   cmInitExpected,           ///< initial action is expected
   cmUnsupportedData
@@ -118,8 +118,19 @@ enum ENalPriority {
 #define IS_IDR_NAL(eNalRefIdc, eNalType) \
 ( (eNalRefIdc == NAL_PRIORITY_HIGHEST) && (eNalType == NAL_SLICE_IDR) )
 
-#define FRAME_NUM_PARAM_SET		(-1)
-#define FRAME_NUM_IDR			0
+#define FRAME_NUM_PARAM_SET     (-1)
+#define FRAME_NUM_IDR           0
+
+/**
+ * @brief eDeblockingIdc
+ */
+enum {
+  DEBLOCKING_IDC_0 = 0,
+  DEBLOCKING_IDC_1 = 1,
+  DEBLOCKING_IDC_2 = 2
+};
+#define DEBLOCKING_OFFSET (6)
+#define DEBLOCKING_OFFSET_MINUS (-6)
 
 /* Error Tools definition */
 typedef unsigned short ERR_TOOL;
@@ -135,7 +146,7 @@ enum {
   ET_IR_R2 = 0x08,          ///< Intra Refresh in predifined 5% MB
   ET_IR_R3 = 0x10,          ///< Intra Refresh in predifined 10% MB
   ET_FEC_HALF = 0x20,       ///< Forward Error Correction in 50% redundency mode
-  ET_FEC_FULL	= 0x40,     ///< Forward Error Correction in 100% redundency mode
+  ET_FEC_FULL = 0x40,       ///< Forward Error Correction in 100% redundency mode
   ET_RFS = 0x80             ///< Reference Frame Selection
 };
 
@@ -143,15 +154,15 @@ enum {
 * @brief Information of coded Slice(=NAL)(s)
 */
 typedef struct SliceInformation {
-  unsigned char* pBufferOfSlices;	 ///< base buffer of coded slice(s)
+  unsigned char* pBufferOfSlices;    ///< base buffer of coded slice(s)
   int            iCodedSliceCount;   ///< number of coded slices
-  unsigned int*	 pLengthOfSlices;	 ///< array of slices length accordingly by number of slice
+  unsigned int*  pLengthOfSlices;    ///< array of slices length accordingly by number of slice
   int            iFecType;           ///< FEC type[0, 50%FEC, 100%FEC]
-  unsigned char	 uiSliceIdx;         ///< index of slice in frame [FMO: 0,..,uiSliceCount-1; No FMO: 0]
-  unsigned char	 uiSliceCount;       ///< count number of slice in frame [FMO: 2-8; No FMO: 1]
+  unsigned char  uiSliceIdx;         ///< index of slice in frame [FMO: 0,..,uiSliceCount-1; No FMO: 0]
+  unsigned char  uiSliceCount;       ///< count number of slice in frame [FMO: 2-8; No FMO: 1]
   char           iFrameIndex;        ///< index of frame[-1, .., idr_interval-1]
-  unsigned char	 uiNalRefIdc;        ///< NRI, priority level of slice(NAL)
-  unsigned char	 uiNalType;          ///< NAL type
+  unsigned char  uiNalRefIdc;        ///< NRI, priority level of slice(NAL)
+  unsigned char  uiNalType;          ///< NAL type
   unsigned char
   uiContainingFinalNal;              ///< whether final NAL is involved in buffer of coded slices, flag used in Pause feature in T27
 } SliceInfo, *PSliceInfo;
@@ -190,6 +201,7 @@ typedef struct TagBufferInfo {
   union {
     SSysMEMBuffer sSystemBuffer; ///<  memory info for one picture
   } UsrData;                     ///<  output buffer info
+  unsigned char* pDst[3];  //point to picture YUV data
 } SBufferInfo;
 
 

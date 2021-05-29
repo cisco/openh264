@@ -47,7 +47,7 @@ struct SVCEncoderImpl : public ISVCEncoder {
     EXPECT_TRUE (gThis == this);
     return 6;
   }
-  virtual int EXTAPI ForceIntraFrame (bool bIDR) {
+  virtual int EXTAPI ForceIntraFrame (bool bIDR, int iLayerId = -1) {
     EXPECT_TRUE (gThis == this);
     return 7;
   }
@@ -77,29 +77,38 @@ struct SVCDecoderImpl : public ISVCDecoder {
     EXPECT_TRUE (gThis == this);
     return static_cast<DECODING_STATE> (3);
   }
-  virtual DECODING_STATE EXTAPI DecodeFrame2 (const unsigned char* pSrc,
+  virtual DECODING_STATE EXTAPI DecodeFrameNoDelay (const unsigned char* pSrc,
       const int iSrcLen, unsigned char** ppDst, SBufferInfo* pDstInfo) {
     EXPECT_TRUE (gThis == this);
     return static_cast<DECODING_STATE> (4);
+  }
+  virtual DECODING_STATE EXTAPI DecodeFrame2 (const unsigned char* pSrc,
+      const int iSrcLen, unsigned char** ppDst, SBufferInfo* pDstInfo) {
+    EXPECT_TRUE (gThis == this);
+    return static_cast<DECODING_STATE> (5);
+  }
+  virtual DECODING_STATE EXTAPI FlushFrame (unsigned char** ppDst, SBufferInfo* pDstInfo) {
+    EXPECT_TRUE (gThis == this);
+    return static_cast<DECODING_STATE> (10);
   }
   virtual DECODING_STATE EXTAPI DecodeFrameEx (const unsigned char* pSrc,
       const int iSrcLen, unsigned char* pDst, int iDstStride,
       int& iDstLen, int& iWidth, int& iHeight, int& iColorFormat) {
     EXPECT_TRUE (gThis == this);
-    return static_cast<DECODING_STATE> (5);
+    return static_cast<DECODING_STATE> (6);
   }
   virtual DECODING_STATE EXTAPI DecodeParser (const unsigned char* pSrc,
       const int iSrcLen, SParserBsInfo* pDstInfo) {
     EXPECT_TRUE (gThis == this);
-    return static_cast<DECODING_STATE> (6);
+    return static_cast<DECODING_STATE> (7);
   }
   virtual long EXTAPI SetOption (DECODER_OPTION eOptionId, void* pOption) {
     EXPECT_TRUE (gThis == this);
-    return 7;
+    return static_cast<DECODING_STATE> (8);
   }
   virtual long EXTAPI GetOption (DECODER_OPTION eOptionId, void* pOption) {
     EXPECT_TRUE (gThis == this);
-    return 8;
+    return static_cast<DECODING_STATE> (9);
   }
 };
 

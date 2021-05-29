@@ -62,9 +62,9 @@ int main(int argc, char * argv[])
     else
         NSLog(@"Unit test runing failed on devices");
     abort();
-    
+
 #endif
-    
+
     @autoreleasepool {
         return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
     }

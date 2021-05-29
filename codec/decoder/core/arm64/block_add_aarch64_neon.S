@@ -31,42 +31,8 @@
  */
 
 #ifdef HAVE_NEON_AARCH64
-.text
 #include "arm_arch64_common_macro.S"
-#ifdef __APPLE__
-.macro ROW_TRANSFORM_1_STEP
-//  {   //  input: src_d[0]~[3], output: e_q[0]~[3]; working: $8 $9
 
-    saddl       $4.4s, $0.4h, $2.4h          //int32 e[i][0] = src[0] + src[2];
-    ssubl       $5.4s, $0.4h, $2.4h          //int32 e[i][1] = src[0] - src[2];
-    sshr        $8.4h, $1.4h, #1
-    sshr        $9.4h, $3.4h, #1
-    ssubl       $6.4s, $8.4h, $3.4h          //int32 e[i][2] = (src[1]>>1)-src[3];
-    saddl       $7.4s, $1.4h, $9.4h          //int32 e[i][3] = src[1] + (src[3]>>1);
-//  }
-.endm
-
-.macro TRANSFORM_4BYTES // both row & col transform used
-//  {   //  output: f_q[0]~[3], input: e_q[0]~[3];
-    add       $0.4s, $4.4s, $7.4s          //int16 f[i][0] = e[i][0] + e[i][3];
-    add       $1.4s, $5.4s, $6.4s          //int16 f[i][1] = e[i][1] + e[i][2];
-    sub       $2.4s, $5.4s, $6.4s          //int16 f[i][2] = e[i][1] - e[i][2];
-    sub       $3.4s, $4.4s, $7.4s          //int16 f[i][3] = e[i][0] - e[i][3];
-//  }
-.endm
-
-.macro COL_TRANSFORM_1_STEP
-//  {   //  input: src_q[0]~[3], output: e_q[0]~[3];
-    add        $4.4s, $0.4s, $2.4s          //int32 e[0][j] = f[0][j] + f[2][j];
-    sub        $5.4s, $0.4s, $2.4s          //int32 e[1][j] = f[0][j] - f[2][j];
-    sshr        $6.4s, $1.4s, #1
-    sshr        $7.4s, $3.4s, #1
-    sub        $6.4s, $6.4s, $3.4s          //int32 e[2][j] = (f[1][j]>>1) - f[3][j];
-    add        $7.4s, $1.4s, $7.4s          //int32 e[3][j] = f[1][j] + (f[3][j]>>1);
-//  }
-.endm
-
-#else
 .macro ROW_TRANSFORM_1_STEP arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
 //  {   //  input: src_d[0]~[3], output: e_q[0]~[3]; working: \arg8\() \arg9\()
 
@@ -99,25 +65,10 @@
     add        \arg7\().4s, \arg1\().4s, \arg7\().4s          //int32 e[3][j] = f[1][j] + (f[3][j]>>1);
 //  }
 .endm
-#endif
-// x0    int8_t* non_zero_count,
-WELS_ASM_AARCH64_FUNC_BEGIN SetNonZeroCount_AArch64_neon
-    mov x1, x0
-    ld1 {v0.16b}, [x1], #16
-    ld1 {v1.8b}, [x1]
-    cmeq v0.16b, v0.16b, #0
-    cmeq v1.8b, v1.8b, #0
-    mvn  v0.16b, v0.16b
-    mvn  v1.8b, v1.8b
-    abs  v0.16b, v0.16b
-    abs  v1.8b, v1.8b
-    st1 {v0.16b}, [x0], #16
-    st1 {v1.8b}, [x0]
-WELS_ASM_AARCH64_FUNC_END
 
 //  uint8_t *pred, const int32_t stride, int16_t *rs
 WELS_ASM_AARCH64_FUNC_BEGIN IdctResAddPred_AArch64_neon
-
+    SIGN_EXTENSION x1,w1
     ld4        {v0.4h, v1.4h, v2.4h, v3.4h}, [x2]      // cost 3 cycles!
     ROW_TRANSFORM_1_STEP        v0, v1, v2, v3, v16, v17, v18, v19, v4, v5
     TRANSFORM_4BYTES        v0, v1, v2, v3, v16, v17, v18, v19
@@ -162,6 +113,7 @@ WELS_ASM_AARCH64_FUNC_END
 WELS_ASM_AARCH64_FUNC_BEGIN WelsBlockZero16x16_AArch64_neon
     eor v0.16b, v0.16b, v0.16b
     eor v1.16b, v1.16b, v1.16b
+    SIGN_EXTENSION x1,w1
     lsl x1, x1, 1
 .rept 16
     st1 {v0.16b, v1.16b}, [x0], x1
@@ -170,6 +122,7 @@ WELS_ASM_AARCH64_FUNC_END
 
 WELS_ASM_AARCH64_FUNC_BEGIN WelsBlockZero8x8_AArch64_neon
     eor v0.16b, v0.16b, v0.16b
+    SIGN_EXTENSION x1, w1
     lsl x1, x1, 1
 .rept 8
     st1 {v0.16b}, [x0], x1

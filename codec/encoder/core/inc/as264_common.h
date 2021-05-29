@@ -29,11 +29,11 @@
  *     POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * \file	common.h
+ * \file    common.h
  *
- * \brief	common flag definitions
+ * \brief   common flag definitions
  *
- * \date	7/6/2009 Created
+ * \date    7/6/2009 Created
  *
  *************************************************************************************
  */
@@ -50,16 +50,16 @@ $(TargetPath)
 /****************************************************************************
  * Options for algorithm, usually change bitrate
  ****************************************************************************/
-#define DISABLE_FMO_FEATURE	//
+#define DISABLE_FMO_FEATURE             //
 
 /****************************************************************************
  * Options for optimization, not change bitrate
  ****************************************************************************/
-//#undef	X86_ASM			// X86_ASM is included in project preprocessor definitions, undef it when need to disable asm code
-#define SINGLE_REF_FRAME		// need to disable it when use multi-reference
+//#undef        X86_ASM             // X86_ASM is included in project preprocessor definitions, undef it when need to disable asm code
+#define SINGLE_REF_FRAME            // need to disable it when use multi-reference
 
 
-#if defined(WELS_TESTBED)	    // for SGE testing
+#if defined(WELS_TESTBED)               // for SGE testing
 #define ENABLE_FRAME_DUMP
 
 #ifdef FRAME_INFO_OUTPUT
@@ -68,7 +68,7 @@ $(TargetPath)
 #endif//WELS_TESTBED
 
 
-#if defined(__UNITTEST__)	// for unittest
+#if defined(__UNITTEST__)               // for unittest
 #ifndef ENABLE_FRAME_DUMP
 #define ENABLE_FRAME_DUMP
 #endif//ENABLE_FRAME_DUMP
@@ -80,7 +80,7 @@ $(TargetPath)
 //
 //#define FRAME_INFO_OUTPUT
 //#define LAYER_INFO_OUTPUT
-//#define SLICE_INFO_OUTPUT		// useful in multiple slice coding track
+//#define SLICE_INFO_OUTPUT             // useful in multiple slice coding track
 //#define MB_TYPES_INFO_OUTPUT
 
 
@@ -138,17 +138,6 @@ $(TargetPath)
 #define MB_TYPES_CHECK
 #endif//MB_TYPES_CHECK
 #endif//MB_TYPES_INFO_OUTPUT
-
-// NOTE: please do not clean below lines even comment, turn on for potential memory leak verify and memory usage monitor etc.
-//#define MEMORY_CHECK
-#define MEMORY_MONITOR
-#ifdef MEMORY_CHECK
-#ifndef MEMORY_MONITOR
-#define MEMORY_MONITOR
-#endif//MEMORY_MONITOR
-#endif//MEMORY_CHECK
-
-
 
 #endif // AS264_COMMON_H_
 

@@ -39,7 +39,7 @@
 #include <stdarg.h>
 #include <string.h>
 
-#include "crt_util_safe_x.h"	// Safe CRT routines like utils for cross platforms
+#include "crt_util_safe_x.h" // Safe CRT routines like utils for cross platforms
 
 #include "welsCodecTrace.h"
 #include "utils.h"
@@ -58,6 +58,7 @@ welsCodecTrace::welsCodecTrace() {
 
   m_sLogCtx.pLogCtx = this;
   m_sLogCtx.pfLog = StaticCodecTrace;
+  m_sLogCtx.pCodecInstance = NULL;
 }
 
 welsCodecTrace::~welsCodecTrace() {
@@ -77,15 +78,19 @@ void welsCodecTrace::CodecTrace (const int32_t iLevel, const char* Str_Format, v
   }
 
   char pBuf[MAX_LOG_SIZE] = {0};
-  WelsVsnprintf (pBuf, MAX_LOG_SIZE, Str_Format, vl);	// confirmed_safe_unsafe_usage
+  WelsVsnprintf (pBuf, MAX_LOG_SIZE, Str_Format, vl); // confirmed_safe_unsafe_usage
   if (m_fpTrace) {
     m_fpTrace (m_pTraceCtx, iLevel, pBuf);
   }
 }
 
+void welsCodecTrace::SetCodecInstance (void* pCodecInstance) {
+  m_sLogCtx.pCodecInstance = pCodecInstance;
+}
+
 void welsCodecTrace::SetTraceLevel (const int32_t iLevel) {
   if (iLevel >= 0)
-    m_iTraceLevel	= iLevel;
+    m_iTraceLevel = iLevel;
 }
 
 void welsCodecTrace::SetTraceCallback (WelsTraceCallback func) {
