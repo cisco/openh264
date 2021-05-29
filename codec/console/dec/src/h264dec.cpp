@@ -52,7 +52,6 @@
 #include "measure_time.h"
 #include "d3d9_utils.h"
 
-
 using namespace std;
 
 #if defined (WINDOWS_PHONE)
@@ -69,6 +68,153 @@ int    g_iDecodedFrameNum = 0;
 #endif
 //using namespace WelsDec;
 
+int32_t readBit (uint8_t* pBufPtr, int32_t& curBit) {
+  int nIndex = curBit / 8;
+  int nOffset = curBit % 8 + 1;
+
+  curBit++;
+  return (pBufPtr[nIndex] >> (8 - nOffset)) & 0x01;
+}
+
+int32_t readBits (uint8_t* pBufPtr, int32_t& n, int32_t& curBit) {
+  int r = 0;
+  int i;
+  for (i = 0; i < n; i++) {
+    r |= (readBit (pBufPtr, curBit) << (n - i - 1));
+  }
+  return r;
+}
+
+int32_t bsGetUe (uint8_t* pBufPtr, int32_t& curBit) {
+  int r = 0;
+  int i = 0;
+  while ((readBit (pBufPtr, curBit) == 0) && (i < 32)) {
+    i++;
+  }
+  r = readBits (pBufPtr, i, curBit);
+  r += (1 << i) - 1;
+  return r;
+}
+
+int32_t readFirstMbInSlice (uint8_t* pSliceNalPtr) {
+  int32_t curBit = 0;
+  int32_t firstMBInSlice = bsGetUe (pSliceNalPtr + 1, curBit);
+  return firstMBInSlice;
+}
+
+int32_t readPicture (uint8_t* pBuf, const int32_t& iFileSize, const int32_t& bufPos, uint8_t*& pSpsBuf,
+                     int32_t& sps_byte_count) {
+  int32_t bytes_available = iFileSize - bufPos;
+  if (bytes_available < 4) {
+    return bytes_available;
+  }
+  uint8_t* ptr = pBuf + bufPos;
+  int32_t read_bytes = 0;
+  int32_t sps_count = 0;
+  int32_t pps_count = 0;
+  int32_t non_idr_pict_count = 0;
+  int32_t idr_pict_count = 0;
+  int32_t nal_deliminator = 0;
+  pSpsBuf = NULL;
+  sps_byte_count = 0;
+  while (read_bytes < bytes_available - 4) {
+    bool has4ByteStartCode = ptr[0] == 0 && ptr[1] == 0 && ptr[2] == 0 && ptr[3] == 1;
+    bool has3ByteStartCode = false;
+    if (!has4ByteStartCode) {
+      has3ByteStartCode = ptr[0] == 0 && ptr[1] == 0 && ptr[2] == 1;
+    }
+    if (has4ByteStartCode || has3ByteStartCode) {
+      int32_t byteOffset = has4ByteStartCode ? 4 : 3;
+      uint8_t nal_unit_type = has4ByteStartCode ? (ptr[4] & 0x1F) : (ptr[3] & 0x1F);
+      if (nal_unit_type == 1) {
+        int32_t firstMBInSlice = readFirstMbInSlice (ptr + byteOffset);
+        if (++non_idr_pict_count >= 1 && idr_pict_count >= 1 && firstMBInSlice == 0) {
+          return read_bytes;
+        }
+        if (non_idr_pict_count >= 2 && firstMBInSlice == 0) {
+          return read_bytes;
+        }
+      } else if (nal_unit_type == 5) {
+        int32_t firstMBInSlice = readFirstMbInSlice (ptr + byteOffset);
+        if (++idr_pict_count >= 1 && non_idr_pict_count >= 1 && firstMBInSlice == 0) {
+          return read_bytes;
+        }
+        if (idr_pict_count >= 2 && firstMBInSlice == 0) {
+          return read_bytes;
+        }
+      } else if (nal_unit_type == 7) {
+        pSpsBuf = ptr + (has4ByteStartCode ? 4 : 3);
+        if ((++sps_count >= 1) && (non_idr_pict_count >= 1 || idr_pict_count >= 1)) {
+          return read_bytes;
+        }
+        if (sps_count == 2) {
+          return read_bytes;
+        }
+      } else if (nal_unit_type == 8) {
+        if (++pps_count == 1 && sps_count == 1) {
+          sps_byte_count = int32_t (ptr - pSpsBuf);
+        }
+        if (pps_count >= 1 && (non_idr_pict_count >= 1 || idr_pict_count >= 1)) {
+          return read_bytes;
+        }
+      } else if (nal_unit_type == 9) {
+        if (++nal_deliminator == 2) {
+          return read_bytes;
+        }
+      }
+      if (read_bytes >= bytes_available - 4) {
+        return bytes_available;
+      }
+      read_bytes += 4;
+      ptr += 4;
+    } else {
+      ++ptr;
+      ++read_bytes;
+    }
+  }
+  return bytes_available;
+}
+
+void FlushFrames (ISVCDecoder* pDecoder, int64_t& iTotal, FILE* pYuvFile, FILE* pOptionFile, int32_t& iFrameCount,
+                  unsigned long long& uiTimeStamp, int32_t& iWidth, int32_t& iHeight, int32_t& iLastWidth, int32_t iLastHeight) {
+  uint8_t* pData[3] = { NULL };
+  uint8_t* pDst[3] = { NULL };
+  SBufferInfo sDstBufInfo;
+  int32_t num_of_frames_in_buffer = 0;
+  CUtils cOutputModule;
+  pDecoder->GetOption (DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER, &num_of_frames_in_buffer);
+  for (int32_t i = 0; i < num_of_frames_in_buffer; ++i) {
+    int64_t iStart = WelsTime();
+    pData[0] = NULL;
+    pData[1] = NULL;
+    pData[2] = NULL;
+    memset (&sDstBufInfo, 0, sizeof (SBufferInfo));
+    sDstBufInfo.uiInBsTimeStamp = uiTimeStamp;
+    pDecoder->FlushFrame (pData, &sDstBufInfo);
+    if (sDstBufInfo.iBufferStatus == 1) {
+      pDst[0] = sDstBufInfo.pDst[0];
+      pDst[1] = sDstBufInfo.pDst[1];
+      pDst[2] = sDstBufInfo.pDst[2];
+    }
+    int64_t iEnd = WelsTime();
+    iTotal += iEnd - iStart;
+    if (sDstBufInfo.iBufferStatus == 1) {
+      cOutputModule.Process ((void**)pDst, &sDstBufInfo, pYuvFile);
+      iWidth = sDstBufInfo.UsrData.sSystemBuffer.iWidth;
+      iHeight = sDstBufInfo.UsrData.sSystemBuffer.iHeight;
+      if (pOptionFile != NULL) {
+        if (iWidth != iLastWidth && iHeight != iLastHeight) {
+          fwrite (&iFrameCount, sizeof (iFrameCount), 1, pOptionFile);
+          fwrite (&iWidth, sizeof (iWidth), 1, pOptionFile);
+          fwrite (&iHeight, sizeof (iHeight), 1, pOptionFile);
+          iLastWidth = iWidth;
+          iLastHeight = iHeight;
+        }
+      }
+      ++iFrameCount;
+    }
+  }
+}
 void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, const char* kpOuputFileName,
                          int32_t& iWidth, int32_t& iHeight, const char* pOptionFileName, const char* pLengthFileName,
                          int32_t iErrorConMethod,
@@ -95,14 +241,17 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
 
   int32_t iBufPos = 0;
   int32_t iFileSize;
-  int32_t i = 0;
   int32_t iLastWidth = 0, iLastHeight = 0;
   int32_t iFrameCount = 0;
   int32_t iEndOfStreamFlag = 0;
-  int32_t num_of_frames_in_buffer = 0;
   pDecoder->SetOption (DECODER_OPTION_ERROR_CON_IDC, &iErrorConMethod);
   CUtils cOutputModule;
   double dElapsed = 0;
+  uint8_t uLastSpsBuf[32];
+  int32_t iLastSpsByteCount = 0;
+
+  int32_t iThreadCount = 1;
+  pDecoder->GetOption (DECODER_OPTION_NUM_OF_THREADS, &iThreadCount);
 
   if (kpH264FileName) {
     pH264File = fopen (kpH264FileName, "rb");
@@ -181,13 +330,32 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
         goto label_exit;
       iSliceSize = static_cast<int32_t> (pInfo[2]);
     } else {
-      for (i = 0; i < iFileSize; i++) {
-        if ((pBuf[iBufPos + i] == 0 && pBuf[iBufPos + i + 1] == 0 && pBuf[iBufPos + i + 2] == 0 && pBuf[iBufPos + i + 3] == 1
-             && i > 0) || (pBuf[iBufPos + i] == 0 && pBuf[iBufPos + i + 1] == 0 && pBuf[iBufPos + i + 2] == 1 && i > 0)) {
-          break;
+      if (iThreadCount >= 1) {
+        uint8_t* uSpsPtr = NULL;
+        int32_t iSpsByteCount = 0;
+        iSliceSize = readPicture (pBuf, iFileSize, iBufPos, uSpsPtr, iSpsByteCount);
+        if (iLastSpsByteCount > 0 && iSpsByteCount > 0) {
+          if (iSpsByteCount != iLastSpsByteCount || memcmp (uSpsPtr, uLastSpsBuf, iLastSpsByteCount) != 0) {
+            //whenever new sequence is different from preceding sequence. All pending frames must be flushed out before the new sequence can start to decode.
+            FlushFrames (pDecoder, iTotal, pYuvFile, pOptionFile, iFrameCount, uiTimeStamp, iWidth, iHeight, iLastWidth,
+                         iLastHeight);
+          }
         }
+        if (iSpsByteCount > 0 && uSpsPtr != NULL) {
+          if (iSpsByteCount > 32) iSpsByteCount = 32;
+          iLastSpsByteCount = iSpsByteCount;
+          memcpy (uLastSpsBuf, uSpsPtr, iSpsByteCount);
+        }
+      } else {
+        int i = 0;
+        for (i = 0; i < iFileSize; i++) {
+          if ((pBuf[iBufPos + i] == 0 && pBuf[iBufPos + i + 1] == 0 && pBuf[iBufPos + i + 2] == 0 && pBuf[iBufPos + i + 3] == 1
+               && i > 0) || (pBuf[iBufPos + i] == 0 && pBuf[iBufPos + i + 1] == 0 && pBuf[iBufPos + i + 2] == 1 && i > 0)) {
+            break;
+          }
+        }
+        iSliceSize = i;
       }
-      iSliceSize = i;
     }
     if (iSliceSize < 4) { //too small size, no effective data, ignore
       iBufPos += iSliceSize;
@@ -225,9 +393,9 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
     }
 
     if (sDstBufInfo.iBufferStatus == 1) {
-      pDst[0] = pData[0];
-      pDst[1] = pData[1];
-      pDst[2] = pData[2];
+      pDst[0] = sDstBufInfo.pDst[0];
+      pDst[1] = sDstBufInfo.pDst[1];
+      pDst[2] = sDstBufInfo.pDst[2];
     }
     iEnd    = WelsTime();
     iTotal += iEnd - iStart;
@@ -257,9 +425,9 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
       sDstBufInfo.uiInBsTimeStamp = uiTimeStamp;
       pDecoder->DecodeFrame2 (NULL, 0, pData, &sDstBufInfo);
       if (sDstBufInfo.iBufferStatus == 1) {
-        pDst[0] = pData[0];
-        pDst[1] = pData[1];
-        pDst[2] = pData[2];
+        pDst[0] = sDstBufInfo.pDst[0];
+        pDst[1] = sDstBufInfo.pDst[1];
+        pDst[2] = sDstBufInfo.pDst[2];
       }
       iEnd    = WelsTime();
       iTotal += iEnd - iStart;
@@ -283,41 +451,8 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
     iBufPos += iSliceSize;
     ++ iSliceIndex;
   }
-
-  pDecoder->GetOption (DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER, &num_of_frames_in_buffer);
-  for (int32_t i = 0; i < num_of_frames_in_buffer; ++i) {
-    iStart = WelsTime();
-    pData[0] = NULL;
-    pData[1] = NULL;
-    pData[2] = NULL;
-    memset (&sDstBufInfo, 0, sizeof (SBufferInfo));
-    sDstBufInfo.uiInBsTimeStamp = uiTimeStamp;
-    sDstBufInfo.iBufferStatus = 1;
-    pDecoder->FlushFrame (pData, &sDstBufInfo);
-    if (sDstBufInfo.iBufferStatus == 1) {
-      pDst[0] = pData[0];
-      pDst[1] = pData[1];
-      pDst[2] = pData[2];
-    }
-    iEnd = WelsTime();
-    iTotal += iEnd - iStart;
-    if (sDstBufInfo.iBufferStatus == 1) {
-      cOutputModule.Process ((void**)pDst, &sDstBufInfo, pYuvFile);
-      iWidth = sDstBufInfo.UsrData.sSystemBuffer.iWidth;
-      iHeight = sDstBufInfo.UsrData.sSystemBuffer.iHeight;
-
-      if (pOptionFile != NULL) {
-        if (iWidth != iLastWidth && iHeight != iLastHeight) {
-          fwrite (&iFrameCount, sizeof (iFrameCount), 1, pOptionFile);
-          fwrite (&iWidth, sizeof (iWidth), 1, pOptionFile);
-          fwrite (&iHeight, sizeof (iHeight), 1, pOptionFile);
-          iLastWidth = iWidth;
-          iLastHeight = iHeight;
-        }
-      }
-      ++iFrameCount;
-    }
-  }
+  FlushFrames (pDecoder, iTotal, pYuvFile, pOptionFile, iFrameCount, uiTimeStamp, iWidth, iHeight, iLastWidth,
+               iLastHeight);
   dElapsed = iTotal / 1e6;
   fprintf (stderr, "-------------------------------------------------------\n");
   fprintf (stderr, "iWidth:\t\t%d\nheight:\t\t%d\nFrames:\t\t%d\ndecode time:\t%f sec\nFPS:\t\t%f fps\n",
@@ -488,6 +623,9 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
   if (iLevelSetting >= 0) {
     pDecoder->SetOption (DECODER_OPTION_TRACE_LEVEL, &iLevelSetting);
   }
+
+  int32_t iThreadCount = 0;
+  pDecoder->SetOption (DECODER_OPTION_NUM_OF_THREADS, &iThreadCount);
 
   if (pDecoder->Initialize (&sDecParam)) {
     printf ("Decoder initialization failed.\n");

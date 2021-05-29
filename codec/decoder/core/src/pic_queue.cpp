@@ -106,13 +106,15 @@ PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const
   pPic->iWidthInPixel  = kiPicWidth;
   pPic->iHeightInPixel = kiPicHeight;
   pPic->iFrameNum      = -1;
-  pPic->bAvailableFlag = true;
+  pPic->iRefCount = 0;
 
   uint32_t uiMbWidth = (kiPicWidth + 15) >> 4;
   uint32_t uiMbHeight = (kiPicHeight + 15) >> 4;
   uint32_t uiMbCount = uiMbWidth * uiMbHeight;
-  pPic->pMbType = (uint32_t*)pMa->WelsMallocz (uiMbCount * sizeof (uint32_t),
-                  "pPic->pMbType");
+
+  pPic->pMbCorrectlyDecodedFlag = (bool*)pMa->WelsMallocz (uiMbCount * sizeof (bool), "pPic->pMbCorrectlyDecodedFlag");
+  pPic->pNzc = GetThreadCount (pCtx) > 1 ? (int8_t (*)[24])pMa->WelsMallocz (uiMbCount * 24, "pPic->pNzc") : NULL;
+  pPic->pMbType = (uint32_t*)pMa->WelsMallocz (uiMbCount * sizeof (uint32_t), "pPic->pMbType");
   pPic->pMv[LIST_0] = (int16_t (*)[16][2])pMa->WelsMallocz (uiMbCount * sizeof (
                         int16_t) * MV_A * MB_BLOCK4x4_NUM, "pPic->pMv[]");
   pPic->pMv[LIST_1] = (int16_t (*)[16][2])pMa->WelsMallocz (uiMbCount * sizeof (
@@ -121,6 +123,15 @@ PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const
                               int8_t) * MB_BLOCK4x4_NUM, "pCtx->sMb.pRefIndex[]");
   pPic->pRefIndex[LIST_1] = (int8_t (*)[16])pMa->WelsMallocz (uiMbCount * sizeof (
                               int8_t) * MB_BLOCK4x4_NUM, "pCtx->sMb.pRefIndex[]");
+  if (pCtx->pThreadCtx != NULL) {
+    pPic->pReadyEvent = (SWelsDecEvent*)pMa->WelsMallocz (uiMbHeight * sizeof (SWelsDecEvent), "pPic->pReadyEvent");
+    for (uint32_t i = 0; i < uiMbHeight; ++i) {
+      CREATE_EVENT (&pPic->pReadyEvent[i], 1, 0, NULL);
+    }
+  } else {
+    pPic->pReadyEvent = NULL;
+  }
+
   return pPic;
 }
 
@@ -129,6 +140,16 @@ void FreePicture (PPicture pPic, CMemoryAlign* pMa) {
     if (pPic->pBuffer[0]) {
       pMa->WelsFree (pPic->pBuffer[0], "pPic->pBuffer[0]");
       pPic->pBuffer[0] = NULL;
+    }
+
+    if (pPic->pMbCorrectlyDecodedFlag) {
+      pMa->WelsFree (pPic->pMbCorrectlyDecodedFlag, "pPic->pMbCorrectlyDecodedFlag");
+      pPic->pMbCorrectlyDecodedFlag = NULL;
+    }
+
+    if (pPic->pNzc) {
+      pMa->WelsFree (pPic->pNzc, "pPic->pNzc");
+      pPic->pNzc = NULL;
     }
 
     if (pPic->pMbType) {
@@ -147,6 +168,14 @@ void FreePicture (PPicture pPic, CMemoryAlign* pMa) {
         pPic->pRefIndex[listIdx] = NULL;
       }
     }
+    if (pPic->pReadyEvent != NULL) {
+      uint32_t uiMbHeight = (pPic->iHeightInPixel + 15) >> 4;
+      for (uint32_t i = 0; i < uiMbHeight; ++i) {
+        CLOSE_EVENT (&pPic->pReadyEvent[i]);
+      }
+      pMa->WelsFree (pPic->pReadyEvent, "pPic->pReadyEvent");
+      pPic->pReadyEvent = NULL;
+    }
     pMa->WelsFree (pPic, "pPic");
     pPic = NULL;
   }
@@ -160,25 +189,55 @@ PPicture PrefetchPic (PPicBuff pPicBuf) {
   }
 
   for (iPicIdx = pPicBuf->iCurrentIdx + 1; iPicIdx < pPicBuf->iCapacity ; ++iPicIdx) {
-    if (pPicBuf->ppPic[iPicIdx] != NULL && pPicBuf->ppPic[iPicIdx]->bAvailableFlag
-        && !pPicBuf->ppPic[iPicIdx]->bUsedAsRef) {
+    if (pPicBuf->ppPic[iPicIdx] != NULL && !pPicBuf->ppPic[iPicIdx]->bUsedAsRef
+        && pPicBuf->ppPic[iPicIdx]->iRefCount <= 0) {
       pPic = pPicBuf->ppPic[iPicIdx];
       break;
     }
   }
   if (pPic != NULL) {
     pPicBuf->iCurrentIdx = iPicIdx;
+    pPic->iPicBuffIdx = iPicIdx;
     return pPic;
   }
   for (iPicIdx = 0 ; iPicIdx <= pPicBuf->iCurrentIdx ; ++iPicIdx) {
-    if (pPicBuf->ppPic[iPicIdx] != NULL && pPicBuf->ppPic[iPicIdx]->bAvailableFlag
-        && !pPicBuf->ppPic[iPicIdx]->bUsedAsRef) {
+    if (pPicBuf->ppPic[iPicIdx] != NULL && !pPicBuf->ppPic[iPicIdx]->bUsedAsRef
+        && pPicBuf->ppPic[iPicIdx]->iRefCount <= 0) {
       pPic = pPicBuf->ppPic[iPicIdx];
       break;
     }
   }
 
   pPicBuf->iCurrentIdx = iPicIdx;
+  if (pPic != NULL) {
+    pPic->iPicBuffIdx = iPicIdx;
+  }
+  return pPic;
+}
+
+PPicture PrefetchPicForThread (PPicBuff pPicBuf) {
+  PPicture pPic = NULL;
+
+  if (pPicBuf->iCapacity == 0) {
+    return NULL;
+  }
+  pPic = pPicBuf->ppPic[pPicBuf->iCurrentIdx];
+  pPic->iPicBuffIdx = pPicBuf->iCurrentIdx;
+  if (++pPicBuf->iCurrentIdx >= pPicBuf->iCapacity) {
+    pPicBuf->iCurrentIdx = 0;
+  }
+  return pPic;
+}
+
+PPicture PrefetchLastPicForThread (PPicBuff pPicBuf, const int32_t& iLastPicBuffIdx) {
+  PPicture pPic = NULL;
+
+  if (pPicBuf->iCapacity == 0) {
+    return NULL;
+  }
+  if (iLastPicBuffIdx >= 0 && iLastPicBuffIdx < pPicBuf->iCapacity) {
+    pPic = pPicBuf->ppPic[iLastPicBuffIdx];
+  }
   return pPic;
 }
 

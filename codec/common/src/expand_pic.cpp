@@ -33,6 +33,240 @@
 #include "expand_pic.h"
 #include "cpu_core.h"
 
+static inline void MBPadTopLeftLuma_c (uint8_t*& pDst, const int32_t& kiStride) {
+  const uint8_t kuiTL = pDst[0];
+  int32_t i = 0;
+  uint8_t* pTopLeft = pDst;
+  do {
+    pTopLeft -= kiStride;
+    // pad pTop
+    memcpy (pTopLeft, pDst, 16);           // confirmed_safe_unsafe_usage
+    memset (pTopLeft - PADDING_LENGTH, kuiTL, PADDING_LENGTH); //pTop left
+  } while (++i < PADDING_LENGTH);
+}
+
+static inline void MBPadTopLuma_c (uint8_t*& pDst, const int32_t& kiStride, const int32_t& kiMbX) {
+  uint8_t* pTopLine = pDst + (kiMbX << 4);
+  int32_t i = 0;
+  uint8_t* pTop = pTopLine;
+  do {
+    pTop -= kiStride;
+    // pad pTop
+    memcpy (pTop, pTopLine, 16);          // confirmed_safe_unsafe_usage
+  } while (++i < PADDING_LENGTH);
+}
+
+static inline void MBPadBottomLuma_c (uint8_t*& pDst, const int32_t& kiStride, const int32_t& kiMbX,
+                                      const int32_t& kiPicH) {
+  uint8_t* pBottomLine = pDst + (kiPicH - 1) * kiStride + (kiMbX << 4);
+  int32_t i = 0;
+  uint8_t* pBottom = pBottomLine;
+  do {
+    pBottom += kiStride;
+    // pad pBottom
+    memcpy (pBottom, pBottomLine, 16);       // confirmed_safe_unsafe_usage
+  } while (++i < PADDING_LENGTH);
+}
+
+static inline void MBPadTopRightLuma_c (uint8_t*& pDst, const int32_t& kiStride, const int32_t& kiPicW) {
+  uint8_t* pTopRight = pDst + kiPicW;
+  const uint8_t kuiTR = pTopRight[-1];
+  int32_t i = 0;
+  uint8_t* pTop = pTopRight;
+  do {
+    pTop -= kiStride;
+    // pad pTop
+    memcpy (pTop - 16, pTopRight - 16, 16);          // confirmed_safe_unsafe_usage
+    memset (pTop, kuiTR, PADDING_LENGTH); //pTop Right
+  } while (++i < PADDING_LENGTH);
+}
+
+static inline void MBPadBottomLeftLuma_c (uint8_t*& pDst, const int32_t& kiStride, const int32_t& kiPicH) {
+  uint8_t* pDstLastLine = pDst + (kiPicH - 1) * kiStride;
+  const uint8_t kuiBL = pDstLastLine[0];
+  int32_t i = 0;
+  uint8_t* pBottom = pDstLastLine;
+  do {
+    pBottom += kiStride;
+    // pad pBottom
+    memcpy (pBottom, pDstLastLine, 16);          // confirmed_safe_unsafe_usage
+    memset (pBottom - PADDING_LENGTH, kuiBL, PADDING_LENGTH); //pBottom left
+  } while (++i < PADDING_LENGTH);
+}
+
+static inline void MBPadBottomRightLuma_c (uint8_t*& pDst, const int32_t& kiStride, const int32_t& kiPicW,
+    const int32_t& kiPicH) {
+  uint8_t* pDstLastLine = pDst + (kiPicH - 1) * kiStride + kiPicW;
+  const uint8_t kuiBR = pDstLastLine[-1];
+  int32_t i = 0;
+  uint8_t* pBottom = pDstLastLine;
+  do {
+    pBottom += kiStride;
+    // pad pBottom
+    memcpy (pBottom - 16, pDstLastLine - 16, 16);         // confirmed_safe_unsafe_usage
+    memset (pBottom, kuiBR, PADDING_LENGTH); //pBottom Right
+  } while (++i < PADDING_LENGTH);
+}
+
+static inline void MBPadLeftLuma_c (uint8_t*& pDst, const int32_t& kiStride, const int32_t& kiMbY) {
+  uint8_t* pTmp = pDst + (kiMbY << 4) * kiStride;
+  for (int32_t i = 0; i < 16; ++i) {
+    // pad left
+    memset (pTmp - PADDING_LENGTH, pTmp[0], PADDING_LENGTH);
+    pTmp += kiStride;
+  }
+}
+
+static inline void MBPadRightLuma_c (uint8_t*& pDst, const int32_t& kiStride, const int32_t& kiMbY,
+                                     const int32_t& kiPicW) {
+  uint8_t* pTmp = pDst + (kiMbY << 4) * kiStride + kiPicW;
+  for (int32_t i = 0; i < 16; ++i) {
+    // pad right
+    memset (pTmp, pTmp[-1], PADDING_LENGTH);
+    pTmp += kiStride;
+  }
+}
+
+static inline void MBPadTopChroma_c (uint8_t*& pDst, const int32_t& kiStride, const int32_t& kiMbX) {
+  uint8_t* pTopLine = pDst + (kiMbX << 3);
+  int32_t i = 0;
+  uint8_t* pTop = pTopLine;
+  do {
+    pTop -= kiStride;
+    // pad pTop
+    memcpy (pTop, pTopLine, 8);         // confirmed_safe_unsafe_usage
+  } while (++i < CHROMA_PADDING_LENGTH);
+}
+
+static inline void MBPadBottomChroma_c (uint8_t*& pDst, const int32_t& kiStride, const int32_t& kiMbX,
+                                        const int32_t& kiPicH) {
+  uint8_t* pBottomLine = pDst + (kiPicH - 1) * kiStride + (kiMbX << 3);
+  int32_t i = 0;
+  uint8_t* pBottom = pBottomLine;
+  do {
+    pBottom += kiStride;
+    // pad pBottom
+    memcpy (pBottom, pBottomLine, 8);        // confirmed_safe_unsafe_usage
+  } while (++i < CHROMA_PADDING_LENGTH);
+}
+
+static inline void MBPadTopLeftChroma_c (uint8_t*& pDst, const int32_t& kiStride) {
+  const uint8_t kuiTL = pDst[0];
+  int32_t i = 0;
+  uint8_t* pTopLeft = pDst;
+  do {
+    pTopLeft -= kiStride;
+    // pad pTop
+    memcpy (pTopLeft, pDst, 8);          // confirmed_safe_unsafe_usage
+    memset (pTopLeft - CHROMA_PADDING_LENGTH, kuiTL, CHROMA_PADDING_LENGTH); //pTop left
+  } while (++i < CHROMA_PADDING_LENGTH);
+}
+
+static inline void MBPadTopRightChroma_c (uint8_t*& pDst, const int32_t& kiStride, const int32_t& kiPicW) {
+  uint8_t* pTopRight = pDst + kiPicW;
+  const uint8_t kuiTR = pTopRight[-1];
+  int32_t i = 0;
+  uint8_t* pTop = pTopRight;
+  do {
+    pTop -= kiStride;
+    // pad pTop
+    memcpy (pTop - 8, pTopRight - 8, 8);         // confirmed_safe_unsafe_usage
+    memset (pTop, kuiTR, CHROMA_PADDING_LENGTH); //pTop Right
+  } while (++i < CHROMA_PADDING_LENGTH);
+}
+
+static inline void MBPadBottomLeftChroma_c (uint8_t*& pDst, const int32_t& kiStride, const int32_t& kiPicH) {
+  uint8_t* pDstLastLine = pDst + (kiPicH - 1) * kiStride;
+  const uint8_t kuiBL = pDstLastLine[0];
+  int32_t i = 0;
+  uint8_t* pBottom = pDstLastLine;
+  do {
+    pBottom += kiStride;
+    // pad pBottom
+    memcpy (pBottom, pDstLastLine, 8);         // confirmed_safe_unsafe_usage
+    memset (pBottom - CHROMA_PADDING_LENGTH, kuiBL, CHROMA_PADDING_LENGTH); //pBottom left
+  } while (++i < CHROMA_PADDING_LENGTH);
+}
+
+static inline void MBPadBottomRightChroma_c (uint8_t*& pDst, const int32_t& kiStride, const int32_t& kiPicW,
+    const int32_t kiPicH) {
+  uint8_t* pDstLastLine = pDst + (kiPicH - 1) * kiStride + kiPicW;
+  const uint8_t kuiBR = pDstLastLine[-1];
+  int32_t i = 0;
+  uint8_t* pBottom = pDstLastLine;
+  do {
+    pBottom += kiStride;
+    // pad pBottom
+    memcpy (pBottom - 8, pDstLastLine - 8, 8);       // confirmed_safe_unsafe_usage
+    memset (pBottom, kuiBR, CHROMA_PADDING_LENGTH); //pBottom Right
+  } while (++i < CHROMA_PADDING_LENGTH);
+}
+
+static inline void MBPadLeftChroma_c (uint8_t*& pDst, const int32_t& kiStride, const int32_t& kiMbY) {
+  uint8_t* pTmp = pDst + (kiMbY << 3) * kiStride;
+  for (int32_t i = 0; i < 8; ++i) {
+    // pad left
+    memset (pTmp - CHROMA_PADDING_LENGTH, pTmp[0], CHROMA_PADDING_LENGTH);
+    pTmp += kiStride;
+  }
+}
+
+static inline void MBPadRightChroma_c (uint8_t*& pDst, const int32_t& kiStride, const int32_t& kiMbY,
+                                       const int32_t& kiPicW) {
+  uint8_t* pTmp = pDst + (kiMbY << 3) * kiStride + kiPicW;
+  for (int32_t i = 0; i < 8; ++i) {
+    // pad right
+    memset (pTmp, pTmp[-1], CHROMA_PADDING_LENGTH);
+    pTmp += kiStride;
+  }
+}
+
+void PadMBLuma_c (uint8_t*& pDst, const int32_t& kiStride, const int32_t& kiPicW, const int32_t& kiPicH,
+                  const int32_t& kiMbX, const int32_t& kiMbY, const int32_t& kiMBWidth, const int32_t& kiMBHeight) {
+  if (kiMbX == 0 && kiMbY == 0) {
+    MBPadTopLeftLuma_c (pDst, kiStride);
+  } else if (kiMbY == 0 && kiMbX == kiMBWidth - 1) {
+    MBPadTopRightLuma_c (pDst, kiStride, kiPicW);
+  } else if (kiMbY == kiMBHeight - 1 && kiMbX == 0) {
+    MBPadBottomLeftLuma_c (pDst, kiStride, kiPicH);
+  } else if (kiMbY == kiMBHeight - 1 && kiMbX == kiMBWidth - 1) {
+    MBPadBottomRightLuma_c (pDst, kiStride, kiPicW, kiPicH);
+  }
+  if (kiMbX == 0) {
+    MBPadLeftLuma_c (pDst, kiStride, kiMbY);
+  } else if (kiMbX == kiMBWidth - 1) {
+    MBPadRightLuma_c (pDst, kiStride, kiMbY, kiPicW);
+  }
+  if (kiMbY == 0 && kiMbX > 0 && kiMbX < kiMBWidth - 1) {
+    MBPadTopLuma_c (pDst, kiStride, kiMbX);
+  } else if (kiMbY == kiMBHeight - 1 && kiMbX > 0 && kiMbX < kiMBWidth - 1) {
+    MBPadBottomLuma_c (pDst, kiStride, kiMbX, kiPicH);
+  }
+}
+
+void PadMBChroma_c (uint8_t*& pDst, const int32_t& kiStride, const int32_t& kiPicW, const int32_t& kiPicH,
+                    const int32_t& kiMbX, const int32_t& kiMbY, const int32_t& kiMBWidth, const int32_t& kiMBHeight) {
+  if (kiMbX == 0 && kiMbY == 0) {
+    MBPadTopLeftChroma_c (pDst, kiStride);
+  } else if (kiMbY == 0 && kiMbX == kiMBWidth - 1) {
+    MBPadTopRightChroma_c (pDst, kiStride, kiPicW);
+  } else if (kiMbY == kiMBHeight - 1 && kiMbX == 0) {
+    MBPadBottomLeftChroma_c (pDst, kiStride, kiPicH);
+  } else if (kiMbY == kiMBHeight - 1 && kiMbX == kiMBWidth - 1) {
+    MBPadBottomRightChroma_c (pDst, kiStride, kiPicW, kiPicH);
+  }
+  if (kiMbX == 0) {
+    MBPadLeftChroma_c (pDst, kiStride, kiMbY);
+  } else if (kiMbX == kiMBWidth - 1) {
+    MBPadRightChroma_c (pDst, kiStride, kiMbY, kiPicW);
+  }
+  if (kiMbY == 0 && kiMbX > 0 && kiMbX < kiMBWidth - 1) {
+    MBPadTopChroma_c (pDst, kiStride, kiMbX);
+  } else if (kiMbY == kiMBHeight - 1 && kiMbX > 0 && kiMbX < kiMBWidth - 1) {
+    MBPadBottomChroma_c (pDst, kiStride, kiMbX, kiPicH);
+  }
+}
+
 // rewrite it (split into luma & chroma) that is helpful for mmx/sse2 optimization perform, 9/27/2009
 static inline void ExpandPictureLuma_c (uint8_t* pDst, const int32_t kiStride, const int32_t kiPicW,
                                         const int32_t kiPicH) {

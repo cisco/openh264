@@ -201,6 +201,7 @@ typedef struct TagBufferInfo {
   union {
     SSysMEMBuffer sSystemBuffer; ///<  memory info for one picture
   } UsrData;                     ///<  output buffer info
+  unsigned char* pDst[3];  //point to picture YUV data
 } SBufferInfo;
 
 

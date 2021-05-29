@@ -1,6 +1,12 @@
 
 Releases
 -----------
+v2.1.0
+------
+- Experimentally support for multi-thread decoding(default disabled,and may result in random problems if enabled)
+- Assembly optimization for loongson platform
+- Update meson version to 5
+- Some minor bug fixes
 
 v2.0.0
 ------
@@ -191,6 +197,22 @@ Binaries
 -----------
 These binary releases are distributed under this license:
 http://www.openh264.org/BINARY_LICENSE.txt
+
+v2.1.0
+http://ciscobinary.openh264.org/libopenh264-2.1.0-android-arm.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.0-android-arm.so.sig.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.0-android-arm64.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.0-android-arm64.so.sig.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.0-ios.a.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.0-ios.a.sig.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.0-linux32.5.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.0-linux32.5.so.sig.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.0-linux64.5.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.0-linux64.5.so.sig.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.0-osx32.5.dylib.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.0-osx64.5.dylib.bz2
+http://ciscobinary.openh264.org/openh264-2.1.0-win32.dll.bz2
+http://ciscobinary.openh264.org/openh264-2.1.0-win64.dll.bz2
 
 v2.0.0
 ------

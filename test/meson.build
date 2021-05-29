@@ -1,15 +1,19 @@
-gtest_main_dep = dependency('gtest', main : true, fallback: ['gtest', 'gtest_main_dep'], required: false)
-gtest_dep = dependency('gtest', fallback: ['gtest', 'gtest_dep'], required: false)
+build_tests = get_option('tests')
 
-test_inc = include_directories('.')
+if not build_tests.disabled()
+  gtest_main_dep = dependency('gtest', main : true, fallback: ['gtest', 'gtest_main_dep'], required: build_tests)
+  gtest_dep = dependency('gtest', fallback: ['gtest', 'gtest_dep'], required: build_tests)
 
-test_data_generator_sources = files('api/DataGenerator.cpp')
-test_base_encoder_sources = files('api/BaseEncoderTest.cpp')
+  test_inc = include_directories('.')
 
-if gtest_dep.found()
-  subdir('api')
-  subdir('common')
-  subdir('decoder')
-  subdir('encoder')
-  subdir('processing')
+  test_data_generator_sources = files('api/DataGenerator.cpp')
+  test_base_encoder_sources = files('api/BaseEncoderTest.cpp')
+
+  if gtest_dep.found() and gtest_main_dep.found()
+    subdir('api')
+    subdir('common')
+    subdir('decoder')
+    subdir('encoder')
+    subdir('processing')
+  endif
 endif

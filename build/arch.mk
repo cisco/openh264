@@ -30,14 +30,26 @@ CFLAGS += -DHAVE_NEON_AARCH64
 endif
 endif
 
-#for loongson
+#for mips
 ifneq ($(filter mips mips64, $(ARCH)),)
 ifeq ($(USE_ASM), Yes)
+ENABLE_MMI=Yes
+ENABLE_MSA=Yes
 ASM_ARCH = mips
 ASMFLAGS += -I$(SRC_PATH)codec/common/mips/
-LOONGSON3A = $(shell g++ -dM -E - < /dev/null | grep '_MIPS_TUNE ' | cut -f 3 -d " ")
-ifeq ($(LOONGSON3A), "loongson3a")
-CFLAGS += -DHAVE_MMI
+#mmi
+ifeq ($(ENABLE_MMI), Yes)
+ENABLE_MMI = $(shell $(SRC_PATH)build/mips-simd-check.sh $(CC) mmi)
+ifeq ($(ENABLE_MMI), Yes)
+CFLAGS += -DHAVE_MMI -march=loongson3a
+endif
+endif
+#msa
+ifeq ($(ENABLE_MSA), Yes)
+ENABLE_MSA = $(shell $(SRC_PATH)build/mips-simd-check.sh $(CC) msa)
+ifeq ($(ENABLE_MSA), Yes)
+CFLAGS += -DHAVE_MSA -mmsa
+endif
 endif
 endif
 endif

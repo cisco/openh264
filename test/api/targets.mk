@@ -5,6 +5,7 @@ API_TEST_SRCDIR=test/api
 API_TEST_CPP_SRCS=\
 	$(API_TEST_SRCDIR)/BaseDecoderTest.cpp\
 	$(API_TEST_SRCDIR)/BaseEncoderTest.cpp\
+	$(API_TEST_SRCDIR)/BaseThreadDecoderTest.cpp\
 	$(API_TEST_SRCDIR)/cpp_interface_test.cpp\
 	$(API_TEST_SRCDIR)/DataGenerator.cpp\
 	$(API_TEST_SRCDIR)/decode_api_test.cpp\
@@ -16,6 +17,7 @@ API_TEST_CPP_SRCS=\
 	$(API_TEST_SRCDIR)/encoder_test.cpp\
 	$(API_TEST_SRCDIR)/ltr_test.cpp\
 	$(API_TEST_SRCDIR)/simple_test.cpp\
+	$(API_TEST_SRCDIR)/thread_decoder_test.cpp\
 
 API_TEST_OBJS += $(API_TEST_CPP_SRCS:.cpp=.$(OBJ))
 

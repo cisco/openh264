@@ -331,6 +331,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\api\BaseThreadDecoderTest.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\api\BaseEncoderTest.cpp"
 				>
 			</File>
@@ -360,6 +364,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\api\decoder_test.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\api\thread_decoder_test.cpp"
 				>
 			</File>
 			<File

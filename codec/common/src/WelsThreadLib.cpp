@@ -71,18 +71,6 @@
 
 #if defined(_WIN32) || defined(__CYGWIN__)
 
-#ifdef WINAPI_FAMILY
-#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-#define WP80
-
-#define InitializeCriticalSection(x) InitializeCriticalSectionEx(x, 0, 0)
-#define GetSystemInfo(x) GetNativeSystemInfo(x)
-#define CreateEvent(attr, reset, init, name) CreateEventEx(attr, name, ((reset) ? CREATE_EVENT_MANUAL_RESET : 0) | ((init) ? CREATE_EVENT_INITIAL_SET : 0), EVENT_ALL_ACCESS)
-#define WaitForSingleObject(a, b) WaitForSingleObjectEx(a, b, FALSE)
-#define WaitForMultipleObjects(a, b, c, d) WaitForMultipleObjectsEx(a, b, c, d, FALSE)
-#endif
-#endif
-
 WELS_THREAD_ERROR_CODE    WelsMutexInit (WELS_MUTEX*    mutex) {
   InitializeCriticalSection (mutex);
 

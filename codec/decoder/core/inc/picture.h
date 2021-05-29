@@ -37,6 +37,7 @@
 #include "typedefs.h"
 #include "wels_common_defs.h"
 #include "wels_const_common.h"
+#include "wels_decoder_thread.h"
 
 using namespace WelsCommon;
 
@@ -68,8 +69,7 @@ struct SPicture {
   /*******************************sef_definition for misc use****************************/
   bool            bUsedAsRef;                                                     //for ref pic management
   bool            bIsLongRef;     // long term reference frame flag       //for ref pic management
-  uint8_t         uiRefCount;
-  bool            bAvailableFlag; // indicate whether it is available in this picture memory block.
+  int8_t          iRefCount;
 
   bool            bIsComplete;    // indicate whether current picture is complete, not from EC
   /*******************************for future use****************************/
@@ -85,15 +85,22 @@ struct SPicture {
   int32_t     iSpsId; //against mosaic caused by cross-IDR interval reference.
   int32_t     iPpsId;
   unsigned long long uiTimeStamp;
+  uint32_t    uiDecodingTimeStamp; //represent relative decoding time stamps
+  int32_t     iPicBuffIdx;
+  EWelsSliceType  eSliceType;
+  bool        bIsUngroupedMultiSlice; //multi-slice picture with each each slice group contains one slice.
   bool bNewSeqBegin;
   int32_t iMbEcedNum;
   int32_t iMbEcedPropNum;
   int32_t iMbNum;
 
+  bool*    pMbCorrectlyDecodedFlag;
+  int8_t (*pNzc)[24];
   uint32_t*  pMbType; // mb type used for direct mode
   int16_t (*pMv[LIST_A])[MB_BLOCK4x4_NUM][MV_A]; // used for direct mode
   int8_t (*pRefIndex[LIST_A])[MB_BLOCK4x4_NUM]; //used for direct mode
   struct SPicture* pRefPic[LIST_A][17];  //ref pictures used for direct mode
+  SWelsDecEvent* pReadyEvent;  //MB line ready event
 
 };// "Picture" declaration is comflict with Mac system
 
