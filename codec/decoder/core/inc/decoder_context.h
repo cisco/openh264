@@ -295,6 +295,7 @@ typedef struct tagPictReoderingStatus {
   int32_t iLastGOPRemainPicts;
   int32_t iLastWrittenPOC;
   int32_t iLargestBufferedPicIndex;
+  bool    bHasBSlice;
 } SPictReoderingStatus, *PPictReoderingStatus;
 
 /*
