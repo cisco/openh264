@@ -68,6 +68,40 @@ int    g_iDecodedFrameNum = 0;
 #endif
 //using namespace WelsDec;
 
+int32_t readBit (uint8_t* pBufPtr, int32_t& curBit) {
+  int nIndex = curBit / 8;
+  int nOffset = curBit % 8 + 1;
+
+  curBit++;
+  return (pBufPtr[nIndex] >> (8 - nOffset)) & 0x01;
+}
+
+int32_t readBits (uint8_t* pBufPtr, int32_t& n, int32_t& curBit) {
+  int r = 0;
+  int i;
+  for (i = 0; i < n; i++) {
+    r |= (readBit (pBufPtr, curBit) << (n - i - 1));
+  }
+  return r;
+}
+
+int32_t bsGetUe (uint8_t* pBufPtr, int32_t& curBit) {
+  int r = 0;
+  int i = 0;
+  while ((readBit (pBufPtr, curBit) == 0) && (i < 32)) {
+    i++;
+  }
+  r = readBits (pBufPtr, i, curBit);
+  r += (1 << i) - 1;
+  return r;
+}
+
+int32_t readFirstMbInSlice (uint8_t* pSliceNalPtr) {
+  int32_t curBit = 0;
+  int32_t firstMBInSlice = bsGetUe (pSliceNalPtr + 1, curBit);
+  return firstMBInSlice;
+}
+
 int32_t readPicture (uint8_t* pBuf, const int32_t& iFileSize, const int32_t& bufPos, uint8_t*& pSpsBuf,
                      int32_t& sps_byte_count) {
   int32_t bytes_available = iFileSize - bufPos;
@@ -80,6 +114,7 @@ int32_t readPicture (uint8_t* pBuf, const int32_t& iFileSize, const int32_t& buf
   int32_t pps_count = 0;
   int32_t non_idr_pict_count = 0;
   int32_t idr_pict_count = 0;
+  int32_t nal_deliminator = 0;
   pSpsBuf = NULL;
   sps_byte_count = 0;
   while (read_bytes < bytes_available - 4) {
@@ -89,29 +124,42 @@ int32_t readPicture (uint8_t* pBuf, const int32_t& iFileSize, const int32_t& buf
       has3ByteStartCode = ptr[0] == 0 && ptr[1] == 0 && ptr[2] == 1;
     }
     if (has4ByteStartCode || has3ByteStartCode) {
+      int32_t byteOffset = has4ByteStartCode ? 4 : 3;
       uint8_t nal_unit_type = has4ByteStartCode ? (ptr[4] & 0x1F) : (ptr[3] & 0x1F);
       if (nal_unit_type == 1) {
-        if (++non_idr_pict_count == 1 && idr_pict_count == 1) {
+        int32_t firstMBInSlice = readFirstMbInSlice (ptr + byteOffset);
+        if (++non_idr_pict_count >= 1 && idr_pict_count >= 1 && firstMBInSlice == 0) {
           return read_bytes;
         }
-        if (non_idr_pict_count == 2) {
+        if (non_idr_pict_count >= 2 && firstMBInSlice == 0) {
           return read_bytes;
         }
       } else if (nal_unit_type == 5) {
-        if (++idr_pict_count == 1 && non_idr_pict_count == 1) {
+        int32_t firstMBInSlice = readFirstMbInSlice (ptr + byteOffset);
+        if (++idr_pict_count >= 1 && non_idr_pict_count >= 1 && firstMBInSlice == 0) {
           return read_bytes;
         }
-        if (idr_pict_count == 2) {
+        if (idr_pict_count >= 2 && firstMBInSlice == 0) {
           return read_bytes;
         }
       } else if (nal_unit_type == 7) {
         pSpsBuf = ptr + (has4ByteStartCode ? 4 : 3);
-        if ((++sps_count == 1) && (non_idr_pict_count == 1 || idr_pict_count == 1)) {
+        if ((++sps_count >= 1) && (non_idr_pict_count >= 1 || idr_pict_count >= 1)) {
+          return read_bytes;
+        }
+        if (sps_count == 2) {
           return read_bytes;
         }
       } else if (nal_unit_type == 8) {
         if (++pps_count == 1 && sps_count == 1) {
           sps_byte_count = int32_t (ptr - pSpsBuf);
+        }
+        if (pps_count >= 1 && (non_idr_pict_count >= 1 || idr_pict_count >= 1)) {
+          return read_bytes;
+        }
+      } else if (nal_unit_type == 9) {
+        if (++nal_deliminator == 2) {
+          return read_bytes;
         }
       }
       if (read_bytes >= bytes_available - 4) {

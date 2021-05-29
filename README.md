@@ -93,6 +93,24 @@ is `SDK_MIN`, specifying the minimum deployment target for the built library.
 For other details on building using make on the command line, see
 'For All Platforms' below.
 
+For Linux Builds
+--------------
+
+You can build the libraries (but not the demo applications) using the
+make based build system from the command line. Build with
+
+    make OS=linux ARCH=**ARCH**
+
+ You can set `ARCH` according to your linux device .
+`ARCH` specifies the architecture of the device. Currently `arm`, `arm64`, `x86` and `x86_64` are supported   
+
+ NOTICE:
+ 	If your computer is x86 architecture, for build the libnary which be used on arm/aarch64 machine, you may need to use cross-compiler, for example:
+ 		make OS=linux CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ ARCH=arm64
+   		 or
+    	make OS=linux CC=arm-linux-gnueabi-gcc CXX=arm-linux-gnueabi-g++ ARCH=arm
+
+
 For Windows Builds
 ------------------
 

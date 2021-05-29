@@ -5,6 +5,102 @@
 #include "utils/BufferedData.h"
 #include "BaseThreadDecoderTest.h"
 
+static int32_t readBit (uint8_t* pBufPtr, int32_t& curBit) {
+  int nIndex = curBit / 8;
+  int nOffset = curBit % 8 + 1;
+
+  curBit++;
+  return (pBufPtr[nIndex] >> (8 - nOffset)) & 0x01;
+}
+
+static int32_t readBits (uint8_t* pBufPtr, int32_t& n, int32_t& curBit) {
+  int r = 0;
+  int i;
+  for (i = 0; i < n; i++) {
+    r |= (readBit (pBufPtr, curBit) << (n - i - 1));
+  }
+  return r;
+}
+
+static int32_t bsGetUe (uint8_t* pBufPtr, int32_t& curBit) {
+  int r = 0;
+  int i = 0;
+  while ((readBit (pBufPtr, curBit) == 0) && (i < 32)) {
+    i++;
+  }
+  r = readBits (pBufPtr, i, curBit);
+  r += (1 << i) - 1;
+  return r;
+}
+
+static int32_t readFirstMbInSlice (uint8_t* pSliceNalPtr) {
+  int32_t curBit = 0;
+  int32_t firstMBInSlice = bsGetUe (pSliceNalPtr + 1, curBit);
+  return firstMBInSlice;
+}
+
+static int32_t ReadFrame (uint8_t* pBuf, const int32_t& iFileSize, const int32_t& bufPos) {
+  int32_t bytes_available = iFileSize - bufPos;
+  if (bytes_available < 4) {
+    return bytes_available;
+  }
+  uint8_t* ptr = pBuf + bufPos;
+  int32_t read_bytes = 0;
+  int32_t sps_count = 0;
+  int32_t pps_count = 0;
+  int32_t non_idr_pict_count = 0;
+  int32_t idr_pict_count = 0;
+  int32_t nal_deliminator = 0;
+  while (read_bytes < bytes_available - 4) {
+    bool has4ByteStartCode = ptr[0] == 0 && ptr[1] == 0 && ptr[2] == 0 && ptr[3] == 1;
+    bool has3ByteStartCode = false;
+    if (!has4ByteStartCode) {
+      has3ByteStartCode = ptr[0] == 0 && ptr[1] == 0 && ptr[2] == 1;
+    }
+    if (has4ByteStartCode || has3ByteStartCode) {
+      int32_t byteOffset = has4ByteStartCode ? 4 : 3;
+      uint8_t nal_unit_type = has4ByteStartCode ? (ptr[4] & 0x1F) : (ptr[3] & 0x1F);
+      if (nal_unit_type == 1) {
+        int32_t firstMBInSlice = readFirstMbInSlice (ptr + byteOffset);
+        if (++non_idr_pict_count >= 1 && idr_pict_count >= 1 && firstMBInSlice == 0) {
+          return read_bytes;
+        }
+        if (non_idr_pict_count >= 2 && firstMBInSlice == 0) {
+          return read_bytes;
+        }
+      } else if (nal_unit_type == 5) {
+        int32_t firstMBInSlice = readFirstMbInSlice (ptr + byteOffset);
+        if (++idr_pict_count >= 1 && non_idr_pict_count >= 1 && firstMBInSlice == 0) {
+          return read_bytes;
+        }
+        if (idr_pict_count >= 2 && firstMBInSlice == 0) {
+          return read_bytes;
+        }
+      } else if (nal_unit_type == 7) {
+        if ((++sps_count >= 1) && (non_idr_pict_count >= 1 || idr_pict_count >= 1)) {
+          return read_bytes;
+        }
+        if (sps_count == 2) return read_bytes;
+      } else if (nal_unit_type == 8) {
+        if (++pps_count >= 1 && (non_idr_pict_count >= 1 || idr_pict_count >= 1)) return read_bytes;
+      } else if (nal_unit_type == 9) {
+        if (++nal_deliminator == 2) {
+          return read_bytes;
+        }
+      }
+      if (read_bytes >= bytes_available - 4) {
+        return bytes_available;
+      }
+      read_bytes += 4;
+      ptr += 4;
+    } else {
+      ++ptr;
+      ++read_bytes;
+    }
+  }
+  return bytes_available;
+}
+
 static void Write2File (FILE* pFp, unsigned char* pData[3], int iStride[2], int iWidth, int iHeight) {
   int   i;
   unsigned char*  pPtr = NULL;
@@ -39,121 +135,6 @@ static void Process (SBufferInfo* pInfo, FILE* pFp) {
     iStride[1] = pInfo->UsrData.sSystemBuffer.iStride[1];
 
     Write2File (pFp, (unsigned char**)pInfo->pDst, iStride, iWidth, iHeight);
-  }
-}
-
-static bool ReadFrame (std::ifstream* file, BufferedData* buf) {
-  // start code of a frame is {0, 0, 1} or {0, 0, 0, 1}
-  char b;
-
-  buf->Clear();
-  int32_t sps_count = 0;
-  int32_t non_idr_pict_count = 0;
-  int32_t idr_pict_count = 0;
-  int32_t zeroCount = 0;
-  for (;;) {
-    file->read (&b, 1);
-    if (file->gcount() != 1) { // end of file
-      return true;
-    }
-    if (!buf->PushBack (b)) {
-      std::cout << "unable to allocate memory" << std::endl;
-      return false;
-    }
-    if (buf->Length() < 5) {
-      continue;
-    }
-    uint8_t nal_unit_type = 0;
-    int32_t startcode_len_plus_one = 0;
-    if (buf->Length() == 5) {
-      if (buf->data()[2] == 1) {
-        nal_unit_type = buf->data()[3] & 0x1F;
-      } else {
-        nal_unit_type = buf->data()[4] & 0x1F;
-      }
-    } else {
-      if (zeroCount < 2) {
-        zeroCount = b != 0 ? 0 : zeroCount + 1;
-      }
-      if (zeroCount == 2) {
-        file->read (&b, 1);
-        if (file->gcount() != 1) { // end of file
-          return true;
-        }
-        if (!buf->PushBack (b)) {
-          std::cout << "unable to allocate memory" << std::endl;
-          return false;
-        }
-        if (b == 1) { //0x000001
-          file->read (&b, 1);
-          if (file->gcount() != 1) { // end of file
-            return true;
-          }
-          if (!buf->PushBack (b)) {
-            std::cout << "unable to allocate memory" << std::endl;
-            return false;
-          }
-          nal_unit_type = b & 0x1F;
-          startcode_len_plus_one = 4;
-          zeroCount = 0;
-        } else if (b == 0) {
-          file->read (&b, 1);
-          if (file->gcount() != 1) { // end of file
-            return true;
-          }
-          if (!buf->PushBack (b)) {
-            std::cout << "unable to allocate memory" << std::endl;
-            return false;
-          }
-          if (b == 1) { //0x00000001
-            file->read (&b, 1);
-            if (file->gcount() != 1) { // end of file
-              return true;
-            }
-            if (!buf->PushBack (b)) {
-              std::cout << "unable to allocate memory" << std::endl;
-              return false;
-            }
-            nal_unit_type = b & 0x1F;
-            startcode_len_plus_one = 5;
-            zeroCount = 0;
-          } else {
-            zeroCount = 0;
-          }
-        } else {
-          zeroCount = 0;
-        }
-      }
-    }
-    if (nal_unit_type == 1) {
-      if (++non_idr_pict_count == 1 && idr_pict_count == 1) {
-        file->seekg (-startcode_len_plus_one, file->cur).good();
-        buf->SetLength (buf->Length() - startcode_len_plus_one);
-        return true;
-      }
-      if (non_idr_pict_count == 2) {
-        file->seekg (-startcode_len_plus_one, file->cur).good();
-        buf->SetLength (buf->Length() - startcode_len_plus_one);
-        return true;
-      }
-    } else if (nal_unit_type == 5) {
-      if (++idr_pict_count == 1 && non_idr_pict_count == 1) {
-        file->seekg (-startcode_len_plus_one, file->cur).good();
-        buf->SetLength (buf->Length() - startcode_len_plus_one);
-        return true;
-      }
-      if (idr_pict_count == 2) {
-        file->seekg (-startcode_len_plus_one, file->cur).good();
-        buf->SetLength (buf->Length() - startcode_len_plus_one);
-        return true;
-      }
-    } else if (nal_unit_type == 7) {
-      if ((++sps_count == 1) && (non_idr_pict_count == 1 || idr_pict_count == 1)) {
-        file->seekg (-startcode_len_plus_one, file->cur).good();
-        buf->SetLength (buf->Length() - startcode_len_plus_one);
-        return true;
-      }
-    }
   }
 }
 
@@ -272,6 +253,19 @@ bool BaseThreadDecoderTest::ThreadDecodeFile (const char* fileName, Callback* cb
   if (!file.is_open())
     return false;
 
+  BufferedData buf;
+  char b;
+  for (;;) {
+    file.read (&b, 1);
+    if (file.gcount() != 1) { // end of file
+      break;
+    }
+    if (!buf.PushBack (b)) {
+      std::cout << "unable to allocate memory" << std::endl;
+      return false;
+    }
+  }
+
   std::string outFileName = std::string (fileName);
   size_t pos = outFileName.find_last_of (".");
   if (bEnableYuvDumpTest) {
@@ -279,25 +273,23 @@ bool BaseThreadDecoderTest::ThreadDecodeFile (const char* fileName, Callback* cb
     pYuvFile = fopen (outFileName.c_str(), "wb");
   }
 
-  int iBufIndex = 0;
   uiTimeStamp = 0;
   memset (&sBufInfo, 0, sizeof (SBufferInfo));
-  while (true) {
-    if (false == ReadFrame (&file, &buf[iBufIndex]))
-      return false;
+  int32_t bufPos = 0;
+  int32_t bytesConsumed = 0;
+  int32_t fileSize = (int32_t)buf.Length();
+  while (bytesConsumed < fileSize) {
+    int32_t frameSize = ReadFrame (buf.data(), fileSize, bufPos);
     if (::testing::Test::HasFatalFailure()) {
       return false;
     }
-    if (buf[iBufIndex].Length() == 0) {
-      break;
-    }
-    DecodeFrame (buf[iBufIndex].data(), buf[iBufIndex].Length(), cbk);
+    uint8_t* frame_ptr = buf.data() + bufPos;
+    DecodeFrame (frame_ptr, frameSize, cbk);
     if (::testing::Test::HasFatalFailure()) {
       return false;
     }
-    if (++iBufIndex >= 16) {
-      iBufIndex = 0;
-    }
+    bufPos += frameSize;
+    bytesConsumed += frameSize;
   }
 
   int32_t iEndOfStreamFlag = 1;
@@ -322,37 +314,6 @@ bool BaseThreadDecoderTest::Open (const char* fileName) {
       decodeStatus_ = Decoding;
       return true;
     }
-  }
-  return false;
-}
-
-bool BaseThreadDecoderTest::DecodeNextFrame (Callback* cbk) {
-  switch (decodeStatus_) {
-  case Decoding:
-    if (false == ReadFrame (&file_, &buf_))
-      return false;
-    if (::testing::Test::HasFatalFailure()) {
-      return false;
-    }
-    if (buf_.Length() == 0) {
-      decodeStatus_ = EndOfStream;
-      return true;
-    }
-    DecodeFrame (buf_.data(), buf_.Length(), cbk);
-    if (::testing::Test::HasFatalFailure()) {
-      return false;
-    }
-    return true;
-  case EndOfStream: {
-    int32_t iEndOfStreamFlag = 1;
-    decoder_->SetOption (DECODER_OPTION_END_OF_STREAM, &iEndOfStreamFlag);
-    DecodeFrame (NULL, 0, cbk);
-    decodeStatus_ = End;
-    break;
-  }
-  case OpenFile:
-  case End:
-    break;
   }
   return false;
 }

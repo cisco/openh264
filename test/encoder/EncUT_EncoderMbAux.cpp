@@ -332,6 +332,12 @@ GENERATE_UT_FOR_COPY (16, 8, WelsCopy16x8NotAligned_mmi);
 GENERATE_UT_FOR_COPY (16, 16, WelsCopy16x16NotAligned_mmi);
 GENERATE_UT_FOR_COPY (16, 16, WelsCopy16x16_mmi);
 #endif
+#ifdef HAVE_MSA
+GENERATE_UT_FOR_COPY (8, 8, WelsCopy8x8_msa);
+GENERATE_UT_FOR_COPY (8, 16, WelsCopy8x16_msa);
+GENERATE_UT_FOR_COPY (16, 8, WelsCopy16x8_msa);
+GENERATE_UT_FOR_COPY (16, 16, WelsCopy16x16_msa);
+#endif
 
 namespace {
 

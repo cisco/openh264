@@ -628,7 +628,6 @@ bool WelsBuildRefList (sWelsEncCtx* pCtx, const int32_t iPOC, int32_t iBestLtrRe
           WelsLog (& (pCtx->sLogCtx), WELS_LOG_DETAIL,
                    "WelsBuildRefList pCtx->uiTemporalId = %d,pRef->iFrameNum = %d,pRef->uiTemporalId = %d",
                    pCtx->uiTemporalId, pRef->iFrameNum, pRef->uiTemporalId);
-          break;
         }
       }
     }

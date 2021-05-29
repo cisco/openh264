@@ -41,7 +41,7 @@ ASMFLAGS += -I$(SRC_PATH)codec/common/mips/
 ifeq ($(ENABLE_MMI), Yes)
 ENABLE_MMI = $(shell $(SRC_PATH)build/mips-simd-check.sh $(CC) mmi)
 ifeq ($(ENABLE_MMI), Yes)
-CFLAGS += -DHAVE_MMI -Wa,-mloongson-mmi,-mloongson-ext
+CFLAGS += -DHAVE_MMI -march=loongson3a
 endif
 endif
 #msa

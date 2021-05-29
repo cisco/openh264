@@ -1390,6 +1390,7 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
             if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE) {
               ref_idx_list[listIdx][0] = 0;
               pCtx->iErrorCode |= dsBitstreamError;
+              RETURN_ERR_IF_NULL(ppRefPic[listIdx][ref_idx_list[listIdx][0]]);
             } else {
               return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_REF_INDEX);
             }
@@ -1439,6 +1440,7 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
               if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE) {
                 iRefIdx = 0;
                 pCtx->iErrorCode |= dsBitstreamError;
+                RETURN_ERR_IF_NULL(ppRefPic[listIdx][iRefIdx]);
               } else {
                 return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_REF_INDEX);
               }
@@ -1498,6 +1500,7 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
               if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE) {
                 iRefIdx = 0;
                 pCtx->iErrorCode |= dsBitstreamError;
+                RETURN_ERR_IF_NULL(ppRefPic[listIdx][iRefIdx]);
               } else {
                 return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_REF_INDEX);
               }
@@ -1644,6 +1647,7 @@ int32_t ParseInterBInfo (PWelsDecoderContext pCtx, int16_t iMvArray[LIST_A][30][
                 if (pCtx->pParam->eEcActiveIdc != ERROR_CON_DISABLE) {
                   iref = 0;
                   pCtx->iErrorCode |= dsBitstreamError;
+                  RETURN_ERR_IF_NULL(ppRefPic[listIdx][iref]);
                 } else {
                   return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_REF_INDEX);
                 }
