@@ -1,6 +1,12 @@
 
 Releases
 -----------
+v2.1.1
+------
+- release x86 and x64 libraries for android platform
+- release arm and arm64 libraries for linux platform
+- Bug fixes
+
 v2.1.0
 ------
 - Experimentally support for multi-thread decoding(default disabled,and may result in random problems if enabled)
@@ -19,6 +25,11 @@ v2.0.0
 - Remove extra visual studio projects for the decoder
 - Remove check for working compiler in NDK
 - Bug fixes
+
+v1.8.1
+------
+- Fix decoding failure when H.264 video coming from Safari 12, see https://bugzilla.mozilla.org/show_bug.cgi?id=1492038
+- Fix GMP plugin deadlock, see https://bugzilla.mozilla.org/show_bug.cgi?id=1397539
 
 v1.8.0
 ------
@@ -197,6 +208,30 @@ Binaries
 -----------
 These binary releases are distributed under this license:
 http://www.openh264.org/BINARY_LICENSE.txt
+
+v2.1.1
+http://ciscobinary.openh264.org/libopenh264-2.1.1-android-arm.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.1-android-arm.so.sig.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.1-android-arm64.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.1-android-arm64.so.sig.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.1-android-x86.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.1-android-x86.so.sig.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.1-android-x64.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.1-android-x64.so.sig.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.1-ios.a.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.1-ios.a.sig.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.1-linux32.6.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.1-linux32.6.so.sig.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.1-linux64.6.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.1-linux64.6.so.sig.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.1-linux-arm.6.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.1-linux-arm.6.so.sig.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.1-linux-arm64.6.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.1-linux-arm64.6.so.sig.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.1-osx32.6.dylib.bz2
+http://ciscobinary.openh264.org/libopenh264-2.1.1-osx64.6.dylib.bz2
+http://ciscobinary.openh264.org/openh264-2.1.1-win32.dll.bz2
+http://ciscobinary.openh264.org/openh264-2.1.1-win64.dll.bz2
 
 v2.1.0
 http://ciscobinary.openh264.org/libopenh264-2.1.0-android-arm.so.bz2
