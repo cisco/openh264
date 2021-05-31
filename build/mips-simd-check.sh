@@ -15,7 +15,7 @@ TMPO=$(mktemp tmp.XXXXXX.o)
 if [ $2 == "mmi" ]
 then
    echo "void main(void){ __asm__ volatile(\"punpcklhw \$f0, \$f0, \$f0\"); }" > $TMPC
-   $1 -Wa,-mloongson-mmi $TMPC -o $TMPO &> /dev/null
+   $1 -march=loongson3a $TMPC -o $TMPO &> /dev/null
    if test -s $TMPO
    then
       echo "Yes"

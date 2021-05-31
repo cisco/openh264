@@ -405,7 +405,7 @@ void CreateImplicitWeightTable (PWelsDecoderContext pCtx) {
     //fix Bugzilla 1485229 check if pointers are NULL
     if (pCtx->sRefPic.pRefList[LIST_0][0] && pCtx->sRefPic.pRefList[LIST_1][0]) {
       if (pSliceHeader->uiRefCount[0] == 1 && pSliceHeader->uiRefCount[1] == 1
-          && pCtx->sRefPic.pRefList[LIST_0][0]->iFramePoc + pCtx->sRefPic.pRefList[LIST_1][0]->iFramePoc == 2 * iPoc) {
+          && int64_t(pCtx->sRefPic.pRefList[LIST_0][0]->iFramePoc) + int64_t(pCtx->sRefPic.pRefList[LIST_1][0]->iFramePoc) == 2 * int64_t(iPoc)) {
         pCurDqLayer->bUseWeightedBiPredIdc = false;
         return;
       }
@@ -543,7 +543,12 @@ int32_t ParseDecRefPicMarking (PWelsDecoderContext pCtx, PBitStringAux pBs, PSli
           WELS_VERIFY_RETURN_IF (-1, bMmco4Exist);
           bMmco4Exist = true;
           WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //max_long_term_frame_idx_plus1
-          kpRefMarking->sMmcoRef[iIdx].iMaxLongTermFrameIdx = -1 + uiCode;
+          int32_t iMaxLongTermFrameIdx = -1 + uiCode;
+          if (iMaxLongTermFrameIdx > int32_t (pSps->uiLog2MaxFrameNum)) {
+            //ISO/IEC 14496-10:2009(E) 7.4.3.3 Decoded reference picture marking semantics page 96
+            return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_REF_MARKING);
+          }
+          kpRefMarking->sMmcoRef[iIdx].iMaxLongTermFrameIdx = iMaxLongTermFrameIdx;
         } else if (kuiMmco == MMCO_RESET) {
           WELS_VERIFY_RETURN_IF (-1, (!bAllowMmco5 || bMmco5Exist));
           bMmco5Exist = true;
@@ -2338,7 +2343,7 @@ int32_t InitConstructAccessUnit (PWelsDecoderContext pCtx, SBufferInfo* pDstInfo
  */
 int32_t ConstructAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo) {
   int32_t iErr = ERR_NONE;
-  if (pCtx->pThreadCtx == NULL) {
+  if (GetThreadCount (pCtx) <= 1) {
     iErr = InitConstructAccessUnit (pCtx, pDstInfo);
     if (ERR_NONE != iErr) {
       return iErr;
@@ -2421,9 +2426,6 @@ void WelsDqLayerDecodeStart (PWelsDecoderContext pCtx, PNalUnit pCurNal, PSps pS
 
 int32_t InitRefPicList (PWelsDecoderContext pCtx, const uint8_t kuiNRi, int32_t iPoc) {
   int32_t iRet = ERR_NONE;
-  if (GetThreadCount (pCtx) > 1 && pCtx->bNewSeqBegin) {
-    WelsResetRefPic (pCtx);
-  }
   if (pCtx->eSliceType == B_SLICE) {
     iRet = WelsInitBSliceRefList (pCtx, iPoc);
     CreateImplicitWeightTable (pCtx);
@@ -2525,37 +2527,20 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
     SLayerInfo pLayerInfo;
     PSliceHeaderExt pShExt = NULL;
     PSliceHeader pSh = NULL;
-
-    if (pLastThreadCtx != NULL) {
-      pSh = &pNalCur->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader;
-      if (pSh->iFirstMbInSlice == 0) {
-        if (pLastThreadCtx->pCtx->pDec != NULL && pLastThreadCtx->pCtx->pDec->bIsUngroupedMultiSlice) {
-          WAIT_EVENT (&pLastThreadCtx->sSliceDecodeFinish, WELS_DEC_THREAD_WAIT_INFINITE);
-        }
-        pCtx->pDec = NULL;
-        pCtx->iTotalNumMbRec = 0;
-      } else if (pLastThreadCtx->pCtx->pDec != NULL) {
-        if (pSh->iFrameNum == pLastThreadCtx->pCtx->pDec->iFrameNum
-            && pSh->iPicOrderCntLsb == pLastThreadCtx->pCtx->pDec->iFramePoc) {
-          WAIT_EVENT (&pLastThreadCtx->sSliceDecodeFinish, WELS_DEC_THREAD_WAIT_INFINITE);
-          pCtx->pDec = pLastThreadCtx->pCtx->pDec;
-          pCtx->pDec->bIsUngroupedMultiSlice = true;
-          pCtx->sRefPic = pLastThreadCtx->pCtx->sRefPic;
-          pCtx->iTotalNumMbRec = pLastThreadCtx->pCtx->iTotalNumMbRec;
-        }
-      }
-    }
     bool isNewFrame = true;
     if (iThreadCount > 1) {
       isNewFrame = pCtx->pDec == NULL;
     }
     if (pCtx->pDec == NULL) {
+      //make call PrefetchPic first before updating reference lists in threaded mode
+      //this prevents from possible thread-decoding hanging
+      pCtx->pDec = PrefetchPic (pCtx->pPicBuff);
       if (pLastThreadCtx != NULL) {
         pLastThreadCtx->pDec->bUsedAsRef = pLastThreadCtx->pCtx->uiNalRefIdc > 0;
         if (pLastThreadCtx->pDec->bUsedAsRef) {
           for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
             uint32_t i = 0;
-            while (i < MAX_DPB_COUNT && pLastThreadCtx->pCtx->sRefPic.pRefList[listIdx][i]) {
+            while (i < MAX_REF_PIC_COUNT && pLastThreadCtx->pCtx->sRefPic.pRefList[listIdx][i]) {
               pLastThreadCtx->pDec->pRefPic[listIdx][i] = pLastThreadCtx->pCtx->sRefPic.pRefList[listIdx][i];
               ++i;
             }
@@ -2567,7 +2552,11 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
           pCtx->sRefPic = pLastThreadCtx->pCtx->sRefPic;
         }
       }
-      pCtx->pDec = PrefetchPic (pCtx->pPicBuff);
+      //WelsResetRefPic needs to be called when a new sequence is encountered
+      //Otherwise artifacts is observed in decoded yuv in couple of unit tests with multiple-slice frame
+      if (GetThreadCount (pCtx) > 1 && pCtx->bNewSeqBegin) {
+        WelsResetRefPic (pCtx);
+      }
       if (pCtx->iTotalNumMbRec != 0)
         pCtx->iTotalNumMbRec = 0;
 
@@ -2580,7 +2569,6 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         return ERR_INFO_REF_COUNT_OVERFLOW;
       }
       if (pThreadCtx != NULL) {
-        pCtx->pDec->bIsUngroupedMultiSlice = false;
         pThreadCtx->pDec = pCtx->pDec;
         if (iThreadCount > 1) ++pCtx->pDec->iRefCount;
         uint32_t uiMbHeight = (pCtx->pDec->iHeightInPixel + 15) >> 4;
@@ -2683,13 +2671,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
           // Subclause 8.2.5.2 Decoding process for gaps in frame_num
           int32_t iPrevFrameNum = pCtx->pLastDecPicInfo->iPrevFrameNum;
           if (pLastThreadCtx != NULL) {
-            if (pCtx->bNewSeqBegin) {
-              iPrevFrameNum = 0;
-            } else if (pLastThreadCtx->pDec != NULL) {
-              iPrevFrameNum = pLastThreadCtx->pDec->iFrameNum;
-            } else {
-              iPrevFrameNum = pCtx->bNewSeqBegin ? 0 : pLastThreadCtx->pCtx->iFrameNum;
-            }
+            //call GetPrevFrameNum() to get correct iPrevFrameNum to prevent frame gap warning
+            iPrevFrameNum = pCtx->bNewSeqBegin ? 0 : GetPrevFrameNum (pCtx);
           }
           if (!kbIdrFlag  &&
               pSh->iFrameNum != iPrevFrameNum &&
@@ -2715,6 +2698,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
 
         if (iCurrIdD == kuiDependencyIdMax && iCurrIdQ == BASE_QUALITY_ID && isNewFrame) {
           iRet = InitRefPicList (pCtx, pCtx->uiNalRefIdc, pSh->iPicOrderCntLsb);
+          if (iThreadCount > 1) isNewFrame = false;
           if (iRet) {
             pCtx->bRPLRError = true;
             bAllRefComplete = false; // RPLR error, set ref pictures complete flag false
@@ -2734,8 +2718,10 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
           ComputeColocatedTemporalScaling (pCtx);
 
         if (iThreadCount > 1) {
-          memset (&pCtx->lastReadyHeightOffset[0][0], -1, LIST_A * MAX_REF_PIC_COUNT * sizeof (int16_t));
-          SET_EVENT (&pThreadCtx->sSliceDecodeStart);
+          if (iIdx == 0) {
+            memset (&pCtx->lastReadyHeightOffset[0][0], -1, LIST_A * MAX_REF_PIC_COUNT * sizeof (int16_t));
+            SET_EVENT (&pThreadCtx->sSliceDecodeStart);
+          }
           iRet = WelsDecodeAndConstructSlice (pCtx);
         } else {
           iRet = WelsDecodeSlice (pCtx, bFreshSliceAvailable, pNalCur);

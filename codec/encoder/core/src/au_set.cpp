@@ -134,7 +134,7 @@ static int32_t WelsCheckNumRefSetting (SLogContext* pLogCtx, SWelsSvcCodingParam
 
 int32_t WelsCheckRefFrameLimitationNumRefFirst (SLogContext* pLogCtx, SWelsSvcCodingParam* pParam) {
 
-  if (WelsCheckNumRefSetting (pLogCtx, pParam, true)) {
+  if (WelsCheckNumRefSetting (pLogCtx, pParam, false)) {
     // we take num-ref as the honored setting but it conflicts with temporal and LTR
     return ENC_RETURN_UNSUPPORTED_PARA;
   }

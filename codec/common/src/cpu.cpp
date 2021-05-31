@@ -331,7 +331,7 @@ static uint32_t get_cpu_flags_from_cpuinfo(void)
     }
     while (fgets(buf, sizeof(buf), fp)) {
         if(!strncmp(buf, "ASEs implemented", strlen("ASEs implemented"))) {
-            if (strstr(buf, "loongson-mmi") || strstr(buf, "loongson-ext")) {
+            if (strstr(buf, "loongson-mmi") && strstr(buf, "loongson-ext")) {
                 flags |= WELS_CPU_MMI;
             }
             if (strstr(buf, "msa")) {

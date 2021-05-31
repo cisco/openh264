@@ -3,7 +3,10 @@ SHAREDLIBSUFFIX = so
 SHAREDLIBSUFFIXFULLVER=$(SHAREDLIBSUFFIX).$(FULL_VERSION)
 SHAREDLIBSUFFIXMAJORVER=$(SHAREDLIBSUFFIX).$(SHAREDLIB_MAJORVERSION)
 SHLDFLAGS = -Wl,-soname,$(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXMAJORVER)
-CFLAGS += -Wall -fno-strict-aliasing -fPIC -MMD -MP -fstack-protector-all
+CFLAGS += -Wall -fno-strict-aliasing -fPIC -MMD -MP
+ifeq ($(USE_STACK_PROTECTOR), Yes)
+CFLAGS += -fstack-protector-all
+endif
 LDFLAGS += -lpthread
 STATIC_LDFLAGS += -lpthread -lm
 AR_OPTS = crD $@

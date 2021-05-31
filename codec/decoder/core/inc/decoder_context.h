@@ -295,6 +295,7 @@ typedef struct tagPictReoderingStatus {
   int32_t iLastGOPRemainPicts;
   int32_t iLastWrittenPOC;
   int32_t iLargestBufferedPicIndex;
+  bool    bHasBSlice;
 } SPictReoderingStatus, *PPictReoderingStatus;
 
 /*
@@ -513,6 +514,7 @@ typedef struct TagWelsDecoderContext {
   int16_t lastReadyHeightOffset[LIST_A][MAX_REF_PIC_COUNT]; //last ready reference MB offset
   PPictInfo               pPictInfoList;
   PPictReoderingStatus    pPictReoderingStatus;
+  SBufferInfo*            pDstInfo;
 } SWelsDecoderContext, *PWelsDecoderContext;
 
 typedef struct tagSWelsDecThread {
@@ -556,6 +558,25 @@ static inline int32_t GetThreadCount (PWelsDecoderContext pCtx) {
     iThreadCount = pThreadCtx->sThreadInfo.uiThrMaxNum;
   }
   return iThreadCount;
+}
+//GetPrevFrameNum only applies when thread count >= 2
+static inline int32_t GetPrevFrameNum (PWelsDecoderContext pCtx) {
+  if (pCtx->uiDecodingTimeStamp > 0) {
+    PWelsDecoderThreadCTX pThreadCtx = (PWelsDecoderThreadCTX)pCtx->pThreadCtx;
+    int32_t iThreadCount = int32_t (pThreadCtx->sThreadInfo.uiThrMaxNum);
+    int32_t  uiThrNum = int32_t (pThreadCtx->sThreadInfo.uiThrNum);
+    for (int32_t i = 0; i < iThreadCount; ++i) {
+      int32_t id = i - uiThrNum;
+      if (id != 0 && pThreadCtx[id].pCtx->uiDecodingTimeStamp == pCtx->uiDecodingTimeStamp - 1) {
+        if (pThreadCtx[id].pCtx->pDec != NULL) {
+          int32_t iFrameNum = pThreadCtx[id].pCtx->pDec->iFrameNum;
+          if (iFrameNum >= 0) return iFrameNum;
+        }
+        return pThreadCtx[id].pCtx->iFrameNum;
+      }
+    }
+  }
+  return pCtx->pLastDecPicInfo->iPrevFrameNum;
 }
 //#ifdef __cplusplus
 //}

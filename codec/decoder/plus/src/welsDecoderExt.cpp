@@ -450,6 +450,7 @@ int32_t CWelsDecoder::ResetDecoder (PWelsDecoderContext& pCtx) {
       WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "ResetDecoder() failed as decoder context null");
     }
     ResetReorderingPictureBuffers (&m_sReoderingStatus, m_sPictInfoList, false);
+    if (pCtx->pDstInfo) pCtx->pDstInfo->iBufferStatus = 0;
   }
   return ERR_INFO_UNINIT;
 }
@@ -461,6 +462,7 @@ int32_t CWelsDecoder::ThreadResetDecoder (PWelsDecoderContext& pCtx) {
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "ResetDecoder(), context error code is %d", pCtx->iErrorCode);
     memcpy (&sPrevParam, pCtx->pParam, sizeof (SDecodingParam));
     ResetReorderingPictureBuffers (&m_sReoderingStatus, m_sPictInfoList, true);
+    if (pCtx->pDstInfo) pCtx->pDstInfo->iBufferStatus = 0;
     CloseDecoderThreads();
     UninitDecoder();
     InitDecoder (&sPrevParam);
@@ -697,8 +699,15 @@ DECODING_STATE CWelsDecoder::DecodeFrameNoDelay (const unsigned char* kpSrc,
     if (m_sReoderingStatus.iNumOfPicts) {
       WAIT_EVENT (&m_sBufferingEvent, WELS_DEC_THREAD_WAIT_INFINITE);
       RESET_EVENT (&m_sReleaseBufferEvent);
-      ReleaseBufferedReadyPicture (NULL, ppDst, pDstInfo);
-      SET_EVENT (&m_sReleaseBufferEvent);
+      if (!m_sReoderingStatus.bHasBSlice) {
+        if (m_sReoderingStatus.iNumOfPicts > 1) {
+          ReleaseBufferedReadyPictureNoReorder (NULL, ppDst, pDstInfo);
+        }
+      }
+      else {
+        ReleaseBufferedReadyPictureReorder (NULL, ppDst, pDstInfo);
+      }
+      SET_EVENT(&m_sReleaseBufferEvent);
     }
     return (DECODING_STATE)iRet;
   }
@@ -811,13 +820,6 @@ DECODING_STATE CWelsDecoder::DecodeFrame2WithCtx (PWelsDecoderContext pDecContex
       }
       return dsErrorFree;
     }
-    if ((pDecContext->iErrorCode & (dsBitstreamError | dsDataErrorConcealed)) && pDecContext->eSliceType == B_SLICE) {
-      if (ResetDecoder (pDecContext)) {
-        pDstInfo->iBufferStatus = 0;
-        return (DECODING_STATE)pDecContext->iErrorCode;
-      }
-      return dsErrorFree;
-    }
     //for AVC bitstream (excluding AVC with temporal scalability, including TP), as long as error occur, SHOULD notify upper layer key frame loss.
     if ((IS_PARAM_SETS_NALS (eNalType) || NAL_UNIT_CODED_SLICE_IDR == eNalType) ||
         (VIDEO_BITSTREAM_AVC == pDecContext->eVideoType)) {
@@ -869,7 +871,6 @@ DECODING_STATE CWelsDecoder::DecodeFrame2WithCtx (PWelsDecoderContext pDecContex
     pDecContext->dDecTime += (iEnd - iStart) / 1e3;
 
     OutputStatisticsLog (*pDecContext->pDecoderStatistics);
-
     if (GetThreadCount (pDecContext) >= 1) {
       WAIT_EVENT (&m_sReleaseBufferEvent, WELS_DEC_THREAD_WAIT_INFINITE);
       RESET_EVENT (&m_sBufferingEvent);
@@ -912,6 +913,7 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
     unsigned char** ppDst,
     SBufferInfo* pDstInfo) {
   PWelsDecoderContext pDecContext = m_pDecThrCtx[0].pCtx;
+  pDecContext->pDstInfo = pDstInfo;
   return DecodeFrame2WithCtx (pDecContext, kpSrc, kiSrcLen, ppDst, pDstInfo);
 }
 
@@ -926,69 +928,13 @@ DECODING_STATE CWelsDecoder::FlushFrame (unsigned char** ppDst,
     }
   }
   if (bEndOfStreamFlag && m_sReoderingStatus.iNumOfPicts > 0) {
-    m_sReoderingStatus.iMinPOC = IMinInt32;
-    if (m_bIsBaseline) {
-      uint32_t uiDecodingTimeStamp = 0;
-      int32_t firstValidIdx = -1;
-      for (int32_t i = 0; i <= m_sReoderingStatus.iLargestBufferedPicIndex; ++i) {
-        if (m_sPictInfoList[i].iPOC > IMinInt32) {
-          uiDecodingTimeStamp = m_sPictInfoList[i].uiDecodingTimeStamp;
-          m_sReoderingStatus.iMinPOC = m_sPictInfoList[i].iPOC;
-          m_sReoderingStatus.iPictInfoIndex = i;
-          firstValidIdx = i;
-          break;
-        }
-      }
-      for (int32_t i = 0; i <= m_sReoderingStatus.iLargestBufferedPicIndex; ++i) {
-        if (i == firstValidIdx) continue;
-        if (m_sPictInfoList[i].iPOC > IMinInt32 && m_sPictInfoList[i].uiDecodingTimeStamp < uiDecodingTimeStamp) {
-          uiDecodingTimeStamp = m_sPictInfoList[i].uiDecodingTimeStamp;
-          m_sReoderingStatus.iMinPOC = m_sPictInfoList[i].iPOC;
-          m_sReoderingStatus.iPictInfoIndex = i;
-        }
-      }
-    } else {
-      int32_t firstValidIdx = -1;
-      for (int32_t i = 0; i <= m_sReoderingStatus.iLargestBufferedPicIndex; ++i) {
-        if (m_sReoderingStatus.iMinPOC == IMinInt32 && m_sPictInfoList[i].iPOC > IMinInt32) {
-          m_sReoderingStatus.iMinPOC = m_sPictInfoList[i].iPOC;
-          m_sReoderingStatus.iPictInfoIndex = i;
-          firstValidIdx = i;
-          break;
-        }
-      }
-      for (int32_t i = 0; i <= m_sReoderingStatus.iLargestBufferedPicIndex; ++i) {
-        if (i == firstValidIdx) continue;
-        if (m_sPictInfoList[i].iPOC > IMinInt32 && m_sPictInfoList[i].iPOC < m_sReoderingStatus.iMinPOC) {
-          m_sReoderingStatus.iMinPOC = m_sPictInfoList[i].iPOC;
-          m_sReoderingStatus.iPictInfoIndex = i;
-        }
-      }
+    if (!m_sReoderingStatus.bHasBSlice) {
+      ReleaseBufferedReadyPictureNoReorder (NULL, ppDst, pDstInfo);
+    }
+    else {
+      ReleaseBufferedReadyPictureReorder (NULL, ppDst, pDstInfo, true);
     }
   }
-  if (m_sReoderingStatus.iMinPOC > IMinInt32) {
-    m_sReoderingStatus.iLastWrittenPOC = m_sReoderingStatus.iMinPOC;
-#if defined (_DEBUG)
-#ifdef _MOTION_VECTOR_DUMP_
-    fprintf (stderr, "Output POC: #%d uiDecodingTimeStamp=%d\n", m_sReoderingStatus.iLastWrittenPOC,
-             m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].uiDecodingTimeStamp);
-#endif
-#endif
-    memcpy (pDstInfo, &m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].sBufferInfo, sizeof (SBufferInfo));
-    ppDst[0] = pDstInfo->pDst[0];
-    ppDst[1] = pDstInfo->pDst[1];
-    ppDst[2] = pDstInfo->pDst[2];
-    m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPOC = IMinInt32;
-    PPicBuff pPicBuff = m_iThreadCount <= 1 ? m_pDecThrCtx[0].pCtx->pPicBuff : m_pPicBuff;
-    if (m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPicBuffIdx < pPicBuff->iCapacity) {
-      PPicture pPic = pPicBuff->ppPic[m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPicBuffIdx];
-      --pPic->iRefCount;
-    }
-    m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].bLastGOP = false;
-    m_sReoderingStatus.iMinPOC = IMinInt32;
-    --m_sReoderingStatus.iNumOfPicts;
-  }
-
   return dsErrorFree;
 }
 
@@ -1044,6 +990,9 @@ void CWelsDecoder::BufferingReadyPicture (PWelsDecoderContext pCtx, unsigned cha
   }
   m_bIsBaseline = pCtx->pSps->uiProfileIdc == 66 || pCtx->pSps->uiProfileIdc == 83;
   if (!m_bIsBaseline) {
+    if (pCtx->pSliceHeader->eSliceType == B_SLICE) {
+      m_sReoderingStatus.bHasBSlice = true;
+    }
     if (m_sReoderingStatus.iNumOfPicts && pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb
         && pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb->bNewSeqBegin) {
       m_sReoderingStatus.iLastGOPRemainPicts = m_sReoderingStatus.iNumOfPicts;
@@ -1093,13 +1042,13 @@ void CWelsDecoder::BufferingReadyPicture (PWelsDecoderContext pCtx, unsigned cha
   }
 }
 
-void CWelsDecoder::ReleaseBufferedReadyPicture (PWelsDecoderContext pCtx, unsigned char** ppDst,
-    SBufferInfo* pDstInfo) {
+void CWelsDecoder::ReleaseBufferedReadyPictureReorder (PWelsDecoderContext pCtx, unsigned char** ppDst,
+    SBufferInfo* pDstInfo, bool isFlush) {
   PPicBuff pPicBuff = pCtx ? pCtx->pPicBuff : m_pPicBuff;
   if (pCtx == NULL && m_iThreadCount <= 1) {
     pCtx = m_pDecThrCtx[0].pCtx;
   }
-  if (!m_bIsBaseline && m_sReoderingStatus.iLastGOPRemainPicts > 0) {
+  if (m_sReoderingStatus.iLastGOPRemainPicts > 0) {
     m_sReoderingStatus.iMinPOC = IMinInt32;
     int32_t firstValidIdx = -1;
     for (int32_t i = 0; i <= m_sReoderingStatus.iLargestBufferedPicIndex; ++i) {
@@ -1130,50 +1079,16 @@ void CWelsDecoder::ReleaseBufferedReadyPicture (PWelsDecoderContext pCtx, unsign
     ppDst[1] = pDstInfo->pDst[1];
     ppDst[2] = pDstInfo->pDst[2];
     m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPOC = IMinInt32;
-    PPicture pPic = pPicBuff->ppPic[m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPicBuffIdx];
-    --pPic->iRefCount;
+    if (pPicBuff != NULL) {
+      PPicture pPic = pPicBuff->ppPic[m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPicBuffIdx];
+      --pPic->iRefCount;
+    }
     m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].bLastGOP = false;
     m_sReoderingStatus.iMinPOC = IMinInt32;
     --m_sReoderingStatus.iNumOfPicts;
     --m_sReoderingStatus.iLastGOPRemainPicts;
     if (m_sReoderingStatus.iLastGOPRemainPicts == 0) {
       m_sReoderingStatus.iLastWrittenPOC = IMinInt32;
-    }
-    return;
-  }
-  if (m_sReoderingStatus.iNumOfPicts && m_bIsBaseline) {
-    uint32_t uiDecodingTimeStamp = 0;
-    int32_t firstValidIdx = -1;
-    for (int32_t i = 0; i <= m_sReoderingStatus.iLargestBufferedPicIndex; ++i) {
-      if (m_sPictInfoList[i].iPOC > IMinInt32) {
-        uiDecodingTimeStamp = m_sPictInfoList[i].uiDecodingTimeStamp;
-        m_sReoderingStatus.iPictInfoIndex = i;
-        firstValidIdx = i;
-        break;
-      }
-    }
-    for (int32_t i = 0; i <= m_sReoderingStatus.iLargestBufferedPicIndex; ++i) {
-      if (i == firstValidIdx) continue;
-      if (m_sPictInfoList[i].iPOC > IMinInt32 && m_sPictInfoList[i].uiDecodingTimeStamp < uiDecodingTimeStamp) {
-        uiDecodingTimeStamp = m_sPictInfoList[i].uiDecodingTimeStamp;
-        m_sReoderingStatus.iPictInfoIndex = i;
-      }
-    }
-    if (uiDecodingTimeStamp > 0) {
-#if defined (_DEBUG)
-#ifdef _MOTION_VECTOR_DUMP_
-      fprintf (stderr, "Output POC: #%d uiDecodingTimeStamp=%d\n", m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPOC,
-               uiDecodingTimeStamp);
-#endif
-#endif
-      memcpy (pDstInfo, &m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].sBufferInfo, sizeof (SBufferInfo));
-      ppDst[0] = pDstInfo->pDst[0];
-      ppDst[1] = pDstInfo->pDst[1];
-      ppDst[2] = pDstInfo->pDst[2];
-      m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPOC = IMinInt32;
-      PPicture pPic = pPicBuff->ppPic[m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPicBuffIdx];
-      --pPic->iRefCount;
-      --m_sReoderingStatus.iNumOfPicts;
     }
     return;
   }
@@ -1197,10 +1112,13 @@ void CWelsDecoder::ReleaseBufferedReadyPicture (PWelsDecoderContext pCtx, unsign
     }
   }
   if (m_sReoderingStatus.iMinPOC > IMinInt32) {
-    int32_t iLastPOC = pCtx != NULL ? pCtx->pSliceHeader->iPicOrderCntLsb : m_sPictInfoList[m_iLastBufferedIdx].iPOC;
-    bool isReady = (m_sReoderingStatus.iLastWrittenPOC > IMinInt32
-                    && m_sReoderingStatus.iMinPOC - m_sReoderingStatus.iLastWrittenPOC <= 1)
-                   || m_sReoderingStatus.iMinPOC < iLastPOC;
+    bool isReady = true;
+    if (!isFlush) {
+      int32_t iLastPOC = pCtx != NULL ? pCtx->pSliceHeader->iPicOrderCntLsb : m_sPictInfoList[m_iLastBufferedIdx].iPOC;
+      isReady = (m_sReoderingStatus.iLastWrittenPOC > IMinInt32
+        && m_sReoderingStatus.iMinPOC - m_sReoderingStatus.iLastWrittenPOC <= 1)
+        || m_sReoderingStatus.iMinPOC < iLastPOC;
+    }
     if (isReady) {
       m_sReoderingStatus.iLastWrittenPOC = m_sReoderingStatus.iMinPOC;
 #if defined (_DEBUG)
@@ -1214,8 +1132,10 @@ void CWelsDecoder::ReleaseBufferedReadyPicture (PWelsDecoderContext pCtx, unsign
       ppDst[1] = pDstInfo->pDst[1];
       ppDst[2] = pDstInfo->pDst[2];
       m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPOC = IMinInt32;
-      PPicture pPic = pPicBuff->ppPic[m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPicBuffIdx];
-      --pPic->iRefCount;
+      if (pPicBuff != NULL) {
+        PPicture pPic = pPicBuff->ppPic[m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPicBuffIdx];
+        --pPic->iRefCount;
+      }
       m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].bLastGOP = false;
       m_sReoderingStatus.iMinPOC = IMinInt32;
       --m_sReoderingStatus.iNumOfPicts;
@@ -1223,14 +1143,69 @@ void CWelsDecoder::ReleaseBufferedReadyPicture (PWelsDecoderContext pCtx, unsign
   }
 }
 
-DECODING_STATE CWelsDecoder::ReorderPicturesInDisplay (PWelsDecoderContext pDecContext, unsigned char** ppDst,
-    SBufferInfo* pDstInfo) {
+//if there is no b-frame, no ordering based on values of POCs is necessary.
+//The function is added to force to avoid picture reordering because some h.264 streams do not follow H.264 POC specifications. 
+void CWelsDecoder::ReleaseBufferedReadyPictureNoReorder(PWelsDecoderContext pCtx, unsigned char** ppDst, SBufferInfo* pDstInfo)
+{
+  int32_t firstValidIdx = -1;
+  uint32_t uiDecodingTimeStamp = 0;
+  for (int32_t i = 0; i <= m_sReoderingStatus.iLargestBufferedPicIndex; ++i) {
+    if (m_sPictInfoList[i].iPOC != IMinInt32) {
+      uiDecodingTimeStamp = m_sPictInfoList[i].uiDecodingTimeStamp;
+      m_sReoderingStatus.iPictInfoIndex = i;
+      firstValidIdx = i;
+      break;
+    }
+  }
+  for (int32_t i = 0; i <= m_sReoderingStatus.iLargestBufferedPicIndex; ++i) {
+    if (i == firstValidIdx) continue;
+    if (m_sPictInfoList[i].iPOC != IMinInt32 && m_sPictInfoList[i].uiDecodingTimeStamp < uiDecodingTimeStamp) {
+      uiDecodingTimeStamp = m_sPictInfoList[i].uiDecodingTimeStamp;
+      m_sReoderingStatus.iPictInfoIndex = i;
+    }
+  }
+  if (uiDecodingTimeStamp > 0) {
+#if defined (_DEBUG)
+#ifdef _MOTION_VECTOR_DUMP_
+    fprintf(stderr, "Output POC: #%d uiDecodingTimeStamp=%d\n", m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPOC,
+      uiDecodingTimeStamp);
+#endif
+#endif
+    m_sReoderingStatus.iLastWrittenPOC = m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPOC;
+    memcpy(pDstInfo, &m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].sBufferInfo, sizeof(SBufferInfo));
+    ppDst[0] = pDstInfo->pDst[0];
+    ppDst[1] = pDstInfo->pDst[1];
+    ppDst[2] = pDstInfo->pDst[2];
+    m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPOC = IMinInt32;
+    if (pCtx || m_pPicBuff) {
+      PPicBuff pPicBuff = pCtx ? pCtx->pPicBuff : m_pPicBuff;
+      PPicture pPic = pPicBuff->ppPic[m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPicBuffIdx];
+      --pPic->iRefCount;
+    }
+    if (m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].bLastGOP) {
+      --m_sReoderingStatus.iLastGOPRemainPicts;
+      m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].bLastGOP = false;
+    }
+    --m_sReoderingStatus.iNumOfPicts;
+  }
+  return;
+}
+
+DECODING_STATE CWelsDecoder::ReorderPicturesInDisplay(PWelsDecoderContext pDecContext, unsigned char** ppDst,
+  SBufferInfo* pDstInfo) {
   DECODING_STATE iRet = dsErrorFree;
-  if (pDstInfo->iBufferStatus == 1) {
+  if (pDecContext->pSps != NULL) {
     m_bIsBaseline = pDecContext->pSps->uiProfileIdc == 66 || pDecContext->pSps->uiProfileIdc == 83;
     if (!m_bIsBaseline) {
-      BufferingReadyPicture (pDecContext, ppDst, pDstInfo);
-      ReleaseBufferedReadyPicture (pDecContext, ppDst, pDstInfo);
+      if (pDstInfo->iBufferStatus == 1) {
+        BufferingReadyPicture(pDecContext, ppDst, pDstInfo);
+        if (!m_sReoderingStatus.bHasBSlice && m_sReoderingStatus.iNumOfPicts > 1) {
+          ReleaseBufferedReadyPictureNoReorder (pDecContext, ppDst, pDstInfo);
+        }
+        else {
+          ReleaseBufferedReadyPictureReorder (pDecContext, ppDst, pDstInfo);
+        }
+      }
     }
   }
   return iRet;
@@ -1374,6 +1349,13 @@ DECODING_STATE CWelsDecoder::ParseAccessUnit (SWelsDecoderThreadCTX& sThreadCtx)
       sThreadCtx.pCtx->iImgHeightInPixel = m_pLastDecThrCtx->pCtx->iImgHeightInPixel;
     }
   }
+
+  //if threadCount > 1, then each thread must contain exact one complete frame.
+  if (GetThreadCount (sThreadCtx.pCtx) > 1) {
+    sThreadCtx.pCtx->pAccessUnitList->uiAvailUnitsNum = 0;
+    sThreadCtx.pCtx->pAccessUnitList->uiActualUnitsNum = 0;
+  }
+
   int32_t iRet = DecodeFrame2WithCtx (sThreadCtx.pCtx, sThreadCtx.kpSrc, sThreadCtx.kiSrcLen, sThreadCtx.ppDst,
                                       &sThreadCtx.sDstInfo);
 
@@ -1385,6 +1367,9 @@ DECODING_STATE CWelsDecoder::ParseAccessUnit (SWelsDecoderThreadCTX& sThreadCtx)
     m_pPicBuff = sThreadCtx.pCtx->pPicBuff;
   } else if (bPicBuffChanged) {
     InitialDqLayersContext (sThreadCtx.pCtx, sThreadCtx.pCtx->pSps->iMbWidth << 4, sThreadCtx.pCtx->pSps->iMbHeight << 4);
+  }
+  if (!sThreadCtx.pCtx->bNewSeqBegin && m_pLastDecThrCtx != NULL) {
+    sThreadCtx.pCtx->sFrameCrop = m_pLastDecThrCtx->pCtx->pSps->sFrameCrop;
   }
   m_bParamSetsLostFlag = sThreadCtx.pCtx->bNewSeqBegin ? false : sThreadCtx.pCtx->bParamSetsLostFlag;
   m_bFreezeOutput = sThreadCtx.pCtx->bNewSeqBegin ? false : sThreadCtx.pCtx->bFreezeOutput;

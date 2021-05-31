@@ -783,6 +783,11 @@ void WelsBlockFuncInit (PSetNoneZeroCountZeroFunc* pfSetNZCZero,  int32_t iCpu) 
     *pfSetNZCZero = WelsNonZeroCount_mmi;
   }
 #endif
+#if defined(HAVE_MSA)
+  if (iCpu & WELS_CPU_MSA) {
+    *pfSetNZCZero = WelsNonZeroCount_msa;
+  }
+#endif
 }
 
 void  DeblockingInit (DeblockingFunc*   pFunc,  int32_t iCpu) {
@@ -860,6 +865,19 @@ void  DeblockingInit (DeblockingFunc*   pFunc,  int32_t iCpu) {
     pFunc->pfChromaDeblockingEQ4Hor = DeblockChromaEq4H_mmi;
   }
 #endif//HAVE_MMI
+
+#if defined(HAVE_MSA)
+  if (iCpu & WELS_CPU_MSA) {
+    pFunc->pfLumaDeblockingLT4Ver   = DeblockLumaLt4V_msa;
+    pFunc->pfLumaDeblockingEQ4Ver   = DeblockLumaEq4V_msa;
+    pFunc->pfLumaDeblockingLT4Hor   = DeblockLumaLt4H_msa;
+    pFunc->pfLumaDeblockingEQ4Hor   = DeblockLumaEq4H_msa;
+    pFunc->pfChromaDeblockingLT4Ver = DeblockChromaLt4V_msa;
+    pFunc->pfChromaDeblockingEQ4Ver = DeblockChromaEq4V_msa;
+    pFunc->pfChromaDeblockingLT4Hor = DeblockChromaLt4H_msa;
+    pFunc->pfChromaDeblockingEQ4Hor = DeblockChromaEq4H_msa;
+  }
+#endif//HAVE_MSA
 }
 
 
