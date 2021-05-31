@@ -295,6 +295,7 @@ typedef struct tagPictReoderingStatus {
   int32_t iLastGOPRemainPicts;
   int32_t iLastWrittenPOC;
   int32_t iLargestBufferedPicIndex;
+  bool    bHasBSlice;
 } SPictReoderingStatus, *PPictReoderingStatus;
 
 /*
@@ -513,6 +514,7 @@ typedef struct TagWelsDecoderContext {
   int16_t lastReadyHeightOffset[LIST_A][MAX_REF_PIC_COUNT]; //last ready reference MB offset
   PPictInfo               pPictInfoList;
   PPictReoderingStatus    pPictReoderingStatus;
+  SBufferInfo*            pDstInfo;
 } SWelsDecoderContext, *PWelsDecoderContext;
 
 typedef struct tagSWelsDecThread {

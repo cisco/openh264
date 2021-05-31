@@ -405,7 +405,7 @@ void CreateImplicitWeightTable (PWelsDecoderContext pCtx) {
     //fix Bugzilla 1485229 check if pointers are NULL
     if (pCtx->sRefPic.pRefList[LIST_0][0] && pCtx->sRefPic.pRefList[LIST_1][0]) {
       if (pSliceHeader->uiRefCount[0] == 1 && pSliceHeader->uiRefCount[1] == 1
-          && pCtx->sRefPic.pRefList[LIST_0][0]->iFramePoc + pCtx->sRefPic.pRefList[LIST_1][0]->iFramePoc == 2 * iPoc) {
+          && int64_t(pCtx->sRefPic.pRefList[LIST_0][0]->iFramePoc) + int64_t(pCtx->sRefPic.pRefList[LIST_1][0]->iFramePoc) == 2 * int64_t(iPoc)) {
         pCurDqLayer->bUseWeightedBiPredIdc = false;
         return;
       }
