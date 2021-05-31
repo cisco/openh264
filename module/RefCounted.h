@@ -115,25 +115,36 @@ public:
   explicit RefPtr(T* aPtr) : mPtr(nullptr) {
     Assign(aPtr);
   }
+
+  RefPtr(RefPtr& other) : mPtr(nullptr) {
+    Assign(other.mPtr);
+  }
+
   ~RefPtr() {
     Assign(nullptr);
   }
   T* operator->() const { return mPtr; }
+  T* get() const { return mPtr; }
 
   RefPtr& operator=(T* aVal) {
     Assign(aVal);
     return *this;
   }
 
+  RefPtr& operator=(RefPtr& other) {
+    Assign(other.get());
+    return *this;
+  }
+
 private:
   void Assign(T* aPtr) {
+    if (aPtr) {
+      aPtr->AddRef();
+    }
     if (mPtr) {
       mPtr->Release();
     }
     mPtr = aPtr;
-    if (mPtr) {
-      aPtr->AddRef();
-    }
   }
   T* mPtr;
 };
