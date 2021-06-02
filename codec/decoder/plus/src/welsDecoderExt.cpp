@@ -1222,7 +1222,7 @@ void CWelsDecoder::ReleaseBufferedReadyPicture (PWelsDecoderContext pCtx, unsign
 DECODING_STATE CWelsDecoder::ReorderPicturesInDisplay (PWelsDecoderContext pDecContext, unsigned char** ppDst,
     SBufferInfo* pDstInfo) {
   DECODING_STATE iRet = dsErrorFree;
-  if ((pDstInfo->iBufferStatus == 1) && (pDecContext->pPps->bEntropyCodingModeFlag)) {
+  if (pDstInfo->iBufferStatus == 1) {
     m_bIsBaseline = pDecContext->pSps->uiProfileIdc == 66 || pDecContext->pSps->uiProfileIdc == 83;
     if (!m_bIsBaseline) {
       BufferingReadyPicture (pDecContext, ppDst, pDstInfo);
