@@ -807,4 +807,5 @@ typedef struct TagVuiSarInfo {
   bool bOverscanAppropriateFlag;               ///< SAR overscan flag
 } SVuiSarInfo, *PVuiSarInfo;
 
+#include "vdumpyuv.h"
 #endif//WELS_VIDEO_CODEC_APPLICATION_DEFINITION_H__
