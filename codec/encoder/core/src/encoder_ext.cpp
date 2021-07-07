@@ -3616,6 +3616,9 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       eNalRefIdc = NRI_PRI_LOWEST;
     else if (1 + iCurTid == iDecompositionStages)
       eNalRefIdc = NRI_PRI_LOW;
+    else if (2 + iCurTid == iDecompositionStages)
+      // 次次高层，2
+      eNalRefIdc = NRI_PRI_HIGH;
     else // more details for other temporal layers?
       eNalRefIdc = NRI_PRI_HIGHEST;
     pCtx->eNalType = eNalType;
