@@ -13,7 +13,7 @@ endif
 endif
 
 #for arm
-ifneq ($(filter-out arm64, $(filter arm%, $(ARCH))),)
+ifneq ($(filter-out arm64 arm64e, $(filter arm%, $(ARCH))),)
 ifeq ($(USE_ASM), Yes)
 ASM_ARCH = arm
 ASMFLAGS += -I$(SRC_PATH)codec/common/arm/
@@ -22,7 +22,7 @@ endif
 endif
 
 #for arm64
-ifneq ($(filter arm64 aarch64, $(ARCH)),)
+ifneq ($(filter arm64 aarch64 arm64e, $(ARCH)),)
 ifeq ($(USE_ASM), Yes)
 ASM_ARCH = arm64
 ASMFLAGS += -I$(SRC_PATH)codec/common/arm64/
