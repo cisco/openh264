@@ -145,6 +145,15 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
     }
   }
 
+  if (uiMaxCpuidLevel >= 7) {
+    uiFeatureC = WelsCPUDetectAVX512();
+    if (uiFeatureC & 0x10000) uiCPU |= WELS_CPU_AVX512F;
+    if (uiFeatureC & 0x10000000) uiCPU |= WELS_CPU_AVX512CD;
+    if (uiFeatureC & 0x20000) uiCPU |= WELS_CPU_AVX512DQ;
+    if (uiFeatureC & 0x40000000) uiCPU |= WELS_CPU_AVX512BW;
+    if (uiFeatureC & 0x80000000) uiCPU |= WELS_CPU_AVX512VL;
+  }
+
   if (pNumberOfLogicProcessors != NULL) {
     if (uiCPU & WELS_CPU_HTT) {
       *pNumberOfLogicProcessors = (uiFeatureB & 0x00ff0000) >> 16; // feature bits: 23-16 on returned EBX
