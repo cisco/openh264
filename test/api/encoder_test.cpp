@@ -103,78 +103,78 @@ TEST_P (EncoderOutputTest, CompareOutput) {
 static const EncodeFileParam kFileParamArray[] = {
   {
     "res/CiscoVT2people_320x192_12fps.yuv",
-    {"c4be9cea9fd012da2efa1247a934d3041cb8e210"}, CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 1, false, false, false
+    {"19dd24f5a3ae9e9582024db5b63696948b8ac82f"}, CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 1, false, false, false
   },
   {
     "res/CiscoVT2people_160x96_6fps.yuv",
-    {"0f4638fadc3c688424e3c4708f0c48aed91cf508"}, CAMERA_VIDEO_REAL_TIME, 160, 96, 6.0f, SM_SINGLE_SLICE, false, 1, false, false, false
+    {"7acf58ba0e72ffc4725ad897ed45f990b9ab8413"}, CAMERA_VIDEO_REAL_TIME, 160, 96, 6.0f, SM_SINGLE_SLICE, false, 1, false, false, false
   },
   {
     "res/Static_152_100.yuv",
-    {"22f317206212ec53c195726a07c157cb54163143"}, CAMERA_VIDEO_REAL_TIME, 152, 100, 6.0f, SM_SINGLE_SLICE, false, 1, false, false, false
+    {"d27c6a56efe899528ddd3f8f3b33efb8f3ce2d51"}, CAMERA_VIDEO_REAL_TIME, 152, 100, 6.0f, SM_SINGLE_SLICE, false, 1, false, false, false
   },
   {
     "res/CiscoVT2people_320x192_12fps.yuv",
-    {"f6f802ea68ecbc313de6327275a7dd92607cb9f8"}, CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_RASTER_SLICE, false, 1, false, false, false // One slice per MB row
+    {"5111d90ce90849020b7ed830cc2f962ccfea4457"}, CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_RASTER_SLICE, false, 1, false, false, false // One slice per MB row
   },
   {
     "res/CiscoVT2people_320x192_12fps.yuv",
-    {"5f958ec330026009d5fd47d0acc2f3dd9b38acc0"}, CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, true, 1, false, false, false
+    {"91ca058f728a001546ae34ce1b7a00163800faac"}, CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, true, 1, false, false, false
   },
   {
     "res/CiscoVT2people_320x192_12fps.yuv",
     // Allow for different output depending on whether averaging is done
     // vertically or horizontally first when downsampling.
-    { "a9b51d700974501807199bc0612054de86a23278", "214059cd68f10da94d0c240624e6364071388d74" },
+    { "4faa2a17c6629135af43c2392531f4ce954ec92d", "a4c2caccada00189c683cd61c6f0bb995d09aeff" },
     CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 2, false, false, false
   },
   {
     "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
-    {"bc95b57efa84595a8e41bfb6e97e5086f4743134"}, CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_SIZELIMITED_SLICE, false, 1, false, false, false
+    {"abd7aa034f916659a9f68b33160b404fb43411dd"}, CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_SIZELIMITED_SLICE, false, 1, false, false, false
   },
   {
     "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
     // Allow for different output depending on whether averaging is done
     // vertically or horizontally first when downsampling.
-    { "3b435a98682957cf58b3aa819e6fc6727e0f783d", "d59eb6f7657a82008d60d44f7de95445a35483d7" },
+    { "291fba557fdfd0e077ff6681425dc81c65704b62", "9e4fb2b503a877c21441545ee4f0cd5416dbe5e9" },
     CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_SINGLE_SLICE, false, 4, false, false, false
   },
 
   // the following values may be adjusted for times since we start tuning the strategy
   {
     "res/CiscoVT2people_320x192_12fps.yuv",
-    {"70db2fe49cabaa7a3cef50c1d0b3bc177f655717"}, SCREEN_CONTENT_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 1, false, false, false
+    {"dd51c2007f944ee752532c74c4d38da1413acd88"}, SCREEN_CONTENT_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 1, false, false, false
   },
   {
     "res/CiscoVT2people_160x96_6fps.yuv",
-    {"34de3a5d4dcbeb956722ba42c2dca1b3840dd12a"}, SCREEN_CONTENT_REAL_TIME, 160, 96, 6.0f, SM_SINGLE_SLICE, false, 1, false, false, false
+    {"564b0e774f0157c91c7ff3548708f88fb0f3abc6"}, SCREEN_CONTENT_REAL_TIME, 160, 96, 6.0f, SM_SINGLE_SLICE, false, 1, false, false, false
   },
   {
     "res/Static_152_100.yuv",
-    {"49b1e0077eb9698731242890104c67ea170d533c"}, SCREEN_CONTENT_REAL_TIME, 152, 100, 6.0f, SM_SINGLE_SLICE, false, 1, false, false, false
+    {"9b88952f0ec5ebf3e25e642b8a9f355854681f57"}, SCREEN_CONTENT_REAL_TIME, 152, 100, 6.0f, SM_SINGLE_SLICE, false, 1, false, false, false
   },
   {
     "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
-    {"138b205e6c5ceacda38c94e975bb8d861fc12b88"}, SCREEN_CONTENT_REAL_TIME, 1280, 720, 30.0f, SM_SIZELIMITED_SLICE, false, 1, false, false, false
+    {"7db72f0d6f347f57d5137a5cd4de2a3e3fba5b95"}, SCREEN_CONTENT_REAL_TIME, 1280, 720, 30.0f, SM_SIZELIMITED_SLICE, false, 1, false, false, false
   },
   //for different strategy
   {
     "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
-    {"5db43d830d7d31549b5ff3d085b5c4a803b23cf4"}, SCREEN_CONTENT_REAL_TIME, 1280, 720, 30.0f, SM_SIZELIMITED_SLICE, false, 1, true, true, false
+    {"30b877303081e2c5ee579d8bbeb2094abd2018c1"}, SCREEN_CONTENT_REAL_TIME, 1280, 720, 30.0f, SM_SIZELIMITED_SLICE, false, 1, true, true, false
   },
   {
     "res/CiscoVT2people_320x192_12fps.yuv",
-    {"2bbea8b822405788aa37755bfabfc111bbf807ac"}, CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 1, false, false, true //turn on cabac
+    {"3c27f9134d79edaa769741005b569565c2367e6f"}, CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 1, false, false, true //turn on cabac
   },
 
   {
     "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
-    {"e2231611b47abee0ebfe861e0d077b2000e633aa"}, CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_SIZELIMITED_SLICE, false, 1, false, false, true
+    {"e5a91447595a2a3560f7cdabbb62b694134fe4ca"}, CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_SIZELIMITED_SLICE, false, 1, false, false, true
   },
 
   {
     "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
-    {"822071b3d149557b758299178d4146dab0e7022d"}, CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_FIXEDSLCNUM_SLICE, false, 1, false, false, true
+    {"77aa8bc391a84d308a09d4fbb859f4a0e8ae8196"}, CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_FIXEDSLCNUM_SLICE, false, 1, false, false, true
   },
 
 };
