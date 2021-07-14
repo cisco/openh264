@@ -184,24 +184,11 @@ api_header_deps = []
 subdir ('codec')
 subdir ('test')
 
-all_objects = [
-  libcommon.extract_all_objects(),
-  libprocessing.extract_all_objects(),
-  libencoder.extract_all_objects(),
-  libdecoder.extract_all_objects()
-]
-
-libopenh264_shared = shared_library('openh264',
-  objects: all_objects,
+libopenh264 = library('openh264',
+  link_whole: [libcommon, libprocessing, libencoder, libdecoder],
   install: true,
   soversion: major_version,
-  version: meson.project_version(),
   vs_module_defs: 'openh264.def',
-  dependencies: deps)
-
-libopenh264_static = static_library('openh264',
-  objects: all_objects,
-  install: true,
   dependencies: deps)
 
 pkg_install_dir = '@0@/pkgconfig'.format(get_option('libdir'))
@@ -235,7 +222,7 @@ foreach t : ['', '-static']
 endforeach
 
 openh264_dep = declare_dependency(
-  link_with: libopenh264_shared,
+  link_with: libopenh264,
   include_directories: include_directories('include'),
   dependencies: deps + api_header_deps)
 
