@@ -11,6 +11,10 @@ SHLDFLAGS = -dynamiclib -twolevel_namespace -undefined dynamic_lookup \
 SHARED = -dynamiclib
 SHARED += -current_version $(CURRENT_VERSION) -compatibility_version $(COMPATIBILITY_VERSION)
 CFLAGS += -Wall -fPIC -MMD -MP
+ifeq ($(ARCH), arm64)
+CFLAGS += -arch arm64
+LDFLAGS += -arch arm64
+endif
 ifeq ($(USE_STACK_PROTECTOR), Yes)
 CFLAGS += -fstack-protector-all
 endif
