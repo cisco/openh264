@@ -191,17 +191,12 @@ all_objects = [
   libdecoder.extract_all_objects()
 ]
 
-libopenh264_shared = shared_library('openh264',
+libopenh264_shared = library('openh264',
   objects: all_objects,
   install: true,
   soversion: major_version,
   version: meson.project_version(),
   vs_module_defs: 'openh264.def',
-  dependencies: deps)
-
-libopenh264_static = static_library('openh264',
-  objects: all_objects,
-  install: true,
   dependencies: deps)
 
 pkg_install_dir = '@0@/pkgconfig'.format(get_option('libdir'))
