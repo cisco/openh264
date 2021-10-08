@@ -191,7 +191,7 @@ typedef unsigned char bool;
   *  SFrameBSInfo info;
   *  memset (&info, 0, sizeof (SFrameBSInfo));
   *  SSourcePicture pic;
-  *  memset (&pic, 0, sizeof (SsourcePicture));
+  *  memset (&pic, 0, sizeof (SSourcePicture));
   *  pic.iPicWidth = width;
   *  pic.iPicHeight = height;
   *  pic.iColorFormat = videoFormatI420;
