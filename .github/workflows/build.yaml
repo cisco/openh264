@@ -16,7 +16,7 @@ jobs:
       - run: make gtest-bootstrap
       - run: meson builddir
       - run: ninja -C builddir -v
+      - run: ( cd test/encoder_binary_comparison ; ./run_PrepareAllTestData.sh 64 )
+      - run: meson test -C builddir -v
+      - run: ./run_Test.sh BinaryCompare BA_MW_D.264
 
-
-
-        
