@@ -20,6 +20,6 @@ jobs:
       - run: ( cd test/encoder_binary_comparison ; ./run_PrepareAllTestData.sh 64 )
       - run: meson test -C builddir -v
       - run: ./run_Test.sh BinaryCompare BA_MW_D.264
-      # - run: ./run_Test.sh BinaryCompare Adobe_PDF_sample_a_1024x768_50Frms.264
+      - run: ./run_Test.sh BinaryCompare Adobe_PDF_sample_a_1024x768_50Frms.264
       - run: ./run_Test.sh BinaryCompare Zhling_1280x720.264
 
