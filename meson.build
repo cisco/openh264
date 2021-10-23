@@ -54,7 +54,7 @@ asm_inc = []
 casm_inc = []
 cpp_lib = '-lstdc++'
 
-libm_dep = cpp.find_library('libm', required : false)
+libm_dep = cpp.find_library('m', required : false)
 deps += [libm_dep]
 
 if ['linux', 'android', 'ios', 'darwin'].contains(system)
