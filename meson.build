@@ -54,9 +54,6 @@ asm_inc = []
 casm_inc = []
 cpp_lib = '-lstdc++'
 
-# TODO: should rely on dependency('threads') instead and change the pkg-config
-# generator below
-pthread_dep = cpp.find_library('pthread', required : false)
 libm_dep = cpp.find_library('libm', required : false)
 deps += [libm_dep]
 
