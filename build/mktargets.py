@@ -123,8 +123,12 @@ for file in cfiles:
     if 'mips' in c:
         mipsfiles.append(file)
 cfiles = [x for x in cfiles if x not in mipsfiles]
-
-
+loongarchfiles = []
+for file in cfiles:
+    c = file.split('/')
+    if 'loongarch' in c:
+        loongarchfiles.append(file)
+cfiles = [x for x in cfiles if x not in loongarchfiles]
 
 
 f = open(OUTFILE, "w")
@@ -209,6 +213,37 @@ if len(mipsfiles) > 0:
     f.write("endif\n")
     f.write("OBJS += $(%s_OBJSMIPS_MMI)\n"%(PREFIX))
     f.write("OBJS += $(%s_OBJSMIPS_MSA)\n\n"%(PREFIX))
+
+if len(loongarchfiles) > 0:
+    lsxfiles = []
+    for file in loongarchfiles:
+        if '_lsx' in file:
+            lsxfiles.append(file)
+    f.write("%s_ASM_LOONGARCH_LSX_SRCS=\\\n"%(PREFIX))
+    for c in lsxfiles:
+        f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, c))
+    f.write("\n")
+    f.write("%s_OBJSLOONGARCH_LSX += $(%s_ASM_LOONGARCH_LSX_SRCS:.c=.$(OBJ))\n\n"%(PREFIX, PREFIX))
+    lasxfiles = []
+    for file in loongarchfiles:
+        if '_lasx' in file:
+            lasxfiles.append(file)
+    f.write("%s_ASM_LOONGARCH_LASX_SRCS=\\\n"%(PREFIX))
+    for c in lasxfiles:
+        f.write("\t$(%s_SRCDIR)/%s\\\n"%(PREFIX, c))
+    f.write("\n")
+    f.write("%s_OBJSLOONGARCH_LASX += $(%s_ASM_LOONGARCH_LASX_SRCS:.c=.$(OBJ))\n"%(PREFIX, PREFIX))
+
+    f.write("ifeq ($(ASM_ARCH), loongarch)\n")
+    f.write("ifeq ($(ENABLE_LSX), Yes)\n")
+    f.write("%s_OBJS += $(%s_OBJSLOONGARCH_LSX)\n"%(PREFIX,PREFIX))
+    f.write("endif\n")
+    f.write("ifeq ($(ENABLE_LASX), Yes)\n")
+    f.write("%s_OBJS += $(%s_OBJSLOONGARCH_LASX)\n"%(PREFIX,PREFIX))
+    f.write("endif\n")
+    f.write("endif\n")
+    f.write("OBJS += $(%s_OBJSLOONGARCH_LSX)\n"%(PREFIX))
+    f.write("OBJS += $(%s_OBJSLOONGARCH_LASX)\n\n"%(PREFIX))
 
 f.write("OBJS += $(%s_OBJS)\n\n"%(PREFIX))
 write_cpp_rule_pattern(f)

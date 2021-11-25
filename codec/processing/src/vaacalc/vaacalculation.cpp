@@ -103,6 +103,12 @@ void CVAACalculation::InitVaaFuncs (SVaaFuncs& sVaaFuncs, int32_t iCpuFlag) {
     sVaaFuncs.pfVAACalcSadVar    = VAACalcSadVar_mmi;
   }
 #endif//HAVE_MMI
+
+#ifdef HAVE_LSX
+  if ((iCpuFlag & WELS_CPU_LSX) == WELS_CPU_LSX) {
+    sVaaFuncs.pfVAACalcSadBgd    = VAACalcSadBgd_lsx;
+  }
+#endif//HAVE_LSX
 }
 
 EResult CVAACalculation::Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pRefPixMap) {

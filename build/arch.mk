@@ -53,3 +53,27 @@ endif
 endif
 endif
 endif
+
+#for loongarch
+ifneq ($(filter loongarch64, $(ARCH)),)
+ifeq ($(USE_ASM), Yes)
+ENABLE_LSX=Yes
+ENABLE_LASX=Yes
+ASM_ARCH = loongarch
+ASMFLAGS += -I$(SRC_PATH)codec/common/loongarch/
+#lsx
+ifeq ($(ENABLE_LSX), Yes)
+ENABLE_LSX = $(shell $(SRC_PATH)build/loongarch-simd-check.sh $(CC) lsx)
+ifeq ($(ENABLE_LSX), Yes)
+CFLAGS += -DHAVE_LSX -mlsx
+endif
+endif
+#lasx
+ifeq ($(ENABLE_LASX), Yes)
+ENABLE_LASX = $(shell $(SRC_PATH)build/loongarch-simd-check.sh $(CC) lasx)
+ifeq ($(ENABLE_LASX), Yes)
+CFLAGS += -DHAVE_LASX -mlasx
+endif
+endif
+endif
+endif

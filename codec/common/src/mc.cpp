@@ -4195,6 +4195,42 @@ void PixelAvg_mmi(uint8_t* pDst, int32_t iDstStride, const uint8_t* pSrcA, int32
   kpfFuncs[iWidth >> 4] (pDst, iDstStride, pSrcA, iSrcAStride, pSrcB, iSrcBStride, iHeight);
 }
 #endif//HAVE_MMI
+
+#if defined(HAVE_LSX)
+static inline void McCopy_lsx(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst,
+                              int32_t iDstStride, int32_t iWidth, int32_t iHeight) {
+  if (iWidth == 16)
+    McCopyWidthEq16_lsx (pSrc, iSrcStride, pDst, iDstStride, iHeight);
+  else if (iWidth == 8)
+    McCopyWidthEq8_lsx (pSrc, iSrcStride, pDst, iDstStride, iHeight);
+  else if (iWidth == 4)
+    McCopyWidthEq4_lsx (pSrc, iSrcStride, pDst, iDstStride, iHeight);
+  else
+    McCopyWidthEq2_c (pSrc, iSrcStride, pDst, iDstStride, iHeight);
+}
+
+void McChroma_lsx(const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst,
+                  int32_t iDstStride, int16_t iMvX, int16_t iMvY,
+                  int32_t iWidth, int32_t iHeight) {
+  static const PMcChromaWidthExtFunc kpMcChromaWidthFuncs[2] = {
+    McChromaWidthEq4_lsx,
+    McChromaWidthEq8_lsx
+  };
+  const int32_t kiD8x = iMvX & 0x07;
+  const int32_t kiD8y = iMvY & 0x07;
+  if (kiD8x == 0 && kiD8y == 0) {
+    McCopy_lsx (pSrc, iSrcStride, pDst, iDstStride, iWidth, iHeight);
+    return;
+  }
+  if (iWidth != 2) {
+    kpMcChromaWidthFuncs[iWidth >> 3] (pSrc, iSrcStride, pDst, iDstStride,
+                                       g_kuiABCD[kiD8y][kiD8x], iHeight);
+  } else
+    McChromaWithFragMv_c (pSrc, iSrcStride, pDst, iDstStride, iMvX, iMvY,
+                          iWidth, iHeight);
+}
+#endif//HAVE_LSX
+
 } // anon ns.
 
 void WelsCommon::InitMcFunc (SMcFunc* pMcFuncs, uint32_t uiCpuFlag) {
@@ -4263,4 +4299,10 @@ void WelsCommon::InitMcFunc (SMcFunc* pMcFuncs, uint32_t uiCpuFlag) {
     pMcFuncs->pMcLumaFunc       = McLuma_mmi;
   }
 #endif//HAVE_MMI
+
+#if defined(HAVE_LSX)
+  if (uiCpuFlag & WELS_CPU_LSX) {
+    pMcFuncs->pMcChromaFunc     = McChroma_lsx;
+  }
+#endif//HAVE_LSX
 }
