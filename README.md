@@ -38,6 +38,7 @@ OS Support
 ----------
 - Windows 64-bit and 32-bit
 - Mac OS X 64-bit and 32-bit
+- Mac OS X ARM64
 - Linux 64-bit and 32-bit
 - Android 64-bit and 32-bit
 - iOS 64-bit and 32-bit
@@ -154,6 +155,7 @@ From the main project directory:
 - `make` for automatically detecting architecture and building accordingly
 - `make ARCH=i386` for x86 32-bit builds
 - `make ARCH=x86_64` for x86 64-bit builds
+- `make ARCH=arm64` for arm64 Mac 64-bit builds
 - `make V=No` for a silent build (not showing the actual compiler commands)
 - `make DEBUGSYMBOLS=True` for two libraries, one is normal libraries, another one is removed the debugging symbol table entries (those created by the -g option)
 
