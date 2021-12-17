@@ -44,6 +44,10 @@ OS Support
 - iOS 64-bit and 32-bit
 - Windows Phone 32-bit
 
+Architectures verified to be working
+----------
+- ppc64el
+
 Processor Support
 -----------------
 - Intel x86 optionally with MMX/SSE (no AVX yet, help is welcome)
