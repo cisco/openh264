@@ -356,6 +356,20 @@ void McHorVer20Width17U8ToS16_avx2 (const uint8_t* pSrc, int32_t iSrcStride, int
 
 #endif //X86_ASM
 
+//***************************************************************************//
+//                       LSX definition                                      //
+//***************************************************************************//
+#if defined(HAVE_LSX)
+void McCopyWidthEq4_lsx (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
+void McCopyWidthEq8_lsx (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
+void McCopyWidthEq16_lsx (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride, int32_t iHeight);
+
+void McChromaWidthEq4_lsx (const uint8_t *pSrc, int32_t iSrcStride, uint8_t *pDst, int32_t iDstStride,
+                           const uint8_t *pABCD, int32_t iHeight);
+void McChromaWidthEq8_lsx (const uint8_t *pSrc, int32_t iSrcStride, uint8_t *pDst, int32_t iDstStride,
+                           const uint8_t *pABCD, int32_t iHeight);
+#endif//HAVE_LSX
+
 #if defined(__cplusplus)
 }
 #endif//__cplusplus

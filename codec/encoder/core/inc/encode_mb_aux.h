@@ -174,6 +174,11 @@ void WelsQuant4x4Dc_mmi (int16_t* pDct, int16_t iFF, int16_t iMF);
 void WelsQuantFour4x4_mmi (int16_t* pDct, const int16_t* pFF, const int16_t* pMF);
 void WelsQuantFour4x4Max_mmi (int16_t* pDct, const int16_t* pFF, const int16_t* pMF, int16_t* pMax);
 #endif//HAVE_MMI
+
+#ifdef HAVE_LSX
+void WelsQuantFour4x4Max_lsx (int16_t* pDct, const int16_t* pFF, const int16_t* pMF, int16_t* pMax);
+#endif//HAVE_LSX
+
 #if defined(__cplusplus)
 }
 #endif//__cplusplus
