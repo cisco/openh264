@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v2
       - run: sudo apt-get update -qq
       - run: sudo apt-get install -qq nasm g++-multilib gcc-multilib libc6-dev-i386 python3-pip python3-setuptools
-      - run: sudo python3 -m pip install meson==0.50.1 ninja
+      - run: sudo python3 -m pip install meson==0.52.1 ninja
       - run: nasm -v 
       - run: c++ --version
       - run: make gmp-bootstrap
