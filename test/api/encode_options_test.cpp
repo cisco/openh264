@@ -2140,8 +2140,8 @@ TEST_F (EncodeDecodeTestAPI, UnsupportedVideoSizeInput) {
   int iSliceNum    = 1;
   int iRet;
 
-  int iSrcWidth = rand() % 16;
-  int iSrcHeight = rand() % 16;
+  int iSrcWidth = rand() % 15 + 1;
+  int iSrcHeight = rand() % 15 + 1;
 
   SEncParamExt sParam;
   encoder_->GetDefaultParams (&sParam);
