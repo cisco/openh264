@@ -1,6 +1,6 @@
 project('openh264', ['c', 'cpp'],
   version : '2.1.1',
-  meson_version : '>= 0.50',
+  meson_version : '>= 0.52',
   default_options : [ 'warning_level=1',
                       'buildtype=debugoptimized' ])
 
@@ -184,15 +184,8 @@ api_header_deps = []
 subdir ('codec')
 subdir ('test')
 
-all_objects = [
-  libcommon.extract_all_objects(),
-  libprocessing.extract_all_objects(),
-  libencoder.extract_all_objects(),
-  libdecoder.extract_all_objects()
-]
-
 libopenh264_shared = library('openh264',
-  objects: all_objects,
+  link_with: [libcommon, libprocessing, libencoder, libdecoder],
   install: true,
   soversion: major_version,
   version: meson.project_version(),
