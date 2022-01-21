@@ -56,7 +56,7 @@ Processor Support
 
 Building the Library
 --------------------
-NASM needed to be installed for assembly code: workable version 2.10.06 or above, NASM can downloaded from http://www.nasm.us/.
+NASM needed to be installed for assembly code: workable version 2.10.06 or above, NASM can be downloaded from http://www.nasm.us/.
 For Mac OSX 64-bit NASM needed to be below version 2.11.08 as NASM 2.11.08 will introduce error when using RIP-relative addresses in Mac OSX 64-bit
 
 To build the arm assembly for Windows Phone, gas-preprocessor is required. It can be downloaded from git://git.libav.org/gas-preprocessor.git
@@ -119,35 +119,15 @@ make based build system from the command line. Build with
 For Windows Builds
 ------------------
 
-Our Windows builds use MinGW which can be downloaded from http://www.mingw.org/
+"make" must be installed. It is recommended to install the Cygwin and "make" must be selected to be included in the installation. After the installation, please add the Cygwin bin path to your PATH.
 
-To build with gcc, add the MinGW bin directory (e.g. `/c/MinGW/bin`) to your path and follow the 'For All Platforms' instructions below.
+openh264/build/AutoBuildForWindows.bat is provided to help compile the libraries on Windows platform.  
+Usage of the .bat script:  
 
-To build with Visual Studio you will need to set up your path to run cl.exe.  The easiest way is to start MSYS from a developer command line session.  Instructions can be found at http://msdn.microsoft.com/en-us/library/ms229859(v=vs.110).aspx.  If you need to do it by hand here is an example from a Windows 64bit install of VS2012:
-
-    export PATH="$PATH:/c/Program Files (x86)/Microsoft Visual Studio 11.0/VC/bin:/c/Program Files (x86)/Microsoft Visual Studio 11.0/Common7/IDE"
-
-You will also need to set your INCLUDE and LIB paths to point to your VS and SDK installs.  Something like this, again from Win64 with VS2012 (note the use of Windows-style paths here).
-
-    export INCLUDE="C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include;C:\Program Files (x86)\Windows Kits\8.0\Include\um;C:\Program Files (x86)\Windows Kits\8.0\Include\shared"
-    export LIB="C:\Program Files (x86)\Windows Kits\8.0\Lib\Win8\um\x86;C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\lib"
-
-Then add `OS=msvc` to the make line of the 'For All Platforms' instructions.
-
-For Windows Phone Builds
-------------------------
-
-Follow the instructions above for normal Windows builds, but use `OS=msvc-wp`
-instead of `OS=msvc`. You will also need gas-preprocessor (as mentioned below
-"Building the Library").
-
-If building for Windows Phone with MSVC 2013, there's no included bat file that sets the lib paths to the Windows Phone kit, but that can be done with a command like this:
-
-    export LIB="c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib\store\arm;c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib\arm;c:\Program Files (x86)\Windows Phone Kits\8.1\lib\arm"
-
-This is only necessary for building the DLL; the static library can be built without setting this.
-
-Note, only Windows Phone 8.1 or newer is supported, 8.0 is no longer supported.
+    `AutoBuildForWindows.bat Win32-Release-ASM` for x86 Release build  
+    `AutoBuildForWindows.bat Win64-Release-ASM` for x86_64 Release build  
+    `AutoBuildForWindows.bat ARM64-Release-ASM` for arm64 release build  
+for more usage, please refer to the .bat script help.  
 
 For All Platforms
 -------------------
