@@ -22,7 +22,7 @@ ifeq ($(ASM_ARCH), arm64)
 CC = clang-cl
 CXX = clang-cl
 CCAS = clang-cl
-CFLAGS += -DHAVE_NEON_AARCH64 --target=arm64-windows
+CFLAGS += --target=arm64-windows
 CCASFLAGS = -nologo -DHAVE_NEON_AARCH64 --target=arm64-windows
 endif
 
