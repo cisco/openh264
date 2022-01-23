@@ -2,15 +2,9 @@ include $(SRC_PATH)build/arch.mk
 ifeq ($(ASM_ARCH), x86)
 ifeq ($(ARCH), x86_64)
 ASMFLAGS += -f win64
-ASMFLAGS_PLATFORM = -DWIN64 -D_WIN64
-CFLAGS += -D_WIN64
-CXXFLAGS += -D_WIN64
-COMMON_CFLAGS += -D_WIN64
+ASMFLAGS_PLATFORM = -DWIN64
 else
 ASMFLAGS += -f win32 -DPREFIX
-CFLAGS += -DWIN32
-CXXFLAGS += -DWIN32
-COMMON_CFLAGS += -DWIN32
 endif
 else
 endif
@@ -28,7 +22,7 @@ ifeq ($(ASM_ARCH), arm64)
 CC = clang-cl
 CXX = clang-cl
 CCAS = clang-cl
-CFLAGS += -DWIN32 -nologo -DHAVE_NEON_AARCH64 --target=arm64-windows
+CFLAGS += -DHAVE_NEON_AARCH64 --target=arm64-windows
 CCASFLAGS = -nologo -DHAVE_NEON_AARCH64 --target=arm64-windows
 LDFLAGS += -link
 else
