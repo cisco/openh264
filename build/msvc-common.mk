@@ -32,8 +32,8 @@ endif
 CFLAGS += -nologo -W3 -EHsc -fp:precise -Zc:wchar_t -Zc:forScope -D_VARIADIC_MAX=10
 CXX_LINK_O=-nologo -Fe$@
 AR_OPTS=-nologo -out:$@
-CFLAGS_OPT=-O2 -Ob1 -Oy- -Zi -GF -GS -Gy -DNDEBUG
-CFLAGS_DEBUG=-Od -Oy- -Zi -RTC1 -D_DEBUG
+CFLAGS_OPT=-O2 -Ob1 -Oy- -Zi -FS -GF -GS -Gy -DNDEBUG
+CFLAGS_DEBUG=-Od -Oy- -Zi -FS -RTC1 -D_DEBUG
 CFLAGS_M32=
 CFLAGS_M64=
 LINK_LOCAL_DIR=
