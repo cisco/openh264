@@ -35,7 +35,7 @@ endif
 # it unconditionally. The same issue can also be worked around by adding
 # -DGTEST_HAS_TR1_TUPLE=0 instead, but we prefer this version since it
 # matches what gtest itself does.
-CFLAGS += -nologo -W3 -WX -EHsc -fp:precise -Zc:wchar_t -Zc:forScope -D_VARIADIC_MAX=10
+CFLAGS += -nologo -W3 -EHsc -fp:precise -Zc:wchar_t -Zc:forScope -D_VARIADIC_MAX=10
 CXX_LINK_O=-nologo -Fe$@
 AR_OPTS=-nologo -out:$@
 CFLAGS_OPT=-O2 -Ob1 -Oy- -Zi -GF -GS -Gy -DNDEBUG
