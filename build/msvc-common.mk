@@ -24,9 +24,6 @@ CXX = clang-cl
 CCAS = clang-cl
 CFLAGS += -DHAVE_NEON_AARCH64 --target=arm64-windows
 CCASFLAGS = -nologo -DHAVE_NEON_AARCH64 --target=arm64-windows
-LDFLAGS += -link
-else
-LDFLAGS += -link -cetcompat
 endif
 
 
@@ -54,10 +51,14 @@ SHAREDLIBSUFFIXFULLVER=$(SHAREDLIBSUFFIX)
 SHAREDLIBSUFFIXMAJORVER=$(SHAREDLIBSUFFIX)
 SHARED=-LD
 EXTRA_LIBRARY=$(PROJECT_NAME)_dll.lib
-
+LDFLAGS += -link
 SHLDFLAGS=-debug -map -opt:ref -opt:icf -def:$(SRC_PATH)openh264.def -implib:$(EXTRA_LIBRARY)
 STATIC_LDFLAGS=
 CODEC_UNITTEST_CFLAGS+=-D_CRT_SECURE_NO_WARNINGS
+
+ifneq ($(filter %86 x86_64, $(ARCH)),)
+LDFLAGS += -cetcompat
+endif
 
 %.res: %.rc
 	$(QUIET_RC)rc -fo $@ $<
