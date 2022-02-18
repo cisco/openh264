@@ -185,7 +185,7 @@ subdir ('codec')
 subdir ('test')
 
 libopenh264_shared = library('openh264',
-  link_with: [libcommon, libprocessing, libencoder, libdecoder],
+  link_whole: [libcommon, libprocessing, libencoder, libdecoder],
   install: true,
   soversion: major_version,
   version: meson.project_version(),
