@@ -222,3 +222,109 @@ void WelsDctFourT4_lasx (int16_t* pDct, uint8_t* pPixel1,
   __lasx_xvst(dst2, pDct, 64);
   __lasx_xvst(dst3, pDct, 96);
 }
+
+/****************************************************************************
+ * IDCT functions, final output = prediction(CS) + IDCT(scaled_coeff)
+ ****************************************************************************/
+void WelsIDctT4Rec_lasx (uint8_t* pRec, int32_t iStride,
+                         uint8_t* pPred, int32_t iPredStride,
+                         int16_t* pDct) {
+  int32_t iDstStride_x2 = iStride << 1;
+  int32_t iDstStride_x3 = iStride + iDstStride_x2;
+  int32_t iPredStride_x2 = iPredStride << 1;
+  int32_t iPredStride_x3 = iPredStride + iPredStride_x2;
+
+  __m256i src0, src1, src2, src3, src4, src5, src6, src7,
+          tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7,
+          dst0, dst1, dst2, dst3;
+
+  __m256i zero = __lasx_xvldi(0);
+  src0 = __lasx_xvld(pDct, 0);
+  src4 = __lasx_xvld(pPred, 0);
+  src5 = __lasx_xvldx(pPred, iPredStride);
+  src6 = __lasx_xvldx(pPred, iPredStride_x2);
+  src7 = __lasx_xvldx(pPred, iPredStride_x3);
+
+  src1 = __lasx_xvpickve_d(src0, 1);
+  src2 = __lasx_xvpickve_d(src0, 2);
+  src3 = __lasx_xvpickve_d(src0, 3);
+
+  LASX_TRANSPOSE4x4_H(src0, src1, src2, src3,
+                      tmp0, tmp1, tmp2, tmp3);
+  DUP4_ARG1(__lasx_vext2xv_w_h,
+            tmp0, tmp1, tmp2, tmp3,
+            src0, src1, src2, src3);
+  //horizon
+  tmp0 = __lasx_xvadd_w(src0, src2); //0+2 sumu
+  tmp1 = __lasx_xvsrai_w(src3, 1);
+  tmp1 = __lasx_xvadd_w(src1, tmp1); //1+3 sumd
+  tmp2 = __lasx_xvsub_w(src0, src2); //0-2 delu
+  tmp3 = __lasx_xvsrai_w(src1, 1);
+  tmp3 = __lasx_xvsub_w(tmp3, src3); //1-3 deld
+
+  src0 = __lasx_xvadd_w(tmp0 ,tmp1); //0 4 8  12
+  src1 = __lasx_xvadd_w(tmp2, tmp3); //1 5 9  13
+  src2 = __lasx_xvsub_w(tmp2, tmp3); //2 6 10 14
+  src3 = __lasx_xvsub_w(tmp0, tmp1); //3 7 11 15
+  DUP4_ARG2(__lasx_xvpickev_h,
+            zero, src0,
+            zero, src1,
+            zero, src2,
+            zero, src3,
+            src0, src1, src2, src3);
+  //vertical
+  LASX_TRANSPOSE4x4_H(src0, src1, src2, src3,
+                      tmp0, tmp1, tmp2, tmp3);
+  DUP4_ARG1(__lasx_vext2xv_w_h,
+            tmp0, tmp1, tmp2, tmp3,
+            src0, src1, src2, src3);
+  tmp0 = __lasx_xvadd_w(src0, src2); //suml
+  tmp1 = __lasx_xvsrai_w(src3, 1);
+  tmp1 = __lasx_xvadd_w(src1, tmp1); //sumr
+  tmp2 = __lasx_xvsub_w(src0, src2); //dell
+  tmp3 = __lasx_xvsrai_w(src1, 1);
+  tmp3 = __lasx_xvsub_w(tmp3, src3); //delr
+
+  dst0 = __lasx_xvadd_w(tmp0, tmp1);
+  dst1 = __lasx_xvadd_w(tmp2, tmp3);
+  dst2 = __lasx_xvsub_w(tmp2, tmp3);
+  dst3 = __lasx_xvsub_w(tmp0, tmp1);
+  DUP4_ARG2(__lasx_xvsrari_w,
+            dst0, 6,
+            dst1, 6,
+            dst2, 6,
+            dst3, 6,
+            dst0, dst1, dst2, dst3);
+  DUP4_ARG1(__lasx_vext2xv_wu_bu,
+            src4, src5, src6, src7,
+            tmp4, tmp5, tmp6, tmp7);
+  DUP4_ARG2(__lasx_xvadd_w,
+            tmp4, dst0,
+            tmp5, dst1,
+            tmp6, dst2,
+            tmp7, dst3,
+            dst0, dst1, dst2, dst3);
+  DUP4_ARG1(__lasx_xvclip255_w,
+            dst0, dst1, dst2, dst3,
+            dst0, dst1, dst2, dst3);
+  DUP2_ARG2(__lasx_xvpickev_h,
+            dst1, dst0,
+            dst3, dst2,
+            dst0, dst2);
+  dst0 = __lasx_xvpickev_b(dst2, dst0);
+  __lasx_xvstelm_w(dst0, pRec, 0, 0);
+  __lasx_xvstelm_w(dst0, pRec + iStride, 0, 1);
+  __lasx_xvstelm_w(dst0, pRec + iDstStride_x2, 0, 2);
+  __lasx_xvstelm_w(dst0, pRec + iDstStride_x3, 0, 3);
+}
+
+void WelsIDctFourT4Rec_lasx (uint8_t* pRec, int32_t iStride,
+                             uint8_t* pPred, int32_t iPredStride,
+                             int16_t* pDct) {
+  int32_t iDstStridex4  = iStride << 2;
+  int32_t iPredStridex4 = iPredStride << 2;
+  WelsIDctT4Rec_lasx (pRec,                    iStride, pPred,                     iPredStride, pDct);
+  WelsIDctT4Rec_lasx (&pRec[4],                iStride, &pPred[4],                 iPredStride, pDct + 16);
+  WelsIDctT4Rec_lasx (&pRec[iDstStridex4    ], iStride, &pPred[iPredStridex4  ],   iPredStride, pDct + 32);
+  WelsIDctT4Rec_lasx (&pRec[iDstStridex4 + 4], iStride, &pPred[iPredStridex4 + 4], iPredStride, pDct + 48);
+}
