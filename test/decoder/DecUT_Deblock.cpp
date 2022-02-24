@@ -180,3 +180,8 @@ GENERATE_CHROMA_UT (ChromaLt4H_msa, DeblockChromaLt4H_msa, DeblockChromaLt4H_c, 
 GENERATE_CHROMA_UT (ChromaEq4V_msa, DeblockChromaEq4V_msa_wrap, DeblockChromaEq4V_c_wrap, WELS_CPU_MSA, 0)
 GENERATE_CHROMA_UT (ChromaEq4H_msa, DeblockChromaEq4H_msa_wrap, DeblockChromaEq4H_c_wrap, WELS_CPU_MSA, 1)
 #endif//HAVE_MSA
+
+#if defined(HAVE_LSX)
+GENERATE_LUMA_UT (LumaLt4V_lsx, DeblockLumaLt4V_lsx, DeblockLumaLt4V_c, WELS_CPU_LSX, 0)
+GENERATE_LUMA_UT (LumaLt4H_lsx, DeblockLumaLt4H_lsx, DeblockLumaLt4H_c, WELS_CPU_LSX, 1)
+#endif//HAVE_LSX
