@@ -632,5 +632,11 @@ void WelsInitEncodingFuncs (SWelsFuncPtrList* pFuncList, uint32_t  uiCpuFlag) {
     pFuncList->pfQuantizationFour4x4Max = WelsQuantFour4x4Max_lsx;
   }
 #endif
+#if defined(HAVE_LASX)
+  if (uiCpuFlag & WELS_CPU_LASX) {
+    pFuncList->pfDctT4                  = WelsDctT4_lasx;
+    pFuncList->pfDctFourT4              = WelsDctFourT4_lasx;
+}
+#endif
 }
 }

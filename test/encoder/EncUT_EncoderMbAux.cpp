@@ -292,6 +292,15 @@ TEST (EncodeMbAuxTest, WelsCalculateSingleCtr4x4_mmi) {
   FREE_MEMORY (iDctS);
 }
 #endif
+#ifdef HAVE_LASX
+TEST (EncodeMbAuxTest, WelsDctT4_lasx) {
+  TestDctT4 (WelsDctT4_lasx);
+}
+
+TEST (EncodeMbAuxTest, WelsDctFourT4_lasx) {
+  TestDctFourT4 (WelsDctFourT4_lasx);
+}
+#endif
 
 void copy (uint8_t* pDst, int32_t iDStride, uint8_t* pSrc, int32_t iSStride, int32_t iWidth, int32_t iHeight) {
   for (int i = 0; i < iHeight; i++)
