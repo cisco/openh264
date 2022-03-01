@@ -54,10 +54,7 @@ asm_inc = []
 casm_inc = []
 cpp_lib = '-lstdc++'
 
-# TODO: should rely on dependency('threads') instead and change the pkg-config
-# generator below
-pthread_dep = cpp.find_library('pthread', required : false)
-libm_dep = cpp.find_library('libm', required : false)
+libm_dep = cpp.find_library('m', required : false)
 deps += [libm_dep]
 
 if ['linux', 'android', 'ios', 'darwin'].contains(system)
@@ -184,7 +181,7 @@ api_header_deps = []
 subdir ('codec')
 subdir ('test')
 
-libopenh264_shared = library('openh264',
+libopenh264 = library('openh264',
   link_whole: [libcommon, libprocessing, libencoder, libdecoder],
   install: true,
   soversion: major_version,
@@ -192,39 +189,16 @@ libopenh264_shared = library('openh264',
   vs_module_defs: 'openh264.def',
   dependencies: deps)
 
-pkg_install_dir = '@0@/pkgconfig'.format(get_option('libdir'))
-
-foreach t : ['', '-static']
-  pkgconf = configuration_data()
-  pkgconf.set('prefix', join_paths(get_option('prefix')))
-  pkgconf.set('libdir', '${prefix}/@0@'.format(get_option('libdir')))
-  pkgconf.set('VERSION', meson.project_version())
-  pkglibs = cpp_lib
-  if libm_dep.found()
-    pkglibs += ' -lm'
-  endif
-  if pthread_dep.found()
-    pkglibs += ' -lpthread'
-  endif
-  if t == '-static'
-    pkgconf.set('LIBS', pkglibs)
-    pkgconf.set('LIBS_PRIVATE', '')
-  else
-    pkgconf.set('LIBS', '')
-    pkgconf.set('LIBS_PRIVATE', pkglibs)
-  endif
-
-  configure_file(
-    input: 'openh264.pc.in',
-    output: 'openh264@0@.pc'.format(t),
-    install: t == '-static' ? false : true,
-    install_dir: t == '-static' ? '' : pkg_install_dir,
-    configuration: pkgconf)
-endforeach
-
 openh264_dep = declare_dependency(
-  link_with: libopenh264_shared,
+  link_with: libopenh264,
   include_directories: include_directories('include'),
   dependencies: deps + api_header_deps)
+
+pkg = import('pkgconfig')
+pkg.generate(libopenh264,
+  description: 'OpenH264 is a codec library which supports H.264 encoding ' +
+               'and decoding. It is suitable for use in real time ' +
+               'applications such as WebRTC.',
+)
 
 subdir ('include')
