@@ -22,7 +22,6 @@ CFLAGS_DEBUG=-g
 BUILDTYPE=Release
 V=Yes
 PREFIX=/usr/local
-INCLUDE_PREFIX=$(PREFIX)/include/openh264
 SHARED=-shared
 OBJ=o
 DESTDIR=
@@ -293,8 +292,8 @@ $(PROJECT_NAME)-static.pc: $(PROJECT_NAME).pc.in
 	@sed -e 's;@prefix@;$(PREFIX);' -e 's;@libdir@;$(PREFIX)/lib;' -e 's;@VERSION@;$(FULL_VERSION);' -e 's;@LIBS@;$(STATIC_LDFLAGS);' -e 's;@LIBS_PRIVATE@;;' < $< > $@
 
 install-headers:
-	mkdir -p $(DESTDIR)$(INCLUDE_PREFIX)
-	install -m 644 $(SRC_PATH)/codec/api/svc/codec*.h $(DESTDIR)$(INCLUDE_PREFIX)
+	mkdir -p $(DESTDIR)$(PREFIX)/include/wels
+	install -m 644 $(SRC_PATH)/codec/api/svc/codec*.h $(DESTDIR)$(PREFIX)/include/wels
 
 install-static-lib: $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) install-headers
 	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBDIR_NAME)
