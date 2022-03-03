@@ -56,11 +56,11 @@ void DeblockLumaLt4V_lsx (uint8_t* pPix, int32_t iStrideX,
   __m128i iTc0_l, iTc0_h, negiTc0_l, negiTc0_h;
   __m128i bDetaP0Q0, bDetaP1P0, bDetaQ1Q0, bDetaP2P0, bDetaQ2Q0;
 
-  __m128i zero = __lsx_vreplgr2vr_b(0);
-  __m128i not_255 = __lsx_vreplgr2vr_h(-256);
+  __m128i zero = __lsx_vldi(0);
   __m128i alpha = __lsx_vreplgr2vr_b(iAlpha);
   __m128i beta = __lsx_vreplgr2vr_b(iBeta);
   __m128i shuf = {0x0101010100000000, 0x0303030302020202};
+  __m128i not_255 = {0xff00ff00ff00ff00, 0xff00ff00ff00ff00};
   int32_t iStrideX_x0 = 0;
   int32_t iStrideX_x2 = iStrideX << 1;
   int32_t iStrideX_x3 = iStrideX_x2 + iStrideX;
@@ -252,11 +252,11 @@ void DeblockLumaLt4H_lsx (uint8_t* pPix, int32_t iStrideY,
   __m128i iTc0_l, iTc0_h, negiTc0_l, negiTc0_h;
   __m128i bDetaP0Q0, bDetaP1P0, bDetaQ1Q0, bDetaP2P0, bDetaQ2Q0;
 
-  __m128i zero = __lsx_vreplgr2vr_b(0);
-  __m128i not_255 = __lsx_vreplgr2vr_h(-256);
+  __m128i zero = __lsx_vldi(0);
   __m128i alpha = __lsx_vreplgr2vr_b(iAlpha);
   __m128i beta = __lsx_vreplgr2vr_b(iBeta);
   __m128i shuf = {0x0101010100000000, 0x0303030302020202};
+  __m128i not_255 = {0xff00ff00ff00ff00, 0xff00ff00ff00ff00};
   int32_t iStrideY_x0 = 0;
   int32_t iStrideY_x2 = iStrideY << 1;
   int32_t iStrideY_x3 = iStrideY_x2 + iStrideY;
