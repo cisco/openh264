@@ -95,6 +95,7 @@ COMMON_ASM_LOONGARCH_LSX_SRCS=\
         $(COMMON_SRCDIR)/loongarch/mc_chroma_lsx.c\
         $(COMMON_SRCDIR)/loongarch/copy_mb_lsx.c\
         $(COMMON_SRCDIR)/loongarch/deblock_lsx.c\
+        $(COMMON_SRCDIR)/loongarch/mc_horver_lsx.c\
 
 COMMON_OBJSLOONGARCH_LSX += $(COMMON_ASM_LOONGARCH_LSX_SRCS:.c=.$(OBJ))
 
