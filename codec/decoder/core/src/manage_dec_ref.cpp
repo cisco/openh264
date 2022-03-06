@@ -873,7 +873,7 @@ static int32_t AddLongTermToList (PRefPic pRefPic, PPicture pPic, int32_t iLongT
   if (pRefPic->uiLongRefCount[LIST_0] == 0) {
     pRefPic->pLongRefList[LIST_0][pRefPic->uiLongRefCount[LIST_0]] = pPic;
   } else {
-    for (i = 0; i < pRefPic->uiLongRefCount[LIST_0]; i++) {
+    for (i = 0; i < WELS_MIN(pRefPic->uiLongRefCount[LIST_0], MAX_REF_PIC_COUNT); i++) {
       if (!pRefPic->pLongRefList[LIST_0][i]) {
         return ERR_INFO_INVALID_PTR;
       }
