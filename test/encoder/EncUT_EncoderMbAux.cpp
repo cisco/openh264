@@ -580,6 +580,10 @@ TEST (EncodeMbAuxTest, WelsQuantFour4x4Max_mmi) {
 #endif //HAVE_MMI
 
 #ifdef HAVE_LSX
+TEST (EncodeMbAuxTest, WelsQuantFour4x4_lsx) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_LSX)
+    TestWelsQuantFour4x4 (WelsQuantFour4x4_lsx);
+}
 TEST (EncodeMbAuxTest, WelsQuantFour4x4Max_lsx) {
   if (WelsCPUFeatureDetect (0) & WELS_CPU_LSX)
     TestWelsQuantFour4x4Max (WelsQuantFour4x4Max_lsx);

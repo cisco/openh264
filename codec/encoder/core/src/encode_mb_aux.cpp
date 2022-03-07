@@ -629,6 +629,7 @@ void WelsInitEncodingFuncs (SWelsFuncPtrList* pFuncList, uint32_t  uiCpuFlag) {
     pFuncList->pfCopy8x8Aligned         = WelsCopy8x8_lsx;
     pFuncList->pfCopy16x16Aligned       = WelsCopy16x16_lsx;
     pFuncList->pfCopy16x16NotAligned    = WelsCopy16x16NotAligned_lsx;
+    pFuncList->pfQuantizationFour4x4    = WelsQuantFour4x4_lsx;
     pFuncList->pfQuantizationFour4x4Max = WelsQuantFour4x4Max_lsx;
   }
 #endif
