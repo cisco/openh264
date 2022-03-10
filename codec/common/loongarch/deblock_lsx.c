@@ -471,3 +471,214 @@ void DeblockLumaLt4H_lsx (uint8_t* pPix, int32_t iStrideY,
   __lsx_vstelm_w(q0, pPix + iStrideY_x2, 0, 2);
   __lsx_vstelm_w(q0, pPix + iStrideY_x3, 0, 3);
 }
+
+void DeblockLumaEq4V_lsx(uint8_t *pPix, int32_t iStride, int32_t iAlpha,
+                         int32_t iBeta) {
+  int32_t iStride0 = 0;
+  int32_t iStride_x2 = iStride << 1;
+  int32_t iStride_x3 = iStride + iStride_x2;
+  int32_t iStride_x4 = iStride << 2;
+  __m128i p0, p1, p2, p3, q0, q1, q2, q3;
+  __m128i p0_l, p1_l, p2_l, p3_l, q0_l, q1_l, q2_l, q3_l;
+  __m128i p0_h, p1_h, p2_h, p3_h, q0_h, q1_h, q2_h, q3_h;
+  __m128i t0, t1, t2, t0_con1, s0, s1, s2, s0_con1;
+  __m128i alpha, beta;
+  __m128i iDetaP0Q0, bDetaP1P0, bDetaQ1Q0, bDetaP2P0, bDetaQ2Q0;
+  __m128i mask0, mask1;
+
+  DUP4_ARG2(__lsx_vldx,
+            pPix, -iStride_x4,
+            pPix, -iStride_x3,
+            pPix, -iStride_x2,
+            pPix, -iStride,
+            p3, p2, p1, p0);
+  DUP4_ARG2(__lsx_vldx,
+            pPix, iStride_x3,
+            pPix, iStride_x2,
+            pPix, iStride,
+            pPix, iStride0,
+            q3, q2, q1, q0);
+  alpha = __lsx_vreplgr2vr_b(iAlpha);
+  beta  = __lsx_vreplgr2vr_b(iBeta);
+  iDetaP0Q0 = __lsx_vabsd_bu(p0, q0);
+  DUP4_ARG2(__lsx_vabsd_bu,
+            p1, p0,
+            q1, q0,
+            p2, p0,
+            q2, q0,
+            bDetaP1P0, bDetaQ1Q0, bDetaP2P0, bDetaQ2Q0);
+  DUP4_ARG2(__lsx_vslt_bu,
+            bDetaP1P0, beta,
+            bDetaQ1Q0, beta,
+            bDetaP2P0, beta,
+            bDetaQ2Q0, beta,
+            bDetaP1P0, bDetaQ1Q0, bDetaP2P0, bDetaQ2Q0);
+  DUP4_ARG2(__lsx_vsllwil_hu_bu,
+            p0, 0,
+            p1, 0,
+            p2, 0,
+            p3, 0,
+            p0_l, p1_l, p2_l, p3_l);
+  DUP4_ARG1(__lsx_vexth_hu_bu,
+            p0,
+            p1,
+            p2,
+            p3,
+            p0_h, p1_h, p2_h, p3_h);
+  DUP4_ARG2(__lsx_vsllwil_hu_bu,
+            q0, 0,
+            q1, 0,
+            q2, 0,
+            q3, 0,
+            q0_l, q1_l, q2_l, q3_l);
+  DUP4_ARG1(__lsx_vexth_hu_bu,
+            q0,
+            q1,
+            q2,
+            q3,
+            q0_h, q1_h, q2_h, q3_h);
+  //(iDetaP0Q0 < iAlpha) && bDetaP1P0 && bDetaQ1Q0
+  mask0 = __lsx_vslt_bu(iDetaP0Q0, alpha);
+  mask0 &= bDetaP1P0;
+  mask0 &= bDetaQ1Q0;
+  //iDetaP0Q0 < ((iAlpha >> 2) + 2)
+  mask1 = __lsx_vsrli_b(alpha, 2);
+  mask1 = __lsx_vaddi_bu(mask1, 2);
+  mask1 = __lsx_vslt_bu(iDetaP0Q0, mask1);
+  //low part
+  //p0
+  t0 = __lsx_vadd_h(__lsx_vslli_h(p1_l, 1), p2_l);
+  t0 = __lsx_vadd_h(__lsx_vslli_h(p0_l, 1), t0);
+  t0 = __lsx_vadd_h(__lsx_vslli_h(q0_l, 1), t0);
+  t0 = __lsx_vadd_h(q1_l, t0);
+  t0 = __lsx_vsrari_h(t0, 3);
+  //p1
+  t1 = __lsx_vadd_h(p2_l, p1_l);
+  t1 = __lsx_vadd_h(p0_l, t1);
+  t1 = __lsx_vadd_h(q0_l, t1);
+  t1 = __lsx_vsrari_h(t1, 2);
+  //p2
+  t2 = __lsx_vadd_h(__lsx_vslli_h(p3_l, 1), p2_l);
+  t2 = __lsx_vadd_h(__lsx_vslli_h(p2_l, 1), t2);
+  t2 = __lsx_vadd_h(p1_l, t2);
+  t2 = __lsx_vadd_h(p0_l, t2);
+  t2 = __lsx_vadd_h(q0_l, t2);
+  t2 = __lsx_vsrari_h(t2, 3);
+  //p0 condition 1
+  t0_con1 = __lsx_vadd_h(__lsx_vslli_h(p1_l, 1), p0_l);
+  t0_con1 = __lsx_vadd_h(q1_l, t0_con1);
+  t0_con1 = __lsx_vsrari_h(t0_con1, 2);
+  //q0
+  s0 = __lsx_vadd_h(__lsx_vslli_h(p0_l, 1), p1_l);
+  s0 = __lsx_vadd_h(__lsx_vslli_h(q0_l, 1), s0);
+  s0 = __lsx_vadd_h(__lsx_vslli_h(q1_l, 1), s0);
+  s0 = __lsx_vadd_h(q2_l, s0);
+  s0 = __lsx_vsrari_h(s0, 3);
+  //q1
+  s1 = __lsx_vadd_h(p0_l, q0_l);
+  s1 = __lsx_vadd_h(q1_l, s1);
+  s1 = __lsx_vadd_h(q2_l, s1);
+  s1 = __lsx_vsrari_h(s1, 2);
+  //q2
+  s2 = __lsx_vadd_h(__lsx_vslli_h(q3_l, 1), q2_l);
+  s2 = __lsx_vadd_h(__lsx_vslli_h(q2_l, 1), s2);
+  s2 = __lsx_vadd_h(q1_l, s2);
+  s2 = __lsx_vadd_h(q0_l, s2);
+  s2 = __lsx_vadd_h(p0_l, s2);
+  s2 = __lsx_vsrari_h(s2, 3);
+  //q0 condition 1
+  s0_con1 = __lsx_vadd_h(__lsx_vslli_h(q1_l, 1), q0_l);
+  s0_con1 = __lsx_vadd_h(p1_l, s0_con1);
+  s0_con1 = __lsx_vsrari_h(s0_con1, 2);
+  //move back
+  p0_l = t0; p1_l = t1; p2_l = t2;
+  q0_l = s0; q1_l = s1; q2_l = s2;
+  p3_l = t0_con1; q3_l = s0_con1;
+
+  //high part
+  //p0
+  t0 = __lsx_vadd_h(__lsx_vslli_h(p1_h, 1), p2_h);
+  t0 = __lsx_vadd_h(__lsx_vslli_h(p0_h, 1), t0);
+  t0 = __lsx_vadd_h(__lsx_vslli_h(q0_h, 1), t0);
+  t0 = __lsx_vadd_h(q1_h, t0);
+  t0 = __lsx_vsrari_h(t0, 3);
+  //p1
+  t1 = __lsx_vadd_h(p2_h, p1_h);
+  t1 = __lsx_vadd_h(p0_h, t1);
+  t1 = __lsx_vadd_h(q0_h, t1);
+  t1 = __lsx_vsrari_h(t1, 2);
+  //p2
+  t2 = __lsx_vadd_h(__lsx_vslli_h(p3_h, 1), p2_h);
+  t2 = __lsx_vadd_h(__lsx_vslli_h(p2_h, 1), t2);
+  t2 = __lsx_vadd_h(p1_h, t2);
+  t2 = __lsx_vadd_h(p0_h, t2);
+  t2 = __lsx_vadd_h(q0_h, t2);
+  t2 = __lsx_vsrari_h(t2, 3);
+  //p0 condition 1
+  t0_con1 = __lsx_vadd_h(__lsx_vslli_h(p1_h, 1), p0_h);
+  t0_con1 = __lsx_vadd_h(q1_h, t0_con1);
+  t0_con1 = __lsx_vsrari_h(t0_con1, 2);
+  //q0
+  s0 = __lsx_vadd_h(__lsx_vslli_h(p0_h, 1), p1_h);
+  s0 = __lsx_vadd_h(__lsx_vslli_h(q0_h, 1), s0);
+  s0 = __lsx_vadd_h(__lsx_vslli_h(q1_h, 1), s0);
+  s0 = __lsx_vadd_h(q2_h, s0);
+  s0 = __lsx_vsrari_h(s0, 3);
+  //q1
+  s1 = __lsx_vadd_h(p0_h, q0_h);
+  s1 = __lsx_vadd_h(q1_h, s1);
+  s1 = __lsx_vadd_h(q2_h, s1);
+  s1 = __lsx_vsrari_h(s1, 2);
+  //q2
+  s2 = __lsx_vadd_h(__lsx_vslli_h(q3_h, 1), q2_h);
+  s2 = __lsx_vadd_h(__lsx_vslli_h(q2_h, 1), s2);
+  s2 = __lsx_vadd_h(q1_h, s2);
+  s2 = __lsx_vadd_h(q0_h, s2);
+  s2 = __lsx_vadd_h(p0_h, s2);
+  s2 = __lsx_vsrari_h(s2, 3);
+  //q0 condition 1
+  s0_con1 = __lsx_vadd_h(__lsx_vslli_h(q1_h, 1), q0_h);
+  s0_con1 = __lsx_vadd_h(p1_h, s0_con1);
+  s0_con1 = __lsx_vsrari_h(s0_con1, 2);
+  //move back
+  p0_h = t0; p1_h = t1; p2_h = t2;
+  q0_h = s0; q1_h = s1; q2_h = s2;
+  p3_h = t0_con1; q3_h = s0_con1;
+
+  //pack low part and high part
+  DUP4_ARG2(__lsx_vpickev_b,
+            p0_h, p0_l,
+            p1_h, p1_l,
+            p2_h, p2_l,
+            q0_h, q0_l,
+            t0, t1, t2, s0);
+  DUP4_ARG2(__lsx_vpickev_b,
+            q1_h, q1_l,
+            q2_h, q2_l,
+            p3_h, p3_l,
+            q3_h, q3_l,
+            s1, s2, t0_con1, s0_con1);
+  t0 = t0 & mask0 & mask1 & bDetaP2P0;
+  t0 = __lsx_vadd_b(t0, t0_con1 & mask0 & mask1 & (~bDetaP2P0));
+  t0 = __lsx_vadd_b(t0, t0_con1 & mask0 & (~mask1));
+  t1 = t1 & mask0 & mask1 & bDetaP2P0;
+  t2 = t2 & mask0 & mask1 & bDetaP2P0;
+  s0 = s0 & mask0 & mask1 & bDetaQ2Q0;
+  s0 = __lsx_vadd_b(s0, s0_con1 & mask0 & mask1 & (~bDetaQ2Q0));
+  s0 = __lsx_vadd_b(s0, s0_con1 & mask0 & (~mask1));
+  s1 = s1 & mask0 & mask1 & bDetaQ2Q0;
+  s2 = s2 & mask0 & mask1 & bDetaQ2Q0;
+  p0 = __lsx_vadd_b(t0, p0 & (~mask0));
+  p1 = __lsx_vadd_b(t1, p1 & ~(mask0 & mask1 & bDetaP2P0));
+  p2 = __lsx_vadd_b(t2, p2 & ~(mask0 & mask1 & bDetaP2P0));
+  q0 = __lsx_vadd_b(s0, q0 & (~mask0));
+  q1 = __lsx_vadd_b(s1, q1 & ~(mask0 & mask1 & bDetaQ2Q0));
+  q2 = __lsx_vadd_b(s2, q2 & ~(mask0 & mask1 & bDetaQ2Q0));
+  //Store back
+  __lsx_vstx(p2, pPix, -iStride_x3);
+  __lsx_vstx(p1, pPix, -iStride_x2);
+  __lsx_vstx(p0, pPix, -iStride);
+  __lsx_vstx(q0, pPix, iStride0);
+  __lsx_vstx(q1, pPix, iStride);
+  __lsx_vstx(q2, pPix, iStride_x2);
+}

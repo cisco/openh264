@@ -1422,6 +1422,7 @@ void  DeblockingInit (SDeblockingFunc*  pFunc,  int32_t iCpu) {
   if (iCpu & WELS_CPU_LSX) {
     pFunc->pfLumaDeblockingLT4Ver   = DeblockLumaLt4V_lsx;
     pFunc->pfLumaDeblockingLT4Hor   = DeblockLumaLt4H_lsx;
+    pFunc->pfLumaDeblockingEQ4Ver   = DeblockLumaEq4V_lsx;
   }
 #endif//HAVE_LSX
 }
