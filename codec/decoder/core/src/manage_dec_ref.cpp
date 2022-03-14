@@ -886,7 +886,9 @@ static int32_t AddLongTermToList (PRefPic pRefPic, PPicture pPic, int32_t iLongT
     pRefPic->pLongRefList[LIST_0][i] = pPic;
   }
 
-  pRefPic->uiLongRefCount[LIST_0]++;
+  if (pRefPic->uiLongRefCount[LIST_0] < MAX_REF_PIC_COUNT) {
+    pRefPic->uiLongRefCount[LIST_0]++;
+  }
   return ERR_NONE;
 }
 
