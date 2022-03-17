@@ -183,8 +183,14 @@ GENERATE_CHROMA_UT (ChromaEq4H_msa, DeblockChromaEq4H_msa_wrap, DeblockChromaEq4
 
 #if defined(HAVE_LSX)
 WRAP_LUMA_FUNC (DeblockLumaEq4V_lsx)
+WRAP_LUMA_FUNC (DeblockLumaEq4H_lsx)
+WRAP_CHROMA_FUNC (DeblockChromaEq4H_lsx)
 
 GENERATE_LUMA_UT (LumaLt4V_lsx, DeblockLumaLt4V_lsx, DeblockLumaLt4V_c, WELS_CPU_LSX, 0)
 GENERATE_LUMA_UT (LumaLt4H_lsx, DeblockLumaLt4H_lsx, DeblockLumaLt4H_c, WELS_CPU_LSX, 1)
 GENERATE_LUMA_UT (LumaEq4V_lsx, DeblockLumaEq4V_lsx_wrap, DeblockLumaEq4V_c_wrap, WELS_CPU_LSX, 0)
+GENERATE_LUMA_UT (LumaEq4H_lsx, DeblockLumaEq4H_lsx_wrap, DeblockLumaEq4H_c_wrap, WELS_CPU_LSX, 1)
+GENERATE_CHROMA_UT (ChromaLt4V_lsx, DeblockChromaLt4V_lsx, DeblockChromaLt4V_c, WELS_CPU_LSX, 0)
+GENERATE_CHROMA_UT (ChromaLt4H_lsx, DeblockChromaLt4H_lsx, DeblockChromaLt4H_c, WELS_CPU_LSX, 1)
+GENERATE_CHROMA_UT (ChromaEq4H_lsx, DeblockChromaEq4H_lsx_wrap, DeblockChromaEq4H_c_wrap, WELS_CPU_LSX, 1)
 #endif//HAVE_LSX
