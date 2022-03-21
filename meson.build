@@ -9,7 +9,7 @@ major_version = '6'
 cpp = meson.get_compiler('cpp')
 
 inc = include_directories([
-  join_paths('codec', 'api', 'svc'),
+  join_paths('codec', 'api', 'wels'),
   join_paths('codec', 'common', 'inc'),
 ])
 
