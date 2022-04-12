@@ -442,7 +442,8 @@ static inline int32_t GetTargetRefListSize (PWelsDecoderContext pCtx) {
     iNumRefFrames = pCtx->pSps->iNumRefFrames + 2;
     int32_t  iThreadCount = GetThreadCount (pCtx);
     if (iThreadCount > 1) {
-      iNumRefFrames = MAX_REF_PIC_COUNT;
+      //due to thread and reordering buffering, it needs more dpb space
+      iNumRefFrames = MAX_DPB_COUNT + iThreadCount;
     }
   }
 

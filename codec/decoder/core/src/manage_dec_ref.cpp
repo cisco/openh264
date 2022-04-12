@@ -395,8 +395,8 @@ int32_t WelsReorderRefList (PWelsDecoderContext pCtx) {
     PPicture pPic = NULL;
     PPicture* ppRefList = pCtx->sRefPic.pRefList[listIdx];
     int32_t  iMaxRefIdx = pCtx->iPicQueueNumber;
-    if (iMaxRefIdx >= MAX_REF_PIC_COUNT) {
-      iMaxRefIdx = MAX_REF_PIC_COUNT - 1;
+    if (iMaxRefIdx > MAX_REF_PIC_COUNT) {
+      iMaxRefIdx = MAX_REF_PIC_COUNT;
     }
     int32_t iRefCount = pSliceHeader->uiRefCount[listIdx];
     int32_t iPredFrameNum = pSliceHeader->iFrameNum;
@@ -411,7 +411,7 @@ int32_t WelsReorderRefList (PWelsDecoderContext pCtx) {
     }
 
     if (pRefPicListReorderSyn->bRefPicListReorderingFlag[listIdx]) {
-      while ((iReorderingIndex < iMaxRefIdx)
+      while ((iReorderingIndex <= iMaxRefIdx)
              && (pRefPicListReorderSyn->sReorderingSyn[listIdx][iReorderingIndex].uiReorderingOfPicNumsIdc != 3)) {
         uint16_t uiReorderingOfPicNumsIdc =
           pRefPicListReorderSyn->sReorderingSyn[listIdx][iReorderingIndex].uiReorderingOfPicNumsIdc;
@@ -873,7 +873,7 @@ static int32_t AddLongTermToList (PRefPic pRefPic, PPicture pPic, int32_t iLongT
   if (pRefPic->uiLongRefCount[LIST_0] == 0) {
     pRefPic->pLongRefList[LIST_0][pRefPic->uiLongRefCount[LIST_0]] = pPic;
   } else {
-    for (i = 0; i < pRefPic->uiLongRefCount[LIST_0]; i++) {
+    for (i = 0; i < WELS_MIN(pRefPic->uiLongRefCount[LIST_0], MAX_REF_PIC_COUNT); i++) {
       if (!pRefPic->pLongRefList[LIST_0][i]) {
         return ERR_INFO_INVALID_PTR;
       }
@@ -886,7 +886,9 @@ static int32_t AddLongTermToList (PRefPic pRefPic, PPicture pPic, int32_t iLongT
     pRefPic->pLongRefList[LIST_0][i] = pPic;
   }
 
-  pRefPic->uiLongRefCount[LIST_0]++;
+  if (pRefPic->uiLongRefCount[LIST_0] < MAX_REF_PIC_COUNT) {
+    pRefPic->uiLongRefCount[LIST_0]++;
+  }
   return ERR_NONE;
 }
 

@@ -1417,6 +1417,13 @@ void  DeblockingInit (SDeblockingFunc*  pFunc,  int32_t iCpu) {
     pFunc->pfChromaDeblockingEQ4Hor = DeblockChromaEq4H_msa;
   }
 #endif//HAVE_MSA
+
+#if defined(HAVE_LSX)
+  if (iCpu & WELS_CPU_LSX) {
+    pFunc->pfLumaDeblockingLT4Ver   = DeblockLumaLt4V_lsx;
+    pFunc->pfLumaDeblockingLT4Hor   = DeblockLumaLt4H_lsx;
+  }
+#endif//HAVE_LSX
 }
 
 } // namespace WelsDec
