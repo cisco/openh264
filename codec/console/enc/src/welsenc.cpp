@@ -702,7 +702,7 @@ int FillSpecificParameters (SEncParamExt& sParam) {
   sParam.iComplexityMode = LOW_COMPLEXITY;
   sParam.bSimulcastAVC         = false;
   sParam.bFixRCOverShoot = true;
-  sParam.iIdrBitrateRatio = IDR_BITRATE_RATIO;
+  sParam.iIdrBitrateRatio = IDR_BITRATE_RATIO * 100;
   int iIndexLayer = 0;
   sParam.sSpatialLayers[iIndexLayer].uiProfileIdc       = PRO_BASELINE;
   sParam.sSpatialLayers[iIndexLayer].iVideoWidth        = 160;

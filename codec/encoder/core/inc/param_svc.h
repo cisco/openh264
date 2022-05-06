@@ -179,7 +179,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     param.uiMaxNalSize = 0;
     param.bIsLosslessLink = false;
     param.bFixRCOverShoot = true;
-    param.iIdrBitrateRatio = IDR_BITRATE_RATIO;
+    param.iIdrBitrateRatio = IDR_BITRATE_RATIO * 100;
     for (int32_t iLayer = 0; iLayer < MAX_SPATIAL_LAYER_NUM; iLayer++) {
       param.sSpatialLayers[iLayer].uiProfileIdc = PRO_UNKNOWN;
       param.sSpatialLayers[iLayer].uiLevelIdc = LEVEL_UNKNOWN;
