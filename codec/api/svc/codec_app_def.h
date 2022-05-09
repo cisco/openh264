@@ -589,7 +589,9 @@ typedef struct TagEncParamExt {
   bool    bEnableFrameCroppingFlag;    ///< enable frame cropping flag: TRUE always in application
   bool    bEnableSceneChangeDetect;
 
-  bool    bIsLosslessLink;            ///<  LTR advanced setting
+  bool    bIsLosslessLink;             ///< LTR advanced setting
+  bool    bFixRCOverShoot;             ///< fix rate control overshooting
+  int     iIdrBitrateRatio;            ///< the target bits of IDR is (idr_bitrate_ratio/100) * average target bit per frame.
 } SEncParamExt;
 
 /**
