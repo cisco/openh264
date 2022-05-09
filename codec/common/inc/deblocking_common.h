@@ -109,6 +109,13 @@ void WelsNonZeroCount_msa (int8_t* pNonZeroCount);
 #if defined(HAVE_LSX)
 void DeblockLumaLt4V_lsx (uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* pTc);
 void DeblockLumaLt4H_lsx (uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* pTc);
+void DeblockLumaEq4V_lsx (uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta);
+void DeblockLumaEq4H_lsx (uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta);
+void DeblockChromaEq4H_lsx (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta);
+void DeblockChromaLt4V_lsx (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta,
+                            int8_t* pTC);
+void DeblockChromaLt4H_lsx (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, int32_t iAlpha, int32_t iBeta,
+                            int8_t* pTC);
 #endif//HAVE_LSX
 #if defined(__cplusplus)
 }

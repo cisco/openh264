@@ -1169,6 +1169,14 @@ void InitPredFunc (PWelsDecoderContext pCtx, uint32_t uiCpuFlag) {
     pCtx->pGetI4x4LumaPredFunc[I4_PRED_H]     = WelsDecoderI4x4LumaPredH_mmi;
   }
 #endif//HAVE_MMI
+
+#if defined(HAVE_LSX)
+  if (uiCpuFlag & WELS_CPU_LSX) {
+    pCtx->pIdctResAddPredFunc   = IdctResAddPred_lsx;
+    pCtx->pIdctFourResAddPredFunc = IdctFourResAddPred_<IdctResAddPred_lsx>;
+    pCtx->pIdctResAddPredFunc8x8  = IdctResAddPred8x8_lsx;
+  }
+#endif
 }
 
 //reset decoder number related statistics info

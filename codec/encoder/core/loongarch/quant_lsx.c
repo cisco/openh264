@@ -41,8 +41,51 @@
  **********************************************************************************
  */
 
-#include "stdint.h"
+#include <stdint.h>
 #include "loongson_intrinsics.h"
+
+void WelsQuantFour4x4_lsx (int16_t* pDct, const int16_t* pFF, const int16_t* pMF) {
+  int32_t i;
+  __m128i vec_pFF0, vec_pFF1, vec_pFF2, vec_pMF0, vec_pMF1, vec_pMF2;
+  __m128i vec_pDct, vec_pDct0, vec_pDct1, vec_pDct2, vec_pFF, vec_pMF;
+  __m128i vec_pDct10, vec_pDct11, vec_pDct12, vec_pDct20, vec_pDct21, vec_pDct22;
+  __m128i vec_iSign1, vec_iSign2;
+
+  DUP2_ARG2(__lsx_vld, pFF, 0, pMF, 0, vec_pFF, vec_pMF);
+  DUP2_ARG2(__lsx_vsrai_h, vec_pFF, 15, vec_pMF, 15, vec_pFF0, vec_pMF0);
+  DUP2_ARG2(__lsx_vilvl_h, vec_pFF0, vec_pFF, vec_pMF0, vec_pMF, vec_pFF1, vec_pMF1);
+  DUP2_ARG2(__lsx_vilvh_h, vec_pFF0, vec_pFF, vec_pMF0, vec_pMF, vec_pFF2, vec_pMF2);
+
+  for (i = 0; i < 8; i++) {
+    vec_pDct = __lsx_vld(pDct, 0);
+    vec_pDct0 = __lsx_vsrai_h(vec_pDct, 15);
+    vec_pDct1 = __lsx_vilvl_h(vec_pDct0, vec_pDct);
+    vec_pDct2 = __lsx_vilvh_h(vec_pDct0, vec_pDct);
+
+    vec_iSign1 = __lsx_vsrai_w(vec_pDct1, 31);
+    vec_iSign2 = __lsx_vsrai_w(vec_pDct2, 31);
+
+    vec_pDct10 = __lsx_vxor_v(vec_iSign1, vec_pDct1);
+    vec_pDct10 = __lsx_vsub_w(vec_pDct10, vec_iSign1);
+    vec_pDct11 = __lsx_vadd_w(vec_pFF1, vec_pDct10);
+    vec_pDct11 = __lsx_vmul_w(vec_pDct11, vec_pMF1);
+    vec_pDct11 = __lsx_vsrai_w(vec_pDct11, 16);
+    vec_pDct12 = __lsx_vxor_v(vec_iSign1, vec_pDct11);
+    vec_pDct12 = __lsx_vsub_w(vec_pDct12, vec_iSign1);
+
+    vec_pDct20 = __lsx_vxor_v(vec_iSign2, vec_pDct2);
+    vec_pDct20 = __lsx_vsub_w(vec_pDct20, vec_iSign2);
+    vec_pDct21 = __lsx_vadd_w(vec_pFF2, vec_pDct20);
+    vec_pDct21 = __lsx_vmul_w(vec_pDct21, vec_pMF2);
+    vec_pDct21 = __lsx_vsrai_w(vec_pDct21, 16);
+    vec_pDct22 = __lsx_vxor_v(vec_iSign2, vec_pDct21);
+    vec_pDct22 = __lsx_vsub_w(vec_pDct22, vec_iSign2);
+
+    vec_pDct = __lsx_vpickev_h(vec_pDct22, vec_pDct12);
+    __lsx_vst(vec_pDct, pDct, 0);
+    pDct += 8;
+  }
+}
 
 void WelsQuantFour4x4Max_lsx (int16_t* pDct, const int16_t* pFF, const int16_t* pMF, int16_t* pMax) {
   int32_t k;
