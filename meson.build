@@ -185,9 +185,6 @@ elif system == 'windows'
   endif
 endif
 
-api_headers = []
-api_header_deps = []
-
 subdir ('codec')
 subdir ('test')
 
@@ -201,8 +198,8 @@ libopenh264 = library('openh264',
 
 openh264_dep = declare_dependency(
   link_with: libopenh264,
-  include_directories: include_directories('include'),
-  dependencies: deps + api_header_deps)
+  include_directories: include_directories('codec/api'),
+  dependencies: deps)
 
 pkg = import('pkgconfig')
 pkg.generate(libopenh264,
@@ -210,5 +207,3 @@ pkg.generate(libopenh264,
                'and decoding. It is suitable for use in real time ' +
                'applications such as WebRTC.',
 )
-
-subdir ('include')
