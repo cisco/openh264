@@ -582,7 +582,7 @@
 					"$(inherited)",
 					"$(SRCROOT)/../../../../common/inc",
 					"$(SRCROOT)/../../../../processing/interface",
-					"$(SRCROOT)/../../../../api/svc",
+					"$(SRCROOT)/../../../../api/wels",
 					"$(SRCROOT)/../../../../common/arm",
 					"$(SRCROOT)/../../../../common/arm64",
 				);
@@ -619,7 +619,7 @@
 					"$(inherited)",
 					"$(SRCROOT)/../../../../common/inc",
 					"$(SRCROOT)/../../../../processing/interface",
-					"$(SRCROOT)/../../../../api/svc",
+					"$(SRCROOT)/../../../../api/wels",
 					"$(SRCROOT)/../../../../common/arm",
 					"$(SRCROOT)/../../../../common/arm64",
 				);

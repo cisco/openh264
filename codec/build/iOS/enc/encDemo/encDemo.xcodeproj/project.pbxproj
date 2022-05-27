@@ -474,7 +474,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = APPLE_IOS;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/../../../../api/svc\"",
+					"\"$(SRCROOT)/../../../../api/wels\"",
 					"\"$(SRCROOT)/../../../../common/inc\"",
 					"\"$(SRCROOT)/../../../../processing/interface\"",
 					"\"$(SRCROOT)/../../../../encoder/core/inc\"",
@@ -493,7 +493,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = APPLE_IOS;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/../../../../api/svc\"",
+					"\"$(SRCROOT)/../../../../api/wels\"",
 					"\"$(SRCROOT)/../../../../common/inc\"",
 					"\"$(SRCROOT)/../../../../processing/interface\"",
 					"\"$(SRCROOT)/../../../../encoder/core/inc\"",

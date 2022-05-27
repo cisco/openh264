@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\;..\..\..\..\codec\encoder\plus\inc;..\..\..\..\codec\encoder\core\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\codec\processing\src\common;..\..\..\..\codec\processing\interface"
+				AdditionalIncludeDirectories="..\..\..\;..\..\..\..\codec\encoder\plus\inc;..\..\..\..\codec\encoder\core\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\codec\processing\src\common;..\..\..\..\codec\processing\interface"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;X86_ASM;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -118,7 +118,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\;..\..\..\..\codec\encoder\plus\inc;..\..\..\..\codec\encoder\core\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\codec\processing\src\common;..\..\..\..\codec\processing\interface"
+				AdditionalIncludeDirectories="..\..\..\;..\..\..\..\codec\encoder\plus\inc;..\..\..\..\codec\encoder\core\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\codec\processing\src\common;..\..\..\..\codec\processing\interface"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -193,7 +193,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..\..\..\;..\..\..\..\codec\encoder\plus\inc;..\..\..\..\codec\encoder\core\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\codec\processing\src\common;..\..\..\..\codec\processing\interface"
+				AdditionalIncludeDirectories="..\..\..\;..\..\..\..\codec\encoder\plus\inc;..\..\..\..\codec\encoder\core\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\codec\processing\src\common;..\..\..\..\codec\processing\interface"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;X86_ASM;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -269,7 +269,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..\..\..\;..\..\..\..\codec\encoder\plus\inc;..\..\..\..\codec\encoder\core\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\codec\processing\src\common;..\..\..\..\codec\processing\interface"
+				AdditionalIncludeDirectories="..\..\..\;..\..\..\..\codec\encoder\plus\inc;..\..\..\..\codec\encoder\core\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\codec\processing\src\common;..\..\..\..\codec\processing\interface"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -478,7 +478,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -486,7 +486,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -494,7 +494,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -502,7 +502,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 			</File>
@@ -518,7 +518,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -526,7 +526,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -534,7 +534,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -542,7 +542,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 			</File>
@@ -554,7 +554,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -562,7 +562,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -570,7 +570,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -578,7 +578,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 			</File>
@@ -590,7 +590,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -598,7 +598,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -606,7 +606,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -614,7 +614,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 			</File>
@@ -626,7 +626,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -634,7 +634,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -642,7 +642,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -650,7 +650,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 			</File>
@@ -662,7 +662,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -670,7 +670,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -678,7 +678,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -686,7 +686,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 			</File>
@@ -698,7 +698,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -706,7 +706,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -714,7 +714,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -722,7 +722,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="..\..\..\..\codec\api\svc;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
+						AdditionalIncludeDirectories="..\..\..\..\codec\api\wels;..\..\..\..\gtest\include;..\..\..\;..\..\..\..\codec\decoder\plus\inc;..\..\..\..\codec\common\inc;..\..\..\..\codec\decoder\core\inc;$(NOINHERIT)"
 					/>
 				</FileConfiguration>
 			</File>
