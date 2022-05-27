@@ -38,3 +38,16 @@ jobs:
       - working-directory: ./build
         run: ./AutoBuildForWindows.bat
       - run: ./bin/Win32/Release/codec_unittest.exe
+
+  aarch64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: sudo dpkg --add-architecture aarch64
+      - run: sudo apt-get update -qq
+      - run: sudo apt-get install -qq gcc-aarch64-linux-gnu g++-aarch64-linux-gnu qemu-user
+      - run: c++ --version
+      - run: make gmp-bootstrap
+      - run: make gtest-bootstrap
+      - run: make OS=linux CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ ARCH=arm64
+      - run: qemu-aarch64 -L /usr/aarch64-linux-gnu/ ./codec_unittest
