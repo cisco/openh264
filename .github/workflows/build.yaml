@@ -25,3 +25,16 @@ jobs:
       - run: ./run_Test.sh BinaryCompare Adobe_PDF_sample_a_1024x768_50Frms.264
       - run: ./run_Test.sh BinaryCompare Zhling_1280x720.264
 
+  windows:
+    runs-on: windows-2019
+    steps:
+      - uses: actions/checkout@v2
+      - run: choco install nasm
+      # nasm is not installed into the $PATH so add it manually
+      - run: echo "C:\Program Files\NASM" >> $env:GITHUB_PATH
+      - run: nasm -v
+      - run: make OS=msvc gmp-bootstrap
+      - run: make OS=msvc gtest-bootstrap
+      - working-directory: ./build
+        run: ./AutoBuildForWindows.bat
+      - run: ./bin/Win32/Release/codec_unittest.exe
