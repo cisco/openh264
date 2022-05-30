@@ -262,7 +262,7 @@ void RcInitVGop (sWelsEncCtx* pEncCtx) {
   if (fix_rc_overshoot) {
     // subtract unused bits if interrupted in a mid of VGOP
     int32_t iLeftInVGop = pWelsSvcRc->iGopNumberInVGop - pWelsSvcRc->iGopIndexInVGop;
-    pWelsSvcRc->iRemainingBits -= iLeftInVGop * pWelsSvcRc->iLastAllocatedBits / pWelsSvcRc->iGopNumberInVGop;
+    pWelsSvcRc->iRemainingBits -= iLeftInVGop * (pWelsSvcRc->iLastAllocatedBits / pWelsSvcRc->iGopNumberInVGop);
   }
 
   if (fix_rc_overshoot && pWelsSvcRc->iRemainingBits < 0) {
