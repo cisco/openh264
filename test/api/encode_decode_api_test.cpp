@@ -34,7 +34,7 @@ bool EncodeDecodeTestBase::prepareEncDecParam (const EncodeDecodeFileParamBase E
   //for encoder
   //I420: 1(Y) + 1/4(U) + 1/4(V)
   int frameSize = EncDecFileParam.width * EncDecFileParam.height * 3 / 2;
-  if (-1 == buf_.SetLength(frameSize))
+  if (-1 == buf_.SetLength (frameSize))
     return false;
   if (buf_.Length() != (size_t)frameSize) {
     printf ("buf_.Length() failed! frameSize = %d\n", frameSize);
@@ -85,7 +85,7 @@ void EncodeDecodeTestAPIBase::prepareParamDefault (int iLayers, int iSlices, int
     SEncParamExt* pParam) {
   memset (pParam, 0, sizeof (SEncParamExt));
   encoder_->GetDefaultParams (pParam);
-  EncodeDecodeTestBase::prepareParam (iLayers, iSlices, VALID_SIZE(width), VALID_SIZE(height), framerate, pParam);
+  EncodeDecodeTestBase::prepareParam (iLayers, iSlices, VALID_SIZE (width), VALID_SIZE (height), framerate, pParam);
 }
 
 
@@ -95,10 +95,11 @@ void EncodeDecodeTestAPIBase::EncodeOneFrame (int iCheckTypeIndex) {
   memset (buf_.data(), iRandValue, lumaSize);
   memset (buf_.data() + lumaSize, rand() % 256, (frameSize - lumaSize));
   int rv = encoder_->EncodeFrame (&EncPic, &info);
-  if (0 == iCheckTypeIndex)
+  if (0 == iCheckTypeIndex) {
     ASSERT_TRUE (rv == cmResultSuccess) << rv;
-  else if (1 == iCheckTypeIndex)
+  } else if (1 == iCheckTypeIndex) {
     ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnknownReason);
+  }
 }
 
 bool EncodeDecodeTestAPIBase::EncDecOneFrame (const int iWidth, const int iHeight, const int iFrame, FILE* pfEnc) {

@@ -192,8 +192,9 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECIDC_GeneralSliceChange) {
       if (!bVCLLoss) { //not loss
         rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf + iTotalSliceSize,
                                      info.sLayerInfo[0].pNalLengthInByte[iPacketNum], pData, &dstBufInfo_);
-        if (uiEcIdc == ERROR_CON_DISABLE)
+        if (uiEcIdc == ERROR_CON_DISABLE) {
           EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
+        }
       }
       //EC_IDC should not change till now
       decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
@@ -206,8 +207,9 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECIDC_GeneralSliceChange) {
 
       rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
       //EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
-      if (uiEcIdc == ERROR_CON_DISABLE && rv != 0)
+      if (uiEcIdc == ERROR_CON_DISABLE && rv != 0) {
         EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
+      }
 
       //deal with next slice
       iTotalSliceSize += len;
