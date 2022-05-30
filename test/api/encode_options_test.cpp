@@ -1316,10 +1316,11 @@ class EncodeTestAPI : public ::testing::TestWithParam<EncodeOptionParam>, public
       ptr[i] = bAllRandom ? (rand() % 256) : uiVal;
     }
     int rv = encoder_->EncodeFrame (&EncPic, &info);
-    if (0 == iCheckTypeIndex)
+    if (0 == iCheckTypeIndex) {
       ASSERT_TRUE (rv == cmResultSuccess) << "rv=" << rv;
-    else if (1 == iCheckTypeIndex)
+    } else if (1 == iCheckTypeIndex) {
       ASSERT_TRUE (rv == cmResultSuccess || rv == cmUnknownReason) << "rv=" << rv;
+    }
   }
 };
 
@@ -2309,7 +2310,8 @@ TEST_F (EncodeDecodeTestAPI,  TemporalLayerChangeDuringEncoding_Specific) {
       if ((iStepIdx < 3) && (iFrameNum == ((iTotalFrame / 3) * (iStepIdx + 1)))) {
         sParam.iTemporalLayerNum = originalTemporalLayerNum * iSteps[iStepIdx];
         sParam.iTargetBitrate = sParam.sSpatialLayers[0].iSpatialBitrate = originalBR * iSteps[iStepIdx];
-        sParam.fMaxFrameRate = sParam.sSpatialLayers[0].fFrameRate = static_cast <float> (originalFR * pow (2.0f, iSteps[iStepIdx]));
+        sParam.fMaxFrameRate = sParam.sSpatialLayers[0].fFrameRate = static_cast <float> (originalFR * pow (2.0f,
+                               iSteps[iStepIdx]));
         encoder_->SetOption (ENCODER_OPTION_SVC_ENCODE_PARAM_EXT, &sParam);
 
         bSetOption = true;
