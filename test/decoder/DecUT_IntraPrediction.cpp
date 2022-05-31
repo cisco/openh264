@@ -378,33 +378,33 @@ GENERATE_4x4_UT (WelsI4x4LumaPredHD_c, WelsI4x4LumaPredHD_ref, 0, 0)
 
 #define GENERATE_8x8_UT(pred, ref, ASM, CPUFLAGS) \
 TEST(DecoderIntraPredictionTest, pred) {\
-const int32_t kiStride = 32; \
-int iRunTimes = 1000; \
-ENFORCE_STACK_ALIGN_1D (uint8_t, pRefBuffer, 18 * kiStride, 16); \
-ENFORCE_STACK_ALIGN_1D (uint8_t, pPredBuffer, 18 * kiStride, 16); \
-if (ASM) { \
-  int32_t iTmp = 1; \
-  uint32_t uiCPUFlags = WelsCPUFeatureDetect(&iTmp); \
-  if ((uiCPUFlags & CPUFLAGS) == 0) {\
-    return; \
-  } \
-} \
-while(iRunTimes--) {\
-for (int i = 0; i < 17; i ++) {\
-  pRefBuffer[kiStride + i] = pPredBuffer[kiStride + i] = rand() & 255; \
-  pRefBuffer[(i+1) * kiStride - 1] = pPredBuffer[(i+1) * kiStride - 1] = rand() & 255; \
-}\
-pred(&pPredBuffer[2*kiStride], kiStride); \
-ref(&pRefBuffer[2*kiStride], kiStride); \
-bool ok = true; \
-for (int i = 0; i < 8; i ++)\
-  for(int j = 0; j < 8; j ++)\
-    if (pPredBuffer[(i+2) * kiStride + j] != pRefBuffer[(i+2) * kiStride + j]) {\
-      ok = false; \
-      break; \
+  const int32_t kiStride = 32; \
+  int iRunTimes = 1000; \
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pRefBuffer, 18 * kiStride, 16); \
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pPredBuffer, 18 * kiStride, 16); \
+  if (ASM) { \
+    int32_t iTmp = 1; \
+    uint32_t uiCPUFlags = WelsCPUFeatureDetect(&iTmp); \
+    if ((uiCPUFlags & CPUFLAGS) == 0) {\
+      return; \
     } \
+  } \
+  while(iRunTimes--) {\
+    for (int i = 0; i < 17; i ++) {\
+      pRefBuffer[kiStride + i] = pPredBuffer[kiStride + i] = rand() & 255; \
+      pRefBuffer[(i+1) * kiStride - 1] = pPredBuffer[(i+1) * kiStride - 1] = rand() & 255; \
+    }\
+    pred(&pPredBuffer[2*kiStride], kiStride); \
+    ref(&pRefBuffer[2*kiStride], kiStride); \
+    bool ok = true; \
+    for (int i = 0; i < 8; i ++)\
+      for(int j = 0; j < 8; j ++)\
+        if (pPredBuffer[(i+2) * kiStride + j] != pRefBuffer[(i+2) * kiStride + j]) {\
+          ok = false; \
+          break; \
+        } \
     EXPECT_EQ(ok, true); \
-} \
+  } \
 }
 
 void WelsIChromaPredPlane_ref (uint8_t* pPred, const int32_t kiStride) {
@@ -514,33 +514,33 @@ GENERATE_8x8_UT (WelsIChromaPredH_c, LumaI8x8PredH, 0, 0)
 GENERATE_8x8_UT (WelsIChromaPredV_c, LumaI8x8PredV, 0, 0)
 #define GENERATE_16x16_UT(pred, ref, ASM, CPUFLAGS) \
 TEST(DecoderIntraPredictionTest, pred) {\
-const int32_t kiStride = 32; \
-int32_t iRunTimes = 1000; \
-ENFORCE_STACK_ALIGN_1D (uint8_t, pRefBuffer, 18 * kiStride, 16); \
-ENFORCE_STACK_ALIGN_1D (uint8_t, pPredBuffer, 18 * kiStride, 16); \
-if (ASM) { \
-  int32_t iTmp = 1; \
-  uint32_t uiCPUFlags = WelsCPUFeatureDetect( &iTmp); \
-  if ((uiCPUFlags & CPUFLAGS) == 0) {\
-    return ; \
-  } \
-}\
-while(iRunTimes--) {\
-for (int i = 0; i < 17; i ++) {\
-  pRefBuffer[kiStride + i] = pPredBuffer[kiStride + i] = rand() & 255; \
-  pRefBuffer[(i+1) * kiStride - 1] = pPredBuffer[(i+1) * kiStride - 1] = rand() & 255; \
-}\
-pred(&pPredBuffer[2*kiStride], kiStride); \
-ref(&pRefBuffer[2*kiStride], kiStride); \
-bool ok = true; \
-for (int i = 0; i < 16; i ++)\
-  for(int j = 0; j < 16; j ++)\
-    if (pPredBuffer[(i+2) * kiStride + j] != pRefBuffer[(i+2) * kiStride + j]) {\
-      ok = false; \
-      break; \
+  const int32_t kiStride = 32; \
+  int32_t iRunTimes = 1000; \
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pRefBuffer, 18 * kiStride, 16); \
+  ENFORCE_STACK_ALIGN_1D (uint8_t, pPredBuffer, 18 * kiStride, 16); \
+  if (ASM) { \
+    int32_t iTmp = 1; \
+    uint32_t uiCPUFlags = WelsCPUFeatureDetect( &iTmp); \
+    if ((uiCPUFlags & CPUFLAGS) == 0) {\
+      return ; \
     } \
+  }\
+  while(iRunTimes--) {\
+    for (int i = 0; i < 17; i ++) {\
+      pRefBuffer[kiStride + i] = pPredBuffer[kiStride + i] = rand() & 255; \
+      pRefBuffer[(i+1) * kiStride - 1] = pPredBuffer[(i+1) * kiStride - 1] = rand() & 255; \
+    }\
+    pred(&pPredBuffer[2*kiStride], kiStride); \
+    ref(&pRefBuffer[2*kiStride], kiStride); \
+    bool ok = true; \
+    for (int i = 0; i < 16; i ++)\
+      for(int j = 0; j < 16; j ++)\
+        if (pPredBuffer[(i+2) * kiStride + j] != pRefBuffer[(i+2) * kiStride + j]) {\
+          ok = false; \
+          break; \
+        } \
     EXPECT_EQ(ok, true); \
-} \
+  } \
 }
 void WelsI16x16LumaPredPlane_ref (uint8_t* pPred, const int32_t kiStride) {
   int32_t a = 0, b = 0, c = 0, H = 0, V = 0;
