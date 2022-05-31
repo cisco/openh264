@@ -3,13 +3,20 @@ SHAREDLIBSUFFIX = so
 SHAREDLIBSUFFIXFULLVER=$(SHAREDLIBSUFFIX).$(FULL_VERSION)
 SHAREDLIBSUFFIXMAJORVER=$(SHAREDLIBSUFFIX).$(SHAREDLIB_MAJORVERSION)
 SHLDFLAGS = -Wl,-soname,$(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXMAJORVER)
-CFLAGS += -Wall -Werror -Wno-error=class-memaccess -fno-strict-aliasing -fPIC -MMD -MP
-ifeq ($(USE_STACK_PROTECTOR), Yes)
-CFLAGS += -fstack-protector-all
-endif
+CFLAGS += -Wall -Werror -fno-strict-aliasing -fPIC -MMD -MP
 LDFLAGS += -lpthread
 STATIC_LDFLAGS += -lpthread -lm
 AR_OPTS = crD $@
+
+ifeq ($(USE_STACK_PROTECTOR), Yes)
+CFLAGS += -fstack-protector-all
+endif
+
+GCCVER_GTEQ8 = $(shell echo $$((`gcc -dumpversion | awk -F "." '{print $$1}'` >= 8)))
+ifeq ($(GCCVER_GTEQ8), 1)
+CFLAGS += -Wno-error=class-memaccess
+endif
+
 ifeq ($(ASM_ARCH), x86)
 ifeq ($(ARCH), x86_64)
 ASMFLAGS += -f elf64
