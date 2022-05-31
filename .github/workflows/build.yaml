@@ -40,3 +40,63 @@ jobs:
           CFLAGS: -WX
         run: ./AutoBuildForWindows.bat
       - run: ./bin/Win32/Release/codec_unittest.exe
+
+  mingw:
+    runs-on: windows-2019
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: mingw64
+          install: >-
+            git
+            make
+            mingw-w64-x86_64-toolchain
+            mingw-w64-x86_64-nasm
+            mingw-w64-x86_64-meson
+      - uses: actions/checkout@v2
+      - run: c++ --version
+      - run: make gmp-bootstrap
+      - run: make gtest-bootstrap
+      - run: CFLAGS=-Werror make -j$(nproc) all plugin test
+      - run: meson builddir --werror
+      - run: ninja -C builddir -v
+      - run: meson test -C builddir -v
+
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: brew install nasm meson
+      - run: make gmp-bootstrap
+      - run: make gtest-bootstrap
+      - run: nasm -v
+      - run: c++ --version
+      - run: CFLAGS=-Werror make -j$(sysctl -n hw.ncpu) all plugin test
+      - run: meson builddir --werror
+      - run: ninja -C builddir -v
+      - run: meson test -C builddir -v
+
+  linux-cross-arm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: sudo apt-get update -qq
+      - run: sudo apt-get install -qq g++-arm-linux-gnueabihf g++-aarch64-linux-gnu
+      - run: arm-linux-gnueabihf-g++ --version
+      - run: make gmp-bootstrap
+      - run: make gtest-bootstrap
+      - run: CFLAGS=-Werror make -j$(nproc) ARCH=armv7 CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++
+      - run: CFLAGS=-Werror make clean
+      - run: CFLAGS=-Werror make -j$(nproc) ARCH=aarch64 CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
+
+  macos-cross-arm64:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: make gmp-bootstrap
+      - run: make gtest-bootstrap
+      - run: c++ --version
+      - run: CFLAGS=-Werror make -j$(sysctl -n hw.ncpu) ARCH=arm64
