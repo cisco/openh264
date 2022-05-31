@@ -10,7 +10,7 @@ SHLDFLAGS = -dynamiclib -twolevel_namespace -undefined dynamic_lookup \
 	$(SHAREDLIB_DIR)/$(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXMAJORVER)
 SHARED = -dynamiclib
 SHARED += -current_version $(CURRENT_VERSION) -compatibility_version $(COMPATIBILITY_VERSION)
-CFLAGS += -Wall -Werror -fPIC -MMD -MP -stdlib=libc++
+CFLAGS += -Wall -fPIC -MMD -MP -stdlib=libc++
 LDFLAGS += -stdlib=libc++
 ifeq ($(ARCH), arm64)
 CFLAGS += -arch arm64
