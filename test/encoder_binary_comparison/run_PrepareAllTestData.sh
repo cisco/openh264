@@ -151,6 +151,7 @@ runMain()
 
     echo ""
     echo "building codec.........."
+    echo "`gcc --version`"
     runBuildCodec  ${BitType}>build.log
     if [ ! $? -eq 0 ]
     then
