@@ -41,8 +41,8 @@ runUnitTest()
   CFLAGS=-Werror make -B ENABLE64BIT=No  BUILDTYPE=Debug   all plugin test
   return $?
 }
-#usage: runPrepareAndBinaryTest $TestBitStream
-runPrepareAndBinaryTest()
+#usage: runBinaryTest $TestBitStream
+runBinaryTest()
 {
   if [ ! $# -eq 2  ]
   then
@@ -53,14 +53,11 @@ runPrepareAndBinaryTest()
   local TestType=$2
   local WorkingDir=`pwd`
   local BinaryTestDir="test/encoder_binary_comparison"
-  local TestSpacePrepareLog="AllTestSpacePrepare.log"
-  cd ${BinaryTestDir}
-  ./run_PrepareAllTestData.sh 64 2>${TestSpacePrepareLog}
   cd ${WorkingDir}
   echo ""
   echo " binary compare test, test bit stream is ${TestBitStream}"
   echo ""
-./test/encoder_binary_comparison/run_OneBitStream.sh  ${TestBitStream} ${TestType}
+  ${BinaryTestDir}/run_OneBitStream.sh  ${TestBitStream} ${TestType}
   return $?
 }
 #usage:runMain  ${TestType}  ${TestBitStream}
@@ -84,7 +81,7 @@ runMain()
   if [  "${TestType}"  = "BinaryCompare" ]
   then
     set -e
-    runPrepareAndBinaryTest ${TestBitStream} TravisTest
+    runBinaryTest ${TestBitStream} TravisTest
     return $?
   fi
 }
