@@ -84,13 +84,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: sudo apt-get update -qq
-      - run: sudo apt-get install -qq g++-arm-linux-gnueabihf g++-aarch64-linux-gnu
+      - run: sudo apt-get install -qq g++-arm-linux-gnueabihf g++-aarch64-linux-gnu qemu-user
       - run: arm-linux-gnueabihf-g++ --version
       - run: make gmp-bootstrap
       - run: make gtest-bootstrap
       - run: CFLAGS=-Werror make -j$(nproc) ARCH=armv7 CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++
       - run: CFLAGS=-Werror make clean
       - run: CFLAGS=-Werror make -j$(nproc) ARCH=aarch64 CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
+      - run: qemu-aarch64 -L /usr/aarch64-linux-gnu/ ./codec_unittest
 
   macos-cross-arm64:
     runs-on: macos-latest
