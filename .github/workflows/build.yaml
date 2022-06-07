@@ -25,6 +25,19 @@ jobs:
       - run: ./run_Test.sh BinaryCompare Adobe_PDF_sample_a_1024x768_50Frms.264
       - run: ./run_Test.sh BinaryCompare Zhling_1280x720.264
 
+  asan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: sudo apt-get update -qq
+      - run: sudo apt-get install -qq nasm
+      - run: nasm -v
+      - run: c++ --version
+      - run: make gtest-bootstrap
+      - run: LDFLAGS=-fsanitize=address CFLAGS=-fsanitize=address make -j$(nproc)
+      - run: ./codec_unittest
+
+
   windows:
     runs-on: windows-2019
     steps:
