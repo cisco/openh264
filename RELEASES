@@ -1,6 +1,14 @@
 
 Releases
 -----------
+v2.3.0
+------
+- Decoder bug fix to correct the B-frame order in some case
+- Fixes to avoid hanging for multi-thread decoding
+- Some Enhancements and fixes for rate control
+- Assembly optimization for loongson platform
+- Some minor bug fixes
+
 v2.2.0
 ------
 - Add support for B-slice error concealment
@@ -212,6 +220,21 @@ Binaries
 -----------
 These binary releases are distributed under this license:
 http://www.openh264.org/BINARY_LICENSE.txt
+
+v2.3.0
+http://ciscobinary.openh264.org/libopenh264-2.3.0-android-arm.6.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.0-android-arm64.6.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.0-android-x86.6.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.0-android-x64.6.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.0-ios.a.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.0-linux32.6.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.0-linux64.6.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.0-linux-arm.6.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.0-linux-arm64.6.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.0-osx-arm64.6.dylib.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.0-osx-x64.6.dylib.bz2
+http://ciscobinary.openh264.org/openh264-2.3.0-win32.dll.bz2
+http://ciscobinary.openh264.org/openh264-2.3.0-win64.dll.bz2
 
 v2.2.0
 http://ciscobinary.openh264.org/libopenh264-2.2.0-android-arm.6.so.bz2
