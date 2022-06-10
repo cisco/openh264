@@ -73,7 +73,7 @@ void AnchorPredMv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIS
   }
 }
 
-void AnchorPredInter8x16Mv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30],
+void AnchorPredInter8x16Mv (int16_t (&iMotionVector)[LIST_A][30][MV_A], int8_t (&iRefIndex)[LIST_A][30],
                             int32_t iPartIdx, int8_t iRef, int16_t iMVP[2]) {
   if (0 == iPartIdx) {
     const int8_t kiLeftRef = iRefIndex[0][6];
@@ -97,7 +97,7 @@ void AnchorPredInter8x16Mv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRef
   AnchorPredMv (iMotionVector, iRefIndex, iPartIdx, 2, iRef, iMVP);
 }
 
-void AnchorPredInter16x8Mv (int16_t iMotionVector[LIST_A][30][MV_A], int8_t iRefIndex[LIST_A][30],
+void AnchorPredInter16x8Mv (int16_t (&iMotionVector)[LIST_A][30][MV_A], int8_t (&iRefIndex)[LIST_A][30],
                             int32_t iPartIdx, int8_t iRef, int16_t iMVP[2]) {
   if (0 == iPartIdx) {
     const int8_t kiTopRef = iRefIndex[0][1];
