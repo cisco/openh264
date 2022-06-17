@@ -367,12 +367,12 @@ int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc) {
 
   int32_t i, iCount = 0;
   //short
-  for (i = 0; i < pCtx->sRefPic.uiShortRefCount[LIST_0]; ++i) {
+  for (i = 0; i < pCtx->sRefPic.uiShortRefCount[LIST_0] && iCount < MAX_REF_PIC_COUNT; ++i) {
     pCtx->sRefPic.pRefList[LIST_0][iCount++ ] = ppShoreRefList[i];
   }
 
   //long
-  for (i = 0; i < pCtx->sRefPic.uiLongRefCount[LIST_0] ; ++i) {
+  for (i = 0; i < pCtx->sRefPic.uiLongRefCount[LIST_0] && iCount < MAX_REF_PIC_COUNT; ++i) {
     pCtx->sRefPic.pRefList[LIST_0][iCount++  ] = ppLongRefList[i];
   }
   pCtx->sRefPic.uiRefCount[LIST_0] = iCount;
