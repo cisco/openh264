@@ -175,6 +175,9 @@ TEST (PredMvTest, PredMv) {
   const int32_t kiRandTime = 100;
   bool bOK = true;
 
+  memset(&sWelsMvPred, 0, sizeof(SWelsMvPred));
+  memset(&sAncMvPred, 0, sizeof(SAnchorMvPred));
+
   //test specific input: 16x16
   iIndex = 0;
   iBlockWidth = 4;
@@ -230,6 +233,9 @@ TEST (PredMvTest, PredInter16x8Mv) {
   const int32_t kiRandTime = 100;
   bool bOK = true;
 
+  memset(&sWelsMvPred, 0, sizeof(SWelsMvPred));
+  memset(&sAncMvPred, 0, sizeof(SAnchorMvPred));
+
   i = 0;
   while (i++ < kiRandTime) {
     iIndex = (rand() & 1) << 3; //0, 8
@@ -248,6 +254,9 @@ TEST (PredMvTest, PredInter8x16Mv) {
   int32_t i, iRef, iIndex;
   const int32_t kiRandTime = 100;
   bool bOK = true;
+
+  memset(&sWelsMvPred, 0, sizeof(SWelsMvPred));
+  memset(&sAncMvPred, 0, sizeof(SAnchorMvPred));
 
   i = 0;
   while (i++ < kiRandTime) {
