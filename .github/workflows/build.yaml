@@ -61,7 +61,7 @@ jobs:
       - run: make gmp-bootstrap
       - run: make gtest-bootstrap
       - run: CFLAGS=-Werror make -j$(nproc) all plugin test
-      - run: meson builddir --werror
+      - run: meson builddir
       - run: ninja -C builddir -v
       - run: meson test -C builddir -v
 
