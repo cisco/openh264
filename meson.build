@@ -165,7 +165,7 @@ elif system == 'windows'
   elif cpu_family == 'aarch64'
     # For ARM64, Clang can build the assembly as-is without needing to use
     # either gas-preprocessor or armasm64.
-    if cpp.get_argument_syntax() == 'msvc'
+    if cpp.get_argument_syntax() == 'msvc' and (cpp.get_id() != 'clang-cl' or meson.version().version_compare('<0.58.0'))
       use_asm_gen = true
       gasprep = find_program('gas-preprocessor.pl')
       asm_gen = generator(gasprep,
