@@ -1,6 +1,10 @@
 
 Releases
 -----------
+v2.3.1
+------
+- update SHAREDLIB_MAJORVERSION value in Makefile
+
 v2.3.0
 ------
 - Decoder bug fix to correct the B-frame order in some case
@@ -220,6 +224,34 @@ Binaries
 -----------
 These binary releases are distributed under this license:
 http://www.openh264.org/BINARY_LICENSE.txt
+
+v2.3.1
+http://ciscobinary.openh264.org/libopenh264-2.3.1-android-arm.7.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.1-android-arm.7.so.signed.md5.txt
+http://ciscobinary.openh264.org/libopenh264-2.3.1-android-arm64.7.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.1-android-arm64.7.so.signed.md5.txt
+http://ciscobinary.openh264.org/libopenh264-2.3.1-android-x64.7.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.1-android-x64.7.so.signed.md5.txt
+http://ciscobinary.openh264.org/libopenh264-2.3.1-android-x86.7.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.1-android-x86.7.so.signed.md5.txt
+http://ciscobinary.openh264.org/libopenh264-2.3.1-ios.a.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.1-ios.a.signed.md5.txt
+http://ciscobinary.openh264.org/libopenh264-2.3.1-linux32.7.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.1-linux32.7.so.signed.md5.txt
+http://ciscobinary.openh264.org/libopenh264-2.3.1-linux64.7.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.1-linux64.7.so.signed.md5.txt
+http://ciscobinary.openh264.org/libopenh264-2.3.1-linux-arm.7.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.1-linux-arm.7.so.signed.md5.txt
+http://ciscobinary.openh264.org/libopenh264-2.3.1-linux-arm64.7.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.1-linux-arm64.7.so.signed.md5.txt
+http://ciscobinary.openh264.org/libopenh264-2.3.1-mac-arm64.dylib.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.1-mac-arm64.dylib.signed.md5.txt
+http://ciscobinary.openh264.org/libopenh264-2.3.1-mac-x64.dylib.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.1-mac-x64.dylib.signed.md5.txt
+http://ciscobinary.openh264.org/openh264-2.3.1-win32.dll.signed.md5.txt
+http://ciscobinary.openh264.org/openh264-2.3.1-win32.dll.bz2
+http://ciscobinary.openh264.org/openh264-2.3.1-win64.dll.bz2
+http://ciscobinary.openh264.org/openh264-2.3.1-win64.dll.signed.md5.txt
 
 v2.3.0
 http://ciscobinary.openh264.org/libopenh264-2.3.0-android-arm.6.so.bz2
