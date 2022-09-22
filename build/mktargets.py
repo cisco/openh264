@@ -268,7 +268,16 @@ if args.library is not None:
 if args.binary is not None:
     f.write("%s$(EXEEXT): $(%s_OBJS) $(%s_DEPS)\n"%(args.binary, PREFIX, PREFIX))
     f.write("\t$(QUIET_CXX)$(CXX) $(CXX_LINK_O) $(%s_OBJS) $(%s_LDFLAGS) $(LDFLAGS)\n\n"%(PREFIX, PREFIX))
+    # for wasm build
+    f.write("%s.html: $(%s_OBJS) $(%s_DEPS)\n"%(args.binary, PREFIX, PREFIX))
+    f.write("\t$(QUIET_CXX)$(CXX) $(CXX_LINK_O) $(%s_OBJS) $(%s_LDFLAGS) $(LDFLAGS)\n\n"%(PREFIX, PREFIX))
+    
+    f.write("ifeq ($(OS), wasm)\n")
+    f.write("binaries: %s.html\n"%args.binary)
+    f.write("BINARIES += %s.html\n"%args.binary)
+    f.write("else\n")
     f.write("binaries: %s$(EXEEXT)\n"%args.binary)
     f.write("BINARIES += %s$(EXEEXT)\n"%args.binary)
+    f.write("endif")
 
 f.close()

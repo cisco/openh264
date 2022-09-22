@@ -46,6 +46,8 @@ testbin/test_vd_rc.264
 testbin/test_vd_rc.yuv
 testbin/test.264
 testbin/test.yuv
+testbin/Static.264
+testbin/Static.yuv
 
 # iOS output files
 codec/build/iOS/common/build/
@@ -56,4 +58,12 @@ codec/build/iOS/dec/welsdec/build/
 
 # editor files
 *~
+
+#wasm
+.vscode/*
+*.html
+*.js
+*.wat
+*.wasm
+*.data
 
