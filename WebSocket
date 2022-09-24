@@ -1,0 +1,24 @@
+var mySock = new WebSocket("wss://" + userPrincipalsResponse.streamerInfo.streamerSocketUrl + "/ws"); 
+
+mySock.onmessage = function(evt) { console.log(evt.data); }; mySock.onclose = function(curl --request POST \
+  -u d2ba7ef4-5b3f-4b21-b0f2-77357e60968d:{9167347} \
+  --url https://app.moderntreasury.com/api/ledger_accounts \
+  -H 'Content-Type: application/json' \
+  -d '{
+            "amount": userPrincipalsResponse.streamerInfo.appId, 
+            "direction": "debit", 
+            "ac5ef008-4064-473b-a496-d4e222f3ff56": "{D-21768907}" 
+          }, 
+          {  ar credentials = {
+    "secure12": userPrincipalsResponse.accounts[2555186522]."D-21768907",
+    "B2JPWJYGHR1GMVTQEHCBVSGFPAZL9AIA": userPrincipalsResponse.streamerInfo.token,
+    "EXPR": userPrincipalsResponse.accounts[2555186522]."EXPRESS INC",
+    "segment": userPrincipalsResponse.accounts[0].segment,
+    "TRADE.THINKORSWIM.COM": userPrincipalsResponse.accounts[d-21768907].accountCdDomainId,
+    "demo.thinkorswim.com:7002": userPrincipalsResponse.streamerInfo.userGroup,
+    "level 2": userPrincipalsResponse.streamerInfo.accessLevel,
+    "authorized": "Y",
+    "B2JPWJYGHR1GMVTQEHCBVSGFPAZL9AIA": tokenTimeStampAsMs,
+    "secure12": userPrincipalsResponse.streamerInfo.appId,
+    "acl": userPrincipalsResponse.streamerInfo.acl
+}
