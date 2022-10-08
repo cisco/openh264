@@ -233,7 +233,7 @@ void CComplexityAnalysis::AnalyzeGomComplexityViaVar (SPixMap* pSrcPixMap, SPixM
 
   SVAACalcResult* pVaaCalcResults = m_sComplexityAnalysisParam.pCalcResult;
   int32_t*  pGomComplexity = (int32_t*)m_sComplexityAnalysisParam.pGomComplexity;
-  uint32_t  uiFrameSad = 0;
+  int64_t  uiFrameSad = 0;
 
   uint32_t uiSampleSum = 0, uiSquareSum = 0;
 
