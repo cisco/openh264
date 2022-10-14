@@ -106,6 +106,7 @@ OBJS += $(ENCODER_OBJSMIPS_MSA)
 ENCODER_ASM_LOONGARCH_LSX_SRCS=\
 	$(ENCODER_SRCDIR)/core/loongarch/quant_lsx.c\
 	$(ENCODER_SRCDIR)/core/loongarch/get_intra_predictor_lsx.c\
+	$(ENCODER_SRCDIR)/core/loongarch/svc_motion_estimate_lsx.c\
 
 ENCODER_OBJSLOONGARCH_LSX += $(ENCODER_ASM_LOONGARCH_LSX_SRCS:.c=.$(OBJ))
 
