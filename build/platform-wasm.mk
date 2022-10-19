@@ -14,6 +14,11 @@ CFLAGS += -DNODEFS
 CXXFLAGS += -DNODEFS 
 LDFLAGS += -lnodefs.js
 endif
+ifeq ($(EMFS), noderawfs)
+CFLAGS += -DNODERAWFS
+CXXFLAGS += -DNODERAWFS
+LDFLAGS += -s NODERAWFS=1
+endif
 ifeq ($(EMFS), memfs)
 CFLAGS += -DMEMFS
 CXXFLAGS += -DMEMFS

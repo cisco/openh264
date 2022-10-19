@@ -1,0 +1,34 @@
+name: wasm-test
+
+on: workflow_dispatch
+
+jobs:
+  
+  wasm-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: mymindstorm/setup-emsdk@v11
+        with:
+          version: 3.1.16
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - run: node -v
+      - run: emcc -v
+      - run: sudo apt-get update -qq
+      - run: sudo apt-get install -qq nasm g++-multilib gcc-multilib libc6-dev-i386
+      - run: make gmp-bootstrap
+      - run: make gtest-bootstrap
+      - run: bash ./build/mktargets.sh
+      - run: emmake make all OS=wasm ARCH= EMFS=noderawfs
+      - run: node h264enc.js testbin/welsenc_vd_1d_wasm_nodefs.cfg
+      - run: node h264enc.js testbin/welsenc_vd_rc_wasm_nodefs.cfg
+      - run: node h264enc.js testbin/welsenc_arbitrary_res_wasm_nodefs.cfg
+      - run: node h264dec.js res/test_vd_1d.264 testbin/test_vd_1d.yuv
+      - run: node h264dec.js res/test_vd_rc.264 testbin/test_vd_rc.yuv
+      - run: node h264dec.js res/Static.264 testbin/Static.yuv
+      - run: ( cd test/encoder_binary_comparison ; ./run_PrepareAllTestData.sh 64 wasm )
+      - run: ./run_Test.sh BinaryCompareWasm BA_MW_D.264
+      - run: ./run_Test.sh BinaryCompareWasm Adobe_PDF_sample_a_1024x768_50Frms.264
+      - run: ./run_Test.sh BinaryCompareWasm Zhling_1280x720.264

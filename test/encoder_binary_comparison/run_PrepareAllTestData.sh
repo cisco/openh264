@@ -37,12 +37,24 @@ runBuildCodec()
     cd ${MakeFileDir}
     if [ "${BitType}" -eq 64   ]
     then
-        make clean
-        make -B ENABLE64BIT=Yes h264dec h264enc
+        if [ "${TestWasm}" -eq 1 ]
+        then
+            make clean
+            emmake make binaries -B ENABLE64BIT=Yes OS=wasm ARCH= EMFS=noderawfs
+        else
+            make clean
+            make -B ENABLE64BIT=Yes h264dec h264enc
+        fi
     elif [ "${BitType}" -eq 32   ]
     then
-        make clean
-        make -B ENABLE64BIT=No h264dec h264enc
+        if [ "${TestWasm}" -eq 1 ]
+        then
+            make clean
+            emmake make binaries -B ENABLE64BIT=No OS=wasm ARCH= EMFS=noderawfs
+        else
+            make clean
+            make -B ENABLE64BIT=No h264dec h264enc
+        fi
     else
         echo "usage: runBuildCodec  \64/32  #bits"
         exit 1
@@ -51,14 +63,20 @@ runBuildCodec()
     cd ${CurrentDir}
 
     echo ""
-    if [ ! -e ${MakeFileDir}/h264enc  ]
+    if [ ! -e ${MakeFileDir}/h264enc ]
     then
-        echo "h264 Encoder build failed"
-        return 1
-    elif [ ! -e ${MakeFileDir}/h264dec  ]
+        if [! -e $${MakeFileDir}/h264enc.js ]
+        then
+            echo "h264 Encoder build failed"
+            return 1
+        fi
+    elif [ ! -e ${MakeFileDir}/h264dec ]
     then
-        echo "h264 Decoder build failed"
-        return 1
+        if [! -e $${MakeFileDir}/h264dec.js ]
+        then
+            echo "h264 Decoder build failed"
+            return 1
+        fi
     else
         echo "codec build succeed!"
         return 0
@@ -74,8 +92,18 @@ runCopyFiles()
     local ConfigureFileDir="../../testbin"
 
     #copy codec and configure files
-    cp  -p  ${MakeFileDir}/h264enc    ${CodecFolder}/
-    cp  -p  ${MakeFileDir}/h264dec    ${CodecFolder}/
+    if [ "${TestWasm}" -eq 1 ]
+    then
+        cp  -p  ${MakeFileDir}/h264enc.js    ${CodecFolder}/
+        cp  -p  ${MakeFileDir}/h264dec.js    ${CodecFolder}/
+        cp  -p  ${MakeFileDir}/h264enc.worker.js    ${CodecFolder}/
+        cp  -p  ${MakeFileDir}/h264dec.worker.js    ${CodecFolder}/
+        cp  -p  ${MakeFileDir}/h264enc.wasm    ${CodecFolder}/
+        cp  -p  ${MakeFileDir}/h264dec.wasm    ${CodecFolder}/
+    else
+        cp  -p  ${MakeFileDir}/h264enc    ${CodecFolder}/
+        cp  -p  ${MakeFileDir}/h264dec    ${CodecFolder}/
+    fi
     cp  -p  ${ConfigureFileDir}/layer2.cfg     ${CodecFolder}/layer0.cfg
     cp  -p  ${ConfigureFileDir}/layer2.cfg     ${CodecFolder}/layer1.cfg
     cp  -p  ${ConfigureFileDir}/layer2.cfg     ${CodecFolder}/layer2.cfg
@@ -125,13 +153,18 @@ runPrepareAllFolder()
 runMain()
 {
     #parameter check!
-    if [ ! $# -eq 1  ]
+    if [ ! $# -eq 2 ]
     then
         echo "usage: run_PrepareAllTestFolder.sh   \${BitType}"
         exit 1
     fi
 
     BitType=$1
+    export TestWasm=0
+    if [ "${WasmTest}" = "wasm" ]
+    then 
+        let "TestWasm=1"
+    fi
     AllTestDataFolder="./AllTestData"
     CodecFolder="./Codec"
     ScriptFolder="./Scripts"
@@ -150,7 +183,12 @@ runMain()
     mkdir FinalResult
 
     echo ""
-    echo "building codec.........."
+    if [ "${TestWasm}" -eq 1 ]
+    then 
+        echo "building wasm codec.........."
+    else
+        echo "building codec.........."
+    fi
     runBuildCodec  ${BitType}
     if [ ! $? -eq 0 ]
     then
@@ -170,5 +208,6 @@ runMain()
 }
 
 BitType=$1
-runMain     ${BitType}
+WasmTest=${2:-"normal"}
+runMain     ${BitType} ${WasmTest}
 
