@@ -102,6 +102,7 @@ COMMON_OBJSLOONGARCH_LSX += $(COMMON_ASM_LOONGARCH_LSX_SRCS:.c=.$(OBJ))
 
 COMMON_ASM_LOONGARCH_LASX_SRCS=\
         $(COMMON_SRCDIR)/loongarch/satd_sad_lasx.c\
+        $(COMMON_SRCDIR)/loongarch/intra_pred_com_lasx.c\
 
 COMMON_OBJSLOONGARCH_LASX += $(COMMON_ASM_LOONGARCH_LASX_SRCS:.c=.$(OBJ))
 ifeq ($(ASM_ARCH), loongarch)

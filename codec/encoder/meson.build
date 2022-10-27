@@ -80,6 +80,7 @@ elif cpu_family in ['loongarch32', 'loongarch64']
     'core/loongarch/get_intra_predictor_lsx.c',
     'core/loongarch/dct_lasx.c',
     'core/loongarch/svc_motion_estimate_lsx.c',
+    'core/loongarch/sample_lasx.c',
   ]
   cpp_sources += asm_sources
 else
