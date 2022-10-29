@@ -106,6 +106,7 @@ void CVAACalculation::InitVaaFuncs (SVaaFuncs& sVaaFuncs, int32_t iCpuFlag) {
 
 #ifdef HAVE_LSX
   if ((iCpuFlag & WELS_CPU_LSX) == WELS_CPU_LSX) {
+    sVaaFuncs.pfVAACalcSad       = VAACalcSad_lsx;
     sVaaFuncs.pfVAACalcSadBgd    = VAACalcSadBgd_lsx;
   }
 #endif//HAVE_LSX
