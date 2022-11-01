@@ -65,14 +65,14 @@ runBuildCodec()
     echo ""
     if [ ! -e ${MakeFileDir}/h264enc ]
     then
-        if [! -e $${MakeFileDir}/h264enc.js ]
+        if [ ! -e ${MakeFileDir}/h264enc.js ]
         then
             echo "h264 Encoder build failed"
             return 1
         fi
     elif [ ! -e ${MakeFileDir}/h264dec ]
     then
-        if [! -e $${MakeFileDir}/h264dec.js ]
+        if [ ! -e ${MakeFileDir}/h264dec.js ]
         then
             echo "h264 Decoder build failed"
             return 1

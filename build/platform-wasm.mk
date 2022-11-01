@@ -6,9 +6,9 @@ SHLDFLAGS = -Wl,-soname,$(LIBPREFIX)$(PROJECT_NAME).$(SHAREDLIBSUFFIXMAJORVER)
 CFLAGS += -Wall -fno-strict-aliasing -fPIC -MMD -MP 
 # fix undifined symbol: __stack_chk_guard bug
 # flags needed to build wasm
-CFLAGS += -U_FORTIFY_SOURCE -pthread -DWASMSIMD -msimd128 
-CXXFLAGS += -U_FORTIFY_SOURCE -pthread -DWASMSIMD -msimd128 
-LDFLAGS += -U_FORTIFY_SOURCE -pthread -msimd128
+CFLAGS += -U_FORTIFY_SOURCE -pthread -DWASMSIMD -msimd128 -sINITIAL_MEMORY=104857600 
+CXXFLAGS += -U_FORTIFY_SOURCE -pthread -DWASMSIMD -msimd128 -sINITIAL_MEMORY=104857600
+LDFLAGS += -U_FORTIFY_SOURCE -pthread -msimd128 -sINITIAL_MEMORY=104857600
 ifeq ($(EMFS), nodefs)
 CFLAGS += -DNODEFS
 CXXFLAGS += -DNODEFS 
