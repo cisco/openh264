@@ -514,7 +514,7 @@ void RcCalculatePictureQp (sWelsEncCtx* pEncCtx) {
     if (iLastIdxCodecInVGop < 0)
       iLastIdxCodecInVGop += VGOP_SIZE;
     int32_t iTlLast = pWelsSvcRc->iTlOfFrames[iLastIdxCodecInVGop];
-    int32_t iDeltaQpTemporal = iTl - iTlLast;
+    iDeltaQpTemporal = iTl - iTlLast;
     if (0 == iTlLast && iTl > 0)
       iDeltaQpTemporal += 1;
     else if (0 == iTl && iTlLast > 0)
