@@ -8,7 +8,7 @@
 
 static void ToHashStr (char* dst, const unsigned char* src, size_t src_len) {
   for (size_t i = 0; i < src_len; ++i) {
-    snprintf (&dst[i * 2], 3, "%.2x", src[i]);
+    sprintf (&dst[i * 2], "%.2x", src[i]);
   }
   dst[src_len * 2] = '\0';
 }
