@@ -145,6 +145,7 @@ WELSVP_EXTERN_C_END
 #ifdef HAVE_LSX
 WELSVP_EXTERN_C_BEGIN
 VAACalcSadBgdFunc       VAACalcSadBgd_lsx;
+VAACalcSadFunc          VAACalcSad_lsx;
 WELSVP_EXTERN_C_END
 #endif
 

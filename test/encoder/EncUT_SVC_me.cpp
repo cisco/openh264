@@ -139,6 +139,9 @@ GENERATE_SumOfSingleBlock (SumOf8x8SingleBlock_ref, SumOf8x8SingleBlock_AArch64_
 GENERATE_SumOfSingleBlock (SumOf16x16SingleBlock_ref, SumOf16x16SingleBlock_AArch64_neon, WELS_CPU_NEON)
 #endif
 
+#ifdef HAVE_LSX
+GENERATE_SumOfSingleBlock (SumOf8x8SingleBlock_ref, SumOf8x8SingleBlock_lsx, WELS_CPU_LSX)
+#endif
 
 #define ENFORCE_NEW_ALIGN_1D(_tp, _nm, _nbuff, _sz, _al) \
 _tp *_nbuff = new _tp[(_sz)+(_al)-1]; \
@@ -319,4 +322,10 @@ GENERATE_InitializeHashforFeature (InitializeHashforFeature_ref, InitializeHashf
     WELS_CPU_NEON)
 GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref,
     FillQpelLocationByFeatureValue_AArch64_neon, 640, 320, WELS_CPU_NEON)
+#endif
+
+#ifdef HAVE_LSX
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_lsx, 1, 1, WELS_CPU_LSX)
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_lsx, 1, 320, WELS_CPU_LSX)
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_lsx, 640, 320, WELS_CPU_LSX)
 #endif
