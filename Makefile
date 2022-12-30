@@ -364,11 +364,13 @@ endif
 ifeq (android,$(OS))
 ifeq (./,$(SRC_PATH))
 codec_unittest$(EXEEXT):
-	cd ./test/build/android && $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI) && android update project -t $(TARGET) -p . && ant debug
+	$(NDK_BUILD) -C test/build/android -B
+	./gradlew unittest:assembleDebug
 
 clean_Android: clean_Android_ut
 clean_Android_ut:
-	-cd ./test/build/android && $(NDKROOT)/ndk-build APP_ABI=$(APP_ABI) clean && ant clean
+	-$(NDK_BUILD) -C test/build/android -B clean
+	-./gradlew unittest:clean
 endif
 endif
 
