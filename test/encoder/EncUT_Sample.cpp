@@ -125,6 +125,10 @@ GENERATE_Intra8x8_UT (WelsIntra8x8Combined3Sad_AArch64_neon, WelsSampleSadIntra8
 GENERATE_Intra4x4_UT (WelsIntra4x4Combined3Satd_AArch64_neon, 1, WELS_CPU_NEON)
 #endif
 
+#ifdef HAVE_LASX
+GENERATE_Intra8x8_UT (WelsIntra8x8Combined3Sad_lasx, WelsSampleSadIntra8x8Combined3_c, 1, WELS_CPU_LASX)
+#endif
+
 #define ASSERT_MEMORY_FAIL2X(A, B)     \
   if (NULL == B) {                     \
     pMemAlign->WelsFree(A, "Sad_SrcA");\

@@ -52,6 +52,94 @@ void SetNonZeroCount_ref (int8_t* pNonZeroCount) {
   }
 }
 
+void IdctResAddPred8x8_ref (uint8_t* pPred, const int32_t kiStride, int16_t* pRs) {
+  int16_t p[8], b[8];
+  int16_t a[4];
+
+  int16_t iTmp[64];
+  int16_t iRes[64];
+
+  // Horizontal
+  for (int i = 0; i < 8; i++) {
+    for (int j = 0; j < 8; j++) {
+      p[j] = pRs[j + (i << 3)];
+    }
+    a[0] = p[0] + p[4];
+    a[1] = p[0] - p[4];
+    a[2] = p[6] - (p[2] >> 1);
+    a[3] = p[2] + (p[6] >> 1);
+
+    b[0] =  a[0] + a[3];
+    b[2] =  a[1] - a[2];
+    b[4] =  a[1] + a[2];
+    b[6] =  a[0] - a[3];
+
+    a[0] = -p[3] + p[5] - p[7] - (p[7] >> 1);
+    a[1] =  p[1] + p[7] - p[3] - (p[3] >> 1);
+    a[2] = -p[1] + p[7] + p[5] + (p[5] >> 1);
+    a[3] =  p[3] + p[5] + p[1] + (p[1] >> 1);
+
+    b[1] =  a[0] + (a[3] >> 2);
+    b[3] =  a[1] + (a[2] >> 2);
+    b[5] =  a[2] - (a[1] >> 2);
+    b[7] =  a[3] - (a[0] >> 2);
+
+    iTmp[0 + (i << 3)] = b[0] + b[7];
+    iTmp[1 + (i << 3)] = b[2] - b[5];
+    iTmp[2 + (i << 3)] = b[4] + b[3];
+    iTmp[3 + (i << 3)] = b[6] + b[1];
+    iTmp[4 + (i << 3)] = b[6] - b[1];
+    iTmp[5 + (i << 3)] = b[4] - b[3];
+    iTmp[6 + (i << 3)] = b[2] + b[5];
+    iTmp[7 + (i << 3)] = b[0] - b[7];
+  }
+
+  //Vertical
+  for (int i = 0; i < 8; i++) {
+    for (int j = 0; j < 8; j++) {
+      p[j] = iTmp[i + (j << 3)];
+    }
+
+    a[0] =  p[0] + p[4];
+    a[1] =  p[0] - p[4];
+    a[2] =  p[6] - (p[2] >> 1);
+    a[3] =  p[2] + (p[6] >> 1);
+
+    b[0] = a[0] + a[3];
+    b[2] = a[1] - a[2];
+    b[4] = a[1] + a[2];
+    b[6] = a[0] - a[3];
+
+    a[0] = -p[3] + p[5] - p[7] - (p[7] >> 1);
+    a[1] =  p[1] + p[7] - p[3] - (p[3] >> 1);
+    a[2] = -p[1] + p[7] + p[5] + (p[5] >> 1);
+    a[3] =  p[3] + p[5] + p[1] + (p[1] >> 1);
+
+
+    b[1] =  a[0] + (a[3] >> 2);
+    b[7] =  a[3] - (a[0] >> 2);
+    b[3] =  a[1] + (a[2] >> 2);
+    b[5] =  a[2] - (a[1] >> 2);
+
+    iRes[ (0 << 3) + i] = b[0] + b[7];
+    iRes[ (1 << 3) + i] = b[2] - b[5];
+    iRes[ (2 << 3) + i] = b[4] + b[3];
+    iRes[ (3 << 3) + i] = b[6] + b[1];
+    iRes[ (4 << 3) + i] = b[6] - b[1];
+    iRes[ (5 << 3) + i] = b[4] - b[3];
+    iRes[ (6 << 3) + i] = b[2] + b[5];
+    iRes[ (7 << 3) + i] = b[0] - b[7];
+  }
+
+  uint8_t* pDst = pPred;
+  for (int i = 0; i < 8; i++) {
+    for (int j = 0; j < 8; j++) {
+      pDst[i * kiStride + j] = WelsClip1 (((32 + iRes[ (i << 3) + j]) >> 6) + pDst[i * kiStride + j]);
+    }
+  }
+
+}
+
 #if defined(X86_ASM)
 #if defined(HAVE_AVX2)
 void IdctFourResAddPred_ref (uint8_t* pPred, int32_t iStride, int16_t* pRs) {
@@ -211,4 +299,45 @@ GENERATE_SETNONZEROCOUNT (WelsNonZeroCount_AArch64_neon, WELS_CPU_NEON)
 
 #if defined(HAVE_MSA)
 GENERATE_SETNONZEROCOUNT (WelsNonZeroCount_msa, WELS_CPU_MSA)
+#endif
+
+#define GENERATE_IDCTRESADDPRED8x8(pred, flag) \
+TEST(DecoderDecodeMbAux, pred) {\
+  const int32_t kiStride = 32;\
+  const int iBits = 12;\
+  const int iMask = (1 << iBits) - 1;\
+  const int iOffset = 1 << (iBits - 1);\
+  ENFORCE_STACK_ALIGN_1D (int16_t, iRS, 64, 16);\
+  ENFORCE_STACK_ALIGN_1D (uint8_t, uiPred, 64 * kiStride, 16);\
+  int16_t iRefRS[64];\
+  uint8_t uiRefPred[64*kiStride];\
+  int32_t iRunTimes = 1000;\
+  uint32_t uiCPUFlags = WelsCPUFeatureDetect(NULL); \
+  if ((uiCPUFlags & flag) == 0 && flag != 0) \
+    return; \
+  while(iRunTimes--) {\
+    for(int i = 0; i < 8; i++)\
+      for(int j = 0; j < 8; j++)\
+        iRefRS[i*8+j] = iRS[i*8+j] = (rand() & iMask) - iOffset;\
+    for(int i = 0; i < 8; i++)\
+      for(int j = 0; j < 8; j++)\
+        uiRefPred[i * kiStride + j] = uiPred[i * kiStride + j] = rand() & 255;\
+    pred(uiPred, kiStride, iRS);\
+    IdctResAddPred8x8_ref(uiRefPred, kiStride, iRefRS);\
+    bool ok = true;\
+    for(int i = 0; i < 8; i++)\
+      for(int j = 0; j < 8; j++)\
+        if (uiRefPred[i * kiStride + j] != uiPred[i * kiStride + j]) {\
+          ok = false;\
+          goto next;\
+        }\
+    next:\
+    EXPECT_EQ(ok, true);\
+  }\
+}
+
+GENERATE_IDCTRESADDPRED8x8 (IdctResAddPred8x8_c, 0);
+
+#if defined(HAVE_LSX)
+GENERATE_IDCTRESADDPRED8x8 (IdctResAddPred8x8_lsx, WELS_CPU_LSX)
 #endif

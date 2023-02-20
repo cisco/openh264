@@ -1000,7 +1000,9 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
 
     if (iEncFrames == cmResultSuccess) {
       int iLayer = 0;
+#if defined (STICK_STREAM_SIZE)
       int iFrameSize = 0;
+#endif//STICK_STREAM_SIZE
       while (iLayer < sFbi.iLayerNum) {
         SLayerBSInfo* pLayerBsInfo = &sFbi.sLayerInfo[iLayer];
         if (pLayerBsInfo != NULL) {
@@ -1045,7 +1047,9 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
               fwrite (pLayerBsInfo->pBsBuf, 1, iLayerSize, pFpBs[pLayerBsInfo->uiSpatialId]);
             }
           }
+#if defined (STICK_STREAM_SIZE)
           iFrameSize += iLayerSize;
+#endif//STICK_STREAM_SIZE
         }
         ++ iLayer;
       }

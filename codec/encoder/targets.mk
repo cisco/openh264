@@ -106,11 +106,13 @@ OBJS += $(ENCODER_OBJSMIPS_MSA)
 ENCODER_ASM_LOONGARCH_LSX_SRCS=\
 	$(ENCODER_SRCDIR)/core/loongarch/quant_lsx.c\
 	$(ENCODER_SRCDIR)/core/loongarch/get_intra_predictor_lsx.c\
+	$(ENCODER_SRCDIR)/core/loongarch/svc_motion_estimate_lsx.c\
 
 ENCODER_OBJSLOONGARCH_LSX += $(ENCODER_ASM_LOONGARCH_LSX_SRCS:.c=.$(OBJ))
 
 ENCODER_ASM_LOONGARCH_LASX_SRCS=\
 	$(ENCODER_SRCDIR)/core/loongarch/dct_lasx.c\
+	$(ENCODER_SRCDIR)/core/loongarch/sample_lasx.c\
 
 ENCODER_OBJSLOONGARCH_LASX += $(ENCODER_ASM_LOONGARCH_LASX_SRCS:.c=.$(OBJ))
 ifeq ($(ASM_ARCH), loongarch)
