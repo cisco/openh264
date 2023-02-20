@@ -194,7 +194,9 @@ endif
 
 test: codec_unittest$(EXEEXT)
 ifeq ($(BUILD_UT_EXE), Yes)
+ifneq (wasm,$(OS))
 	./codec_unittest
+endif
 endif
 
 else
