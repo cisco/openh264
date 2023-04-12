@@ -625,6 +625,7 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
     callback_ (nullptr),
     decoder_ (nullptr),
     stats_ ("Decoder"),
+    gmp_api_version_ (kGMPVersion33),
     shutting_down(false) {
       AddRef();
     }
@@ -635,6 +636,7 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
                            GMPVideoDecoderCallback* callback,
                            int32_t coreCount) {
     callback_ = callback;
+    gmp_api_version_ = codecSettings.mGMPApiVersion;
 
     GMPLOG (GL_INFO, "InitDecode");
 
@@ -823,6 +825,9 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
     SBufferInfo decoded;
     bool valid = false;
     memset (&decoded, 0, sizeof (decoded));
+    if (gmp_api_version_ >= kGMPVersion34) {
+      decoded.uiInBsTimeStamp = inputFrame->TimeStamp();
+    }
     unsigned char* data[3] = {nullptr, nullptr, nullptr};
 
     dState = decoder_->DecodeFrameNoDelay (inputFrame->Buffer(),
@@ -911,6 +916,9 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
     GMPLOG (GL_DEBUG, "Allocated size = "
             << frame->AllocatedSize (kGMPYPlane));
     frame->SetTimestamp (inputFrame->TimeStamp());
+    if (gmp_api_version_ >= kGMPVersion34) {
+      frame->SetDecodedTimestamp (decoded->uiOutYuvTimeStamp);
+    }
     frame->SetDuration (inputFrame->Duration());
     if (callback_) {
       callback_->Decoded (frame);
@@ -924,6 +932,7 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
   GMPVideoDecoderCallback* callback_;
   ISVCDecoder* decoder_;
   FrameStats stats_;
+  uint32_t gmp_api_version_;
   bool shutting_down;
 };
 
