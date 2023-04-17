@@ -40,10 +40,7 @@
  *
  **********************************************************************************
  */
-
-#include <stdint.h>
 #include "sad_common.h"
-#include "loongson_intrinsics.h"
 
 void WelsIChromaPredV_lasx (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 void WelsIChromaPredH_lasx (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
