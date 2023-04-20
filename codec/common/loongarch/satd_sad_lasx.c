@@ -111,7 +111,6 @@ int32_t WelsSampleSad8x8x2_lasx (uint8_t* pSample1, int32_t iStride1,
           src1_4, src1_5, src1_6, src1_7;
   __m256i src2_0, src2_1, src2_2, src2_3,
           src2_4, src2_5, src2_6, src2_7;
-
   DUP4_ARG2(__lasx_xvldx,
             pSrc1, iStride0,
             pSrc1, iStride1,
@@ -136,7 +135,6 @@ int32_t WelsSampleSad8x8x2_lasx (uint8_t* pSample1, int32_t iStride1,
             pSrc2, iStride2_tmp6,
             pSrc2, iStride2_tmp7,
             src2_4, src2_5, src2_6, src2_7);
-
   DUP4_ARG3(__lasx_xvpermi_q,
             src1_0, src1_1, 0x20,
             src1_2, src1_3, 0x20,
@@ -149,19 +147,22 @@ int32_t WelsSampleSad8x8x2_lasx (uint8_t* pSample1, int32_t iStride1,
             src2_4, src2_5, 0x20,
             src2_6, src2_7, 0x20,
             src2_0, src2_2, src2_4, src2_6);
-
-  HORISUM(src1_0, src2_0, src1_0);
-  HORISUM(src1_2, src2_2, src1_2);
-  HORISUM(src1_4, src2_4, src1_4);
-  HORISUM(src1_6, src2_6, src1_6);
-
-  src1_0 = __lasx_xvadd_d(src1_0, src1_2);
-  src1_0 = __lasx_xvadd_d(src1_0, src1_4);
-  src1_0 = __lasx_xvadd_d(src1_0, src1_6);
+  src1_0 = __lasx_xvabsd_bu(src1_0, src2_0);
+  src1_2 = __lasx_xvabsd_bu(src1_2, src2_2);
+  src1_4 = __lasx_xvabsd_bu(src1_4, src2_4);
+  src1_6 = __lasx_xvabsd_bu(src1_6, src2_6);
+  src1_0 = __lasx_xvhaddw_hu_bu(src1_0, src1_0);
+  src1_2 = __lasx_xvhaddw_hu_bu(src1_2, src1_2);
+  src1_4 = __lasx_xvhaddw_hu_bu(src1_4, src1_4);
+  src1_6 = __lasx_xvhaddw_hu_bu(src1_6, src1_6);
+  src1_0 = __lasx_xvadd_h(src1_0, src1_2);
+  src1_0 = __lasx_xvadd_h(src1_0, src1_4);
+  src1_0 = __lasx_xvadd_h(src1_0, src1_6);
+  src1_0 = __lasx_xvhaddw_wu_hu(src1_0, src1_0);
+  src1_0 = __lasx_xvhaddw_du_wu(src1_0, src1_0);
   src1_0 = __lasx_xvhaddw_qu_du(src1_0, src1_0);
-
-  return (__lasx_xvpickve2gr_d(src1_0, 0) +
-          __lasx_xvpickve2gr_d(src1_0, 2));
+  return (__lasx_xvpickve2gr_w(src1_0, 0) +
+          __lasx_xvpickve2gr_w(src1_0, 4));
 }
 
 int32_t WelsSampleSad8x8_lasx (uint8_t* pSample1, int32_t iStride1,
