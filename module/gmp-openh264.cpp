@@ -122,6 +122,145 @@ GMPPlatformAPI* g_platform_api = nullptr;
 
 class OpenH264VideoEncoder;
 
+static uint32_t GMPLogLevelToWelsLogLevel(GMPLogLevel aLevel) {
+  switch (aLevel) {
+    default:
+    case kGMPLogInvalid:
+    case kGMPLogDefault:
+      return WELS_LOG_DEFAULT;
+    case kGMPLogQuiet:
+      return WELS_LOG_QUIET;
+    case kGMPLogError:
+      return WELS_LOG_ERROR;
+    case kGMPLogWarning:
+      return WELS_LOG_WARNING;
+    case kGMPLogInfo:
+      return WELS_LOG_INFO;
+    case kGMPLogDebug:
+      return WELS_LOG_DEBUG;
+    case kGMPLogDetail:
+      return WELS_LOG_DETAIL;
+  }
+}
+
+static EUsageType GMPVideoCodecModeToWelsUsageType(GMPVideoCodecMode aMode) {
+  switch (aMode) {
+    default:
+    case kGMPRealtimeVideo:
+      return CAMERA_VIDEO_REAL_TIME;
+    case kGMPScreensharing:
+      return SCREEN_CONTENT_REAL_TIME;
+    case kGMPStreamingVideo:
+      return SCREEN_CONTENT_NON_REAL_TIME;
+    case kGMPNonRealtimeVideo:
+      return CAMERA_VIDEO_NON_REAL_TIME;
+  }
+}
+
+static RC_MODES GMPRateControlModeToWelsRcModes(GMPRateControlMode aMode) {
+  switch (aMode) {
+    default:
+    case kGMPRateControlUnknown:
+    case kGMPRateControlBitrate:
+      return RC_BITRATE_MODE;
+    case kGMPRateControlQuality:
+      return RC_QUALITY_MODE;
+    case kGMPRateControlBufferBased:
+      return RC_BUFFERBASED_MODE;
+    case kGMPRateControlTimestamp:
+      return RC_TIMESTAMP_MODE;
+    case kGMPRateControlBitratePostskip:
+      return RC_BITRATE_MODE_POST_SKIP;
+    case kGMPRateControlOff:
+      return RC_OFF_MODE;
+  }
+}
+
+EProfileIdc GMPProfileToWelsProfile(GMPProfile aProfile) {
+  switch (aProfile) {
+    default:
+    case kGMPH264ProfileUnknown:
+      return PRO_UNKNOWN;
+    case kGMPH264ProfileBaseline:
+      return PRO_BASELINE;
+    case kGMPH264ProfileMain:
+      return PRO_MAIN;
+    case kGMPH264ProfileExtended:
+      return PRO_EXTENDED;
+    case kGMPH264ProfileHigh:
+      return PRO_HIGH;
+    case kGMPH264ProfileHigh10:
+      return PRO_HIGH10;
+    case kGMPH264ProfileHigh422:
+      return PRO_HIGH422;
+    case kGMPH264ProfileHigh444:
+      return PRO_HIGH444;
+    case kGMPH264ProfileCavlc444:
+      return PRO_CAVLC444;
+    case kGMPH264ProfileScalableBaseline:
+      return PRO_SCALABLE_BASELINE;
+    case kGMPH264ProfileScalableHigh:
+      return PRO_SCALABLE_HIGH;
+  }
+}
+
+ELevelIdc GMPLevelToWelsLevel(GMPLevel aLevel) {
+  switch (aLevel) {
+    default:
+    case kGMPH264LevelUnknown:
+      return LEVEL_UNKNOWN;
+    case kGMPH264Level1_0:
+      return LEVEL_1_0;
+    case kGMPH264Level1_B:
+      return LEVEL_1_B;
+    case kGMPH264Level1_1:
+      return LEVEL_1_1;
+    case kGMPH264Level1_2:
+      return LEVEL_1_2;
+    case kGMPH264Level1_3:
+      return LEVEL_1_3;
+    case kGMPH264Level2_0:
+      return LEVEL_2_0;
+    case kGMPH264Level2_1:
+      return LEVEL_2_1;
+    case kGMPH264Level2_2:
+      return LEVEL_2_2;
+    case kGMPH264Level3_0:
+      return LEVEL_3_0;
+    case kGMPH264Level3_1:
+      return LEVEL_3_1;
+    case kGMPH264Level3_2:
+      return LEVEL_3_2;
+    case kGMPH264Level4_0:
+      return LEVEL_4_0;
+    case kGMPH264Level4_1:
+      return LEVEL_4_1;
+    case kGMPH264Level4_2:
+      return LEVEL_4_2;
+    case kGMPH264Level5_0:
+      return LEVEL_5_0;
+    case kGMPH264Level5_1:
+      return LEVEL_5_1;
+    case kGMPH264Level5_2:
+      return LEVEL_5_2;
+  }
+}
+
+SliceModeEnum GMPSliceToWelsSliceMode(GMPSliceMode aMode) {
+  switch (aMode) {
+    default:
+    case kGMPSliceUnknown:
+    case kGMPSliceSingle:
+      return SM_SINGLE_SLICE;
+    case kGMPSliceSizeLimited:
+      return SM_SIZELIMITED_SLICE;
+    case kGMPSliceFixedSlcNum:
+      return SM_FIXEDSLCNUM_SLICE;
+    case kGMPSliceRaster:
+      return SM_RASTER_SLICE;
+  }
+}
+
 template <typename T> class SelfDestruct {
  public:
   SelfDestruct (T* t) : t_ (t) {}
@@ -190,6 +329,7 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
     max_payload_size_ (0),
     callback_ (nullptr),
     stats_ ("Encoder"),
+    gmp_api_version_ (kGMPVersion33),
     shutting_down(false) {
       AddRef();
     }
@@ -200,6 +340,7 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
                            GMPVideoEncoderCallback* callback,
                            int32_t numberOfCores,
                            uint32_t maxPayloadSize) {
+    gmp_api_version_ = codecSettings.mGMPApiVersion;
     callback_ = callback;
 
     GMPErr err = g_platform_api->createthread (&worker_thread_);
@@ -214,6 +355,15 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
       Error (GMPGenericErr);
       return;
     }
+
+    if (gmp_api_version_ >= kGMPVersion34) {
+      uint32_t logLevel = GMPLogLevelToWelsLogLevel(codecSettings.mLogLevel);
+      long rv = encoder_->SetOption(ENCODER_OPTION_TRACE_LEVEL, &logLevel);
+      if (rv != cmResultSuccess) {
+        GMPLOG (GL_ERROR, "Encoder SetOption OPTION_TRACE_LEVEL failed " << rv);
+      }
+    }
+
     SEncParamExt param;
     memset (&param, 0, sizeof (param));
     encoder_->GetDefaultParams (&param);
@@ -226,12 +376,20 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
             << static_cast<int> (codecSettings.mMaxFramerate));
 
     // Translate parameters.
-    param.iUsageType = CAMERA_VIDEO_REAL_TIME;
-    if(codecSettings.mMode == kGMPScreensharing)
+    if (gmp_api_version_ >= kGMPVersion35) {
+      param.iUsageType = GMPVideoCodecModeToWelsUsageType(codecSettings.mMode);
+    } else if (codecSettings.mMode == kGMPScreensharing) {
       param.iUsageType = SCREEN_CONTENT_REAL_TIME;
+    } else {
+      param.iUsageType = CAMERA_VIDEO_REAL_TIME;
+    }
     param.iPicWidth = codecSettings.mWidth;
     param.iPicHeight = codecSettings.mHeight;
-    param.iRCMode = RC_BITRATE_MODE;
+    if (gmp_api_version_ >= kGMPVersion35) {
+      param.iRCMode = GMPRateControlModeToWelsRcModes(codecSettings.mRateControlMode);
+    } else {
+      param.iRCMode = RC_BITRATE_MODE;
+    }
     param.iTargetBitrate = codecSettings.mStartBitrate * 1000;
     param.iMaxBitrate = codecSettings.mMaxBitrate * 1000;
     GMPLOG (GL_INFO, "Initializing Bit Rate at: Start: "
@@ -276,9 +434,22 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
     layer->iSpatialBitrate = param.iTargetBitrate;
     layer->iMaxSpatialBitrate = param.iMaxBitrate;
 
+    if (gmp_api_version_ >= kGMPVersion35) {
+      layer->uiProfileIdc = GMPProfileToWelsProfile(codecSettings.mProfile);
+      layer->uiLevelIdc = GMPLevelToWelsLevel(codecSettings.mLevel);
+      layer->sSliceArgument.uiSliceMode = GMPSliceToWelsSliceMode(codecSettings.mSliceMode);
+      if (codecSettings.mUseThreadedEncode) {
+        param.iMultipleThreadIdc = numberOfCores;
+      } else {
+        param.iMultipleThreadIdc = 1; // disabled
+      }
+    }
+
     //for controlling the NAL size (normally for packetization-mode=0)
     if (maxPayloadSize != 0) {
-      layer->sSliceArgument.uiSliceMode = SM_SIZELIMITED_SLICE;
+      if (gmp_api_version_ < kGMPVersion35) {
+        layer->sSliceArgument.uiSliceMode = SM_SIZELIMITED_SLICE;
+      }
       layer->sSliceArgument.uiSliceSizeConstraint = maxPayloadSize;
     }
     rv = encoder_->InitializeExt (&param);
@@ -604,6 +775,7 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
   uint32_t max_payload_size_;
   GMPVideoEncoderCallback* callback_;
   FrameStats stats_;
+  uint32_t gmp_api_version_;
   bool shutting_down;
 };
 
@@ -625,6 +797,7 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
     callback_ (nullptr),
     decoder_ (nullptr),
     stats_ ("Decoder"),
+    gmp_api_version_ (kGMPVersion33),
     shutting_down(false) {
       AddRef();
     }
@@ -634,6 +807,7 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
                            uint32_t aCodecSpecificSize,
                            GMPVideoDecoderCallback* callback,
                            int32_t coreCount) {
+    gmp_api_version_ = codecSettings.mGMPApiVersion;
     callback_ = callback;
 
     GMPLOG (GL_INFO, "InitDecode");
@@ -655,6 +829,21 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
       GMPLOG (GL_ERROR, "Couldn't create decoder");
       Error (GMPGenericErr);
       return;
+    }
+
+    if (gmp_api_version_ >= kGMPVersion34) {
+      if (codecSettings.mUseThreadedDecode) {
+        long rv = decoder_->SetOption(DECODER_OPTION_NUM_OF_THREADS, &coreCount);
+        if (rv != cmResultSuccess) {
+          GMPLOG (GL_ERROR, "Decoder SetOption NUM_OF_THREADS failed " << rv);
+        }
+      }
+
+      uint32_t logLevel = GMPLogLevelToWelsLogLevel(codecSettings.mLogLevel);
+      long rv = decoder_->SetOption(DECODER_OPTION_TRACE_LEVEL, &logLevel);
+      if (rv != cmResultSuccess) {
+        GMPLOG (GL_ERROR, "Decoder SetOption OPTION_TRACE_LEVEL failed " << rv);
+      }
     }
 
     SDecodingParam param;
@@ -759,7 +948,10 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
   }
 
   virtual void Reset() {
-    if (callback_) {
+    if (gmp_api_version_ >= kGMPVersion34) {
+      worker_thread_->Post (WrapTaskRefCounted (
+                              this, &OpenH264VideoDecoder::Reset_w));
+    } else if (callback_) {
       callback_->ResetComplete ();
     }
   }
@@ -823,6 +1015,9 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
     SBufferInfo decoded;
     bool valid = false;
     memset (&decoded, 0, sizeof (decoded));
+    if (gmp_api_version_ >= kGMPVersion34) {
+      decoded.uiInBsTimeStamp = inputFrame->TimeStamp();
+    }
     unsigned char* data[3] = {nullptr, nullptr, nullptr};
 
     dState = decoder_->DecodeFrameNoDelay (inputFrame->Buffer(),
@@ -911,6 +1106,9 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
     GMPLOG (GL_DEBUG, "Allocated size = "
             << frame->AllocatedSize (kGMPYPlane));
     frame->SetTimestamp (inputFrame->TimeStamp());
+    if (gmp_api_version_ >= kGMPVersion34) {
+      frame->SetUpdatedTimestamp (decoded->uiOutYuvTimeStamp);
+    }
     frame->SetDuration (inputFrame->Duration());
     if (callback_) {
       callback_->Decoded (frame);
@@ -919,11 +1117,43 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
     stats_.FrameOut();
   }
 
+  void Reset_w () {
+    int eos = 1;
+    long rv = decoder_->SetOption(DECODER_OPTION_END_OF_STREAM, &eos);
+    if (rv != cmResultSuccess) {
+      GMPLOG (GL_ERROR, "Decoder SetOption END_OF_STREAM failed " << rv);
+    }
+
+    DECODING_STATE dState;
+    SBufferInfo decoded;
+    unsigned char* data[3];
+    do {
+      memset (&decoded, 0, sizeof (decoded));
+      memset (data, 0, sizeof (data));
+      dState = decoder_->FlushFrame(data, &decoded);
+      if (dState) {
+        GMPLOG (GL_ERROR, "Flush error dState=" << dState);
+        break;
+      }
+    } while (decoded.iBufferStatus == 1);
+
+    TrySyncRunOnMainThread (WrapTask (
+                                 this,
+                                 &OpenH264VideoDecoder::Reset_m));
+  }
+
+  void Reset_m () {
+    if (callback_) {
+      callback_->ResetComplete ();
+    }
+  }
+
   GMPVideoHost* host_;
   GMPThread* worker_thread_;
   GMPVideoDecoderCallback* callback_;
   ISVCDecoder* decoder_;
   FrameStats stats_;
+  uint32_t gmp_api_version_;
   bool shutting_down;
 };
 
