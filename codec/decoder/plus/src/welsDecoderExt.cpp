@@ -69,6 +69,7 @@ extern "C" {
 #include <stdarg.h>
 #include <sys/types.h>
 #include <malloc.h>
+#include <iostream>
 #else
 #include <sys/time.h>
 #endif
@@ -920,7 +921,151 @@ DECODING_STATE CWelsDecoder::DecodeFrame2 (const unsigned char* kpSrc,
     unsigned char** ppDst,
     SBufferInfo* pDstInfo) {
   PWelsDecoderContext pDecContext = m_pDecThrCtx[0].pCtx;
-  return DecodeFrame2WithCtx (pDecContext, kpSrc, kiSrcLen, ppDst, pDstInfo);
+  auto state =  DecodeFrame2WithCtx (pDecContext, kpSrc, kiSrcLen, ppDst, pDstInfo);
+  pDecContext->mMotionVectorData -= pDecContext->mMotionVectorSize;
+  pDecContext->mMotionVectorSize = 0;
+  return state;
+}
+
+DECODING_STATE CWelsDecoder::ParseBitstreamGetMotionVectors (const unsigned char* kpSrc,
+    const int kiSrcLen,
+    unsigned char** ppDst,
+    SParserBsInfo* pDstInfo,
+    SBufferInfo* ppDecodeInfo,
+    int32_t* motionVectorSize,
+    int16_t** motionVectorData) {
+
+  PWelsDecoderContext pDecContext = m_pDecThrCtx[0].pCtx;
+
+  if (pDecContext == NULL || pDecContext->pParam == NULL) {
+    if (m_pWelsTrace != NULL) {
+      WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "Call DecodeParser without Initialize.\n");
+    }
+    return dsInitialOptExpected;
+  }
+
+  if (!pDecContext->pParam->bParseOnly) {
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "bParseOnly should be true for this API calling! \n");
+    pDecContext->iErrorCode |= dsInvalidArgument;
+    return dsInvalidArgument;
+  }
+  int64_t iEnd, iStart = WelsTime();
+  if (CheckBsBuffer (pDecContext, kiSrcLen)) {
+    if (ResetDecoder (pDecContext))
+      return dsOutOfMemory;
+
+    return dsErrorFree;
+  }
+  if (kiSrcLen > 0 && kpSrc != NULL) {
+#ifdef OUTPUT_BITSTREAM
+    if (m_pFBS) {
+      WelsFwrite (kpSrc, sizeof (unsigned char), kiSrcLen, m_pFBS);
+      WelsFflush (m_pFBS);
+    }
+#endif//OUTPUT_BIT_STREAM
+    pDecContext->bEndOfStreamFlag = false;
+  } else {
+    //For application MODE, the error detection should be added for safe.
+    //But for CONSOLE MODE, when decoding LAST AU, kiSrcLen==0 && kpSrc==NULL.
+    pDecContext->bEndOfStreamFlag = true;
+    pDecContext->bInstantDecFlag = true;
+  }
+
+  pDecContext->iErrorCode = dsErrorFree; //initialize at the starting of AU decoding.
+  pDecContext->pParam->eEcActiveIdc = ERROR_CON_DISABLE; //add protection to disable EC here.
+  pDecContext->iFeedbackNalRefIdc = -1; //initialize
+  if (!pDecContext->bFramePending) { //frame complete
+    pDecContext->pParserBsInfo->iNalNum = 0;
+    memset (pDecContext->pParserBsInfo->pNalLenInByte, 0, MAX_NAL_UNITS_IN_LAYER);
+  }
+  pDstInfo->iNalNum = 0;
+  pDstInfo->iSpsWidthInPixel = pDstInfo->iSpsHeightInPixel = 0;
+  if (pDstInfo) {
+    pDecContext->uiTimeStamp = pDstInfo->uiInBsTimeStamp;
+    pDstInfo->uiOutBsTimeStamp = 0;
+  } else {
+    pDecContext->uiTimeStamp = 0;
+  }
+  WelsDecodeBs (pDecContext, kpSrc, kiSrcLen, ppDst, ppDecodeInfo, pDstInfo);
+
+  if(pDecContext->mMotionVectorSize)
+  {
+    *motionVectorSize = pDecContext->mMotionVectorSize;
+    pDecContext->mMotionVectorData -= pDecContext->mMotionVectorSize;
+    memcpy(*motionVectorData, pDecContext->mMotionVectorData, pDecContext->mMotionVectorSize * sizeof(int16_t));
+    pDecContext->mMotionVectorSize = 0;
+  }
+
+  if (pDecContext->iErrorCode & dsOutOfMemory) {
+    if (ResetDecoder (pDecContext))
+      return dsOutOfMemory;
+    return dsErrorFree;
+  }
+
+  if (!pDecContext->bFramePending && pDecContext->pParserBsInfo->iNalNum) {
+    memcpy (pDstInfo, pDecContext->pParserBsInfo, sizeof (SParserBsInfo));
+
+    if (pDecContext->iErrorCode == ERR_NONE) { //update statistics: decoding frame count
+      pDecContext->pDecoderStatistics->uiDecodedFrameCount++;
+      if (pDecContext->pDecoderStatistics->uiDecodedFrameCount == 0) { //exceed max value of uint32_t
+        ResetDecStatNums (pDecContext->pDecoderStatistics);
+        pDecContext->pDecoderStatistics->uiDecodedFrameCount++;
+      }
+    }
+  }
+
+  pDecContext->bInstantDecFlag = false; //reset no-delay flag
+
+  if (pDecContext->iErrorCode && pDecContext->bPrintFrameErrorTraceFlag) {
+    WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, "decode failed, failure type:%d \n", pDecContext->iErrorCode);
+    pDecContext->bPrintFrameErrorTraceFlag = false;
+  }
+  iEnd = WelsTime();
+  pDecContext->dDecTime += (iEnd - iStart) / 1e3;
+  return (DECODING_STATE)pDecContext->iErrorCode;
+}
+
+DECODING_STATE CWelsDecoder::DecodeFrameGetMotionVectorsNoDelay (const unsigned char* kpSrc,
+    const int kiSrcLen,
+    unsigned char** ppDst,
+    SBufferInfo* pDstInfo,
+    int32_t* motionVectorSize,
+    int16_t** motionVectorData) {
+  int iRet = dsErrorFree;
+   if (m_iThreadCount >= 1) {
+    iRet = ThreadDecodeFrameInternal (kpSrc, kiSrcLen, ppDst, pDstInfo);
+    if (m_sReoderingStatus.iNumOfPicts) {
+      WAIT_EVENT (&m_sBufferingEvent, WELS_DEC_THREAD_WAIT_INFINITE);
+      RESET_EVENT (&m_sReleaseBufferEvent);
+      if (!m_sReoderingStatus.bHasBSlice) {
+        if (m_sReoderingStatus.iNumOfPicts > 1) {
+          ReleaseBufferedReadyPictureNoReorder (NULL, ppDst, pDstInfo);
+        }
+      }
+      else {
+        ReleaseBufferedReadyPictureReorder (NULL, ppDst, pDstInfo);
+      }
+      SET_EVENT(&m_sReleaseBufferEvent);
+    }
+    return (DECODING_STATE)iRet;
+  }
+  PWelsDecoderContext pDecContext = m_pDecThrCtx[0].pCtx;
+  //pDecContext->pDstInfo = pDstInfo;
+  iRet = DecodeFrame2WithCtx (pDecContext, kpSrc, kiSrcLen, ppDst, pDstInfo);
+
+  pDecContext = m_pDecThrCtx[0].pCtx;
+  //pDecContext->pDstInfo = pDstInfo;
+  iRet |= DecodeFrame2WithCtx (pDecContext, NULL, 0, ppDst, pDstInfo);
+
+  if(pDecContext->mMotionVectorSize)
+  {
+    *motionVectorSize = pDecContext->mMotionVectorSize;
+    pDecContext->mMotionVectorData -= pDecContext->mMotionVectorSize;
+    memcpy(*motionVectorData, pDecContext->mMotionVectorData, pDecContext->mMotionVectorSize * sizeof(int16_t));
+    pDecContext->mMotionVectorSize = 0;
+  }
+
+  return (DECODING_STATE)iRet;
 }
 
 DECODING_STATE CWelsDecoder::FlushFrame (unsigned char** ppDst,
