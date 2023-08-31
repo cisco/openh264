@@ -78,13 +78,17 @@ if ['linux', 'android', 'ios', 'darwin'].contains(system)
     asm_inc = join_paths(meson.current_source_dir(), 'codec', 'common', 'x86', '')
   elif cpu_family == 'arm'
     asm_format = asm_format32
-    add_project_arguments('-DHAVE_NEON', language: 'c')
-    add_project_arguments('-DHAVE_NEON', language: 'c')
+    if get_option('neon').enabled()
+      add_project_arguments('-DHAVE_NEON', language: 'c')
+      add_project_arguments('-DHAVE_NEON', language: 'cpp')
+    endif
     casm_inc = include_directories(join_paths('codec', 'common', 'arm'))
   elif cpu_family == 'aarch64'
     asm_format = asm_format64
-    add_project_arguments('-DHAVE_NEON_ARM64', language: 'c')
-    add_project_arguments('-DHAVE_NEON_ARM64', language: 'cpp')
+    if get_option('neon').enabled()
+      add_project_arguments('-DHAVE_NEON_ARM64', language: 'c')
+      add_project_arguments('-DHAVE_NEON_ARM64', language: 'cpp')
+    endif
     casm_inc = include_directories(join_paths('codec', 'common', 'arm64'))
   elif cpu_family == 'loongarch32'
     asm_format = asm_format32
