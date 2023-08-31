@@ -17,7 +17,10 @@ endif
 endif
 ifeq ($(ASM_ARCH), arm)
 CCAS = gas-preprocessor.pl -as-type clang -force-thumb -- $(CC)
-CCASFLAGS = -DHAVE_NEON -mimplicit-it=always
+CCASFLAGS = -mimplicit-it=always
+ifeq ($(USE_NEON), Yes)
+CCASFLAGS += -DHAVE_NEON
+endif
 endif
 EXEEXT = .exe
 

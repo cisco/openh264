@@ -10,7 +10,10 @@ else
 endif
 ifeq ($(ASM_ARCH), arm)
 CCAS = gas-preprocessor.pl -as-type armasm -force-thumb -- armasm
-CCASFLAGS = -nologo -DHAVE_NEON -ignore 4509
+CCASFLAGS = -nologo -ignore 4509
+ifeq ($(USE_NEON), Yes)
+CCASFLAGS += -DHAVE_NEON
+endif
 endif
 
 CC=cl
@@ -20,7 +23,10 @@ CXX_O=-Fo$@
 
 ifeq ($(ASM_ARCH), arm64)
 CCAS = clang-cl
-CCASFLAGS = -nologo -DHAVE_NEON_AARCH64 --target=arm64-windows
+CCASFLAGS = -nologo --target=arm64-windows
+ifeq ($(USE_NEON), Yes)
+CCASFLAGS += -DHAVE_NEON_AARCH64
+endif
 endif
 
 
