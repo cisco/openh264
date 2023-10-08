@@ -80,7 +80,11 @@ endif
 # Make sure the all target is the first one
 all: libraries binaries
 
-include $(SRC_PATH)build/platform-$(OS).mk
+ifeq ($(findstring android-ndk-r18, $(NDKROOT)), android-ndk-r18)
+    include $(SRC_PATH)build/platform-android-r18b.mk
+else
+    include $(SRC_PATH)build/platform-$(OS).mk
+endif
 
 MODULE := $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIX)
 
