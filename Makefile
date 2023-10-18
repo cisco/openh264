@@ -81,9 +81,9 @@ endif
 all: libraries binaries
 
 ifeq ($(findstring android-ndk-r18, $(NDKROOT)), android-ndk-r18)
-    include $(SRC_PATH)build/platform-android-r18b.mk
+    include $(SRC_PATH)build/platform-$(OS)-ant.mk
 else
-    include $(SRC_PATH)build/platform-$(OS).mk
+    include $(SRC_PATH)build/platform-$(OS)-gradlew.mk
 endif
 
 MODULE := $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIX)
@@ -368,13 +368,22 @@ endif
 ifeq (android,$(OS))
 ifeq (./,$(SRC_PATH))
 codec_unittest$(EXEEXT):
+ifeq ($(findstring android-ndk-r18, $(NDKROOT)), android-ndk-r18)
+	cd ./test/build/android && $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI) && android update project -t $(TARGET) -p . && ant debug
+else
 	$(NDK_BUILD) -C test/build/android -B
 	./gradlew unittest:assembleDebug
+endif
 
 clean_Android: clean_Android_ut
 clean_Android_ut:
+ifeq ($(findstring android-ndk-r18, $(NDKROOT)), android-ndk-r18)
+	-cd ./test/build/android && $(NDKROOT)/ndk-build APP_ABI=$(APP_ABI) clean && ant clean
+else
 	-$(NDK_BUILD) -C test/build/android -B clean
 	-./gradlew unittest:clean
+endif
+
 endif
 endif
 
