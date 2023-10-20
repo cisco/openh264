@@ -85,13 +85,13 @@ all: libraries binaries
 ifeq (android, $(OS))
 USE_LOW_VERSION_NDK = $(shell $(SRC_PATH)build/ndk-version-check.sh $(NDKROOT))
 ifeq (Yes, $(USE_LOW_VERSION_NDK))
-	USE_ANT = Yes
-	include $(SRC_PATH)build/platform-android-r18b.mk
+USE_ANT = Yes
+include $(SRC_PATH)build/platform-android-r18b.mk
 else
-	include $(SRC_PATH)build/platform-android.mk
+include $(SRC_PATH)build/platform-android.mk
 endif
 else
-	include $(SRC_PATH)build/platform-$(OS).mk
+include $(SRC_PATH)build/platform-$(OS).mk
 endif
 
 MODULE := $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIX)
