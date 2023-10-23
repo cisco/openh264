@@ -1,1 +1,2 @@
 option('tests', type : 'feature', value : 'auto', yield : true)
+option('neon', type : 'feature', value : 'enabled')

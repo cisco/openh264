@@ -17,7 +17,9 @@ ifneq ($(filter-out arm64 arm64e, $(filter arm%, $(ARCH))),)
 ifeq ($(USE_ASM), Yes)
 ASM_ARCH = arm
 ASMFLAGS += -I$(SRC_PATH)codec/common/arm/
+ifeq ($(USE_NEON), Yes)
 CFLAGS += -DHAVE_NEON
+endif
 endif
 endif
 
@@ -26,7 +28,9 @@ ifneq ($(filter arm64 aarch64 arm64e, $(ARCH)),)
 ifeq ($(USE_ASM), Yes)
 ASM_ARCH = arm64
 ASMFLAGS += -I$(SRC_PATH)codec/common/arm64/
+ifeq ($(USE_NEON), Yes)
 CFLAGS += -DHAVE_NEON_AARCH64
+endif
 endif
 endif
 
