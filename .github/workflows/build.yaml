@@ -49,7 +49,6 @@ jobs:
 
   windows:
     runs-on: windows-2019
-
     steps:
       - uses: actions/checkout@v3
       - run: choco install nasm
@@ -58,13 +57,11 @@ jobs:
       - run: nasm -v
       - run: make OS=msvc gmp-bootstrap
       - run: make OS=msvc gtest-bootstrap
-      # disable Werror on gcc 12 until #3533 is fixed.
-      #- run: CFLAGS=-Werror make -j$(nproc) all plugin test
-      - run: make -j$(nproc) all plugin test
-      #- run: meson builddir --werror
-      - run: meson builddir
-      - run: ninja -C builddir -v
-      - run: meson test -C builddir -v
+      - working-directory: ./build
+        env:
+          CFLAGS: -WX
+        run: ./AutoBuildForWindows.bat
+      - run: ./bin/Win32/Release/codec_unittest.exe
       # Upload artifacts
       - uses: actions/upload-artifact@v3
         with:
