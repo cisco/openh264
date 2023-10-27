@@ -1,5 +1,5 @@
 project('openh264', ['c', 'cpp'],
-  version : '2.3.0',
+  version : '2.4.0',
   meson_version : '>= 0.52',
   default_options : [ 'warning_level=1',
                       'buildtype=debugoptimized' ])
