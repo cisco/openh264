@@ -65,8 +65,8 @@ jobs:
       # Upload artifacts
       - uses: actions/upload-artifact@v3
         with:
-          name: windows-artifacts
-          path: bin/Win32/Release
+          name: build-artifacts
+          path: bin
 
   mingw:
     runs-on: windows-2019
@@ -98,7 +98,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: mingw-artifacts
-          path: bin
+          path: builddir
 
   macos:
     runs-on: macos-latest
@@ -118,7 +118,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: macos-artifacts
-          path: bin
+          path: builddir
 
   linux-cross-arm:
     runs-on: ubuntu-latest
