@@ -43,7 +43,7 @@ jobs:
           path: codec_unittest
 
   windows:
-    runs-on: windows-2022
+    runs-on: windows-2019
     steps:
       - uses: actions/checkout@v3
       - run: choco install nasm
