@@ -24,11 +24,6 @@ jobs:
       - run: ./run_Test.sh BinaryCompare BA_MW_D.264
       - run: ./run_Test.sh BinaryCompare Adobe_PDF_sample_a_1024x768_50Frms.264
       - run: ./run_Test.sh BinaryCompare Zhling_1280x720.264
-      # Upload artifacts
-      - uses: actions/upload-artifact@v3
-        with:
-          name: build-artifacts
-          path: bin
 
   asan:
     runs-on: ubuntu-latest
@@ -48,7 +43,7 @@ jobs:
           path: codec_unittest
 
   windows:
-    runs-on: windows-2019
+    runs-on: windows-2022
     steps:
       - uses: actions/checkout@v3
       - run: choco install nasm
