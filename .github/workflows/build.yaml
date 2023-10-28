@@ -65,7 +65,7 @@ jobs:
       # Upload artifacts
       - uses: actions/upload-artifact@v3
         with:
-          name: build-artifacts
+          name: windows-artifacts
           path: bin
 
   mingw:
