@@ -1,6 +1,17 @@
 
 Releases
 -----------
+v2.4.0
+------
+- Add LoongArch SIMD
+- Support Android NDK r20 (also r21)
+- Support using gradle to build Android demo and unittest
+- Bug fixes
+
+v2.3.1
+------
+- update SHAREDLIB_MAJORVERSION value in Makefile
+
 v2.3.0
 ------
 - Decoder bug fix to correct the B-frame order in some case
