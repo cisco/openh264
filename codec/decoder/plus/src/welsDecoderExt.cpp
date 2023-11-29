@@ -1136,7 +1136,7 @@ void CWelsDecoder::ReleaseBufferedReadyPictureReorder (PWelsDecoderContext pCtx,
       m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPOC = IMinInt32;
       int32_t iPicBuffIdx = m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPicBuffIdx;
       if (pPicBuff != NULL) {
-        if (iPicBuffIdx > 0 && iPicBuffIdx < pPicBuff->iCapacity)
+        if (iPicBuffIdx >= 0 && iPicBuffIdx < pPicBuff->iCapacity)
         {
             PPicture pPic = pPicBuff->ppPic[iPicBuffIdx];
             --pPic->iRefCount;
