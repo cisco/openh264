@@ -1206,6 +1206,7 @@ DECODING_STATE CWelsDecoder::ReorderPicturesInDisplay(PWelsDecoderContext pDecCo
       if (pDstInfo->iBufferStatus == 1) {
         if (m_sReoderingStatus.iLastGOPRemainPicts == 0 && pDecContext->pSliceHeader->eSliceType == B_SLICE && 
             pDecContext->pSliceHeader->iPicOrderCntLsb <= m_sReoderingStatus.iLastWrittenPOC + 2) {
+          m_sReoderingStatus.iLastWrittenPOC = pDecContext->pSliceHeader->iPicOrderCntLsb;
           //issue #3478, use b-slice type to determine correct picture order as the first priority as POC order is not as reliable as based on b-slice 
           ppDst[0] = pDstInfo->pDst[0];
           ppDst[1] = pDstInfo->pDst[1];
