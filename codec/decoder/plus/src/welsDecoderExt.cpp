@@ -1084,6 +1084,8 @@ void CWelsDecoder::ReleaseBufferedReadyPictureReorder (PWelsDecoderContext pCtx,
     if (pPicBuff != NULL) {
       PPicture pPic = pPicBuff->ppPic[m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPicBuffIdx];
       --pPic->iRefCount;
+      if (m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].bLastGOP)
+        pPic->bUsedAsRef = false;
     }
     m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].bLastGOP = false;
     m_sReoderingStatus.iMinPOC = IMinInt32;
@@ -1187,6 +1189,8 @@ void CWelsDecoder::ReleaseBufferedReadyPictureNoReorder(PWelsDecoderContext pCtx
       PPicBuff pPicBuff = pCtx ? pCtx->pPicBuff : m_pPicBuff;
       PPicture pPic = pPicBuff->ppPic[m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPicBuffIdx];
       --pPic->iRefCount;
+      if (m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].bLastGOP)
+        pPic->bUsedAsRef = false;
     }
     if (m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].bLastGOP) {
       --m_sReoderingStatus.iLastGOPRemainPicts;

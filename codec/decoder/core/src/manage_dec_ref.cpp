@@ -66,8 +66,10 @@ int32_t GetLTRFrameIndex (PRefPic pRefPic, int32_t iAncLTRFrameNum);
 #endif
 static int32_t RemainOneBufferInDpbForEC (PWelsDecoderContext pCtx, PRefPic pRefPic);
 
-static void SetUnRef (PPicture pRef) {
-  if (NULL != pRef) {
+static void SetUnRef (PPicture pRef, bool bNewSeqBegin) {
+  if (pRef == NULL) return;
+
+  if (pRef->iRefCount <= 0 && (!pRef->bUsedAsRef || bNewSeqBegin)) {
     pRef->bUsedAsRef = false;
     pRef->bIsLongRef = false;
     pRef->iFrameNum = -1;
@@ -81,17 +83,18 @@ static void SetUnRef (PPicture pRef) {
     pRef->iSpsId = -1;
     pRef->bIsComplete = false;
     pRef->iRefCount = 0;
+  }
 
-    if (pRef->eSliceType == I_SLICE) {
-      return;
-    }
-    int32_t lists = pRef->eSliceType == P_SLICE ? 1 : 2;
-    for (int32_t i = 0; i < MAX_DPB_COUNT; ++i) {
-      for (int32_t list = 0; list < lists; ++list) {
-        if (pRef->pRefPic[list][i] != NULL) {
-          pRef->pRefPic[list][i]->iRefCount = 0;
-          pRef->pRefPic[list][i] = NULL;
-        }
+  if (pRef->eSliceType == I_SLICE) {
+    return;
+  }
+  int32_t lists = pRef->eSliceType == P_SLICE ? 1 : 2;
+  for (int32_t i = 0; i < MAX_DPB_COUNT; ++i) {
+    for (int32_t list = 0; list < lists; ++list) {
+      if (pRef->pRefPic[list][i] != NULL) {
+        if (pRef->pRefPic[list][i]->iRefCount > 0) continue;
+        pRef->pRefPic[list][i]->iRefCount = 0;
+        pRef->pRefPic[list][i] = NULL;
       }
     }
   }
@@ -111,7 +114,7 @@ void WelsResetRefPic (PWelsDecoderContext pCtx) {
 
   for (i = 0; i < MAX_DPB_COUNT; i++) {
     if (pRefPic->pShortRefList[LIST_0][i] != NULL) {
-      SetUnRef (pRefPic->pShortRefList[LIST_0][i]);
+      SetUnRef (pRefPic->pShortRefList[LIST_0][i], pCtx->bNewSeqBegin);
       pRefPic->pShortRefList[LIST_0][i] = NULL;
     }
   }
@@ -119,7 +122,7 @@ void WelsResetRefPic (PWelsDecoderContext pCtx) {
 
   for (i = 0; i < MAX_DPB_COUNT; i++) {
     if (pRefPic->pLongRefList[LIST_0][i] != NULL) {
-      SetUnRef (pRefPic->pLongRefList[LIST_0][i]);
+      SetUnRef (pRefPic->pLongRefList[LIST_0][i], pCtx->bNewSeqBegin);
       pRefPic->pLongRefList[LIST_0][i] = NULL;
     }
   }
@@ -767,7 +770,7 @@ static int32_t SlidingWindow (PWelsDecoderContext pCtx, PRefPic pRefPic) {
     for (i = pRefPic->uiShortRefCount[LIST_0] - 1; i >= 0; i--) {
       pPic = WelsDelShortFromList (pRefPic, pRefPic->pShortRefList[LIST_0][i]->iFrameNum);
       if (pPic) {
-        SetUnRef (pPic);
+        SetUnRef (pPic, pCtx->bNewSeqBegin);
         break;
       } else {
         return ERR_INFO_INVALID_MMCO_REF_NUM_OVERFLOW;
@@ -803,7 +806,7 @@ static PPicture WelsDelShortFromList (PRefPic pRefPic, int32_t iFrameNum) {
 static PPicture WelsDelShortFromListSetUnref (PRefPic pRefPic, int32_t iFrameNum) {
   PPicture pPic = WelsDelShortFromList (pRefPic, iFrameNum);
   if (pPic) {
-    SetUnRef (pPic);
+    SetUnRef (pPic, false);
   }
   return pPic;
 }
@@ -832,7 +835,7 @@ static PPicture WelsDelLongFromList (PRefPic pRefPic, uint32_t uiLongTermFrameId
 static PPicture WelsDelLongFromListSetUnref (PRefPic pRefPic, uint32_t uiLongTermFrameIdx) {
   PPicture pPic = WelsDelLongFromList (pRefPic, uiLongTermFrameIdx);
   if (pPic) {
-    SetUnRef (pPic);
+    SetUnRef (pPic, false);
   }
   return pPic;
 }
