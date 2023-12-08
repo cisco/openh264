@@ -15,5 +15,5 @@ Please provide the following information in your report:
 - A description of the vulnerability and its impact
 - How to reproduce the issue
 
-This project is maintained by volunteers on a reasonable-effort basis. As such,
-please give us 90 days to work on a fix before public exposure.
+This project is maintained on a reasonable-effort basis. As such, please give us 90 days to
+work on a fix before public exposure.
