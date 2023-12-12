@@ -5,10 +5,7 @@ privately. **Do not disclose it as a public issue.** This gives us time to work 
 to fix the issue before public exposure, reducing the chance that the exploit will be
 used before a patch is released.
 
-You may submit the report in the following ways:
-
-- send an email to benzzhan@cisco.com; and/or
-- send a [private vulnerability report](https://github.com/cisco/openh264/security/advisories/new)
+You may submit the report as an email to benzzhan@cisco.com.
 
 Please provide the following information in your report:
 
