@@ -7,7 +7,7 @@ used before a patch is released.
 
 You may submit the report in the following ways:
 
-- send an email to ???@???; and/or
+- send an email to benzzhan@cisco.com; and/or
 - send a [private vulnerability report](https://github.com/cisco/openh264/security/advisories/new)
 
 Please provide the following information in your report:
