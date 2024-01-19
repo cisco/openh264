@@ -67,7 +67,9 @@ int32_t GetLTRFrameIndex (PRefPic pRefPic, int32_t iAncLTRFrameNum);
 static int32_t RemainOneBufferInDpbForEC (PWelsDecoderContext pCtx, PRefPic pRefPic);
 
 static void SetUnRef (PPicture pRef) {
-  if (NULL != pRef) {
+  if (pRef == NULL) return;
+
+  if (pRef->iRefCount <= 0) {
     pRef->bUsedAsRef = false;
     pRef->bIsLongRef = false;
     pRef->iFrameNum = -1;
@@ -81,6 +83,7 @@ static void SetUnRef (PPicture pRef) {
     pRef->iSpsId = -1;
     pRef->bIsComplete = false;
     pRef->iRefCount = 0;
+    pRef->pSetUnRef = NULL;
 
     if (pRef->eSliceType == I_SLICE) {
       return;
@@ -88,12 +91,11 @@ static void SetUnRef (PPicture pRef) {
     int32_t lists = pRef->eSliceType == P_SLICE ? 1 : 2;
     for (int32_t i = 0; i < MAX_DPB_COUNT; ++i) {
       for (int32_t list = 0; list < lists; ++list) {
-        if (pRef->pRefPic[list][i] != NULL) {
-          pRef->pRefPic[list][i]->iRefCount = 0;
-          pRef->pRefPic[list][i] = NULL;
-        }
+        pRef->pRefPic[list][i] = NULL;
       }
     }
+  } else {
+    pRef->pSetUnRef = SetUnRef;
   }
 }
 

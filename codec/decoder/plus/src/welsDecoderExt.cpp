@@ -993,46 +993,17 @@ void CWelsDecoder::BufferingReadyPicture (PWelsDecoderContext pCtx, unsigned cha
     if (pCtx->pSliceHeader->eSliceType == B_SLICE) {
       m_sReoderingStatus.bHasBSlice = true;
     }
-    if (m_sReoderingStatus.iNumOfPicts && pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb
-        && pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb->bNewSeqBegin) {
-      m_sReoderingStatus.iLastGOPRemainPicts = m_sReoderingStatus.iNumOfPicts;
-
-      for (int32_t i = 0; i <= m_sReoderingStatus.iLargestBufferedPicIndex; ++i) {
-        if (m_sPictInfoList[i].iPOC > IMinInt32) {
-          m_sPictInfoList[i].bLastGOP = true;
-        }
-      }
-    } else {
-      if (m_sReoderingStatus.iNumOfPicts > 0) {
-        //This can happen when decoder moves to next GOP without being able to decoder first picture PicOrderCntLsb = 0
-        bool hasGOPChanged = false;
-        for (int32_t i = 0; i <= m_sReoderingStatus.iLargestBufferedPicIndex; ++i) {
-          if (m_sPictInfoList[i].iPOC == pCtx->pSliceHeader->iPicOrderCntLsb) {
-            hasGOPChanged = true;
-            break;
-          }
-        }
-        if (hasGOPChanged) {
-          m_sReoderingStatus.iLastGOPRemainPicts = m_sReoderingStatus.iNumOfPicts;
-          for (int32_t i = 0; i <= m_sReoderingStatus.iLargestBufferedPicIndex; ++i) {
-            if (m_sPictInfoList[i].iPOC > IMinInt32) {
-              m_sPictInfoList[i].bLastGOP = true;
-            }
-          }
-        }
-      }
-    }
   }
   for (int32_t i = 0; i < 16; ++i) {
     if (m_sPictInfoList[i].iPOC == IMinInt32) {
       memcpy (&m_sPictInfoList[i].sBufferInfo, pDstInfo, sizeof (SBufferInfo));
       m_sPictInfoList[i].iPOC = pCtx->pSliceHeader->iPicOrderCntLsb;
+      m_sPictInfoList[i].iSeqNum = pCtx->iSeqNum;
       m_sPictInfoList[i].uiDecodingTimeStamp = pCtx->uiDecodingTimeStamp;
       if (pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb != NULL) {
         m_sPictInfoList[i].iPicBuffIdx = pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb->iPicBuffIdx;
         if (GetThreadCount (pCtx) <= 1) ++pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb->iRefCount;
       }
-      m_sPictInfoList[i].bLastGOP = false;
       m_iLastBufferedIdx = i;
       pDstInfo->iBufferStatus = 0;
       ++m_sReoderingStatus.iNumOfPicts;
@@ -1050,56 +1021,13 @@ void CWelsDecoder::ReleaseBufferedReadyPictureReorder (PWelsDecoderContext pCtx,
   if (pCtx == NULL && m_iThreadCount <= 1) {
     pCtx = m_pDecThrCtx[0].pCtx;
   }
-  if (m_sReoderingStatus.iLastGOPRemainPicts > 0) {
-    m_sReoderingStatus.iMinPOC = IMinInt32;
-    int32_t firstValidIdx = -1;
-    for (int32_t i = 0; i <= m_sReoderingStatus.iLargestBufferedPicIndex; ++i) {
-      if (m_sReoderingStatus.iMinPOC == IMinInt32 && m_sPictInfoList[i].iPOC > IMinInt32 && m_sPictInfoList[i].bLastGOP) {
-        m_sReoderingStatus.iMinPOC = m_sPictInfoList[i].iPOC;
-        m_sReoderingStatus.iPictInfoIndex = i;
-        firstValidIdx = i;
-        break;
-      }
-    }
-    for (int32_t i = 0; i <= m_sReoderingStatus.iLargestBufferedPicIndex; ++i) {
-      if (i == firstValidIdx) continue;
-      if (m_sPictInfoList[i].iPOC > IMinInt32 && m_sPictInfoList[i].iPOC < m_sReoderingStatus.iMinPOC
-          && m_sPictInfoList[i].bLastGOP) {
-        m_sReoderingStatus.iMinPOC = m_sPictInfoList[i].iPOC;
-        m_sReoderingStatus.iPictInfoIndex = i;
-      }
-    }
-    m_sReoderingStatus.iLastWrittenPOC = m_sReoderingStatus.iMinPOC;
-#if defined (_DEBUG)
-#ifdef _MOTION_VECTOR_DUMP_
-    fprintf (stderr, "Output POC: #%d uiDecodingTimeStamp=%d\n", m_sReoderingStatus.iLastWrittenPOC,
-             m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].uiDecodingTimeStamp);
-#endif
-#endif
-    memcpy (pDstInfo, &m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].sBufferInfo, sizeof (SBufferInfo));
-    ppDst[0] = pDstInfo->pDst[0];
-    ppDst[1] = pDstInfo->pDst[1];
-    ppDst[2] = pDstInfo->pDst[2];
-    m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPOC = IMinInt32;
-    if (pPicBuff != NULL) {
-      PPicture pPic = pPicBuff->ppPic[m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPicBuffIdx];
-      --pPic->iRefCount;
-    }
-    m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].bLastGOP = false;
-    m_sReoderingStatus.iMinPOC = IMinInt32;
-    --m_sReoderingStatus.iNumOfPicts;
-    --m_sReoderingStatus.iLastGOPRemainPicts;
-    if (m_sReoderingStatus.iLastGOPRemainPicts == 0) {
-      m_sReoderingStatus.iLastWrittenPOC = IMinInt32;
-    }
-    return;
-  }
   if (m_sReoderingStatus.iNumOfPicts > 0) {
     m_sReoderingStatus.iMinPOC = IMinInt32;
     int32_t firstValidIdx = -1;
     for (int32_t i = 0; i <= m_sReoderingStatus.iLargestBufferedPicIndex; ++i) {
       if (m_sReoderingStatus.iMinPOC == IMinInt32 && m_sPictInfoList[i].iPOC > IMinInt32) {
         m_sReoderingStatus.iMinPOC = m_sPictInfoList[i].iPOC;
+        m_sReoderingStatus.iMinSeqNum = m_sPictInfoList[i].iSeqNum;
         m_sReoderingStatus.iPictInfoIndex = i;
         firstValidIdx = i;
         break;
@@ -1107,8 +1035,10 @@ void CWelsDecoder::ReleaseBufferedReadyPictureReorder (PWelsDecoderContext pCtx,
     }
     for (int32_t i = 0; i <= m_sReoderingStatus.iLargestBufferedPicIndex; ++i) {
       if (i == firstValidIdx) continue;
-      if (m_sPictInfoList[i].iPOC > IMinInt32 && m_sPictInfoList[i].iPOC < m_sReoderingStatus.iMinPOC) {
+      if (m_sPictInfoList[i].iPOC > IMinInt32
+          && ((m_sPictInfoList[i].iSeqNum == m_sReoderingStatus.iMinSeqNum) ? (m_sPictInfoList[i].iPOC < m_sReoderingStatus.iMinPOC) : (m_sPictInfoList[i].iSeqNum - m_sReoderingStatus.iMinSeqNum < 0))) {
         m_sReoderingStatus.iMinPOC = m_sPictInfoList[i].iPOC;
+        m_sReoderingStatus.iMinSeqNum = m_sPictInfoList[i].iSeqNum;
         m_sReoderingStatus.iPictInfoIndex = i;
       }
     }
@@ -1117,12 +1047,15 @@ void CWelsDecoder::ReleaseBufferedReadyPictureReorder (PWelsDecoderContext pCtx,
     bool isReady = true;
     if (!isFlush) {
       int32_t iLastPOC = pCtx != NULL ? pCtx->pSliceHeader->iPicOrderCntLsb : m_sPictInfoList[m_iLastBufferedIdx].iPOC;
+      int32_t iLastSeqNum = pCtx != NULL ? pCtx->iSeqNum : m_sPictInfoList[m_iLastBufferedIdx].iSeqNum;
       isReady = (m_sReoderingStatus.iLastWrittenPOC > IMinInt32
         && m_sReoderingStatus.iMinPOC - m_sReoderingStatus.iLastWrittenPOC <= 1)
-        || m_sReoderingStatus.iMinPOC < iLastPOC;
+        || m_sReoderingStatus.iMinPOC < iLastPOC
+        || m_sReoderingStatus.iMinSeqNum - iLastSeqNum < 0;
     }
     if (isReady) {
       m_sReoderingStatus.iLastWrittenPOC = m_sReoderingStatus.iMinPOC;
+      m_sReoderingStatus.iLastWrittenSeqNum = m_sReoderingStatus.iMinSeqNum;
 #if defined (_DEBUG)
 #ifdef _MOTION_VECTOR_DUMP_
       fprintf (stderr, "Output POC: #%d uiDecodingTimeStamp=%d\n", m_sReoderingStatus.iLastWrittenPOC,
@@ -1140,9 +1073,10 @@ void CWelsDecoder::ReleaseBufferedReadyPictureReorder (PWelsDecoderContext pCtx,
         {
             PPicture pPic = pPicBuff->ppPic[iPicBuffIdx];
             --pPic->iRefCount;
+            if (pPic->iRefCount <= 0 && pPic->pSetUnRef)
+              pPic->pSetUnRef(pPic);
         }
       }
-      m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].bLastGOP = false;
       m_sReoderingStatus.iMinPOC = IMinInt32;
       --m_sReoderingStatus.iNumOfPicts;
     }
@@ -1178,6 +1112,7 @@ void CWelsDecoder::ReleaseBufferedReadyPictureNoReorder(PWelsDecoderContext pCtx
 #endif
 #endif
     m_sReoderingStatus.iLastWrittenPOC = m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPOC;
+    m_sReoderingStatus.iLastWrittenSeqNum = m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iSeqNum;
     memcpy(pDstInfo, &m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].sBufferInfo, sizeof(SBufferInfo));
     ppDst[0] = pDstInfo->pDst[0];
     ppDst[1] = pDstInfo->pDst[1];
@@ -1187,10 +1122,8 @@ void CWelsDecoder::ReleaseBufferedReadyPictureNoReorder(PWelsDecoderContext pCtx
       PPicBuff pPicBuff = pCtx ? pCtx->pPicBuff : m_pPicBuff;
       PPicture pPic = pPicBuff->ppPic[m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPicBuffIdx];
       --pPic->iRefCount;
-    }
-    if (m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].bLastGOP) {
-      --m_sReoderingStatus.iLastGOPRemainPicts;
-      m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].bLastGOP = false;
+      if (pPic->iRefCount <= 0 && pPic->pSetUnRef)
+        pPic->pSetUnRef(pPic);
     }
     --m_sReoderingStatus.iNumOfPicts;
   }
@@ -1204,8 +1137,12 @@ DECODING_STATE CWelsDecoder::ReorderPicturesInDisplay(PWelsDecoderContext pDecCo
     m_bIsBaseline = pDecContext->pSps->uiProfileIdc == 66 || pDecContext->pSps->uiProfileIdc == 83;
     if (!m_bIsBaseline) {
       if (pDstInfo->iBufferStatus == 1) {
-        if (m_sReoderingStatus.iLastGOPRemainPicts == 0 && pDecContext->pSliceHeader->eSliceType == B_SLICE && 
-            pDecContext->pSliceHeader->iPicOrderCntLsb <= m_sReoderingStatus.iLastWrittenPOC + 2) {
+        if (pDecContext->pSliceHeader->eSliceType == B_SLICE &&
+            ((pDecContext->iSeqNum == m_sReoderingStatus.iLastWrittenSeqNum) ?
+              (pDecContext->pSliceHeader->iPicOrderCntLsb <= m_sReoderingStatus.iLastWrittenPOC + 2) :
+              (pDecContext->iSeqNum - m_sReoderingStatus.iLastWrittenSeqNum == 1 && pDecContext->pSliceHeader->iPicOrderCntLsb == 0))) {
+          m_sReoderingStatus.iLastWrittenPOC = pDecContext->pSliceHeader->iPicOrderCntLsb;
+          m_sReoderingStatus.iLastWrittenSeqNum = pDecContext->iSeqNum;
           //issue #3478, use b-slice type to determine correct picture order as the first priority as POC order is not as reliable as based on b-slice 
           ppDst[0] = pDstInfo->pDst[0];
           ppDst[1] = pDstInfo->pDst[1];
