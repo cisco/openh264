@@ -1092,7 +1092,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
   break;
   case ENCODER_OPTION_TRACE_CALLBACK: {
     if (m_pWelsTrace) {
-      WelsTraceCallback callback = * ((WelsTraceCallback*)pOption);
+      WelsTraceCallback callback = (WelsTraceCallback)pOption;
       m_pWelsTrace->SetTraceCallback (callback);
       WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO,
                "CWelsH264SVCEncoder::SetOption():ENCODER_OPTION_TRACE_CALLBACK callback = %p.",
