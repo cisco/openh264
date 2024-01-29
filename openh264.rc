@@ -24,8 +24,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,4,0,2310
- PRODUCTVERSION 2,4,0,2310
+ FILEVERSION 2,4,1,2401
+ PRODUCTVERSION 2,4,1,2401
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -43,12 +43,12 @@ BEGIN
             VALUE "Comments", "Cisco OpenH264 codec"
             VALUE "CompanyName", "Cisco Systems Inc."
             VALUE "FileDescription", "Cisco OpenH264 codec"
-            VALUE "FileVersion", "2.4.0.2310"
+            VALUE "FileVersion", "2.4.1.2401"
             VALUE "InternalName", "openh264.dll"
             VALUE "LegalCopyright", "© 2011-2015 Cisco and/or its affiliates. All rights reserved."
             VALUE "OriginalFilename", "openh264.dll"
             VALUE "ProductName", "Cisco OpenH264 codec"
-            VALUE "ProductVersion", "2.4.0.2310"
+            VALUE "ProductVersion", "2.4.1.2401"
         END
     END
     BLOCK "VarFileInfo"
