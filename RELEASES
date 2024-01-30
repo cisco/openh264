@@ -1,6 +1,12 @@
 
 Releases
 -----------
+v2.4.1
+------
+- Fix off by one regression in decoder
+- Add security policy
+- Fix glitches that sometimes happen near the scene changes
+
 v2.4.0
 ------
 - Add LoongArch SIMD
