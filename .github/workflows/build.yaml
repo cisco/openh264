@@ -36,6 +36,11 @@ jobs:
       - run: make gtest-bootstrap
       - run: LDFLAGS=-fsanitize=address CFLAGS=-fsanitize=address make -j$(nproc)
       - run: ./codec_unittest
+      # Upload artifacts
+      - uses: actions/upload-artifact@v3
+        with:
+          name: asan-artifacts
+          path: codec_unittest
 
   windows:
     runs-on: windows-2019
@@ -52,6 +57,11 @@ jobs:
           CFLAGS: -WX
         run: ./AutoBuildForWindows.bat
       - run: ./bin/Win32/Release/codec_unittest.exe
+      # Upload artifacts
+      - uses: actions/upload-artifact@v3
+        with:
+          name: windows-artifacts
+          path: bin
 
   mingw:
     runs-on: windows-2019
@@ -79,9 +89,15 @@ jobs:
       - run: meson builddir
       - run: ninja -C builddir -v
       - run: meson test -C builddir -v
+      # Upload artifacts
+      - uses: actions/upload-artifact@v3
+        with:
+          name: mingw-artifacts
+          path: builddir
 
   macos:
     runs-on: macos-latest
+
     steps:
       - uses: actions/checkout@v3
       - run: brew install nasm meson
@@ -93,6 +109,11 @@ jobs:
       - run: meson builddir --werror
       - run: ninja -C builddir -v
       - run: meson test -C builddir -v
+      # Upload artifacts
+      - uses: actions/upload-artifact@v3
+        with:
+          name: macos-artifacts
+          path: builddir
 
   linux-cross-arm:
     runs-on: ubuntu-latest
