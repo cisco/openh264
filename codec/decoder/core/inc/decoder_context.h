@@ -432,6 +432,7 @@ typedef struct TagWelsDecoderContext {
 #endif
   bool       bNewSeqBegin;
   bool       bNextNewSeqBegin;
+  int32_t    *pStreamSeqNum;
   int32_t    iSeqNum;
 
 //for Parse only

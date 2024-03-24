@@ -138,6 +138,7 @@ class CWelsDecoder : public ISVCDecoder {
   SVlcTable               m_sVlcTable;
   SWelsLastDecPicInfo     m_sLastDecPicInfo;
   SDecoderStatistics      m_sDecoderStatistics;// For real time debugging
+  int32_t                 m_iStreamSeqNum;
 
  private:
   int32_t InitDecoder (const SDecodingParam* pParam);
