@@ -2261,10 +2261,15 @@ int32_t WelsDecodeInitAccessUnitStart (PWelsDecoderContext pCtx, SBufferInfo* pD
   pCtx->bAuReadyFlag = false;
   pCtx->pLastDecPicInfo->bLastHasMmco5 = false;
   bool bTmpNewSeqBegin = CheckNewSeqBeginAndUpdateActiveLayerSps (pCtx);
-  if (bTmpNewSeqBegin)
-    (*pCtx->pStreamSeqNum)++;
+  if (bTmpNewSeqBegin) {
+    if (pCtx->pStreamSeqNum)
+      (*pCtx->pStreamSeqNum)++;
+    else
+      pCtx->iSeqNum++;
+  }
   pCtx->bNewSeqBegin = pCtx->bNewSeqBegin || bTmpNewSeqBegin;
-  pCtx->iSeqNum = *pCtx->pStreamSeqNum;
+  if (pCtx->pStreamSeqNum)
+    pCtx->iSeqNum = *pCtx->pStreamSeqNum;
   iErr = WelsDecodeAccessUnitStart (pCtx);
   GetVclNalTemporalId (pCtx);
 
