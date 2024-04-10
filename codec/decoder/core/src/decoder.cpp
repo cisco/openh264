@@ -820,8 +820,6 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
             if (pCtx->bAuReadyFlag && pCtx->pAccessUnitList->uiAvailUnitsNum != 0) {
               if (GetThreadCount (pCtx) <= 1) {
                 ConstructAccessUnit (pCtx, ppDst, pDstBufInfo);
-              } else {
-                pCtx->pAccessUnitList->uiAvailUnitsNum = 1;
               }
             }
           }
@@ -884,8 +882,6 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
       if (pCtx->bAuReadyFlag && pCtx->pAccessUnitList->uiAvailUnitsNum != 0) {
         if (GetThreadCount (pCtx) <= 1) {
           ConstructAccessUnit (pCtx, ppDst, pDstBufInfo);
-        } else {
-          pCtx->pAccessUnitList->uiAvailUnitsNum = 1;
         }
       }
     }
