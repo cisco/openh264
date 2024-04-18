@@ -695,9 +695,11 @@ DECODING_STATE CWelsDecoder::DecodeFrameNoDelay (const unsigned char* kpSrc,
     SBufferInfo* pDstInfo) {
   int iRet = dsErrorFree;
   if (m_iThreadCount >= 1) {
+    SET_EVENT (&m_sReleaseBufferEvent);
     iRet = ThreadDecodeFrameInternal (kpSrc, kiSrcLen, ppDst, pDstInfo);
     if (m_sReoderingStatus.iNumOfPicts) {
       WAIT_EVENT (&m_sBufferingEvent, WELS_DEC_THREAD_WAIT_INFINITE);
+      RESET_EVENT (&m_sBufferingEvent);
       RESET_EVENT (&m_sReleaseBufferEvent);
       if (!m_sReoderingStatus.bHasBSlice) {
         if (m_sReoderingStatus.iNumOfPicts > 1) {
@@ -707,7 +709,6 @@ DECODING_STATE CWelsDecoder::DecodeFrameNoDelay (const unsigned char* kpSrc,
       else {
         ReleaseBufferedReadyPictureReorder (NULL, ppDst, pDstInfo);
       }
-      SET_EVENT(&m_sReleaseBufferEvent);
     }
     return (DECODING_STATE)iRet;
   }
@@ -793,6 +794,10 @@ DECODING_STATE CWelsDecoder::DecodeFrame2WithCtx (PWelsDecoderContext pDecContex
   pDecContext->iFrameNum = -1; //initialize
 #endif
 
+  if (GetThreadCount (pDecContext) >= 1) {
+    WAIT_EVENT (&m_sReleaseBufferEvent, WELS_DEC_THREAD_WAIT_INFINITE);
+  }
+
   pDecContext->iFeedbackTidInAu = -1; //initialize
   pDecContext->iFeedbackNalRefIdc = -1; //initialize
   if (pDstInfo) {
@@ -875,8 +880,6 @@ DECODING_STATE CWelsDecoder::DecodeFrame2WithCtx (PWelsDecoderContext pDecContex
 
     OutputStatisticsLog (*pDecContext->pDecoderStatistics);
     if (GetThreadCount (pDecContext) >= 1) {
-      WAIT_EVENT (&m_sReleaseBufferEvent, WELS_DEC_THREAD_WAIT_INFINITE);
-      RESET_EVENT (&m_sBufferingEvent);
       BufferingReadyPicture (pDecContext, ppDst, pDstInfo);
       SET_EVENT (&m_sBufferingEvent);
     } else {
@@ -901,8 +904,6 @@ DECODING_STATE CWelsDecoder::DecodeFrame2WithCtx (PWelsDecoderContext pDecContex
   pDecContext->dDecTime += (iEnd - iStart) / 1e3;
 
   if (GetThreadCount (pDecContext) >= 1) {
-    WAIT_EVENT (&m_sReleaseBufferEvent, WELS_DEC_THREAD_WAIT_INFINITE);
-    RESET_EVENT (&m_sBufferingEvent);
     BufferingReadyPicture (pDecContext, ppDst, pDstInfo);
     SET_EVENT (&m_sBufferingEvent);
   } else {
