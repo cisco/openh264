@@ -45,7 +45,7 @@ uint32_t        uiSpsId;
 int16_t         iMbWidth;
 int16_t         iMbHeight;
 uint32_t        uiLog2MaxFrameNum;
-// uint32_t        uiPocType;
+uint32_t        uiPocType;
 /* POC type 0 */
 int32_t         iLog2MaxPocLsb;
 /* POC type 1 */
