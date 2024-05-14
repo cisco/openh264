@@ -125,7 +125,7 @@ static const EncodeFileParam kFileParamArray[] = {
     "res/CiscoVT2people_320x192_12fps.yuv",
     // Allow for different output depending on whether averaging is done
     // vertically or horizontally first when downsampling.
-    { "e626f7efa3d54da15794407c15b7c694f7ddd383", "a4c2caccada00189c683cd61c6f0bb995d09aeff" },
+    { "eb4adc831563ce4f02f2942f52c992da760b4113", "a4c2caccada00189c683cd61c6f0bb995d09aeff" },
     CAMERA_VIDEO_REAL_TIME, 320, 192, 12.0f, SM_SINGLE_SLICE, false, 2, false, false, false
   },
   {
@@ -136,7 +136,7 @@ static const EncodeFileParam kFileParamArray[] = {
     "res/Cisco_Absolute_Power_1280x720_30fps.yuv",
     // Allow for different output depending on whether averaging is done
     // vertically or horizontally first when downsampling.
-    { "0d4bf6a3b6f09d6de7bbce6daf8002c614ee6241", "9e4fb2b503a877c21441545ee4f0cd5416dbe5e9" },
+    { "a32db3cfa66568e231d1f580d239d6468d26ce9a", "9e4fb2b503a877c21441545ee4f0cd5416dbe5e9" },
     CAMERA_VIDEO_REAL_TIME, 1280, 720, 30.0f, SM_SINGLE_SLICE, false, 4, false, false, false
   },
 
