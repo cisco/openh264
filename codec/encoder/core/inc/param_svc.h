@@ -493,7 +493,6 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     const int32_t iDecStages = WELS_LOG2 (uiGopSize); // (int8_t)GetLogFactor(1.0f, 1.0f * pcfg->uiGopSize);  //log2(uiGopSize)
     const uint8_t* pTemporalIdList = &g_kuiTemporalIdListTable[iDecStages][0];
     SSpatialLayerInternal* pDlp    = &sDependencyLayers[0];
-    SSpatialLayerConfig* pSpatialLayer = &sSpatialLayers[0];
     int8_t i = 0;
 
     while (i < iSpatialLayerNum) {
@@ -524,7 +523,6 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
         return ENC_RETURN_INVALIDINPUT;
       }
       ++ pDlp;
-      ++ pSpatialLayer;
       ++ i;
     }
     iDecompStages = (int8_t)iDecStages;
