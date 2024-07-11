@@ -23,8 +23,12 @@ endif
 ifeq ($(ASM_ARCH), x86)
 ASMFLAGS += -DPREFIX
 ifeq ($(ARCH), x86_64)
+CFLAGS += -arch x86_64
+LDFLAGS += -arch x86_64
 ASMFLAGS += -f macho64
 else
+CFLAGS += -arch i386
+LDFLAGS += -arch i386
 ASMFLAGS += -f macho
 LDFLAGS += -read_only_relocs suppress
 endif
