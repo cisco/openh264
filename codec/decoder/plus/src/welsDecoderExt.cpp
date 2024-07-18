@@ -325,6 +325,7 @@ void CWelsDecoder::OpenDecoderThreads() {
 }
 void CWelsDecoder::CloseDecoderThreads() {
   if (m_iThreadCount >= 1) {
+    SET_EVENT (&m_sReleaseBufferEvent);
     for (int32_t i = 0; i < m_iThreadCount; i++) { //waiting the completion begun slices
       WAIT_SEMAPHORE (&m_pDecThrCtx[i].sThreadInfo.sIsIdle, WELS_DEC_THREAD_WAIT_INFINITE);
       m_pDecThrCtx[i].sThreadInfo.uiCommand = WELS_DEC_THREAD_COMMAND_ABORT;
@@ -513,6 +514,8 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
       if (pDecContext == NULL) return dsInitialOptExpected;
 
       pDecContext->bEndOfStreamFlag = iVal ? true : false;
+      if (iVal && m_iThreadCount >= 1)
+        SET_EVENT (&m_sReleaseBufferEvent);
 
       return cmResultSuccess;
     } else if (eOptID == DECODER_OPTION_ERROR_CON_IDC) { // Indicate error concealment status
