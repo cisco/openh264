@@ -566,7 +566,7 @@ int32_t WelsReorderRefList2 (PWelsDecoderContext pCtx) {
           k = iCount;
           for (j = k; j <= iRefCount; j++) {
             if (ppRefList[j] != NULL) {
-              if (!ppRefList[j]->bIsLongRef || ppLongRefList[j]->uiLongTermPicNum != (uint32_t)iPredFrameNum)
+              if (!ppRefList[j]->bIsLongRef || ppRefList[j]->uiLongTermPicNum != (uint32_t)iPredFrameNum)
                 ppRefList[k++] = ppRefList[j];
             }
           }
