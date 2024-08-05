@@ -494,7 +494,10 @@ int32_t WelsReorderRefList2 (PWelsDecoderContext pCtx) {
   int32_t i = 0;
   int32_t j = 0;
   int32_t k = 0;
-  int32_t iMaxRefIdx = pCtx->pSps->iNumRefFrames;
+  int32_t iMaxRefIdx = pCtx->iPicQueueNumber;
+  if (iMaxRefIdx > MAX_REF_PIC_COUNT) {
+    iMaxRefIdx = MAX_REF_PIC_COUNT;
+  }
   const int32_t iCurFrameNum = pSliceHeader->iFrameNum;
   const int32_t iMaxPicNum = 1 << pSliceHeader->pSps->uiLog2MaxFrameNum;
   int32_t iListCount = 1;
@@ -563,7 +566,7 @@ int32_t WelsReorderRefList2 (PWelsDecoderContext pCtx) {
           k = iCount;
           for (j = k; j <= iRefCount; j++) {
             if (ppRefList[j] != NULL) {
-              if (!ppRefList[j]->bIsLongRef || ppLongRefList[j]->uiLongTermPicNum != (uint32_t)iPredFrameNum)
+              if (!ppRefList[j]->bIsLongRef || ppRefList[j]->uiLongTermPicNum != (uint32_t)iPredFrameNum)
                 ppRefList[k++] = ppRefList[j];
             }
           }
