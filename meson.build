@@ -98,6 +98,9 @@ if ['linux', 'android', 'ios', 'darwin'].contains(system)
     add_project_arguments('-mlsx', '-DHAVE_LSX', '-mlasx', '-DHAVE_LASX', language: 'c')
     add_project_arguments('-DHAVE_LSX', '-DHAVE_LASX', language: 'cpp')
     casm_inc = include_directories(join_paths('codec', 'common', 'loongarch'))
+  elif cpu_family == 'riscv64'
+    # We dont't have riscv64-specific optimization for now.
+    asm_format = asm_format64
   else
     error('FIXME: unhandled CPU family @0@ for @1@'.format(cpu_family, system))
   endif
