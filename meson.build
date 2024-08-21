@@ -85,8 +85,8 @@ if ['linux', 'android', 'ios', 'darwin'].contains(system)
     casm_inc = include_directories(join_paths('codec', 'common', 'arm'))
   elif cpu_family == 'aarch64'
     asm_format = asm_format64
-    add_project_arguments('-DHAVE_NEON_ARM64', language: 'c')
-    add_project_arguments('-DHAVE_NEON_ARM64', language: 'cpp')
+    add_project_arguments('-DHAVE_NEON_AARCH64', language: 'c')
+    add_project_arguments('-DHAVE_NEON_AARCH64', language: 'cpp')
     casm_inc = include_directories(join_paths('codec', 'common', 'arm64'))
   elif cpu_family == 'loongarch32'
     asm_format = asm_format32

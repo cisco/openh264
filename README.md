@@ -159,7 +159,7 @@ See <http://mesonbuild.com/Installing.html> for instructions on how to
 install meson, then:
 
 ``` shell
-meson builddir
+meson setup builddir
 ninja -C builddir
 ```
 
