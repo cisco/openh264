@@ -200,7 +200,6 @@ bool ComparePictureDataI420 (uint8_t* pSrcData, uint8_t* pDstData, const uint32_
   uint8_t* pCompData;
   int32_t iStride;
   int32_t iCurHeight;
-  int32_t iHeight = kiHeight;
 
   //Y component
   iStride = kiStride;
@@ -212,7 +211,6 @@ bool ComparePictureDataI420 (uint8_t* pSrcData, uint8_t* pDstData, const uint32_
     pCompData += iStride;
   }
   //chroma component
-  iHeight >>= 1;
   iStride >>= 1;
   //U component
   for (iCurHeight = 0; bSame && (iCurHeight < kiHeight / 2); ++iCurHeight) {

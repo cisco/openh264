@@ -43,6 +43,121 @@
 #include "stdint.h"
 #include "loongson_intrinsics.h"
 
+void VAACalcSad_lsx (const uint8_t* pCurData, const uint8_t* pRefData,
+                     int32_t iPicWidth, int32_t iPicHeight, int32_t iPicStride,
+                     int32_t* pFrameSad, int32_t* pSad8x8, int32_t* pSd8x8,
+                     uint8_t* pMad8x8) {
+  const uint8_t* tmp_ref = pRefData;
+  const uint8_t* tmp_cur = pCurData;
+  int32_t iMbWidth = (iPicWidth >> 4);
+  int32_t mb_height = (iPicHeight >> 4);
+  int32_t mb_index = 0;
+  int32_t pic_stride_x8 = iPicStride << 3;
+  int32_t step = (iPicStride << 4) - iPicWidth;
+
+  *pFrameSad = 0;
+  for (int32_t i = 0; i < mb_height; i++) {
+    for (int32_t j = 0; j < iMbWidth; j++) {
+      int32_t k, l_sad;
+      const uint8_t* tmp_cur_row;
+      const uint8_t* tmp_ref_row;
+      int32_t tmp_mb_index = mb_index << 2;
+      int32_t tmp_mb_index1 = tmp_mb_index + 1;
+      int32_t tmp_mb_index2 = tmp_mb_index + 2;
+      int32_t tmp_mb_index3 = tmp_mb_index + 3;
+      __m128i cur, ref;
+      __m128i vec_abs_diff, tmp_l_sad;
+      __m128i zero = __lsx_vreplgr2vr_b(0);
+      __m128i vec_l_sad = zero;
+
+      l_sad =  0;
+      tmp_cur_row = tmp_cur;
+      tmp_ref_row = tmp_ref;
+      for (k = 0; k < 8; k ++) {
+        DUP2_ARG2(__lsx_vld, tmp_cur_row, 0, tmp_ref_row, 0, cur, ref);
+        DUP2_ARG2(__lsx_vilvl_b, zero, cur, zero, ref, cur, ref);
+
+        vec_abs_diff = __lsx_vabsd_h(cur, ref);
+        vec_l_sad = __lsx_vadd_h(vec_l_sad, vec_abs_diff);
+        tmp_cur_row += iPicStride;
+        tmp_ref_row += iPicStride;
+      }
+      tmp_l_sad = __lsx_vhaddw_w_h(vec_l_sad, vec_l_sad);
+      tmp_l_sad = __lsx_vhaddw_d_w(tmp_l_sad, tmp_l_sad);
+      tmp_l_sad = __lsx_vhaddw_q_d(tmp_l_sad, tmp_l_sad);
+      l_sad = __lsx_vpickve2gr_d(tmp_l_sad, 0);
+      *pFrameSad += l_sad;
+      pSad8x8[tmp_mb_index] = l_sad;
+
+      l_sad =  0;
+      tmp_cur_row = tmp_cur + 8;
+      tmp_ref_row = tmp_ref + 8;
+      vec_l_sad = zero;
+      for (k = 0; k < 8; k ++) {
+        DUP2_ARG2(__lsx_vld, tmp_cur_row, 0, tmp_ref_row, 0, cur, ref);
+        DUP2_ARG2(__lsx_vilvl_b, zero, cur, zero, ref, cur, ref);
+
+        vec_abs_diff = __lsx_vabsd_h(cur, ref);
+        vec_l_sad = __lsx_vadd_h(vec_l_sad, vec_abs_diff);
+        tmp_cur_row += iPicStride;
+        tmp_ref_row += iPicStride;
+      }
+      tmp_l_sad = __lsx_vhaddw_w_h(vec_l_sad, vec_l_sad);
+      tmp_l_sad = __lsx_vhaddw_d_w(tmp_l_sad, tmp_l_sad);
+      tmp_l_sad = __lsx_vhaddw_q_d(tmp_l_sad, tmp_l_sad);
+      l_sad = __lsx_vpickve2gr_d(tmp_l_sad, 0);
+      *pFrameSad += l_sad;
+      pSad8x8[tmp_mb_index1] = l_sad;
+
+      l_sad =  0;
+      tmp_cur_row = tmp_cur + pic_stride_x8;
+      tmp_ref_row = tmp_ref + pic_stride_x8;
+      vec_l_sad = zero;
+      for (k = 0; k < 8; k ++) {
+        DUP2_ARG2(__lsx_vld, tmp_cur_row, 0, tmp_ref_row, 0, cur, ref);
+        DUP2_ARG2(__lsx_vilvl_b, zero, cur, zero, ref, cur, ref);
+
+        vec_abs_diff = __lsx_vabsd_h(cur, ref);
+        vec_l_sad = __lsx_vadd_h(vec_l_sad, vec_abs_diff);
+        tmp_cur_row += iPicStride;
+        tmp_ref_row += iPicStride;
+      }
+      tmp_l_sad = __lsx_vhaddw_w_h(vec_l_sad, vec_l_sad);
+      tmp_l_sad = __lsx_vhaddw_d_w(tmp_l_sad, tmp_l_sad);
+      tmp_l_sad = __lsx_vhaddw_q_d(tmp_l_sad, tmp_l_sad);
+      l_sad = __lsx_vpickve2gr_d(tmp_l_sad, 0);
+      *pFrameSad += l_sad;
+      pSad8x8[tmp_mb_index2] = l_sad;
+
+      l_sad =  0;
+      tmp_cur_row = tmp_cur + pic_stride_x8 + 8;
+      tmp_ref_row = tmp_ref + pic_stride_x8 + 8;
+      vec_l_sad = zero;
+      for (k = 0; k < 8; k ++) {
+        DUP2_ARG2(__lsx_vld, tmp_cur_row, 0, tmp_ref_row, 0, cur, ref);
+        DUP2_ARG2(__lsx_vilvl_b, zero, cur, zero, ref, cur, ref);
+
+        vec_abs_diff = __lsx_vabsd_h(cur, ref);
+        vec_l_sad = __lsx_vadd_h(vec_l_sad, vec_abs_diff);
+        tmp_cur_row += iPicStride;
+        tmp_ref_row += iPicStride;
+      }
+      tmp_l_sad = __lsx_vhaddw_w_h(vec_l_sad, vec_l_sad);
+      tmp_l_sad = __lsx_vhaddw_d_w(tmp_l_sad, tmp_l_sad);
+      tmp_l_sad = __lsx_vhaddw_q_d(tmp_l_sad, tmp_l_sad);
+      l_sad = __lsx_vpickve2gr_d(tmp_l_sad, 0);
+      *pFrameSad += l_sad;
+      pSad8x8[tmp_mb_index3] = l_sad;
+
+      tmp_ref += 16;
+      tmp_cur += 16;
+      ++mb_index;
+    }
+    tmp_ref += step;
+    tmp_cur += step;
+  }
+}
+
 void VAACalcSadBgd_lsx (const uint8_t* pCurData, const uint8_t* pRefData,
                         int32_t iPicWidth, int32_t iPicHeight, int32_t iPicStride,
                         int32_t* pFrameSad, int32_t* pSad8x8, int32_t* pSd8x8,
@@ -232,4 +347,3 @@ void VAACalcSadBgd_lsx (const uint8_t* pCurData, const uint8_t* pRefData,
     tmp_cur += step;
   }
 }
-

@@ -1,10 +1,10 @@
 project('openh264', ['c', 'cpp'],
-  version : '2.3.0',
+  version : '2.4.1',
   meson_version : '>= 0.52',
   default_options : [ 'warning_level=1',
                       'buildtype=debugoptimized' ])
 
-major_version = '6'
+major_version = '7'
 
 cpp = meson.get_compiler('cpp')
 
@@ -42,6 +42,8 @@ cpu_family = host_machine.cpu_family()
 supported_arguments = cpp.get_supported_arguments([
   '-Wno-non-virtual-dtor',
   '-Wno-class-memaccess',
+  '-Werror',
+  '-Wunused-but-set-variable',
   '-Wno-strict-aliasing'])
 
 add_project_arguments(supported_arguments, language: 'cpp')
@@ -83,19 +85,22 @@ if ['linux', 'android', 'ios', 'darwin'].contains(system)
     casm_inc = include_directories(join_paths('codec', 'common', 'arm'))
   elif cpu_family == 'aarch64'
     asm_format = asm_format64
-    add_project_arguments('-DHAVE_NEON_ARM64', language: 'c')
-    add_project_arguments('-DHAVE_NEON_ARM64', language: 'cpp')
+    add_project_arguments('-DHAVE_NEON_AARCH64', language: 'c')
+    add_project_arguments('-DHAVE_NEON_AARCH64', language: 'cpp')
     casm_inc = include_directories(join_paths('codec', 'common', 'arm64'))
   elif cpu_family == 'loongarch32'
     asm_format = asm_format32
-    add_project_arguments('-mlsx', '-mlasx', language: 'c')
+    add_project_arguments('-mlsx', '-DHAVE_LSX', '-mlasx', '-DHAVE_LASX', language: 'c')
     add_project_arguments('-DHAVE_LSX', '-DHAVE_LASX', language: 'cpp')
     casm_inc = include_directories(join_paths('codec', 'common', 'loongarch'))
   elif cpu_family == 'loongarch64'
     asm_format = asm_format64
-    add_project_arguments('-mlsx', '-mlasx', language: 'c')
-    add_project_arguments('-mlsx', '-DHAVE_LSX', '-mlasx', '-DHAVE_LASX', language: 'cpp')
+    add_project_arguments('-mlsx', '-DHAVE_LSX', '-mlasx', '-DHAVE_LASX', language: 'c')
+    add_project_arguments('-DHAVE_LSX', '-DHAVE_LASX', language: 'cpp')
     casm_inc = include_directories(join_paths('codec', 'common', 'loongarch'))
+  elif cpu_family == 'riscv64'
+    # We dont't have riscv64-specific optimization for now.
+    asm_format = asm_format64
   else
     error('FIXME: unhandled CPU family @0@ for @1@'.format(cpu_family, system))
   endif
@@ -165,7 +170,7 @@ elif system == 'windows'
   elif cpu_family == 'aarch64'
     # For ARM64, Clang can build the assembly as-is without needing to use
     # either gas-preprocessor or armasm64.
-    if cpp.get_argument_syntax() == 'msvc'
+    if cpp.get_argument_syntax() == 'msvc' and (cpp.get_id() != 'clang-cl' or meson.version().version_compare('<0.58.0'))
       use_asm_gen = true
       gasprep = find_program('gas-preprocessor.pl')
       asm_gen = generator(gasprep,

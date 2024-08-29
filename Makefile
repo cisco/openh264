@@ -29,15 +29,17 @@ LIBDIR_NAME=lib
 SHAREDLIB_DIR=$(PREFIX)/lib
 PROJECT_NAME=openh264
 MODULE_NAME=gmpopenh264
-GMP_API_BRANCH=Firefox39
+GMP_API_BRANCH=Firefox114_2
 GTEST_VER=release-1.8.1
 CCASFLAGS=$(CFLAGS)
 STATIC_LDFLAGS=-lstdc++
 STRIP ?= strip
 USE_STACK_PROTECTOR = Yes
+USE_LOW_VERSION_NDK=No
+USE_ANT=No
 
-SHAREDLIB_MAJORVERSION=6
-FULL_VERSION := 2.3.0
+SHAREDLIB_MAJORVERSION=7
+FULL_VERSION := 2.4.1
 
 ifeq (,$(wildcard $(SRC_PATH)gmp-api))
 HAVE_GMP_API=No
@@ -80,7 +82,17 @@ endif
 # Make sure the all target is the first one
 all: libraries binaries
 
+ifeq (android, $(OS))
+USE_LOW_VERSION_NDK = $(shell $(SRC_PATH)build/ndk-version-check.sh $(NDKROOT))
+ifeq (Yes, $(USE_LOW_VERSION_NDK))
+USE_ANT = Yes
+include $(SRC_PATH)build/platform-android-r18b.mk
+else
+include $(SRC_PATH)build/platform-android.mk
+endif
+else
 include $(SRC_PATH)build/platform-$(OS).mk
+endif
 
 MODULE := $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIX)
 
@@ -364,11 +376,22 @@ endif
 ifeq (android,$(OS))
 ifeq (./,$(SRC_PATH))
 codec_unittest$(EXEEXT):
+ifeq ($(USE_ANT), Yes)
 	cd ./test/build/android && $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI) && android update project -t $(TARGET) -p . && ant debug
+else
+	$(NDK_BUILD) -C test/build/android -B
+	./gradlew unittest:assembleDebug
+endif
 
 clean_Android: clean_Android_ut
 clean_Android_ut:
+ifeq ($(USE_ANT), Yes)
 	-cd ./test/build/android && $(NDKROOT)/ndk-build APP_ABI=$(APP_ABI) clean && ant clean
+else
+	-$(NDK_BUILD) -C test/build/android -B clean
+	-./gradlew unittest:clean
+endif
+
 endif
 endif
 

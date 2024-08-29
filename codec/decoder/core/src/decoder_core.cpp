@@ -2261,7 +2261,15 @@ int32_t WelsDecodeInitAccessUnitStart (PWelsDecoderContext pCtx, SBufferInfo* pD
   pCtx->bAuReadyFlag = false;
   pCtx->pLastDecPicInfo->bLastHasMmco5 = false;
   bool bTmpNewSeqBegin = CheckNewSeqBeginAndUpdateActiveLayerSps (pCtx);
+  if (bTmpNewSeqBegin) {
+    if (pCtx->pStreamSeqNum)
+      (*pCtx->pStreamSeqNum)++;
+    else
+      pCtx->iSeqNum++;
+  }
   pCtx->bNewSeqBegin = pCtx->bNewSeqBegin || bTmpNewSeqBegin;
+  if (pCtx->pStreamSeqNum)
+    pCtx->iSeqNum = *pCtx->pStreamSeqNum;
   iErr = WelsDecodeAccessUnitStart (pCtx);
   GetVclNalTemporalId (pCtx);
 
@@ -2432,7 +2440,7 @@ int32_t InitRefPicList (PWelsDecoderContext pCtx, const uint8_t kuiNRi, int32_t 
   } else
     iRet = WelsInitRefList (pCtx, iPoc);
   if ((pCtx->eSliceType != I_SLICE && pCtx->eSliceType != SI_SLICE)) {
-#if 0
+#if 1
     if (pCtx->pSps->uiProfileIdc != 66 && pCtx->pPps->bEntropyCodingModeFlag)
       iRet = WelsReorderRefList2 (pCtx);
     else

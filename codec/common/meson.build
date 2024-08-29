@@ -63,11 +63,14 @@ elif cpu_family in ['loongarch32', 'loongarch64']
     'loongarch/copy_mb_lsx.c',
     'loongarch/deblock_lsx.c',
     'loongarch/intra_pred_com_lsx.c',
+    'loongarch/intra_pred_com_lasx.c',
     'loongarch/mc_chroma_lsx.c',
     'loongarch/mc_horver_lsx.c',
     'loongarch/satd_sad_lasx.c',
   ]
   cpp_sources += asm_sources
+elif cpu_family == 'riscv64'
+  asm_sources = []
 else
   error('Unsupported cpu_family @0@'.format(cpu_family))
 endif
