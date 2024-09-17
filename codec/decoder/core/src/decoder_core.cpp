@@ -544,7 +544,7 @@ int32_t ParseDecRefPicMarking (PWelsDecoderContext pCtx, PBitStringAux pBs, PSli
           bMmco4Exist = true;
           WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //max_long_term_frame_idx_plus1
           int32_t iMaxLongTermFrameIdx = -1 + uiCode;
-          if (iMaxLongTermFrameIdx > int32_t (pSps->uiLog2MaxFrameNum)) {
+          if (iMaxLongTermFrameIdx > int32_t (pSps->iNumRefFrames)) {
             //ISO/IEC 14496-10:2009(E) 7.4.3.3 Decoded reference picture marking semantics page 96
             return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_HEADER, ERR_INFO_INVALID_REF_MARKING);
           }
