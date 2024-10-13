@@ -285,14 +285,15 @@ typedef struct tagPictInfo {
   int32_t                 iPOC;
   int32_t                 iPicBuffIdx;
   uint32_t                uiDecodingTimeStamp;
-  bool                    bLastGOP;
+  int32_t                 iSeqNum;
 } SPictInfo, *PPictInfo;
 
 typedef struct tagPictReoderingStatus {
   int32_t iPictInfoIndex;
+  int32_t iMinSeqNum;
   int32_t iMinPOC;
   int32_t iNumOfPicts;
-  int32_t iLastGOPRemainPicts;
+  int32_t iLastWrittenSeqNum;
   int32_t iLastWrittenPOC;
   int32_t iLargestBufferedPicIndex;
   bool    bHasBSlice;
@@ -431,6 +432,8 @@ typedef struct TagWelsDecoderContext {
 #endif
   bool       bNewSeqBegin;
   bool       bNextNewSeqBegin;
+  int32_t    *pStreamSeqNum;
+  int32_t    iSeqNum;
 
 //for Parse only
   bool bFramePending;

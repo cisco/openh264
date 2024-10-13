@@ -67,7 +67,9 @@ int32_t GetLTRFrameIndex (PRefPic pRefPic, int32_t iAncLTRFrameNum);
 static int32_t RemainOneBufferInDpbForEC (PWelsDecoderContext pCtx, PRefPic pRefPic);
 
 static void SetUnRef (PPicture pRef) {
-  if (NULL != pRef) {
+  if (pRef == NULL) return;
+
+  if (pRef->iRefCount <= 0) {
     pRef->bUsedAsRef = false;
     pRef->bIsLongRef = false;
     pRef->iFrameNum = -1;
@@ -81,6 +83,7 @@ static void SetUnRef (PPicture pRef) {
     pRef->iSpsId = -1;
     pRef->bIsComplete = false;
     pRef->iRefCount = 0;
+    pRef->pSetUnRef = NULL;
 
     if (pRef->eSliceType == I_SLICE) {
       return;
@@ -88,12 +91,11 @@ static void SetUnRef (PPicture pRef) {
     int32_t lists = pRef->eSliceType == P_SLICE ? 1 : 2;
     for (int32_t i = 0; i < MAX_DPB_COUNT; ++i) {
       for (int32_t list = 0; list < lists; ++list) {
-        if (pRef->pRefPic[list][i] != NULL) {
-          pRef->pRefPic[list][i]->iRefCount = 0;
-          pRef->pRefPic[list][i] = NULL;
-        }
+        pRef->pRefPic[list][i] = NULL;
       }
     }
+  } else {
+    pRef->pSetUnRef = SetUnRef;
   }
 }
 
@@ -492,7 +494,10 @@ int32_t WelsReorderRefList2 (PWelsDecoderContext pCtx) {
   int32_t i = 0;
   int32_t j = 0;
   int32_t k = 0;
-  int32_t iMaxRefIdx = pCtx->pSps->iNumRefFrames;
+  int32_t iMaxRefIdx = pCtx->iPicQueueNumber;
+  if (iMaxRefIdx > MAX_REF_PIC_COUNT) {
+    iMaxRefIdx = MAX_REF_PIC_COUNT;
+  }
   const int32_t iCurFrameNum = pSliceHeader->iFrameNum;
   const int32_t iMaxPicNum = 1 << pSliceHeader->pSps->uiLog2MaxFrameNum;
   int32_t iListCount = 1;
@@ -561,7 +566,7 @@ int32_t WelsReorderRefList2 (PWelsDecoderContext pCtx) {
           k = iCount;
           for (j = k; j <= iRefCount; j++) {
             if (ppRefList[j] != NULL) {
-              if (!ppRefList[j]->bIsLongRef || ppLongRefList[j]->uiLongTermPicNum != (uint32_t)iPredFrameNum)
+              if (!ppRefList[j]->bIsLongRef || ppRefList[j]->uiLongTermPicNum != (uint32_t)iPredFrameNum)
                 ppRefList[k++] = ppRefList[j];
             }
           }

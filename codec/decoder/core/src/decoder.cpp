@@ -152,6 +152,7 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
     pPicNewBuf->ppPic[i]->bUsedAsRef = false;
     pPicNewBuf->ppPic[i]->bIsLongRef = false;
     pPicNewBuf->ppPic[i]->iRefCount = 0;
+    pPicNewBuf->ppPic[i]->pSetUnRef = NULL;
     pPicNewBuf->ppPic[i]->bIsComplete = false;
   }
 // remove old PicBuf
@@ -240,6 +241,7 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
     pPicNewBuf->ppPic[i]->bUsedAsRef = false;
     pPicNewBuf->ppPic[i]->bIsLongRef = false;
     pPicNewBuf->ppPic[i]->iRefCount = 0;
+    pPicNewBuf->ppPic[i]->pSetUnRef = NULL;
     pPicNewBuf->ppPic[i]->bIsComplete = false;
   }
   // remove old PicBuf
@@ -296,11 +298,9 @@ void ResetReorderingPictureBuffers (PPictReoderingStatus pPictReoderingStatus, P
     pPictReoderingStatus->iPictInfoIndex = 0;
     pPictReoderingStatus->iMinPOC = IMinInt32;
     pPictReoderingStatus->iNumOfPicts = 0;
-    pPictReoderingStatus->iLastGOPRemainPicts = 0;
     pPictReoderingStatus->iLastWrittenPOC = IMinInt32;
     pPictReoderingStatus->iLargestBufferedPicIndex = 0;
     for (int32_t i = 0; i < pictInfoListCount; ++i) {
-      pPictInfo[i].bLastGOP = false;
       pPictInfo[i].iPOC = IMinInt32;
     }
     pPictInfo->sBufferInfo.iBufferStatus = 0;
@@ -621,6 +621,7 @@ int32_t WelsOpenDecoder (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   pCtx->bPrintFrameErrorTraceFlag = true;
   pCtx->iIgnoredErrorInfoPacketCount = 0;
   pCtx->bFrameFinish = true;
+  pCtx->iSeqNum = 0;
   return iRet;
 }
 
@@ -796,14 +797,13 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
           bNalStartBytes = true;
         } else if (pSrcNal[2 + iSrcIdx] == 0x03) {
           if ((3 + iSrcConsumed < iSrcLength) && pSrcNal[3 + iSrcIdx] > 0x03) {
-            pCtx->iErrorCode |= dsBitstreamError;
-            return pCtx->iErrorCode;
+            /* Just skip */
           } else {
             ST16 (pDstNal + iDstIdx, 0);
             iDstIdx      += 2;
-            iSrcIdx      += 3;
-            iSrcConsumed += 3;
           }
+          iSrcIdx      += 3;
+          iSrcConsumed += 3;
         } else { // 0x01
           bNalStartBytes = false;
 
@@ -819,8 +819,6 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
             if (pCtx->bAuReadyFlag && pCtx->pAccessUnitList->uiAvailUnitsNum != 0) {
               if (GetThreadCount (pCtx) <= 1) {
                 ConstructAccessUnit (pCtx, ppDst, pDstBufInfo);
-              } else {
-                pCtx->pAccessUnitList->uiAvailUnitsNum = 1;
               }
             }
           }
@@ -883,8 +881,6 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
       if (pCtx->bAuReadyFlag && pCtx->pAccessUnitList->uiAvailUnitsNum != 0) {
         if (GetThreadCount (pCtx) <= 1) {
           ConstructAccessUnit (pCtx, ppDst, pDstBufInfo);
-        } else {
-          pCtx->pAccessUnitList->uiAvailUnitsNum = 1;
         }
       }
     }
