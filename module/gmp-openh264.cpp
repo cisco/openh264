@@ -898,7 +898,6 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
   }
 
   virtual void Decode (GMPVideoEncodedFrame* inputFrame,
-                       bool missingFrames,
                        const uint8_t* aCodecSpecificInfo,
                        uint32_t aCodecSpecificInfoLength,
                        int64_t renderTimeMs = -1) {
@@ -939,7 +938,6 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
     worker_thread_->Post (WrapTaskRefCounted (
                             this, &OpenH264VideoDecoder::Decode_w,
                             inputFrame,
-                            missingFrames,
                             dState,
                             renderTimeMs));
     if (dState) {
@@ -1006,7 +1004,6 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
   }
 
   void Decode_w (GMPVideoEncodedFrame* inputFrame,
-                 bool missingFrames,
                  DECODING_STATE& dState,
                  int64_t renderTimeMs = -1) {
     GMPLOG (GL_DEBUG, "Frame decode on worker thread length = "
