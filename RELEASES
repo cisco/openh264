@@ -1,6 +1,18 @@
 
 Releases
 -----------
+v2.5.0
+------
+- Fix some multi-thread decoding issues
+- Remove unused pSpatialLayer variable in DetermineTemporalSettings
+- Change picOrderCnt to 2
+- Fix cross compile from darwin arm64 to x86_64
+- Fix deadlock at the end of decoding
+- Fix frame-decode errors
+- Fix build with meson on riscv64
+- Enable pac bti support
+- Fix a bug in decoding H.264 streams encoded by Apple HWA encoder
+
 v2.4.1
 ------
 - Fix off by one regression in decoder
