@@ -2329,7 +2329,7 @@ int32_t WelsInitEncoderExt (sWelsEncCtx** ppCtx, SWelsSvcCodingParam* pCodingPar
     WelsUninitEncoderExt (&pCtx);
     return iRet;
   }
-  memcpy (pCtx->pSvcParam, pCodingParam, sizeof (SWelsSvcCodingParam)); // confirmed_safe_unsafe_usage
+  memcpy ((void*) pCtx->pSvcParam, pCodingParam, sizeof (SWelsSvcCodingParam)); // confirmed_safe_unsafe_usage
 
   pCtx->pFuncList = (SWelsFuncPtrList*)pCtx->pMemAlign->WelsMallocz (sizeof (SWelsFuncPtrList), "SWelsFuncPtrList");
   if (NULL == pCtx->pFuncList) {
@@ -4456,7 +4456,7 @@ int32_t WelsEncoderApplyLTR (SLogContext* pLogCtx, sWelsEncCtx** ppCtx, SLTRConf
   SWelsSvcCodingParam sConfig;
   int32_t iNumRefFrame = 1;
   int32_t iRet = 0;
-  memcpy (&sConfig, (*ppCtx)->pSvcParam, sizeof (SWelsSvcCodingParam));
+  memcpy ((void*) &sConfig, (*ppCtx)->pSvcParam, sizeof (SWelsSvcCodingParam));
   sConfig.bEnableLongTermReference = pLTRValue->bEnableLongTermReference;
   sConfig.iLTRRefNum = pLTRValue->iLTRRefNum;
   int32_t uiGopSize = 1 << (sConfig.iTemporalLayerNum - 1);

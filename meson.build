@@ -41,7 +41,6 @@ cpu_family = host_machine.cpu_family()
 
 supported_arguments = cpp.get_supported_arguments([
   '-Wno-non-virtual-dtor',
-  '-Wno-class-memaccess',
   '-Werror',
   '-Wunused-but-set-variable',
   '-Wno-strict-aliasing'])
