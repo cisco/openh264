@@ -2,7 +2,8 @@ project('openh264', ['c', 'cpp'],
   version : '2.5.0',
   meson_version : '>= 0.52',
   default_options : [ 'warning_level=1',
-                      'buildtype=debugoptimized' ])
+                      'buildtype=debugoptimized',
+                      'werror=true' ])
 
 major_version = '7'
 
@@ -42,7 +43,6 @@ cpu_family = host_machine.cpu_family()
 supported_arguments = cpp.get_supported_arguments([
   '-Wno-non-virtual-dtor',
   '-Wno-class-memaccess',
-  '-Werror',
   '-Wunused-but-set-variable',
   '-Wno-strict-aliasing'])
 
