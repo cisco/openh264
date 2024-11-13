@@ -57,7 +57,14 @@ cpp_lib = '-lstdc++'
 libm_dep = cpp.find_library('m', required : false)
 deps += [libm_dep]
 
-if ['linux', 'freebsd', 'android', 'ios', 'darwin'].contains(system)
+# https://github.com/cisco/openh264/issues/2534
+if cpu_family == 'x86'
+  c_args += ['-DX86_32_PICASM']
+  cpp_args += ['-DX86_32_PICASM']
+  asm_args += ['-DX86_32_PICASM']
+endif
+
+if ['linux', 'android', 'ios', 'darwin'].contains(system)
   asm_format32 = 'elf'
   asm_format64 = 'elf64'
   if ['ios', 'darwin'].contains(system)
@@ -199,11 +206,15 @@ subdir ('test')
 
 libopenh264 = library('openh264',
   link_whole: [libcommon, libprocessing, libencoder, libdecoder],
+  # failsafe for ASM relocations
+  link_args: cpp.get_supported_link_arguments(['-Wl,-Bsymbolic', '-Wl,-z,text']),
   install: true,
   soversion: major_version,
   version: meson.project_version(),
   vs_module_defs: 'openh264.def',
-  dependencies: deps)
+  dependencies: deps,
+  pic: true
+)
 
 openh264_dep = declare_dependency(
   link_with: libopenh264,
