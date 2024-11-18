@@ -31,12 +31,3 @@ endif
 ifneq ($(filter %clang++,$(CXX)),)
 CXXFLAGS += -Wc++11-compat-reserved-user-defined-literal
 endif
-
-ifneq ($(filter %g++,$(CXX)),)
-ifeq ($(filter %clang++,$(CXX)),)
-GCCVER_GTEQ8 = $(shell echo $$(($$($(CXX) -dumpversion | awk -F "." '{print $$1}') >= 8)))
-ifeq ($(GCCVER_GTEQ8), 1)
-CXXFLAGS += -Wno-class-memaccess
-endif
-endif
-endif
