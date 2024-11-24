@@ -78,7 +78,13 @@ jobs:
       - run: meson test -C builddir -v
 
   macos:
-    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        runner:
+          - macos-13 # x86_64
+          - macos-latest # aarch64
+    runs-on: ${{matrix.runner}}
     steps:
       - uses: actions/checkout@v3
       - run: brew install nasm meson
@@ -104,15 +110,6 @@ jobs:
       - run: CFLAGS=-Werror make clean
       - run: CFLAGS=-Werror make -j$(nproc) ARCH=aarch64 CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
       - run: qemu-aarch64 -L /usr/aarch64-linux-gnu/ ./codec_unittest
-
-  macos-cross-arm64:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v3
-      - run: make gmp-bootstrap
-      - run: make gtest-bootstrap
-      - run: c++ --version
-      - run: CFLAGS=-Werror make -j$(sysctl -n hw.ncpu) ARCH=arm64
 
   ios-cross-arm64:
     runs-on: macos-latest
