@@ -32,8 +32,10 @@
 
 #ifdef HAVE_NEON_AARCH64
 #include "arm_arch64_common_macro.S"
+.rodata
 .align 4
 filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0
+.previous
 
 .macro FILTER_6TAG_8BITS1 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
 //  {   // input:src[-2], src[-1], src[0], src[1], src[2], src[3], dst_d, multiplier a/b; working: v18, v19
@@ -1912,7 +1914,8 @@ WELS_ASM_AARCH64_FUNC_BEGIN McHorVer20Width17_AArch64_neon
     mov x5, #16
     movi v0.8h, #20, lsl #0
     movi v1.8h, #5, lsl #0
-    ldr q22, filter_para
+    adrp x6, filter_para
+    ldr q22, [x6, #:lo12:filter_para]
 w17_h_mc_luma_loop:
     ld1 {v2.16b, v3.16b}, [x0], x1 //only use 22(17+5); v2=src[-2]
 
@@ -1946,7 +1949,8 @@ WELS_ASM_AARCH64_FUNC_BEGIN McHorVer20Width9_AArch64_neon
     mov x5, #8
     movi v0.8h, #20, lsl #0
     movi v1.8h, #5, lsl #0
-    ldr q22, filter_para
+    adrp x6, filter_para
+    ldr q22, [x6, #:lo12:filter_para]
 w9_h_mc_luma_loop:
     ld1 {v2.16b}, [x0], x1 //only use 14(9+5); v2=src[-2]
     mov v3.d[0], v2.d[1]
@@ -2012,7 +2016,8 @@ WELS_ASM_AARCH64_FUNC_BEGIN McHorVer22Width17_AArch64_neon
     movi v1.8h, #5, lsl #0
     sub x3, x3, #16
     mov x5, #16
-    ldr q29, filter_para
+    adrp x6, filter_para
+    ldr q29, [x6, #:lo12:filter_para]
 
     sub x4, x4, #1
 
@@ -2215,7 +2220,8 @@ WELS_ASM_AARCH64_FUNC_BEGIN McHorVer22Width9_AArch64_neon
     movi v1.8h, #5, lsl #0
     sub x3, x3, #8
     mov x5, #8
-    ldr q29, filter_para
+    adrp x6, filter_para
+    ldr q29, [x6, #:lo12:filter_para]
     sub x4, x4, #1
 
     //prfm pldl1strm, [x0]
@@ -2315,7 +2321,8 @@ WELS_ASM_AARCH64_FUNC_BEGIN McHorVer22Width5_AArch64_neon
     movi v1.8h, #5, lsl #0
     sub x3, x3, #4
     mov x5, #4
-    ldr q29, filter_para
+    adrp x6, filter_para
+    ldr q29, [x6, #:lo12:filter_para]
     sub x4, x4, #1
 
     //prfm pldl1strm, [x0]

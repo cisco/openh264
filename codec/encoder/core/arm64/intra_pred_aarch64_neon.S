@@ -307,9 +307,11 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsIChromaPredDcTop_AArch64_neon
 .endr
 WELS_ASM_AARCH64_FUNC_END
 
+.rodata
 .align 4
 intra_1_to_4: .short 17*1, 17*2, 17*3, 17*4, 17*1, 17*2, 17*3, 17*4
 intra_m3_to_p4: .short -3, -2, -1, 0, 1, 2, 3, 4
+.previous
 
 WELS_ASM_AARCH64_FUNC_BEGIN WelsIChromaPredPlane_AArch64_neon
     SIGN_EXTENSION x2,w2
@@ -339,8 +341,10 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsIChromaPredPlane_AArch64_neon
 
     uxtl    v1.8h, v1.8b
     uxtl    v0.8h, v0.8b
-    ldr     q2, intra_1_to_4
-    ldr     q3, intra_m3_to_p4
+    adrp    x4, intra_1_to_4
+    adrp    x5, intra_m3_to_p4
+    ldr     q2, [x4, #:lo12:intra_1_to_4]
+    ldr     q3, [x5, #:lo12:intra_m3_to_p4]
     dup     v4.8h, v0.h[3]
     dup     v5.8h, v0.h[7]
     add     v4.8h, v4.8h, v5.8h
@@ -437,9 +441,11 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsI16x16LumaPredDcLeft_AArch64_neon
 WELS_ASM_AARCH64_FUNC_END
 
 
+.rodata
 .align 4
 intra_1_to_8: .short 5, 10, 15, 20, 25, 30, 35, 40
 intra_m7_to_p8: .short -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8
+.previous
 //void WelsI16x16LumaPredPlane_AArch64_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 WELS_ASM_AARCH64_FUNC_BEGIN WelsI16x16LumaPredPlane_AArch64_neon
     SIGN_EXTENSION x2,w2
@@ -473,7 +479,8 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsI16x16LumaPredPlane_AArch64_neon
     uxtl    v3.8h, v3.8b
     sub     v0.8h, v1.8h, v0.8h
     sub     v2.8h, v3.8h, v2.8h
-    ldr     q4, intra_1_to_8
+    adrp    x4, intra_1_to_8
+    ldr     q4, [x4, #:lo12:intra_1_to_8]
     mul     v0.8h, v0.8h, v4.8h
     mul     v2.8h, v2.8h, v4.8h
     saddlv  s0, v0.8h
@@ -482,8 +489,10 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsI16x16LumaPredPlane_AArch64_neon
     sqrshrn v0.4h, v0.4S, #6  // b is in v0.h[0]
     sqrshrn v2.4h, v2.4S, #6  // c is in v2.h[0]
     shl     v1.8h, v1.8h, #4   // a is in v1.h[7]
-    ldr     q4, intra_m7_to_p8
-    ldr     q5, intra_m7_to_p8 + 16
+    adrp    x4, intra_m7_to_p8
+    add     x5, x4, 16
+    ldr     q4, [x4, #:lo12:intra_m7_to_p8]
+    ldr     q5, [x5, #:lo12:intra_m7_to_p8]
     dup     v1.8h, v1.h[7]
     dup     v3.8h, v1.h[7]
     mla     v1.8h, v4.8h, v0.h[0]
