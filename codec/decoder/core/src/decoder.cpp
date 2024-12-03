@@ -846,6 +846,10 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
             return pCtx->iErrorCode;
           }
 
+          if (pCtx->iErrorCode != ERR_NONE && !(pCtx->iErrorCode & dsDataErrorConcealed)) {
+              return pCtx->iErrorCode;
+          }
+
           pDstNal += (iDstIdx + 4); //init, increase 4 reserved zero bytes, used to store the next NAL
           if ((iSrcLength - iSrcConsumed + 4) > (pRawData->pEnd - pDstNal)) {
             pDstNal = pRawData->pCurPos = pRawData->pHead;
