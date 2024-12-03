@@ -55,6 +55,8 @@
 #endif
 #ifdef __APPLE__
 #define HW_NCPU_NAME "hw.logicalcpu"
+#elif defined(HW_NCPUONLINE)
+#define HW_NCPU_NAME "hw.ncpuonline"
 #else
 #define HW_NCPU_NAME "hw.ncpu"
 #endif
@@ -522,7 +524,7 @@ WELS_THREAD_ERROR_CODE    WelsQueryLogicalProcessInfo (WelsLogicalProcessInfo* p
   size_t len = sizeof (pInfo->ProcessorCount);
 
 #if defined(__OpenBSD__)
-  int scname[] = { CTL_HW, HW_NCPU };
+  int scname[] = { CTL_HW, HW_NCPUONLINE };
   if (sysctl (scname, 2, &pInfo->ProcessorCount, &len, NULL, 0) == -1)
 #else
   if (sysctlbyname (HW_NCPU_NAME, &pInfo->ProcessorCount, &len, NULL, 0) == -1)
