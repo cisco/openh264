@@ -45,6 +45,7 @@ typedef unsigned char bool;
 
 #include "codec_app_def.h"
 #include "codec_def.h"
+#include <stdint.h>
 
 #if defined(_WIN32) || defined(__cdecl)
 #define EXTAPI __cdecl
@@ -452,6 +453,43 @@ class ISVCDecoder {
       int& iColorFormat) = 0;
 
   /**
+  * @brief  parse bitstream and get motion vectors - skip frame reconstruction
+  * @param   pSrc the h264 stream to be decoded
+  * @param   iSrcLen the length of h264 stream
+  * @param   ppDst buffer pointer of decoded data (YUV)
+  * @param   pDstInfo information provided to API(width, height, etc.)
+  * @param   MotionVectorSize size of the total motion vector for the given P frame.
+  * @param   MotionVectorData Motion vector data.(ex: MotionX, MotionY, Xoffset, Yoffset)
+  * @return  0 - success; otherwise -failed;
+  */
+  virtual DECODING_STATE EXTAPI ParseBitstreamGetMotionVectors (const unsigned char* kpSrc,
+    const int kiSrcLen,
+    unsigned char** ppDst,
+    SParserBsInfo* pDstInfo,
+    SBufferInfo* ppDecodeInfo,
+    int32_t* motionVectorSize,
+    int16_t** motionVectorData) = 0;
+
+  /**
+   @brief   ParseBitstreamGetMotionVectors is used to parse the encoded bitstream and get the motion vectors for the given P frame.
+  *          If bParseOnly mode is enabled then only motionVectorData and motionVectorSize is updated and ppDst is returned with NULL Value.
+  *          If bParseOnly mode is disabled then along MotionVectorData and motionVectorSize the deocoded YUV buffer is updated in ppDst. 
+  * @param   pSrc the h264 stream to be decoded
+  * @param   iSrcLen the length of h264 stream
+  * @param   ppDst buffer pointer of decoded data (YUV)
+  * @param   pDstInfo information provided to API(width, height, etc.)
+  * @param   MotionVectorSize size of the total motion vector for the given P frame.
+  * @param   MotionVectorData Motion vector data.(ex: MotionX, MotionY, Xoffset, Yoffset)
+  * @return  0 - success; otherwise -failed;
+  */
+   virtual DECODING_STATE EXTAPI DecodeFrameGetMotionVectorsNoDelay (const unsigned char* pSrc,
+      const int iSrcLen,
+      unsigned char** ppDst,
+      SBufferInfo* pDstInfo,
+      int32_t* motionVectorSize,
+      int16_t** motionVectorData) = 0;
+
+  /**
   * @brief   Set option for decoder, detail option type, please refer to enumurate DECODER_OPTION.
   * @param   pOption  option for decoder such as OutDataFormat, Eos Flag, EC method, ...
   * @return  CM_RETURN: 0 - success; otherwise - failed;
@@ -509,6 +547,21 @@ DECODING_STATE (*DecodeFrameNoDelay) (ISVCDecoder*, const unsigned char* pSrc,
                                       const int iSrcLen,
                                       unsigned char** ppDst,
                                       SBufferInfo* pDstInfo);
+
+DECODING_STATE (*ParseBitstreamGetMotionVectors) (const unsigned char* kpSrc,
+                                                  const int kiSrcLen,
+                                                  unsigned char** ppDst,
+                                                  SParserBsInfo* pDstInfo,
+                                                  SBufferInfo* ppDecodeInfo,
+                                                  int32_t* motionVectorSize,
+                                                  int16_t** motionVectorData);
+
+DECODING_STATE (*DecodeFrameGetMotionVectorsNoDelay) (const unsigned char* pSrc,
+                                                             const int iSrcLen,
+                                                             unsigned char** ppDst,
+                                                             SBufferInfo* pDstInfo,
+                                                             int32_t* motionVectorSize,
+                                                             int16_t** motionVectorData);
 
 DECODING_STATE (*DecodeFrame2) (ISVCDecoder*, const unsigned char* pSrc,
                                 const int iSrcLen,

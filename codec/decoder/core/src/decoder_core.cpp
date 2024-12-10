@@ -1587,6 +1587,9 @@ int32_t InitialDqLayersContext (PWelsDecoderContext pCtx, const int32_t kiMaxWid
     pCtx->sMb.pMbRefConcealedFlag[i] = (bool*) pMa->WelsMallocz (pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight * sizeof (
                                          bool),
                                        "pCtx->pMbRefConcealedFlag[]");
+    
+    pCtx->mMotionVectorData = (int16_t*)  pMa->WelsMallocz (pCtx->iImgWidthInPixel * pCtx->iImgHeightInPixel * 8 ,
+                                          "pCtx->pMbRefConcealedFlag[]");
 
     // check memory block valid due above allocated..
     WELS_VERIFY_RETURN_IF (ERR_INFO_OUT_OF_MEMORY,
@@ -1643,6 +1646,13 @@ void UninitialDqLayersContext (PWelsDecoderContext pCtx) {
     if (pDq == NULL) {
       ++ i;
       continue;
+    }
+
+     if (pCtx->mMotionVectorData)
+    {
+      pCtx->mMotionVectorData -= pCtx->mMotionVectorSize;
+      pMa->WelsFree (pCtx->mMotionVectorData, "pCtx->mMotionVectorData");
+      pCtx->mMotionVectorData = nullptr;
     }
 
     if (pCtx->sMb.pMbType[i]) {
