@@ -34,6 +34,7 @@ rem         --arm64 folder bin\ARM64
 rem
 rem      [winsdk_version] : full Windows 10 SDK number (e.g. 10.0.17763.0)
 rem      [vc_version] : Specify a VC++ version
+rem                     VC17 for VC++ 2022
 rem                     VC16 for VC++ 2019
 rem                     VC15 for VC++ 2017
 rem
@@ -97,6 +98,15 @@ goto :EOF
   set MinGWPath=C:\MinGW\bin
   set MsysPath=C:\MinGW\msys\1.0\bin
 
+  set VC17BuildToolsPath=C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC
+  set VC17CommunityPath=C:\Program Files\Microsoft Visual Studio\2022\Community\VC
+  set VC17ProfessionalPath=C:\Program Files\Microsoft Visual Studio\2022\Professional\VC
+  set VC17EnterprisePath=C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC
+  if exist "%VC17BuildToolsPath%" set VC17PATH=%VC17BuildToolsPath%
+  if exist "%VC17CommunityPath%" set VC17PATH=%VC17CommunityPath%
+  if exist "%VC17ProfessionalPath%" set VC17PATH=%VC17ProfessionalPath%
+  if exist "%VC17EnterprisePath%" set VC17PATH=%VC17EnterprisePath%
+
   set VC16BuildToolsPath=C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC
   set VC16CommunityPath=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC
   set VC16ProfessionalPath=C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC
@@ -130,14 +140,21 @@ goto :EOF
   set VCVARSPATH=%VCPATH%
   if exist "%VC15Path%"    set VCVARSPATH=%VC15Path%\Auxiliary\Build
   if exist "%VC16Path%"    set VCVARSPATH=%VC16Path%\Auxiliary\Build
+  if exist "%VC17Path%"    set VCVARSPATH=%VC17Path%\Auxiliary\Build
 
-  if /I "%OPENH264_VC_VERSION%" == "VC15" (
+  if /I "%OPENH264_VC_VERSION%" == "VC17" (
     set VCPATH=
-    set "VCVARSPATH=%VC15Path%\Auxiliary\Build"
-) else if /I "%OPENH264_VC_VERSION%" == "VC12" (
-    set "VCPATH=%VC12Path%"
-	set "VCVARSPATH=%VCPATH%"
-)
+    set "VCVARSPATH=%VC17Path%\Auxiliary\Build"
+  ) else if /I "%OPENH264_VC_VERSION%" == "VC16" (
+      set VCPATH=
+      set "VCVARSPATH=%VC16Path%\Auxiliary\Build"
+  ) else if /I "%OPENH264_VC_VERSION%" == "VC15" (
+      set VCPATH=
+      set "VCVARSPATH=%VC15Path%\Auxiliary\Build"
+  ) else if /I "%OPENH264_VC_VERSION%" == "VC12" (
+      set "VCPATH=%VC12Path%"
+      set "VCVARSPATH=%VCPATH%"
+  )
 
   set GasScriptPath=%VCPATH%\bin
 
@@ -392,6 +409,7 @@ rem ***********************************************
   echo           Win32-Release-ASM
   echo      [winsdk_version] : full Windows 10 SDK number (e.g. 10.0.17763.0)
   echo      [vc_version] : Specify a VC++ version
+  echo                     VC17 for VC++ 2022
   echo                     VC16 for VC++ 2019
   echo                     VC15 for VC++ 2017
 
