@@ -445,6 +445,10 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
       }
     }
 
+    if (gmp_api_version_ >= kGMPVersion36) {
+      param.iTemporalLayerNum = codecSettings.mTemporalLayerNum;
+    }
+
     //for controlling the NAL size (normally for packetization-mode=0)
     if (maxPayloadSize != 0) {
       if (gmp_api_version_ < kGMPVersion35) {
@@ -740,6 +744,10 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
     f->SetFrameType (frame_type);
     f->SetCompleteFrame (true);
     f->SetBufferType (GMP_BufferLength32);
+
+    if (gmp_api_version_ >= kGMPVersion36) {
+      f->SetTemporalLayerId (encoded->iLayerNum);
+    }
 
     GMPLOG (GL_DEBUG, "Encoding complete. type= "
             << f->FrameType()
