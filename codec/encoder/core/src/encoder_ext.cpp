@@ -2186,7 +2186,7 @@ void StatOverallEncodingExt (sWelsEncCtx* pCtx) {
 
   }
 }
-#endif
+#endif //#if defined(STAT_OUTPUT)
 
 
 int32_t GetMultipleThreadIdc (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingParam, int16_t& iSliceNum,
@@ -3956,6 +3956,19 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
              (iLayerSize << 3));
 #endif//LAYER_INFO_OUTPUT
 
+    pLayerBsInfo->rPsnr[0] = NAN;
+    pLayerBsInfo->rPsnr[1] = NAN;
+    pLayerBsInfo->rPsnr[2] = NAN;
+    if (pSrcPic->bPsnrY) {
+      pLayerBsInfo->rPsnr[0] = fSnrY;
+    }
+    if (pSrcPic->bPsnrU) {
+      pLayerBsInfo->rPsnr[1] = fSnrU;
+    }
+    if (pSrcPic->bPsnrV) {
+      pLayerBsInfo->rPsnr[2] = fSnrV;
+    }
+
 #if defined(STAT_OUTPUT)
 
     {
@@ -3968,18 +3981,6 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
       if (pSvcParam->bPsnrV) {
         pCtx->sStatData[iCurDid][0].sQualityStat.rVPsnr[pCtx->eSliceType] += fSnrV;
       }
-    }
-    pLayerBsInfo->rPsnr[0] = NAN;
-    pLayerBsInfo->rPsnr[1] = NAN;
-    pLayerBsInfo->rPsnr[2] = NAN;
-    if (pSrcPic->bPsnrY) {
-      pLayerBsInfo->rPsnr[0] = fSnrY;
-    }
-    if (pSrcPic->bPsnrU) {
-      pLayerBsInfo->rPsnr[1] = fSnrU;
-    }
-    if (pSrcPic->bPsnrV) {
-      pLayerBsInfo->rPsnr[2] = fSnrV;
     }
 
 #if defined(MB_TYPES_CHECK) //091025, frame output
