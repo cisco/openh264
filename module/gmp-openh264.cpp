@@ -708,10 +708,13 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
     // Buffer up the data.
     uint32_t length = 0;
     std::vector<uint32_t> lengths;
+    unsigned char temporalId = 0;
 
     for (int i = 0; i < encoded->iLayerNum; ++i) {
       lengths.push_back (0);
       uint8_t* tmp = encoded->sLayerInfo[i].pBsBuf;
+      assert(encoded->sLayerInfo[i].uiSpatialId == 0);
+      temporalId = encoded->sLayerInfo[i].uiTemporalId;
       for (int j = 0; j < encoded->sLayerInfo[i].iNalCount; ++j) {
         lengths[i] += encoded->sLayerInfo[i].pNalLengthInByte[j];
         // Convert from 4-byte start codes to GMP_BufferLength32 (NAL lengths)
@@ -746,7 +749,7 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
     f->SetBufferType (GMP_BufferLength32);
 
     if (gmp_api_version_ >= kGMPVersion36) {
-      f->SetTemporalLayerId (encoded->iLayerNum);
+      f->SetTemporalLayerId (temporalId);
     }
 
     GMPLOG (GL_DEBUG, "Encoding complete. type= "
