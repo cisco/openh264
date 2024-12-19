@@ -180,6 +180,9 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     param.bIsLosslessLink = false;
     param.bFixRCOverShoot = true;
     param.iIdrBitrateRatio = IDR_BITRATE_RATIO * 100;
+    param.bPsnrY = false;
+    param.bPsnrU = false;
+    param.bPsnrV = false;
     for (int32_t iLayer = 0; iLayer < MAX_SPATIAL_LAYER_NUM; iLayer++) {
       param.sSpatialLayers[iLayer].uiProfileIdc = PRO_UNKNOWN;
       param.sSpatialLayers[iLayer].uiLevelIdc = LEVEL_UNKNOWN;
@@ -345,6 +348,9 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
     bIsLosslessLink = pCodingParam.bIsLosslessLink;
     bFixRCOverShoot = pCodingParam.bFixRCOverShoot;
     iIdrBitrateRatio = pCodingParam.iIdrBitrateRatio;
+    bPsnrY = pCodingParam.bPsnrY;
+    bPsnrU = pCodingParam.bPsnrU;
+    bPsnrV = pCodingParam.bPsnrV;
     if (iUsageType == SCREEN_CONTENT_REAL_TIME && !bIsLosslessLink && bEnableLongTermReference) {
       bEnableLongTermReference = false;
     }
