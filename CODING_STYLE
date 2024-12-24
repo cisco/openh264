@@ -1,8 +1,0 @@
-Code Guidelines
-
-Try to follow the style of the existing code.
-
-Please do not add tabs, trailing whitespace, or Windows-style line endings (CRLF).
-
-The C++ code was pretty-printed with astyle on 05/01/2014 using the configuration found in build/astyle.cfg
-
