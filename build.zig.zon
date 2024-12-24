@@ -1,0 +1,12 @@
+.{
+    .name = "openh264",
+    .version = "2.5.0-423eb2c3e47009f4e631b5e413123a003fdff1ed",
+    .dependencies = .{},
+    .paths = .{
+        "LICENSE",
+        "README.md",
+        "build.zig",
+        "build.zig.zon",
+        "codec",
+    },
+}
