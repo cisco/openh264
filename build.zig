@@ -1,40 +1,27 @@
 const std = @import("std");
 
-// TODO(docs): console not included
-// TODO(docs): Tests have been stripped
-
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
     const build_config = makeBuildConfiguration(target.result);
 
-    const libcommon = addLibcommon(b, &build_config, target, optimize);
-    const libprocessing = addLibprocessing(b, &build_config, target, optimize);
-    const libencoder = addLibencoder(b, &build_config, target, optimize);
-    const libdecoder = addLibdecoder(b, &build_config, target, optimize);
-
     const lib = b.addStaticLibrary(.{
         .name = "openh264",
         .target = target,
         .optimize = optimize,
     });
-    // NOTE: zig-pkg bypass (artifact need generate object file)
-    // Originally found this here:
-    // https://github.com/allyourcodebase/boost-libraries-zig/blob/5d6661b35fc80a1d09cf3857b423f386c53384f8/build.zig#L186
-    const empty = b.addWriteFile("empty.c",
-        \\ #include <codec_api.h>
-    );
-    lib.step.dependOn(&empty.step);
-    lib.addCSourceFiles(.{
-        .root = empty.getDirectory(),
-        .files = &.{"empty.c"},
-    });
+
+    const common = addObjectLibraryCommon(b, &build_config, target, optimize);
+    const processing = addObjectLibraryProcessing(b, &build_config, target, optimize);
+    const encoder = addObjectLibraryEncoder(b, &build_config, target, optimize);
+    const decoder = addObjectLibraryDecoder(b, &build_config, target, optimize);
+
     lib.addIncludePath(b.path("codec/api/wels"));
-    lib.linkLibrary(libcommon);
-    lib.linkLibrary(libprocessing);
-    lib.linkLibrary(libencoder);
-    lib.linkLibrary(libdecoder);
+    lib.addObject(common);
+    lib.addObject(processing);
+    lib.addObject(encoder);
+    lib.addObject(decoder);
 
     // TODO: bindings
     // const bindings = b.addModule("openh264", .{
@@ -44,28 +31,33 @@ pub fn build(b: *std.Build) void {
     // });
     // bindings.linkLibrary(lib);
 
+    lib.installHeader(b.path("codec/api/wels/codec_api.h"), "codec_api.h");
+    lib.installHeader(b.path("codec/api/wels/codec_app_def.h"), "codec_app_def.h");
+    lib.installHeader(b.path("codec/api/wels/codec_def.h"), "codec_def.h");
+    lib.installHeader(b.path("codec/api/wels/codec_ver.h"), "codec_ver.h");
+
     b.installArtifact(lib);
 }
 
-fn addLibcommon(
+fn addObjectLibraryCommon(
     b: *std.Build,
     build_config: *const BuildConfiguration,
     target: std.Build.ResolvedTarget,
     optimize: std.builtin.OptimizeMode,
 ) *std.Build.Step.Compile {
-    const lib = b.addStaticLibrary(.{
-        .name = "libcommon",
+    const obj = b.addObject(.{
+        .name = "common",
         .target = target,
         .optimize = optimize,
     });
 
-    lib.linkLibC();
-    lib.linkLibCpp();
+    obj.linkLibC();
+    obj.linkLibCpp();
 
-    lib.addIncludePath(b.path("codec/api/wels"));
-    lib.addIncludePath(b.path("codec/common/inc"));
+    obj.addIncludePath(b.path("codec/api/wels"));
+    obj.addIncludePath(b.path("codec/common/inc"));
 
-    lib.addCSourceFiles(.{
+    obj.addCSourceFiles(.{
         .files = &.{
             "codec/common/src/common_tables.cpp",
             "codec/common/src/copy_mb.cpp",
@@ -89,9 +81,9 @@ fn addLibcommon(
 
     switch (target.result.cpu.arch) {
         .x86, .x86_64 => {
-            lib.addIncludePath(b.path("codec/common/x86/inc"));
+            obj.addIncludePath(b.path("codec/common/x86/inc"));
 
-            addNasmFiles(b, lib, build_config, &.{
+            addNasmFiles(b, obj, build_config, &.{
                 "codec/common/x86/cpuid.asm",
                 "codec/common/x86/dct.asm",
                 "codec/common/x86/deblock.asm",
@@ -105,9 +97,9 @@ fn addLibcommon(
             });
         },
         .arm => {
-            lib.addIncludePath(b.path("codec/common/arm/inc"));
+            obj.addIncludePath(b.path("codec/common/arm/inc"));
 
-            lib.addCSourceFiles(.{
+            obj.addCSourceFiles(.{
                 .files = &.{
                     "codec/common/arm/copy_mb_neon.S",
                     "codec/common/arm/deblocking_neon.S",
@@ -118,9 +110,9 @@ fn addLibcommon(
             });
         },
         .aarch64 => {
-            lib.addIncludePath(b.path("codec/common/armcomm/inc"));
+            obj.addIncludePath(b.path("codec/common/armcomm/inc"));
 
-            lib.addCSourceFiles(.{
+            obj.addCSourceFiles(.{
                 .files = &.{
                     "codec/common/arm64/copy_mb_aarch64_neon.S",
                     "codec/common/arm64/deblocking_aarch64_neon.S",
@@ -131,9 +123,9 @@ fn addLibcommon(
             });
         },
         .loongarch32, .loongarch64 => {
-            lib.addIncludePath(b.path("codec/common/loongarch/inc"));
+            obj.addIncludePath(b.path("codec/common/loongarch/inc"));
 
-            lib.addCSourceFiles(.{
+            obj.addCSourceFiles(.{
                 .files = &.{
                     "codec/common/loongarch/copy_mb_lsx.c",
                     "codec/common/loongarch/deblock_lsx.c",
@@ -148,35 +140,35 @@ fn addLibcommon(
         else => {},
     }
 
-    return lib;
+    return obj;
 }
 
-fn addLibprocessing(
+fn addObjectLibraryProcessing(
     b: *std.Build,
     build_config: *const BuildConfiguration,
     target: std.Build.ResolvedTarget,
     optimize: std.builtin.OptimizeMode,
 ) *std.Build.Step.Compile {
-    const lib = b.addStaticLibrary(.{
-        .name = "libprocessing",
+    const obj = b.addObject(.{
+        .name = "processing",
         .target = target,
         .optimize = optimize,
     });
 
-    lib.linkLibC();
-    lib.linkLibCpp();
+    obj.linkLibC();
+    obj.linkLibCpp();
 
-    lib.addIncludePath(b.path("codec/api/wels"));
-    lib.addIncludePath(b.path("codec/common/inc"));
+    obj.addIncludePath(b.path("codec/api/wels"));
+    obj.addIncludePath(b.path("codec/common/inc"));
 
-    lib.addIncludePath(b.path("codec/processing/interface"));
-    lib.addIncludePath(b.path("codec/processing/src/common"));
-    lib.addIncludePath(b.path("codec/processing/src/adaptivequantization"));
-    lib.addIncludePath(b.path("codec/processing/src/downsample"));
-    lib.addIncludePath(b.path("codec/processing/src/scrolldetection"));
-    lib.addIncludePath(b.path("codec/processing/src/vaacalc"));
+    obj.addIncludePath(b.path("codec/processing/interface"));
+    obj.addIncludePath(b.path("codec/processing/src/common"));
+    obj.addIncludePath(b.path("codec/processing/src/adaptivequantization"));
+    obj.addIncludePath(b.path("codec/processing/src/downsample"));
+    obj.addIncludePath(b.path("codec/processing/src/scrolldetection"));
+    obj.addIncludePath(b.path("codec/processing/src/vaacalc"));
 
-    lib.addCSourceFiles(.{
+    obj.addCSourceFiles(.{
         .files = &.{
             "codec/processing/src/adaptivequantization/AdaptiveQuantization.cpp",
             "codec/processing/src/backgrounddetection/BackgroundDetection.cpp",
@@ -201,18 +193,18 @@ fn addLibprocessing(
 
     switch (target.result.cpu.arch) {
         .x86, .x86_64 => {
-            lib.addIncludePath(b.path("codec/common/x86/inc"));
+            obj.addIncludePath(b.path("codec/common/x86/inc"));
 
-            addNasmFiles(b, lib, build_config, &.{
+            addNasmFiles(b, obj, build_config, &.{
                 "codec/processing/src/x86/denoisefilter.asm",
                 "codec/processing/src/x86/downsample_bilinear.asm",
                 "codec/processing/src/x86/vaa.asm",
             });
         },
         .arm => {
-            lib.addIncludePath(b.path("codec/common/arm/inc"));
+            obj.addIncludePath(b.path("codec/common/arm/inc"));
 
-            lib.addCSourceFiles(.{
+            obj.addCSourceFiles(.{
                 .files = &.{
                     "codec/processing/src/arm/adaptive_quantization.S",
                     "codec/processing/src/arm/down_sample_neon.S",
@@ -222,9 +214,9 @@ fn addLibprocessing(
             });
         },
         .aarch64 => {
-            lib.addIncludePath(b.path("codec/common/armcomm/inc"));
+            obj.addIncludePath(b.path("codec/common/armcomm/inc"));
 
-            lib.addCSourceFiles(.{
+            obj.addCSourceFiles(.{
                 .files = &.{
                     "codec/processing/src/arm64/adaptive_quantization_aarch64_neon.S",
                     "codec/processing/src/arm64/down_sample_aarch64_neon.S",
@@ -234,9 +226,9 @@ fn addLibprocessing(
             });
         },
         .loongarch32, .loongarch64 => {
-            lib.addIncludePath(b.path("codec/common/loongarch/inc"));
+            obj.addIncludePath(b.path("codec/common/loongarch/inc"));
 
-            lib.addCSourceFiles(.{
+            obj.addCSourceFiles(.{
                 .files = &.{
                     "codec/processing/src/loongarch/vaa_lsx.c",
                     "codec/processing/src/loongarch/vaa_lasx.c",
@@ -246,39 +238,39 @@ fn addLibprocessing(
         else => {},
     }
 
-    return lib;
+    return obj;
 }
 
-fn addLibencoder(
+fn addObjectLibraryEncoder(
     b: *std.Build,
     build_config: *const BuildConfiguration,
     target: std.Build.ResolvedTarget,
     optimize: std.builtin.OptimizeMode,
 ) *std.Build.Step.Compile {
-    const lib = b.addStaticLibrary(.{
-        .name = "libencoder",
+    const obj = b.addObject(.{
+        .name = "encoder",
         .target = target,
         .optimize = optimize,
     });
 
-    lib.linkLibC();
-    lib.linkLibCpp();
+    obj.linkLibC();
+    obj.linkLibCpp();
 
-    lib.addIncludePath(b.path("codec/api/wels"));
-    lib.addIncludePath(b.path("codec/common/inc"));
+    obj.addIncludePath(b.path("codec/api/wels"));
+    obj.addIncludePath(b.path("codec/common/inc"));
 
-    // NOTE: Encoder needs libprocessing headers.
-    lib.addIncludePath(b.path("codec/processing/interface"));
-    lib.addIncludePath(b.path("codec/processing/src/common"));
-    lib.addIncludePath(b.path("codec/processing/src/adaptivequantization"));
-    lib.addIncludePath(b.path("codec/processing/src/downsample"));
-    lib.addIncludePath(b.path("codec/processing/src/scrolldetection"));
-    lib.addIncludePath(b.path("codec/processing/src/vaacalc"));
+    // NOTE: Encoder needs processing headers.
+    obj.addIncludePath(b.path("codec/processing/interface"));
+    obj.addIncludePath(b.path("codec/processing/src/common"));
+    obj.addIncludePath(b.path("codec/processing/src/adaptivequantization"));
+    obj.addIncludePath(b.path("codec/processing/src/downsample"));
+    obj.addIncludePath(b.path("codec/processing/src/scrolldetection"));
+    obj.addIncludePath(b.path("codec/processing/src/vaacalc"));
 
-    lib.addIncludePath(b.path("codec/encoder/core/inc"));
-    lib.addIncludePath(b.path("codec/encoder/plus/inc"));
+    obj.addIncludePath(b.path("codec/encoder/core/inc"));
+    obj.addIncludePath(b.path("codec/encoder/plus/inc"));
 
-    lib.addCSourceFiles(.{
+    obj.addCSourceFiles(.{
         .files = &.{
             "codec/encoder/core/src/au_set.cpp",
             "codec/encoder/core/src/deblocking.cpp",
@@ -318,9 +310,9 @@ fn addLibencoder(
 
     switch (target.result.cpu.arch) {
         .x86, .x86_64 => {
-            lib.addIncludePath(b.path("codec/common/x86/inc"));
+            obj.addIncludePath(b.path("codec/common/x86/inc"));
 
-            addNasmFiles(b, lib, build_config, &.{
+            addNasmFiles(b, obj, build_config, &.{
                 "codec/encoder/core/x86/coeff.asm",
                 "codec/encoder/core/x86/dct.asm",
                 "codec/encoder/core/x86/intra_pred.asm",
@@ -332,9 +324,9 @@ fn addLibencoder(
             });
         },
         .arm => {
-            lib.addIncludePath(b.path("codec/common/arm/inc"));
+            obj.addIncludePath(b.path("codec/common/arm/inc"));
 
-            lib.addCSourceFiles(.{
+            obj.addCSourceFiles(.{
                 .files = &.{
                     "codec/encoder/core/arm/intra_pred_neon.S",
                     "codec/encoder/core/arm/intra_pred_sad_3_opt_neon.S",
@@ -346,9 +338,9 @@ fn addLibencoder(
             });
         },
         .aarch64 => {
-            lib.addIncludePath(b.path("codec/common/armcomm/inc"));
+            obj.addIncludePath(b.path("codec/common/armcomm/inc"));
 
-            lib.addCSourceFiles(.{
+            obj.addCSourceFiles(.{
                 .files = &.{
                     "codec/encoder/core/arm64/intra_pred_aarch64_neon.S",
                     "codec/encoder/core/arm64/intra_pred_sad_3_opt_aarch64_neon.S",
@@ -360,9 +352,9 @@ fn addLibencoder(
             });
         },
         .loongarch32, .loongarch64 => {
-            lib.addIncludePath(b.path("codec/common/loongarch/inc"));
+            obj.addIncludePath(b.path("codec/common/loongarch/inc"));
 
-            lib.addCSourceFiles(.{
+            obj.addCSourceFiles(.{
                 .files = &.{
                     "codec/encoder/core/loongarch/quant_lsx.c",
                     "codec/encoder/core/loongarch/get_intra_predictor_lsx.c",
@@ -375,31 +367,31 @@ fn addLibencoder(
         else => {},
     }
 
-    return lib;
+    return obj;
 }
 
-fn addLibdecoder(
+fn addObjectLibraryDecoder(
     b: *std.Build,
     build_config: *const BuildConfiguration,
     target: std.Build.ResolvedTarget,
     optimize: std.builtin.OptimizeMode,
 ) *std.Build.Step.Compile {
-    const lib = b.addStaticLibrary(.{
-        .name = "libdecoder",
+    const obj = b.addObject(.{
+        .name = "decoder",
         .target = target,
         .optimize = optimize,
     });
 
-    lib.linkLibC();
-    lib.linkLibCpp();
+    obj.linkLibC();
+    obj.linkLibCpp();
 
-    lib.addIncludePath(b.path("codec/api/wels"));
-    lib.addIncludePath(b.path("codec/common/inc"));
+    obj.addIncludePath(b.path("codec/api/wels"));
+    obj.addIncludePath(b.path("codec/common/inc"));
 
-    lib.addIncludePath(b.path("codec/decoder/core/inc"));
-    lib.addIncludePath(b.path("codec/decoder/plus/inc"));
+    obj.addIncludePath(b.path("codec/decoder/core/inc"));
+    obj.addIncludePath(b.path("codec/decoder/plus/inc"));
 
-    lib.addCSourceFiles(.{
+    obj.addCSourceFiles(.{
         .files = &.{
             "codec/decoder/core/src/au_parser.cpp",
             "codec/decoder/core/src/bit_stream.cpp",
@@ -428,17 +420,17 @@ fn addLibdecoder(
 
     switch (target.result.cpu.arch) {
         .x86, .x86_64 => {
-            lib.addIncludePath(b.path("codec/common/x86/inc"));
+            obj.addIncludePath(b.path("codec/common/x86/inc"));
 
-            addNasmFiles(b, lib, build_config, &.{
+            addNasmFiles(b, obj, build_config, &.{
                 "codec/decoder/core/x86/dct.asm",
                 "codec/decoder/core/x86/intra_pred.asm",
             });
         },
         .arm => {
-            lib.addIncludePath(b.path("codec/common/arm/inc"));
+            obj.addIncludePath(b.path("codec/common/arm/inc"));
 
-            lib.addCSourceFiles(.{
+            obj.addCSourceFiles(.{
                 .files = &.{
                     "codec/decoder/core/arm/block_add_neon.S",
                     "codec/decoder/core/arm/intra_pred_neon.S",
@@ -446,9 +438,9 @@ fn addLibdecoder(
             });
         },
         .aarch64 => {
-            lib.addIncludePath(b.path("codec/common/armcomm/inc"));
+            obj.addIncludePath(b.path("codec/common/armcomm/inc"));
 
-            lib.addCSourceFiles(.{
+            obj.addCSourceFiles(.{
                 .files = &.{
                     "codec/decoder/core/arm64/block_add_aarch64_neon.S",
                     "codec/decoder/core/arm64/intra_pred_aarch64_neon.S",
@@ -456,9 +448,9 @@ fn addLibdecoder(
             });
         },
         .loongarch32, .loongarch64 => {
-            lib.addIncludePath(b.path("codec/common/loongarch/inc"));
+            obj.addIncludePath(b.path("codec/common/loongarch/inc"));
 
-            lib.addCSourceFiles(.{
+            obj.addCSourceFiles(.{
                 .files = &.{
                     "codec/decoder/core/loongarch/mb_aux_lsx.c",
                 },
@@ -467,12 +459,12 @@ fn addLibdecoder(
         else => {},
     }
 
-    return lib;
+    return obj;
 }
 
 fn addNasmFiles(
     b: *std.Build,
-    lib: *std.Build.Step.Compile,
+    obj: *std.Build.Step.Compile,
     build_config: *const BuildConfiguration,
     comptime asm_source_files: []const []const u8,
 ) void {
@@ -490,7 +482,7 @@ fn addNasmFiles(
         nasm_run.addArgs(&.{ "-f", build_config.nasm_format });
         nasm_run.addArgs(&.{ "-i", "codec/common/x86" });
         nasm_run.addArg("-o");
-        lib.addObjectFile(nasm_run.addOutputFileArg(asm_object_file));
+        obj.addObjectFile(nasm_run.addOutputFileArg(asm_object_file));
         nasm_run.addArgs(build_config.nasm_flags);
         nasm_run.addFileArg(b.path(asm_source_file));
     }
