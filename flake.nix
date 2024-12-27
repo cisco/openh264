@@ -34,7 +34,6 @@
           packages = with pkgs; [
             zigpkgs.default
             zls
-            nasm
           ];
         };
       }

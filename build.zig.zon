@@ -1,7 +1,12 @@
 .{
     .name = "openh264",
     .version = "2.5.0-423eb2c3e47009f4e631b5e413123a003fdff1ed",
-    .dependencies = .{},
+    .dependencies = .{
+        .nasm = .{
+            .url = "https://github.com/allyourcodebase/nasm/archive/refs/tags/2.16.1-3.tar.gz",
+            .hash = "12200a9194f9cdd05e9ff23729f4ed0e54f51abe09bd6eaf61b58609791647b141d2",
+        },
+    },
     .paths = .{
         "LICENSE",
         "README.md",
