@@ -36,6 +36,15 @@ pub fn build(b: *std.Build) void {
     lib.installHeader(b.path("codec/api/wels/codec_ver.h"), "codec_ver.h");
 
     b.installArtifact(lib);
+
+    const example_rainbow = b.addExecutable(.{
+        .name = "example_rainbow",
+        .root_source_file = b.path("examples/rainbow.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    example_rainbow.root_module.addImport("openh264", bindings);
+    b.installArtifact(example_rainbow);
 }
 
 fn addObjectLibraryCommon(

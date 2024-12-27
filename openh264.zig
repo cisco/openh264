@@ -80,7 +80,7 @@ pub const ISVCEncoderVtbl = extern struct {
     /// @brief   Set option for encoder, detail option type, please refer to enumurate ENCODER_OPTION.
     /// @param   pOption option for encoder such as InDataFormat, IDRInterval, SVC Encode Param, Frame Rate, Bitrate,...
     /// @return  CM_RETURN: 0 - success; otherwise - failed;
-    SetOption: ?*const fn (?*ISVCEncoder, EncoderOption, ?*anyopaque) callconv(.C) c_int,
+    SetOption: ?*const fn (?*ISVCEncoder, EncoderOption, ?*const anyopaque) callconv(.C) c_int,
 
     /// @brief   Get option for encoder, detail option type, please refer to enumurate ENCODER_OPTION.
     /// @param   pOption option for encoder such as InDataFormat, IDRInterval, SVC Encode Param, Frame Rate, Bitrate,...
@@ -267,6 +267,25 @@ pub const EUsageType = enum(c_uint) {
     input_content_type_all = 4,
 };
 
+pub const EVideoFormatType = enum(c_uint) {
+    rgb = 1,
+    rgba = 2,
+    rgb555 = 3,
+    rgb565 = 4,
+    bgr = 5,
+    bgra = 6,
+    abgr = 7,
+    argb = 8,
+    yuy2 = 20,
+    yvyu = 21,
+    uyvy = 22,
+    i420 = 23,
+    yv12 = 24,
+    internal = 25,
+    nv12 = 26,
+    vflip = 2147483648,
+};
+
 pub const EVideoFrameType = enum(c_uint) {
     invalid = 0,
     idr = 1,
@@ -365,8 +384,9 @@ pub const SParserBsInfo = extern struct {
     uiInBsTimeStamp: c_ulonglong,
     uiOutBsTimeStamp: c_ulonglong,
 };
+
 pub const SSourcePicture = extern struct {
-    iColorFormat: c_int,
+    iColorFormat: EVideoFormatType,
     iStride: [4]c_int,
     pData: [4][*c]u8,
     iPicWidth: c_int,
