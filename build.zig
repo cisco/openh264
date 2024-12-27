@@ -23,13 +23,12 @@ pub fn build(b: *std.Build) void {
     lib.addObject(encoder);
     lib.addObject(decoder);
 
-    // TODO: bindings
-    // const bindings = b.addModule("openh264", .{
-    //     .root_source_file = b.path("openh264.zig"),
-    //     .target = target,
-    //     .optimize = optimize,
-    // });
-    // bindings.linkLibrary(lib);
+    const bindings = b.addModule("openh264", .{
+        .root_source_file = b.path("openh264.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    bindings.linkLibrary(lib);
 
     lib.installHeader(b.path("codec/api/wels/codec_api.h"), "codec_api.h");
     lib.installHeader(b.path("codec/api/wels/codec_app_def.h"), "codec_app_def.h");
