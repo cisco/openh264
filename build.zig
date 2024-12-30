@@ -42,6 +42,17 @@ pub fn build(b: *std.Build) void {
     });
     openh264_bindings.linkLibrary(lib);
 
+    // Zig-friendly API
+
+    const openh264 = b.addModule("openh264", .{
+        .root_source_file = b.path("openh264.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    openh264.addImport("openh264_bindings", openh264_bindings);
+
+    // Bindings example
+
     const example_rainbow_low_level = b.addExecutable(.{
         .name = "example_rainbow_low_level",
         .root_source_file = b.path("examples/rainbow_low_level.zig"),
@@ -51,14 +62,16 @@ pub fn build(b: *std.Build) void {
     example_rainbow_low_level.root_module.addImport("openh264_bindings", openh264_bindings);
     b.installArtifact(example_rainbow_low_level);
 
-    // Zig-friendly API
+    // Zig-friendly API example
 
-    const openh264 = b.addModule("openh264", .{
-        .root_source_file = b.path("openh264.zig"),
+    const example_rainbow = b.addExecutable(.{
+        .name = "example_rainbow",
+        .root_source_file = b.path("examples/rainbow.zig"),
         .target = target,
         .optimize = optimize,
     });
-    openh264.linkLibrary(lib);
+    example_rainbow.root_module.addImport("openh264", openh264);
+    b.installArtifact(example_rainbow);
 }
 
 fn addObjectLibraryCommon(

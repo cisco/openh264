@@ -269,6 +269,14 @@ pub const WelsLogLevel = enum(u32) {
     reserved = 32,
 };
 
+pub const EParameterSetStrategy = enum(c_uint) {
+    constant_id = 0,
+    increasing_id = 1,
+    sps_listing = 2,
+    sps_listing_and_pps_increasing = 3,
+    sps_pps_listing = 6,
+};
+
 /// Note that is seems only camera_video_real_time and screen_content_real_time
 /// are supported for encoding.
 pub const EUsageType = enum(c_uint) {
@@ -317,13 +325,22 @@ pub const ErrorConIdc = enum(c_uint) {
     slice_mv_copy_cross_idr_freeze_res_change = 7,
 };
 
-pub const RcMode = enum(c_int) {
+pub const RCMode = enum(c_int) {
     quality_mode = 0,
     bitrate_mode = 1,
     bufferbased_mode = 2,
     timestamp_mode = 3,
     bitrate_mode_post_skip = 4,
     off_mode = -1,
+};
+
+pub const ReturnCode = enum(c_int) {
+    success = 0,
+    init_para_error = 1,
+    unknown_reason = 2,
+    malloc_meme_error = 3,
+    init_expected = 4,
+    unsuporrted_data = 5,
 };
 
 pub const VideoBitstreamType = enum(c_uint) {
@@ -362,7 +379,7 @@ pub const SEncParamBase = extern struct {
     iPicWidth: c_int,
     iPicHeight: c_int,
     iTargetBitrate: c_int,
-    iRCMode: RcMode,
+    iRCMode: RCMode,
     fMaxFrameRate: f32,
 };
 
