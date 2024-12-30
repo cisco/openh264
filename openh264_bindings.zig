@@ -422,5 +422,5 @@ pub const SSourcePicture = extern struct {
 
 pub const SVideoProperty = extern struct {
     size: c_uint,
-    eVideoBsType: VideoBitstreamType = default_video_bistream_type,
+    eVideoBsType: VideoBitstreamType,
 };
