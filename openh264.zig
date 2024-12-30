@@ -62,15 +62,14 @@ pub const EncoderOptions = struct {
     max_bitrate: ?u32 = null,
     rate_control_frame_skip: ?bool = null,
     padding: ?bool = null,
-    // FIXME: Support profile and level later which is complicated since there is
-    // something called spatial layers which I'll have to figure out.
     enable_ssei: ?bool = null,
     enable_prefix_nal_adding: ?bool = null,
     parameter_set_strategy: ?ParameterSetStrategy = null,
 };
 
-/// H254 video encoder.
+/// OpenH264 video encoder.
 /// This API is not thread-safe.
+/// The encoder only does Constrained Baseline.
 pub const Encoder = struct {
     inner: *openh264_bindings.ISVCEncoder,
 
@@ -211,11 +210,6 @@ pub const Encoder = struct {
     pub fn set_padding(self: *Encoder, value: bool) !void {
         try rc(self.get_inner_vtable().SetOption.?(self.inner, .padding, &value));
     }
-
-    // FIXME: Support profile and level later which is complicated since there is
-    // something called spatial layers which I'll have to figure out.
-    // * set_profile
-    // * set_level
 
     pub fn set_enable_ssei(self: *Encoder, value: bool) !void {
         try rc(self.get_inner_vtable().SetOption.?(self.inner, .enable_ssei, &value));
