@@ -2,7 +2,10 @@ const std = @import("std");
 
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
-    const optimize = b.standardOptimizeOption(.{});
+    const optimize = b.standardOptimizeOption(.{ .preferred_optimize_mode = .ReleaseFast });
+    // XXX: Building in debug mode breaks encoding (Illegal instruction on
+    // WRITE_BE_32).
+    if (optimize == .Debug) @panic("building openh264 in debug mode is not supported");
 
     const build_config = makeBuildConfiguration(target.result);
 
@@ -23,13 +26,6 @@ pub fn build(b: *std.Build) void {
     lib.addObject(encoder);
     lib.addObject(decoder);
 
-    const bindings = b.addModule("openh264", .{
-        .root_source_file = b.path("openh264.zig"),
-        .target = target,
-        .optimize = optimize,
-    });
-    bindings.linkLibrary(lib);
-
     lib.installHeader(b.path("codec/api/wels/codec_api.h"), "codec_api.h");
     lib.installHeader(b.path("codec/api/wels/codec_app_def.h"), "codec_app_def.h");
     lib.installHeader(b.path("codec/api/wels/codec_def.h"), "codec_def.h");
@@ -37,14 +33,32 @@ pub fn build(b: *std.Build) void {
 
     b.installArtifact(lib);
 
-    const example_rainbow = b.addExecutable(.{
-        .name = "example_rainbow",
-        .root_source_file = b.path("examples/rainbow.zig"),
+    // Bindings
+
+    const openh264_bindings = b.addModule("openh264_bindings", .{
+        .root_source_file = b.path("openh264_bindings.zig"),
         .target = target,
         .optimize = optimize,
     });
-    example_rainbow.root_module.addImport("openh264", bindings);
-    b.installArtifact(example_rainbow);
+    openh264_bindings.linkLibrary(lib);
+
+    const example_rainbow_low_level = b.addExecutable(.{
+        .name = "example_rainbow_low_level",
+        .root_source_file = b.path("examples/rainbow_low_level.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    example_rainbow_low_level.root_module.addImport("openh264_bindings", openh264_bindings);
+    b.installArtifact(example_rainbow_low_level);
+
+    // Zig-friendly API
+
+    const openh264 = b.addModule("openh264", .{
+        .root_source_file = b.path("openh264.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    openh264.linkLibrary(lib);
 }
 
 fn addObjectLibraryCommon(
@@ -525,7 +539,7 @@ fn makeBuildConfiguration(target: std.Target) BuildConfiguration {
                 .nasm_flags = &.{},
                 .nasm_format = "elf64",
             },
-            // NOTE: Adding support for longarch32, longarch64 and some other
+            // FUTURE: Adding support for longarch32, longarch64 and some other
             // architectures is relatively easy. See the original meson.build
             // file for more information:
             // https://github.com/cisco/openh264/blob/423eb2c3e47009f4e631b5e413123a003fdff1ed/meson.build#L89
@@ -565,7 +579,7 @@ fn makeBuildConfiguration(target: std.Target) BuildConfiguration {
                 .nasm_flags = &.{"-DWIN64"},
                 .nasm_format = "win64",
             },
-            // NOTE: arm and aarch64 can be added but have some complications.
+            // FUTURE: arm and aarch64 can be added but have some complications.
             // See meson.build:
             // https://github.com/cisco/openh264/blob/423eb2c3e47009f4e631b5e413123a003fdff1ed/meson.build#L124
             // Especially arm is complicated since it needs extra preprocessing
