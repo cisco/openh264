@@ -102,10 +102,11 @@ pub const Encoder = struct {
             .iTargetBitrate = @intCast(options.target_bitrate),
             .iRCMode = options.rate_control_mode,
         };
+
         try rc(inner_vtable.Initialize.?(inner, &parameters));
         errdefer _ = inner_vtable.Uninitialize.?(inner);
 
-        // only yuv420 is supported
+        // only yuv420 is supported so we must set this
         try rc(inner_vtable.SetOption.?(inner, .dataformat, &format));
 
         // pre-fill SSourcePicture values
@@ -229,6 +230,55 @@ pub const Encoder = struct {
     }
 
     inline fn get_inner_vtable(self: *const Encoder) *const openh264_bindings.ISVCEncoderVtbl {
+        return self.inner.*.?;
+    }
+};
+
+pub const VideoBitstreamType = openh264_bindings.VideoBitstreamType;
+
+pub const DecoderOptions = struct {
+    trace_level: TraceLevel = .err,
+    video_bitstream_type: VideoBitstreamType = .avc,
+    // TODO
+};
+
+pub const Decoder = struct {
+    inner: *openh264_bindings.ISVCDecoder,
+
+    allocator: std.mem.Allocator,
+
+    pub fn init(allocator: std.mem.Allocator, options: DecoderOptions) !Decoder {
+        var inner: ?*openh264_bindings.ISVCDecoder = null;
+        try rc(openh264_bindings.WelsCreateSVCDecoder(&inner));
+        std.debug.assert(inner != null);
+        const inner_vtable = inner.?.*.?;
+        errdefer openh264_bindings.WelsDestroySVCDecoder(inner);
+
+        try rc(inner_vtable.SetOption.?(inner, .trace_level, &options.trace_level));
+        try rc(inner_vtable.SetOption.?(inner, .video_bitstream_type, &options.video_bitstream_type));
+
+        try rc(inner_vtable.Initialize.?(inner));
+        errdefer _ = inner_vtable.Uninitialize.?(inner);
+
+        // TODO: other options
+
+        // TODO: prepare buffers
+
+        return Decoder{
+            .inner = inner.?,
+            .allocator = allocator,
+        };
+    }
+
+    // TODO: actual decode
+    // https://github.com/cisco/openh264/blob/423eb2c3e47009f4e631b5e413123a003fdff1ed/codec/api/wels/codec_api.h#L68
+
+    pub fn deinit(self: *const Decoder) void {
+        _ = self.get_inner_vtable().Uninitialize.?(self.inner);
+        openh264_bindings.WelsDestroySVCDecoder(self.inner);
+    }
+
+    inline fn get_inner_vtable(self: *const Decoder) *const openh264_bindings.ISVCDecoderVtbl {
         return self.inner.*.?;
     }
 };

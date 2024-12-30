@@ -348,8 +348,6 @@ pub const VideoBitstreamType = enum(c_uint) {
     svc = 1,
 };
 
-pub const default_video_bistream_type = VideoBitstreamType.svc;
-
 pub const SBufferInfo = extern struct {
     iBufferStatus: c_int,
     uiInBsTimeStamp: c_ulonglong,
