@@ -5,13 +5,13 @@ This is [OpenH264](https://github.com/cisco/openh264), packaged for
 
 ## Installation
 
-First, update your build.zig.zon:
+First, update your `build.zig.zon`:
 
 ```bash
 zig fetch --save git+https://github.com/gerwin3/openh264.git
 ```
 
-Next, add this snippet to your build.zig script:
+Next, add this snippet to your `build.zig` script:
 
 ```zig
 const openh264_dep = b.dependency("openh264", .{
