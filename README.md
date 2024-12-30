@@ -23,6 +23,8 @@ your_compilation.linkLibrary(openh264_dep.artifact("openh264"));
 
 This will provide OpenH264 as a static library to `your_compilation`.
 
+TODO: About openh264 module and openh264_bindings module.
+
 ## Contribute
 
 This repo is a stripped down version of the original OpenH264 repository:
