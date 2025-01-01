@@ -61,7 +61,6 @@ pub const EncoderOptions = struct {
     // options that can only be set through SetOption:
     idr_interval: ?u32 = null,
     frame_rate: ?f32 = null,
-    bitrate: ?u32 = null,
     max_bitrate: ?u32 = null,
     rate_control_frame_skip: ?bool = null,
     padding: ?bool = null,
@@ -140,8 +139,6 @@ pub const Encoder = struct {
             try encoder.set_idr_interval(value);
         if (options.frame_rate) |value|
             try encoder.set_frame_rate(value);
-        if (options.bitrate) |value|
-            try encoder.set_bitrate(value);
         if (options.max_bitrate) |value|
             try encoder.set_max_bitrate(value);
         if (options.rate_control_frame_skip) |value|
@@ -194,20 +191,24 @@ pub const Encoder = struct {
         try rc(self.get_inner_vtable().SetOption.?(self.inner, .idr_interval, &value_int));
     }
 
-    // TODO: corresponding get options
+    pub fn get_frame_rate(self: *const Encoder) !f32 {
+        const value: f32 = undefined;
+        try rc(self.get_inner_vtable().GetOption.?(self.inner, .frame_rate, &value));
+        return value;
+    }
 
     pub fn set_frame_rate(self: *Encoder, value: f32) !void {
         try rc(self.get_inner_vtable().SetOption.?(self.inner, .frame_rate, &value));
     }
 
-    pub fn set_bitrate(self: *Encoder, value: u32) !void {
-        const value_int: i32 = @intCast(value);
-        try rc(self.get_inner_vtable().SetOption.?(self.inner, .bitrate, &value_int));
-    }
+    // FIXME: target bitrate (OPTION_BITRATE) and max_bitrate
+    // (OPTION_MAX_BITRATE) are left out because they require some extra logic
+    // with the spatial and temporal layer stuff.
 
-    pub fn set_max_bitrate(self: *Encoder, value: u32) !void {
-        const value_int: i32 = @intCast(value);
-        try rc(self.get_inner_vtable().SetOption.?(self.inner, .max_bitrate, &value_int));
+    pub fn get_rate_control_mode(self: *Encoder) !RateControlMode {
+        const value_int: i32 = undefined;
+        try rc(self.get_inner_vtable().GetOption.?(self.inner, .rc_mode, &value_int));
+        return @enumFromInt(value_int);
     }
 
     pub fn set_rate_control_mode(self: *Encoder, value: RateControlMode) !void {
@@ -215,11 +216,23 @@ pub const Encoder = struct {
         try rc(self.get_inner_vtable().SetOption.?(self.inner, .rc_mode, &value_int));
     }
 
-    pub fn set_rate_control_frame_skip(self: *Encoder, value: bool) !void {
-        try rc(self.get_inner_vtable().SetOption.?(self.inner, .rc_mode, &value));
+    pub fn get_rate_control_frame_skip(self: *Encoder) !bool {
+        const value_int: i32 = undefined;
+        try rc(self.get_inner_vtable().GetOption.?(self.inner, .rc_frame_skip, &value_int));
+        return @as(bool, value_int);
     }
 
-    pub fn set_padding(self: *Encoder, value: bool) !void {
+    pub fn set_rate_control_frame_skip(self: *Encoder, value: bool) !void {
+        try rc(self.get_inner_vtable().SetOption.?(self.inner, .rc_frame_skip, &value));
+    }
+
+    pub fn get_padding(self: *Encoder) !i32 {
+        const value_int: i32 = undefined;
+        try rc(self.get_inner_vtable().GetOption.?(self.inner, .padding, &value_int));
+        return value_int;
+    }
+
+    pub fn set_padding(self: *Encoder, value: i32) !void {
         try rc(self.get_inner_vtable().SetOption.?(self.inner, .padding, &value));
     }
 
@@ -227,8 +240,20 @@ pub const Encoder = struct {
         try rc(self.get_inner_vtable().SetOption.?(self.inner, .enable_ssei, &value));
     }
 
+    pub fn get_enable_prefix_nal_adding(self: *Encoder) !bool {
+        const value_int: i32 = undefined;
+        try rc(self.get_inner_vtable().GetOption.?(self.inner, .enable_ssi, &value_int));
+        return @as(bool, value_int);
+    }
+
     pub fn set_enable_prefix_nal_adding(self: *Encoder, value: bool) !void {
         try rc(self.get_inner_vtable().SetOption.?(self.inner, .enable_prefix_nal_adding, &value));
+    }
+
+    pub fn get_parameter_set_strategy(self: *Encoder) !ParameterSetStrategy {
+        const value_int: i32 = undefined;
+        try rc(self.get_inner_vtable().GetOption.?(self.inner, .sps_pps_id_strategy, &value_int));
+        return @enumFromInt(value_int);
     }
 
     pub fn set_parameter_set_strategy(self: *Encoder, value: ParameterSetStrategy) !void {
