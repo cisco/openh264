@@ -314,19 +314,28 @@ pub const Decoder = struct {
 
     /// Slice should include start-code prefix.
     /// Frame is borrowed and only valid until the next call to decode.
-    pub fn decode(self: *const Decoder, slice: []u8) !Frame {
+    pub fn decode(self: *const Decoder, slice: []u8) Error!Frame {
 
         // TODO: prepare buffers
         // look at this: https://github.com/ralfbiedert/openh264-rs/blob/37b831126c66043b6ad1b9cc3b3d42756e2aa6a6/openh264/src/decoder.rs#L339
 
-        // DecodeFrameNoDelay: ?*const fn (?*ISVCDecoder, [*c]const u8, c_int, [*c][*c]u8, [*c]SBufferInfo) callconv(.C) DecodingState,
-
         var buffer_info = std.mem.zeroes(openh264_bindings.SBufferInfo);
         var frame_pointers: [3][*c]u8 = .{ null, null, null };
-        const state = self.get_inner_vtable().DecodeFrameNoDelay(slice.ptr, @intCast(slice.len), &frame_pointers, &buffer_info);
-        _ = state; // autofix
-        // TODO: check state
-        // TODO: what about iBufferStatus
+
+        const state = self.get_inner_vtable().DecodeFrameNoDelay(
+            slice.ptr,
+            @intCast(slice.len),
+            &frame_pointers,
+            &buffer_info,
+        );
+        try rc_decoding_state(state);
+
+        switch (buffer_info.iBufferStatus) {
+            0 => {}, // no frame
+            1 => {}, // TODO: handle frame
+            _ => unreachable,
+        }
+
         // TODO: handle case where frame_pointers a null (this is valid)
 
         // TODO: assert buffer_info.sSystemBuffer.iFormat
@@ -346,6 +355,8 @@ pub const Decoder = struct {
 
         return frame;
     }
+
+    // TODO: flush
 
     pub fn get_end_of_stream(self: *const Decoder) !bool {
         const value_int: i32 = undefined;
@@ -442,6 +453,17 @@ pub const Error = error{
     NotInitialized,
     UnsupportedData,
     InvalidFrame,
+
+    // decode-only errors:
+    FramePending,
+    RefLost,
+    Bitstream,
+    DepLayerLost,
+    NoParameterSets,
+    DataErrorConcealed,
+    RefListNullPointers,
+    InvalidArgument,
+    DestinationBufferNeedExpand,
 };
 
 fn rc(return_code: c_int) Error!void {
@@ -452,5 +474,22 @@ fn rc(return_code: c_int) Error!void {
         .malloc_meme_error => return Error.OutOfMemory,
         .init_expected => return Error.NotInitialized,
         .unsuporrted_data => return Error.UnsupportedData,
+    }
+}
+
+fn rc_decoding_state(decoding_state: openh264_bindings.DecodingState) Error!void {
+    switch (decoding_state) {
+        .error_free => return,
+        .frame_pending => return Error.FramePending,
+        .ref_lost => return Error.RefLost,
+        .bitstream_error => return Error.Bitstream,
+        .dep_layer_lost => return Error.DepLayerLost,
+        .no_param_sets => return Error.NoParameterSets,
+        .data_error_concealed => return Error.DataErrorConcealed,
+        .ref_list_null_ptrs => return Error.RefListNullPointers,
+        .invalid_argument => return Error.InvalidArgument,
+        .initial_opt_expected => return Error.NotInitialized,
+        .out_of_memory => return Error.OutOfMemory,
+        .dst_buf_need_expand => return Error.DestinationBufferNeedExpand,
     }
 }
