@@ -213,7 +213,7 @@ pub const Encoder = struct {
     }
 
     pub fn get_idr_interval(self: *const Encoder) !u32 {
-        const value_int: i32 = undefined;
+        var value_int: i32 = undefined;
         try rc(self.get_inner_vtable().GetOption.?(self.inner, .idr_interval, &value_int));
         return @intCast(value_int);
     }
@@ -224,7 +224,7 @@ pub const Encoder = struct {
     }
 
     pub fn get_frame_rate(self: *const Encoder) !f32 {
-        const value: f32 = undefined;
+        var value: f32 = undefined;
         try rc(self.get_inner_vtable().GetOption.?(self.inner, .frame_rate, &value));
         return value;
     }
@@ -238,7 +238,7 @@ pub const Encoder = struct {
     // with the spatial and temporal layer stuff.
 
     pub fn get_rate_control_mode(self: *Encoder) !RateControlMode {
-        const value_int: i32 = undefined;
+        var value_int: i32 = undefined;
         try rc(self.get_inner_vtable().GetOption.?(self.inner, .rc_mode, &value_int));
         return @enumFromInt(value_int);
     }
@@ -249,7 +249,7 @@ pub const Encoder = struct {
     }
 
     pub fn get_rate_control_frame_skip(self: *Encoder) !bool {
-        const value_int: i32 = undefined;
+        var value_int: i32 = undefined;
         try rc(self.get_inner_vtable().GetOption.?(self.inner, .rc_frame_skip, &value_int));
         return @as(bool, value_int);
     }
@@ -259,7 +259,7 @@ pub const Encoder = struct {
     }
 
     pub fn get_padding(self: *Encoder) !bool {
-        const value_int: i32 = undefined;
+        var value_int: i32 = undefined;
         try rc(self.get_inner_vtable().GetOption.?(self.inner, .padding, &value_int));
         return @as(bool, value_int);
     }
@@ -273,7 +273,7 @@ pub const Encoder = struct {
     }
 
     pub fn get_enable_prefix_nal_adding(self: *Encoder) !bool {
-        const value_int: i32 = undefined;
+        var value_int: i32 = undefined;
         try rc(self.get_inner_vtable().GetOption.?(self.inner, .enable_ssi, &value_int));
         return @as(bool, value_int);
     }
@@ -283,7 +283,7 @@ pub const Encoder = struct {
     }
 
     pub fn get_parameter_set_strategy(self: *Encoder) !ParameterSetStrategy {
-        const value_int: i32 = undefined;
+        var value_int: i32 = undefined;
         try rc(self.get_inner_vtable().GetOption.?(self.inner, .sps_pps_id_strategy, &value_int));
         return @enumFromInt(value_int);
     }
@@ -384,49 +384,52 @@ pub const Decoder = struct {
         var buffer_info = std.mem.zeroes(openh264_bindings.SBufferInfo);
         var frame_pointers: [3][*c]u8 = .{ null, null, null };
 
-        const state = self.get_inner_vtable().Flush.?(self.inner, &frame_pointers, &buffer_info);
+        const state = self.get_inner_vtable().FlushFrame.?(
+            self.inner,
+            &frame_pointers,
+            &buffer_info,
+        );
         try rc_decoding_state(state);
 
         return frame(frame_pointers, &buffer_info);
     }
 
     pub fn get_end_of_stream(self: *const Decoder) !bool {
-        const value_int: i32 = undefined;
+        var value_int: i32 = undefined;
         try rc(self.get_inner_vtable().GetOption.?(self.inner, .end_of_stream, &value_int));
         return @as(bool, value_int);
     }
 
-    pub fn set_end_of_stream(self: *Encoder, value: bool) !void {
-        const value_int: i32 = @intCast(value);
-        try rc(self.get_inner_vtable().SetOption.?(self.inner, .end_of_stream, &value_int));
+    pub fn set_end_of_stream(self: *Decoder, value: bool) !void {
+        try rc(self.get_inner_vtable().SetOption.?(self.inner, .end_of_stream, &value));
     }
 
     pub fn get_vcl_nal(self: *const Decoder) !bool {
-        const value_int: i32 = undefined;
+        var value_int: i32 = undefined;
         try rc(self.get_inner_vtable().GetOption.?(self.inner, .vcl_nal, &value_int));
         return @as(bool, value_int);
     }
 
     pub fn get_temporal_id(self: *const Decoder) !i32 {
-        const value_int: i32 = undefined;
+        var value_int: i32 = undefined;
         try rc(self.get_inner_vtable().GetOption.?(self.inner, .temporal_id, &value_int));
         return value_int;
     }
 
     pub fn get_frame_num(self: *const Decoder) !usize {
-        const value_int: i32 = undefined;
+        var value_int: i32 = undefined;
         try rc(self.get_inner_vtable().GetOption.?(self.inner, .frame_num, &value_int));
         return @intCast(value_int);
     }
 
     pub fn get_idr_pic_id(self: *const Decoder) !i32 {
-        const value_int: i32 = undefined;
+        var value_int: i32 = undefined;
         try rc(self.get_inner_vtable().GetOption.?(self.inner, .idr_pic_id, &value_int));
         return value_int;
     }
 
     pub fn get_error_concealment_idc(self: *const Decoder) !ErrorConcealment {
-        const value_int: i32 = undefined;
+        var value_int: i32 = undefined;
         try rc(self.get_inner_vtable().GetOption.?(self.inner, .error_con_idc, &value_int));
         return @enumFromInt(value_int);
     }
@@ -437,31 +440,31 @@ pub const Decoder = struct {
     }
 
     pub fn get_profile(self: *const Decoder) !Profile {
-        const value_int: i32 = undefined;
+        var value_int: i32 = undefined;
         try rc(self.get_inner_vtable().GetOption.?(self.inner, .profile, &value_int));
         return @enumFromInt(value_int);
     }
 
     pub fn get_level(self: *const Decoder) !Level {
-        const value_int: i32 = undefined;
+        var value_int: i32 = undefined;
         try rc(self.get_inner_vtable().GetOption.?(self.inner, .level, &value_int));
         return @enumFromInt(value_int);
     }
 
     pub fn get_is_ref_pic(self: *const Decoder) !bool {
-        const value_int: i32 = undefined;
+        var value_int: i32 = undefined;
         try rc(self.get_inner_vtable().GetOption.?(self.inner, .is_ref_pic, &value_int));
         return @as(bool, value_int);
     }
 
     pub fn get_number_of_frames_remaining_in_buffer(self: *const Decoder) !usize {
-        const value_int: i32 = undefined;
+        var value_int: i32 = undefined;
         try rc(self.get_inner_vtable().GetOption.?(self.inner, .num_of_frames_remaining_in_buffer, &value_int));
         return @intCast(value_int);
     }
 
     pub fn get_number_of_threads(self: *const Decoder) !usize {
-        const value_int: i32 = undefined;
+        var value_int: i32 = undefined;
         try rc(self.get_inner_vtable().GetOption.?(self.inner, .num_of_threads, &value_int));
         return @intCast(value_int);
     }

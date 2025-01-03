@@ -19,8 +19,6 @@ pub fn main() !void {
     var buffer = try allocator.alloc(u8, 4096);
     defer allocator.free(buffer);
 
-    // TODO: bug somewhere in NAL splitting
-
     var nal = std.ArrayList(u8).init(allocator);
     defer nal.deinit();
 
@@ -29,17 +27,16 @@ pub fn main() !void {
 
         var last_nal: usize = 0;
 
-        for (0..len - 4) |index| {
+        const len_range = @max(len, 4) - 4;
+        for (0..len_range) |index| {
             if (std.mem.eql(u8, buffer[index .. index + 4], &.{ 0, 0, 0, 1 })) {
                 if (index - last_nal > 0) {
                     nal.appendSlice(buffer[last_nal..index]) catch @panic("oom");
                 }
-
                 if (nal.items.len > 0) {
                     if (try decoder.decode(nal.items)) |frame| {
                         handle_frame(&frame);
                     }
-
                     nal.clearRetainingCapacity();
                     last_nal = index;
                 }
@@ -49,24 +46,28 @@ pub fn main() !void {
         if (last_nal < len) {
             nal.appendSlice(buffer[last_nal..len]) catch @panic("oom");
         }
+
+        if (len < buffer.len) break;
+    }
+
+    if (try decoder.decode(nal.items)) |frame| {
+        handle_frame(&frame);
     }
 
     try decoder.set_end_of_stream(true);
 
-    for (0..decoder.get_number_of_remaining_frames_in_buffer()) |_| {
-        if (decoder.flush()) |frame| {
+    for (0..try decoder.get_number_of_frames_remaining_in_buffer()) |_| {
+        if (try decoder.flush()) |frame| {
             handle_frame(&frame);
         }
     }
 }
 
+/// Print YUV values of the frame.
 fn handle_frame(frame: *const openh264.Frame) void {
-    std.debug.print("yuv = ({}, {}, {}), dims = {}x{}, time = {}\n", .{
+    std.debug.print("yuv = ({}, {}, {})\n", .{
         frame.data.y[0],
         frame.data.u[0],
         frame.data.v[0],
-        frame.dims.width,
-        frame.dims.height,
-        frame.timestamp,
     });
 }
