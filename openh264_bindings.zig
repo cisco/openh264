@@ -138,6 +138,10 @@ pub const DecoderOption = enum(c_uint) {
     ltr_marking_flag = 6,
     ltr_marked_frame_num = 7,
     error_con_idc = 8,
+    trace_level = 9,
+    trace_callback = 10,
+    trace_callback_context = 11,
+    get_statistics = 12,
     get_sar_info = 13,
     profile = 14,
     level = 15,
@@ -221,7 +225,7 @@ pub const ISVCDecoderVtbl = extern struct {
     /// @brief   Set option for decoder, detail option type, please refer to enumurate DECODER_OPTION.
     /// @param   pOption  option for decoder such as OutDataFormat, Eos Flag, EC method, ...
     /// @return  CM_RETURN: 0 - success; otherwise - failed;
-    SetOption: ?*const fn (?*ISVCDecoder, DecoderOption, ?*anyopaque) callconv(.C) c_long,
+    SetOption: ?*const fn (?*ISVCDecoder, DecoderOption, ?*const anyopaque) callconv(.C) c_long,
 
     /// @brief   Get option for decoder, detail option type, please refer to enumurate DECODER_OPTION.
     /// @param   pOption  option for decoder such as OutDataFormat, Eos Flag, EC method, ...
@@ -275,6 +279,41 @@ pub const EParameterSetStrategy = enum(c_uint) {
     sps_listing = 2,
     sps_listing_and_pps_increasing = 3,
     sps_pps_listing = 6,
+};
+
+pub const EProfileIdc = enum(c_uint) {
+    unknown = 0,
+    baseline = 66,
+    main = 77,
+    extended = 88,
+    high = 100,
+    high10 = 110,
+    high422 = 122,
+    high444 = 144,
+    cavlc444 = 244,
+    scalable_baseline = 83,
+    scalable_high = 86,
+};
+
+pub const ELevelIdc = enum(c_uint) {
+    unknown = 0,
+    level_1_0 = 10,
+    level_1_b = 9,
+    level_1_1 = 11,
+    level_1_2 = 12,
+    level_1_3 = 13,
+    level_2_0 = 20,
+    level_2_1 = 21,
+    level_2_2 = 22,
+    level_3_0 = 30,
+    level_3_1 = 31,
+    level_3_2 = 32,
+    level_4_0 = 40,
+    level_4_1 = 41,
+    level_4_2 = 42,
+    level_5_0 = 50,
+    level_5_1 = 51,
+    level_5_2 = 52,
 };
 
 /// Note that is seems only camera_video_real_time and screen_content_real_time

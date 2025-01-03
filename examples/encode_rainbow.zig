@@ -1,4 +1,4 @@
-//! This example shows how to use the high-level bindings.
+//! This example shows how to use the high-level bindings to encode a video.
 //!
 //! The high-level bindings are more Zig-friendly and work around some of the
 //! idiosyncrasies of the OpenH264 API.
@@ -26,14 +26,15 @@ pub fn main() !void {
     });
     defer encoder.deinit();
 
-    var frame = try openh264.Frame.init(1920, 1080, allocator);
-    defer frame.deinit(allocator);
+    var frame = try openh264.Frame.alloc(1920, 1080, allocator);
+    defer frame.free(allocator);
 
     for (0..rainbow_num_frames) |i| {
         const r = rainbow(i, rainbow_num_frames);
-        @memset(frame.y, r.y);
-        @memset(frame.u, r.u);
-        @memset(frame.v, r.v);
+        frame.timestamp = i * 33;
+        @memset(frame.data.y, r.y);
+        @memset(frame.data.u, r.u);
+        @memset(frame.data.v, r.v);
         try encoder.encode(&frame, writer);
     }
 }

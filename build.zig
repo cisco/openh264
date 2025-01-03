@@ -51,27 +51,38 @@ pub fn build(b: *std.Build) void {
     });
     openh264.addImport("openh264_bindings", openh264_bindings);
 
-    // Bindings example
+    // Encoding with raw bindings example
 
-    const example_rainbow_low_level = b.addExecutable(.{
-        .name = "example_rainbow_low_level",
-        .root_source_file = b.path("examples/rainbow_low_level.zig"),
+    const example_encode_rainbow_low_level = b.addExecutable(.{
+        .name = "example_encode_rainbow_low_level",
+        .root_source_file = b.path("examples/encode_rainbow_low_level.zig"),
         .target = target,
         .optimize = optimize,
     });
-    example_rainbow_low_level.root_module.addImport("openh264_bindings", openh264_bindings);
-    b.installArtifact(example_rainbow_low_level);
+    example_encode_rainbow_low_level.root_module.addImport("openh264_bindings", openh264_bindings);
+    b.installArtifact(example_encode_rainbow_low_level);
 
-    // Zig-friendly API example
+    // Encoding with Zig-friendly API example
 
-    const example_rainbow = b.addExecutable(.{
-        .name = "example_rainbow",
-        .root_source_file = b.path("examples/rainbow.zig"),
+    const example_encode_rainbow = b.addExecutable(.{
+        .name = "example_encode_rainbow",
+        .root_source_file = b.path("examples/encode_rainbow.zig"),
         .target = target,
         .optimize = optimize,
     });
-    example_rainbow.root_module.addImport("openh264", openh264);
-    b.installArtifact(example_rainbow);
+    example_encode_rainbow.root_module.addImport("openh264", openh264);
+    b.installArtifact(example_encode_rainbow);
+
+    // Decoding with Zig-friendly API example
+
+    const example_decode_rainbow = b.addExecutable(.{
+        .name = "example_decode_rainbow",
+        .root_source_file = b.path("examples/decode_rainbow.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    example_decode_rainbow.root_module.addImport("openh264", openh264);
+    b.installArtifact(example_decode_rainbow);
 }
 
 fn addObjectLibraryCommon(

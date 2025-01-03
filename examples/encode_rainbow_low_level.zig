@@ -1,4 +1,4 @@
-//! This example shows how to use the low-level bindings.
+//! This example shows how to use the low-level bindings to encode a video.
 
 const std = @import("std");
 
