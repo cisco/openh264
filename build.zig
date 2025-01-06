@@ -3,16 +3,17 @@ const std = @import("std");
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{ .preferred_optimize_mode = .ReleaseFast });
-    // XXX: Building in debug mode breaks encoding (Illegal instruction on
-    // WRITE_BE_32).
-    if (optimize == .Debug) @panic("building openh264 in debug mode is not supported");
+    // TODO: TESTING
+    // // XXX: Building in debug mode breaks encoding (Illegal instruction on
+    // // WRITE_BE_32).
+    // if (optimize == .Debug) @panic("building openh264 in debug mode is not supported");
 
     const build_config = makeBuildConfiguration(target.result);
 
     const lib = b.addStaticLibrary(.{
         .name = "openh264",
         .target = target,
-        .optimize = optimize,
+        .optimize = .ReleaseFast,
     });
 
     const common = addObjectLibraryCommon(b, &build_config, target, optimize);
