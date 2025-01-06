@@ -13,5 +13,7 @@
         "build.zig",
         "build.zig.zon",
         "codec",
+        "openh264.zig",
+        "openh264_bindings.zig",
     },
 }
