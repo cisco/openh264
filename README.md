@@ -11,7 +11,39 @@ First, update your `build.zig.zon`:
 zig fetch --save git+https://github.com/gerwin3/openh264.git
 ```
 
-Next, add this snippet to your `build.zig` script:
+### To use the Zig-friendly bindings
+
+Add this snippet to your `build.zig` script:
+
+```zig
+const openh264_dep = b.dependency("openh264", .{
+    .target = target,
+    .optimize = optimize,
+});
+your_compilation.root_module.addImport("openh264", openh264_dep.module("openh264"));
+```
+
+You can now import and use the `openh264` module. See the `examples` directory
+for usage. This will automatically link the OpenH264 library.
+
+### To use the raw bindings
+
+Add this snippet to your `build.zig` script:
+
+```zig
+const openh264_dep = b.dependency("openh264", .{
+    .target = target,
+    .optimize = optimize,
+});
+your_compilation.root_module.addImport("openh264_bindings", openh264_dep.module("openh264_bindings"));
+```
+
+You can now import and use the `openh264_bindings` module. See the `examples`
+directory for usage. This will automatically link the OpenH264 library.
+
+### To use the static OpenH264 library without bindings
+
+Add this snippet to your `build.zig` script:
 
 ```zig
 const openh264_dep = b.dependency("openh264", .{
@@ -21,9 +53,8 @@ const openh264_dep = b.dependency("openh264", .{
 your_compilation.linkLibrary(openh264_dep.artifact("openh264"));
 ```
 
-This will provide OpenH264 as a static library to `your_compilation`.
-
-TODO: About openh264 module and openh264_bindings module.
+This will provide OpenH264 as a static library to `your_compilation` without the
+included bindings.
 
 ## Contribute
 
