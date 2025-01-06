@@ -36,6 +36,7 @@ pub fn build(b: *std.Build) void {
     // Bindings
 
     const openh264_bindings = b.addModule("openh264_bindings", .{
+        .name = "openh264_bindings",
         .root_source_file = b.path("openh264_bindings.zig"),
         .target = target,
         .optimize = optimize,
@@ -45,6 +46,7 @@ pub fn build(b: *std.Build) void {
     // Zig-friendly API
 
     const openh264 = b.addModule("openh264", .{
+        .name = "openh264",
         .root_source_file = b.path("openh264.zig"),
         .target = target,
         .optimize = optimize,
