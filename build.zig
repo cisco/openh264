@@ -2,24 +2,25 @@ const std = @import("std");
 
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
-    const optimize = b.standardOptimizeOption(.{ .preferred_optimize_mode = .ReleaseFast });
-    // TODO: TESTING
-    // // XXX: Building in debug mode breaks encoding (Illegal instruction on
-    // // WRITE_BE_32).
-    // if (optimize == .Debug) @panic("building openh264 in debug mode is not supported");
+    const optimize = b.standardOptimizeOption(.{});
 
     const build_config = makeBuildConfiguration(target.result);
+
+    // Building in debug mode breaks encoding (Illegal instruction on
+    // WRITE_BE_32). For the library itself, we only support release mode.
+    // Bindings and the wrapper lib will follow user optimization level.
+    const lib_optimize_mode = std.builtin.OptimizeMode.ReleaseFast;
 
     const lib = b.addStaticLibrary(.{
         .name = "openh264",
         .target = target,
-        .optimize = .ReleaseFast,
+        .optimize = lib_optimize_mode,
     });
 
-    const common = addObjectLibraryCommon(b, &build_config, target, optimize);
-    const processing = addObjectLibraryProcessing(b, &build_config, target, optimize);
-    const encoder = addObjectLibraryEncoder(b, &build_config, target, optimize);
-    const decoder = addObjectLibraryDecoder(b, &build_config, target, optimize);
+    const common = addObjectLibraryCommon(b, &build_config, target, lib_optimize_mode);
+    const processing = addObjectLibraryProcessing(b, &build_config, target, lib_optimize_mode);
+    const encoder = addObjectLibraryEncoder(b, &build_config, target, lib_optimize_mode);
+    const decoder = addObjectLibraryDecoder(b, &build_config, target, lib_optimize_mode);
 
     lib.addIncludePath(b.path("codec/api/wels"));
     lib.addObject(common);
