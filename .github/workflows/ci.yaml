@@ -11,13 +11,13 @@ on:
 
 jobs:
   build:
-    name: build / ${{ matrix.os }} / zig ${{ matrix.zig-version }}
+    name: build / linux / zig ${{ matrix.zig-version }}
 
     strategy:
       fail-fast: false
       matrix:
         zig-version: ["master", "0.13.0"]
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
     steps:

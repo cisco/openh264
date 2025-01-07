@@ -56,6 +56,11 @@ your_compilation.linkLibrary(openh264_dep.artifact("openh264"));
 This will provide OpenH264 as a static library to `your_compilation` without the
 included bindings.
 
+## Known Issues
+
+* Windows is not supported since the Zig `nasm` dependency [does not work on
+Windows](https://github.com/allyourcodebase/nasm/issues/3) at this time.
+
 ## Contribute
 
 This repo is a stripped down version of the original OpenH264 repository:
