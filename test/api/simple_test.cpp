@@ -13,7 +13,7 @@ int main (int argc, char** argv) {
 
 #if (defined(ANDROID_NDK)||defined(APPLE_IOS)||defined(WINDOWS_PHONE))
   char xmlPath[1024] = "";
-  sprintf (xmlPath, "xml:%s", argv[1]);
+  snprintf (xmlPath, sizeof(xmlPath), "xml:%s", argv[1]);
   ::testing::GTEST_FLAG (output) = xmlPath;
 #endif
   ::testing::InitGoogleTest (&argc, argv);
