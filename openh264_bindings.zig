@@ -426,6 +426,7 @@ pub const SFrameBSInfo = extern struct {
     eFrameType: EVideoFrameType,
     iFrameSizeInBytes: c_int,
     uiTimeStamp: c_longlong,
+    rPsnr: [3]f32,
 };
 
 pub const SLayerBSInfo = extern struct {
@@ -457,6 +458,9 @@ pub const SSourcePicture = extern struct {
     iPicWidth: c_int,
     iPicHeight: c_int,
     uiTimeStamp: c_longlong,
+    bPsnrY: bool = false,
+    bPsnrU: bool = false,
+    bPsnrV: bool = false,
 };
 
 pub const SVideoProperty = extern struct {
