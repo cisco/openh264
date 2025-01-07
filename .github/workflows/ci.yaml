@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    name: build / linux / zig ${{ matrix.zig-version }}
+    name: build / ${{ matrix.os }} / zig ${{ matrix.zig-version }}
 
     strategy:
       fail-fast: false
