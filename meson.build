@@ -66,7 +66,7 @@ if ['linux', 'android', 'ios', 'darwin'].contains(system)
   endif
   if cpu_family == 'x86'
     asm_format = asm_format32
-    asm_args += ['-DX86_32', '-DHAVE_AVX2']
+    asm_args += ['-DX86_32', '-DX86_32_PICASM', '-DHAVE_AVX2']
     add_project_arguments('-DHAVE_AVX2', language: 'cpp')
     add_project_arguments('-DHAVE_AVX2', '-DX86_ASM', '-DX86_32_ASM', language: 'c')
     asm_inc = join_paths(meson.current_source_dir(), 'codec', 'common', 'x86', '')
