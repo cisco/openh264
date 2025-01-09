@@ -3,6 +3,10 @@
 This is [OpenH264](https://github.com/cisco/openh264), packaged for
 [Zig](https://ziglang.org/).
 
+## Status
+
+
+
 ## Installation
 
 First, update your `build.zig.zon`:

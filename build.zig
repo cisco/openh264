@@ -516,8 +516,10 @@ fn addNasmFiles(
     build_config: *const BuildConfiguration,
     comptime asm_source_files: []const []const u8,
 ) void {
-    const nasm_dep = b.dependency("nasm", .{ .optimize = .ReleaseFast });
-    const nasm_exe = nasm_dep.artifact("nasm");
+    const nasm_exe: ?*std.Build.Step.Compile = if (obj.rootModuleTarget().os.tag != .windows) blk: {
+        const nasm_dep = b.dependency("nasm", .{ .optimize = .ReleaseFast });
+        break :blk nasm_dep.artifact("nasm");
+    } else null;
 
     inline for (asm_source_files) |asm_source_file| {
         const asm_object_file = o_name: {
@@ -526,7 +528,7 @@ fn addNasmFiles(
             break :o_name b.fmt("{s}{s}", .{ basename[0 .. basename.len - ext.len], ".o" });
         };
 
-        const nasm_run = b.addRunArtifact(nasm_exe);
+        const nasm_run = if (nasm_exe) |nasm_builtin| b.addRunArtifact(nasm_builtin) else b.addSystemCommand(&.{"nasm"});
         nasm_run.addArgs(&.{ "-f", build_config.nasm_format });
         nasm_run.addArgs(&.{ "-i", "codec/common/x86" });
         nasm_run.addArg("-o");
