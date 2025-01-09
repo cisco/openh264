@@ -27,7 +27,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - if: ${{ needs_external_nasm }}
+      - if: ${{ matrix.needs_external_nasm }}
         name: Setup NASM
         uses: ilammy/setup-nasm@v1
 
