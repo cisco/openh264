@@ -11,29 +11,28 @@ pub fn build(b: *std.Build) void {
     // Bindings and the wrapper lib will follow user optimization level.
     const lib_optimize_mode = std.builtin.OptimizeMode.ReleaseFast;
 
-    const lib = b.addStaticLibrary(.{
-        .name = "openh264",
-        .target = target,
-        .optimize = lib_optimize_mode,
-    });
+    const lib_openh264_common = addLibraryCommon(b, &build_config, target, lib_optimize_mode);
 
-    const common = addObjectLibraryCommon(b, &build_config, target, lib_optimize_mode);
-    const processing = addObjectLibraryProcessing(b, &build_config, target, lib_optimize_mode);
-    const encoder = addObjectLibraryEncoder(b, &build_config, target, lib_optimize_mode);
-    const decoder = addObjectLibraryDecoder(b, &build_config, target, lib_optimize_mode);
+    const lib_openh264_processing = addLibraryProcessing(b, &build_config, target, lib_optimize_mode);
+    lib_openh264_processing.linkLibrary(lib_openh264_common);
 
-    lib.addIncludePath(b.path("codec/api/wels"));
-    lib.addObject(common);
-    lib.addObject(processing);
-    lib.addObject(encoder);
-    lib.addObject(decoder);
+    const lib_openh264_encoder = addLibraryEncoder(b, &build_config, target, lib_optimize_mode);
+    lib_openh264_encoder.linkLibrary(lib_openh264_common);
+    lib_openh264_encoder.linkLibrary(lib_openh264_processing);
 
-    lib.installHeader(b.path("codec/api/wels/codec_api.h"), "codec_api.h");
-    lib.installHeader(b.path("codec/api/wels/codec_app_def.h"), "codec_app_def.h");
-    lib.installHeader(b.path("codec/api/wels/codec_def.h"), "codec_def.h");
-    lib.installHeader(b.path("codec/api/wels/codec_ver.h"), "codec_ver.h");
+    const lib_openh264_decoder = addLibraryDecoder(b, &build_config, target, lib_optimize_mode);
+    lib_openh264_decoder.linkLibrary(lib_openh264_common);
 
-    b.installArtifact(lib);
+    const install_libs: [2]*std.Build.Step.Compile = .{
+        lib_openh264_encoder, lib_openh264_decoder,
+    };
+    for (install_libs) |lib| {
+        lib.installHeader(b.path("codec/api/wels/codec_api.h"), "codec_api.h");
+        lib.installHeader(b.path("codec/api/wels/codec_app_def.h"), "codec_app_def.h");
+        lib.installHeader(b.path("codec/api/wels/codec_def.h"), "codec_def.h");
+        lib.installHeader(b.path("codec/api/wels/codec_ver.h"), "codec_ver.h");
+        b.installArtifact(lib);
+    }
 
     // Bindings
 
@@ -42,7 +41,8 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
-    openh264_bindings.linkLibrary(lib);
+    openh264_bindings.linkLibrary(lib_openh264_encoder);
+    openh264_bindings.linkLibrary(lib_openh264_decoder);
 
     // Zig-friendly API
 
@@ -87,14 +87,14 @@ pub fn build(b: *std.Build) void {
     b.installArtifact(example_decode_rainbow);
 }
 
-fn addObjectLibraryCommon(
+fn addLibraryCommon(
     b: *std.Build,
     build_config: *const BuildConfiguration,
     target: std.Build.ResolvedTarget,
     optimize: std.builtin.OptimizeMode,
 ) *std.Build.Step.Compile {
-    const obj = b.addObject(.{
-        .name = "common",
+    const obj = b.addStaticLibrary(.{
+        .name = "openh264_common",
         .target = target,
         .optimize = optimize,
     });
@@ -191,14 +191,14 @@ fn addObjectLibraryCommon(
     return obj;
 }
 
-fn addObjectLibraryProcessing(
+fn addLibraryProcessing(
     b: *std.Build,
     build_config: *const BuildConfiguration,
     target: std.Build.ResolvedTarget,
     optimize: std.builtin.OptimizeMode,
 ) *std.Build.Step.Compile {
-    const obj = b.addObject(.{
-        .name = "processing",
+    const obj = b.addStaticLibrary(.{
+        .name = "openh264_processing",
         .target = target,
         .optimize = optimize,
     });
@@ -289,14 +289,14 @@ fn addObjectLibraryProcessing(
     return obj;
 }
 
-fn addObjectLibraryEncoder(
+fn addLibraryEncoder(
     b: *std.Build,
     build_config: *const BuildConfiguration,
     target: std.Build.ResolvedTarget,
     optimize: std.builtin.OptimizeMode,
 ) *std.Build.Step.Compile {
-    const obj = b.addObject(.{
-        .name = "encoder",
+    const obj = b.addStaticLibrary(.{
+        .name = "openh264_encoder",
         .target = target,
         .optimize = optimize,
     });
@@ -418,14 +418,14 @@ fn addObjectLibraryEncoder(
     return obj;
 }
 
-fn addObjectLibraryDecoder(
+fn addLibraryDecoder(
     b: *std.Build,
     build_config: *const BuildConfiguration,
     target: std.Build.ResolvedTarget,
     optimize: std.builtin.OptimizeMode,
 ) *std.Build.Step.Compile {
-    const obj = b.addObject(.{
-        .name = "decoder",
+    const obj = b.addStaticLibrary(.{
+        .name = "openh264_decoder",
         .target = target,
         .optimize = optimize,
     });

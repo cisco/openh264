@@ -82,6 +82,7 @@ pub fn main() !void {
         @memset(picture_data.y, r.y);
         @memset(picture_data.u, r.u);
         @memset(picture_data.v, r.v);
+        std.debug.print("{}, {}, {}\n", .{ r.y, r.u, r.v }); // TODO
         rc = encoder.?.*.?.*.EncodeFrame.?(encoder, &picture, &info);
         std.debug.assert(rc == 0);
         std.debug.assert(info.eFrameType != .invalid);
