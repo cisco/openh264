@@ -108,6 +108,18 @@ jobs:
       - run: CFLAGS=-Werror make -j$(nproc) ARCH=aarch64 CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
       - run: qemu-aarch64 -L /usr/aarch64-linux-gnu/ ./codec_unittest
 
+  linux-cross-loongarch64:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v3
+      - run: sudo apt-get update -qq
+      - run: sudo apt-get install -qq gcc-14-loongarch64-linux-gnu g++-14-loongarch64-linux-gnu qemu-user-static
+      - run: loongarch64-linux-gnu-g++-14 --version
+      - run: make gmp-bootstrap
+      - run: make gtest-bootstrap
+      - run: CFLAGS=-Werror make -j$(nproc) ARCH=loongarch64 CC=loongarch64-linux-gnu-gcc-14 CXX=loongarch64-linux-gnu-g++-14
+      - run: qemu-loongarch64-static -L /usr/loongarch64-linux-gnu/ ./codec_unittest
+
   macos-cross-arm64:
     runs-on: macos-latest
     steps:
