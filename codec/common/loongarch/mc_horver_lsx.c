@@ -483,7 +483,7 @@ void McHorVer22WidthEq4_lsx(const uint8_t *pSrc, int32_t iSrcStride, uint8_t *pD
   uint8_t *psrc = (uint8_t*)pSrc - 2;
   __m128i src0, src1, src2, src3, src4, src5;
   __m128i tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, out0_l, out0_h;
-  __m128i dst0, dst1, dst2, dst3, dst4, dst5, dst6, dst7;
+  __m128i dst0, dst1, dst2, dst3, dst4={0}, dst5={0}, dst6={0}, dst7={0};
   v8i16 mask1 = {3, 4, 5, 6, 7, 8, 9, 10};
   for (int i = 0; i < iHeight; i++) {
     DUP4_ARG2(__lsx_vldx,
@@ -565,7 +565,7 @@ void McHorVer22WidthEq5_lsx(const uint8_t *pSrc, int32_t iSrcStride, uint8_t *pD
   uint8_t *psrc = (uint8_t*)pSrc - 2;
   __m128i src0, src1, src2, src3, src4, src5;
   __m128i tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, out0_l, out0_h;
-  __m128i dst0, dst1, dst2, dst3, dst4, dst5, dst6, dst7;
+  __m128i dst0, dst1, dst2, dst3, dst4={0}, dst5={0}, dst6={0}, dst7={0};
   v8i16 mask1 = {3, 4, 5, 6, 7, 8, 9, 10};
   for (int i = 0; i < iHeight; i++) {
     DUP4_ARG2(__lsx_vldx,
