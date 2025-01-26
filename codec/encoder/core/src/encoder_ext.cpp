@@ -3956,9 +3956,9 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
              (iLayerSize << 3));
 #endif//LAYER_INFO_OUTPUT
 
-    pLayerBsInfo->rPsnr[0] = NAN;
-    pLayerBsInfo->rPsnr[1] = NAN;
-    pLayerBsInfo->rPsnr[2] = NAN;
+    pLayerBsInfo->rPsnr[0] = 0;
+    pLayerBsInfo->rPsnr[1] = 0;
+    pLayerBsInfo->rPsnr[2] = 0;
     if (pSrcPic->bPsnrY) {
       pLayerBsInfo->rPsnr[0] = fSnrY;
     }
