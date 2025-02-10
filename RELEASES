@@ -1,6 +1,21 @@
 
 Releases
 -----------
+v2.6.0
+------
+- Initialize PSNR to 0 instead of NAN (Commit: cf3b514b, PR: #3836)
+- Enable PIC in x86 assembly code (Commit: c42fa040, PR: #3831)
+- Add QEMU test for LoongArch architecture (Commit: e49c0953, PR: #3833)
+- Add support for calculating PSNR for Y/U/V components (Commit: 33f7f486, PR: #3824)
+- Add support for PowerPC architecture in meson.build (Commit: 423eb2c3, PR: #3806)
+- Fix potential bug in the codebase (Commit: 63db555e, PR: #3818)
+- Pass the actual temporal ID to GMPVideoEncodedFrame (Commit: 1c47e719, PR: #3828)
+- Use HW_NCPUONLINE on OpenBSD / NetBSD for CPU detection (Commit: fc1605c1, PR: #3813)
+- Add Windows VSBuildTools VC17 compile support (Commit: 1ebb3f1a, PR: #3823)
+- Expose temporal layer info via GMP API at encoder initialization and on a per-frame basis (Commit: ad3f6904, PR: #3821)
+- Remove the use of -Werror to prevent warnings from being treated as errors (Commit: edbef4df, PR: #3809)
+- Use void casts to silence warnings about memcpy to a class (Commit: 6746bc48, PR: #3800)
+
 v2.5.0
 ------
 - Fix some multi-thread decoding issues
