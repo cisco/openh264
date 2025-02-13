@@ -4,7 +4,7 @@ project('openh264', ['c', 'cpp'],
   default_options : [ 'warning_level=1',
                       'buildtype=debugoptimized' ])
 
-major_version = '7'
+major_version = '8'
 
 cpp = meson.get_compiler('cpp')
 
