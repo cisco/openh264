@@ -513,6 +513,8 @@ typedef struct TagWelsDecoderContext {
   CMemoryAlign*     pMemAlign;
   void* pThreadCtx;
   void* pLastThreadCtx;
+  int32_t mMotionVectorSize = 0; 
+  int16_t* mMotionVectorData ; 
   WELS_MUTEX* pCsDecoder;
   int16_t lastReadyHeightOffset[LIST_A][MAX_REF_PIC_COUNT]; //last ready reference MB offset
   PPictInfo               pPictInfoList;
