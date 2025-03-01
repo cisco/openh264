@@ -4,29 +4,26 @@
 #    mmi, msa (maybe more in the future).
 #
 #   --usage:
-#             ./mips-simd-check.sh $(CC) mmi
-#         or  ./mips-simd-check.sh $(CC) msa
+#             ./mips-simd-check.sh mmi
+#         or  ./mips-simd-check.sh msa
 #
 # date:  10/17/2019 Created
 #**********************************************************************************
 
 TMPC=$(mktemp tmp.XXXXXX.c)
-TMPO=$(mktemp tmp.XXXXXX.o)
-if [ $2 == "mmi" ]
+if [ $1 == "mmi" ]
 then
    echo "void main(void){ __asm__ volatile(\"punpcklhw \$f0, \$f0, \$f0\"); }" > $TMPC
-   $1 -march=loongson3a $TMPC -o $TMPO &> /dev/null
-   if test -s $TMPO
+   if make -f /dev/null "${TMPC/.c/.o}" &> /dev/null
    then
       echo "Yes"
    fi
-elif [ $2 == "msa" ]
+elif [ $1 == "msa" ]
 then
    echo "void main(void){ __asm__ volatile(\"addvi.b \$w0, \$w1, 1\"); }" > $TMPC
-   $1 -mmsa $TMPC -o $TMPO &> /dev/null
-   if test -s $TMPO
+   if make -f /dev/null "${TMPC/.c/.o}" &> /dev/null
    then
       echo "Yes"
    fi
 fi
-rm -f $TMPC $TMPO
+rm -f $TMPC
