@@ -45,8 +45,7 @@
 
 void VAACalcSad_lsx (const uint8_t* pCurData, const uint8_t* pRefData,
                      int32_t iPicWidth, int32_t iPicHeight, int32_t iPicStride,
-                     int32_t* pFrameSad, int32_t* pSad8x8, int32_t* pSd8x8,
-                     uint8_t* pMad8x8) {
+                     int32_t* pFrameSad, int32_t* pSad8x8) {
   const uint8_t* tmp_ref = pRefData;
   const uint8_t* tmp_cur = pCurData;
   int32_t iMbWidth = (iPicWidth >> 4);
