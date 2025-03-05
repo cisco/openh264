@@ -1,6 +1,10 @@
 
 Releases
 -----------
+v2.5.1
+------
+- Fix decoder heap overflow vulnerability (Commit: 63db555e, PR: #3818)
+
 v2.5.0
 ------
 - Fix some multi-thread decoding issues
