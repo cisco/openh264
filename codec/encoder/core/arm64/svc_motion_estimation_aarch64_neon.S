@@ -283,16 +283,21 @@ _hash_assign_loop_x4_rem:
 _hash_assign_end:
 WELS_ASM_AARCH64_FUNC_END
 
+.rodata
 .align 4
 mv_x_inc_x4: .short 0x10, 0x10, 0x10, 0x10, 0x00, 0x00, 0x00, 0x00
 mv_y_inc_x4: .short 0x04, 0x04, 0x04, 0x04, 0x00, 0x00, 0x00, 0x00
 mx_x_offset_x4: .short 0x00, 0x04, 0x08, 0x0c, 0x00, 0x00, 0x00, 0x00
+.previous
 
 WELS_ASM_AARCH64_FUNC_BEGIN FillQpelLocationByFeatureValue_AArch64_neon
 // void  (uint16_t* pFeatureOfBlock, const int32_t kiWidth, const int32_t kiHeight, uint16_t** pFeatureValuePointerList)
-    ldr q7, mv_x_inc_x4
-    ldr q6, mv_y_inc_x4
-    ldr q5, mx_x_offset_x4
+    adrp x4, mv_x_inc_x4
+    adrp x5, mv_y_inc_x4
+    adrp x6, mx_x_offset_x4
+    ldr q7, [x4, #:lo12:mv_x_inc_x4]
+    ldr q6, [x5, #:lo12:mv_y_inc_x4]
+    ldr q5, [x6, #:lo12:mx_x_offset_x4]
     SIGN_EXTENSION x1,w1
     SIGN_EXTENSION x2,w2
     eor v4.16b, v4.16b, v4.16b
