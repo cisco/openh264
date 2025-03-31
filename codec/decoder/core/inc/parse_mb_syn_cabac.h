@@ -84,6 +84,7 @@ void    UpdateP8x8DirectCabac (PDqLayer pCurDqLayer, int32_t iPartIdx);
 void    UpdateP16x16DirectCabac (PDqLayer pCurDqLayer);
 void    UpdateP8x8RefCacheIdxCabac (int8_t pRefIndex[LIST_A][30], const int16_t& iPartIdx, const int32_t& listIdx,
                                     const int8_t& iRef);
+void UpdateMotionVector (PWelsDecoderContext pCtx , int16_t pMotionX, int16_t pMotionY, int16_t xOffset, int16_t yOffset);
 }
 //#pragma pack()
 #endif
