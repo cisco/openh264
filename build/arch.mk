@@ -39,14 +39,14 @@ ASM_ARCH = mips
 ASMFLAGS += -I$(SRC_PATH)codec/common/mips/
 #mmi
 ifeq ($(ENABLE_MMI), Yes)
-ENABLE_MMI = $(shell $(SRC_PATH)build/mips-simd-check.sh $(CC) mmi)
+ENABLE_MMI = $(shell CC="$(CC)" CFLAGS="$(CFLAGS)" $(SRC_PATH)build/mips-simd-check.sh mmi)
 ifeq ($(ENABLE_MMI), Yes)
 CFLAGS += -DHAVE_MMI -march=loongson3a
 endif
 endif
 #msa
 ifeq ($(ENABLE_MSA), Yes)
-ENABLE_MSA = $(shell $(SRC_PATH)build/mips-simd-check.sh $(CC) msa)
+ENABLE_MSA = $(shell CC="$(CC)" CFLAGS="$(CFLAGS)" $(SRC_PATH)build/mips-simd-check.sh msa)
 ifeq ($(ENABLE_MSA), Yes)
 CFLAGS += -DHAVE_MSA -mmsa
 endif
@@ -63,14 +63,14 @@ ASM_ARCH = loongarch
 ASMFLAGS += -I$(SRC_PATH)codec/common/loongarch/
 #lsx
 ifeq ($(ENABLE_LSX), Yes)
-ENABLE_LSX = $(shell $(SRC_PATH)build/loongarch-simd-check.sh $(CC) lsx)
+ENABLE_LSX = $(shell CC="$(CC)" CFLAGS="$(CFLAGS)" $(SRC_PATH)build/loongarch-simd-check.sh lsx)
 ifeq ($(ENABLE_LSX), Yes)
 CFLAGS += -DHAVE_LSX -mlsx
 endif
 endif
 #lasx
 ifeq ($(ENABLE_LASX), Yes)
-ENABLE_LASX = $(shell $(SRC_PATH)build/loongarch-simd-check.sh $(CC) lasx)
+ENABLE_LASX = $(shell CC="$(CC)" CFLAGS="$(CFLAGS)" $(SRC_PATH)build/loongarch-simd-check.sh lasx)
 ifeq ($(ENABLE_LASX), Yes)
 CFLAGS += -DHAVE_LASX -mlasx
 endif
