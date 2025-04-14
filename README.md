@@ -110,7 +110,7 @@ make based build system from the command line. Build with
 `ARCH` specifies the architecture of the device. Currently `arm`, `arm64`, `x86` and `x86_64` are supported   
 
  NOTICE:
- 	If your computer is x86 architecture, for build the libnary which be used on arm/aarch64 machine, you may need to use cross-compiler, for example:
+ 	If your computer has a x86 architecture, to build a library which can be used on arm/aarch64 machine, you may need to use cross-compiler, for example:
  		make OS=linux CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ ARCH=arm64
    		 or
     	make OS=linux CC=arm-linux-gnueabi-gcc CXX=arm-linux-gnueabi-g++ ARCH=arm
