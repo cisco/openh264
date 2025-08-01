@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="17.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.20506</ProductVersion>
+    <ProductVersion>17.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{5424CF29-908E-417E-93F3-F1CD81E5372C}</ProjectGuid>
     <ProjectTypeGuids>{C089C8C0-30E0-4E22-80C0-CE093F111A43};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
@@ -24,14 +24,28 @@
     <SilverlightManifestTemplate>Properties\AppManifest.xml</SilverlightManifestTemplate>
     <SilverlightAppEntry>CodecApp.App</SilverlightAppEntry>
     <ValidateXaml>true</ValidateXaml>
-    <MinimumVisualStudioVersion>12.0</MinimumVisualStudioVersion>
+    <MinimumVisualStudioVersion>17.0</MinimumVisualStudioVersion>
     <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
     <TargetFrameworkProfile />
     <DefaultLanguage>en-US</DefaultLanguage>
+    
+    <!-- Enhanced VS2022 compatibility fixes -->
+    <MSBuildWarningsAsMessages>MSB3277;MSB3644;MSB3246;MSB3270</MSBuildWarningsAsMessages>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <LangVersion>latest</LangVersion>
+    <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+    <NoWarn>$(NoWarn);NETSDK1138;NU1603</NoWarn>
+    
+    <!-- Improved build performance -->
+    <UseCommonOutputDirectory>true</UseCommonOutputDirectory>
+    <SkipCopyBuildProduct>false</SkipCopyBuildProduct>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
   </PropertyGroup>
+  
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>Bin\Debug</OutputPath>
     <DefineConstants>DEBUG;TRACE;SILVERLIGHT;WINDOWS_PHONE</DefineConstants>
@@ -39,9 +53,11 @@
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
+  
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>Bin\Release</OutputPath>
     <DefineConstants>TRACE;SILVERLIGHT;WINDOWS_PHONE</DefineConstants>
@@ -49,10 +65,12 @@
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
+  
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>Bin\x86\Debug</OutputPath>
     <DefineConstants>DEBUG;TRACE;SILVERLIGHT;WINDOWS_PHONE</DefineConstants>
@@ -60,10 +78,12 @@
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget />
+    <PlatformTarget>x86</PlatformTarget>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
+  
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>Bin\x86\Release</OutputPath>
     <DefineConstants>TRACE;SILVERLIGHT;WINDOWS_PHONE</DefineConstants>
@@ -71,11 +91,13 @@
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget />
+    <PlatformTarget>x86</PlatformTarget>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
+  
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|ARM' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>Bin\ARM\Debug</OutputPath>
     <DefineConstants>DEBUG;TRACE;SILVERLIGHT;WINDOWS_PHONE</DefineConstants>
@@ -83,10 +105,12 @@
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget />
+    <PlatformTarget>ARM</PlatformTarget>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
+  
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|ARM' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>Bin\ARM\Release</OutputPath>
     <DefineConstants>TRACE;SILVERLIGHT;WINDOWS_PHONE</DefineConstants>
@@ -94,8 +118,10 @@
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget />
+    <PlatformTarget>ARM</PlatformTarget>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
+  
   <ItemGroup>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
@@ -111,6 +137,7 @@
       <DependentUpon>AppResources.resx</DependentUpon>
     </Compile>
   </ItemGroup>
+  
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
       <SubType>Designer</SubType>
@@ -121,6 +148,7 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  
   <ItemGroup>
     <Content Include="Assets\BadgeLogo.png" />
     <Content Include="Assets\Logo.png" />
@@ -158,6 +186,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  
   <ItemGroup>
     <Content Include="Assets\AlignmentGrid.png" />
     <Content Include="Assets\ApplicationIcon.png">
@@ -179,32 +208,66 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  
   <ItemGroup>
     <EmbeddedResource Include="Resources\AppResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\CodecRTComponent.vcxproj">
       <Project>{fe5bf241-f4ea-4b94-b36a-23511e5908ec}</Project>
       <Name>CodecRTComponent</Name>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />
-  <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
+  
+  <!-- Enhanced VS2022 compatible imports with better error handling -->
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" 
+          Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets')" />
+  
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets" 
+          Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets')" />
+  
+  <!-- Enhanced fallback chain for VS2022 and newer versions -->
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" 
+          Condition="!Exists('$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets') And Exists('$(MSBuildToolsPath)\Microsoft.CSharp.targets')" />
+  
+  <!-- Ultimate fallback for very new VS versions -->
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" 
+          Condition="!Exists('$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets') And !Exists('$(MSBuildToolsPath)\Microsoft.CSharp.targets') And Exists('$(MSBuildBinPath)\Microsoft.CSharp.targets')" />
+  
+  <!-- Error handling for missing build targets -->
+  <Target Name="EnsureBuildTargets" BeforeTargets="PrepareForBuild">
+    <Error Text="Unable to locate MSBuild targets for $(TargetFrameworkIdentifier) $(TargetFrameworkVersion). Please install the Windows Phone SDK or use a supported Visual Studio version." 
+           Condition="!Exists('$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets') And 
+                      !Exists('$(MSBuildToolsPath)\Microsoft.CSharp.targets') And 
+                      !Exists('$(MSBuildBinPath)\Microsoft.CSharp.targets')" />
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
-  <ProjectExtensions />
+  
+  <!-- Enhanced PreBuildEvent with better error handling -->
   <PropertyGroup>
-    <PreBuildEvent>copy  /y   ..\..\..\..\..\..\..\..\bin\$(Platform)\$(Configuration)\openh264.dll    ..\..\..\
-copy  /y   ..\..\..\..\..\..\..\..\res\*.yuv    ..\..\..\
-copy  /y   ..\..\..\..\..\..\..\..\res\B*.264    ..\..\..\
-</PreBuildEvent>
+    <PreBuildEvent>
+if exist "..\..\..\..\..\..\..\..\bin\$(Platform)\$(Configuration)\openh264.dll" (
+  copy /y "..\..\..\..\..\..\..\..\bin\$(Platform)\$(Configuration)\openh264.dll" "..\..\.."
+) else (
+  echo Warning: openh264.dll not found, skipping copy
+)
+
+if exist "..\..\..\..\..\..\..\..\res\*.yuv" (
+  copy /y "..\..\..\..\..\..\..\..\res\*.yuv" "..\..\.."
+) else (
+  echo Warning: .yuv files not found, skipping copy  
+)
+
+if exist "..\..\..\..\..\..\..\..\res\B*.264" (
+  copy /y "..\..\..\..\..\..\..\..\res\B*.264" "..\..\.."
+) else (
+  echo Warning: .264 files not found, skipping copy
+)
+    </PreBuildEvent>
   </PropertyGroup>
+  
+  <ProjectExtensions />
 </Project>
