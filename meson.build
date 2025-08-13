@@ -115,12 +115,16 @@ if ['linux', 'freebsd', 'android', 'ios', 'darwin'].contains(system)
 elif system == 'windows'
   if cpu_family == 'x86'
     asm_format = 'win32'
-    asm_args += ['-DPREFIX', '-DX86_32']
+    asm_args += ['-DPREFIX', '-DX86_32', '-DHAVE_AVX2']
     asm_inc = join_paths(meson.current_source_dir(), 'codec', 'common', 'x86', '')
+    add_project_arguments('-DX86_ASM', language: 'cpp')
+    add_project_arguments('-DX86_ASM', language: 'c')
   elif cpu_family == 'x86_64'
     asm_format = 'win64'
-    asm_args += ['-DWIN64']
+    asm_args += ['-DWIN64', '-DHAVE_AVX2']
     asm_inc = join_paths(meson.current_source_dir(), 'codec', 'common', 'x86', '')
+    add_project_arguments('-DX86_ASM', language: 'cpp')
+    add_project_arguments('-DX86_ASM', language: 'c')
   elif cpu_family == 'arm'
     if cpp.get_argument_syntax() == 'msvc'
       asm_format = 'armasm'
