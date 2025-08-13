@@ -67,13 +67,13 @@ if ['linux', 'freebsd', 'android', 'ios', 'darwin'].contains(system)
   if cpu_family == 'x86'
     asm_format = asm_format32
     asm_args += ['-DX86_32', '-DX86_32_PICASM', '-DHAVE_AVX2']
-    add_project_arguments('-DHAVE_AVX2', language: 'cpp')
+    add_project_arguments('-DHAVE_AVX2', '-DX86_ASM', '-DX86_32_ASM', language: 'cpp')
     add_project_arguments('-DHAVE_AVX2', '-DX86_ASM', '-DX86_32_ASM', language: 'c')
     asm_inc = join_paths(meson.current_source_dir(), 'codec', 'common', 'x86', '')
   elif cpu_family == 'x86_64'
     asm_format = asm_format64
     asm_args += ['-DUNIX64', '-DHAVE_AVX2']
-    add_project_arguments('-DHAVE_AVX2', language: 'cpp')
+    add_project_arguments('-DHAVE_AVX2', '-DX86_ASM',  language: 'cpp')
     add_project_arguments('-DHAVE_AVX2', '-DX86_ASM', language: 'c')
     asm_inc = join_paths(meson.current_source_dir(), 'codec', 'common', 'x86', '')
   elif cpu_family == 'arm'
@@ -117,14 +117,14 @@ elif system == 'windows'
     asm_format = 'win32'
     asm_args += ['-DPREFIX', '-DX86_32', '-DHAVE_AVX2']
     asm_inc = join_paths(meson.current_source_dir(), 'codec', 'common', 'x86', '')
-    add_project_arguments('-DX86_ASM', language: 'cpp')
-    add_project_arguments('-DX86_ASM', language: 'c')
+    add_project_arguments('-DX86_ASM', '-DHAVE_AVX2', language: 'cpp')
+    add_project_arguments('-DX86_ASM', '-DHAVE_AVX2', language: 'c')
   elif cpu_family == 'x86_64'
     asm_format = 'win64'
     asm_args += ['-DWIN64', '-DHAVE_AVX2']
     asm_inc = join_paths(meson.current_source_dir(), 'codec', 'common', 'x86', '')
-    add_project_arguments('-DX86_ASM', language: 'cpp')
-    add_project_arguments('-DX86_ASM', language: 'c')
+    add_project_arguments('-DX86_ASM', '-DHAVE_AVX2', language: 'cpp')
+    add_project_arguments('-DX86_ASM', '-DHAVE_AVX2', language: 'c')
   elif cpu_family == 'arm'
     if cpp.get_argument_syntax() == 'msvc'
       asm_format = 'armasm'
