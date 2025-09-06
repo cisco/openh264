@@ -3907,6 +3907,61 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         WelsLog (pLogCtx, WELS_LOG_WARNING,
                  "WelsEncoderEncodeExt()MinCr Checking,codec bitstream size is larger than Level limitation");
     }
+
+    if (iSpatialNum == 1 && NULL != pFbi->pReconPic
+        && (NULL != pFbi->pReconPic->pData[0]
+            || NULL != pFbi->pReconPic->pData[1]
+            || NULL != pFbi->pReconPic->pData[2])) {
+      SReconPicture* pReconPic = pFbi->pReconPic;
+      unsigned char* pReconData[4] = {pReconPic->pData[0], pReconPic->pData[1],
+                                      pReconPic->pData[2], pReconPic->pData[3]};
+      SWelsSPS* pSpsTmp = pCtx->pCurDqLayer->sLayerInfo.pSpsP;
+      bool bFrameCroppingFlag = pSpsTmp->bFrameCroppingFlag;
+      SCropOffset* pFrameCrop = &pSpsTmp->sFrameCrop;
+
+      const int32_t kiStrideY      = fsnr->iLineSize[0];
+      const int32_t kiLumaWidth    = bFrameCroppingFlag ? (fsnr->iWidthInPixel - ((pFrameCrop->iCropLeft +
+          pFrameCrop->iCropRight) << 1)) : fsnr->iWidthInPixel;
+      const int32_t kiLumaHeight   = bFrameCroppingFlag ? (fsnr->iHeightInPixel - ((pFrameCrop->iCropTop +
+          pFrameCrop->iCropBottom) << 1)) : fsnr->iHeightInPixel;
+      const int32_t kiChromaWidth  = kiLumaWidth >> 1;
+      const int32_t kiChromaHeight = kiLumaHeight >> 1;
+
+      pReconPic->iColorFormat = videoFormatI420;
+      pReconPic->iPicWidth    = kiLumaWidth;
+      pReconPic->iPicHeight   = kiLumaHeight;
+      pReconPic->iStride[0]   = kiStrideY;
+      pReconPic->uiTimeStamp  = pSrcPic->uiTimeStamp;
+
+      // Copy Y plane
+      if (NULL != pReconData[0]) {
+        unsigned char* pSrcY = bFrameCroppingFlag ? (fsnr->pData[0] + kiStrideY * (pFrameCrop->iCropTop << 1) +
+            (pFrameCrop->iCropLeft << 1)) : fsnr->pData[0];
+        for (int32_t j = 0; j < kiLumaHeight; ++j) {
+          memcpy (pReconData[0] + j * kiLumaWidth, pSrcY + j * kiStrideY, kiLumaWidth);
+        }
+      }
+
+      // Copy U and V planes
+      for (int i = 1; i < 3; ++i) {
+        if (NULL == pReconData[i])
+          continue;
+        const int32_t kiStrideUV = fsnr->iLineSize[i];
+        pReconPic->iStride[i] = kiStrideUV;
+        unsigned char* pSrcUV = bFrameCroppingFlag ? (fsnr->pData[i] + kiStrideUV * pFrameCrop->iCropTop +
+            pFrameCrop->iCropLeft)
+          : fsnr->pData[i];
+        for (int32_t j = 0; j < kiChromaHeight; ++j) {
+          memcpy (pReconData[i] + j * kiChromaWidth, pSrcUV + j * kiStrideUV, kiChromaWidth);
+        }
+      }
+
+      pFbi->bHaveRecon = true;
+    } else {
+      pFbi->bHaveRecon = false;
+    }
+
+
 #ifdef ENABLE_FRAME_DUMP
     {
       DumpDependencyRec (fsnr, &pSvcParam->sDependencyLayers[iCurDid].sRecFileName[0], iCurDid,
