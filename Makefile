@@ -115,6 +115,30 @@ ifneq ($(V),Yes)
     QUIET      = @
 endif
 
+### Not apply -mflags globaly
+ifeq (loongarch64, $(ARCH))
+LSX_OBJS := \
+    $(SRC_PATH)codec/common/loongarch/copy_mb_lsx.o \
+    $(SRC_PATH)codec/common/loongarch/deblock_lsx.o \
+    $(SRC_PATH)codec/common/loongarch/intra_pred_com_lsx.o \
+    $(SRC_PATH)codec/common/loongarch/mc_chroma_lsx.o \
+    $(SRC_PATH)codec/common/loongarch/mc_horver_lsx.o \
+    $(SRC_PATH)codec/decoder/core/loongarch/mb_aux_lsx.o \
+    $(SRC_PATH)codec/encoder/core/loongarch/get_intra_predictor_lsx.o \
+    $(SRC_PATH)codec/encoder/core/loongarch/quant_lsx.o \
+    $(SRC_PATH)codec/encoder/core/loongarch/svc_motion_estimate_lsx.o \
+    $(SRC_PATH)codec/processing/src/loongarch/vaa_lsx.o
+
+LASX_OBJS := \
+    $(SRC_PATH)codec/common/loongarch/intra_pred_com_lasx.o \
+    $(SRC_PATH)codec/common/loongarch/satd_sad_lasx.o \
+    $(SRC_PATH)codec/encoder/core/loongarch/dct_lasx.o \
+    $(SRC_PATH)codec/encoder/core/loongarch/sample_lasx.o \
+    $(SRC_PATH)codec/processing/src/loongarch/vaa_lasx.o
+
+$(LSX_OBJS): CFLAGS += -mlsx
+$(LASX_OBJS): CFLAGS += -mlasx
+endif
 
 INCLUDES += -I$(SRC_PATH)codec/api/wels -I$(SRC_PATH)codec/common/inc -Icodec/common/inc
 
