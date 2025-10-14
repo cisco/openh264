@@ -58,7 +58,7 @@ void IdctFourResAddPred_avx2 (uint8_t* pPred, int32_t iStride, int16_t* pRs, con
 void IdctResAddPred_neon (uint8_t* pred, const int32_t stride, int16_t* rs);
 #endif
 
-#if defined(HAVE_NEON_AARCH64)
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 void IdctResAddPred_AArch64_neon (uint8_t* pred, const int32_t stride, int16_t* rs);
 #endif
 

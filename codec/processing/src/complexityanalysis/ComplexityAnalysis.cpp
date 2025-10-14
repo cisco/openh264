@@ -294,7 +294,7 @@ CComplexityAnalysisScreen::CComplexityAnalysisScreen (int32_t iCpuFlag) {
   }
 #endif
 
-#if defined (HAVE_NEON_AARCH64)
+#if defined (HAVE_NEON_AARCH64) && defined(__aarch64__)
   if (iCpuFlag & WELS_CPU_NEON) {
     m_pSadFunc = WelsSampleSad16x16_AArch64_neon;
     m_pIntraFunc[0] =  WelsI16x16LumaPredV_AArch64_neon;

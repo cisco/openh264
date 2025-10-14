@@ -67,7 +67,7 @@ void WelsCopy16x8NotAligned_neon (uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc
 void WelsCopy8x16_neon (uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrideS);
 #endif
 
-#if defined (HAVE_NEON_AARCH64)
+#if defined (HAVE_NEON_AARCH64) && defined(__aarch64__)
 void WelsCopy8x8_AArch64_neon (uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrideS);
 void WelsCopy16x16_AArch64_neon (uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrideS);
 void WelsCopy16x16NotAligned_AArch64_neon (uint8_t* pDst, int32_t iStrideD, uint8_t* pSrc, int32_t iStrideS);

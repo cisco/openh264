@@ -68,7 +68,7 @@ VarFunc      SampleVariance16x16_neon;
 WELSVP_EXTERN_C_END
 #endif
 
-#ifdef HAVE_NEON_AARCH64
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 WELSVP_EXTERN_C_BEGIN
 VarFunc      SampleVariance16x16_AArch64_neon;
 WELSVP_EXTERN_C_END

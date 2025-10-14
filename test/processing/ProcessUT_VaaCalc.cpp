@@ -856,7 +856,7 @@ GENERATE_VAACalcSadSsd_UT (VAACalcSadSsd_neon, 1, WELS_CPU_NEON)
 GENERATE_VAACalcSadVar_UT (VAACalcSadVar_neon, 1, WELS_CPU_NEON)
 #endif
 
-#if defined(HAVE_NEON_AARCH64)
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 GENERATE_VAACalcSad_UT (VAACalcSad_AArch64_neon, 1, WELS_CPU_NEON)
 GENERATE_VAACalcSadBgd_UT (VAACalcSadBgd_AArch64_neon, 1, WELS_CPU_NEON)
 GENERATE_VAACalcSadSsdBgd_UT (VAACalcSadSsdBgd_AArch64_neon, 1, WELS_CPU_NEON)

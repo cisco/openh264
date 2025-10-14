@@ -1370,7 +1370,7 @@ void PixelAvg_neon (uint8_t* pDst, int32_t iDstStride, const uint8_t* pSrcA, int
   kpfFuncs[iWidth >> 4] (pDst, iDstStride, pSrcA, iSrcAStride, pSrcB, iSrcBStride, iHeight);
 }
 #endif
-#if defined(HAVE_NEON_AARCH64)
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 void McHorVer20Width5Or9Or17_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                                         int32_t iWidth, int32_t iHeight) {
   if (iWidth == 17)
@@ -4570,7 +4570,7 @@ void WelsCommon::InitMcFunc (SMcFunc* pMcFuncs, uint32_t uiCpuFlag) {
     pMcFuncs->pfLumaHalfpelCen  = McHorVer22Width5Or9Or17Height5Or9Or17_neon;//iWidth+1/heigh+1
   }
 #endif
-#if defined(HAVE_NEON_AARCH64)
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
   if (uiCpuFlag & WELS_CPU_NEON) {
     pMcFuncs->pMcLumaFunc       = McLuma_AArch64_neon;
     pMcFuncs->pMcChromaFunc     = McChroma_AArch64_neon;
