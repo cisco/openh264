@@ -238,7 +238,7 @@ GENERATE_IDCTFOURRESADDPRED (IdctFourResAddPred_avx2, WELS_CPU_AVX2)
 GENERATE_IDCTRESADDPRED (IdctResAddPred_neon, WELS_CPU_NEON)
 #endif
 
-#if defined(HAVE_NEON_AARCH64)
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 GENERATE_IDCTRESADDPRED (IdctResAddPred_AArch64_neon, WELS_CPU_NEON)
 #endif
 
@@ -293,7 +293,7 @@ GENERATE_SETNONZEROCOUNT (WelsNonZeroCount_sse2, WELS_CPU_SSE2)
 GENERATE_SETNONZEROCOUNT (WelsNonZeroCount_neon, WELS_CPU_NEON)
 #endif
 
-#if defined(HAVE_NEON_AARCH64)
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 GENERATE_SETNONZEROCOUNT (WelsNonZeroCount_AArch64_neon, WELS_CPU_NEON)
 #endif
 

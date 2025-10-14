@@ -134,7 +134,7 @@ GENERATE_SumOfSingleBlock (SumOf8x8SingleBlock_ref, SumOf8x8SingleBlock_neon, WE
 GENERATE_SumOfSingleBlock (SumOf16x16SingleBlock_ref, SumOf16x16SingleBlock_neon, WELS_CPU_NEON)
 #endif
 
-#ifdef HAVE_NEON_AARCH64
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 GENERATE_SumOfSingleBlock (SumOf8x8SingleBlock_ref, SumOf8x8SingleBlock_AArch64_neon, WELS_CPU_NEON)
 GENERATE_SumOfSingleBlock (SumOf16x16SingleBlock_ref, SumOf16x16SingleBlock_AArch64_neon, WELS_CPU_NEON)
 #endif
@@ -307,7 +307,7 @@ GENERATE_FillQpelLocationByFeatureValue (FillQpelLocationByFeatureValue_ref, Fil
     320, WELS_CPU_NEON)
 #endif
 
-#ifdef HAVE_NEON_AARCH64
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_AArch64_neon, 1, 1, WELS_CPU_NEON)
 GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_AArch64_neon, 1, 1, WELS_CPU_NEON)
 GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_AArch64_neon, 1, 320, WELS_CPU_NEON)

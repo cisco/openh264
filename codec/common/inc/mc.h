@@ -158,7 +158,7 @@ void McHorVer22Width5_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pD
                             int32_t iHeight);//width+1&&height+1
 #endif
 
-#if defined(HAVE_NEON_AARCH64)
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 void McCopyWidthEq4_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,
                                   int32_t iHeight);
 void McCopyWidthEq8_AArch64_neon (const uint8_t* pSrc, int32_t iSrcStride, uint8_t* pDst, int32_t iDstStride,

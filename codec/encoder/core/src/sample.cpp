@@ -442,7 +442,7 @@ void WelsInitSampleSadFunc (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag) {
   }
 #endif
 
-#if defined (HAVE_NEON_AARCH64)
+#if defined (HAVE_NEON_AARCH64) && defined(__aarch64__)
   if (uiCpuFlag & WELS_CPU_NEON) {
     pFuncList->sSampleDealingFuncs.pfSampleSad[BLOCK_4x4  ] = WelsSampleSad4x4_AArch64_neon;
     pFuncList->sSampleDealingFuncs.pfSampleSad[BLOCK_16x16] = WelsSampleSad16x16_AArch64_neon;

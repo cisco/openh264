@@ -30,7 +30,7 @@
  *
  */
 
-#ifdef HAVE_NEON_AARCH64
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 #include "arm_arch64_common_macro.S"
 //int32_t SumOf8x8SingleBlock_AArch64_neon (uint8_t* pRef, const int32_t kiRefStride);
 WELS_ASM_AARCH64_FUNC_BEGIN SumOf8x8SingleBlock_AArch64_neon

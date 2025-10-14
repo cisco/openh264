@@ -304,7 +304,7 @@ uint32_t WelsCPUFeatureDetect (int32_t* pNumberOfLogicProcessors) {
          WELS_CPU_NEON;
 }
 #endif
-#elif defined(HAVE_NEON_AARCH64)
+#elif defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 
 /* For AArch64, no runtime detection actually is necessary for now, since
  * NEON and VFPv3 is mandatory on all such CPUs. (/proc/cpuinfo doesn't

@@ -154,7 +154,7 @@ void GeneralBilinearAccurateDownsampler_neon (uint8_t* pDst, const int32_t kiDst
 WELSVP_EXTERN_C_END
 #endif
 
-#ifdef HAVE_NEON_AARCH64
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 WELSVP_EXTERN_C_BEGIN
 // iSrcWidth no limitation
 HalveDownsampleFunc     DyadicBilinearDownsampler_AArch64_neon;

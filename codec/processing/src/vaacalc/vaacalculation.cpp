@@ -84,7 +84,7 @@ void CVAACalculation::InitVaaFuncs (SVaaFuncs& sVaaFuncs, int32_t iCpuFlag) {
   }
 #endif//HAVE_NEON
 
-#ifdef HAVE_NEON_AARCH64
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
   if ((iCpuFlag & WELS_CPU_NEON) == WELS_CPU_NEON) {
     sVaaFuncs.pfVAACalcSad       = VAACalcSad_AArch64_neon;
     sVaaFuncs.pfVAACalcSadBgd    = VAACalcSadBgd_AArch64_neon;
