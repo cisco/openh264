@@ -531,7 +531,7 @@ TEST (DecoderDeblocking, DeblockingInit) {
   DB_FUNC_CPUFLAG (neon)
 #endif
 
-#ifdef HAVE_NEON_AARCH64
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
   // pure C
   DeblockingInit (&sDBFunc, 0x00000000);
   DB_FUNC_CPUFLAG (c)

@@ -128,7 +128,7 @@ GENERATE_CHROMA_UT (ChromaEq4V_neon, DeblockChromaEq4V_neon_wrap, DeblockChromaE
 GENERATE_CHROMA_UT (ChromaEq4H_neon, DeblockChromaEq4H_neon_wrap, DeblockChromaEq4H_c_wrap, WELS_CPU_NEON, 1)
 #endif
 
-#if defined(HAVE_NEON_AARCH64)
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 WRAP_LUMA_FUNC (DeblockLumaEq4V_AArch64_neon)
 WRAP_LUMA_FUNC (DeblockLumaEq4H_AArch64_neon)
 WRAP_CHROMA_FUNC (DeblockChromaEq4V_AArch64_neon)
