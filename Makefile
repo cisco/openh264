@@ -11,6 +11,8 @@ OS=$(shell uname | tr A-Z a-z | tr -d \\-0-9. | sed -E 's/^(net|open|free)bsd/bs
 ARCH=$(shell uname -m)
 LIBPREFIX=lib
 LIBSUFFIX=a
+# EMFS = nodefs | memfs
+EMFS=
 CCAS=$(CC)
 CXX_O=-o $@
 CXX_LINK_O=-o $@
@@ -206,7 +208,7 @@ clean:
 ifeq (android,$(OS))
 clean: clean_Android
 endif
-	$(QUIET)rm -f $(OBJS) $(OBJS:.$(OBJ)=.d) $(OBJS:.$(OBJ)=.obj) $(LIBRARIES) $(BINARIES) *.lib *.a *.dylib *.dll *.so *.so.* *.exe *.pdb *.exp *.pc *.res *.map $(SRC_PATH)codec/common/inc/version_gen.h
+	$(QUIET)rm -f $(OBJS) $(OBJS:.$(OBJ)=.d) $(OBJS:.$(OBJ)=.obj) $(LIBRARIES) $(BINARIES) *.lib *.a *.js *.html *.wasm *.wat *.data *.dylib *.dll *.so *.so.* *.exe *.pdb *.exp *.pc *.res *.map $(SRC_PATH)codec/common/inc/version_gen.h
 
 gmp-bootstrap:
 	if [ ! -d gmp-api ] ; then git clone https://github.com/mozilla/gmp-api gmp-api ; fi
@@ -228,7 +230,9 @@ endif
 
 test: codec_unittest$(EXEEXT)
 ifeq ($(BUILD_UT_EXE), Yes)
+ifneq (wasm,$(OS))
 	./codec_unittest
+endif
 endif
 
 else
