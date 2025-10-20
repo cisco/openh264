@@ -1080,7 +1080,7 @@ void InitPredFunc (PWelsDecoderContext pCtx, uint32_t uiCpuFlag) {
   }
 #endif//HAVE_NEON
 
-#if defined(HAVE_NEON_AARCH64)
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
   if (uiCpuFlag & WELS_CPU_NEON) {
     pCtx->pIdctResAddPredFunc   = IdctResAddPred_AArch64_neon;
     pCtx->pIdctFourResAddPredFunc = IdctFourResAddPred_<IdctResAddPred_AArch64_neon>;

@@ -247,7 +247,7 @@ void GeneralBilinearAccurateDownsampler_c (uint8_t* pDst, const int32_t kiDstStr
   }
 }
 
-#if defined(X86_ASM) || defined(HAVE_NEON) || defined(HAVE_NEON_AARCH64)
+#if defined(X86_ASM) || defined(HAVE_NEON) || (defined(HAVE_NEON_AARCH64) && defined(__aarch64__))
 static void GeneralBilinearDownsamplerWrap (uint8_t* pDst, const int32_t kiDstStride, const int32_t kiDstWidth,
     const int32_t kiDstHeight,
     uint8_t* pSrc, const int32_t kiSrcStride, const int32_t kiSrcWidth, const int32_t kiSrcHeight,
@@ -294,7 +294,7 @@ DEFINE_GENERAL_BILINEAR_ACCURATE_DOWNSAMPLER_WRAP (avx2)
 DEFINE_GENERAL_BILINEAR_ACCURATE_DOWNSAMPLER_WRAP (neon)
 #endif
 
-#ifdef HAVE_NEON_AARCH64
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 DEFINE_GENERAL_BILINEAR_ACCURATE_DOWNSAMPLER_WRAP (AArch64_neon)
 #endif
 WELSVP_NAMESPACE_END
