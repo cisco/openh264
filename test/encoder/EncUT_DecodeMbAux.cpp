@@ -253,7 +253,8 @@ TEST (DecodeMbAuxTest, WelsIDctT4Rec_mmi) {
 #endif
 #if defined(HAVE_LASX)
 TEST (DecodeMbAuxTest, WelsIDctT4Rec_lasx) {
-  TestIDctT4Rec<int16_t> (WelsIDctT4Rec_lasx);
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_LASX)
+    TestIDctT4Rec<int16_t> (WelsIDctT4Rec_lasx);
 }
 #endif
 template<typename clip_t>
@@ -428,6 +429,7 @@ TEST (DecodeMbAuxTest, WelsIDctRecI16x16Dc_mmi) {
 #endif
 #if defined(HAVE_LASX)
 TEST (DecodeMbAuxTest, WelsIDctFourT4Rec_lasx) {
-  TestIDctFourT4Rec<int16_t> (WelsIDctFourT4Rec_lasx);
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_LASX)
+    TestIDctFourT4Rec<int16_t> (WelsIDctFourT4Rec_lasx);
 }
 #endif
