@@ -129,7 +129,7 @@ void CDownsampling::InitDownsampleFuncs (SDownsampleFuncs& sDownsampleFunc,  int
   }
 #endif
 
-#if defined(HAVE_NEON_AARCH64)
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
   if (iCpuFlag & WELS_CPU_NEON) {
     sDownsampleFunc.pfHalfAverageWidthx32 = DyadicBilinearDownsamplerWidthx32_AArch64_neon;
     sDownsampleFunc.pfHalfAverageWidthx16 = DyadicBilinearDownsampler_AArch64_neon;

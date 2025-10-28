@@ -122,7 +122,7 @@ VAACalcSadSsdFunc       VAACalcSadSsd_neon;
 WELSVP_EXTERN_C_END
 #endif
 
-#ifdef HAVE_NEON_AARCH64
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 WELSVP_EXTERN_C_BEGIN
 VAACalcSadBgdFunc       VAACalcSadBgd_AArch64_neon;
 VAACalcSadSsdBgdFunc    VAACalcSadSsdBgd_AArch64_neon;

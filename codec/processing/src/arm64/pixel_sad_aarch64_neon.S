@@ -30,7 +30,7 @@
  *
  */
 
-#ifdef HAVE_NEON_AARCH64
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 #include "arm_arch64_common_macro.S"
 //int32_t WelsProcessingSampleSad8x8_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t);
 WELS_ASM_AARCH64_FUNC_BEGIN WelsProcessingSampleSad8x8_AArch64_neon

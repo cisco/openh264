@@ -3000,7 +3000,7 @@ void WelsBlockFuncInit (SBlockFunc*    pFunc,  int32_t iCpu) {
   }
 #endif
 
-#ifdef HAVE_NEON_AARCH64
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
   if (iCpu & WELS_CPU_NEON) {
     pFunc->pWelsSetNonZeroCountFunc = WelsNonZeroCount_AArch64_neon;
     pFunc->pWelsBlockZero16x16Func  = WelsBlockZero16x16_AArch64_neon;

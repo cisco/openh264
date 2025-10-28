@@ -131,7 +131,7 @@ void WelsQuantFour4x4_neon (int16_t* pDct, const int16_t* pFF, const int16_t* pM
 void WelsQuantFour4x4Max_neon (int16_t* pDct, const int16_t* pFF, const int16_t* pMF, int16_t* pMax);
 #endif
 
-#ifdef HAVE_NEON_AARCH64
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 void WelsHadamardT4Dc_AArch64_neon (int16_t* pLumaDc, int16_t* pDct);
 int32_t WelsHadamardQuant2x2_AArch64_neon (int16_t* pRes, const int16_t kiFF, int16_t iMF, int16_t* pDct, int16_t* pBlock);
 int32_t WelsHadamardQuant2x2Skip_AArch64_neon (int16_t* pRes, int16_t iFF,  int16_t iMF);

@@ -393,7 +393,7 @@ GENERATE_GeneralBilinearDownsampler_UT (GeneralBilinearAccurateDownsamplerWrap_n
                                         GeneralBilinearAccurateDownsampler_ref, 1, WELS_CPU_NEON)
 #endif
 
-#if defined(HAVE_NEON_AARCH64)
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 GENERATE_DyadicBilinearDownsampler_UT (DyadicBilinearDownsamplerWidthx32_AArch64_neon, 1, WELS_CPU_NEON)
 GENERATE_DyadicBilinearDownsampler_UT (DyadicBilinearDownsampler_AArch64_neon, 1, WELS_CPU_NEON)
 

@@ -624,7 +624,7 @@ GENERATE_8x8_UT (WelsDecoderIChromaPredDc_neon, WelsIChromaPredDc_ref, 1, WELS_C
 GENERATE_8x8_UT (WelsDecoderIChromaPredPlane_neon, WelsIChromaPredPlane_ref, 1, WELS_CPU_NEON)
 #endif
 
-#if defined(HAVE_NEON_AARCH64)
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 GENERATE_16x16_UT (WelsDecoderI16x16LumaPredV_AArch64_neon, LumaI16x16PredV, 1, WELS_CPU_NEON)
 GENERATE_16x16_UT (WelsDecoderI16x16LumaPredH_AArch64_neon, LumaI16x16PredH, 1, WELS_CPU_NEON)
 GENERATE_16x16_UT (WelsDecoderI16x16LumaPredDc_AArch64_neon, LumaI16x16PredDC, 1, WELS_CPU_NEON)

@@ -30,7 +30,7 @@
  *
  */
 
-#ifdef HAVE_NEON_AARCH64
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 #include "arm_arch64_common_macro.S"
 .align 4
 filter_para: .short 0, 1, -5, 20, 0, 0, 0, 0

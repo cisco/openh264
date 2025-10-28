@@ -291,7 +291,7 @@ void WelsInitReconstructionFuncs (SWelsFuncPtrList* pFuncList, uint32_t  uiCpuFl
   }
 #endif
 
-#if defined(HAVE_NEON_AARCH64)
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
   if (uiCpuFlag & WELS_CPU_NEON) {
     pFuncList->pfDequantization4x4          = WelsDequant4x4_AArch64_neon;
     pFuncList->pfDequantizationFour4x4      = WelsDequantFour4x4_AArch64_neon;

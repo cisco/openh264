@@ -1378,7 +1378,7 @@ void  DeblockingInit (SDeblockingFunc*  pFunc,  int32_t iCpu) {
   }
 #endif
 
-#if defined(HAVE_NEON_AARCH64)
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
   if (iCpu & WELS_CPU_NEON) {
     pFunc->pfLumaDeblockingLT4Ver   = DeblockLumaLt4V_AArch64_neon;
     pFunc->pfLumaDeblockingEQ4Ver   = DeblockLumaEq4V_AArch64_neon;

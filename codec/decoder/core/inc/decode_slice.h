@@ -85,7 +85,7 @@ void WelsBlockZero16x16_neon (int16_t* block, int32_t stride);
 void WelsBlockZero8x8_neon (int16_t* block, int32_t stride);
 #endif
 
-#if defined(HAVE_NEON_AARCH64)
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 void WelsBlockZero16x16_AArch64_neon (int16_t* block, int32_t stride);
 void WelsBlockZero8x8_AArch64_neon (int16_t* block, int32_t stride);
 #endif

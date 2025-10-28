@@ -73,7 +73,7 @@ GENERATE_AQTEST (SampleVariance16x16_sse2, WELS_CPU_SSE2)
 GENERATE_AQTEST (SampleVariance16x16_neon, WELS_CPU_NEON)
 #endif
 
-#if defined(HAVE_NEON_AARCH64)
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 GENERATE_AQTEST (SampleVariance16x16_AArch64_neon, WELS_CPU_NEON)
 #endif
 

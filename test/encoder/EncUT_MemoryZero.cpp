@@ -42,7 +42,7 @@ TEST (SetMemZeroFunTest, WelsSetMemZero) {
   }
 #endif
 
-#if defined(HAVE_NEON_AARCH64)
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
   if (uiCpuFlag & WELS_CPU_NEON) {
     sFuncPtrList.pfSetMemZeroSize8           = WelsSetMemZero_AArch64_neon;
     sFuncPtrList.pfSetMemZeroSize64Aligned16 = WelsSetMemZero_AArch64_neon;
