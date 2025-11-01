@@ -135,7 +135,7 @@ void WelsInitMeFunc (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag, bool bScre
     }
 #endif
 
-#if defined (HAVE_NEON_AARCH64)
+#if defined (HAVE_NEON_AARCH64) && defined(__aarch64__)
     if (uiCpuFlag & WELS_CPU_NEON) {
       //for feature search
       pFuncList->pfInitializeHashforFeature = InitializeHashforFeature_AArch64_neon;

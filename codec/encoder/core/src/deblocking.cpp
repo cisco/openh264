@@ -574,7 +574,7 @@ void DeblockingBSCalc_neon (SWelsFuncPtrList* pFunc, SMB* pCurMb, uint8_t uiBS[2
 }
 #endif
 
-#if defined(HAVE_NEON_AARCH64) && defined(SINGLE_REF_FRAME)
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__) && defined(SINGLE_REF_FRAME)
 void DeblockingBSCalc_AArch64_neon (SWelsFuncPtrList* pFunc, SMB* pCurMb, uint8_t uiBS[2][4][4], Mb_Type uiCurMbType,
                                     int32_t iMbStride, int32_t iLeftFlag, int32_t iTopFlag) {
   DeblockingBSCalcEnc_AArch64_neon (pCurMb->pNonZeroCount, pCurMb->sMv,
@@ -768,7 +768,7 @@ void WelsBlockFuncInit (PSetNoneZeroCountZeroFunc* pfSetNZCZero,  int32_t iCpu) 
     *pfSetNZCZero = WelsNonZeroCount_neon;
   }
 #endif
-#ifdef HAVE_NEON_AARCH64
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
   if (iCpu & WELS_CPU_NEON) {
     *pfSetNZCZero = WelsNonZeroCount_AArch64_neon;
   }
@@ -835,7 +835,7 @@ void  DeblockingInit (DeblockingFunc*   pFunc,  int32_t iCpu) {
   }
 #endif
 
-#if defined(HAVE_NEON_AARCH64)
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
   if (iCpu & WELS_CPU_NEON) {
     pFunc->pfLumaDeblockingLT4Ver   = DeblockLumaLt4V_AArch64_neon;
     pFunc->pfLumaDeblockingEQ4Ver   = DeblockLumaEq4V_AArch64_neon;

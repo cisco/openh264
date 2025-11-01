@@ -667,7 +667,7 @@ void WelsInitIntraPredFuncs (SWelsFuncPtrList* pFuncList, const uint32_t kuiCpuF
   }
 #endif
 
-#if defined(HAVE_NEON_AARCH64)
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
   if (kuiCpuFlag & WELS_CPU_NEON) {
     pFuncList->pfGetLumaI16x16Pred[I16_PRED_DC] = WelsI16x16LumaPredDc_AArch64_neon;
     pFuncList->pfGetLumaI16x16Pred[I16_PRED_P]  = WelsI16x16LumaPredPlane_AArch64_neon;

@@ -286,7 +286,7 @@ void SumOf16x16BlockOfFrame_neon (uint8_t* pRefPicture, const int32_t kiWidth, c
 }
 #endif
 
-#ifdef HAVE_NEON_AARCH64
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 extern "C"
 {
 void InitializeHashforFeature_AArch64_neon (uint32_t* pTimesOfFeatureValue, uint16_t* pBuf, const int32_t kiListSize,

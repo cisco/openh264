@@ -294,11 +294,13 @@ TEST (EncodeMbAuxTest, WelsCalculateSingleCtr4x4_mmi) {
 #endif
 #ifdef HAVE_LASX
 TEST (EncodeMbAuxTest, WelsDctT4_lasx) {
-  TestDctT4 (WelsDctT4_lasx);
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_LASX)
+    TestDctT4 (WelsDctT4_lasx);
 }
 
 TEST (EncodeMbAuxTest, WelsDctFourT4_lasx) {
-  TestDctFourT4 (WelsDctFourT4_lasx);
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_LASX)
+    TestDctFourT4 (WelsDctFourT4_lasx);
 }
 #endif
 

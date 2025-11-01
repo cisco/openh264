@@ -62,7 +62,7 @@ void DeblockChromaEq4H_neon (uint8_t* pPixCb, uint8_t* pPixCr, int32_t iStride, 
 void WelsNonZeroCount_neon (int8_t* pNonZeroCount);
 #endif
 
-#if defined(HAVE_NEON_AARCH64)
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 void DeblockLumaLt4V_AArch64_neon (uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* pTc);
 void DeblockLumaEq4V_AArch64_neon (uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta);
 void DeblockLumaLt4H_AArch64_neon (uint8_t* pPixY, int32_t iStride, int32_t iAlpha, int32_t iBeta, int8_t* pTc);

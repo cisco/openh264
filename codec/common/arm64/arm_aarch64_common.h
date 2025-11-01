@@ -35,6 +35,8 @@
 #ifndef CODEC_COMMON_ARM64_ARM_AARCH64_COMMON_H_
 #define CODEC_COMMON_ARM64_ARM_AARCH64_COMMON_H_
 
+#if defined(__aarch64__)
+
 /*
  ; Support macros for
  ;   - Armv8.3-A Pointer Authentication and
@@ -80,6 +82,8 @@
   .long(GNU_PROPERTY_AARCH64_POINTER_AUTH | GNU_PROPERTY_AARCH64_BTI);
   .long 0;
   .popsection;
+#endif
+
 #endif
 
 #endif /* CODEC_COMMON_ARM64_ARM_AARCH64_COMMON_H_ */
