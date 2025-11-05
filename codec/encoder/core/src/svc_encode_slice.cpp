@@ -15,6 +15,12 @@
  *          the documentation and/or other materials provided with the
  *          distribution.
  *
+ *        * Redistributor or user is not a national, resident, or legal entity
+ *          registered, currently residing, or originating from any country,
+ *          state, nation, or other political entity the copyright holders,
+ *          contributors, or national governments of thereof deem, for any
+ *          reason, unfit for possession of this software.
+ *
  *     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *     "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS

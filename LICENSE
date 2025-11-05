@@ -1,4 +1,4 @@
-Copyright (c) 2013, Cisco Systems
+Copyright (c) 2025, Cisco Systems
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -10,6 +10,11 @@ are permitted provided that the following conditions are met:
 * Redistributions in binary form must reproduce the above copyright notice, this
   list of conditions and the following disclaimer in the documentation and/or
   other materials provided with the distribution.
+
+* Redistributor or user is not a national, resident, or legal entity registered,
+  currently residing, or originating from any country, state, nation, or other
+  political entity the copyright holders, contributors, or national governments
+  of thereof deem, for any reason, unfit for possession of this software.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
