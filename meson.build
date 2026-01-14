@@ -79,7 +79,7 @@ if ['linux', 'freebsd', 'android', 'ios', 'darwin'].contains(system)
   elif cpu_family == 'arm'
     asm_format = asm_format32
     add_project_arguments('-DHAVE_NEON', language: 'c')
-    add_project_arguments('-DHAVE_NEON', language: 'c')
+    add_project_arguments('-DHAVE_NEON', language: 'cpp')
     casm_inc = include_directories(join_paths('codec', 'common', 'arm'))
   elif cpu_family == 'aarch64'
     asm_format = asm_format64
