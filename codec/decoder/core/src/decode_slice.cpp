@@ -1840,6 +1840,10 @@ int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
 
     int32_t iIndex = ((-pBs->iLeftBits) >> 3) + 2;
 
+    if (pBs->pCurBuf - iIndex + (pCtx->pSps->uiChromaFormatIdc ? 384 : 256) > pBs->pEndBuf) {
+      return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_ACCESS);
+    }
+
     pCurDqLayer->pDec->pMbType[iMbXy] = MB_TYPE_INTRA_PCM;
 
     //step 1: locating bit-stream pointer [must align into integer byte]
@@ -1853,19 +1857,21 @@ int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
         pDecY += iDecStrideL;
         pTmpBsBuf += 16;
       }
-      for (i = 0; i < 8; i++) { //cb
-        memcpy (pDecU, pTmpBsBuf, iCopySizeUV);
-        pDecU += iDecStrideC;
-        pTmpBsBuf += 8;
-      }
-      for (i = 0; i < 8; i++) { //cr
-        memcpy (pDecV, pTmpBsBuf, iCopySizeUV);
-        pDecV += iDecStrideC;
-        pTmpBsBuf += 8;
+      if (pCtx->pSps->uiChromaFormatIdc) {
+        for (i = 0; i < 8; i++) { //cb
+          memcpy (pDecU, pTmpBsBuf, iCopySizeUV);
+          pDecU += iDecStrideC;
+          pTmpBsBuf += 8;
+        }
+        for (i = 0; i < 8; i++) { //cr
+          memcpy (pDecV, pTmpBsBuf, iCopySizeUV);
+          pDecV += iDecStrideC;
+          pTmpBsBuf += 8;
+        }
       }
     }
 
-    pBs->pCurBuf += 384;
+    pBs->pCurBuf += (pCtx->pSps->uiChromaFormatIdc ? 384 : 256);
 
     //step 3: update QP and pNonZeroCount
     pCurDqLayer->pLumaQp[iMbXy] = 0;
@@ -2181,6 +2187,10 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
 
       int32_t iIndex = ((-pBs->iLeftBits) >> 3) + 2;
 
+      if (pBs->pCurBuf - iIndex + (pCtx->pSps->uiChromaFormatIdc ? 384 : 256) > pBs->pEndBuf) {
+        return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_ACCESS);
+      }
+
       pCurDqLayer->pDec->pMbType[iMbXy] = MB_TYPE_INTRA_PCM;
 
       //step 1: locating bit-stream pointer [must align into integer byte]
@@ -2195,19 +2205,21 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
           pTmpBsBuf += 16;
         }
 
-        for (i = 0; i < 8; i++) { //cb
-          memcpy (pDecU, pTmpBsBuf, iCopySizeUV);
-          pDecU += iDecStrideC;
-          pTmpBsBuf += 8;
-        }
-        for (i = 0; i < 8; i++) { //cr
-          memcpy (pDecV, pTmpBsBuf, iCopySizeUV);
-          pDecV += iDecStrideC;
-          pTmpBsBuf += 8;
+        if (pCtx->pSps->uiChromaFormatIdc) {
+          for (i = 0; i < 8; i++) { //cb
+            memcpy (pDecU, pTmpBsBuf, iCopySizeUV);
+            pDecU += iDecStrideC;
+            pTmpBsBuf += 8;
+          }
+          for (i = 0; i < 8; i++) { //cr
+            memcpy (pDecV, pTmpBsBuf, iCopySizeUV);
+            pDecV += iDecStrideC;
+            pTmpBsBuf += 8;
+          }
         }
       }
 
-      pBs->pCurBuf += 384;
+      pBs->pCurBuf += (pCtx->pSps->uiChromaFormatIdc ? 384 : 256);
 
       //step 3: update QP and pNonZeroCount
       pCurDqLayer->pLumaQp[iMbXy] = 0;
@@ -2728,6 +2740,10 @@ int32_t WelsActualDecodeMbCavlcBSlice (PWelsDecoderContext pCtx) {
 
       int32_t iIndex = ((-pBs->iLeftBits) >> 3) + 2;
 
+      if (pBs->pCurBuf - iIndex + (pCtx->pSps->uiChromaFormatIdc ? 384 : 256) > pBs->pEndBuf) {
+        return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_INVALID_ACCESS);
+      }
+
       pCurDqLayer->pDec->pMbType[iMbXy] = MB_TYPE_INTRA_PCM;
 
       //step 1: locating bit-stream pointer [must align into integer byte]
@@ -2742,19 +2758,21 @@ int32_t WelsActualDecodeMbCavlcBSlice (PWelsDecoderContext pCtx) {
           pTmpBsBuf += 16;
         }
 
-        for (i = 0; i < 8; i++) { //cb
-          memcpy (pDecU, pTmpBsBuf, iCopySizeUV);
-          pDecU += iDecStrideC;
-          pTmpBsBuf += 8;
-        }
-        for (i = 0; i < 8; i++) { //cr
-          memcpy (pDecV, pTmpBsBuf, iCopySizeUV);
-          pDecV += iDecStrideC;
-          pTmpBsBuf += 8;
+        if (pCtx->pSps->uiChromaFormatIdc) {
+          for (i = 0; i < 8; i++) { //cb
+            memcpy (pDecU, pTmpBsBuf, iCopySizeUV);
+            pDecU += iDecStrideC;
+            pTmpBsBuf += 8;
+          }
+          for (i = 0; i < 8; i++) { //cr
+            memcpy (pDecV, pTmpBsBuf, iCopySizeUV);
+            pDecV += iDecStrideC;
+            pTmpBsBuf += 8;
+          }
         }
       }
 
-      pBs->pCurBuf += 384;
+      pBs->pCurBuf += (pCtx->pSps->uiChromaFormatIdc ? 384 : 256);
 
       //step 3: update QP and pNonZeroCount
       pCurDqLayer->pLumaQp[iMbXy] = 0;
