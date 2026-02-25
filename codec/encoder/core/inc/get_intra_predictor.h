@@ -1,6 +1,7 @@
 /*!
  * \copy
  *     Copyright (c)  2009-2013, Cisco Systems
+ *     Copyright (c)  2026, Richard Ben Aleya
  *     All rights reserved.
  *
  *     Redistribution and use in source and binary forms, with or without
@@ -109,6 +110,12 @@ void WelsI4x4LumaPredVR_mmx (uint8_t* pPred, uint8_t* pRef, const int32_t kiStri
 void WelsI4x4LumaPredHD_mmx (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 void WelsI4x4LumaPredVL_mmx (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 void WelsI4x4LumaPredHU_mmx (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+
+#if defined(HAVE_AVX2)
+void WelsI16x16LumaPredDc_avx2 (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+void WelsI16x16LumaPredPlane_avx2 (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+void WelsIChromaPredV_avx2 (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+#endif//HAVE_AVX2
 #endif//X86_ASM
 
 #if defined(HAVE_NEON)
