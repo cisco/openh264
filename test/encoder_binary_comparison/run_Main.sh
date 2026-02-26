@@ -113,7 +113,7 @@ runMain()
     runTestTypeCheck  ${TestType}
 
     # 32 -->32 bits release version;64 -->64 bits release version
-    ./run_PrepareAllTestData.sh  32
+    ./run_PrepareAllTestData.sh  64
     if [ ! $? -eq 0 ]
     then
         echo "failed to prepare test space for all test data!"

@@ -57,3 +57,9 @@ codec/build/iOS/dec/welsdec/build/
 # editor files
 *~
 
+# android gradle integration – regenerated when the project is opened in Android Studio
+/.idea/
+/.gradle/
+/gradle/
+/gradlew.bat
+/local.properties

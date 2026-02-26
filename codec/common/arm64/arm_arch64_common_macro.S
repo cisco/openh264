@@ -30,6 +30,8 @@
  *
  */
 
+#include "arm_aarch64_common.h"
+
 #ifdef __APPLE__
 
 .text
@@ -60,6 +62,7 @@ ret
 .func \funcName
 #endif
 \funcName:
+    BTI_C
 .endm
 
 .macro WELS_ASM_AARCH64_FUNC_END

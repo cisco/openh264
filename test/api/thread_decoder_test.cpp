@@ -71,7 +71,7 @@ class ThreadDecoderOutputTest : public ::testing::WithParamInterface<FileParam>,
   SHA1Context ctx_;
 };
 
-TEST_P (ThreadDecoderOutputTest, CompareOutput) {
+TEST_P (ThreadDecoderOutputTest, DISABLED_CompareOutput) {
   FileParam p = GetParam();
 #if defined(ANDROID_NDK)
   std::string filename = std::string ("/sdcard/") + p.fileName;

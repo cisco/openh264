@@ -50,6 +50,18 @@ elif cpu_family == 'aarch64'
   else
     cpp_sources += asm_sources
   endif
+elif cpu_family in ['loongarch32', 'loongarch64']
+  asm_sources = [
+    'src/loongarch/vaa_lsx.c',
+    'src/loongarch/vaa_lasx.c',
+  ]
+  cpp_sources += asm_sources
+elif cpu_family == 'riscv64'
+  asm_sources = []
+elif cpu_family == 'ppc'
+  asm_sources = []
+elif cpu_family == 'ppc64'
+  asm_sources = []
 else
   error('Unsupported cpu family @0@'.format(cpu_family))
 endif

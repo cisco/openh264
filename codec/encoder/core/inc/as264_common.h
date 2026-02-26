@@ -74,7 +74,6 @@ $(TargetPath)
 #endif//ENABLE_FRAME_DUMP
 #endif//__UNITTEST__
 
-//#define ENABLE_PSNR_CALC
 //#define STAT_OUTPUT
 //#define MB_TYPES_CHECK
 //
@@ -87,10 +86,6 @@ $(TargetPath)
 /* macros dependencies check */
 //@if !FRAME_INFO_OUTPUT
 #if !defined(FRAME_INFO_OUTPUT)
-
-#if defined(ENABLE_PSNR_CALC)
-#undef ENABLE_PSNR_CALC
-#endif//ENABLE_PSNR_CALC
 
 //#if defined(STAT_OUTPUT)
 //#undef STAT_OUTPUT

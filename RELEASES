@@ -1,6 +1,58 @@
 
 Releases
 -----------
+v2.6.0
+------
+- Initialize PSNR to 0 instead of NAN (Commit: cf3b514b, PR: #3836)
+- Enable PIC in x86 assembly code (Commit: c42fa040, PR: #3831)
+- Add QEMU test for LoongArch architecture (Commit: e49c0953, PR: #3833)
+- Add support for calculating PSNR for Y/U/V components (Commit: 33f7f486, PR: #3824)
+- Add support for PowerPC architecture in meson.build (Commit: 423eb2c3, PR: #3806)
+- Fix potential bug in the codebase (Commit: 63db555e, PR: #3818)
+- Pass the actual temporal ID to GMPVideoEncodedFrame (Commit: 1c47e719, PR: #3828)
+- Use HW_NCPUONLINE on OpenBSD / NetBSD for CPU detection (Commit: fc1605c1, PR: #3813)
+- Add Windows VSBuildTools VC17 compile support (Commit: 1ebb3f1a, PR: #3823)
+- Expose temporal layer info via GMP API at encoder initialization and on a per-frame basis (Commit: ad3f6904, PR: #3821)
+- Remove the use of -Werror to prevent warnings from being treated as errors (Commit: edbef4df, PR: #3809)
+- Use void casts to silence warnings about memcpy to a class (Commit: 6746bc48, PR: #3800)
+
+v2.5.0
+------
+- Fix some multi-thread decoding issues
+- Remove unused pSpatialLayer variable in DetermineTemporalSettings
+- Change picOrderCnt to 2
+- Fix cross compile from darwin arm64 to x86_64
+- Fix deadlock at the end of decoding
+- Fix frame-decode errors
+- Fix build with meson on riscv64
+- Enable pac bti support
+- Fix a bug in decoding H.264 streams encoded by Apple HWA encoder
+
+v2.4.1
+------
+- Fix off by one regression in decoder
+- Add security policy
+- Fix glitches that sometimes happen near the scene changes
+
+v2.4.0
+------
+- Add LoongArch SIMD
+- Support Android NDK r20 (also r21)
+- Support using gradle to build Android demo and unittest
+- Bug fixes
+
+v2.3.1
+------
+- update SHAREDLIB_MAJORVERSION value in Makefile
+
+v2.3.0
+------
+- Decoder bug fix to correct the B-frame order in some case
+- Fixes to avoid hanging for multi-thread decoding
+- Some Enhancements and fixes for rate control
+- Assembly optimization for loongson platform
+- Some minor bug fixes
+
 v2.2.0
 ------
 - Add support for B-slice error concealment
@@ -212,6 +264,21 @@ Binaries
 -----------
 These binary releases are distributed under this license:
 http://www.openh264.org/BINARY_LICENSE.txt
+
+v2.3.0
+http://ciscobinary.openh264.org/libopenh264-2.3.0-android-arm.6.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.0-android-arm64.6.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.0-android-x86.6.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.0-android-x64.6.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.0-ios.a.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.0-linux32.6.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.0-linux64.6.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.0-linux-arm.6.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.0-linux-arm64.6.so.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.0-mac-arm64.6.dylib.bz2
+http://ciscobinary.openh264.org/libopenh264-2.3.0-mac-x64.6.dylib.bz2
+http://ciscobinary.openh264.org/openh264-2.3.0-win32.dll.bz2
+http://ciscobinary.openh264.org/openh264-2.3.0-win64.dll.bz2
 
 v2.2.0
 http://ciscobinary.openh264.org/libopenh264-2.2.0-android-arm.6.so.bz2

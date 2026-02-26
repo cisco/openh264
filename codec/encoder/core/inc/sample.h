@@ -109,7 +109,7 @@ int32_t WelsIntra4x4Combined3Satd_neon (uint8_t*, int32_t, uint8_t*, int32_t, ui
 
 #endif
 
-#if defined (HAVE_NEON_AARCH64)
+#if defined (HAVE_NEON_AARCH64) && defined(__aarch64__)
 int32_t WelsSampleSatd4x4_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t);
 int32_t WelsSampleSatd16x16_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t);
 int32_t WelsSampleSatd16x8_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t);
@@ -139,6 +139,8 @@ int32_t WelsSampleSatd8x8_lasx (uint8_t*, int32_t, uint8_t*, int32_t);
 int32_t WelsSampleSatd16x8_lasx (uint8_t*, int32_t, uint8_t*, int32_t);
 int32_t WelsSampleSatd8x16_lasx (uint8_t*, int32_t, uint8_t*, int32_t);
 int32_t WelsSampleSatd16x16_lasx (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsIntra8x8Combined3Sad_lasx (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*, int32_t, uint8_t*, uint8_t*,
+                                       uint8_t*);
 #endif
 
 #if defined(__cplusplus)

@@ -291,7 +291,7 @@ void WelsInitReconstructionFuncs (SWelsFuncPtrList* pFuncList, uint32_t  uiCpuFl
   }
 #endif
 
-#if defined(HAVE_NEON_AARCH64)
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
   if (uiCpuFlag & WELS_CPU_NEON) {
     pFuncList->pfDequantization4x4          = WelsDequant4x4_AArch64_neon;
     pFuncList->pfDequantizationFour4x4      = WelsDequantFour4x4_AArch64_neon;
@@ -310,5 +310,12 @@ void WelsInitReconstructionFuncs (SWelsFuncPtrList* pFuncList, uint32_t  uiCpuFl
     pFuncList->pfIDctI16x16Dc   = WelsIDctRecI16x16Dc_mmi;
   }
 #endif//HAVE_MMI
+
+#if defined(HAVE_LASX)
+  if (uiCpuFlag & WELS_CPU_LASX) {
+    pFuncList->pfIDctT4         = WelsIDctT4Rec_lasx;
+    pFuncList->pfIDctFourT4     = WelsIDctFourT4Rec_lasx;
+  }
+#endif
 }
 }

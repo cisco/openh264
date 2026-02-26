@@ -428,7 +428,7 @@
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/../../../../api/svc\"",
+					"\"$(SRCROOT)/../../../../api/wels\"",
 					"\"$(SRCROOT)/../../../../common/inc\"",
 				);
 				INFOPLIST_FILE = "demo/demo-Info.plist";
@@ -448,7 +448,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = APPLE_IOS;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/../../../../api/svc\"",
+					"\"$(SRCROOT)/../../../../api/wels\"",
 					"\"$(SRCROOT)/../../../../common/inc\"",
 				);
 				INFOPLIST_FILE = "demo/demo-Info.plist";

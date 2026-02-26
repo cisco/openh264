@@ -192,8 +192,9 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECIDC_GeneralSliceChange) {
       if (!bVCLLoss) { //not loss
         rv = decoder_->DecodeFrame2 (info.sLayerInfo[0].pBsBuf + iTotalSliceSize,
                                      info.sLayerInfo[0].pNalLengthInByte[iPacketNum], pData, &dstBufInfo_);
-        if (uiEcIdc == ERROR_CON_DISABLE)
+        if (uiEcIdc == ERROR_CON_DISABLE) {
           EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
+        }
       }
       //EC_IDC should not change till now
       decoder_->GetOption (DECODER_OPTION_ERROR_CON_IDC, &uiGet);
@@ -206,8 +207,9 @@ TEST_P (EncodeDecodeTestAPI, SetOptionECIDC_GeneralSliceChange) {
 
       rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
       //EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
-      if (uiEcIdc == ERROR_CON_DISABLE && rv != 0)
+      if (uiEcIdc == ERROR_CON_DISABLE && rv != 0) {
         EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
+      }
 
       //deal with next slice
       iTotalSliceSize += len;
@@ -246,7 +248,6 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   EXPECT_EQ (uiGet, uiEcIdc);
 
   //Start for enc/dec
-  int iIdx = 0;
   int len = 0;
   unsigned char* pData[3] = { NULL };
   ASSERT_TRUE (InitialEncDec (p.width, p.height));
@@ -263,11 +264,9 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
   EXPECT_EQ (rv, 0);
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 1);
-  iIdx++;
 
   //Frame 1: P, EC_IDC=DISABLE, loss = 1
   EncodeOneFrame (1);
-  iIdx++;
 
   //Frame 2: P, EC_IDC=DISABLE, loss = 0
   EncodeOneFrame (1);
@@ -282,7 +281,6 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
   EXPECT_TRUE (rv != 0); //construction error due to data loss
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //no output due to EC DISABLE
-  iIdx++;
 
   //set EC=SLICE_COPY
   uiEcIdc = (uint32_t) (ERROR_CON_SLICE_COPY);
@@ -302,7 +300,6 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
   EXPECT_TRUE (rv != 0); //construction error due to data loss
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 1);
-  iIdx++;
 
   //set EC=DISABLE
   uiEcIdc = (uint32_t) (ERROR_CON_DISABLE);
@@ -323,11 +320,9 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   //Ref picture is ECed, so current status is ECed, when EC disable, NO output
   EXPECT_TRUE (rv != 0);
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
-  iIdx++;
 
   //Frame 5: P, EC_IDC=DISABLE, loss = 1
   EncodeOneFrame (1);
-  iIdx++;
 
   //set EC=FRAME_COPY
   uiEcIdc = (uint32_t) (ERROR_CON_FRAME_COPY);
@@ -337,7 +332,6 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   //Frame 6: P, EC_IDC=FRAME_COPY, loss = 1
   EncodeOneFrame (1);
   EXPECT_EQ (uiGet, uiEcIdc);
-  iIdx++;
 
   //Frame 7: P, EC_IDC=FRAME_COPY, loss = 0
   EncodeOneFrame (1);
@@ -352,7 +346,6 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificFrameChange) {
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
   EXPECT_TRUE (rv != 0); //not sure if previous data drop would be detected in construction
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 1);
-  iIdx++;
 }
 
 //This case contain 2 slices per picture for IDR loss
@@ -378,7 +371,6 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
 
   //Start for enc/dec
-  int iIdx = 0;
   int len = 0;
   unsigned char* pData[3] = { NULL };
   int iTotalSliceSize = 0;
@@ -404,7 +396,6 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
   EXPECT_EQ (rv, 0); // Reconstruct first slice OK
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //slice incomplete, no output
-  iIdx++;
 
   //Frame 1: P, EC_IDC=2, loss = 0
   //will clean SPS/PPS status
@@ -420,7 +411,6 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //ECed status, reconstruction current frame 1
   EXPECT_TRUE ((rv & 32) != 0); //decoder ECed status
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 1); //ECed output for frame 1
-  iIdx++;
 
   //set EC=DISABLE
   uiEcIdc = (uint32_t) (ERROR_CON_DISABLE);
@@ -441,7 +431,6 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
   // Ref picture is ECed, so reconstructed picture is ECed
   EXPECT_TRUE ((rv & 32) != 0);
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
-  iIdx++;
 
   //set EC=SLICE_COPY
   uiEcIdc = (uint32_t) (ERROR_CON_FRAME_COPY);
@@ -462,7 +451,6 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
   EXPECT_TRUE ((rv & 32) != 0);
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //slice loss
-  iIdx++;
 
   //set EC=DISABLE
   uiEcIdc = (uint32_t) (ERROR_CON_DISABLE);
@@ -482,7 +470,6 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRLoss) {
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
   EXPECT_TRUE (rv != 0);
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); // No ref picture, no output
-  iIdx++;
 
 }
 
@@ -510,7 +497,6 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
   decoder_->SetOption (DECODER_OPTION_TRACE_LEVEL, &iTraceLevel);
 
   //Start for enc/dec
-  int iIdx = 0;
   int len = 0;
   unsigned char* pData[3] = { NULL };
   int iTotalSliceSize = 0;
@@ -535,7 +521,6 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
   EXPECT_EQ (rv, 0); //parse correct
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 1); //output frame 0
-  iIdx++;
 
   //Frame 1: P, EC_IDC=0, loss = 0
   //Expected result: all OK, 2nd Output
@@ -551,7 +536,6 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction current frame 1
   EXPECT_EQ (rv, 0); //parse correct
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 1); //ECed output for frame 1
-  iIdx++;
 
   //Frame 2: P, EC_IDC=0, loss = 1
   //Expected result: all OK, no Output
@@ -568,7 +552,6 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
   EXPECT_EQ (rv, 0); //parse correct
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 0);
-  iIdx++;
 
   //set EC=SLICE_COPY
   uiEcIdc = (uint32_t) (ERROR_CON_SLICE_COPY);
@@ -589,7 +572,6 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction
   EXPECT_TRUE ((rv & 32) != 0);
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //slice loss
-  iIdx++;
 
   //set EC=DISABLE
   uiEcIdc = (uint32_t) (ERROR_CON_DISABLE);
@@ -611,7 +593,6 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
   // previous frame NOT output, no ref
   EXPECT_TRUE (rv != 0);
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 0); //output previous pic
-  iIdx++;
 
   //Frame 5: IDR, EC_IDC=2->0, loss = 0
   //Expected result: depends on DecodeFrame2 result. If OK, output; else ,no output
@@ -652,7 +633,6 @@ TEST_F (EncodeDecodeTestAPI, SetOptionECIDC_SpecificSliceChange_IDRNoLoss) {
   rv = decoder_->DecodeFrame2 (NULL, 0, pData, &dstBufInfo_); //reconstruction,
   EXPECT_EQ (rv, 0);
   EXPECT_EQ (dstBufInfo_.iBufferStatus, 1); //output previous pic
-  iIdx++;
 
 }
 

@@ -130,7 +130,7 @@ void WelsIChromaPredDc_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStri
 void WelsIChromaPredPlane_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 #endif//HAVE_NEON
 
-#if defined(HAVE_NEON_AARCH64)
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 void WelsI16x16LumaPredDc_AArch64_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 void WelsI16x16LumaPredPlane_AArch64_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 void WelsI16x16LumaPredDcTop_AArch64_neon (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
@@ -163,6 +163,17 @@ void WelsIChromaPredV_mmi (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride
 void WelsIChromaPredDc_mmi (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 void WelsIChromaPredPlane_mmi (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 #endif//HAVE_MMI
+
+#if defined(HAVE_LSX)
+void WelsI16x16LumaPredPlane_lsx (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+#endif//HAVE_LSX
+
+#if defined(HAVE_LASX)
+void WelsIChromaPredV_lasx (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+void WelsIChromaPredH_lasx (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+void WelsIChromaPredDc_lasx (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+#endif//HAVE_LASX
+
 #if defined(__cplusplus)
 }
 #endif//__cplusplus

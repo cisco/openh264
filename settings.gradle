@@ -1,0 +1,4 @@
+include ':test-dec', ':test-enc', ':unittest'
+project(':test-dec').projectDir = new File('codec/build/android/dec')
+project(':test-enc').projectDir = new File('codec/build/android/enc')
+project(':unittest').projectDir = new File('test/build/android')

@@ -152,6 +152,7 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
     pPicNewBuf->ppPic[i]->bUsedAsRef = false;
     pPicNewBuf->ppPic[i]->bIsLongRef = false;
     pPicNewBuf->ppPic[i]->iRefCount = 0;
+    pPicNewBuf->ppPic[i]->pSetUnRef = NULL;
     pPicNewBuf->ppPic[i]->bIsComplete = false;
   }
 // remove old PicBuf
@@ -240,6 +241,7 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
     pPicNewBuf->ppPic[i]->bUsedAsRef = false;
     pPicNewBuf->ppPic[i]->bIsLongRef = false;
     pPicNewBuf->ppPic[i]->iRefCount = 0;
+    pPicNewBuf->ppPic[i]->pSetUnRef = NULL;
     pPicNewBuf->ppPic[i]->bIsComplete = false;
   }
   // remove old PicBuf
@@ -296,11 +298,9 @@ void ResetReorderingPictureBuffers (PPictReoderingStatus pPictReoderingStatus, P
     pPictReoderingStatus->iPictInfoIndex = 0;
     pPictReoderingStatus->iMinPOC = IMinInt32;
     pPictReoderingStatus->iNumOfPicts = 0;
-    pPictReoderingStatus->iLastGOPRemainPicts = 0;
     pPictReoderingStatus->iLastWrittenPOC = IMinInt32;
     pPictReoderingStatus->iLargestBufferedPicIndex = 0;
     for (int32_t i = 0; i < pictInfoListCount; ++i) {
-      pPictInfo[i].bLastGOP = false;
       pPictInfo[i].iPOC = IMinInt32;
     }
     pPictInfo->sBufferInfo.iBufferStatus = 0;
@@ -442,7 +442,8 @@ static inline int32_t GetTargetRefListSize (PWelsDecoderContext pCtx) {
     iNumRefFrames = pCtx->pSps->iNumRefFrames + 2;
     int32_t  iThreadCount = GetThreadCount (pCtx);
     if (iThreadCount > 1) {
-      iNumRefFrames = MAX_REF_PIC_COUNT;
+      //due to thread and reordering buffering, it needs more dpb space
+      iNumRefFrames = MAX_DPB_COUNT + iThreadCount;
     }
   }
 
@@ -620,6 +621,7 @@ int32_t WelsOpenDecoder (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   pCtx->bPrintFrameErrorTraceFlag = true;
   pCtx->iIgnoredErrorInfoPacketCount = 0;
   pCtx->bFrameFinish = true;
+  pCtx->iSeqNum = 0;
   return iRet;
 }
 
@@ -795,14 +797,13 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
           bNalStartBytes = true;
         } else if (pSrcNal[2 + iSrcIdx] == 0x03) {
           if ((3 + iSrcConsumed < iSrcLength) && pSrcNal[3 + iSrcIdx] > 0x03) {
-            pCtx->iErrorCode |= dsBitstreamError;
-            return pCtx->iErrorCode;
+            /* Just skip */
           } else {
             ST16 (pDstNal + iDstIdx, 0);
             iDstIdx      += 2;
-            iSrcIdx      += 3;
-            iSrcConsumed += 3;
           }
+          iSrcIdx      += 3;
+          iSrcConsumed += 3;
         } else { // 0x01
           bNalStartBytes = false;
 
@@ -818,8 +819,6 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
             if (pCtx->bAuReadyFlag && pCtx->pAccessUnitList->uiAvailUnitsNum != 0) {
               if (GetThreadCount (pCtx) <= 1) {
                 ConstructAccessUnit (pCtx, ppDst, pDstBufInfo);
-              } else {
-                pCtx->pAccessUnitList->uiAvailUnitsNum = 1;
               }
             }
           }
@@ -845,6 +844,10 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 #endif
             }
             return pCtx->iErrorCode;
+          }
+
+          if (pCtx->iErrorCode != ERR_NONE && !(pCtx->iErrorCode & dsDataErrorConcealed)) {
+              return pCtx->iErrorCode;
           }
 
           pDstNal += (iDstIdx + 4); //init, increase 4 reserved zero bytes, used to store the next NAL
@@ -882,8 +885,6 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
       if (pCtx->bAuReadyFlag && pCtx->pAccessUnitList->uiAvailUnitsNum != 0) {
         if (GetThreadCount (pCtx) <= 1) {
           ConstructAccessUnit (pCtx, ppDst, pDstBufInfo);
-        } else {
-          pCtx->pAccessUnitList->uiAvailUnitsNum = 1;
         }
       }
     }
@@ -1079,7 +1080,7 @@ void InitPredFunc (PWelsDecoderContext pCtx, uint32_t uiCpuFlag) {
   }
 #endif//HAVE_NEON
 
-#if defined(HAVE_NEON_AARCH64)
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
   if (uiCpuFlag & WELS_CPU_NEON) {
     pCtx->pIdctResAddPredFunc   = IdctResAddPred_AArch64_neon;
     pCtx->pIdctFourResAddPredFunc = IdctFourResAddPred_<IdctResAddPred_AArch64_neon>;
@@ -1168,6 +1169,14 @@ void InitPredFunc (PWelsDecoderContext pCtx, uint32_t uiCpuFlag) {
     pCtx->pGetI4x4LumaPredFunc[I4_PRED_H]     = WelsDecoderI4x4LumaPredH_mmi;
   }
 #endif//HAVE_MMI
+
+#if defined(HAVE_LSX)
+  if (uiCpuFlag & WELS_CPU_LSX) {
+    pCtx->pIdctResAddPredFunc   = IdctResAddPred_lsx;
+    pCtx->pIdctFourResAddPredFunc = IdctFourResAddPred_<IdctResAddPred_lsx>;
+    pCtx->pIdctResAddPredFunc8x8  = IdctResAddPred8x8_lsx;
+  }
+#endif
 }
 
 //reset decoder number related statistics info

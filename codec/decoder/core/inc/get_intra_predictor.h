@@ -141,7 +141,7 @@ void WelsDecoderIChromaPredDc_neon (uint8_t* pPred, const int32_t kiStride);
 void WelsDecoderIChromaPredPlane_neon (uint8_t* pPred, const int32_t kiStride);
 #endif//HAVE_NEON
 
-#if defined(HAVE_NEON_AARCH64)
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 void WelsDecoderI16x16LumaPredV_AArch64_neon (uint8_t* pPred, const int32_t kiStride);
 void WelsDecoderI16x16LumaPredH_AArch64_neon (uint8_t* pPred, const int32_t kiStride);
 void WelsDecoderI16x16LumaPredDc_AArch64_neon (uint8_t* pPred, const int32_t kiStride);

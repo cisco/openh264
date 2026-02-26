@@ -58,7 +58,7 @@ void IdctFourResAddPred_avx2 (uint8_t* pPred, int32_t iStride, int16_t* pRs, con
 void IdctResAddPred_neon (uint8_t* pred, const int32_t stride, int16_t* rs);
 #endif
 
-#if defined(HAVE_NEON_AARCH64)
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 void IdctResAddPred_AArch64_neon (uint8_t* pred, const int32_t stride, int16_t* rs);
 #endif
 
@@ -66,6 +66,11 @@ void IdctResAddPred_AArch64_neon (uint8_t* pred, const int32_t stride, int16_t* 
 #if defined(HAVE_MMI)
 void IdctResAddPred_mmi (uint8_t* pPred, const int32_t kiStride, int16_t* pRs);
 #endif//HAVE_MMI
+
+#if defined(HAVE_LSX)
+void IdctResAddPred_lsx (uint8_t* pPred, const int32_t kiStride, int16_t* pRs);
+void IdctResAddPred8x8_lsx (uint8_t* pPred, const int32_t kiStride, int16_t* pRs);
+#endif
 
 #if defined(__cplusplus)
 }

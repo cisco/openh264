@@ -5,9 +5,5 @@ headers = [
   'codec_ver.h',
 ]
 
-foreach header : headers
-  api_headers += [[header, files(header)]]
-endforeach
-
 install_headers(headers,
   subdir: 'wels')

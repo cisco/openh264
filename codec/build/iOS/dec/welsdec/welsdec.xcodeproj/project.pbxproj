@@ -464,7 +464,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../../../../common/inc",
-					"$(SRCROOT)/../../../../api/svc",
+					"$(SRCROOT)/../../../../api/wels",
 					"$(SRCROOT)/../../../../common/arm",
 					"$(SRCROOT)/../../../../common/arm64",
 				);
@@ -498,7 +498,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../../../../common/inc",
-					"$(SRCROOT)/../../../../api/svc",
+					"$(SRCROOT)/../../../../api/wels",
 					"$(SRCROOT)/../../../../common/arm",
 					"$(SRCROOT)/../../../../common/arm64",
 				);

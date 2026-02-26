@@ -29,15 +29,17 @@ LIBDIR_NAME=lib
 SHAREDLIB_DIR=$(PREFIX)/lib
 PROJECT_NAME=openh264
 MODULE_NAME=gmpopenh264
-GMP_API_BRANCH=Firefox39
+GMP_API_BRANCH=Firefox135
 GTEST_VER=release-1.8.1
 CCASFLAGS=$(CFLAGS)
 STATIC_LDFLAGS=-lstdc++
 STRIP ?= strip
 USE_STACK_PROTECTOR = Yes
+USE_LOW_VERSION_NDK=No
+USE_ANT=No
 
-SHAREDLIB_MAJORVERSION=6
-FULL_VERSION := 2.2.0
+SHAREDLIB_MAJORVERSION=8
+FULL_VERSION := 2.6.0
 
 ifeq (,$(wildcard $(SRC_PATH)gmp-api))
 HAVE_GMP_API=No
@@ -80,7 +82,17 @@ endif
 # Make sure the all target is the first one
 all: libraries binaries
 
+ifeq (android, $(OS))
+USE_LOW_VERSION_NDK = $(shell $(SRC_PATH)build/ndk-version-check.sh $(NDKROOT))
+ifeq (Yes, $(USE_LOW_VERSION_NDK))
+USE_ANT = Yes
+include $(SRC_PATH)build/platform-android-r18b.mk
+else
+include $(SRC_PATH)build/platform-android.mk
+endif
+else
 include $(SRC_PATH)build/platform-$(OS).mk
+endif
 
 MODULE := $(LIBPREFIX)$(MODULE_NAME).$(SHAREDLIBSUFFIX)
 
@@ -103,8 +115,32 @@ ifneq ($(V),Yes)
     QUIET      = @
 endif
 
+### Not apply -mflags globaly
+ifeq (loongarch64, $(ARCH))
+LSX_OBJS := \
+    $(SRC_PATH)codec/common/loongarch/copy_mb_lsx.o \
+    $(SRC_PATH)codec/common/loongarch/deblock_lsx.o \
+    $(SRC_PATH)codec/common/loongarch/intra_pred_com_lsx.o \
+    $(SRC_PATH)codec/common/loongarch/mc_chroma_lsx.o \
+    $(SRC_PATH)codec/common/loongarch/mc_horver_lsx.o \
+    $(SRC_PATH)codec/decoder/core/loongarch/mb_aux_lsx.o \
+    $(SRC_PATH)codec/encoder/core/loongarch/get_intra_predictor_lsx.o \
+    $(SRC_PATH)codec/encoder/core/loongarch/quant_lsx.o \
+    $(SRC_PATH)codec/encoder/core/loongarch/svc_motion_estimate_lsx.o \
+    $(SRC_PATH)codec/processing/src/loongarch/vaa_lsx.o
 
-INCLUDES += -I$(SRC_PATH)codec/api/svc -I$(SRC_PATH)codec/common/inc -Icodec/common/inc
+LASX_OBJS := \
+    $(SRC_PATH)codec/common/loongarch/intra_pred_com_lasx.o \
+    $(SRC_PATH)codec/common/loongarch/satd_sad_lasx.o \
+    $(SRC_PATH)codec/encoder/core/loongarch/dct_lasx.o \
+    $(SRC_PATH)codec/encoder/core/loongarch/sample_lasx.o \
+    $(SRC_PATH)codec/processing/src/loongarch/vaa_lasx.o
+
+$(LSX_OBJS): CFLAGS += -mlsx
+$(LASX_OBJS): CFLAGS += -mlasx
+endif
+
+INCLUDES += -I$(SRC_PATH)codec/api/wels -I$(SRC_PATH)codec/common/inc -Icodec/common/inc
 
 DECODER_INCLUDES += \
     -I$(SRC_PATH)codec/decoder/core/inc \
@@ -293,7 +329,7 @@ $(PROJECT_NAME)-static.pc: $(PROJECT_NAME).pc.in
 
 install-headers:
 	mkdir -p $(DESTDIR)$(PREFIX)/include/wels
-	install -m 644 $(SRC_PATH)/codec/api/svc/codec*.h $(DESTDIR)$(PREFIX)/include/wels
+	install -m 644 $(SRC_PATH)/codec/api/wels/codec*.h $(DESTDIR)$(PREFIX)/include/wels
 
 install-static-lib: $(LIBPREFIX)$(PROJECT_NAME).$(LIBSUFFIX) install-headers
 	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBDIR_NAME)
@@ -364,11 +400,22 @@ endif
 ifeq (android,$(OS))
 ifeq (./,$(SRC_PATH))
 codec_unittest$(EXEEXT):
+ifeq ($(USE_ANT), Yes)
 	cd ./test/build/android && $(NDKROOT)/ndk-build -B APP_ABI=$(APP_ABI) && android update project -t $(TARGET) -p . && ant debug
+else
+	$(NDK_BUILD) -C test/build/android -B
+	./gradlew unittest:assembleDebug
+endif
 
 clean_Android: clean_Android_ut
 clean_Android_ut:
+ifeq ($(USE_ANT), Yes)
 	-cd ./test/build/android && $(NDKROOT)/ndk-build APP_ABI=$(APP_ABI) clean && ant clean
+else
+	-$(NDK_BUILD) -C test/build/android -B clean
+	-./gradlew unittest:clean
+endif
+
 endif
 endif
 

@@ -1056,7 +1056,7 @@ int CWelsH264SVCEncoder::SetOption (ENCODER_OPTION eOptionId, void* pOption) {
       return cmInitParaError;
     }
     SWelsSvcCodingParam sConfig;
-    memcpy (&sConfig, m_pEncContext->pSvcParam, sizeof (SWelsSvcCodingParam));
+    memcpy ((void*) &sConfig, m_pEncContext->pSvcParam, sizeof (SWelsSvcCodingParam));
     sConfig.eSpsPpsIdStrategy = eNewStrategy;
     WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_INFO, " CWelsH264SVCEncoder::SetOption eSpsPpsIdStrategy = %d ",
              sConfig.eSpsPpsIdStrategy);
@@ -1282,6 +1282,7 @@ int CWelsH264SVCEncoder::GetOption (ENCODER_OPTION eOptionId, void* pOption) {
     pStatistics->fAverageFrameRate = pEncStatistics->fAverageFrameRate;
     pStatistics->fLatestFrameRate = pEncStatistics->fLatestFrameRate;
     pStatistics->uiBitRate = pEncStatistics->uiBitRate;
+    pStatistics->uiAverageFrameQP = pEncStatistics->uiAverageFrameQP;
 
     pStatistics->uiInputFrameCount = pEncStatistics->uiInputFrameCount;
     pStatistics->uiSkippedFrameCount = pEncStatistics->uiSkippedFrameCount;

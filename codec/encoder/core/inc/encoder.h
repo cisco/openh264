@@ -132,7 +132,7 @@ void WelsSetMemZeroSize8_mmx (void* pDst, int32_t iSize);
 void WelsPrefetchZero_mmx (int8_t const* kpDst);
 #elif defined(HAVE_NEON)
 void WelsSetMemZero_neon (void* pDst, int32_t iSize);
-#elif defined(HAVE_NEON_AARCH64)
+#elif defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 void WelsSetMemZero_AArch64_neon (void* pDst, int32_t iSize);
 #endif
 

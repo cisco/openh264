@@ -65,14 +65,14 @@ ASMFLAGS += -I$(SRC_PATH)codec/common/loongarch/
 ifeq ($(ENABLE_LSX), Yes)
 ENABLE_LSX = $(shell $(SRC_PATH)build/loongarch-simd-check.sh $(CC) lsx)
 ifeq ($(ENABLE_LSX), Yes)
-CFLAGS += -DHAVE_LSX -mlsx
+CFLAGS += -DHAVE_LSX
 endif
 endif
 #lasx
 ifeq ($(ENABLE_LASX), Yes)
 ENABLE_LASX = $(shell $(SRC_PATH)build/loongarch-simd-check.sh $(CC) lasx)
 ifeq ($(ENABLE_LASX), Yes)
-CFLAGS += -DHAVE_LASX -mlasx
+CFLAGS += -DHAVE_LASX
 endif
 endif
 endif

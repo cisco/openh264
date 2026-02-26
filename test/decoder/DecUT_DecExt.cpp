@@ -140,7 +140,6 @@ void DecoderInterfaceTest::DecoderBs (const char* sFileName) {
   int32_t iFileSize;
   int32_t i = 0;
   int32_t iSliceSize;
-  int32_t iSliceIndex = 0;
   int32_t iEndOfStreamFlag = 0;
   FILE* pH264File;
   uint8_t uiStartCode[4] = {0, 0, 0, 1};
@@ -174,7 +173,6 @@ void DecoderInterfaceTest::DecoderBs (const char* sFileName) {
     m_pDec->DecodeFrame2 (pBuf + iBufPos, iSliceSize, m_pData, &m_sBufferInfo);
     m_pDec->DecodeFrame2 (NULL, 0, m_pData, &m_sBufferInfo);
     iBufPos += iSliceSize;
-    ++ iSliceIndex;
   }
 
   fclose (pH264File);

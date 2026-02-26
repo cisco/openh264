@@ -251,6 +251,12 @@ TEST (DecodeMbAuxTest, WelsIDctT4Rec_mmi) {
   TestIDctT4Rec<int16_t> (WelsIDctT4Rec_mmi);
 }
 #endif
+#if defined(HAVE_LASX)
+TEST (DecodeMbAuxTest, WelsIDctT4Rec_lasx) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_LASX)
+    TestIDctT4Rec<int16_t> (WelsIDctT4Rec_lasx);
+}
+#endif
 template<typename clip_t>
 void WelsIDctT8Anchor (uint8_t* p_dst, int16_t dct[4][16]) {
   WelsIDctT4Anchor<clip_t> (&p_dst[0],                   dct[0]);
@@ -419,5 +425,11 @@ TEST (DecodeMbAuxTest, WelsIDctRecI16x16Dc_mmi) {
     }
     EXPECT_EQ (ok, -1);
   }
+}
+#endif
+#if defined(HAVE_LASX)
+TEST (DecodeMbAuxTest, WelsIDctFourT4Rec_lasx) {
+  if (WelsCPUFeatureDetect (0) & WELS_CPU_LASX)
+    TestIDctFourT4Rec<int16_t> (WelsIDctFourT4Rec_lasx);
 }
 #endif
