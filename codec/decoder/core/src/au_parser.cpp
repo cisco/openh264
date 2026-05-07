@@ -322,16 +322,24 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
       *pConsumedBytes += NAL_UNIT_HEADER_EXT_SIZE;
 
       if (pCtx->pParam->bParseOnly) {
-        pCurNal->sNalData.sVclNal.pNalPos = pSavedData->pCurPos;
         int32_t iTrailingZeroByte = 0;
         while (pSrcNal[iSrcNalLen - iTrailingZeroByte - 1] == 0x0) //remove final trailing 0 bytes
           iTrailingZeroByte++;
         int32_t iActualLen = iSrcNalLen - iTrailingZeroByte;
-        pCurNal->sNalData.sVclNal.iNalLength = iActualLen - NAL_UNIT_HEADER_EXT_SIZE;
         //unify start code as 0x0001
         int32_t iCurrStartByte = 4; //4 for 0x0001, 3 for 0x001
         if (pSrcNal[0] == 0x0 && pSrcNal[1] == 0x0 && pSrcNal[2] == 0x1) { //if 0x001
           iCurrStartByte = 3;
+        }
+        int32_t iOffset = iCurrStartByte + 1 + NAL_UNIT_HEADER_EXT_SIZE;
+        int32_t iWriteLen = 5 + (iActualLen - iOffset); // 4-byte start code + NAL type byte + payload
+        // Bounds check: ensure write fits in sSavedData buffer
+        if (pSavedData->pCurPos + iWriteLen > pSavedData->pEnd) {
+          pSavedData->pCurPos = pSavedData->pHead;
+        }
+        pCurNal->sNalData.sVclNal.pNalPos = pSavedData->pCurPos;
+        pCurNal->sNalData.sVclNal.iNalLength = iActualLen - NAL_UNIT_HEADER_EXT_SIZE;
+        if (iCurrStartByte == 3) {
           pCurNal->sNalData.sVclNal.iNalLength++;
         }
         if (pCurNal->sNalHeaderExt.bIdrFlag) {
@@ -345,23 +353,29 @@ uint8_t* ParseNalHeader (PWelsDecoderContext pCtx, SNalUnitHeader* pNalUnitHeade
         pSavedData->pCurPos[3] = 0x1;
         pSavedData->pCurPos[4] = * (pSrcNal + iCurrStartByte);
         pSavedData->pCurPos += 5;
-        int32_t iOffset = iCurrStartByte + 1 + NAL_UNIT_HEADER_EXT_SIZE;
         memcpy (pSavedData->pCurPos, pSrcNal + iOffset, iActualLen - iOffset);
         pSavedData->pCurPos += iActualLen - iOffset;
       }
     } else {
       if (pCtx->pParam->bParseOnly) {
-        pCurNal->sNalData.sVclNal.pNalPos = pSavedData->pCurPos;
         int32_t iTrailingZeroByte = 0;
         while (pSrcNal[iSrcNalLen - iTrailingZeroByte - 1] == 0x0) //remove final trailing 0 bytes
           iTrailingZeroByte++;
         int32_t iActualLen = iSrcNalLen - iTrailingZeroByte;
-        pCurNal->sNalData.sVclNal.iNalLength = iActualLen;
         //unify start code as 0x0001
         int32_t iStartDeltaByte = 0; //0 for 0x0001, 1 for 0x001
         if (pSrcNal[0] == 0x0 && pSrcNal[1] == 0x0 && pSrcNal[2] == 0x1) { //if 0x001
-          pSavedData->pCurPos[0] = 0x0;
           iStartDeltaByte = 1;
+        }
+        int32_t iWriteLen = iStartDeltaByte + iActualLen;
+        // Bounds check: ensure write fits in sSavedData buffer
+        if (pSavedData->pCurPos + iWriteLen > pSavedData->pEnd) {
+          pSavedData->pCurPos = pSavedData->pHead;
+        }
+        pCurNal->sNalData.sVclNal.pNalPos = pSavedData->pCurPos;
+        pCurNal->sNalData.sVclNal.iNalLength = iActualLen;
+        if (iStartDeltaByte) {
+          pSavedData->pCurPos[0] = 0x0;
           pCurNal->sNalData.sVclNal.iNalLength++;
         }
         memcpy (pSavedData->pCurPos + iStartDeltaByte, pSrcNal, iActualLen);
