@@ -42,6 +42,7 @@
 #include <memory>
 #include <assert.h>
 #include <limits.h>
+#include <vector>
 
 #include "gmp-platform.h"
 #include "gmp-video-host.h"
