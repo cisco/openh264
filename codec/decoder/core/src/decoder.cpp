@@ -756,8 +756,8 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
     uint8_t* pNalPayload   = NULL;
 
 
-    if (NULL == DetectStartCodePrefix (kpBsBuf, &iOffset,
-                                       kiBsLen)) {  //CAN'T find the 00 00 01 start prefix from the source buffer
+    if (NULL == pCtx->pfDetectStartCodePrefix (kpBsBuf, &iOffset,
+                                              kiBsLen)) {  //CAN'T find the 00 00 01 start prefix from the source buffer
       pCtx->iErrorCode |= dsBitstreamError;
       return dsBitstreamError;
     }
@@ -1054,6 +1054,8 @@ void InitPredFunc (PWelsDecoderContext pCtx, uint32_t uiCpuFlag) {
 
   pCtx->pIdctResAddPredFunc8x8  = IdctResAddPred8x8_c;
 
+  pCtx->pfDetectStartCodePrefix = DetectStartCodePrefixC;
+
 #if defined(HAVE_NEON)
   if (uiCpuFlag & WELS_CPU_NEON) {
     pCtx->pIdctResAddPredFunc   = IdctResAddPred_neon;
@@ -1108,6 +1110,8 @@ void InitPredFunc (PWelsDecoderContext pCtx, uint32_t uiCpuFlag) {
     pCtx->pGetIChromaPredFunc[C_PRED_P ]      = WelsDecoderIChromaPredPlane_AArch64_neon;
     pCtx->pGetIChromaPredFunc[C_PRED_DC]      = WelsDecoderIChromaPredDc_AArch64_neon;
     pCtx->pGetIChromaPredFunc[C_PRED_DC_T]      = WelsDecoderIChromaPredDcTop_AArch64_neon;
+
+    pCtx->pfDetectStartCodePrefix = DetectStartCodePrefixNEON;
   }
 #endif//HAVE_NEON_AARCH64
 
