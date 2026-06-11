@@ -4,12 +4,14 @@ on:
   push:
   pull_request:
 
+permissions: read-all
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744  # v3
       - run: sudo apt-get update -qq
       - run: sudo apt-get install -qq nasm g++-multilib gcc-multilib libc6-dev-i386 python3-pip python3-setuptools
       - run: sudo python3 -m pip install meson==0.52.1 ninja
@@ -28,7 +30,7 @@ jobs:
   asan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744  # v3
       - run: sudo apt-get update -qq
       - run: sudo apt-get install -qq nasm
       - run: nasm -v
@@ -40,7 +42,7 @@ jobs:
   windows:
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744  # v3
       - run: choco install nasm
       # nasm is not installed into the $PATH so add it manually
       - run: echo "C:\Program Files\NASM" >> $env:GITHUB_PATH
@@ -59,7 +61,7 @@ jobs:
       run:
         shell: msys2 {0}
     steps:
-      - uses: msys2/setup-msys2@v2
+      - uses: msys2/setup-msys2@e9898307ac31d1a803454791be09ab9973336e1c  # v2
         with:
           msystem: mingw64
           install: >-
@@ -68,7 +70,7 @@ jobs:
             mingw-w64-x86_64-toolchain
             mingw-w64-x86_64-nasm
             mingw-w64-x86_64-meson
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744  # v3
       - run: c++ --version
       - run: make gmp-bootstrap
       - run: make gtest-bootstrap
@@ -83,7 +85,7 @@ jobs:
   macos:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744  # v3
       - run: brew install nasm meson
       - run: make gmp-bootstrap
       - run: make gtest-bootstrap
@@ -97,7 +99,7 @@ jobs:
   linux-cross-arm:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744  # v3
       - run: sudo apt-get update -qq
       - run: sudo apt-get install -qq g++-arm-linux-gnueabihf g++-aarch64-linux-gnu qemu-user
       - run: arm-linux-gnueabihf-g++ --version
@@ -111,7 +113,7 @@ jobs:
   linux-cross-loongarch64:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744  # v3
       - run: sudo apt-get update -qq
       - run: sudo apt-get install -qq gcc-14-loongarch64-linux-gnu g++-14-loongarch64-linux-gnu qemu-user-static
       - run: loongarch64-linux-gnu-g++-14 --version
@@ -123,7 +125,7 @@ jobs:
   macos-cross-arm64:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744  # v3
       - run: make gmp-bootstrap
       - run: make gtest-bootstrap
       - run: c++ --version
@@ -134,18 +136,18 @@ jobs:
     steps:
     - name: Build Fuzzers
       id: build
-      uses: google/oss-fuzz/infra/cifuzz/actions/build_fuzzers@master
+      uses: google/oss-fuzz/infra/cifuzz/actions/build_fuzzers@439b356d09b53fe1161e9fe22ac42536926983db  # master
       with:
         oss-fuzz-project-name: 'openh264'
         language: c++
     - name: Run Fuzzers
-      uses: google/oss-fuzz/infra/cifuzz/actions/run_fuzzers@master
+      uses: google/oss-fuzz/infra/cifuzz/actions/run_fuzzers@439b356d09b53fe1161e9fe22ac42536926983db  # master
       with:
         oss-fuzz-project-name: 'openh264'
         language: c++
         fuzz-seconds: 600
     - name: Upload Crash
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
       if: failure() && steps.build.outcome == 'success'
       with:
         name: artifacts
