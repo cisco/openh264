@@ -444,6 +444,15 @@ int32_t AppendSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, const int32
       assert (pSliceBs->bSliceCodedFlag);
 #endif//MT_DEBUG_BS_WR
 
+      if (pCtx->iPosBsBuffer + pSliceBs->uiBsPos > pCtx->iFrameBsSize) {
+        WelsLog (&pCtx->sLogCtx, WELS_LOG_ERROR,
+                 "AppendSliceToFrameBs(), insufficient memory for the allocation! "
+                 "iPosBsBuffer:%d, uiBsPos:%d, iFrameBsSize:%d",
+                 pCtx->iPosBsBuffer, pSliceBs->uiBsPos, pCtx->iFrameBsSize);
+        pCtx->iEncoderError |= ENC_RETURN_MEMALLOCERR;
+        return 0;
+      }
+
       memmove (pCtx->pFrameBs + pCtx->iPosBsBuffer, pSliceBs->pBs, pSliceBs->uiBsPos); // confirmed_safe_unsafe_usage
       pCtx->iPosBsBuffer += pSliceBs->uiBsPos;
 

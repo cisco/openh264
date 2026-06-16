@@ -1,7 +1,9 @@
 #include <gtest/gtest.h>
 #include "utils/HashFunctions.h"
 #include "BaseEncoderTest.h"
+#include "utils/BufferedData.h"
 #include <string>
+#include <cstdlib>
 
 static void UpdateHashFromFrame (const SFrameBSInfo& info, SHA1Context* ctx) {
   for (int i = 0; i < info.iLayerNum; ++i) {
@@ -181,3 +183,79 @@ static const EncodeFileParam kFileParamArray[] = {
 
 INSTANTIATE_TEST_CASE_P (EncodeFile, EncoderOutputTest,
                          ::testing::ValuesIn (kFileParamArray));
+
+class RandomInputStream : public InputStream {
+ public:
+  RandomInputStream(int max_frames) : max_frames_(max_frames), count_(0) {
+    srand(12345);
+  }
+  virtual int read (void* ptr, size_t len) {
+    if (count_ >= max_frames_) {
+      return 0;
+    }
+    unsigned char* p = (unsigned char*)ptr;
+    for (size_t i = 0; i < len; ++i) {
+      p[i] = rand() % 256;
+    }
+    count_++;
+    return len;
+  }
+ private:
+  int max_frames_;
+  int count_;
+};
+
+// This test uses random noise input and a very low QP to intentionally create
+// poor compression (less than 1:1 ratio). This produces very large slices
+// and tests the encoder's ability to handle inflated buffers correctly without
+// insufficient memory errors.
+TEST_F(EncoderInitTest, VeryLargeSlices) {
+  SEncParamExt param;
+  encoder_->GetDefaultParams(&param);
+  
+  param.iUsageType = CAMERA_VIDEO_REAL_TIME;
+  param.iPicWidth = 1280;
+  param.iPicHeight = 720;
+  param.fMaxFrameRate = 30.0f;
+  param.iSpatialLayerNum = 1;
+  param.iMultipleThreadIdc = 4;
+  param.iRCMode = RC_OFF_MODE;
+  
+  param.sSpatialLayers[0].iVideoWidth = param.iPicWidth;
+  param.sSpatialLayers[0].iVideoHeight = param.iPicHeight;
+  param.sSpatialLayers[0].fFrameRate = param.fMaxFrameRate;
+  param.sSpatialLayers[0].sSliceArgument.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+  param.sSpatialLayers[0].sSliceArgument.uiSliceNum = 4;
+  param.sSpatialLayers[0].iDLayerQp = 12;
+  param.iMinQp = 0;
+  param.iMaxQp = 51;
+
+  int rv = encoder_->InitializeExt(&param);
+  ASSERT_EQ(0, rv);
+
+  RandomInputStream stream(1);
+  
+  int frameSize = param.iPicWidth * param.iPicHeight * 3 / 2;
+  BufferedData buf;
+  buf.SetLength(frameSize);
+  ASSERT_EQ(buf.Length(), (size_t)frameSize);
+
+  SFrameBSInfo info;
+  memset(&info, 0, sizeof(SFrameBSInfo));
+
+  SSourcePicture pic;
+  memset(&pic, 0, sizeof(SSourcePicture));
+  pic.iPicWidth = param.iPicWidth;
+  pic.iPicHeight = param.iPicHeight;
+  pic.iColorFormat = videoFormatI420;
+  pic.iStride[0] = pic.iPicWidth;
+  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
+  pic.pData[0] = buf.data();
+  pic.pData[1] = pic.pData[0] + param.iPicWidth * param.iPicHeight;
+  pic.pData[2] = pic.pData[1] + (param.iPicWidth * param.iPicHeight >> 2);
+
+  while (stream.read(buf.data(), frameSize) == frameSize) {
+    rv = encoder_->EncodeFrame(&pic, &info);
+    ASSERT_EQ(0, rv);
+  }
+}

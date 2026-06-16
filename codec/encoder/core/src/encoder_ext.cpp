@@ -1591,8 +1591,7 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx, SExistingParasetList* pExistingPa
     iLayerBsSize = WELS_ROUND (((3 * fDlp->iVideoWidth * fDlp->iVideoHeight) >> 1) * fCompressRatioThr) +
                    MAX_MACROBLOCK_SIZE_IN_BYTE_x2;
     iLayerBsSize = WELS_ALIGN (iLayerBsSize, 4); // 4 bytes alinged
-    iVclLayersBsSizeCount += iLayerBsSize;
-
+    int32_t iMaxLayerBsSize = 0;
     SSliceArgument* pSliceArgument = & (fDlp->sSliceArgument);
     if (pSliceArgument->uiSliceMode == SM_SIZELIMITED_SLICE) {
       bDynamicSlice = true;
@@ -1601,15 +1600,19 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx, SExistingParasetList* pExistingPa
       (*ppCtx)->iMaxSliceCount = WELS_MAX ((*ppCtx)->iMaxSliceCount, (int) uiMaxSliceNumEstimation);
       iSliceBufferSize = (WELS_MAX (pSliceArgument->uiSliceSizeConstraint,
                                     iLayerBsSize / uiMaxSliceNumEstimation) << 1) + MAX_MACROBLOCK_SIZE_IN_BYTE_x2;
+      iMaxLayerBsSize = iSliceBufferSize * uiMaxSliceNumEstimation;
     } else {
       (*ppCtx)->iMaxSliceCount = WELS_MAX ((*ppCtx)->iMaxSliceCount, (int) pSliceArgument->uiSliceNum);
       iSliceBufferSize = ((iLayerBsSize / pSliceArgument->uiSliceNum) << 1) + MAX_MACROBLOCK_SIZE_IN_BYTE_x2;
+      iMaxLayerBsSize = iSliceBufferSize * pSliceArgument->uiSliceNum;
     }
+    iMaxLayerBsSize = WELS_MAX (iMaxLayerBsSize, iLayerBsSize);
+    iVclLayersBsSizeCount += iMaxLayerBsSize;
     iMaxSliceBufferSize                = WELS_MAX (iMaxSliceBufferSize, iSliceBufferSize);
     (*ppCtx)->iSliceBufferSize[iIndex] = iSliceBufferSize;
     ++ iIndex;
   }
-  iTargetSpatialBsSize = iLayerBsSize;
+  iTargetSpatialBsSize = iVclLayersBsSizeCount;
   iCountBsLen = iNonVclLayersBsSizeCount + iVclLayersBsSizeCount;
 
   iMaxSliceBufferSize = WELS_MIN (iMaxSliceBufferSize, iTargetSpatialBsSize);
@@ -3738,6 +3741,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
         }
 
         iLayerSize = AppendSliceToFrameBs (pCtx, pLayerBsInfo, iSliceCount);
+        WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
       }
       // THREAD_FULLY_FIRE_MODE && SM_SIZELIMITED_SLICE
       else if ((SM_SIZELIMITED_SLICE == pParam->sSliceArgument.uiSliceMode) && (pSvcParam->iMultipleThreadIdc > 1)) {
@@ -3787,6 +3791,7 @@ int32_t WelsEncoderEncodeExt (sWelsEncCtx* pCtx, SFrameBSInfo* pFbi, const SSour
 
         iSliceCount = GetCurrentSliceNum (pCtx->pCurDqLayer);
         iLayerSize  = AppendSliceToFrameBs (pCtx, pLayerBsInfo, iSliceCount);
+        WELS_VERIFY_RETURN_IFNEQ (pCtx->iEncoderError, ENC_RETURN_SUCCESS)
       } else { // for non-dynamic-slicing mode single threading branch..
         const bool bNeedPrefix = pCtx->bNeedPrefixNalFlag;
         int32_t iSliceIdx    = 0;
