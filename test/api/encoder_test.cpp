@@ -198,7 +198,7 @@ class RandomInputStream : public InputStream {
       p[i] = rand() % 256;
     }
     count_++;
-    return len;
+    return static_cast<int>(len);
   }
  private:
   int max_frames_;

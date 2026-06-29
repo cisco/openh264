@@ -444,7 +444,7 @@ int32_t AppendSliceToFrameBs (sWelsEncCtx* pCtx, SLayerBSInfo* pLbi, const int32
       assert (pSliceBs->bSliceCodedFlag);
 #endif//MT_DEBUG_BS_WR
 
-      if (pCtx->iPosBsBuffer + pSliceBs->uiBsPos > pCtx->iFrameBsSize) {
+      if (static_cast<uint64_t>(pCtx->iPosBsBuffer) + pSliceBs->uiBsPos > static_cast<uint64_t>(pCtx->iFrameBsSize)) {
         WelsLog (&pCtx->sLogCtx, WELS_LOG_ERROR,
                  "AppendSliceToFrameBs(), insufficient memory for the allocation! "
                  "iPosBsBuffer:%d, uiBsPos:%d, iFrameBsSize:%d",
