@@ -39,3 +39,15 @@ TEST (UeExpGolombTest, TestBsSizeUeRangeFrom65535ToPlus256) {
     EXPECT_EQ (uiActVal, uiExpVal);
   }
 }
+
+TEST (BsFlushTest, TestBsFlushUb) {
+  uint8_t buffer[16] = {0};
+  WelsCommon::SBitStringAux bs;
+  bs.pStartBuf = buffer;
+  bs.pEndBuf = buffer + 16;
+  bs.pCurBuf = buffer;
+  bs.uiCurBits = 123;
+  bs.iLeftBits = 32;
+
+  WelsCommon::BsFlush(&bs);
+}

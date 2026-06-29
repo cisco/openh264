@@ -100,10 +100,12 @@ static inline int32_t BsWriteOneBit (PBitStringAux pBitString, const uint32_t ku
 }
 
 static inline int32_t BsFlush (PBitStringAux pBitString) {
-  WRITE_BE_32 (pBitString->pCurBuf, pBitString->uiCurBits << pBitString->iLeftBits);
-  pBitString->pCurBuf += 4 - pBitString->iLeftBits / 8;
-  pBitString->iLeftBits = 32;
-  pBitString->uiCurBits = 0;
+  if (pBitString->iLeftBits < 32) {
+    WRITE_BE_32 (pBitString->pCurBuf, pBitString->uiCurBits << pBitString->iLeftBits);
+    pBitString->pCurBuf += 4 - pBitString->iLeftBits / 8;
+    pBitString->iLeftBits = 32;
+    pBitString->uiCurBits = 0;
+  }
   return 0;
 }
 
