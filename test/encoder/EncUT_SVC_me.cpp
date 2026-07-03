@@ -283,6 +283,9 @@ GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_sse2, 6, 320
 GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_sse2, 6, 320, WELS_CPU_SSE2)
 GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_sse2, 640, 320, WELS_CPU_SSE2)
 GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_sse2, 640, 320, WELS_CPU_SSE2)
+GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_sse2, 21840, 16, WELS_CPU_SSE2)
+GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_sse2, 21840, 16, WELS_CPU_SSE2)
+
 
 GENERATE_SumOfFrame (SumOf8x8BlockOfFrame_ref, SumOf8x8BlockOfFrame_sse4, 8, 2, WELS_CPU_SSE41)
 GENERATE_SumOfFrame (SumOf16x16BlockOfFrame_ref, SumOf16x16BlockOfFrame_sse4, 16, 2, WELS_CPU_SSE41)

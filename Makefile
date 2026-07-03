@@ -71,6 +71,7 @@ endif
 
 ifeq ($(USE_ASAN), Yes)
 CFLAGS += -fsanitize=address
+CXXFLAGS += -fsanitize=address
 LDFLAGS += -fsanitize=address
 endif
 

@@ -127,7 +127,7 @@ WIDTH_LOOP:
     psadbw  xmm2,   xmm0
     psubd   xmm1,   xmm2
     movd    eax,    xmm1
-    mov     cx,     [edi]
+    movzx   ecx,    word [edi]
     add     eax,    ecx
 
     mov     [edi+ebp*2],    ax
@@ -906,7 +906,7 @@ WIDTH_LOOP:
     psadbw  xmm2,   xmm0
     psubd   xmm1,   xmm2
     movd    r2d,    xmm1
-    mov     r6w,    [r4]
+    movzx   r6d,    word [r4]
     add     r2d,    r6d
     mov     [r4+r1*2],  r2w
     inc     dword [r5+r2*4]
