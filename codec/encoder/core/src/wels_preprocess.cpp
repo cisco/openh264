@@ -1177,6 +1177,16 @@ ESceneChangeIdc CWelsPreProcessScreen::DetectSceneChange (SPicture* pCurPicture,
 
       if (ret == 0) {
         m_pInterfaceVp->Get (iMethodIdx, (void*) (pScrollDetectInfo));
+        // Ensure detected scroll motion vectors stay within the configured
+        // motion vector range.
+        if (pScrollDetectInfo->bScrollDetectFlag) {
+          pScrollDetectInfo->iScrollMvX =
+              WELS_CLIP3(pScrollDetectInfo->iScrollMvX, -m_pEncCtx->iMvRange,
+                         m_pEncCtx->iMvRange);
+          pScrollDetectInfo->iScrollMvY =
+              WELS_CLIP3(pScrollDetectInfo->iScrollMvY, -m_pEncCtx->iMvRange,
+                         m_pEncCtx->iMvRange);
+        }
       }
       sSceneChangeResult.sScrollResult = pVaaExt->sScrollDetectInfo;
     }

@@ -259,3 +259,95 @@ TEST_F(EncoderInitTest, VeryLargeSlices) {
     ASSERT_EQ(0, rv);
   }
 }
+
+// This test verifies that the encoder correctly handles screen content
+// sequences with large vertical scrolling motion vectors. It ensures that
+// motion vector difference table indexing remains within allocated bounds when
+// scroll detection predicts large vertical displacements at high quantization
+// parameters.
+TEST_F(EncoderInitTest, ScreenContentScrollMotionVectorBounds) {
+  SEncParamExt param;
+  encoder_->GetDefaultParams(&param);
+
+  param.iUsageType = SCREEN_CONTENT_REAL_TIME;
+  param.iPicWidth = 640;
+  param.iPicHeight = 1800;
+  param.fMaxFrameRate = 30.0f;
+  param.iSpatialLayerNum = 1;
+  param.iRCMode = RC_OFF_MODE;
+
+  param.sSpatialLayers[0].iVideoWidth = param.iPicWidth;
+  param.sSpatialLayers[0].iVideoHeight = param.iPicHeight;
+  param.sSpatialLayers[0].fFrameRate = param.fMaxFrameRate;
+  param.sSpatialLayers[0].sSliceArgument.uiSliceMode = SM_SINGLE_SLICE;
+  param.sSpatialLayers[0].iDLayerQp = 51;
+  param.iMinQp = 51;
+  param.iMaxQp = 51;
+
+  int rv = encoder_->InitializeExt(&param);
+  ASSERT_EQ(0, rv);
+
+  SFrameBSInfo info;
+  memset(&info, 0, sizeof(SFrameBSInfo));
+
+  int width = param.iPicWidth;
+  int height = param.iPicHeight;
+  int frameSize = width * height * 3 / 2;
+  std::vector<uint8_t> frame0(frameSize, 128);
+  std::vector<uint8_t> frame1(frameSize, 128);
+
+  // Fill frame0 luma with pseudo-random patterns to ensure CheckLine qualifies
+  for (int y = 0; y < height; ++y) {
+    for (int x = 0; x < width; ++x) {
+      frame0[y * width + x] =
+          static_cast<uint8_t>((x * 29 + y * 43 + 17) % 251);
+    }
+  }
+
+  // Frame 1: shift vertically by -512 pixels (content moving downward by 512)
+  int scroll_mv = -512;
+  for (int y = 0; y < height; ++y) {
+    if (y + scroll_mv >= 0 && y + scroll_mv < height) {
+      memcpy(&frame1[y * width], &frame0[(y + scroll_mv) * width], width);
+    } else {
+      for (int x = 0; x < width; ++x) {
+        frame1[y * width + x] =
+            static_cast<uint8_t>((x * 53 + y * 71 + 101) & 0xFF);
+      }
+    }
+  }
+
+  // Modify macroblock (1, 32) at pixel rows 512..527 and cols 16..31 in frame1.
+  // MB(0, 32) will be skipped by scroll detection with MV -2048.
+  // MB(1, 32) cannot be skipped due to this modification, forcing it into
+  // motion estimation where it uses MB(0, 32)'s scrolled MV as a predictor
+  // during vertical full search.
+  for (int y = 512; y < 528; ++y) {
+    for (int x = 16; x < 32; ++x) {
+      frame1[y * width + x] ^= 0xFF;
+    }
+  }
+
+  SSourcePicture pic;
+  memset(&pic, 0, sizeof(SSourcePicture));
+  pic.iPicWidth = width;
+  pic.iPicHeight = height;
+  pic.iColorFormat = videoFormatI420;
+  pic.iStride[0] = width;
+  pic.iStride[1] = pic.iStride[2] = width >> 1;
+  pic.pData[0] = frame0.data();
+  pic.pData[1] = frame0.data() + width * height;
+  pic.pData[2] = pic.pData[1] + (width * height >> 2);
+
+  // Encode Frame 0 (Base pattern)
+  rv = encoder_->EncodeFrame(&pic, &info);
+  ASSERT_EQ(0, rv);
+  pic.uiTimeStamp += 33;
+
+  // Encode Frame 1 (Scrolled pattern with modified MB)
+  pic.pData[0] = frame1.data();
+  pic.pData[1] = frame1.data() + width * height;
+  pic.pData[2] = pic.pData[1] + (width * height >> 2);
+  rv = encoder_->EncodeFrame(&pic, &info);
+  ASSERT_EQ(0, rv);
+}
