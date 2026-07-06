@@ -351,3 +351,55 @@ TEST_F(EncoderInitTest, ScreenContentScrollMotionVectorBounds) {
   rv = encoder_->EncodeFrame(&pic, &info);
   ASSERT_EQ(0, rv);
 }
+
+// This test verifies that the encoder correctly handles frames with distinct,
+// asymmetric strides for the U and V chroma planes (e.g., when U stride is much
+// larger than V stride, or vice versa). It ensures that memory copy routines
+// advance each chroma plane pointer by its own stride without invalid memory
+// access.
+TEST_F(EncoderInitTest, CustomChromaPlaneStrides) {
+  SEncParamExt param;
+  encoder_->GetDefaultParams(&param);
+
+  param.iUsageType = CAMERA_VIDEO_REAL_TIME;
+  param.iPicWidth = 64;
+  param.iPicHeight = 64;
+  param.fMaxFrameRate = 30.0f;
+  param.iSpatialLayerNum = 1;
+  param.iRCMode = RC_OFF_MODE;
+
+  param.sSpatialLayers[0].iVideoWidth = param.iPicWidth;
+  param.sSpatialLayers[0].iVideoHeight = param.iPicHeight;
+  param.sSpatialLayers[0].fFrameRate = param.fMaxFrameRate;
+  param.sSpatialLayers[0].sSliceArgument.uiSliceMode = SM_SINGLE_SLICE;
+  param.sSpatialLayers[0].iDLayerQp = 24;
+
+  int rv = encoder_->InitializeExt(&param);
+  ASSERT_EQ(0, rv);
+
+  SFrameBSInfo info;
+  memset(&info, 0, sizeof(SFrameBSInfo));
+
+  // Configure distinct strides: U stride is much larger than V stride.
+  int strideY = 64;
+  int strideU = 4096;
+  int strideV = 32;
+
+  std::vector<uint8_t> bufY(strideY * param.iPicHeight, 128);
+  std::vector<uint8_t> bufU(strideU * (param.iPicHeight >> 1), 128);
+  std::vector<uint8_t> bufV(strideV * (param.iPicHeight >> 1), 128);
+
+  SSourcePicture pic;
+  memset(&pic, 0, sizeof(SSourcePicture));
+  pic.iPicWidth = param.iPicWidth;
+  pic.iPicHeight = param.iPicHeight;
+  pic.iColorFormat = videoFormatI420;
+  pic.iStride[0] = strideY;
+  pic.iStride[1] = strideU;
+  pic.iStride[2] = strideV;
+  pic.pData[0] = bufY.data();
+  pic.pData[1] = bufU.data();
+  pic.pData[2] = bufV.data();
+  rv = encoder_->EncodeFrame(&pic, &info);
+  ASSERT_EQ(0, rv);
+}
