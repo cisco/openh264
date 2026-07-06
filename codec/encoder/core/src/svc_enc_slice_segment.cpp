@@ -281,6 +281,12 @@ bool GomValidCheckSliceMbNum (const int32_t kiMbWidth, const int32_t kiMbHeight,
   int32_t iCurNumMbAssigning = 0;
 
   iMinimalMbNum = iGomSize;
+  // Ensure that the minimum macroblock requirement across all slices does not
+  // exceed total frame capacity, preventing negative calculations for remaining
+  // macroblocks.
+  if (iMinimalMbNum * static_cast<int32_t>(kuiSliceNum) > kiMbNumInFrame) {
+    return false;
+  }
   while (uiSliceIdx + 1 < kuiSliceNum) {
     iMaximalMbNum = iNumMbLeft - (kuiSliceNum - uiSliceIdx - 1) * iMinimalMbNum; // get maximal num_mb in left parts
     // make sure one GOM at least in each slice for safe

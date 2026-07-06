@@ -259,3 +259,78 @@ TEST_F(EncoderInitTest, VeryLargeSlices) {
     ASSERT_EQ(0, rv);
   }
 }
+
+// This test verifies dynamic slice adjustment when encoding frames with extreme
+// aspect ratios (very wide resolution) in RC_OFF_MODE using multiple
+// slices/threads. It ensures that macroblocks are correctly distributed across
+// slices without producing negative slice limits or invalid memory access when
+// slice encoding speeds vary.
+TEST_F(EncoderInitTest, DynamicAdjustSlicingExtremeAspectRatio) {
+  SEncParamExt param;
+  encoder_->GetDefaultParams(&param);
+
+  param.iUsageType = CAMERA_VIDEO_REAL_TIME;
+  // Extreme wide aspect ratio: frame height is only 2 macroblock rows (32
+  // pixels), which tests slicing behavior when row-based heuristics exceed
+  // frame dimensions.
+  param.iPicWidth = 32752;
+  param.iPicHeight = 32;
+  param.fMaxFrameRate = 30.0f;
+  param.iSpatialLayerNum = 1;
+  param.iMultipleThreadIdc = 4;
+  param.iRCMode = RC_OFF_MODE;
+  // Enable load balancing and high complexity mode to trigger dynamic slice
+  // adjustments.
+  param.bUseLoadBalancing = true;
+  param.iComplexityMode = HIGH_COMPLEXITY;
+  param.iMinQp = 0;
+  param.iMaxQp = 51;
+
+  param.sSpatialLayers[0].iVideoWidth = param.iPicWidth;
+  param.sSpatialLayers[0].iVideoHeight = param.iPicHeight;
+  param.sSpatialLayers[0].fFrameRate = param.fMaxFrameRate;
+  param.sSpatialLayers[0].sSliceArgument.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+  param.sSpatialLayers[0].sSliceArgument.uiSliceNum = 4;
+  param.sSpatialLayers[0].iDLayerQp = 24;
+
+  int rv = encoder_->InitializeExt(&param);
+  ASSERT_EQ(0, rv);
+
+  int frameSize = param.iPicWidth * param.iPicHeight * 3 / 2;
+  BufferedData buf;
+  buf.SetLength(frameSize);
+  ASSERT_EQ(buf.Length(), (size_t)frameSize);
+
+  SFrameBSInfo info;
+  memset(&info, 0, sizeof(SFrameBSInfo));
+
+  SSourcePicture pic;
+  memset(&pic, 0, sizeof(SSourcePicture));
+  pic.iPicWidth = param.iPicWidth;
+  pic.iPicHeight = param.iPicHeight;
+  pic.iColorFormat = videoFormatI420;
+  pic.iStride[0] = pic.iPicWidth;
+  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
+  pic.pData[0] = buf.data();
+  pic.pData[1] = pic.pData[0] + param.iPicWidth * param.iPicHeight;
+  pic.pData[2] = pic.pData[1] + (param.iPicWidth * param.iPicHeight >> 2);
+
+  for (int i = 0; i < 10; i++) {
+    // Generate varying random noise in Slices 1..3 while keeping Slice 0
+    // completely flat (zeros). This creates a significant encoding speed
+    // differential, causing the encoder to assign a larger proportion of
+    // macroblocks to Slice 0 during dynamic load balancing.
+    for (int idx = 0; idx < frameSize; idx++) {
+      buf.data()[idx] = rand() % 256;
+    }
+    for (int y = 0; y < 16; y++) {
+      memset(pic.pData[0] + y * pic.iStride[0], 0, 16368);
+    }
+    for (int y = 0; y < 8; y++) {
+      memset(pic.pData[1] + y * pic.iStride[1], 0, 8184);
+      memset(pic.pData[2] + y * pic.iStride[2], 0, 8184);
+    }
+    rv = encoder_->EncodeFrame(&pic, &info);
+    ASSERT_EQ(0, rv);
+  }
+}
