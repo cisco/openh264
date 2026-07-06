@@ -206,12 +206,10 @@ WELS_THREAD_ERROR_CODE CWelsThreadPool::Uninit() {
   CWelsAutoLock  cLock (m_cLockPool);
 
   iReturn = StopAllRunning();
-  if (WELS_THREAD_ERROR_OK != iReturn) {
-    return iReturn;
-  }
+  assert (0 == GetBusyThreadNum());
 
   m_cLockIdleTasks.Lock();
-  while (m_cIdleThreads->size() > 0) {
+  while (m_cIdleThreads && m_cIdleThreads->size() > 0) {
     DestroyThread (m_cIdleThreads->begin());
     m_cIdleThreads->pop_front();
   }
@@ -280,6 +278,7 @@ WELS_THREAD_ERROR_CODE CWelsThreadPool::CreateIdleThread() {
   }
 
   if (WELS_THREAD_ERROR_OK != pThread->Start()) {
+    WELS_DELETE_OP (pThread);
     return WELS_THREAD_ERROR_GENERAL;
   }
   //fprintf(stdout, "ThreadPool:  AddThreadToIdleQueue: %x\n", pThread);
