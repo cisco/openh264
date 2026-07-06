@@ -197,6 +197,24 @@ void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
       return;
     }
     iMinimalMbNum = iNumMbInEachGom;
+  } else {
+    // If the number of requested slices equals or exceeds the total macroblocks
+    // in the frame, each slice cannot be assigned even 1 macroblock. In this
+    // case, do not adjust slice sizes.
+    if (kiCountSliceNum >= kiCountNumMb) {
+      WelsLog(&(pCtx->sLogCtx), WELS_LOG_WARNING,
+              "[MT] DynamicAdjustSlicing(), requested slice number (%d) equals "
+              "or exceeds total macroblocks (%d), do not adjust",
+              kiCountSliceNum, kiCountNumMb);
+      return;
+    } else if (iMinimalMbNum * kiCountSliceNum >= kiCountNumMb) {
+      // When rate control is off, iMinimalMbNum defaults to 1 macroblock row
+      // (iMbWidth). For extreme aspect ratios (such as very wide resolutions),
+      // requiring 1 row per slice may exceed total frame capacity. Fall back to
+      // 1 macroblock per slice to ensure valid upper bounds and allow proper
+      // load balancing across slices.
+      iMinimalMbNum = 1;
+    }
   }
 
   if (kiCountSliceNum < 2 || (kiCountSliceNum & 0x01)) // we need suppose uiSliceNum is even for multiple threading
