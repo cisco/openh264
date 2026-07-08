@@ -140,8 +140,8 @@ static const EncodeDecodeFileParamBase kFileParamArray[] = {
   {300, 140, 96, 6.0f, 4, 1, "000000000000001010111010101011101010101001101010100000010101110011010101"},
 };
 
-INSTANTIATE_TEST_CASE_P (EncodeDecodeTestAPIBase, EncodeDecodeTestAPI,
-                         ::testing::ValuesIn (kFileParamArray));
+INSTANTIATE_TEST_SUITE_P (EncodeDecodeTestAPIBase, EncodeDecodeTestAPI,
+                          ::testing::ValuesIn (kFileParamArray));
 
 TEST_P (EncodeDecodeTestAPI, SetOptionECIDC_GeneralSliceChange) {
   uint32_t uiEcIdc;

@@ -149,5 +149,5 @@ static const FileParam kFileParamArray[] = {
   {"res/VID_1920x1080_cavlc_temporal_direct.264", "4467039825f472bae31e58b383b1f2c9a73ce8e0"},
 };
 
-INSTANTIATE_TEST_CASE_P (ThreadDecodeFile, ThreadDecoderOutputTest,
-                         ::testing::ValuesIn (kFileParamArray));
+INSTANTIATE_TEST_SUITE_P (ThreadDecodeFile, ThreadDecoderOutputTest,
+                          ::testing::ValuesIn (kFileParamArray));

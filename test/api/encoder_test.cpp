@@ -181,8 +181,8 @@ static const EncodeFileParam kFileParamArray[] = {
 
 };
 
-INSTANTIATE_TEST_CASE_P (EncodeFile, EncoderOutputTest,
-                         ::testing::ValuesIn (kFileParamArray));
+INSTANTIATE_TEST_SUITE_P (EncodeFile, EncoderOutputTest,
+                          ::testing::ValuesIn (kFileParamArray));
 
 class RandomInputStream : public InputStream {
  public:

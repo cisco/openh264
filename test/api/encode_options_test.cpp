@@ -1324,8 +1324,8 @@ class EncodeTestAPI : public ::testing::TestWithParam<EncodeOptionParam>, public
   }
 };
 
-INSTANTIATE_TEST_CASE_P (EncodeDecodeTestAPIBase, EncodeTestAPI,
-                         ::testing::ValuesIn (kOptionParamArray));
+INSTANTIATE_TEST_SUITE_P (EncodeDecodeTestAPIBase, EncodeTestAPI,
+                          ::testing::ValuesIn (kOptionParamArray));
 
 TEST_P (EncodeTestAPI, SetEncOptionSize) {
   EncodeOptionParam p = GetParam();

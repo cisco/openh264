@@ -135,5 +135,5 @@ static const DecodeEncodeFileParam kFileParamArray[] = {
 };
 
 
-INSTANTIATE_TEST_CASE_P (DecodeEncodeFile, DecodeEncodeTest,
-                         ::testing::ValuesIn (kFileParamArray));
+INSTANTIATE_TEST_SUITE_P (DecodeEncodeFile, DecodeEncodeTest,
+                          ::testing::ValuesIn (kFileParamArray));
