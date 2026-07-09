@@ -1026,6 +1026,7 @@ int32_t InitOneSliceInThread (sWelsEncCtx* pCtx,
   pSlice->sSliceBs.uiBsPos   = 0;
   pSlice->sSliceBs.iNalIndex = 0;
   pSlice->sSliceBs.pBsBuffer = pCtx->pSliceThreading->pThreadBsBuffer[kiSlcBuffIdx];
+  pSlice->sSliceBs.uiSize    = pCtx->iFrameBsSize;
 
   return ENC_RETURN_SUCCESS;
 }
