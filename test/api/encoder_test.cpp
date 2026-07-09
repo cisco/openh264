@@ -365,7 +365,7 @@ TEST_F(EncoderInitTest, DynamicAdjustSlicingExtremeAspectRatio) {
   // Extreme wide aspect ratio: frame height is only 2 macroblock rows (32
   // pixels), which tests slicing behavior when row-based heuristics exceed
   // frame dimensions.
-  param.iPicWidth = 8192;
+  param.iPicWidth = 32752;
   param.iPicHeight = 32;
   param.fMaxFrameRate = 30.0f;
   param.iSpatialLayerNum = 1;
@@ -416,11 +416,11 @@ TEST_F(EncoderInitTest, DynamicAdjustSlicingExtremeAspectRatio) {
       buf.data()[idx] = rand() % 256;
     }
     for (int y = 0; y < 16; y++) {
-      memset(pic.pData[0] + y * pic.iStride[0], 0, 4096);
+      memset(pic.pData[0] + y * pic.iStride[0], 0, 16368);
     }
     for (int y = 0; y < 8; y++) {
-      memset(pic.pData[1] + y * pic.iStride[1], 0, 2048);
-      memset(pic.pData[2] + y * pic.iStride[2], 0, 2048);
+      memset(pic.pData[1] + y * pic.iStride[1], 0, 8184);
+      memset(pic.pData[2] + y * pic.iStride[2], 0, 8184);
     }
     rv = encoder_->EncodeFrame(&pic, &info);
     ASSERT_EQ(0, rv);
