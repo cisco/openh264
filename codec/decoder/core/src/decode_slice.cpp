@@ -1845,6 +1845,13 @@ int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
     //step 1: locating bit-stream pointer [must align into integer byte]
     pBs->pCurBuf -= iIndex;
 
+    //bounds check: I_PCM copies 384 bytes (256 luma + 128 chroma) directly from
+    //the bitstream buffer; reject when fewer than 384 bytes remain to avoid an
+    //out-of-bounds read (mirrors ParseIPCMInfoCabac).
+    if (pBs->pEndBuf - pBs->pCurBuf < 384) {
+      return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_BS_INCOMPLETE);
+    }
+
     //step 2: copy pixel from bit-stream into fdec [reconstruction]
     pTmpBsBuf = pBs->pCurBuf;
     if (!pCtx->pParam->bParseOnly) {
@@ -2185,6 +2192,13 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
 
       //step 1: locating bit-stream pointer [must align into integer byte]
       pBs->pCurBuf -= iIndex;
+
+      //bounds check: I_PCM copies 384 bytes (256 luma + 128 chroma) directly from
+      //the bitstream buffer; reject when fewer than 384 bytes remain to avoid an
+      //out-of-bounds read (mirrors ParseIPCMInfoCabac).
+      if (pBs->pEndBuf - pBs->pCurBuf < 384) {
+        return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_BS_INCOMPLETE);
+      }
 
       //step 2: copy pixel from bit-stream into fdec [reconstruction]
       pTmpBsBuf = pBs->pCurBuf;
@@ -2732,6 +2746,13 @@ int32_t WelsActualDecodeMbCavlcBSlice (PWelsDecoderContext pCtx) {
 
       //step 1: locating bit-stream pointer [must align into integer byte]
       pBs->pCurBuf -= iIndex;
+
+      //bounds check: I_PCM copies 384 bytes (256 luma + 128 chroma) directly from
+      //the bitstream buffer; reject when fewer than 384 bytes remain to avoid an
+      //out-of-bounds read (mirrors ParseIPCMInfoCabac).
+      if (pBs->pEndBuf - pBs->pCurBuf < 384) {
+        return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_BS_INCOMPLETE);
+      }
 
       //step 2: copy pixel from bit-stream into fdec [reconstruction]
       pTmpBsBuf = pBs->pCurBuf;

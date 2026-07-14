@@ -4,6 +4,7 @@
 #include "decoder_context.h"
 #include "decoder.h"
 #include "decoder_core.h"
+#include "error_concealment.h"
 #include "welsCodecTrace.h"
 #include "../../common/src/welsCodecTrace.cpp"
 
@@ -146,6 +147,9 @@ class DecoderParseSyntaxTest : public ::testing::Test {
   //specific bitstream test
   void TestSpecificBs();
   void TestSpecificBsError();
+  //I_PCM CAVLC bounds handling
+  void TestIPcmCavlcRegression();
+  void TestIPcmCavlcTruncated();
   //Do whole tests here
   void DecoderParseSyntaxTestAll();
 
@@ -434,12 +438,87 @@ void DecoderParseSyntaxTest::TestSpecificBsError() {
   Uninit();
 }
 
+// Regression: a valid CAVLC stream that uses I_PCM macroblocks must keep
+// decoding correctly after the I_PCM 384-byte bounds check was added.
+// CVPCMNL1_SVA_C.264 is a CAVLC I_PCM conformance stream (exercises the
+// patched WelsActualDecodeMbCavlcISlice path).
+void DecoderParseSyntaxTest::TestIPcmCavlcRegression() {
+  int32_t iRet = Init();
+  ASSERT_EQ (iRet, ERR_NONE);
+  ASSERT_TRUE (DecodeBs ("res/CVPCMNL1_SVA_C.264", CorrectDec));
+  Uninit();
+}
+
+// Security regression for SPARK-814292 (CWE-125): a CAVLC I_PCM macroblock
+// copies 384 bytes straight from the bitstream buffer. When the buffer is
+// truncated mid I_PCM, the decoder must fail closed instead of reading past
+// the allocation. Feeding a truncated all-I_PCM stream must not crash and
+// must surface a decoding error rather than dsErrorFree.
+void DecoderParseSyntaxTest::TestIPcmCavlcTruncated() {
+  int32_t iRet = Init();
+  ASSERT_EQ (iRet, ERR_NONE);
+
+  // Disable error concealment so a truncated I_PCM macroblock surfaces as a
+  // bitstream error instead of being silently concealed.
+  m_pCtx->pParam->eEcActiveIdc = ERROR_CON_DISABLE;
+  InitErrorCon (m_pCtx);
+
+  FILE* pH264File = fopen ("res/CVPCMNL1_SVA_C.264", "rb");
+  ASSERT_TRUE (pH264File != NULL);
+  fseek (pH264File, 0L, SEEK_END);
+  int32_t iFileSize = (int32_t) ftell (pH264File);
+  fseek (pH264File, 0L, SEEK_SET);
+  ASSERT_GT (iFileSize, 384);
+
+  // Drop the trailing 384 bytes so the final I_PCM macroblock is short of a
+  // full 384-byte PCM payload.
+  int32_t iTruncatedSize = iFileSize - 384;
+  uint8_t* pBuf = new uint8_t[iTruncatedSize + 4];
+  ASSERT_TRUE (pBuf != NULL);
+  size_t uiRead = fread (pBuf, 1, iTruncatedSize, pH264File);
+  fclose (pH264File);
+  ASSERT_EQ (uiRead, (size_t) iTruncatedSize);
+  uint8_t uiStartCode[4] = {0, 0, 0, 1};
+  memcpy (pBuf + iTruncatedSize, &uiStartCode[0], 4);
+
+  int32_t iBufPos = 0;
+  int32_t iAggregatedRet = 0;
+  while (iBufPos < iTruncatedSize) {
+    int32_t i = 0;
+    for (i = 0; i < iTruncatedSize - iBufPos; i++) {
+      if (pBuf[iBufPos + i] == 0 && pBuf[iBufPos + i + 1] == 0 && pBuf[iBufPos + i + 2] == 0
+          && pBuf[iBufPos + i + 3] == 1 && i > 0) {
+        break;
+      }
+    }
+    int32_t iSliceSize = i;
+    if (iSliceSize <= 0)
+      break;
+    // The key property is stability: no out-of-bounds read / crash while
+    // decoding the truncated I_PCM payload.
+    iAggregatedRet |= DecodeFrame (pBuf + iBufPos, iSliceSize, m_pData, &m_sBufferInfo, m_pCtx);
+    iBufPos += iSliceSize;
+  }
+  // Flush the decoder so any delayed/buffered picture is emitted with its status.
+  int32_t iEndOfStreamFlag = 1;
+  m_pDec->SetOption (DECODER_OPTION_END_OF_STREAM, (void*)&iEndOfStreamFlag);
+  iAggregatedRet |= DecodeFrame (NULL, 0, m_pData, &m_sBufferInfo, m_pCtx);
+
+  // Truncated I_PCM must not be reported as a clean decode.
+  EXPECT_NE (dsErrorFree, iAggregatedRet);
+
+  delete[] pBuf;
+  Uninit();
+}
+
 //TEST here for whole tests
 TEST_F (DecoderParseSyntaxTest, DecoderParseSyntaxTestAll) {
 
   TestScalingList();
   TestSpecificBs();
   TestSpecificBsError();
+  TestIPcmCavlcRegression();
+  TestIPcmCavlcTruncated();
 }
 
 
