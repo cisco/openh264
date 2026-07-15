@@ -1388,6 +1388,8 @@ int32_t ParsePps (PWelsDecoderContext pCtx, PPps pPpsList, PBitStringAux pBsAux,
     case 0:
       for (iTmp = 0; iTmp < pPps->uiNumSliceGroups; iTmp++) {
         WELS_READ_VERIFY (BsGetUe (pBsAux, &uiCode)); //run_length_minus1[ iGroup ]
+        WELS_CHECK_SE_UPPER_ERROR (uiCode, MAX_MB_SIZE - 1, "run_length_minus1",
+                                   GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_SLICEGROUP));
         pPps->uiRunLength[iTmp] = RUN_LENGTH_OFFSET + uiCode;
       }
       break;

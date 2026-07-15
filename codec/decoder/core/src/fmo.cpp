@@ -66,13 +66,18 @@ static inline int32_t FmoGenerateMbAllocMapType0 (PFmo pFmo, PPps pPps) {
   do {
     uint8_t uiGroup = 0;
     do {
-      const int32_t kiRunIdx = pPps->uiRunLength[uiGroup];
+      const uint32_t kuiRunIdx = pPps->uiRunLength[uiGroup];
+      // Reject zero or oversized run lengths before advancing i. A single run
+      // cannot legitimately exceed the total MB count; this also prevents any
+      // integer wrap of the map index with attacker-influenced values.
+      WELS_VERIFY_RETURN_IF (ERR_INFO_INVALID_PARAM,
+                 (0 == kuiRunIdx || kuiRunIdx > static_cast<uint32_t> (iMbNum)))
       int32_t j = 0;
       do {
         pFmo->pMbAllocMap[i + j] = uiGroup;
         ++ j;
-      } while (j < kiRunIdx && i + j < iMbNum);
-      i += kiRunIdx;
+      } while (j < static_cast<int32_t> (kuiRunIdx) && i + j < iMbNum);
+      i += static_cast<int32_t> (kuiRunIdx);
       ++ uiGroup;
     } while (uiGroup < uiNumSliceGroups && i < iMbNum);
   } while (i < iMbNum);
