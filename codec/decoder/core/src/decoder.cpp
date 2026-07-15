@@ -302,6 +302,7 @@ void ResetReorderingPictureBuffers (PPictReoderingStatus pPictReoderingStatus, P
     pPictReoderingStatus->iLargestBufferedPicIndex = 0;
     for (int32_t i = 0; i < pictInfoListCount; ++i) {
       pPictInfo[i].iPOC = IMinInt32;
+      pPictInfo[i].iPicBuffIdx = -1; //ensure a deterministic invalid sentinel so error-path decoding cannot leave heap garbage
     }
     pPictInfo->sBufferInfo.iBufferStatus = 0;
 		pPictReoderingStatus->bHasBSlice = false;
