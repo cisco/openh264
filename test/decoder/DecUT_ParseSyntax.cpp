@@ -442,4 +442,57 @@ TEST_F (DecoderParseSyntaxTest, DecoderParseSyntaxTestAll) {
   TestSpecificBsError();
 }
 
+TEST (DecoderReorderingBufferTest, PartialResetInitializesPicBuffIdx) {
+  SPictReoderingStatus sStatus;
+  SPictInfo sPictInfo[16];
+
+  memset (&sStatus, 0, sizeof (sStatus));
+  memset (&sPictInfo, 0, sizeof (sPictInfo));
+
+  for (int32_t i = 0; i < 16; ++i) {
+    sPictInfo[i].iPOC = i + 100;
+    sPictInfo[i].iPicBuffIdx = i + 200;
+  }
+  sPictInfo[0].sBufferInfo.iBufferStatus = 1;
+  sStatus.iLargestBufferedPicIndex = 3;
+
+  ResetReorderingPictureBuffers (&sStatus, sPictInfo, false);
+
+  for (int32_t i = 0; i <= 3; ++i) {
+    EXPECT_EQ (IMinInt32, sPictInfo[i].iPOC);
+    EXPECT_EQ (-1, sPictInfo[i].iPicBuffIdx);
+  }
+
+  // Partial reset should not touch entries beyond iLargestBufferedPicIndex.
+  EXPECT_EQ (104, sPictInfo[4].iPOC);
+  EXPECT_EQ (204, sPictInfo[4].iPicBuffIdx);
+  EXPECT_EQ (0, sPictInfo[0].sBufferInfo.iBufferStatus);
+  EXPECT_FALSE (sStatus.bHasBSlice);
+  EXPECT_EQ (0, sStatus.iNumOfPicts);
+  EXPECT_EQ (0, sStatus.iLargestBufferedPicIndex);
+}
+
+TEST (DecoderReorderingBufferTest, FullResetInitializesPicBuffIdx) {
+  SPictReoderingStatus sStatus;
+  SPictInfo sPictInfo[16];
+
+  memset (&sStatus, 0, sizeof (sStatus));
+  memset (&sPictInfo, 0, sizeof (sPictInfo));
+
+  for (int32_t i = 0; i < 16; ++i) {
+    sPictInfo[i].iPOC = i + 300;
+    sPictInfo[i].iPicBuffIdx = i + 400;
+  }
+  sStatus.iLargestBufferedPicIndex = 1;
+
+  ResetReorderingPictureBuffers (&sStatus, sPictInfo, true);
+
+  for (int32_t i = 0; i < 16; ++i) {
+    EXPECT_EQ (IMinInt32, sPictInfo[i].iPOC);
+    EXPECT_EQ (-1, sPictInfo[i].iPicBuffIdx);
+  }
+  EXPECT_FALSE (sStatus.bHasBSlice);
+  EXPECT_EQ (0, sStatus.iLargestBufferedPicIndex);
+}
+
 
