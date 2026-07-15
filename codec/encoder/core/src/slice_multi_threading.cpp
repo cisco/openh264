@@ -494,7 +494,7 @@ int32_t WriteSliceBs (sWelsEncCtx* pCtx, SWelsSliceBs* pSliceBs, const int32_t i
   int32_t iNalIdx               = 0;
   int32_t iNalSize              = 0;
   int32_t iReturn               = ENC_RETURN_SUCCESS;
-  int32_t iTotalLeftLength      = pSliceBs->uiSize - pSliceBs->uiBsPos;
+  int32_t iTotalLeftLength      = pSliceBs->uiBsSize - pSliceBs->uiBsPos;
   SNalUnitHeaderExt* pNalHdrExt = &pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt;
   uint8_t* pDst                 = pSliceBs->pBs;
 

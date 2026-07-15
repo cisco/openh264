@@ -914,11 +914,14 @@ int32_t InitSliceBsBuffer (SSlice* pSlice,
     pSlice->pSliceBsa      = &pSlice->sSliceBs.sBsWrite;
     pSlice->sSliceBs.pBs   = (uint8_t*)pMa->WelsMallocz (iMaxSliceBufferSize, "sSliceBs.pBs");
     if (NULL == pSlice->sSliceBs.pBs) {
+      pSlice->sSliceBs.uiBsSize = 0;
       return ENC_RETURN_MEMALLOCERR;
     }
+    pSlice->sSliceBs.uiBsSize = iMaxSliceBufferSize;
   } else {
     pSlice->pSliceBsa      = pBsWrite;
     pSlice->sSliceBs.pBs   = NULL;
+    pSlice->sSliceBs.uiBsSize = 0;
   }
   return ENC_RETURN_SUCCESS;
 }

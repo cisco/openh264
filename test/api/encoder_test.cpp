@@ -426,4 +426,3 @@ TEST_F(EncoderInitTest, DynamicAdjustSlicingExtremeAspectRatio) {
     ASSERT_EQ(0, rv);
   }
 }
-}

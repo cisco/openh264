@@ -1603,7 +1603,11 @@ int32_t RequestMemorySvc (sWelsEncCtx** ppCtx, SExistingParasetList* pExistingPa
       iMaxLayerBsSize = iSliceBufferSize * uiMaxSliceNumEstimation;
     } else {
       (*ppCtx)->iMaxSliceCount = WELS_MAX ((*ppCtx)->iMaxSliceCount, (int) pSliceArgument->uiSliceNum);
-      iSliceBufferSize = ((iLayerBsSize / pSliceArgument->uiSliceNum) << 1) + MAX_MACROBLOCK_SIZE_IN_BYTE_x2;
+      if (pParam->bUseLoadBalancing) {
+        iSliceBufferSize = iLayerBsSize + MAX_MACROBLOCK_SIZE_IN_BYTE_x2;
+      } else {
+        iSliceBufferSize = ((iLayerBsSize / pSliceArgument->uiSliceNum) << 1) + MAX_MACROBLOCK_SIZE_IN_BYTE_x2;
+      }
       iMaxLayerBsSize = iSliceBufferSize * pSliceArgument->uiSliceNum;
     }
     iMaxLayerBsSize = WELS_MAX (iMaxLayerBsSize, iLayerBsSize);
