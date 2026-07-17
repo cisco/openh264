@@ -217,18 +217,18 @@ void CWelsPreProcess::FreeSpatialPictures (sWelsEncCtx* pCtx) {
   }
 }
 
-int32_t CWelsPreProcess::BuildSpatialPicList (sWelsEncCtx* pCtx, const SSourcePicture* kpSrcPic) {
+int32_t CWelsPreProcess::BuildSpatialPicList (sWelsEncCtx* pCtx, const SSourcePicture* kpSrcPic, int32_t* pSpatialNum) {
   SWelsSvcCodingParam* pSvcParam = pCtx->pSvcParam;
-  int32_t iSpatialNum = 0;
   int32_t iWidth = ((kpSrcPic->iPicWidth >> 1) << 1);
   int32_t iHeight = ((kpSrcPic->iPicHeight >> 1) << 1);
+  *pSpatialNum = 0;
 
   if (!m_bInitDone) {
     if (WelsPreprocessCreate() != 0)
-      return -1;
+      return ENC_RETURN_MEMALLOCERR;
 
     if (WelsPreprocessReset (pCtx, iWidth, iHeight) != 0)
-      return -1;
+      return ENC_RETURN_MEMALLOCERR;
 
     m_iAvaliableRefInSpatialPicList = pSvcParam->iNumRefFrame;
 
@@ -236,18 +236,21 @@ int32_t CWelsPreProcess::BuildSpatialPicList (sWelsEncCtx* pCtx, const SSourcePi
   } else {
     if ((iWidth != pSvcParam->SUsedPicRect.iWidth) || (iHeight != pSvcParam->SUsedPicRect.iHeight)) {
       if (WelsPreprocessReset (pCtx, iWidth, iHeight) != 0)
-        return -1;
+        return ENC_RETURN_MEMALLOCERR;
     }
   }
 
   if (m_pInterfaceVp == NULL)
-    return -1;
+    return ENC_RETURN_MEMALLOCERR;
 
   pCtx->pVaa->bSceneChangeFlag = pCtx->pVaa->bIdrPeriodFlag = false;
 
-  iSpatialNum = SingleLayerPreprocess (pCtx, kpSrcPic, &m_sScaledPicture);
+  int32_t iRet = SingleLayerPreprocess (pCtx, kpSrcPic, &m_sScaledPicture, pSpatialNum);
+  if (iRet != ENC_RETURN_SUCCESS) {
+    return iRet;
+  }
 
-  return iSpatialNum;
+  return ENC_RETURN_SUCCESS;
 }
 
 SPicture* CWelsPreProcess::GetBestRefPic (EUsageType iUsageType, bool bSceneLtr, EWelsSliceType eSliceType,
@@ -346,7 +349,7 @@ int32_t CWelsPreProcess::UpdateSpatialPictures (sWelsEncCtx* pCtx, SWelsSvcCodin
  *  @return: exact number of spatial layers need to encoder indeed
  */
 int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSourcePicture* kpSrc,
-    Scaled_Picture* pScaledPicture) {
+    Scaled_Picture* pScaledPicture, int32_t* pSpatialNum) {
   SWelsSvcCodingParam* pSvcParam    = pCtx->pSvcParam;
   int8_t  iDependencyId             = pSvcParam->iSpatialLayerNum - 1;
 
@@ -379,10 +382,13 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
     }
   }
 
+  *pSpatialNum = 0;
   pSrcPic = pScaledPicture->pScaledInputPicture ? pScaledPicture->pScaledInputPicture : GetCurrentOrigFrame (
               iDependencyId);
-
-  WelsMoveMemoryWrapper (pSvcParam, pSrcPic, kpSrc, iSrcWidth, iSrcHeight);
+  int32_t iRet = WelsMoveMemoryWrapper (pSvcParam, pSrcPic, kpSrc, iSrcWidth, iSrcHeight);
+  if (iRet != ENC_RETURN_SUCCESS) {
+    return iRet;
+  }
 
   if (pSvcParam->bEnableDenoise)
     BilateralDenoising (pSrcPic, iSrcWidth, iSrcHeight);
@@ -473,8 +479,8 @@ int32_t CWelsPreProcess::SingleLayerPreprocess (sWelsEncCtx* pCtx, const SSource
 
     }
   }
-  return iSpatialNum;
-
+  *pSpatialNum = iSpatialNum;
+  return ENC_RETURN_SUCCESS;
 }
 
 
@@ -1400,11 +1406,11 @@ void WelsMoveMemory_c(uint8_t* pDstY, uint8_t* pDstU, uint8_t* pDstV,
   }
 }
 
-void  CWelsPreProcess::WelsMoveMemoryWrapper (SWelsSvcCodingParam* pSvcParam, SPicture* pDstPic,
+int32_t  CWelsPreProcess::WelsMoveMemoryWrapper (SWelsSvcCodingParam* pSvcParam, SPicture* pDstPic,
     const SSourcePicture* kpSrc,
     const int32_t kiTargetWidth, const int32_t kiTargetHeight) {
   if (VIDEO_FORMAT_I420 != (kpSrc->iColorFormat & (~VIDEO_FORMAT_VFlip)))
-    return;
+    return ENC_RETURN_INVALIDINPUT;
 
   int32_t  iSrcWidth       = kpSrc->iPicWidth;
   int32_t  iSrcHeight      = kpSrc->iPicHeight;
@@ -1441,19 +1447,21 @@ void  CWelsPreProcess::WelsMoveMemoryWrapper (SWelsSvcCodingParam* pSvcParam, SP
 
   if (pSrcY) {
     if (iSrcWidth <= 0 || iSrcHeight <= 0 || (iSrcWidth * iSrcHeight > (MAX_MBS_PER_FRAME << 8)))
-      return;
-    if (kiSrcTopOffsetY >= iSrcHeight || kiSrcLeftOffsetY >= iSrcWidth || iSrcWidth > kiSrcStrideY)
-      return;
+      return ENC_RETURN_INVALIDINPUT;
+    if (kiSrcTopOffsetY >= iSrcHeight || kiSrcLeftOffsetY >= iSrcWidth || iSrcWidth > kiSrcStrideY
+        || (iSrcWidth >> 1) > kiSrcStrideU || (iSrcWidth >> 1) > kiSrcStrideV)
+      return ENC_RETURN_INVALIDINPUT;
   }
   if (pDstY) {
     if (kiTargetWidth <= 0 || kiTargetHeight <= 0 || (kiTargetWidth * kiTargetHeight > (MAX_MBS_PER_FRAME << 8)))
-      return;
-    if (kiTargetWidth > kiDstStrideY)
-      return;
+      return ENC_RETURN_INVALIDINPUT;
+    if (kiTargetWidth > kiDstStrideY || (kiTargetWidth >> 1) > kiDstStrideU || (kiTargetWidth >> 1) > kiDstStrideV)
+      return ENC_RETURN_INVALIDINPUT;
   }
 
   if (pSrcY == NULL || pSrcU == NULL || pSrcV == NULL || pDstY == NULL || pDstU == NULL || pDstV == NULL
       || (iSrcWidth & 1) || (iSrcHeight & 1)) {
+    return ENC_RETURN_INVALIDINPUT;
   } else {
     //i420_to_i420_c
     WelsMoveMemory_c(pDstY, pDstU, pDstV, kiDstStrideY, kiDstStrideU,
@@ -1467,6 +1475,7 @@ void  CWelsPreProcess::WelsMoveMemoryWrapper (SWelsSvcCodingParam* pSvcParam, SP
     }
   }
 
+  return ENC_RETURN_SUCCESS;
 }
 
 bool CWelsPreProcess::GetSceneChangeFlag (ESceneChangeIdc eSceneChangeIdc) {

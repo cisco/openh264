@@ -127,7 +127,7 @@ class CWelsPreProcess {
   int32_t WelsPreprocessReset (sWelsEncCtx* pEncCtx, int32_t iWidth, int32_t iHeight);
   int32_t AllocSpatialPictures (sWelsEncCtx* pCtx, SWelsSvcCodingParam* pParam);
   void    FreeSpatialPictures (sWelsEncCtx* pCtx);
-  int32_t BuildSpatialPicList (sWelsEncCtx* pEncCtx, const SSourcePicture* kpSrcPic);
+  int32_t BuildSpatialPicList (sWelsEncCtx* pEncCtx, const SSourcePicture* kpSrcPic, int32_t* pSpatialNum);
   int32_t AnalyzeSpatialPic (sWelsEncCtx* pEncCtx, const int32_t kiDIdx);
   int32_t UpdateSpatialPictures (sWelsEncCtx* pEncCtx, SWelsSvcCodingParam* pParam, const int8_t iCurTid,
                                  const int32_t d_idx);
@@ -157,7 +157,7 @@ class CWelsPreProcess {
   int32_t InitLastSpatialPictures (sWelsEncCtx* pEncCtx);
 
  private:
-  int32_t SingleLayerPreprocess (sWelsEncCtx* pEncCtx, const SSourcePicture* kpSrc, Scaled_Picture* m_sScaledPicture);
+  int32_t SingleLayerPreprocess (sWelsEncCtx* pEncCtx, const SSourcePicture* kpSrc, Scaled_Picture* m_sScaledPicture, int32_t* pSpatialNum);
 
   void  BilateralDenoising (SPicture* pSrc, const int32_t iWidth, const int32_t iHeight);
 
@@ -175,7 +175,7 @@ class CWelsPreProcess {
 
   int32_t ColorspaceConvert (SWelsSvcCodingParam* pSvcParam, SPicture* pDstPic, const SSourcePicture* kpSrc,
                              const int32_t kiWidth, const int32_t kiHeight);
-  void WelsMoveMemoryWrapper (SWelsSvcCodingParam* pSvcParam, SPicture* pDstPic, const SSourcePicture* kpSrc,
+  int32_t WelsMoveMemoryWrapper (SWelsSvcCodingParam* pSvcParam, SPicture* pDstPic, const SSourcePicture* kpSrc,
                               const int32_t kiWidth, const int32_t kiHeight);
 
   /*!
