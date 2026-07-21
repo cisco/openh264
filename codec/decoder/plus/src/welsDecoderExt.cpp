@@ -1126,10 +1126,13 @@ void CWelsDecoder::ReleaseBufferedReadyPictureNoReorder(PWelsDecoderContext pCtx
     m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPOC = IMinInt32;
     if (pCtx || m_pPicBuff) {
       PPicBuff pPicBuff = pCtx ? pCtx->pPicBuff : m_pPicBuff;
-      PPicture pPic = pPicBuff->ppPic[m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPicBuffIdx];
-      --pPic->iRefCount;
-      if (pPic->iRefCount <= 0 && pPic->pSetUnRef)
-        pPic->pSetUnRef(pPic);
+      int32_t iPicBuffIdx = m_sPictInfoList[m_sReoderingStatus.iPictInfoIndex].iPicBuffIdx;
+      if (pPicBuff != NULL && iPicBuffIdx >= 0 && iPicBuffIdx < pPicBuff->iCapacity) {
+        PPicture pPic = pPicBuff->ppPic[iPicBuffIdx];
+        --pPic->iRefCount;
+        if (pPic->iRefCount <= 0 && pPic->pSetUnRef)
+          pPic->pSetUnRef(pPic);
+      }
     }
     --m_sReoderingStatus.iNumOfPicts;
   }
