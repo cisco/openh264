@@ -1,14 +1,17 @@
+#include "WelsThreadPoolTest.h"
+
 #include <gtest/gtest.h>
 #include <string.h>
-#include <string>
+
 #include <list>
 #include <map>
+#include <string>
 
-#include "typedefs.h"
+#include "WelsTask.h"
 #include "WelsThreadLib.h"
 #include "WelsThreadPool.h"
-#include "WelsTask.h"
-#include "WelsThreadPoolTest.h"
+#include "WelsThreadPoolTestUtil.h"
+#include "typedefs.h"
 
 #define  TEST_TASK_NUM  30
 
@@ -104,3 +107,37 @@ TEST (CThreadPoolTest, CThreadPoolTestMulti) {
   EXPECT_FALSE (CWelsThreadPool::IsReferenced());
 }
 
+class CThreadPoolTestFixture : public ::testing::Test {
+ protected:
+  virtual void SetUp() { WelsThreadPoolTestUtil::SetupSignalHandler(); }
+
+  virtual void TearDown() {
+    WelsThreadPoolTestUtil::RemoveThreadLimit();
+    WelsThreadPoolTestUtil::RestoreSignalHandler();
+  }
+};
+
+TEST_F(CThreadPoolTestFixture, PartialInitLeakUAF) {
+  WelsThreadPoolTestUtil::SThreadLimitResult sLimit =
+      WelsThreadPoolTestUtil::FindSingleThreadLimit();
+  if (!sLimit.bSupported) {
+    printf("Thread limit manipulation is not supported, skipping test.\n");
+    return;
+  }
+
+  WelsThreadPoolTestUtil::CThreadLimitGuard cLimitGuard;
+
+  ASSERT_TRUE(WelsThreadPoolTestUtil::SetThreadLimit(sLimit.uiLimit));
+
+  // Request 2 threads: the first worker thread (i = 0) succeeds, while
+  // attempting to create the second (i = 1) fails due to our 1-thread limit,
+  // triggering a controlled partial initialization failure.
+  CWelsThreadPool::SetThreadNum(2);
+  CWelsThreadPool* pPool = CWelsThreadPool::AddReference();
+  EXPECT_EQ(NULL, pPool);
+
+  // Restore old rlimit immediately so we can create threads/signals normally.
+  WelsThreadPoolTestUtil::RemoveThreadLimit();
+
+  WelsThreadPoolTestUtil::SendSignalToOtherThreads();
+}

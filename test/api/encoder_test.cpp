@@ -4,6 +4,41 @@
 #include "utils/BufferedData.h"
 #include <string>
 #include <cstdlib>
+#include <cmath>
+
+static void GeneratePattern(uint8_t* yBuf, int yStride, uint8_t* uBuf, int uStride, uint8_t* vBuf, int vStride, int width, int height) {
+  for (int y = 0; y < height; ++y) {
+    for (int x = 0; x < width; ++x) {
+      if (x < yStride) {
+        yBuf[y * yStride + x] = (x * 4 + y * 4) % 256;
+      }
+    }
+  }
+  for (int y = 0; y < (height >> 1); ++y) {
+    for (int x = 0; x < (width >> 1); ++x) {
+      if (x < uStride) {
+        uBuf[y * uStride + x] = (x * 8) % 256;
+      }
+      if (x < vStride) {
+        vBuf[y * vStride + x] = (y * 8) % 256;
+      }
+    }
+  }
+}
+
+static double CalculatePlanePsnr(const uint8_t* ref, int refStride, const uint8_t* test, int testStride, int width, int height) {
+  double mse = 0;
+  int compareWidth = std::min(width, std::min(refStride, testStride));
+  for (int y = 0; y < height; ++y) {
+    for (int x = 0; x < compareWidth; ++x) {
+      double diff = ref[y * refStride + x] - test[y * testStride + x];
+      mse += diff * diff;
+    }
+  }
+  mse /= (compareWidth * height);
+  if (mse == 0) return 99.0;
+  return 10.0 * log10((255.0 * 255.0) / mse);
+}
 
 static void UpdateHashFromFrame (const SFrameBSInfo& info, SHA1Context* ctx) {
   for (int i = 0; i < info.iLayerNum; ++i) {
@@ -350,4 +385,252 @@ TEST_F(EncoderInitTest, ScreenContentScrollMotionVectorBounds) {
   pic.pData[2] = pic.pData[1] + (width * height >> 2);
   rv = encoder_->EncodeFrame(&pic, &info);
   ASSERT_EQ(0, rv);
+}
+
+// This test verifies dynamic slice adjustment when encoding frames with extreme
+// aspect ratios (very wide resolution) in RC_OFF_MODE using multiple
+// slices/threads. It ensures that macroblocks are correctly distributed across
+// slices without producing negative slice limits or invalid memory access when
+// slice encoding speeds vary.
+TEST_F(EncoderInitTest, DynamicAdjustSlicingExtremeAspectRatio) {
+  SEncParamExt param;
+  encoder_->GetDefaultParams(&param);
+
+  param.iUsageType = CAMERA_VIDEO_REAL_TIME;
+  // Extreme wide aspect ratio: frame height is only 2 macroblock rows (32
+  // pixels), which tests slicing behavior when row-based heuristics exceed
+  // frame dimensions.
+  param.iPicWidth = 32752;
+  param.iPicHeight = 32;
+  param.fMaxFrameRate = 30.0f;
+  param.iSpatialLayerNum = 1;
+  param.iMultipleThreadIdc = 4;
+  param.iRCMode = RC_OFF_MODE;
+  // Enable load balancing and high complexity mode to trigger dynamic slice
+  // adjustments.
+  param.bUseLoadBalancing = true;
+  param.iComplexityMode = HIGH_COMPLEXITY;
+  param.iMinQp = 0;
+  param.iMaxQp = 51;
+
+  param.sSpatialLayers[0].iVideoWidth = param.iPicWidth;
+  param.sSpatialLayers[0].iVideoHeight = param.iPicHeight;
+  param.sSpatialLayers[0].fFrameRate = param.fMaxFrameRate;
+  param.sSpatialLayers[0].sSliceArgument.uiSliceMode = SM_FIXEDSLCNUM_SLICE;
+  param.sSpatialLayers[0].sSliceArgument.uiSliceNum = 4;
+  param.sSpatialLayers[0].iDLayerQp = 24;
+
+  int rv = encoder_->InitializeExt(&param);
+  ASSERT_EQ(0, rv);
+
+  int frameSize = param.iPicWidth * param.iPicHeight * 3 / 2;
+  BufferedData buf;
+  buf.SetLength(frameSize);
+  ASSERT_EQ(buf.Length(), (size_t)frameSize);
+
+  SFrameBSInfo info;
+  memset(&info, 0, sizeof(SFrameBSInfo));
+
+  SSourcePicture pic;
+  memset(&pic, 0, sizeof(SSourcePicture));
+  pic.iPicWidth = param.iPicWidth;
+  pic.iPicHeight = param.iPicHeight;
+  pic.iColorFormat = videoFormatI420;
+  pic.iStride[0] = pic.iPicWidth;
+  pic.iStride[1] = pic.iStride[2] = pic.iPicWidth >> 1;
+  pic.pData[0] = buf.data();
+  pic.pData[1] = pic.pData[0] + param.iPicWidth * param.iPicHeight;
+  pic.pData[2] = pic.pData[1] + (param.iPicWidth * param.iPicHeight >> 2);
+
+  for (int i = 0; i < 10; i++) {
+    // Generate varying random noise in Slices 1..3 while keeping Slice 0
+    // completely flat (zeros). This creates a significant encoding speed
+    // differential, causing the encoder to assign a larger proportion of
+    // macroblocks to Slice 0 during dynamic load balancing.
+    for (int idx = 0; idx < frameSize; idx++) {
+      buf.data()[idx] = rand() % 256;
+    }
+    for (int y = 0; y < 16; y++) {
+      memset(pic.pData[0] + y * pic.iStride[0], 0, 16368);
+    }
+    for (int y = 0; y < 8; y++) {
+      memset(pic.pData[1] + y * pic.iStride[1], 0, 8184);
+      memset(pic.pData[2] + y * pic.iStride[2], 0, 8184);
+    }
+    rv = encoder_->EncodeFrame(&pic, &info);
+    ASSERT_EQ(0, rv);
+  }
+}
+
+// This test verifies that the encoder correctly handles frames with distinct,
+// asymmetric strides for the U and V chroma planes (e.g., when U stride is much
+// larger than V stride, or vice versa). It ensures that memory copy routines
+// advance each chroma plane pointer by its own stride without invalid memory
+// access.
+TEST_F(EncoderInitTest, CustomChromaPlaneStrides) {
+  SEncParamExt param;
+  encoder_->GetDefaultParams(&param);
+
+  param.iUsageType = CAMERA_VIDEO_REAL_TIME;
+  param.iPicWidth = 64;
+  param.iPicHeight = 64;
+  param.fMaxFrameRate = 30.0f;
+  param.iSpatialLayerNum = 1;
+  param.iRCMode = RC_OFF_MODE;
+
+  param.sSpatialLayers[0].iVideoWidth = param.iPicWidth;
+  param.sSpatialLayers[0].iVideoHeight = param.iPicHeight;
+  param.sSpatialLayers[0].fFrameRate = param.fMaxFrameRate;
+  param.sSpatialLayers[0].sSliceArgument.uiSliceMode = SM_SINGLE_SLICE;
+  param.sSpatialLayers[0].iDLayerQp = 0;
+
+  int rv = encoder_->InitializeExt(&param);
+  ASSERT_EQ(0, rv);
+
+  // Initialize a decoder to verify correctness of the output
+  ISVCDecoder* decoder = nullptr;
+  rv = WelsCreateDecoder(&decoder);
+  ASSERT_EQ(0, rv);
+  ASSERT_TRUE(decoder != nullptr);
+
+  SDecodingParam decParam;
+  memset(&decParam, 0, sizeof(SDecodingParam));
+  decParam.uiTargetDqLayer = UCHAR_MAX;
+  decParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
+  decParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
+
+  rv = decoder->Initialize(&decParam);
+  ASSERT_EQ(0, rv);
+
+  SFrameBSInfo info;
+  memset(&info, 0, sizeof(SFrameBSInfo));
+
+  // Configure distinct strides: U stride is much larger than V stride.
+  int strideY = 64;
+  int strideU = 4096;
+  int strideV = 32;
+
+  // Generate a distinct pattern
+  std::vector<uint8_t> bufY(strideY * param.iPicHeight);
+  std::vector<uint8_t> bufU(strideU * (param.iPicHeight >> 1));
+  std::vector<uint8_t> bufV(strideV * (param.iPicHeight >> 1));
+  GeneratePattern(bufY.data(), strideY, bufU.data(), strideU, bufV.data(), strideV, param.iPicWidth, param.iPicHeight);
+
+  SSourcePicture pic;
+  memset(&pic, 0, sizeof(SSourcePicture));
+  pic.iPicWidth = param.iPicWidth;
+  pic.iPicHeight = param.iPicHeight;
+  pic.iColorFormat = videoFormatI420;
+  pic.iStride[0] = strideY;
+  pic.iStride[1] = strideU;
+  pic.iStride[2] = strideV;
+  pic.pData[0] = bufY.data();
+  pic.pData[1] = bufU.data();
+  pic.pData[2] = bufV.data();
+
+  rv = encoder_->EncodeFrame(&pic, &info);
+  ASSERT_EQ(0, rv);
+
+  // Calculate total bitstream size
+  int len = 0;
+  for (int i = 0; i < info.iLayerNum; ++i) {
+    const SLayerBSInfo& layerInfo = info.sLayerInfo[i];
+    for (int j = 0; j < layerInfo.iNalCount; ++j) {
+      len += layerInfo.pNalLengthInByte[j];
+    }
+  }
+  ASSERT_GT(len, 0);
+
+  // Decode the encoded frame
+  unsigned char* pData[3] = {nullptr};
+  SBufferInfo dstBufInfo;
+  memset(&dstBufInfo, 0, sizeof(SBufferInfo));
+
+  rv = decoder->DecodeFrame2(info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo);
+  ASSERT_EQ(0, rv);
+
+  if (dstBufInfo.iBufferStatus == 0) {
+    rv = decoder->DecodeFrame2(nullptr, 0, pData, &dstBufInfo);
+    ASSERT_EQ(0, rv);
+  }
+
+  ASSERT_EQ(1, dstBufInfo.iBufferStatus);
+
+  // Verify that the decoded YUV content matches our original pattern (high PSNR)
+  int decodedWidthU = dstBufInfo.UsrData.sSystemBuffer.iWidth >> 1;
+  int decodedHeightU = dstBufInfo.UsrData.sSystemBuffer.iHeight >> 1;
+  int strideDecY = dstBufInfo.UsrData.sSystemBuffer.iStride[0];
+  int strideDecChroma = dstBufInfo.UsrData.sSystemBuffer.iStride[1];
+
+  uint8_t* decY = pData[0];
+  uint8_t* decU = pData[1];
+  uint8_t* decV = pData[2];
+
+  ASSERT_TRUE(decY != nullptr);
+  ASSERT_TRUE(decU != nullptr);
+  ASSERT_TRUE(decV != nullptr);
+
+  double psnrY = CalculatePlanePsnr(bufY.data(), strideY, decY, strideDecY, param.iPicWidth, param.iPicHeight);
+  double psnrU = CalculatePlanePsnr(bufU.data(), strideU, decU, strideDecChroma, decodedWidthU, decodedHeightU);
+  double psnrV = CalculatePlanePsnr(bufV.data(), strideV, decV, strideDecChroma, decodedWidthU, decodedHeightU);
+
+  // With lossless QP=0, PSNR should be extremely high (effectively identical)
+  EXPECT_GT(psnrY, 40.0);
+  EXPECT_GT(psnrU, 40.0);
+  EXPECT_GT(psnrV, 40.0);
+
+  WelsDestroyDecoder(decoder);
+}
+
+// This test verifies that the encoder safely returns early and avoids invalid
+// memory access (no crash / ASan error) when the input source picture has U or
+// V strides that are smaller than the required width/2.
+TEST_F(EncoderInitTest, CustomChromaPlaneStridesInvalidSrc) {
+  SEncParamExt param;
+  encoder_->GetDefaultParams(&param);
+
+  param.iUsageType = CAMERA_VIDEO_REAL_TIME;
+  param.iPicWidth = 64;
+  param.iPicHeight = 64;
+  param.fMaxFrameRate = 30.0f;
+  param.iSpatialLayerNum = 1;
+  param.iRCMode = RC_OFF_MODE;
+
+  param.sSpatialLayers[0].iVideoWidth = param.iPicWidth;
+  param.sSpatialLayers[0].iVideoHeight = param.iPicHeight;
+  param.sSpatialLayers[0].fFrameRate = param.fMaxFrameRate;
+  param.sSpatialLayers[0].sSliceArgument.uiSliceMode = SM_SINGLE_SLICE;
+  param.sSpatialLayers[0].iDLayerQp = 0;
+
+  int rv = encoder_->InitializeExt(&param);
+  ASSERT_EQ(0, rv);
+
+  SFrameBSInfo info;
+  memset(&info, 0, sizeof(SFrameBSInfo));
+
+  // Configure invalid strides: U stride is 16, which is smaller than width/2 (32).
+  int strideY = 64;
+  int strideU = 16; // Invalid: must be >= 32
+  int strideV = 32;
+
+  // Generate pattern (alternative pattern is not strictly needed but we'll use a simple fill)
+  std::vector<uint8_t> bufY(strideY * param.iPicHeight, 128);
+  std::vector<uint8_t> bufU(strideU * (param.iPicHeight >> 1), 100);
+  std::vector<uint8_t> bufV(strideV * (param.iPicHeight >> 1), 200);
+
+  SSourcePicture pic;
+  memset(&pic, 0, sizeof(SSourcePicture));
+  pic.iPicWidth = param.iPicWidth;
+  pic.iPicHeight = param.iPicHeight;
+  pic.iColorFormat = videoFormatI420;
+  pic.iStride[0] = strideY;
+  pic.iStride[1] = strideU;
+  pic.iStride[2] = strideV;
+  pic.pData[0] = bufY.data();
+  pic.pData[1] = bufU.data();
+  pic.pData[2] = bufV.data();
+
+  // This should reject the frame and return cmUnsupportedData
+  rv = encoder_->EncodeFrame(&pic, &info);
+  ASSERT_EQ(cmUnsupportedData, rv);
 }

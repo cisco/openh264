@@ -85,6 +85,7 @@ int32_t         iLayerBsIndex;          // layer index of  bit stream for SFrame
 
 typedef struct TagWelsSliceBs {
 uint8_t*        pBs;                    // output bitstream, pBitStringAux not needed for slice 0 due to no dependency of pFrameBs available
+uint32_t        uiBsSize;               // size of pBs buffer
 uint32_t        uiBsPos;                // position of output bitstream
 uint8_t*        pBsBuffer;              // overall bitstream pBuffer allocation for a coded slice, recycling use intend.
 uint32_t        uiSize;                 // size of allocation pBuffer above
