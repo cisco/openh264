@@ -175,6 +175,13 @@ static inline int32_t FmoGenerateSliceGroup (PFmo pFmo, const PPps kpPps, const 
   if (0 == iErr) {      // well now
     pFmo->iSliceGroupCount = kpPps->uiNumSliceGroups;
     pFmo->iSliceGroupType  = kpPps->uiSliceGroupMapType;
+  } else {
+    // Map generation failed (e.g. a rejected/oversized run length). The map was
+    // allocated above but this FMO is not marked active, so UninitFmoList would
+    // never free it. Release it here to avoid a leak on the rejection path.
+    pMa->WelsFree (pFmo->pMbAllocMap, "_fmo->pMbAllocMap");
+    pFmo->pMbAllocMap = NULL;
+    pFmo->iCountMbNum = 0;
   }
 
   return iErr;

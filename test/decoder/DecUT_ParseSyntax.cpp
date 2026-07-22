@@ -458,6 +458,11 @@ TEST (DecoderFmoSecurityTest, RejectsOversizedRunLengthBeforeIndexWrap) {
   const int32_t iRet = InitFmo (&sFmo, &sPps, 120, 68, &cMa);
   EXPECT_NE (ERR_NONE, iRet);
 
+  // The rejection path must also free the allocation map it allocated, otherwise
+  // the FMO is left allocated-but-inactive and leaks (CMemoryAlign asserts on
+  // teardown). A non-NULL map here means the leak regressed.
+  EXPECT_TRUE (NULL == sFmo.pMbAllocMap);
+
   if (NULL != sFmo.pMbAllocMap) {
     cMa.WelsFree (sFmo.pMbAllocMap, "_fmo->pMbAllocMap");
     sFmo.pMbAllocMap = NULL;
