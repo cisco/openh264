@@ -482,8 +482,14 @@ bool MdInterSCDPskipProcess (sWelsEncCtx* pEncCtx, SWelsMD* pWelsMd, SSlice* pSl
     PredSkipMv (pMbCache, &sVaaPredSkipMv);
 
     if (eSkipMode == SCROLLED) {
-      sCurMbMv[1].iMvX = static_cast<int16_t> (pVaaExt->sScrollDetectInfo.iScrollMvX << 2);
-      sCurMbMv[1].iMvY = static_cast<int16_t> (pVaaExt->sScrollDetectInfo.iScrollMvY << 2);
+      sCurMbMv[1].iMvX =
+          static_cast<int16_t>(WELS_CLIP3(pVaaExt->sScrollDetectInfo.iScrollMvX,
+                                          -pEncCtx->iMvRange, pEncCtx->iMvRange)
+                               << 2);
+      sCurMbMv[1].iMvY =
+          static_cast<int16_t>(WELS_CLIP3(pVaaExt->sScrollDetectInfo.iScrollMvY,
+                                          -pEncCtx->iMvRange, pEncCtx->iMvRange)
+                               << 2);
     }
 
     bool bMbSkipFlag = (LD32 (&sVaaPredSkipMv) ==  LD32 (&sCurMbMv[eSkipMode])) ;

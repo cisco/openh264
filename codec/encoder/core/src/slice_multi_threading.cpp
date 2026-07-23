@@ -197,6 +197,24 @@ void DynamicAdjustSlicing (sWelsEncCtx* pCtx,
       return;
     }
     iMinimalMbNum = iNumMbInEachGom;
+  } else {
+    // If the number of requested slices equals or exceeds the total macroblocks
+    // in the frame, each slice cannot be assigned even 1 macroblock. In this
+    // case, do not adjust slice sizes.
+    if (kiCountSliceNum >= kiCountNumMb) {
+      WelsLog(&(pCtx->sLogCtx), WELS_LOG_WARNING,
+              "[MT] DynamicAdjustSlicing(), requested slice number (%d) equals "
+              "or exceeds total macroblocks (%d), do not adjust",
+              kiCountSliceNum, kiCountNumMb);
+      return;
+    } else if (iMinimalMbNum * kiCountSliceNum >= kiCountNumMb) {
+      // When rate control is off, iMinimalMbNum defaults to 1 macroblock row
+      // (iMbWidth). For extreme aspect ratios (such as very wide resolutions),
+      // requiring 1 row per slice may exceed total frame capacity. Fall back to
+      // 1 macroblock per slice to ensure valid upper bounds and allow proper
+      // load balancing across slices.
+      iMinimalMbNum = 1;
+    }
   }
 
   if (kiCountSliceNum < 2 || (kiCountSliceNum & 0x01)) // we need suppose uiSliceNum is even for multiple threading
@@ -476,7 +494,7 @@ int32_t WriteSliceBs (sWelsEncCtx* pCtx, SWelsSliceBs* pSliceBs, const int32_t i
   int32_t iNalIdx               = 0;
   int32_t iNalSize              = 0;
   int32_t iReturn               = ENC_RETURN_SUCCESS;
-  int32_t iTotalLeftLength      = pSliceBs->uiSize - pSliceBs->uiBsPos;
+  int32_t iTotalLeftLength      = pSliceBs->uiBsSize - pSliceBs->uiBsPos;
   SNalUnitHeaderExt* pNalHdrExt = &pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt;
   uint8_t* pDst                 = pSliceBs->pBs;
 
