@@ -66,13 +66,18 @@ static inline int32_t FmoGenerateMbAllocMapType0 (PFmo pFmo, PPps pPps) {
   do {
     uint8_t uiGroup = 0;
     do {
-      const int32_t kiRunIdx = pPps->uiRunLength[uiGroup];
+      const uint32_t kuiRunIdx = pPps->uiRunLength[uiGroup];
+      // Reject zero or oversized run lengths before advancing i. A single run
+      // cannot legitimately exceed the total MB count; this also prevents any
+      // integer wrap of the map index with attacker-influenced values.
+      WELS_VERIFY_RETURN_IF (ERR_INFO_INVALID_PARAM,
+                 (0 == kuiRunIdx || kuiRunIdx > static_cast<uint32_t> (iMbNum)))
       int32_t j = 0;
       do {
         pFmo->pMbAllocMap[i + j] = uiGroup;
         ++ j;
-      } while (j < kiRunIdx && i + j < iMbNum);
-      i += kiRunIdx;
+      } while (j < static_cast<int32_t> (kuiRunIdx) && i + j < iMbNum);
+      i += static_cast<int32_t> (kuiRunIdx);
       ++ uiGroup;
     } while (uiGroup < uiNumSliceGroups && i < iMbNum);
   } while (i < iMbNum);
@@ -170,6 +175,13 @@ static inline int32_t FmoGenerateSliceGroup (PFmo pFmo, const PPps kpPps, const 
   if (0 == iErr) {      // well now
     pFmo->iSliceGroupCount = kpPps->uiNumSliceGroups;
     pFmo->iSliceGroupType  = kpPps->uiSliceGroupMapType;
+  } else {
+    // Map generation failed (e.g. a rejected/oversized run length). The map was
+    // allocated above but this FMO is not marked active, so UninitFmoList would
+    // never free it. Release it here to avoid a leak on the rejection path.
+    pMa->WelsFree (pFmo->pMbAllocMap, "_fmo->pMbAllocMap");
+    pFmo->pMbAllocMap = NULL;
+    pFmo->iCountMbNum = 0;
   }
 
   return iErr;

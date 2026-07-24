@@ -5,6 +5,7 @@
 #include "decoder.h"
 #include "decoder_core.h"
 #include "error_concealment.h"
+#include "fmo.h"
 #include "welsCodecTrace.h"
 #include "../../common/src/welsCodecTrace.cpp"
 
@@ -519,6 +520,32 @@ TEST_F (DecoderParseSyntaxTest, DecoderParseSyntaxTestAll) {
   TestSpecificBsError();
   TestIPcmCavlcRegression();
   TestIPcmCavlcTruncated();
+}
+
+TEST (DecoderFmoSecurityTest, RejectsOversizedRunLengthBeforeIndexWrap) {
+  SFmo sFmo;
+  SPps sPps;
+  memset (&sFmo, 0, sizeof (sFmo));
+  memset (&sPps, 0, sizeof (sPps));
+
+  sPps.uiNumSliceGroups = 2;
+  sPps.uiSliceGroupMapType = 0;
+  sPps.uiRunLength[0] = 0xffffffffu;
+  sPps.uiRunLength[1] = 1;
+
+  CMemoryAlign cMa (16);
+  const int32_t iRet = InitFmo (&sFmo, &sPps, 120, 68, &cMa);
+  EXPECT_NE (ERR_NONE, iRet);
+
+  // The rejection path must also free the allocation map it allocated, otherwise
+  // the FMO is left allocated-but-inactive and leaks (CMemoryAlign asserts on
+  // teardown). A non-NULL map here means the leak regressed.
+  EXPECT_TRUE (NULL == sFmo.pMbAllocMap);
+
+  if (NULL != sFmo.pMbAllocMap) {
+    cMa.WelsFree (sFmo.pMbAllocMap, "_fmo->pMbAllocMap");
+    sFmo.pMbAllocMap = NULL;
+  }
 }
 
 TEST (DecoderReorderingBufferTest, PartialResetInitializesPicBuffIdx) {
