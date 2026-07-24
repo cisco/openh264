@@ -1523,7 +1523,7 @@ int32_t ParseIPCMInfoCabac (PWelsDecoderContext pCtx) {
   pCurDqLayer->pDec->pMbType[iMbXy] = MB_TYPE_INTRA_PCM;
   RestoreCabacDecEngineToBS (pCabacDecEngine, pBsAux);
   intX_t iBytesLeft = pBsAux->pEndBuf - pBsAux->pCurBuf;
-  if (iBytesLeft < 384) {
+  if (iBytesLeft < I_PCM_MB_SIZE_IN_BYTE) {
     return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_CABAC_NO_BS_TO_READ);
   }
   pPtrSrc = pBsAux->pCurBuf;
@@ -1545,7 +1545,7 @@ int32_t ParseIPCMInfoCabac (PWelsDecoderContext pCtx) {
     }
   }
 
-  pBsAux->pCurBuf += 384;
+  pBsAux->pCurBuf += I_PCM_MB_SIZE_IN_BYTE;
 
   pCurDqLayer->pLumaQp[iMbXy] = 0;
   pCurDqLayer->pChromaQp[iMbXy][0] = pCurDqLayer->pChromaQp[iMbXy][1] = 0;

@@ -1845,10 +1845,10 @@ int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
     //step 1: locating bit-stream pointer [must align into integer byte]
     pBs->pCurBuf -= iIndex;
 
-    //bounds check: I_PCM copies 384 bytes (256 luma + 128 chroma) directly from
-    //the bitstream buffer; reject when fewer than 384 bytes remain to avoid an
-    //out-of-bounds read (mirrors ParseIPCMInfoCabac).
-    if (pBs->pEndBuf - pBs->pCurBuf < 384) {
+    //bounds check: I_PCM copies I_PCM_MB_SIZE_IN_BYTE (256 luma + 128 chroma) bytes
+    //directly from the bitstream buffer; reject when fewer bytes remain to avoid
+    //an out-of-bounds read (mirrors ParseIPCMInfoCabac).
+    if (pBs->pEndBuf - pBs->pCurBuf < I_PCM_MB_SIZE_IN_BYTE) {
       return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_BS_INCOMPLETE);
     }
 
@@ -1872,7 +1872,7 @@ int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
       }
     }
 
-    pBs->pCurBuf += 384;
+    pBs->pCurBuf += I_PCM_MB_SIZE_IN_BYTE;
 
     //step 3: update QP and pNonZeroCount
     pCurDqLayer->pLumaQp[iMbXy] = 0;
@@ -2193,10 +2193,10 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
       //step 1: locating bit-stream pointer [must align into integer byte]
       pBs->pCurBuf -= iIndex;
 
-      //bounds check: I_PCM copies 384 bytes (256 luma + 128 chroma) directly from
-      //the bitstream buffer; reject when fewer than 384 bytes remain to avoid an
-      //out-of-bounds read (mirrors ParseIPCMInfoCabac).
-      if (pBs->pEndBuf - pBs->pCurBuf < 384) {
+      //bounds check: I_PCM copies I_PCM_MB_SIZE_IN_BYTE (256 luma + 128 chroma) bytes
+      //directly from the bitstream buffer; reject when fewer bytes remain to avoid
+      //an out-of-bounds read (mirrors ParseIPCMInfoCabac).
+      if (pBs->pEndBuf - pBs->pCurBuf < I_PCM_MB_SIZE_IN_BYTE) {
         return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_BS_INCOMPLETE);
       }
 
@@ -2221,7 +2221,7 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
         }
       }
 
-      pBs->pCurBuf += 384;
+      pBs->pCurBuf += I_PCM_MB_SIZE_IN_BYTE;
 
       //step 3: update QP and pNonZeroCount
       pCurDqLayer->pLumaQp[iMbXy] = 0;
@@ -2747,10 +2747,10 @@ int32_t WelsActualDecodeMbCavlcBSlice (PWelsDecoderContext pCtx) {
       //step 1: locating bit-stream pointer [must align into integer byte]
       pBs->pCurBuf -= iIndex;
 
-      //bounds check: I_PCM copies 384 bytes (256 luma + 128 chroma) directly from
-      //the bitstream buffer; reject when fewer than 384 bytes remain to avoid an
-      //out-of-bounds read (mirrors ParseIPCMInfoCabac).
-      if (pBs->pEndBuf - pBs->pCurBuf < 384) {
+      //bounds check: I_PCM copies I_PCM_MB_SIZE_IN_BYTE (256 luma + 128 chroma) bytes
+      //directly from the bitstream buffer; reject when fewer bytes remain to avoid
+      //an out-of-bounds read (mirrors ParseIPCMInfoCabac).
+      if (pBs->pEndBuf - pBs->pCurBuf < I_PCM_MB_SIZE_IN_BYTE) {
         return GENERATE_ERROR_NO (ERR_LEVEL_MB_DATA, ERR_INFO_BS_INCOMPLETE);
       }
 
@@ -2775,7 +2775,7 @@ int32_t WelsActualDecodeMbCavlcBSlice (PWelsDecoderContext pCtx) {
         }
       }
 
-      pBs->pCurBuf += 384;
+      pBs->pCurBuf += I_PCM_MB_SIZE_IN_BYTE;
 
       //step 3: update QP and pNonZeroCount
       pCurDqLayer->pLumaQp[iMbXy] = 0;

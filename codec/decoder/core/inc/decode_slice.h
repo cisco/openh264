@@ -37,6 +37,10 @@
 
 namespace WelsDec {
 
+// Raw byte size of one 4:2:0 8-bit I_PCM macroblock copied verbatim from the
+// bitstream: 16x16 luma + 2 x (8x8) chroma.
+#define I_PCM_MB_SIZE_IN_BYTE (16 * 16 + 2 * (8 * 8))
+
 int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx);
 int32_t WelsDecodeMbCavlcISlice (PWelsDecoderContext pCtx, PNalUnit pNalCur, uint32_t& uiEosFlag);
 
