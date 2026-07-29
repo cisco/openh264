@@ -2503,10 +2503,15 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
   PWelsDecoderThreadCTX pLastThreadCtx = NULL;
   if (pCtx->pLastThreadCtx != NULL) {
     pLastThreadCtx = (PWelsDecoderThreadCTX) (pCtx->pLastThreadCtx);
-    if (pLastThreadCtx->pDec == NULL) {
-      pLastThreadCtx->pDec = PrefetchLastPicForThread (pCtx->pPicBuff,
-                             pLastThreadCtx->iPicBuffIdx);
-    }
+    // Always re-derive the cached picture from the current picture buffer.  A
+    // previously cached non-NULL pDec can dangle into a DPB that was freed or
+    // reallocated on a resolution/sequence change; writing reference metadata
+    // through such a stale pointer would be a use-after-free.
+    // PrefetchLastPicForThread() bounds-checks the index against the current
+    // buffer and returns NULL when it no longer maps to a live picture.
+    pLastThreadCtx->pDec = (pCtx->pPicBuff != NULL)
+                           ? PrefetchLastPicForThread (pCtx->pPicBuff, pLastThreadCtx->iPicBuffIdx)
+                           : NULL;
   }
   int32_t iThreadCount = GetThreadCount (pCtx);
   int32_t iPpsId = 0;
@@ -2544,19 +2549,26 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
       //this prevents from possible thread-decoding hanging
       pCtx->pDec = PrefetchPic (pCtx->pPicBuff);
       if (pLastThreadCtx != NULL) {
-        pLastThreadCtx->pDec->bUsedAsRef = pLastThreadCtx->pCtx->uiNalRefIdc > 0;
-        if (pLastThreadCtx->pDec->bUsedAsRef) {
-          for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
-            uint32_t i = 0;
-            while (i < MAX_REF_PIC_COUNT && pLastThreadCtx->pCtx->sRefPic.pRefList[listIdx][i]) {
-              pLastThreadCtx->pDec->pRefPic[listIdx][i] = pLastThreadCtx->pCtx->sRefPic.pRefList[listIdx][i];
-              ++i;
+        if (pLastThreadCtx->pDec != NULL) {
+          pLastThreadCtx->pDec->bUsedAsRef = pLastThreadCtx->pCtx->uiNalRefIdc > 0;
+          if (pLastThreadCtx->pDec->bUsedAsRef) {
+            for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
+              uint32_t i = 0;
+              while (i < MAX_REF_PIC_COUNT && pLastThreadCtx->pCtx->sRefPic.pRefList[listIdx][i]) {
+                pLastThreadCtx->pDec->pRefPic[listIdx][i] = pLastThreadCtx->pCtx->sRefPic.pRefList[listIdx][i];
+                ++i;
+              }
             }
+            pLastThreadCtx->pCtx->sTmpRefPic = pLastThreadCtx->pCtx->sRefPic;
+            WelsMarkAsRef (pLastThreadCtx->pCtx, pLastThreadCtx->pDec);
+            pCtx->sRefPic = pLastThreadCtx->pCtx->sTmpRefPic;
+          } else {
+            pCtx->sRefPic = pLastThreadCtx->pCtx->sRefPic;
           }
-          pLastThreadCtx->pCtx->sTmpRefPic = pLastThreadCtx->pCtx->sRefPic;
-          WelsMarkAsRef (pLastThreadCtx->pCtx, pLastThreadCtx->pDec);
-          pCtx->sRefPic = pLastThreadCtx->pCtx->sTmpRefPic;
         } else {
+          // The cached last-thread picture no longer maps to a live buffer
+          // entry (DPB was freed/reallocated).  Copy reference state without
+          // marking a stale picture as reference.
           pCtx->sRefPic = pLastThreadCtx->pCtx->sRefPic;
         }
       }
