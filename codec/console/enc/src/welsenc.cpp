@@ -549,7 +549,7 @@ int ParseCommandLine (int argc, char** argv, SSourcePicture* pSrcPic, SEncParamE
 
     else if (!strcmp (pCommand, "-threadIdc") && (n < argc))
       pSvcParam.iMultipleThreadIdc = atoi (argv[n++]);
-    else if (!strcmp (pCommand, "-loadbalancing") && (n + 1 < argc)) {
+    else if (!strcmp (pCommand, "-loadbalancing") && (n < argc)) {
       pSvcParam.bUseLoadBalancing = (atoi (argv[n++])) ? true : false;
     } else if (!strcmp (pCommand, "-deblockIdc") && (n < argc))
       pSvcParam.iLoopFilterDisableIdc = atoi (argv[n++]);
