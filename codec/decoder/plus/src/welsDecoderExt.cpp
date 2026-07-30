@@ -489,6 +489,11 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
         threadCount = 3;
       }
       if (threadCount != m_iThreadCount) {
+        if (m_pDecThrCtx != NULL && m_pDecThrCtx[0].pCtx != NULL) {
+          WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR,
+                   "CWelsDecoder::SetOption(): DECODER_OPTION_NUM_OF_THREADS cannot be changed after decoder is initialized.");
+          return cmInitParaError;
+        }
         m_iThreadCount = threadCount;
         if (m_pDecThrCtx != NULL) {
           delete [] m_pDecThrCtx;
