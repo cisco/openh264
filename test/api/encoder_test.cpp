@@ -634,3 +634,82 @@ TEST_F(EncoderInitTest, CustomChromaPlaneStridesInvalidSrc) {
   rv = encoder_->EncodeFrame(&pic, &info);
   ASSERT_EQ(cmUnsupportedData, rv);
 }
+
+// SSourcePicture.bPsnrY/U/V asks for the PSNR of a single frame and the result
+// is handed back in SLayerBSInfo.rPsnr. 176 is not a multiple of 32, so the
+// luma plane covers both the vectorized part of WelsCalcPsnr and the columns
+// along the right edge that it sums itself.
+TEST_F(EncoderInitTest, PerFramePsnr) {
+  SEncParamExt param;
+  encoder_->GetDefaultParams(&param);
+
+  param.iUsageType = CAMERA_VIDEO_REAL_TIME;
+  param.iPicWidth = 176;
+  param.iPicHeight = 144;
+  param.fMaxFrameRate = 30.0f;
+  param.iSpatialLayerNum = 1;
+  param.iRCMode = RC_OFF_MODE;
+
+  param.sSpatialLayers[0].iVideoWidth = param.iPicWidth;
+  param.sSpatialLayers[0].iVideoHeight = param.iPicHeight;
+  param.sSpatialLayers[0].fFrameRate = param.fMaxFrameRate;
+  param.sSpatialLayers[0].sSliceArgument.uiSliceMode = SM_SINGLE_SLICE;
+  param.sSpatialLayers[0].iDLayerQp = 0;
+
+  int rv = encoder_->InitializeExt(&param);
+  ASSERT_EQ(0, rv);
+
+  const int strideY = param.iPicWidth;
+  const int strideU = param.iPicWidth >> 1;
+  const int strideV = param.iPicWidth >> 1;
+  std::vector<uint8_t> bufY(strideY * param.iPicHeight);
+  std::vector<uint8_t> bufU(strideU * (param.iPicHeight >> 1));
+  std::vector<uint8_t> bufV(strideV * (param.iPicHeight >> 1));
+  GeneratePattern(bufY.data(), strideY, bufU.data(), strideU, bufV.data(), strideV, param.iPicWidth, param.iPicHeight);
+
+  SSourcePicture pic;
+  memset(&pic, 0, sizeof(SSourcePicture));
+  pic.iPicWidth = param.iPicWidth;
+  pic.iPicHeight = param.iPicHeight;
+  pic.iColorFormat = videoFormatI420;
+  pic.iStride[0] = strideY;
+  pic.iStride[1] = strideU;
+  pic.iStride[2] = strideV;
+  pic.pData[0] = bufY.data();
+  pic.pData[1] = bufU.data();
+  pic.pData[2] = bufV.data();
+
+  SFrameBSInfo info;
+
+  // nothing was asked for, so nothing is reported
+  memset(&info, 0, sizeof(SFrameBSInfo));
+  rv = encoder_->EncodeFrame(&pic, &info);
+  ASSERT_EQ(0, rv);
+  ASSERT_GT(info.iLayerNum, 0);
+  EXPECT_FLOAT_EQ(0.0f, info.sLayerInfo[0].rPsnr[0]);
+  EXPECT_FLOAT_EQ(0.0f, info.sLayerInfo[0].rPsnr[1]);
+  EXPECT_FLOAT_EQ(0.0f, info.sLayerInfo[0].rPsnr[2]);
+
+  // ask for a single component, the other two stay untouched
+  memset(&info, 0, sizeof(SFrameBSInfo));
+  pic.bPsnrY = true;
+  rv = encoder_->EncodeFrame(&pic, &info);
+  ASSERT_EQ(0, rv);
+  ASSERT_GT(info.iLayerNum, 0);
+  EXPECT_GT(info.sLayerInfo[0].rPsnr[0], 30.0f);
+  EXPECT_LE(info.sLayerInfo[0].rPsnr[0], 99.99f);
+  EXPECT_FLOAT_EQ(0.0f, info.sLayerInfo[0].rPsnr[1]);
+  EXPECT_FLOAT_EQ(0.0f, info.sLayerInfo[0].rPsnr[2]);
+
+  // ask for all three of them
+  memset(&info, 0, sizeof(SFrameBSInfo));
+  pic.bPsnrU = true;
+  pic.bPsnrV = true;
+  rv = encoder_->EncodeFrame(&pic, &info);
+  ASSERT_EQ(0, rv);
+  ASSERT_GT(info.iLayerNum, 0);
+  for (int i = 0; i < 3; ++i) {
+    EXPECT_GT(info.sLayerInfo[0].rPsnr[i], 30.0f) << "component " << i;
+    EXPECT_LE(info.sLayerInfo[0].rPsnr[i], 99.99f) << "component " << i;
+  }
+}
