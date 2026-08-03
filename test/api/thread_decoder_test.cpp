@@ -4,8 +4,20 @@
 #include <climits>
 #include <cstring>
 #include <fstream>
+#include <iterator>
 #include <string>
 #include <vector>
+
+#if !defined(_WIN32)
+#include <sys/mman.h>
+#include <unistd.h>
+#endif
+
+static std::vector<unsigned char> ReadBinaryFile (const char* path) {
+  std::ifstream ifs (path, std::ios::binary);
+  return std::vector<unsigned char> ((std::istreambuf_iterator<char> (ifs)),
+                                     std::istreambuf_iterator<char> ());
+}
 
 static void UpdateHashFromPlane (SHA1Context* ctx, const uint8_t* plane,
                                  int width, int height, int stride) {
@@ -220,6 +232,54 @@ class ThreadDecoderInitTest : public ::testing::Test, public BaseThreadDecoderTe
 };
 
 TEST_F (ThreadDecoderInitTest, JustInit) {}
+
+TEST (ThreadDecoderSecurityTest, DecodeFrameNoDelayNoPostReturnWriteToCallerPpDst) {
+#if defined(_WIN32)
+  GTEST_SKIP() << "mmap/munmap based lifetime stress is POSIX-only";
+#else
+  ISVCDecoder* decoder = NULL;
+  ASSERT_EQ (0, WelsCreateDecoder (&decoder));
+  ASSERT_TRUE (decoder != NULL);
+
+  SDecodingParam decParam;
+  memset (&decParam, 0, sizeof (decParam));
+  decParam.uiTargetDqLayer = UCHAR_MAX;
+  decParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
+  decParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
+  int32_t iThreadCount = 2;
+  decoder->SetOption (DECODER_OPTION_NUM_OF_THREADS, &iThreadCount);
+  ASSERT_EQ (0, decoder->Initialize (&decParam));
+
+  std::vector<unsigned char> bitstream = ReadBinaryFile ("res/BA_MW_D.264");
+  ASSERT_FALSE (bitstream.empty());
+
+  const size_t pageSize = static_cast<size_t> (sysconf (_SC_PAGESIZE));
+  const size_t chunkSize = 1200;
+  const int32_t kMaxIters = 12;
+
+  for (size_t off = 0, iter = 0; off < bitstream.size() && iter < static_cast<size_t> (kMaxIters);
+       off += chunkSize, ++iter) {
+    void* page = mmap (NULL, pageSize, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    ASSERT_NE (MAP_FAILED, page);
+
+    unsigned char** ppDst = reinterpret_cast<unsigned char**> (page);
+    memset (ppDst, 0, pageSize);
+
+    SBufferInfo dstInfo;
+    memset (&dstInfo, 0, sizeof (dstInfo));
+    int32_t len = static_cast<int32_t> (std::min (chunkSize, bitstream.size() - off));
+    DECODING_STATE rv = decoder->DecodeFrameNoDelay (bitstream.data() + off, len, ppDst, &dstInfo);
+    EXPECT_EQ (dsErrorFree, rv);
+
+    munmap (page, pageSize);
+    usleep (5000);
+  }
+
+  decoder->Uninitialize();
+  WelsDestroyDecoder (decoder);
+#endif
+}
+
 struct FileParam {
   const char* fileName;
   const char* hashStr;
