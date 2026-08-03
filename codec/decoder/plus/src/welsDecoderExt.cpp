@@ -315,6 +315,7 @@ void CWelsDecoder::OpenDecoderThreads() {
       m_pDecThrCtx[i].threadCtxOwner = this;
       m_pDecThrCtx[i].kpSrc = NULL;
       m_pDecThrCtx[i].kiSrcLen = 0;
+      m_pDecThrCtx[i].pDst[0] = m_pDecThrCtx[i].pDst[1] = m_pDecThrCtx[i].pDst[2] = NULL;
       m_pDecThrCtx[i].ppDst = NULL;
       m_pDecThrCtx[i].pDec = NULL;
       CREATE_EVENT (&m_pDecThrCtx[i].sImageReady, 1, 0, NULL);
@@ -1385,7 +1386,9 @@ int CWelsDecoder::ThreadDecodeFrameInternal (const unsigned char* kpSrc, const i
   }
   m_pDecThrCtx[signal].kpSrc = const_cast<uint8_t*> (kpSrc);
   m_pDecThrCtx[signal].kiSrcLen = kiSrcLen;
-  m_pDecThrCtx[signal].ppDst = ppDst;
+  // Worker threads must not write into caller-owned ppDst after API returns.
+  m_pDecThrCtx[signal].pDst[0] = m_pDecThrCtx[signal].pDst[1] = m_pDecThrCtx[signal].pDst[2] = NULL;
+  m_pDecThrCtx[signal].ppDst = m_pDecThrCtx[signal].pDst;
   memcpy (&m_pDecThrCtx[signal].sDstInfo, pDstInfo, sizeof (SBufferInfo));
 
   state = ParseAccessUnit (m_pDecThrCtx[signal]);
