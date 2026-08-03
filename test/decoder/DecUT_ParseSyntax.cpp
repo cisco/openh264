@@ -136,7 +136,7 @@ class DecoderParseSyntaxTest : public ::testing::Test {
     }
   }
   //Init members
-  int32_t Init();
+  int32_t Init (bool bParseOnly = false);
   //Uninit members
   void Uninit();
   //Decoder real bitstream
@@ -174,7 +174,7 @@ class DecoderParseSyntaxTest : public ::testing::Test {
 };
 
 //Init members
-int32_t DecoderParseSyntaxTest::Init() {
+int32_t DecoderParseSyntaxTest::Init (bool bParseOnly) {
   memset (&m_sBufferInfo, 0, sizeof (SBufferInfo));
   memset (&m_sDecParam, 0, sizeof (SDecodingParam));
   memset (&m_sParserBsInfo, 0, sizeof (SParserBsInfo));
@@ -189,7 +189,7 @@ int32_t DecoderParseSyntaxTest::Init() {
   m_sDecParam.eEcActiveIdc = (ERROR_CON_IDC)7;
   m_sDecParam.sVideoProperty.size = sizeof (SVideoProperty);
   m_sDecParam.sVideoProperty.eVideoBsType = (VIDEO_BITSTREAM_TYPE) (rand() % 2);
-  m_sDecParam.bParseOnly = false;
+  m_sDecParam.bParseOnly = bParseOnly;
 
   m_pData[0] = m_pData[1] = m_pData[2] = NULL;
   m_szBuffer[0] = m_szBuffer[1] = m_szBuffer[2] = 0;
@@ -509,6 +509,48 @@ void DecoderParseSyntaxTest::TestIPcmCavlcTruncated() {
   EXPECT_NE (dsErrorFree, iAggregatedRet);
 
   delete[] pBuf;
+  Uninit();
+}
+
+// Verify that ExpandBsBuffer retargets pNalPos for both current-AU and queued
+// next-AU NALs; pre-fix, only [0, uiActualUnitsNum] was walked, leaving
+// next-AU entries dangling into the freed sSavedData buffer.
+TEST_F (DecoderParseSyntaxTest, ExpandBsBufferRetargetsParseOnlyNalPos) {
+  ASSERT_EQ (cmResultSuccess, Init (true));
+
+  ASSERT_TRUE (m_pCtx != NULL);
+  ASSERT_TRUE (m_pCtx->pParam != NULL);
+  ASSERT_TRUE (m_pCtx->pParam->bParseOnly);
+  ASSERT_TRUE (m_pCtx->sSavedData.pHead != NULL);
+  ASSERT_TRUE (m_pCtx->pAccessUnitList != NULL);
+  ASSERT_TRUE (m_pCtx->pAccessUnitList->pNalUnitsList != NULL);
+  ASSERT_TRUE (m_pCtx->pAccessUnitList->uiCountUnitsNum >= 2);
+
+  // Slot 0: current-AU NAL; slot 1: queued next-AU NAL (uiAvailUnitsNum > uiActualUnitsNum).
+  m_pCtx->pAccessUnitList->uiActualUnitsNum = 1;
+  m_pCtx->pAccessUnitList->uiAvailUnitsNum  = 2;
+
+  uint8_t* pOldSavedHead = m_pCtx->sSavedData.pHead;
+  const int32_t kiOldSavedSize = m_pCtx->iMaxBsBufferSizeInByte;
+  ASSERT_TRUE (kiOldSavedSize > 64);
+
+  PNalUnit pNal0 = m_pCtx->pAccessUnitList->pNalUnitsList[0];
+  PNalUnit pNal1 = m_pCtx->pAccessUnitList->pNalUnitsList[1];
+  ASSERT_TRUE (pNal0 != NULL);
+  ASSERT_TRUE (pNal1 != NULL);
+
+  pNal0->sNalData.sVclNal.pNalPos = pOldSavedHead + 16;
+  pNal1->sNalData.sVclNal.pNalPos = pOldSavedHead + 32;  // queued next-AU entry
+
+  const int32_t kiSrcLen = kiOldSavedSize / MAX_BUFFERED_NUM + 1;
+  ASSERT_EQ (ERR_NONE, ExpandBsBuffer (m_pCtx, kiSrcLen));
+
+  ASSERT_TRUE (m_pCtx->sSavedData.pHead != NULL);
+  EXPECT_NE (pOldSavedHead, m_pCtx->sSavedData.pHead);
+  // Both current-AU and queued next-AU pNalPos must be retargeted.
+  EXPECT_EQ (m_pCtx->sSavedData.pHead + 16, pNal0->sNalData.sVclNal.pNalPos);
+  EXPECT_EQ (m_pCtx->sSavedData.pHead + 32, pNal1->sNalData.sVclNal.pNalPos);
+
   Uninit();
 }
 
