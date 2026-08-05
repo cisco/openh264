@@ -255,6 +255,8 @@ TEST (ThreadDecoderSecurityTest, DecodeFrameNoDelayNoPostReturnWriteToCallerPpDs
 
   const size_t pageSize = static_cast<size_t> (sysconf (_SC_PAGESIZE));
   const size_t chunkSize = 1200;
+  // Capped at 12: iter 13 triggers a separate heap-buffer-overflow in
+  // ResetCurrentAccessUnit unrelated to the ppDst lifetime fix here.
   const int32_t kMaxIters = 12;
 
   for (size_t off = 0, iter = 0; off < bitstream.size() && iter < static_cast<size_t> (kMaxIters);
