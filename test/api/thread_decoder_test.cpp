@@ -434,3 +434,40 @@ TEST_F (ThreadDecoderPreviousPicRaceTest, ThreadedOutputIsConsistent) {
       << "3-thread decode is non-deterministic between run 1 and run 3";
 }
 
+// Regression coverage for the buffered-picture queue data race.
+// In threaded decode the worker publishes ready pictures via
+// BufferingReadyPicture() while the caller drains them via
+// ReleaseBufferedReadyPictureNoReorder() / FlushFrame(); those paths are now
+// serialized under m_csDecoder. Decoding a multi-frame stream in threaded mode
+// must enqueue and dequeue every picture exactly once, so the run is
+// error-free and the decoded frame count is stable across runs. This exercises
+// the guarded enqueue/dequeue path and guards against output regression from
+// the added locking.
+class ThreadDecoderReorderQueueRaceTest : public ThreadDecoderInitTest,
+  public BaseThreadDecoderTest::Callback {
+ public:
+  virtual void SetUp() {
+    ThreadDecoderInitTest::SetUp();
+    iDecodedFrames_ = 0;
+  }
+  virtual void onDecodeFrame (const Frame& frame) {
+    // A corrupted queue would surface as a NULL/short plane or a wrong count.
+    if (frame.y.data != NULL && frame.u.data != NULL && frame.v.data != NULL) {
+      ++iDecodedFrames_;
+    }
+  }
+ protected:
+  int iDecodedFrames_;
+};
+
+TEST_F (ThreadDecoderReorderQueueRaceTest, BufferedPictureQueueDrainsAllFrames) {
+  const char* kFileName = "res/Adobe_PDF_sample_a_1024x768_50Frms.264";
+#if defined(ANDROID_NDK)
+  std::string filename = std::string ("/sdcard/") + kFileName;
+  ASSERT_TRUE (ThreadDecodeFile (filename.c_str(), this));
+#else
+  ASSERT_TRUE (ThreadDecodeFile (kFileName, this));
+#endif
+  ASSERT_FALSE (HasFatalFailure());
+  EXPECT_EQ (iDecodedFrames_, 50);
+}

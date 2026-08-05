@@ -709,12 +709,24 @@ DECODING_STATE CWelsDecoder::DecodeFrameNoDelay (const unsigned char* kpSrc,
   if (m_iThreadCount >= 1) {
     SET_EVENT (&m_sReleaseBufferEvent);
     iRet = ThreadDecodeFrameInternal (kpSrc, kiSrcLen, ppDst, pDstInfo);
-    if (m_sReoderingStatus.iNumOfPicts) {
+    // The worker publishes into the shared reorder queue via
+    // BufferingReadyPicture() while holding m_csDecoder, so every access to that
+    // queue state on the caller side must take the same lock. The lock must not
+    // be held across WAIT_EVENT() or the Release* dequeue (which re-locks), so
+    // snapshot the shared counters under the lock instead of reading them raw.
+    WelsMutexLock (&m_csDecoder);
+    int32_t iNumOfPicts = m_sReoderingStatus.iNumOfPicts;
+    WelsMutexUnlock (&m_csDecoder);
+    if (iNumOfPicts) {
       WAIT_EVENT (&m_sBufferingEvent, WELS_DEC_THREAD_WAIT_INFINITE);
       RESET_EVENT (&m_sBufferingEvent);
       RESET_EVENT (&m_sReleaseBufferEvent);
-      if (!m_sReoderingStatus.bHasBSlice) {
-        if (m_sReoderingStatus.iNumOfPicts > 1) {
+      WelsMutexLock (&m_csDecoder);
+      const bool bHasBSlice = m_sReoderingStatus.bHasBSlice;
+      iNumOfPicts = m_sReoderingStatus.iNumOfPicts;
+      WelsMutexUnlock (&m_csDecoder);
+      if (!bHasBSlice) {
+        if (iNumOfPicts > 1) {
           ReleaseBufferedReadyPictureNoReorder (NULL, ppDst, pDstInfo);
         }
       }
@@ -942,8 +954,15 @@ DECODING_STATE CWelsDecoder::FlushFrame (unsigned char** ppDst,
       }
     }
   }
-  if (bEndOfStreamFlag && m_sReoderingStatus.iNumOfPicts > 0) {
-    if (!m_sReoderingStatus.bHasBSlice) {
+  // Read the shared reorder-queue counters under m_csDecoder in
+  // threaded mode (the worker mutates them in BufferingReadyPicture()); the
+  // Release* dequeue re-locks internally, so do not hold the lock across it.
+  if (m_iThreadCount >= 1) WelsMutexLock (&m_csDecoder);
+  const int32_t iNumOfPicts = m_sReoderingStatus.iNumOfPicts;
+  const bool bHasBSlice = m_sReoderingStatus.bHasBSlice;
+  if (m_iThreadCount >= 1) WelsMutexUnlock (&m_csDecoder);
+  if (bEndOfStreamFlag && iNumOfPicts > 0) {
+    if (!bHasBSlice) {
       ReleaseBufferedReadyPictureNoReorder (NULL, ppDst, pDstInfo);
     }
     else {
@@ -1003,6 +1022,10 @@ void CWelsDecoder::BufferingReadyPicture (PWelsDecoderContext pCtx, unsigned cha
   if (pDstInfo->iBufferStatus == 0) {
     return;
   }
+  // Publish into the shared reorder queue (m_sPictInfoList /
+  // m_sReoderingStatus) under m_csDecoder so the caller-side Release* dequeue
+  // cannot observe or mutate a half-updated slot concurrently.
+  if (m_iThreadCount >= 1) WelsMutexLock (&m_csDecoder);
   m_bIsBaseline = pCtx->pSps->uiProfileIdc == 66 || pCtx->pSps->uiProfileIdc == 83;
   if (!m_bIsBaseline) {
     if (pCtx->pSliceHeader->eSliceType == B_SLICE) {
@@ -1033,10 +1056,15 @@ void CWelsDecoder::BufferingReadyPicture (PWelsDecoderContext pCtx, unsigned cha
       break;
     }
   }
+  if (m_iThreadCount >= 1) WelsMutexUnlock (&m_csDecoder);
 }
 
 void CWelsDecoder::ReleaseBufferedReadyPictureReorder (PWelsDecoderContext pCtx, unsigned char** ppDst,
     SBufferInfo* pDstInfo, bool isFlush) {
+  // Serialize the full dequeue against the worker's
+  // BufferingReadyPicture() publication on the shared m_sPictInfoList /
+  // m_sReoderingStatus queue state.
+  if (m_iThreadCount >= 1) WelsMutexLock (&m_csDecoder);
   PPicBuff pPicBuff = pCtx ? pCtx->pPicBuff : m_pPicBuff;
   if (pCtx == NULL && m_iThreadCount <= 1) {
     pCtx = m_pDecThrCtx[0].pCtx;
@@ -1101,12 +1129,17 @@ void CWelsDecoder::ReleaseBufferedReadyPictureReorder (PWelsDecoderContext pCtx,
       --m_sReoderingStatus.iNumOfPicts;
     }
   }
+  if (m_iThreadCount >= 1) WelsMutexUnlock (&m_csDecoder);
 }
 
 //if there is no b-frame, no ordering based on values of POCs is necessary.
 //The function is added to force to avoid picture reordering because some h.264 streams do not follow H.264 POC specifications. 
 void CWelsDecoder::ReleaseBufferedReadyPictureNoReorder(PWelsDecoderContext pCtx, unsigned char** ppDst, SBufferInfo* pDstInfo)
 {
+  // Serialize the full dequeue against the worker's
+  // BufferingReadyPicture() publication on the shared m_sPictInfoList /
+  // m_sReoderingStatus queue state.
+  if (m_iThreadCount >= 1) WelsMutexLock (&m_csDecoder);
   int32_t firstValidIdx = -1;
   uint32_t uiDecodingTimeStamp = 0;
   for (int32_t i = 0; i <= m_sReoderingStatus.iLargestBufferedPicIndex; ++i) {
@@ -1150,6 +1183,7 @@ void CWelsDecoder::ReleaseBufferedReadyPictureNoReorder(PWelsDecoderContext pCtx
     }
     --m_sReoderingStatus.iNumOfPicts;
   }
+  if (m_iThreadCount >= 1) WelsMutexUnlock (&m_csDecoder);
   return;
 }
 
