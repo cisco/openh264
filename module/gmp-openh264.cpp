@@ -876,35 +876,62 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
       // Convert the AVCC data, starting at the byte containing
       // numOfSequenceParameterSets, to Annex B format.
       const uint8_t* avcc = aCodecSpecific + offsetof(GMPVideoCodecH264, mAVCC.mNumSPS);
+      // SPARK-843503: aCodecSpecificSize is only validated as a floor above.
+      // The AVCC SPS/PPS counts and 16-bit length fields are attacker-controlled,
+      // so bound every read against the end of the codec-specific buffer; the
+      // walking pointer must never read past the allocation.
+      const uint8_t* const avccEnd = aCodecSpecific + aCodecSpecificSize;
+      bool bAvccValid = true;
 
       static const int kSPSMask = (1 << 5) - 1;
-      uint8_t spsCount = *avcc++ & kSPSMask;
-      for (int i = 0; i < spsCount; ++i) {
+      uint8_t spsCount = 0;
+      if (avcc < avccEnd) {
+        spsCount = *avcc++ & kSPSMask;
+      } else {
+        bAvccValid = false;
+      }
+      for (int i = 0; bAvccValid && i < spsCount; ++i) {
+        if (avccEnd - avcc < 2) { bAvccValid = false; break; }
         size_t size = readU16BE(avcc);
         avcc += 2;
+        if (size > static_cast<size_t> (avccEnd - avcc)) { bAvccValid = false; break; }
         copyWithStartCode(annexb, avcc, size);
         avcc += size;
       }
 
-      uint8_t ppsCount = *avcc++;
-      for (int i = 0; i < ppsCount; ++i) {
+      uint8_t ppsCount = 0;
+      if (bAvccValid) {
+        if (avcc < avccEnd) {
+          ppsCount = *avcc++;
+        } else {
+          bAvccValid = false;
+        }
+      }
+      for (int i = 0; bAvccValid && i < ppsCount; ++i) {
+        if (avccEnd - avcc < 2) { bAvccValid = false; break; }
         size_t size = readU16BE(avcc);
         avcc += 2;
+        if (size > static_cast<size_t> (avccEnd - avcc)) { bAvccValid = false; break; }
         copyWithStartCode(annexb, avcc, size);
         avcc += size;
       }
 
-      SBufferInfo decoded;
-      memset (&decoded, 0, sizeof (decoded));
-      unsigned char* data[3] = {nullptr, nullptr, nullptr};
-      DECODING_STATE dState = decoder_->DecodeFrame2 (&*annexb.begin(),
-                                                      annexb.size(),
-                                                      data,
-                                                      &decoded);
-      if (dState) {
-        GMPLOG (GL_ERROR, "Decoding error dState=" << dState);
+      if (!bAvccValid) {
+        GMPLOG (GL_ERROR, "InitDecode(): malformed AVCC extradata (size "
+                << aCodecSpecificSize << "); skipping SPS/PPS priming");
+      } else if (!annexb.empty()) {
+        SBufferInfo decoded;
+        memset (&decoded, 0, sizeof (decoded));
+        unsigned char* data[3] = {nullptr, nullptr, nullptr};
+        DECODING_STATE dState = decoder_->DecodeFrame2 (&*annexb.begin(),
+                                                        annexb.size(),
+                                                        data,
+                                                        &decoded);
+        if (dState) {
+          GMPLOG (GL_ERROR, "Decoding error dState=" << dState);
+        }
+        GMPLOG (GL_ERROR, "InitDecode iBufferStatus=" << decoded.iBufferStatus);
       }
-      GMPLOG (GL_ERROR, "InitDecode iBufferStatus=" << decoded.iBufferStatus);
     }
   }
 
