@@ -404,3 +404,50 @@ GENERATE_DyadicBilinearQuarterDownsampler_UT (DyadicBilinearQuarterDownsampler_A
 GENERATE_GeneralBilinearDownsampler_UT (GeneralBilinearAccurateDownsamplerWrap_AArch64_neon,
                                         GeneralBilinearAccurateDownsampler_ref, 1, WELS_CPU_NEON)
 #endif
+
+TEST (DownSampleTest, VpFrameworkRejectsInvalidChromaStride) {
+  IWelsVP* pVp = NULL;
+  ASSERT_EQ (RET_SUCCESS, WelsCreateVpInterface ((void**) &pVp, WELSVP_INTERFACE_VERION));
+  ASSERT_TRUE (pVp != NULL);
+  ASSERT_EQ (RET_SUCCESS, pVp->Init (METHOD_DOWNSAMPLE, NULL));
+
+  uint8_t srcY[16 * 16] = { 0 };
+  uint8_t srcU[8 * 8] = { 0 };
+  uint8_t srcV[8 * 8] = { 0 };
+  uint8_t dstY[8 * 8] = { 0 };
+  uint8_t dstU[4 * 4] = { 0 };
+  uint8_t dstV[4 * 4] = { 0 };
+
+  SPixMap src;
+  SPixMap dst;
+  memset (&src, 0, sizeof (src));
+  memset (&dst, 0, sizeof (dst));
+
+  src.eFormat = VIDEO_FORMAT_I420;
+  src.pPixel[0] = srcY;
+  src.pPixel[1] = srcU;
+  src.pPixel[2] = srcV;
+  src.iStride[0] = 16;
+  src.iStride[1] = 0;
+  src.iStride[2] = 8;
+  src.sRect.iRectWidth = 16;
+  src.sRect.iRectHeight = 16;
+
+  dst.eFormat = VIDEO_FORMAT_I420;
+  dst.pPixel[0] = dstY;
+  dst.pPixel[1] = dstU;
+  dst.pPixel[2] = dstV;
+  dst.iStride[0] = 8;
+  dst.iStride[1] = 4;
+  dst.iStride[2] = 4;
+  dst.sRect.iRectWidth = 8;
+  dst.sRect.iRectHeight = 8;
+
+  EXPECT_EQ (RET_INVALIDPARAM, pVp->Process (METHOD_DOWNSAMPLE, &src, &dst));
+
+  src.iStride[1] = 8;
+  src.iStride[2] = 0;
+  EXPECT_EQ (RET_INVALIDPARAM, pVp->Process (METHOD_DOWNSAMPLE, &src, &dst));
+
+  EXPECT_EQ (RET_SUCCESS, WelsDestroyVpInterface (pVp, WELSVP_INTERFACE_VERION));
+}
