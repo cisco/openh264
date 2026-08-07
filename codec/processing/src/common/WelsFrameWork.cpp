@@ -240,9 +240,11 @@ bool  CVpFrameWork::CheckValid (EMethods eMethod, SPixMap& pSrcPixMap, SPixMap& 
     if (pSrcPixMap.sRect.iRectTop >= pSrcPixMap.sRect.iRectHeight
         || pSrcPixMap.sRect.iRectLeft >= pSrcPixMap.sRect.iRectWidth || pSrcPixMap.sRect.iRectWidth > pSrcPixMap.iStride[0])
       goto exit;
-    if ((pSrcPixMap.eFormat == VIDEO_FORMAT_I420 || pSrcPixMap.eFormat == VIDEO_FORMAT_YV12)
-        && (pSrcPixMap.iStride[1] <= 0 || pSrcPixMap.iStride[2] <= 0
-            || kiSrcChromaWidth > pSrcPixMap.iStride[1] || kiSrcChromaWidth > pSrcPixMap.iStride[2]))
+    if (eMethod == METHOD_DOWNSAMPLE
+      && (pSrcPixMap.eFormat == VIDEO_FORMAT_I420 || pSrcPixMap.eFormat == VIDEO_FORMAT_YV12)
+      && (pSrcPixMap.pPixel[1] || pSrcPixMap.pPixel[2])
+      && (pSrcPixMap.iStride[1] <= 0 || pSrcPixMap.iStride[2] <= 0
+        || kiSrcChromaWidth > pSrcPixMap.iStride[1] || kiSrcChromaWidth > pSrcPixMap.iStride[2]))
       goto exit;
   }
   if (pDstPixMap.pPixel[0]) {
@@ -253,9 +255,11 @@ bool  CVpFrameWork::CheckValid (EMethods eMethod, SPixMap& pSrcPixMap, SPixMap& 
     if (pDstPixMap.sRect.iRectTop >= pDstPixMap.sRect.iRectHeight
         || pDstPixMap.sRect.iRectLeft >= pDstPixMap.sRect.iRectWidth || pDstPixMap.sRect.iRectWidth > pDstPixMap.iStride[0])
       goto exit;
-    if ((pDstPixMap.eFormat == VIDEO_FORMAT_I420 || pDstPixMap.eFormat == VIDEO_FORMAT_YV12)
-        && (pDstPixMap.iStride[1] <= 0 || pDstPixMap.iStride[2] <= 0
-            || kiDstChromaWidth > pDstPixMap.iStride[1] || kiDstChromaWidth > pDstPixMap.iStride[2]))
+    if (eMethod == METHOD_DOWNSAMPLE
+      && (pDstPixMap.eFormat == VIDEO_FORMAT_I420 || pDstPixMap.eFormat == VIDEO_FORMAT_YV12)
+      && (pDstPixMap.pPixel[1] || pDstPixMap.pPixel[2])
+      && (pDstPixMap.iStride[1] <= 0 || pDstPixMap.iStride[2] <= 0
+        || kiDstChromaWidth > pDstPixMap.iStride[1] || kiDstChromaWidth > pDstPixMap.iStride[2]))
       goto exit;
   }
   eReturn = true;
