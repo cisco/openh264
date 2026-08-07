@@ -496,6 +496,7 @@ int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPa
     SSpatialLayerConfig* pSpatialLayer = &pCodingParam->sSpatialLayers[i];
     int32_t kiPicWidth = pSpatialLayer->iVideoWidth;
     int32_t kiPicHeight = pSpatialLayer->iVideoHeight;
+    const int64_t kiMaxPixelsPerFrame = (static_cast<int64_t> (MAX_MBS_PER_FRAME) << 8);
     uint32_t iMbWidth           = 0;
     uint32_t iMbHeight          = 0;
     int32_t iMbNumInFrame       = 0;
@@ -512,7 +513,8 @@ int32_t ParamValidationExt (SLogContext* pLogCtx, SWelsSvcCodingParam* pCodingPa
                pSpatialLayer->iVideoWidth, pSpatialLayer->iVideoHeight);
     }
 
-    if ((kiPicWidth <= 0) || (kiPicHeight <= 0) || (kiPicWidth * kiPicHeight > (MAX_MBS_PER_FRAME << 8))) {
+    if ((kiPicWidth <= 0) || (kiPicHeight <= 0)
+        || (static_cast<int64_t> (kiPicWidth) * kiPicHeight > kiMaxPixelsPerFrame)) {
       WelsLog (pLogCtx, WELS_LOG_ERROR,
                "ParamValidationExt(), width > 0, height > 0, width * height <= %d, invalid %d x %d in dependency layer settings!",
                (MAX_MBS_PER_FRAME << 8), kiPicWidth, kiPicHeight);
