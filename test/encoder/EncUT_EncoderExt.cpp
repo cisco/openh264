@@ -2,10 +2,19 @@
 #include <stdlib.h>
 #include "codec_api.h"
 #include "codec_app_def.h"
+#include "extern.h"
+#include "param_svc.h"
 #include "svc_enc_slice_segment.h"
 #include "test_stdint.h"
 #include "utils/FileInputStream.h"
 //TODO: consider using BaseEncoderTest class from #include "../BaseEncoderTest.h"
+
+static void NoopLogCallback (void* pCtx, const int32_t iLevel, const char* kpFmt, va_list argv) {
+  (void)pCtx;
+  (void)iLevel;
+  (void)kpFmt;
+  (void)argv;
+}
 
 class EncoderInterfaceTest : public ::testing::Test {
 #define MB_SIZE (16)
@@ -610,6 +619,31 @@ TEST_F (EncoderInterfaceTest, BasicInitializeTestFalse) {
 
   uiTraceLevel = WELS_LOG_ERROR;
   pPtrEnc->SetOption (ENCODER_OPTION_TRACE_LEVEL, &uiTraceLevel);
+}
+
+TEST_F (EncoderInterfaceTest, InitializeExtRejectsGeometryOverflow) {
+  WelsEnc::SWelsSvcCodingParam sCodingParam;
+  sCodingParam.FillDefault();
+
+  // 46368 * 46368 overflows signed int32_t, so this must be validated using
+  // widened arithmetic in ParamValidationExt().
+  sCodingParam.iPicWidth = 46368;
+  sCodingParam.iPicHeight = 46368;
+  sCodingParam.iSpatialLayerNum = 1;
+  sCodingParam.iTemporalLayerNum = 1;
+  sCodingParam.iTargetBitrate = 500000;
+  sCodingParam.fMaxFrameRate = 30.0f;
+  sCodingParam.sSpatialLayers[0].iVideoWidth = sCodingParam.iPicWidth;
+  sCodingParam.sSpatialLayers[0].iVideoHeight = sCodingParam.iPicHeight;
+  sCodingParam.sSpatialLayers[0].iSpatialBitrate = sCodingParam.iTargetBitrate;
+  sCodingParam.sSpatialLayers[0].fFrameRate = sCodingParam.fMaxFrameRate;
+
+  SLogContext sLogCtx;
+  memset (&sLogCtx, 0, sizeof (sLogCtx));
+  sLogCtx.pfLog = NoopLogCallback;
+
+  int iResult = WelsEnc::ParamValidationExt (&sLogCtx, &sCodingParam);
+  EXPECT_EQ (iResult, static_cast<int> (ENC_RETURN_UNSUPPORTED_PARA));
 }
 
 TEST_F (EncoderInterfaceTest, BasicInitializeTestAutoAdjustment) {
