@@ -76,6 +76,7 @@ WELSVP_EXTERN_C_END
 #if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
 WELSVP_EXTERN_C_BEGIN
 int32_t WelsProcessingSampleSad8x8_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsProcessingSampleSad16x16_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t);
 WELSVP_EXTERN_C_END
 #endif
 

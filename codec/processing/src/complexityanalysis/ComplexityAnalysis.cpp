@@ -296,8 +296,7 @@ CComplexityAnalysisScreen::CComplexityAnalysisScreen (int32_t iCpuFlag) {
 
 #if defined (HAVE_NEON_AARCH64) && defined(__aarch64__)
   if (iCpuFlag & WELS_CPU_NEON) {
-    // Keep SAD on the common path here: this processing target does not
-    // always link encoder arm64 asm objects that provide this symbol.
+    m_pSadFunc = WelsProcessingSampleSad16x16_AArch64_neon;
     m_pIntraFunc[0] =  WelsI16x16LumaPredV_AArch64_neon;
     m_pIntraFunc[1] = WelsI16x16LumaPredH_AArch64_neon;
   }
