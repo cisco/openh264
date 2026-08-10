@@ -7,6 +7,13 @@
 
 using namespace WelsDec;
 
+static void DummyDecoderLog (void* pCtx, const int32_t iLevel, const char* kpFmt, va_list argv) {
+  (void)pCtx;
+  (void)iLevel;
+  (void)kpFmt;
+  (void)argv;
+}
+
 //Anchor functions
 #define REF_NOT_AVAIL    -2
 #define REF_NOT_IN_LIST  -1  //intra
@@ -667,4 +674,31 @@ TEST (PredMvTest, PredSkipMvFromNeighbor) {
   }
 
   FreeLayerData (&sDqLayer);
+}
+
+TEST (PredMvTest, GetColocatedMbNullRefPicReturnsErrorBeforeWait) {
+  SWelsDecoderContext sCtx;
+  SDqLayer sDqLayer;
+  SWelsDecoderThreadCTX sThreadCtx;
+  uint32_t uiMbType = MB_TYPE_16x16;
+  MbType mbType = MB_TYPE_16x16;
+  SubMbType subMbType = SUB_MB_TYPE_8x8;
+
+  memset (&sCtx, 0, sizeof (sCtx));
+  memset (&sDqLayer, 0, sizeof (sDqLayer));
+  memset (&sThreadCtx, 0, sizeof (sThreadCtx));
+
+  sDqLayer.iMbXyIndex = 0;
+  sDqLayer.iMbY = 1;
+  sDqLayer.pMbType = &uiMbType;
+  sCtx.pCurDqLayer = &sDqLayer;
+
+  sThreadCtx.sThreadInfo.uiThrMaxNum = 2;
+  sCtx.pThreadCtx = &sThreadCtx;
+  sCtx.sLogCtx.pfLog = DummyDecoderLog;
+  sCtx.lastReadyHeightOffset[1][0] = 0;
+  sCtx.sRefPic.pRefList[LIST_1][0] = NULL;
+
+  const int32_t iRet = GetColocatedMb (&sCtx, mbType, subMbType);
+  EXPECT_EQ (GENERATE_ERROR_NO (ERR_LEVEL_SLICE_DATA, ERR_INFO_REFERENCE_PIC_LOST), iRet);
 }
