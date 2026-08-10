@@ -449,5 +449,22 @@ TEST (DownSampleTest, VpFrameworkRejectsInvalidChromaStride) {
   src.iStride[2] = 0;
   EXPECT_EQ (RET_INVALIDPARAM, pVp->Process (METHOD_DOWNSAMPLE, &src, &dst));
 
+  src.iStride[1] = 8;
+  src.iStride[2] = 8;
+  src.pPixel[1] = NULL;
+  EXPECT_EQ (RET_INVALIDPARAM, pVp->Process (METHOD_DOWNSAMPLE, &src, &dst));
+
+  src.pPixel[1] = srcU;
+  src.pPixel[2] = NULL;
+  EXPECT_EQ (RET_INVALIDPARAM, pVp->Process (METHOD_DOWNSAMPLE, &src, &dst));
+
+  src.pPixel[2] = srcV;
+  dst.pPixel[1] = NULL;
+  EXPECT_EQ (RET_INVALIDPARAM, pVp->Process (METHOD_DOWNSAMPLE, &src, &dst));
+
+  dst.pPixel[1] = dstU;
+  dst.pPixel[2] = NULL;
+  EXPECT_EQ (RET_INVALIDPARAM, pVp->Process (METHOD_DOWNSAMPLE, &src, &dst));
+
   EXPECT_EQ (RET_SUCCESS, WelsDestroyVpInterface (pVp, WELSVP_INTERFACE_VERION));
 }

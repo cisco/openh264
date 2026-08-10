@@ -242,8 +242,8 @@ bool  CVpFrameWork::CheckValid (EMethods eMethod, SPixMap& pSrcPixMap, SPixMap& 
       goto exit;
     if (eMethod == METHOD_DOWNSAMPLE
       && (pSrcPixMap.eFormat == VIDEO_FORMAT_I420 || pSrcPixMap.eFormat == VIDEO_FORMAT_YV12)
-      && (pSrcPixMap.pPixel[1] || pSrcPixMap.pPixel[2])
-      && (pSrcPixMap.iStride[1] <= 0 || pSrcPixMap.iStride[2] <= 0
+      && (pSrcPixMap.pPixel[1] == NULL || pSrcPixMap.pPixel[2] == NULL
+        || pSrcPixMap.iStride[1] <= 0 || pSrcPixMap.iStride[2] <= 0
         || kiSrcChromaWidth > pSrcPixMap.iStride[1] || kiSrcChromaWidth > pSrcPixMap.iStride[2]))
       goto exit;
   }
@@ -257,8 +257,8 @@ bool  CVpFrameWork::CheckValid (EMethods eMethod, SPixMap& pSrcPixMap, SPixMap& 
       goto exit;
     if (eMethod == METHOD_DOWNSAMPLE
       && (pDstPixMap.eFormat == VIDEO_FORMAT_I420 || pDstPixMap.eFormat == VIDEO_FORMAT_YV12)
-      && (pDstPixMap.pPixel[1] || pDstPixMap.pPixel[2])
-      && (pDstPixMap.iStride[1] <= 0 || pDstPixMap.iStride[2] <= 0
+      && (pDstPixMap.pPixel[1] == NULL || pDstPixMap.pPixel[2] == NULL
+        || pDstPixMap.iStride[1] <= 0 || pDstPixMap.iStride[2] <= 0
         || kiDstChromaWidth > pDstPixMap.iStride[1] || kiDstChromaWidth > pDstPixMap.iStride[2]))
       goto exit;
   }
