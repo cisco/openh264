@@ -601,4 +601,54 @@ TEST (DecoderReorderingBufferTest, FullResetInitializesPicBuffIdx) {
   EXPECT_EQ (0, sStatus.iLargestBufferedPicIndex);
 }
 
+TEST_F (DecoderParseSyntaxTest, ExpandBsBufferRetargetsQueuedNalUnitsOnly) {
+  ASSERT_EQ (ERR_NONE, Init());
+  ASSERT_TRUE (m_pCtx != NULL);
+  ASSERT_TRUE (m_pCtx->pAccessUnitList != NULL);
+
+  PAccessUnit pAu = m_pCtx->pAccessUnitList;
+  ASSERT_TRUE (pAu->uiCountUnitsNum >= 3);
+  ASSERT_TRUE (m_pCtx->sRawData.pHead != NULL);
+
+  uint8_t* pOldHead = m_pCtx->sRawData.pHead;
+  PBitStringAux pActual = &pAu->pNalUnitsList[0]->sNalData.sVclNal.sSliceBitsRead;
+  pActual->pStartBuf = pOldHead + 8;
+  pActual->pCurBuf = pOldHead + 12;
+  pActual->pEndBuf = pOldHead + 16;
+
+  PBitStringAux pQueued = &pAu->pNalUnitsList[1]->sNalData.sVclNal.sSliceBitsRead;
+  pQueued->pStartBuf = pOldHead + 24;
+  pQueued->pCurBuf = pOldHead + 28;
+  pQueued->pEndBuf = pOldHead + 32;
+
+  PBitStringAux pOnePastAvail = &pAu->pNalUnitsList[2]->sNalData.sVclNal.sSliceBitsRead;
+  pOnePastAvail->pStartBuf = pOldHead + 40;
+  pOnePastAvail->pCurBuf = pOldHead + 44;
+  pOnePastAvail->pEndBuf = pOldHead + 48;
+  uint8_t* pOnePastStartBefore = pOnePastAvail->pStartBuf;
+  uint8_t* pOnePastCurBefore = pOnePastAvail->pCurBuf;
+  uint8_t* pOnePastEndBefore = pOnePastAvail->pEndBuf;
+
+  pAu->uiAvailUnitsNum = 2;
+  pAu->uiActualUnitsNum = 1; // queued count is still 2, so index 1 must be retargeted
+
+  ASSERT_EQ (ERR_NONE, ExpandBsBuffer (m_pCtx, m_pCtx->iMaxBsBufferSizeInByte));
+  ASSERT_TRUE (m_pCtx->sRawData.pHead != pOldHead);
+
+  EXPECT_EQ (m_pCtx->sRawData.pHead + 8, pActual->pStartBuf);
+  EXPECT_EQ (m_pCtx->sRawData.pHead + 12, pActual->pCurBuf);
+  EXPECT_EQ (m_pCtx->sRawData.pHead + 16, pActual->pEndBuf);
+
+  EXPECT_EQ (m_pCtx->sRawData.pHead + 24, pQueued->pStartBuf);
+  EXPECT_EQ (m_pCtx->sRawData.pHead + 28, pQueued->pCurBuf);
+  EXPECT_EQ (m_pCtx->sRawData.pHead + 32, pQueued->pEndBuf);
+
+  // Slot at index uiAvailUnitsNum (one-past queued range) must not be touched.
+  EXPECT_EQ (pOnePastStartBefore, pOnePastAvail->pStartBuf);
+  EXPECT_EQ (pOnePastCurBefore, pOnePastAvail->pCurBuf);
+  EXPECT_EQ (pOnePastEndBefore, pOnePastAvail->pEndBuf);
+
+  Uninit();
+}
+
 

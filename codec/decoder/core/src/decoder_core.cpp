@@ -661,9 +661,16 @@ int32_t ExpandBsBuffer (PWelsDecoderContext pCtx, const int kiSrcLen) {
     return ERR_INFO_OUT_OF_MEMORY;
   }
 
-  //Calculate and set the bs start and end position
-  for (uint32_t i = 0; i <= pCtx->pAccessUnitList->uiActualUnitsNum; i++) {
-    PBitStringAux pSliceBitsRead = &pCtx->pAccessUnitList->pNalUnitsList[i]->sNalData.sVclNal.sSliceBitsRead;
+  // Retarget all queued NAL units in current AU list. uiAvailUnitsNum is the
+  // queued-NAL count that can be consumed later; using uiActualUnitsNum here
+  // can leave queued entries pointing to freed old buffer.
+  const uint32_t kuiRetargetNum = pCtx->pAccessUnitList->uiAvailUnitsNum;
+  for (uint32_t i = 0; i < kuiRetargetNum; ++i) {
+    PNalUnit pNal = pCtx->pAccessUnitList->pNalUnitsList[i];
+    if (pNal == NULL) {
+      continue;
+    }
+    PBitStringAux pSliceBitsRead = &pNal->sNalData.sVclNal.sSliceBitsRead;
     pSliceBitsRead->pStartBuf = pSliceBitsRead->pStartBuf - pCtx->sRawData.pHead + pNewBsBuff;
     pSliceBitsRead->pEndBuf   = pSliceBitsRead->pEndBuf   - pCtx->sRawData.pHead + pNewBsBuff;
     pSliceBitsRead->pCurBuf   = pSliceBitsRead->pCurBuf   - pCtx->sRawData.pHead + pNewBsBuff;
