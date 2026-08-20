@@ -55,12 +55,19 @@ namespace WelsDec {
     return uiRetTmp; \
 }while(0)
 #define GET_WORD(iCurBits, pBufPtr, iLeftBits, iAllowedBytes, iReadBytes) { \
-  if (iReadBytes > iAllowedBytes+1) { \
+  if (iReadBytes > iAllowedBytes + 1) { \
     return ERR_INFO_READ_OVERFLOW; \
   } \
-  iCurBits |= ((uint32_t)((pBufPtr[0] << 8) | pBufPtr[1])) << (iLeftBits); \
+  uint32_t uiWord = 0; \
+  if (iReadBytes < iAllowedBytes) { \
+    uiWord = ((uint32_t)pBufPtr[0]) << 8; \
+  } \
+  if ((iReadBytes + 1) < iAllowedBytes) { \
+    uiWord |= pBufPtr[1]; \
+  } \
+  iCurBits |= uiWord << (iLeftBits); \
   iLeftBits -= 16; \
-  pBufPtr +=2; \
+  pBufPtr += 2; \
 }
 #define NEED_BITS(iCurBits, pBufPtr, iLeftBits, iAllowedBytes, iReadBytes) { \
   if (iLeftBits > 0) { \
