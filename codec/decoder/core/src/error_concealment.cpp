@@ -39,6 +39,40 @@
 #include "cpu_core.h"
 
 namespace WelsDec {
+
+static inline int32_t GetEcPicWidthInPixel (const PWelsDecoderContext pCtx, const PPicture pPic) {
+  if (pPic != NULL && pPic->iWidthInPixel > 0) {
+    return pPic->iWidthInPixel;
+  }
+  return pCtx->pSps->iMbWidth << 4;
+}
+
+static inline int32_t GetEcPicHeightInPixel (const PWelsDecoderContext pCtx, const PPicture pPic) {
+  if (pPic != NULL && pPic->iHeightInPixel > 0) {
+    return pPic->iHeightInPixel;
+  }
+  return pCtx->pSps->iMbHeight << 4;
+}
+
+static inline bool IsEcRefPicCompatible (const PWelsDecoderContext pCtx, const PPicture pDstPic, const PPicture pSrcPic) {
+  if (pDstPic == NULL || pSrcPic == NULL) {
+    return false;
+  }
+
+  const int32_t iDstWidthInPixel = GetEcPicWidthInPixel (pCtx, pDstPic);
+  const int32_t iDstHeightInPixel = GetEcPicHeightInPixel (pCtx, pDstPic);
+  const int32_t iSrcWidthInPixel = GetEcPicWidthInPixel (pCtx, pSrcPic);
+  const int32_t iSrcHeightInPixel = GetEcPicHeightInPixel (pCtx, pSrcPic);
+
+  if (iDstWidthInPixel != iSrcWidthInPixel || iDstHeightInPixel != iSrcHeightInPixel) {
+    return false;
+  }
+
+  return pSrcPic->iLinesize[0] >= pDstPic->iLinesize[0]
+         && pSrcPic->iLinesize[1] >= pDstPic->iLinesize[1]
+         && pSrcPic->iLinesize[2] >= pDstPic->iLinesize[2];
+}
+
 //Init
 void InitErrorCon (PWelsDecoderContext pCtx) {
   if ((pCtx->pParam->eEcActiveIdc == ERROR_CON_SLICE_COPY)
@@ -91,22 +125,25 @@ void InitErrorCon (PWelsDecoderContext pCtx) {
 void DoErrorConFrameCopy (PWelsDecoderContext pCtx) {
   PPicture pDstPic = pCtx->pDec;
   PPicture pSrcPic = pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb;
-  uint32_t uiHeightInPixelY = (pCtx->pSps->iMbHeight) << 4;
+  int32_t iHeightInPixelY = GetEcPicHeightInPixel (pCtx, pDstPic);
   int32_t iStrideY = pDstPic->iLinesize[0];
   int32_t iStrideUV = pDstPic->iLinesize[1];
   pCtx->pDec->iMbEcedNum = pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight;
   if ((pCtx->pParam->eEcActiveIdc == ERROR_CON_FRAME_COPY) && (pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt.bIdrFlag))
     pSrcPic = NULL; //no cross IDR method, should fill in data instead of copy
+  if (!IsEcRefPicCompatible (pCtx, pDstPic, pSrcPic)) {
+    pSrcPic = NULL;
+  }
   if (pSrcPic == NULL) { //no ref pic, assign specific data to picture
-    memset (pDstPic->pData[0], 128, uiHeightInPixelY * iStrideY);
-    memset (pDstPic->pData[1], 128, (uiHeightInPixelY >> 1) * iStrideUV);
-    memset (pDstPic->pData[2], 128, (uiHeightInPixelY >> 1) * iStrideUV);
+    memset (pDstPic->pData[0], 128, iHeightInPixelY * iStrideY);
+    memset (pDstPic->pData[1], 128, (iHeightInPixelY >> 1) * iStrideUV);
+    memset (pDstPic->pData[2], 128, (iHeightInPixelY >> 1) * iStrideUV);
   } else if (pSrcPic == pDstPic) {
     WelsLog (& (pCtx->sLogCtx), WELS_LOG_WARNING, "DoErrorConFrameCopy()::EC memcpy overlap.");
   } else { //has ref pic here
-    memcpy (pDstPic->pData[0], pSrcPic->pData[0], uiHeightInPixelY * iStrideY);
-    memcpy (pDstPic->pData[1], pSrcPic->pData[1], (uiHeightInPixelY >> 1) * iStrideUV);
-    memcpy (pDstPic->pData[2], pSrcPic->pData[2], (uiHeightInPixelY >> 1) * iStrideUV);
+    memcpy (pDstPic->pData[0], pSrcPic->pData[0], iHeightInPixelY * iStrideY);
+    memcpy (pDstPic->pData[1], pSrcPic->pData[1], (iHeightInPixelY >> 1) * iStrideUV);
+    memcpy (pDstPic->pData[2], pSrcPic->pData[2], (iHeightInPixelY >> 1) * iStrideUV);
   }
 }
 
@@ -119,6 +156,9 @@ void DoErrorConSliceCopy (PWelsDecoderContext pCtx) {
   PPicture pSrcPic = pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb;
   if ((pCtx->pParam->eEcActiveIdc == ERROR_CON_SLICE_COPY) && (pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt.bIdrFlag))
     pSrcPic = NULL; //no cross IDR method, should fill in data instead of copy
+  if (!IsEcRefPicCompatible (pCtx, pDstPic, pSrcPic)) {
+    pSrcPic = NULL;
+  }
 
   //uint8_t *pDstData[3], *pSrcData[3];
   bool* pMbCorrectlyDecodedFlag = pCtx->pCurDqLayer->pMbCorrectlyDecodedFlag;

@@ -78,6 +78,8 @@ int32_t InitAndAllocInputData (PECInputCtx& pECCtx) {
   pECCtx->sWelsPic.iLinesize[0] = pECCtx->sAncPic.iLinesize[0] = pECCtx->sSrcPic.iLinesize[0] = pECCtx->iLinesize[0];
   pECCtx->sWelsPic.iLinesize[1] = pECCtx->sAncPic.iLinesize[1] = pECCtx->sSrcPic.iLinesize[1] = pECCtx->iLinesize[1];
   pECCtx->sWelsPic.iLinesize[2] = pECCtx->sAncPic.iLinesize[2] = pECCtx->sSrcPic.iLinesize[2] = pECCtx->iLinesize[2];
+  pECCtx->sWelsPic.iWidthInPixel = pECCtx->sAncPic.iWidthInPixel = pECCtx->sSrcPic.iWidthInPixel = pECCtx->iMbWidth << 4;
+  pECCtx->sWelsPic.iHeightInPixel = pECCtx->sAncPic.iHeightInPixel = pECCtx->sSrcPic.iHeightInPixel = pECCtx->iMbHeight << 4;
 
   pECCtx->pMbCorrectlyDecodedFlag = (bool*) WelsMallocz (pECCtx->iMbWidth * pECCtx->iMbHeight * sizeof (bool),
                                     "pECCtx->pMbCorrectlyDecodedFlag");
@@ -228,6 +230,23 @@ bool ComparePictureDataI420 (uint8_t* pSrcData, uint8_t* pDstData, const uint32_
   return bSame;
 }
 
+bool IsPictureFilledWithValueI420 (uint8_t* pData, const uint32_t kiStride, const int32_t kiHeight, const uint8_t kuiValue) {
+  const int32_t iLumaSize = kiStride * kiHeight;
+  const int32_t iChromaSize = (kiStride >> 1) * (kiHeight >> 1);
+
+  for (int32_t i = 0; i < iLumaSize; ++i) {
+    if (pData[i] != kuiValue) {
+      return false;
+    }
+  }
+  for (int32_t i = 0; i < iChromaSize; ++i) {
+    if (pData[iLumaSize + i] != kuiValue || pData[iLumaSize + iChromaSize + i] != kuiValue) {
+      return false;
+    }
+  }
+  return true;
+}
+
 //TEST cases followed
 TEST (ErrorConTest, DoErrorConFrameCopy) {
   bool bOK = true;
@@ -293,5 +312,54 @@ TEST (ErrorConTest, DoErrorConSliceCopy) {
     } // no ref, with ref
   } //FRAME_COPY methods
 
+  FreeInputData (pECCtx);
+}
+
+TEST (ErrorConTest, DoErrorConFrameCopyResolutionMismatchFallsBackToFill) {
+  PECInputCtx pECCtx = NULL;
+  if (InitAndAllocInputData (pECCtx)) {
+    FreeInputData (pECCtx);
+    return;
+  }
+
+  pECCtx->pCtx->pParam->eEcActiveIdc = ERROR_CON_FRAME_COPY_CROSS_IDR;
+  InitECCopyData (pECCtx);
+  pECCtx->pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt.bIdrFlag = 0;
+  pECCtx->pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb = &pECCtx->sSrcPic;
+
+  pECCtx->sSrcPic.iWidthInPixel -= 16;
+  memset (pECCtx->sWelsPic.pData[0], 7, pECCtx->iMbWidth * pECCtx->iMbHeight * 256 * 3 / 2);
+
+  DoErrorConFrameCopy (pECCtx->pCtx);
+
+  EXPECT_TRUE (IsPictureFilledWithValueI420 (pECCtx->sWelsPic.pData[0],
+               pECCtx->sWelsPic.iLinesize[0],
+               pECCtx->sWelsPic.iHeightInPixel,
+               128));
+  FreeInputData (pECCtx);
+}
+
+TEST (ErrorConTest, DoErrorConSliceCopyResolutionMismatchFallsBackToFill) {
+  PECInputCtx pECCtx = NULL;
+  if (InitAndAllocInputData (pECCtx)) {
+    FreeInputData (pECCtx);
+    return;
+  }
+
+  pECCtx->pCtx->pParam->eEcActiveIdc = ERROR_CON_SLICE_COPY_CROSS_IDR;
+  InitECCopyData (pECCtx);
+  pECCtx->pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt.bIdrFlag = 0;
+  pECCtx->pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb = &pECCtx->sSrcPic;
+
+  memset (pECCtx->pMbCorrectlyDecodedFlag, 0, pECCtx->iMbWidth * pECCtx->iMbHeight * sizeof (bool));
+  pECCtx->sSrcPic.iHeightInPixel -= 16;
+  memset (pECCtx->sWelsPic.pData[0], 7, pECCtx->iMbWidth * pECCtx->iMbHeight * 256 * 3 / 2);
+
+  DoErrorConSliceCopy (pECCtx->pCtx);
+
+  EXPECT_TRUE (IsPictureFilledWithValueI420 (pECCtx->sWelsPic.pData[0],
+               pECCtx->sWelsPic.iLinesize[0],
+               pECCtx->sWelsPic.iHeightInPixel,
+               128));
   FreeInputData (pECCtx);
 }
