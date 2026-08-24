@@ -45,7 +45,8 @@ class EncoderInterfaceTest : public ::testing::Test {
     pParamExt = new SEncParamExt();
     ASSERT_TRUE (pParamExt != NULL);
 
-    pSrcPic = new SSourcePicture;
+    pSrcPic = new SSourcePicture();
+    memset (pSrcPic, 0, sizeof (SSourcePicture));
     ASSERT_TRUE (pSrcPic != NULL);
 
     pOption = new SEncParamExt();
@@ -644,6 +645,39 @@ TEST_F (EncoderInterfaceTest, InitializeExtRejectsGeometryOverflow) {
 
   int iResult = WelsEnc::ParamValidationExt (&sLogCtx, &sCodingParam);
   EXPECT_EQ (iResult, static_cast<int> (ENC_RETURN_UNSUPPORTED_PARA));
+}
+
+TEST_F (EncoderInterfaceTest, HighBitrateIdrTargetBits) {
+  SEncParamExt sEncParamExt;
+  pPtrEnc->GetDefaultParams (&sEncParamExt);
+  sEncParamExt.iUsageType = CAMERA_VIDEO_REAL_TIME;
+  sEncParamExt.iPicWidth = 1280;
+  sEncParamExt.iPicHeight = 720;
+  sEncParamExt.iTargetBitrate = 200000000;
+  sEncParamExt.fMaxFrameRate = 30.0f;
+  sEncParamExt.iRCMode = RC_BITRATE_MODE;
+  sEncParamExt.iSpatialLayerNum = 1;
+  sEncParamExt.sSpatialLayers[0].iVideoWidth = sEncParamExt.iPicWidth;
+  sEncParamExt.sSpatialLayers[0].iVideoHeight = sEncParamExt.iPicHeight;
+  sEncParamExt.sSpatialLayers[0].iSpatialBitrate = sEncParamExt.iTargetBitrate;
+  sEncParamExt.sSpatialLayers[0].fFrameRate = sEncParamExt.fMaxFrameRate;
+
+  int iResult = pPtrEnc->InitializeExt (&sEncParamExt);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+
+  PrepareOneSrcFrame();
+
+  iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+
+  // Force subsequent IDR frame so that iIdrNum != 0 and RcDecideTargetBits uses iIdrBitrateRatio
+  bool bIDR = true;
+  pPtrEnc->ForceIntraFrame (bIDR);
+  pSrcPic->uiTimeStamp += 33;
+  iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+
+  pPtrEnc->Uninitialize();
 }
 
 TEST_F (EncoderInterfaceTest, BasicInitializeTestAutoAdjustment) {
