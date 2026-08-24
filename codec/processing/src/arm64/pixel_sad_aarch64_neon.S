@@ -48,4 +48,22 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsProcessingSampleSad8x8_AArch64_neon
     fmov    w0, s2
 WELS_ASM_AARCH64_FUNC_END
 
+//int32_t WelsProcessingSampleSad16x16_AArch64_neon (uint8_t*, int32_t, uint8_t*, int32_t);
+WELS_ASM_AARCH64_FUNC_BEGIN WelsProcessingSampleSad16x16_AArch64_neon
+    SIGN_EXTENSION x1, w1
+    SIGN_EXTENSION x3, w3
+    ld1     {v0.16b}, [x0], x1
+    ld1     {v1.16b}, [x2], x3
+    uabdl   v2.8h, v0.8b, v1.8b
+    uabal2  v2.8h, v0.16b, v1.16b
+.rept 15
+    ld1     {v0.16b}, [x0], x1
+    ld1     {v1.16b}, [x2], x3
+    uabal   v2.8h, v0.8b, v1.8b
+    uabal2  v2.8h, v0.16b, v1.16b
+.endr
+    saddlv  s2, v2.8h
+    fmov    w0, s2
+WELS_ASM_AARCH64_FUNC_END
+
 #endif
