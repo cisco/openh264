@@ -1346,8 +1346,6 @@ DECODING_STATE CWelsDecoder::ParseAccessUnit (SWelsDecoderThreadCTX& sThreadCtx)
     if (ERR_NONE != iErr) {
       return (DECODING_STATE) (iRet | iErr);
     }
-  }
-  if (sThreadCtx.pCtx->bNewSeqBegin) {
     m_pPicBuff = sThreadCtx.pCtx->pPicBuff;
     // Keep all thread contexts from carrying stale pointers to the DPB that
     // was just replaced.
@@ -1418,9 +1416,6 @@ int CWelsDecoder::ThreadDecodeFrameInternal (const unsigned char* kpSrc, const i
   memcpy (&m_pDecThrCtx[signal].sDstInfo, pDstInfo, sizeof (SBufferInfo));
 
   ParseAccessUnit (m_pDecThrCtx[signal]);
-  if (m_pDecThrCtx[signal].pCtx->bNewSeqBegin) {
-    m_pDecThrCtx[signal].pCtx->pLastThreadCtx = NULL;
-  }
   if (m_iThreadCount > 1) {
     m_pLastDecThrCtx = &m_pDecThrCtx[signal];
   }
