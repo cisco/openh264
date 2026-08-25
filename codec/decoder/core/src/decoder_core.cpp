@@ -2817,7 +2817,11 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         for (int32_t i = 0; i < iThreadCount; ++i) {
           if (i == id || pThreadCtx[i - id].pCtx->uiDecodingTimeStamp == 0) continue;
           if (pThreadCtx[i - id].pCtx->uiDecodingTimeStamp < pCtx->uiDecodingTimeStamp) {
-            WAIT_EVENT (&pThreadCtx[i - id].sSliceDecodeFinish, WELS_DEC_THREAD_WAIT_INFINITE);
+            if (WAIT_EVENT (&pThreadCtx[i - id].sSliceDecodeFinish, WELS_DEC_THREAD_WAIT_TIMEOUT_MS)
+                != WELS_DEC_THREAD_WAIT_SIGNALED) {
+              pCtx->iErrorCode |= dsRefLost;
+              return GENERATE_ERROR_NO (ERR_LEVEL_SLICE_DATA, ERR_INFO_REFERENCE_PIC_LOST);
+            }
           }
         }
         pCtx->pLastDecPicInfo->uiDecodingTimeStamp = pCtx->uiDecodingTimeStamp;

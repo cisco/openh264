@@ -1,7 +1,11 @@
 #include <gtest/gtest.h>
 #include "utils/HashFunctions.h"
 #include "BaseThreadDecoderTest.h"
+#include <climits>
+#include <cstring>
+#include <fstream>
 #include <string>
+#include <vector>
 
 static void UpdateHashFromPlane (SHA1Context* ctx, const uint8_t* plane,
                                  int width, int height, int stride) {
@@ -9,6 +13,178 @@ static void UpdateHashFromPlane (SHA1Context* ctx, const uint8_t* plane,
     SHA1Input (ctx, plane, width);
     plane += stride;
   }
+}
+
+static int32_t ReadBitForHangRegression (uint8_t* pBufPtr, int32_t& curBit) {
+  int nIndex = curBit / 8;
+  int nOffset = curBit % 8 + 1;
+
+  curBit++;
+  return (pBufPtr[nIndex] >> (8 - nOffset)) & 0x01;
+}
+
+static int32_t ReadBitsForHangRegression (uint8_t* pBufPtr, int32_t& n, int32_t& curBit) {
+  int r = 0;
+  for (int i = 0; i < n; ++i) {
+    r |= (ReadBitForHangRegression (pBufPtr, curBit) << (n - i - 1));
+  }
+  return r;
+}
+
+static int32_t BsGetUeForHangRegression (uint8_t* pBufPtr, int32_t& curBit) {
+  int r = 0;
+  int i = 0;
+  while ((ReadBitForHangRegression (pBufPtr, curBit) == 0) && (i < 32)) {
+    ++i;
+  }
+  r = ReadBitsForHangRegression (pBufPtr, i, curBit);
+  r += (1 << i) - 1;
+  return r;
+}
+
+static int32_t ReadFirstMbInSliceForHangRegression (uint8_t* pSliceNalPtr) {
+  int32_t curBit = 0;
+  return BsGetUeForHangRegression (pSliceNalPtr + 1, curBit);
+}
+
+static int32_t ReadFrameForHangRegression (uint8_t* pBuf, const int32_t& iFileSize, const int32_t& bufPos) {
+  int32_t bytesAvailable = iFileSize - bufPos;
+  if (bytesAvailable < 4) {
+    return bytesAvailable;
+  }
+
+  uint8_t* ptr = pBuf + bufPos;
+  int32_t readBytes = 0;
+  int32_t spsCount = 0;
+  int32_t ppsCount = 0;
+  int32_t nonIdrPictCount = 0;
+  int32_t idrPictCount = 0;
+  int32_t nalDelimiterCount = 0;
+
+  while (readBytes < bytesAvailable - 4) {
+    bool has4ByteStartCode = ptr[0] == 0 && ptr[1] == 0 && ptr[2] == 0 && ptr[3] == 1;
+    bool has3ByteStartCode = false;
+    if (!has4ByteStartCode) {
+      has3ByteStartCode = ptr[0] == 0 && ptr[1] == 0 && ptr[2] == 1;
+    }
+
+    if (has4ByteStartCode || has3ByteStartCode) {
+      int32_t byteOffset = has4ByteStartCode ? 4 : 3;
+      uint8_t nalUnitType = has4ByteStartCode ? (ptr[4] & 0x1F) : (ptr[3] & 0x1F);
+
+      if (nalUnitType == 1) {
+        int32_t firstMbInSlice = ReadFirstMbInSliceForHangRegression (ptr + byteOffset);
+        if (++nonIdrPictCount >= 1 && idrPictCount >= 1 && firstMbInSlice == 0) {
+          return readBytes;
+        }
+        if (nonIdrPictCount >= 2 && firstMbInSlice == 0) {
+          return readBytes;
+        }
+      } else if (nalUnitType == 5) {
+        int32_t firstMbInSlice = ReadFirstMbInSliceForHangRegression (ptr + byteOffset);
+        if (++idrPictCount >= 1 && nonIdrPictCount >= 1 && firstMbInSlice == 0) {
+          return readBytes;
+        }
+        if (idrPictCount >= 2 && firstMbInSlice == 0) {
+          return readBytes;
+        }
+      } else if (nalUnitType == 7) {
+        if ((++spsCount >= 1) && (nonIdrPictCount >= 1 || idrPictCount >= 1)) {
+          return readBytes;
+        }
+        if (spsCount == 2) {
+          return readBytes;
+        }
+      } else if (nalUnitType == 8) {
+        if (++ppsCount >= 1 && (nonIdrPictCount >= 1 || idrPictCount >= 1)) {
+          return readBytes;
+        }
+      } else if (nalUnitType == 9) {
+        if (++nalDelimiterCount == 2) {
+          return readBytes;
+        }
+      }
+
+      if (readBytes >= bytesAvailable - 4) {
+        return bytesAvailable;
+      }
+      readBytes += 4;
+      ptr += 4;
+    } else {
+      ++ptr;
+      ++readBytes;
+    }
+  }
+
+  return bytesAvailable;
+}
+
+class ThreadDecoderHangRegressionTest : public ::testing::Test {
+};
+
+TEST_F (ThreadDecoderHangRegressionTest, Static264ThreeDecodeCallsDoNotDeadlock) {
+  std::ifstream file ("res/Static.264", std::ios::in | std::ios::binary);
+  ASSERT_TRUE (file.is_open());
+  std::vector<uint8_t> bitstream ((std::istreambuf_iterator<char> (file)), std::istreambuf_iterator<char> ());
+  ASSERT_FALSE (bitstream.empty());
+
+  int32_t fileSize = static_cast<int32_t> (bitstream.size());
+  int32_t pos = 0;
+  int32_t frame1 = ReadFrameForHangRegression (bitstream.data(), fileSize, pos);
+  pos += frame1;
+  int32_t frame2 = ReadFrameForHangRegression (bitstream.data(), fileSize, pos);
+  pos += frame2;
+  int32_t frame3 = ReadFrameForHangRegression (bitstream.data(), fileSize, pos);
+
+  ASSERT_GT (frame1, 1);
+  ASSERT_GT (frame2, 0);
+  ASSERT_GT (frame3, 0);
+
+  ISVCDecoder* decoder = NULL;
+  ASSERT_EQ (0, WelsCreateDecoder (&decoder));
+  ASSERT_TRUE (decoder != NULL);
+
+  int threadCount = 2;
+  decoder->SetOption (DECODER_OPTION_NUM_OF_THREADS, &threadCount);
+
+  SDecodingParam decodingParam;
+  std::memset (&decodingParam, 0, sizeof (SDecodingParam));
+  decodingParam.uiTargetDqLayer = UCHAR_MAX;
+  decodingParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
+  decodingParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
+  ASSERT_EQ (0, decoder->Initialize (&decodingParam));
+
+  uint8_t* dst[3] = {NULL, NULL, NULL};
+  SBufferInfo info;
+
+  std::memset (&info, 0, sizeof (info));
+  info.uiInBsTimeStamp = 1;
+  DECODING_STATE state = decoder->DecodeFrameNoDelay (bitstream.data(), frame1 - 1, dst, &info);
+  EXPECT_EQ (dsErrorFree, state);
+
+  std::memset (&info, 0, sizeof (info));
+  info.uiInBsTimeStamp = 2;
+  state = decoder->DecodeFrameNoDelay (bitstream.data() + frame1, frame2, dst, &info);
+  EXPECT_EQ (dsErrorFree, state);
+
+  std::memset (&info, 0, sizeof (info));
+  info.uiInBsTimeStamp = 3;
+  state = decoder->DecodeFrameNoDelay (bitstream.data() + frame1 + frame2, frame3, dst, &info);
+  EXPECT_EQ (dsErrorFree, state);
+
+  // Drain pipelined in-flight frames before teardown so Uninitialize() does not
+  // free decoder state while a worker thread is still reconstructing.
+  int32_t endOfStream = 1;
+  decoder->SetOption (DECODER_OPTION_END_OF_STREAM, &endOfStream);
+  int32_t remaining = 0;
+  decoder->GetOption (DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER, &remaining);
+  for (int32_t i = 0; i < remaining; ++i) {
+    std::memset (&info, 0, sizeof (info));
+    decoder->FlushFrame (dst, &info);
+  }
+
+  decoder->Uninitialize();
+  WelsDestroyDecoder (decoder);
 }
 
 class ThreadDecoderCapabilityTest : public ::testing::Test {

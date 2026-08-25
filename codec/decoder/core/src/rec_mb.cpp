@@ -267,7 +267,10 @@ void BaseMC (PWelsDecoderContext pCtx, sMCRefMember* pMCRefMem, const int32_t& l
     if (offset > pCtx->lastReadyHeightOffset[listIdx][iRefIdx]) {
       const int32_t down_line = WELS_MIN (offset >> 4, int32_t (pCtx->sMb.iMbHeight) - 1);
       if (pRefPic->pReadyEvent[down_line].isSignaled != 1) {
-        WAIT_EVENT (&pRefPic->pReadyEvent[down_line], WELS_DEC_THREAD_WAIT_INFINITE);
+        if (WAIT_EVENT (&pRefPic->pReadyEvent[down_line], WELS_DEC_THREAD_WAIT_TIMEOUT_MS) != WELS_DEC_THREAD_WAIT_SIGNALED) {
+          pCtx->iErrorCode |= dsRefLost;
+          return;
+        }
       }
       pCtx->lastReadyHeightOffset[listIdx][iRefIdx] = offset;
     }

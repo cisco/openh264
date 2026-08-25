@@ -103,6 +103,9 @@ typedef struct tagWelsDecThread {
 
 #endif//_WIN32
 
+// Bound inter-thread waits so a lost reference cannot hang the decoder.
+#define WELS_DEC_THREAD_WAIT_TIMEOUT_MS  3000
+
 #define WelsDecThreadReturn   WELS_THREAD_ROUTINE_RETURN(0);
 
 int32_t GetCPUCount();

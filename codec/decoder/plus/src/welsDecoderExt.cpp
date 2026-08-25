@@ -101,7 +101,10 @@ static DECODING_STATE  ConstructAccessUnit (CWelsDecoder* pWelsDecoder, PWelsDec
   //WelsMutexLock (&pWelsDecoder->m_csDecoder);
   if (pThrCtx->pCtx->pLastThreadCtx != NULL) {
     PWelsDecoderThreadCTX pLastThreadCtx = (PWelsDecoderThreadCTX) (pThrCtx->pCtx->pLastThreadCtx);
-    WAIT_EVENT (&pLastThreadCtx->sSliceDecodeStart, WELS_DEC_THREAD_WAIT_INFINITE);
+    if (WAIT_EVENT (&pLastThreadCtx->sSliceDecodeStart, WELS_DEC_THREAD_WAIT_TIMEOUT_MS) != WELS_DEC_THREAD_WAIT_SIGNALED) {
+      pThrCtx->pCtx->iErrorCode |= dsRefLost;
+      return (DECODING_STATE)GENERATE_ERROR_NO (ERR_LEVEL_SLICE_DATA, ERR_INFO_REFERENCE_PIC_LOST);
+    }
     RESET_EVENT (&pLastThreadCtx->sSliceDecodeStart);
   }
   pThrCtx->pDec = NULL;
@@ -1339,7 +1342,7 @@ DECODING_STATE CWelsDecoder::ParseAccessUnit (SWelsDecoderThreadCTX& sThreadCtx)
   }
   m_bParamSetsLostFlag = sThreadCtx.pCtx->bNewSeqBegin ? false : sThreadCtx.pCtx->bParamSetsLostFlag;
   m_bFreezeOutput = sThreadCtx.pCtx->bNewSeqBegin ? false : sThreadCtx.pCtx->bFreezeOutput;
-  return (DECODING_STATE)iErr;
+  return (DECODING_STATE) (iRet | iErr);
 }
 /*
 * Run decoding picture in separate thread.
@@ -1372,7 +1375,6 @@ int CWelsDecoder::ThreadDecodeFrameInternal (const unsigned char* kpSrc, const i
     }
   }
 
-  m_pDecThrCtxActive[m_DecCtxActiveCount++] = &m_pDecThrCtx[signal];
   if (m_pLastDecThrCtx != NULL) {
     m_pDecThrCtx[signal].pCtx->pLastThreadCtx = m_pLastDecThrCtx;
   }
@@ -1381,7 +1383,18 @@ int CWelsDecoder::ThreadDecodeFrameInternal (const unsigned char* kpSrc, const i
   m_pDecThrCtx[signal].ppDst = ppDst;
   memcpy (&m_pDecThrCtx[signal].sDstInfo, pDstInfo, sizeof (SBufferInfo));
 
-  ParseAccessUnit (m_pDecThrCtx[signal]);
+  state = ParseAccessUnit (m_pDecThrCtx[signal]);
+  if (state != dsErrorFree) {
+    RELEASE_SEMAPHORE (&m_pDecThrCtx[signal].sThreadInfo.sIsIdle);
+    return state;
+  }
+
+  if (m_iThreadCount > 1 && m_pDecThrCtx[signal].pCtx->pAccessUnitList->uiAvailUnitsNum == 0) {
+    RELEASE_SEMAPHORE (&m_pDecThrCtx[signal].sThreadInfo.sIsIdle);
+    return state;
+  }
+
+  m_pDecThrCtxActive[m_DecCtxActiveCount++] = &m_pDecThrCtx[signal];
   if (m_iThreadCount > 1) {
     m_pLastDecThrCtx = &m_pDecThrCtx[signal];
   }
