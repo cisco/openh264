@@ -930,28 +930,25 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
       break;
 
     case GMP_BufferLength32: {
+      static const uint8_t code[] = { 0x00, 0x00, 0x00, 0x01 };
       uint8_t* start_code = inputFrame->Buffer();
-      uint8_t* const frame_end = inputFrame->Buffer() + inputFrame->Size();
-      // start code should be at least four bytes from the end or we risk
-      // reading/writing outside the buffer.
-      while (static_cast<size_t> (frame_end - start_code) >= sizeof (uint32_t)) {
-        static const uint8_t code[] = { 0x00, 0x00, 0x00, 0x01 };
-        uint8_t* lenp = start_code;
-        uint32_t nal_length = 0;
-        memcpy (&nal_length, lenp, sizeof (nal_length));
+      uint32_t remaining = inputFrame->Size();
 
-        // The length field is untrusted input.  Reject zero lengths and
-        // lengths that would move the cursor outside the frame buffer.
-        size_t remaining = static_cast<size_t> (frame_end - start_code);
-        if (nal_length == 0 || nal_length > remaining) {
+      // Keep old semantics: length field includes the 4-byte length header.
+      while (remaining >= sizeof (uint32_t)) {
+        uint32_t nal_length = 0;
+        memcpy (&nal_length, start_code, sizeof (nal_length));
+        if (nal_length <= sizeof (uint32_t) || nal_length > remaining) {
           GMPLOG (GL_ERROR, "Malformed GMP_BufferLength32 frame: nal_length="
                   << nal_length << " remaining=" << remaining);
+          inputFrame->Destroy();
           Error (GMPDecodeErr);
           return;
         }
 
-        memcpy (lenp, code, 4);
+        memcpy (start_code, code, sizeof (code));
         start_code += nal_length;
+        remaining -= nal_length;
       }
     }
     break;
