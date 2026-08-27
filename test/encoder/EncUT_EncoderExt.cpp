@@ -47,6 +47,7 @@ class EncoderInterfaceTest : public ::testing::Test {
 
     pSrcPic = new SSourcePicture;
     ASSERT_TRUE (pSrcPic != NULL);
+    memset (pSrcPic, 0, sizeof (SSourcePicture));
 
     pOption = new SEncParamExt();
     ASSERT_TRUE (pOption != NULL);
