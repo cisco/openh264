@@ -220,7 +220,7 @@ void RcUpdateBitrateFps (sWelsEncCtx* pEncCtx) {
   const int32_t kiHighestTid = pDLayerParamInternal->iHighestTemporalId;
   const int32_t input_iBitsPerFrame = WELS_DIV_ROUND (pDLayerParam->iSpatialBitrate,
                                       pDLayerParamInternal->fOutputFrameRate);
-  const int64_t kiGopBits = input_iBitsPerFrame * kiGopSize;
+  const int64_t kiGopBits = static_cast<int64_t> (input_iBitsPerFrame) * kiGopSize;
   int32_t i;
 
   pWelsSvcRc->iBitRate   = pDLayerParam->iSpatialBitrate;
@@ -452,15 +452,15 @@ void RcCalculateIdrQp (sWelsEncCtx* pEncCtx) {
 
     //obtain the idr qp using previous idr complexity
     if (pWelsSvcRc->iNumberMbFrame != pWelsSvcRc->iIntraMbCount) {
-      pWelsSvcRc->iIntraComplexity = pWelsSvcRc->iIntraComplexity * pWelsSvcRc->iNumberMbFrame /
-                                     pWelsSvcRc->iIntraMbCount;
+      pWelsSvcRc->iIntraComplexity = static_cast<int32_t> (static_cast<int64_t> (pWelsSvcRc->iIntraComplexity) * pWelsSvcRc->iNumberMbFrame /
+                                     pWelsSvcRc->iIntraMbCount);
     }
 
     int64_t iCmplxRatio = WELS_DIV_ROUND64 (iFrameComplexity * INT_MULTIPLY,
                                             pWelsSvcRc->iIntraComplxMean);
     iCmplxRatio = WELS_CLIP3 (iCmplxRatio, INT_MULTIPLY - FRAME_CMPLX_RATIO_RANGE, INT_MULTIPLY + FRAME_CMPLX_RATIO_RANGE);
-    pWelsSvcRc->iQStep = WELS_DIV_ROUND ((pWelsSvcRc->iIntraComplexity * iCmplxRatio),
-                                         (pWelsSvcRc->iTargetBits * INT_MULTIPLY));
+    pWelsSvcRc->iQStep = static_cast<int32_t> (WELS_DIV_ROUND64 (static_cast<int64_t> (pWelsSvcRc->iIntraComplexity) * iCmplxRatio,
+                                               static_cast<int64_t> (pWelsSvcRc->iTargetBits) * INT_MULTIPLY));
     pWelsSvcRc->iInitialQp = RcConvertQStep2Qp (pWelsSvcRc->iQStep);
   }
 
@@ -504,7 +504,8 @@ void RcCalculatePictureQp (sWelsEncCtx* pEncCtx) {
                                             pTOverRc->iFrameCmplxMean);
     iCmplxRatio = WELS_CLIP3 (iCmplxRatio, INT_MULTIPLY - FRAME_CMPLX_RATIO_RANGE, INT_MULTIPLY + FRAME_CMPLX_RATIO_RANGE);
 
-    pWelsSvcRc->iQStep = WELS_DIV_ROUND ((pTOverRc->iLinearCmplx * iCmplxRatio), (pWelsSvcRc->iTargetBits * INT_MULTIPLY));
+    pWelsSvcRc->iQStep = static_cast<int32_t> (WELS_DIV_ROUND64 (static_cast<int64_t> (pTOverRc->iLinearCmplx) * iCmplxRatio,
+                                               static_cast<int64_t> (pWelsSvcRc->iTargetBits) * INT_MULTIPLY));
     iLumaQp = RcConvertQStep2Qp (pWelsSvcRc->iQStep);
     WelsLog (& (pEncCtx->sLogCtx), WELS_LOG_DEBUG,
              "iCmplxRatio = %d,frameComplexity = %" PRId64 ",iFrameCmplxMean = %" PRId64 ",iQStep = %d,iLumaQp = %d", (int)iCmplxRatio,
@@ -574,10 +575,10 @@ void RcDecideTargetBits (sWelsEncCtx* pEncCtx) {
   const bool fix_rc_overshoot = pEncCtx->pSvcParam->bFixRCOverShoot;
   //allocate bits
   if (pEncCtx->eSliceType == I_SLICE) {
-    if( pWelsSvcRc->iIdrNum != 0 ){
-      pWelsSvcRc->iTargetBits = pWelsSvcRc->iBitsPerFrame * pEncCtx->pSvcParam->iIdrBitrateRatio / 100;
+    if (pWelsSvcRc->iIdrNum != 0) {
+      pWelsSvcRc->iTargetBits = static_cast<int32_t> (static_cast<int64_t> (pWelsSvcRc->iBitsPerFrame) * pEncCtx->pSvcParam->iIdrBitrateRatio / 100);
     } else {
-      pWelsSvcRc->iTargetBits = pWelsSvcRc->iBitsPerFrame * IDR_BITRATE_RATIO;
+      pWelsSvcRc->iTargetBits = static_cast<int32_t> (static_cast<int64_t> (pWelsSvcRc->iBitsPerFrame) * IDR_BITRATE_RATIO);
     }
   } else {
     if (pWelsSvcRc->iRemainingWeights > pTOverRc->iTlayerWeight ||
