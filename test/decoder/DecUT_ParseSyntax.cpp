@@ -651,4 +651,31 @@ TEST_F (DecoderParseSyntaxTest, ExpandBsBufferRetargetsQueuedNalUnitsOnly) {
   Uninit();
 }
 
+TEST (DecoderBitStreamBoundsTest, DecInitBitsHandlesShortSeedBytesSafely) {
+  uint8_t uiBuf[3] = {0xff, 0xff, 0xff};
+  SBitStringAux sBs;
+  memset (&sBs, 0, sizeof (sBs));
+
+  ASSERT_EQ (ERR_NONE, DecInitBits (&sBs, uiBuf, 24));
+
+  uint32_t uiCode = 0;
+  EXPECT_EQ (ERR_NONE, BsGetBits (&sBs, 16, &uiCode));
+  EXPECT_EQ (ERR_NONE, BsGetBits (&sBs, 16, &uiCode));
+  EXPECT_EQ (ERR_INFO_READ_OVERFLOW, BsGetBits (&sBs, 16, &uiCode));
+}
+
+TEST (DecoderBitStreamBoundsTest, BsGetBitsStopsOnTwoByteOverread) {
+  uint8_t uiBuf[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+  SBitStringAux sBs;
+  memset (&sBs, 0, sizeof (sBs));
+
+  ASSERT_EQ (ERR_NONE, DecInitBits (&sBs, uiBuf, 48));
+
+  uint32_t uiCode = 0;
+  EXPECT_EQ (ERR_NONE, BsGetBits (&sBs, 16, &uiCode));
+  EXPECT_EQ (ERR_NONE, BsGetBits (&sBs, 16, &uiCode));
+  EXPECT_EQ (ERR_NONE, BsGetBits (&sBs, 16, &uiCode));
+  EXPECT_EQ (ERR_INFO_READ_OVERFLOW, BsGetBits (&sBs, 16, &uiCode));
+}
+
 

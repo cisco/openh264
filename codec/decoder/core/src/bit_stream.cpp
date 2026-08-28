@@ -48,11 +48,26 @@ inline uint32_t GetValue4Bytes (uint8_t* pDstNal) {
   return uiValue;
 }
 
+inline uint32_t GetValue4BytesSafe (uint8_t* pDstNal, intX_t iAvailableBytes) {
+  uint32_t uiValue = 0;
+  for (intX_t i = 0; i < 4; ++i) {
+    uiValue <<= 8;
+    if (i < iAvailableBytes) {
+      uiValue |= pDstNal[i];
+    }
+  }
+  return uiValue;
+}
+
 int32_t InitReadBits (PBitStringAux pBitString, intX_t iEndOffset) {
-  if (pBitString->pCurBuf >= (pBitString->pEndBuf - iEndOffset)) {
+  const intX_t kiAllowedBytes = (pBitString->pEndBuf - pBitString->pStartBuf) - iEndOffset;
+  const intX_t kiReadBytes = pBitString->pCurBuf - pBitString->pStartBuf;
+  const intX_t kiRemainBytes = kiAllowedBytes - kiReadBytes;
+  if (kiRemainBytes <= 0) {
     return ERR_INFO_INVALID_ACCESS;
   }
-  pBitString->uiCurBits  = GetValue4Bytes (pBitString->pCurBuf);
+  const intX_t kiSeedBytes = (kiRemainBytes < 4) ? kiRemainBytes : 4;
+  pBitString->uiCurBits  = GetValue4BytesSafe (pBitString->pCurBuf, kiSeedBytes);
   pBitString->pCurBuf  += 4;
   pBitString->iLeftBits = -16;
   return ERR_NONE;
