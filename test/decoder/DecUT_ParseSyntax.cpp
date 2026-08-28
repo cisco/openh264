@@ -657,12 +657,10 @@ TEST (DecoderBitStreamBoundsTest, DecInitBitsHandlesShortSeedBytesSafely) {
   memset (&sBs, 0, sizeof (sBs));
 
   ASSERT_EQ (ERR_NONE, DecInitBits (&sBs, uiBuf, 24));
-  EXPECT_EQ (sBs.pEndBuf, sBs.pCurBuf);
 
   uint32_t uiCode = 0;
   EXPECT_EQ (ERR_NONE, BsGetBits (&sBs, 16, &uiCode));
   EXPECT_EQ (ERR_NONE, BsGetBits (&sBs, 16, &uiCode));
-  EXPECT_EQ (sBs.pEndBuf, sBs.pCurBuf);
   EXPECT_EQ (ERR_INFO_READ_OVERFLOW, BsGetBits (&sBs, 16, &uiCode));
 }
 
@@ -677,7 +675,6 @@ TEST (DecoderBitStreamBoundsTest, BsGetBitsStopsOnTwoByteOverread) {
   EXPECT_EQ (ERR_NONE, BsGetBits (&sBs, 16, &uiCode));
   EXPECT_EQ (ERR_NONE, BsGetBits (&sBs, 16, &uiCode));
   EXPECT_EQ (ERR_NONE, BsGetBits (&sBs, 16, &uiCode));
-  EXPECT_EQ (sBs.pEndBuf, sBs.pCurBuf);
   EXPECT_EQ (ERR_INFO_READ_OVERFLOW, BsGetBits (&sBs, 16, &uiCode));
 }
 

@@ -68,7 +68,7 @@ int32_t InitReadBits (PBitStringAux pBitString, intX_t iEndOffset) {
   }
   const intX_t kiSeedBytes = (kiRemainBytes < 4) ? kiRemainBytes : 4;
   pBitString->uiCurBits  = GetValue4BytesSafe (pBitString->pCurBuf, kiSeedBytes);
-  pBitString->pCurBuf  += kiSeedBytes;
+  pBitString->pCurBuf  += 4;
   pBitString->iLeftBits = -16;
   return ERR_NONE;
 }
