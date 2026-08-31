@@ -66,15 +66,13 @@ if ['linux', 'freebsd', 'android', 'ios', 'darwin'].contains(system)
   endif
   if cpu_family == 'x86'
     asm_format = asm_format32
-    asm_args += ['-DX86_32', '-DX86_32_PICASM', '-DHAVE_AVX2']
-    add_project_arguments('-DHAVE_AVX2', language: 'cpp')
-    add_project_arguments('-DHAVE_AVX2', '-DX86_ASM', '-DX86_32_ASM', language: 'c')
+    asm_args += ['-DX86_32', '-DX86_32_PICASM']
+    add_project_arguments('-DX86_ASM', '-DX86_32_ASM', language: 'c')
     asm_inc = join_paths(meson.current_source_dir(), 'codec', 'common', 'x86', '')
   elif cpu_family == 'x86_64'
     asm_format = asm_format64
-    asm_args += ['-DUNIX64', '-DHAVE_AVX2']
-    add_project_arguments('-DHAVE_AVX2', language: 'cpp')
-    add_project_arguments('-DHAVE_AVX2', '-DX86_ASM', language: 'c')
+    asm_args += ['-DUNIX64']
+    add_project_arguments('-DX86_ASM', language: 'c')
     asm_inc = join_paths(meson.current_source_dir(), 'codec', 'common', 'x86', '')
   elif cpu_family == 'arm'
     asm_format = asm_format32
@@ -141,6 +139,14 @@ elif system == 'windows'
   endif
 else
   error('FIXME: Unhandled system @0@'.format(system))
+endif
+
+if cpu_family in ['x86', 'x86_64']
+  if cc.get_define('_M_IX86_FP') == '2' or cc.has_define('__AVX2__')
+    asm_args += ['-DHAVE_AVX2']
+    add_project_arguments('-DHAVE_AVX2', language: 'cpp')
+    add_project_arguments('-DHAVE_AVX2', language: 'c')
+  endif
 endif
 
 use_asm_gen = false
