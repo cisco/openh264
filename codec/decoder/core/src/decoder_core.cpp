@@ -686,6 +686,7 @@ int32_t ExpandBsBuffer (PWelsDecoderContext pCtx, const int kiSrcLen) {
 
   if (pCtx->pParam->bParseOnly) {
     //Realloc sSavedData
+    uint8_t* pOldSavedBsBuff = pCtx->sSavedData.pHead;
     uint8_t* pNewSavedBsBuff = static_cast<uint8_t*> (pMa->WelsMallocz (iNewBuffLen, "pCtx->sSavedData.pHead"));
     if (pNewSavedBsBuff == NULL) {
       WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "ExpandBsBuffer() Failed for malloc pNewSavedBsBuff (%d)", iNewBuffLen);
@@ -698,6 +699,21 @@ int32_t ExpandBsBuffer (PWelsDecoderContext pCtx, const int kiSrcLen) {
     pCtx->sSavedData.pStartPos = pNewSavedBsBuff + (pCtx->sSavedData.pStartPos - pCtx->sSavedData.pHead);
     pCtx->sSavedData.pCurPos   = pNewSavedBsBuff + (pCtx->sSavedData.pCurPos   - pCtx->sSavedData.pHead);
     pCtx->sSavedData.pEnd      = pNewSavedBsBuff + iNewBuffLen;
+
+    // Retarget pNalPos for all queued NALs (current AU + next AU) before freeing.
+    const uintptr_t kuiOldStart = reinterpret_cast<uintptr_t> (pOldSavedBsBuff);
+    const uintptr_t kuiOldEnd = kuiOldStart + static_cast<uintptr_t> (pCtx->iMaxBsBufferSizeInByte);
+    for (uint32_t i = 0; i < kuiRetargetNum; ++i) {
+      PNalUnit pNal = pCtx->pAccessUnitList->pNalUnitsList[i];
+      if (pNal == NULL || pNal->sNalData.sVclNal.pNalPos == NULL) {
+        continue;
+      }
+      const uintptr_t kuiNalPos = reinterpret_cast<uintptr_t> (pNal->sNalData.sVclNal.pNalPos);
+      if (kuiNalPos >= kuiOldStart && kuiNalPos < kuiOldEnd) {
+        pNal->sNalData.sVclNal.pNalPos = pNewSavedBsBuff + (kuiNalPos - kuiOldStart);
+      }
+    }
+
     pMa->WelsFree (pCtx->sSavedData.pHead, "pCtx->sSavedData.pHead");
     pCtx->sSavedData.pHead = pNewSavedBsBuff;
   }
