@@ -1,6 +1,7 @@
 /*!
  * \copy
  *     Copyright (c)  2009-2013, Cisco Systems
+ *     Copyright (c)  2026, Richard Ben Aleya
  *     All rights reserved.
  *
  *     Redistribution and use in source and binary forms, with or without
@@ -56,6 +57,10 @@ extern "C" {
 //for intra-prediction ASM functions
 void WelsI16x16LumaPredV_sse2 (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
 void WelsI16x16LumaPredH_sse2 (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+#if defined(HAVE_AVX2)
+void WelsI16x16LumaPredV_avx2 (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+void WelsI16x16LumaPredH_avx2 (uint8_t* pPred, uint8_t* pRef, const int32_t kiStride);
+#endif//HAVE_AVX2
 #endif//X86_ASM
 
 #if defined(HAVE_NEON)
