@@ -1,6 +1,7 @@
 ;*!
 ;* \copy
 ;*     Copyright (c)  2009-2013, Cisco Systems
+;*     Copyright (c)  2026, Richard Ben Aleya
 ;*     All rights reserved.
 ;*
 ;*     Redistribution and use in source and binary forms, with or without
@@ -2732,3 +2733,388 @@ WELS_EXTERN WelsSampleSad4x4_mmx
     WELSEMMS
     LOAD_4_PARA_POP
     ret
+
+%ifdef HAVE_AVX2
+;***********************************************************************
+;
+;Pixel_sad_wxh_avx2 BEGIN
+;
+;***********************************************************************
+
+%macro AVX2_GetSad2x16 0
+    vmovdqu      xmm0, [r0]
+    vinserti128  ymm0, ymm0, [r0+r1], 1
+    vmovdqu      xmm1, [r2]
+    vinserti128  ymm1, ymm1, [r2+r3], 1
+    vpsadbw      ymm2, ymm0, ymm1
+    vpaddq       ymm7, ymm7, ymm2
+    lea          r0, [r0+2*r1]
+    lea          r2, [r2+2*r3]
+%endmacro
+
+;***********************************************************************
+;int32_t WelsSampleSad16x16_avx2(uint8_t*, int32_t, uint8_t*, int32_t)
+;***********************************************************************
+WELS_EXTERN WelsSampleSad16x16_avx2
+    %assign push_num 0
+    LOAD_4_PARA
+    PUSH_XMM 8
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
+    vpxor        ymm7, ymm7, ymm7
+    %rep 8
+    AVX2_GetSad2x16
+    %endrep
+    vextracti128 xmm0, ymm7, 1
+    vpaddq       xmm0, xmm0, xmm7
+    vpsrldq      xmm1, xmm0, 8
+    vpaddq       xmm0, xmm0, xmm1
+    vmovd        retrd, xmm0
+    vzeroupper
+    POP_XMM
+    LOAD_4_PARA_POP
+    ret
+
+;***********************************************************************
+;int32_t WelsSampleSad16x8_avx2(uint8_t*, int32_t, uint8_t*, int32_t)
+;***********************************************************************
+WELS_EXTERN WelsSampleSad16x8_avx2
+    %assign push_num 0
+    LOAD_4_PARA
+    PUSH_XMM 8
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
+    vpxor        ymm7, ymm7, ymm7
+    %rep 4
+    AVX2_GetSad2x16
+    %endrep
+    vextracti128 xmm0, ymm7, 1
+    vpaddq       xmm0, xmm0, xmm7
+    vpsrldq      xmm1, xmm0, 8
+    vpaddq       xmm0, xmm0, xmm1
+    vmovd        retrd, xmm0
+    vzeroupper
+    POP_XMM
+    LOAD_4_PARA_POP
+    ret
+
+;***********************************************************************
+;int32_t WelsSampleSad8x16_avx2(uint8_t*, int32_t, uint8_t*, int32_t)
+;***********************************************************************
+WELS_EXTERN WelsSampleSad8x16_avx2
+    %assign push_num 0
+    LOAD_4_PARA
+    PUSH_XMM 7
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
+    vpxor        ymm6, ymm6, ymm6
+    %rep 4
+    vmovq        xmm0, [r0]
+    vmovhps      xmm0, xmm0, [r0+r1]
+    lea          r0, [r0+2*r1]
+    vmovq        xmm1, [r0]
+    vmovhps      xmm1, xmm1, [r0+r1]
+    vinserti128  ymm0, ymm0, xmm1, 1
+    vmovq        xmm2, [r2]
+    vmovhps      xmm2, xmm2, [r2+r3]
+    lea          r2, [r2+2*r3]
+    vmovq        xmm3, [r2]
+    vmovhps      xmm3, xmm3, [r2+r3]
+    vinserti128  ymm2, ymm2, xmm3, 1
+    vpsadbw      ymm4, ymm0, ymm2
+    vpaddq       ymm6, ymm6, ymm4
+    lea          r0, [r0+2*r1]
+    lea          r2, [r2+2*r3]
+    %endrep
+    vextracti128 xmm0, ymm6, 1
+    vpaddq       xmm0, xmm0, xmm6
+    vpsrldq      xmm1, xmm0, 8
+    vpaddq       xmm0, xmm0, xmm1
+    vmovd        retrd, xmm0
+    vzeroupper
+    POP_XMM
+    LOAD_4_PARA_POP
+    ret
+
+;***********************************************************************
+;int32_t WelsSampleSad8x8_avx2(uint8_t*, int32_t, uint8_t*, int32_t)
+;***********************************************************************
+WELS_EXTERN WelsSampleSad8x8_avx2
+    %assign push_num 0
+    LOAD_4_PARA
+    PUSH_XMM 7
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
+    vpxor        ymm6, ymm6, ymm6
+    %rep 2
+    vmovq        xmm0, [r0]
+    vmovhps      xmm0, xmm0, [r0+r1]
+    lea          r0, [r0+2*r1]
+    vmovq        xmm1, [r0]
+    vmovhps      xmm1, xmm1, [r0+r1]
+    vinserti128  ymm0, ymm0, xmm1, 1
+    vmovq        xmm2, [r2]
+    vmovhps      xmm2, xmm2, [r2+r3]
+    lea          r2, [r2+2*r3]
+    vmovq        xmm3, [r2]
+    vmovhps      xmm3, xmm3, [r2+r3]
+    vinserti128  ymm2, ymm2, xmm3, 1
+    vpsadbw      ymm4, ymm0, ymm2
+    vpaddq       ymm6, ymm6, ymm4
+    lea          r0, [r0+2*r1]
+    lea          r2, [r2+2*r3]
+    %endrep
+    vextracti128 xmm0, ymm6, 1
+    vpaddq       xmm0, xmm0, xmm6
+    vpsrldq      xmm1, xmm0, 8
+    vpaddq       xmm0, xmm0, xmm1
+    vmovd        retrd, xmm0
+    vzeroupper
+    POP_XMM
+    LOAD_4_PARA_POP
+    ret
+
+;***********************************************************************
+;
+;Pixel_sad_wxh_avx2 END
+;
+;***********************************************************************
+
+
+;***********************************************************************
+;
+;Pixel_sad_4_wxh_avx2 BEGIN
+;
+;***********************************************************************
+
+%macro AVX2_SadFour_Reduce 0
+    vextracti128 xmm0, ymm4, 1
+    vpaddq       xmm4, xmm4, xmm0
+    vpsrldq      xmm0, xmm4, 8
+    vpaddq       xmm4, xmm4, xmm0
+
+    vextracti128 xmm0, ymm5, 1
+    vpaddq       xmm5, xmm5, xmm0
+    vpsrldq      xmm0, xmm5, 8
+    vpaddq       xmm5, xmm5, xmm0
+
+    vextracti128 xmm0, ymm6, 1
+    vpaddq       xmm6, xmm6, xmm0
+    vpsrldq      xmm0, xmm6, 8
+    vpaddq       xmm6, xmm6, xmm0
+
+    vextracti128 xmm0, ymm7, 1
+    vpaddq       xmm7, xmm7, xmm0
+    vpsrldq      xmm0, xmm7, 8
+    vpaddq       xmm7, xmm7, xmm0
+
+    vpunpckldq   xmm4, xmm4, xmm5
+    vpunpckldq   xmm6, xmm6, xmm7
+    vpunpcklqdq  xmm4, xmm4, xmm6
+    vmovdqa      [r4], xmm4
+    vzeroupper
+%endmacro
+
+; Process 2 rows for SadFour 16-wide.
+; r0=src, r1=src_stride, r2=ref_up, r3=ref_stride, r5=scratch
+; ymm4=up, ymm5=down, ymm6=left, ymm7=right
+%macro AVX2_SadFour_16x2 0
+    vmovdqu      xmm0, [r0]
+    vinserti128  ymm0, ymm0, [r0+r1], 1
+
+    vmovdqu      xmm1, [r2]
+    vinserti128  ymm1, ymm1, [r2+r3], 1
+    vpsadbw      ymm2, ymm0, ymm1
+    vpaddq       ymm4, ymm4, ymm2
+
+    lea          r5, [r2+2*r3]
+    vmovdqu      xmm1, [r5]
+    vinserti128  ymm1, ymm1, [r5+r3], 1
+    vpsadbw      ymm2, ymm0, ymm1
+    vpaddq       ymm5, ymm5, ymm2
+
+    vmovdqu      xmm1, [r2+r3-1]
+    vinserti128  ymm1, ymm1, [r5-1], 1
+    vpsadbw      ymm2, ymm0, ymm1
+    vpaddq       ymm6, ymm6, ymm2
+
+    vmovdqu      xmm1, [r2+r3+1]
+    vinserti128  ymm1, ymm1, [r5+1], 1
+    vpsadbw      ymm2, ymm0, ymm1
+    vpaddq       ymm7, ymm7, ymm2
+
+    lea          r0, [r0+2*r1]
+    lea          r2, [r2+2*r3]
+%endmacro
+
+;***********************************************************************
+;void WelsSampleSadFour16x16_avx2(uint8_t*, int32_t, uint8_t*, int32_t, int32_t*)
+;***********************************************************************
+WELS_EXTERN WelsSampleSadFour16x16_avx2
+    %assign push_num 0
+%ifdef X86_32
+    push r5
+    %assign push_num 1
+%endif
+    LOAD_5_PARA
+    PUSH_XMM 8
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
+    vpxor        ymm4, ymm4, ymm4
+    vpxor        ymm5, ymm5, ymm5
+    vpxor        ymm6, ymm6, ymm6
+    vpxor        ymm7, ymm7, ymm7
+    sub          r2, r3
+    %rep 8
+    AVX2_SadFour_16x2
+    %endrep
+    AVX2_SadFour_Reduce
+    POP_XMM
+    LOAD_5_PARA_POP
+%ifdef X86_32
+    pop r5
+%endif
+    ret
+
+;***********************************************************************
+;void WelsSampleSadFour16x8_avx2(uint8_t*, int32_t, uint8_t*, int32_t, int32_t*)
+;***********************************************************************
+WELS_EXTERN WelsSampleSadFour16x8_avx2
+    %assign push_num 0
+%ifdef X86_32
+    push r5
+    %assign push_num 1
+%endif
+    LOAD_5_PARA
+    PUSH_XMM 8
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
+    vpxor        ymm4, ymm4, ymm4
+    vpxor        ymm5, ymm5, ymm5
+    vpxor        ymm6, ymm6, ymm6
+    vpxor        ymm7, ymm7, ymm7
+    sub          r2, r3
+    %rep 4
+    AVX2_SadFour_16x2
+    %endrep
+    AVX2_SadFour_Reduce
+    POP_XMM
+    LOAD_5_PARA_POP
+%ifdef X86_32
+    pop r5
+%endif
+    ret
+
+; Process 2 rows for SadFour 8-wide (xmm operations).
+; r0=src, r1=src_stride, r2=ref_up, r3=ref_stride, r5=scratch
+; xmm4=up, xmm5=down, xmm6=left, xmm7=right
+%macro AVX2_SadFour_8x2 0
+    vmovq        xmm0, [r0]
+    vmovhps      xmm0, xmm0, [r0+r1]
+
+    vmovq        xmm1, [r2]
+    vmovhps      xmm1, xmm1, [r2+r3]
+    vpsadbw      xmm2, xmm0, xmm1
+    vpaddq       xmm4, xmm4, xmm2
+
+    lea          r5, [r2+2*r3]
+    vmovq        xmm1, [r5]
+    vmovhps      xmm1, xmm1, [r5+r3]
+    vpsadbw      xmm2, xmm0, xmm1
+    vpaddq       xmm5, xmm5, xmm2
+
+    vmovq        xmm1, [r2+r3-1]
+    vmovhps      xmm1, xmm1, [r5-1]
+    vpsadbw      xmm2, xmm0, xmm1
+    vpaddq       xmm6, xmm6, xmm2
+
+    vmovq        xmm1, [r2+r3+1]
+    vmovhps      xmm1, xmm1, [r5+1]
+    vpsadbw      xmm2, xmm0, xmm1
+    vpaddq       xmm7, xmm7, xmm2
+
+    lea          r0, [r0+2*r1]
+    lea          r2, [r2+2*r3]
+%endmacro
+
+%macro AVX2_SadFour_Reduce_8 0
+    vpsrldq      xmm0, xmm4, 8
+    vpaddq       xmm4, xmm4, xmm0
+    vpsrldq      xmm0, xmm5, 8
+    vpaddq       xmm5, xmm5, xmm0
+    vpsrldq      xmm0, xmm6, 8
+    vpaddq       xmm6, xmm6, xmm0
+    vpsrldq      xmm0, xmm7, 8
+    vpaddq       xmm7, xmm7, xmm0
+    vpunpckldq   xmm4, xmm4, xmm5
+    vpunpckldq   xmm6, xmm6, xmm7
+    vpunpcklqdq  xmm4, xmm4, xmm6
+    vmovdqa      [r4], xmm4
+    vzeroupper
+%endmacro
+
+;***********************************************************************
+;void WelsSampleSadFour8x16_avx2(uint8_t*, int32_t, uint8_t*, int32_t, int32_t*)
+;***********************************************************************
+WELS_EXTERN WelsSampleSadFour8x16_avx2
+    %assign push_num 0
+%ifdef X86_32
+    push r5
+    %assign push_num 1
+%endif
+    LOAD_5_PARA
+    PUSH_XMM 8
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
+    vpxor        xmm4, xmm4, xmm4
+    vpxor        xmm5, xmm5, xmm5
+    vpxor        xmm6, xmm6, xmm6
+    vpxor        xmm7, xmm7, xmm7
+    sub          r2, r3
+    %rep 8
+    AVX2_SadFour_8x2
+    %endrep
+    AVX2_SadFour_Reduce_8
+    POP_XMM
+    LOAD_5_PARA_POP
+%ifdef X86_32
+    pop r5
+%endif
+    ret
+
+;***********************************************************************
+;void WelsSampleSadFour8x8_avx2(uint8_t*, int32_t, uint8_t*, int32_t, int32_t*)
+;***********************************************************************
+WELS_EXTERN WelsSampleSadFour8x8_avx2
+    %assign push_num 0
+%ifdef X86_32
+    push r5
+    %assign push_num 1
+%endif
+    LOAD_5_PARA
+    PUSH_XMM 8
+    SIGN_EXTENSION r1, r1d
+    SIGN_EXTENSION r3, r3d
+    vpxor        xmm4, xmm4, xmm4
+    vpxor        xmm5, xmm5, xmm5
+    vpxor        xmm6, xmm6, xmm6
+    vpxor        xmm7, xmm7, xmm7
+    sub          r2, r3
+    %rep 4
+    AVX2_SadFour_8x2
+    %endrep
+    AVX2_SadFour_Reduce_8
+    POP_XMM
+    LOAD_5_PARA_POP
+%ifdef X86_32
+    pop r5
+%endif
+    ret
+
+;***********************************************************************
+;
+;Pixel_sad_4_wxh_avx2 END
+;
+;***********************************************************************
+
+%endif ; HAVE_AVX2
