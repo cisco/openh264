@@ -2870,6 +2870,11 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
       }
 
       pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb = pCtx->pDec; //store latest decoded picture for EC
+      if (iThreadCount > 1) {
+        // Snapshot into per-thread slot; the shared pLastDecPicInfo field can be
+        // overwritten by another worker before BufferingReadyPicture() reads it.
+        pThreadCtx->pPreviousDecodedPictureInDpb = pCtx->pDec;
+      }
       pCtx->bUsedAsRef = pCtx->uiNalRefIdc > 0;
       if (iThreadCount <= 1) {
         if (pCtx->bUsedAsRef) {
@@ -2964,6 +2969,9 @@ bool CheckAndFinishLastPic (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferIn
 
       DecodeFrameConstruction (pCtx, ppDst, pDstInfo);
       pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb = pCtx->pDec; //save ECed pic for future use
+      if (pCtx->pThreadCtx != NULL && GetThreadCount (pCtx) > 1) {
+        ((PWelsDecoderThreadCTX)pCtx->pThreadCtx)->pPreviousDecodedPictureInDpb = pCtx->pDec;
+      }
       if (pCtx->pLastDecPicInfo->sLastNalHdrExt.sNalUnitHeader.uiNalRefIdc > 0) {
         if (MarkECFrameAsRef (pCtx) == ERR_INFO_INVALID_PTR) {
           pCtx->iErrorCode |= dsRefListNullPtrs;

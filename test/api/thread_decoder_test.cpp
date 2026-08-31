@@ -327,3 +327,110 @@ static const FileParam kFileParamArray[] = {
 
 INSTANTIATE_TEST_SUITE_P (ThreadDecodeFile, ThreadDecoderOutputTest,
                           ::testing::ValuesIn (kFileParamArray));
+
+// Regression: threaded decode of BA_MW_D.264 must produce the same SHA1 output
+// as single-thread decode. Pre-fix, the shared pPreviousDecodedPictureInDpb
+// pointer was overwritten by concurrent workers before BufferingReadyPicture()
+// read it, causing output hash divergence and occasional SIGSEGV.
+class ThreadDecoderPreviousPicRaceTest : public ::testing::Test {
+ public:
+  struct HashCbk : public BaseThreadDecoderTest::Callback {
+    SHA1Context ctx;
+    HashCbk() { SHA1Reset (&ctx); }
+    void onDecodeFrame (const BaseThreadDecoderTest::Frame& frame) override {
+      UpdateHashFromPlane (&ctx, frame.y.data, frame.y.width, frame.y.height, frame.y.stride);
+      UpdateHashFromPlane (&ctx, frame.u.data, frame.u.width, frame.u.height, frame.u.stride);
+      UpdateHashFromPlane (&ctx, frame.v.data, frame.v.width, frame.v.height, frame.v.stride);
+    }
+    std::string Digest() {
+      unsigned char d[SHA_DIGEST_LENGTH];
+      SHA1Result (&ctx, d);
+      char buf[SHA_DIGEST_LENGTH * 2 + 1];
+      for (int i = 0; i < SHA_DIGEST_LENGTH; ++i)
+        std::snprintf (buf + i * 2, 3, "%02x", d[i]);
+      return std::string (buf);
+    }
+  };
+
+  static std::string DecodeFile (const char* path, int threads) {
+    long rv = 0;
+    ISVCDecoder* dec = NULL;
+    rv = WelsCreateDecoder (&dec);
+    if (rv != 0 || dec == NULL) return "";
+    SDecodingParam p;
+    std::memset (&p, 0, sizeof (p));
+    p.uiTargetDqLayer = UCHAR_MAX;
+    p.eEcActiveIdc = ERROR_CON_SLICE_COPY;
+    p.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
+    dec->SetOption (DECODER_OPTION_NUM_OF_THREADS, &threads);
+    if (dec->Initialize (&p) != 0) { WelsDestroyDecoder (dec); return ""; }
+
+    std::ifstream f (path, std::ios::binary);
+    if (!f.is_open()) { dec->Uninitialize(); WelsDestroyDecoder (dec); return ""; }
+    std::vector<uint8_t> bs ((std::istreambuf_iterator<char> (f)), std::istreambuf_iterator<char>());
+    f.close();
+
+    HashCbk cbk;
+    uint64_t ts = 0;
+    int32_t pos = 0;
+    const int32_t sz = static_cast<int32_t> (bs.size());
+    // dst/info must outlive each DecodeFrameNoDelay call: worker threads may
+    // write through ppDst after the call returns (stack-use-after-scope otherwise).
+    unsigned char* dst[3] = {NULL, NULL, NULL};
+    SBufferInfo info;
+    while (pos < sz) {
+      int32_t fsz = ReadFrameForHangRegression (bs.data(), sz, pos);
+      if (fsz <= 0) break;
+      std::memset (dst, 0, sizeof (dst));
+      std::memset (&info, 0, sizeof (info));
+      info.uiInBsTimeStamp = ++ts;
+      dec->DecodeFrameNoDelay (bs.data() + pos, fsz, dst, &info);
+      if (info.iBufferStatus == 1) {
+        BaseThreadDecoderTest::Frame fr;
+        fr.y = {info.pDst[0], info.UsrData.sSystemBuffer.iWidth, info.UsrData.sSystemBuffer.iHeight, info.UsrData.sSystemBuffer.iStride[0]};
+        fr.u = {info.pDst[1], info.UsrData.sSystemBuffer.iWidth/2, info.UsrData.sSystemBuffer.iHeight/2, info.UsrData.sSystemBuffer.iStride[1]};
+        fr.v = {info.pDst[2], info.UsrData.sSystemBuffer.iWidth/2, info.UsrData.sSystemBuffer.iHeight/2, info.UsrData.sSystemBuffer.iStride[1]};
+        cbk.onDecodeFrame (fr);
+      }
+      pos += fsz;
+    }
+    int32_t eos = 1;
+    dec->SetOption (DECODER_OPTION_END_OF_STREAM, &eos);
+    int32_t rem = 0;
+    dec->GetOption (DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER, &rem);
+    for (int i = 0; i < rem; ++i) {
+      std::memset (dst, 0, sizeof (dst));
+      std::memset (&info, 0, sizeof (info));
+      dec->FlushFrame (dst, &info);
+      if (info.iBufferStatus == 1) {
+        BaseThreadDecoderTest::Frame fr;
+        fr.y = {info.pDst[0], info.UsrData.sSystemBuffer.iWidth, info.UsrData.sSystemBuffer.iHeight, info.UsrData.sSystemBuffer.iStride[0]};
+        fr.u = {info.pDst[1], info.UsrData.sSystemBuffer.iWidth/2, info.UsrData.sSystemBuffer.iHeight/2, info.UsrData.sSystemBuffer.iStride[1]};
+        fr.v = {info.pDst[2], info.UsrData.sSystemBuffer.iWidth/2, info.UsrData.sSystemBuffer.iHeight/2, info.UsrData.sSystemBuffer.iStride[1]};
+        cbk.onDecodeFrame (fr);
+      }
+    }
+    dec->Uninitialize();
+    WelsDestroyDecoder (dec);
+    return cbk.Digest();
+  }
+};
+
+TEST_F (ThreadDecoderPreviousPicRaceTest, ThreadedOutputIsConsistent) {
+  const char* kFile = "res/BA_MW_D.264";
+  // Run the same stream three times with the same thread count.
+  // Pre-fix, the shared pPreviousDecodedPictureInDpb could be overwritten by a
+  // concurrent worker between the write and BufferingReadyPicture(), making
+  // multi-thread output non-deterministic.  Post-fix all runs must agree.
+  std::string h1 = DecodeFile (kFile, 3);
+  std::string h2 = DecodeFile (kFile, 3);
+  std::string h3 = DecodeFile (kFile, 3);
+  ASSERT_FALSE (h1.empty()) << "3-thread decode produced no output (run 1)";
+  ASSERT_FALSE (h2.empty()) << "3-thread decode produced no output (run 2)";
+  ASSERT_FALSE (h3.empty()) << "3-thread decode produced no output (run 3)";
+  EXPECT_EQ (h1, h2)
+      << "3-thread decode is non-deterministic between run 1 and run 2";
+  EXPECT_EQ (h1, h3)
+      << "3-thread decode is non-deterministic between run 1 and run 3";
+}
+

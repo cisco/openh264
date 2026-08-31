@@ -1010,8 +1010,13 @@ void CWelsDecoder::BufferingReadyPicture (PWelsDecoderContext pCtx, unsigned cha
       m_sPictInfoList[i].iSeqNum = pCtx->iSeqNum;
       m_sPictInfoList[i].uiDecodingTimeStamp = pCtx->uiDecodingTimeStamp;
       if (pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb != NULL) {
-        m_sPictInfoList[i].iPicBuffIdx = pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb->iPicBuffIdx;
-        if (GetThreadCount (pCtx) <= 1) ++pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb->iRefCount;
+        PPicture pPrevPic = (GetThreadCount (pCtx) > 1 && pCtx->pThreadCtx != NULL)
+                           ? ((PWelsDecoderThreadCTX)pCtx->pThreadCtx)->pPreviousDecodedPictureInDpb
+                           : pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb;
+        if (pPrevPic != NULL) {
+          m_sPictInfoList[i].iPicBuffIdx = pPrevPic->iPicBuffIdx;
+          if (GetThreadCount (pCtx) <= 1) ++pPrevPic->iRefCount;
+        }
       }
       m_iLastBufferedIdx = i;
       pDstInfo->iBufferStatus = 0;

@@ -327,7 +327,7 @@ TEST (ErrorConTest, DoErrorConFrameCopyResolutionMismatchFallsBackToFill) {
   pECCtx->pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt.bIdrFlag = 0;
   pECCtx->pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb = &pECCtx->sSrcPic;
 
-  pECCtx->sSrcPic.iWidthInPixel -= 16;
+  pECCtx->sSrcPic.iWidthInPixel += 16; // use += so value stays > 0 even when iMbWidth==1
   memset (pECCtx->sWelsPic.pData[0], 7, pECCtx->iMbWidth * pECCtx->iMbHeight * 256 * 3 / 2);
 
   DoErrorConFrameCopy (pECCtx->pCtx);
@@ -352,7 +352,7 @@ TEST (ErrorConTest, DoErrorConSliceCopyResolutionMismatchFallsBackToFill) {
   pECCtx->pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb = &pECCtx->sSrcPic;
 
   memset (pECCtx->pMbCorrectlyDecodedFlag, 0, pECCtx->iMbWidth * pECCtx->iMbHeight * sizeof (bool));
-  pECCtx->sSrcPic.iHeightInPixel -= 16;
+  pECCtx->sSrcPic.iHeightInPixel += 16; // use += so value stays > 0 even when iMbHeight==1
   memset (pECCtx->sWelsPic.pData[0], 7, pECCtx->iMbWidth * pECCtx->iMbHeight * 256 * 3 / 2);
 
   DoErrorConSliceCopy (pECCtx->pCtx);
