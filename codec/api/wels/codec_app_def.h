@@ -642,18 +642,6 @@ typedef struct {
 } SLayerBSInfo, *PLayerBSInfo;
 
 /**
-* @brief Frame bit stream info
-*/
-typedef struct {
-  int           iLayerNum;
-  SLayerBSInfo  sLayerInfo[MAX_LAYER_NUM_OF_FRAME];
-
-  EVideoFrameType eFrameType;
-  int iFrameSizeInBytes;
-  long long uiTimeStamp;
-} SFrameBSInfo, *PFrameBSInfo;
-
-/**
 *  @brief Structure for source picture
 */
 typedef struct Source_Picture_s {
@@ -667,6 +655,25 @@ typedef struct Source_Picture_s {
   bool      bPsnrU;                ///< get U PSNR for this frame
   bool      bPsnrV;                ///< get V PSNR for this frame
 } SSourcePicture;
+
+/**
+*  @brief Structure for reconstructed picture
+*/
+typedef SSourcePicture SReconPicture;
+
+/**
+* @brief Frame bit stream info
+*/
+typedef struct {
+  int           iLayerNum;
+  SLayerBSInfo  sLayerInfo[MAX_LAYER_NUM_OF_FRAME];
+
+  EVideoFrameType eFrameType;
+  int iFrameSizeInBytes;
+  long long uiTimeStamp;
+  SReconPicture *pReconPic;        ///< pointer to the reconstructed picture
+  bool bHaveRecon;                 ///< whether have reconstructed picture data
+} SFrameBSInfo, *PFrameBSInfo;
 
 /**
 * @brief Structure for bit rate info
