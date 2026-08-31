@@ -720,4 +720,49 @@ TEST (DecoderBitStreamBoundsTest, BsGetBitsStopsOnTwoByteOverread) {
   EXPECT_EQ (ERR_INFO_READ_OVERFLOW, BsGetBits (&sBs, 16, &uiCode));
 }
 
+// Regression: WelsDecodeBs must not wrap sRawData to pHead when queued VCL
+// NALs have sSliceBitsRead.pStartBuf pointing into the region that would be
+// overwritten by the incoming write.  Pre-fix, the wrap was unconditional and
+// silently replaced queued slice bytes with the new input bytes while leaving
+// the saved bit-reader pointer unchanged.
+TEST_F (DecoderParseSyntaxTest, WelsDecodeBsRejectsWrapIntoQueuedSlice) {
+  ASSERT_EQ (ERR_NONE, Init());
+  ASSERT_TRUE (m_pCtx != NULL);
+  ASSERT_TRUE (m_pCtx->pAccessUnitList != NULL);
+  ASSERT_TRUE (m_pCtx->sRawData.pHead != NULL);
+
+  PAccessUnit pAu = m_pCtx->pAccessUnitList;
+  const int32_t kiBufSize = m_pCtx->iMaxBsBufferSizeInByte;
+
+  // Place a synthetic queued VCL slice bit-reader at offset 8 from pHead,
+  // within the region that a full-buffer wrap would overwrite.
+  PBitStringAux pBs = &pAu->pNalUnitsList[0]->sNalData.sVclNal.sSliceBitsRead;
+  pBs->pStartBuf = m_pCtx->sRawData.pHead + 8;
+  pBs->pCurBuf   = m_pCtx->sRawData.pHead + 8;
+  pBs->pEndBuf   = m_pCtx->sRawData.pHead + kiBufSize / 4;
+  pAu->uiAvailUnitsNum = 1;
+
+  // Position write cursor near pEnd so any new input forces a wrap.
+  m_pCtx->sRawData.pCurPos = m_pCtx->sRawData.pEnd - 3;
+
+  // Remember the bytes the queued slice points to before the wrap attempt.
+  uint8_t snapshot[8];
+  memcpy (snapshot, pBs->pStartBuf, sizeof (snapshot));
+  const uint8_t* pStartBefore = pBs->pStartBuf;
+
+  // Input large enough to trigger wrap check (kiBsLen + 4 > pEnd - pCurPos).
+  static const uint8_t kFiller[16] = {0, 0, 0, 1, 0x0c, 0x80, 0, 0, 0, 1, 0x0c, 0x80, 0, 0, 0, 1};
+  uint8_t* dst[3] = {NULL, NULL, NULL};
+  SBufferInfo dstInfo;
+  memset (&dstInfo, 0, sizeof (dstInfo));
+  m_pCtx->bEndOfStreamFlag = false;
+  WelsDecodeBs (m_pCtx, kFiller, static_cast<int32_t> (sizeof (kFiller)), dst, &dstInfo, NULL);
+
+  // The pointer must not have moved (no retarget happened).
+  EXPECT_EQ (pStartBefore, pBs->pStartBuf);
+  // The bytes at the queued slice start must be unchanged.
+  EXPECT_EQ (0, memcmp (snapshot, pBs->pStartBuf, sizeof (snapshot)));
+
+  Uninit();
+}
 

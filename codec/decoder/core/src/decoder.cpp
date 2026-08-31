@@ -738,6 +738,21 @@ void GetVclNalTemporalId (PWelsDecoderContext pCtx) {
  * \note    N/A
  *************************************************************************************
  */
+// Returns false if wrapping sRawData to pHead would overwrite bytes still referenced
+// by a queued NAL's slice bit-reader, indicating the wrap is unsafe.
+static bool RawDataWrapIsClean (PWelsDecoderContext pCtx, int32_t iNewBytes) {
+  const PAccessUnit pAu = pCtx->pAccessUnitList;
+  if (pAu == NULL || pAu->pNalUnitsList == NULL || pAu->uiAvailUnitsNum == 0) return true;
+  const uint8_t* pHead = pCtx->sRawData.pHead;
+  for (uint32_t i = 0; i < pAu->uiAvailUnitsNum; ++i) {
+    const PNalUnit pNal = pAu->pNalUnitsList[i];
+    if (pNal == NULL) continue;
+    const uint8_t* pStart = pNal->sNalData.sVclNal.sSliceBitsRead.pStartBuf;
+    if (pStart != NULL && pStart >= pHead && pStart < pHead + iNewBytes) return false;
+  }
+  return true;
+}
+
 int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const int32_t kiBsLen,
                       uint8_t** ppDst, SBufferInfo* pDstBufInfo, SParserBsInfo* pDstBsInfo) {
   if (!pCtx->bEndOfStreamFlag) {
@@ -767,6 +782,10 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
     iSrcLength = kiBsLen - iOffset;
 
     if ((kiBsLen + 4) > (pRawData->pEnd - pRawData->pCurPos)) {
+      if (!RawDataWrapIsClean (pCtx, kiBsLen + 4)) {
+        pCtx->iErrorCode |= dsOutOfMemory;
+        return pCtx->iErrorCode;
+      }
       pRawData->pCurPos = pRawData->pHead;
     }
 
@@ -853,6 +872,10 @@ int32_t WelsDecodeBs (PWelsDecoderContext pCtx, const uint8_t* kpBsBuf, const in
 
           pDstNal += (iDstIdx + 4); //init, increase 4 reserved zero bytes, used to store the next NAL
           if ((iSrcLength - iSrcConsumed + 4) > (pRawData->pEnd - pDstNal)) {
+            if (!RawDataWrapIsClean (pCtx, iSrcLength - iSrcConsumed + 4)) {
+              pCtx->iErrorCode |= dsOutOfMemory;
+              return pCtx->iErrorCode;
+            }
             pDstNal = pRawData->pCurPos = pRawData->pHead;
           } else {
             pRawData->pCurPos = pDstNal;
