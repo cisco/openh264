@@ -148,7 +148,8 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   pPicNewBuf->iCurrentIdx = pPicOldBuf->iCurrentIdx;
   * ppPicBuf              = pPicNewBuf;
 
-  for (int32_t i = 0; i < pPicNewBuf->iCapacity; i++) {
+  // only initialize new slots; old slots must preserve iRefCount pinned by output buffering
+  for (int32_t i = kiOldSize; i < pPicNewBuf->iCapacity; i++) {
     pPicNewBuf->ppPic[i]->bUsedAsRef = false;
     pPicNewBuf->ppPic[i]->bIsLongRef = false;
     pPicNewBuf->ppPic[i]->iRefCount = 0;

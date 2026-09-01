@@ -6,6 +6,9 @@
 #include "BaseEncoderTest.h"
 #include "wels_common_defs.h"
 #include "utils/HashFunctions.h"
+#include <climits>
+#include <cstring>
+#include <fstream>
 #include <string>
 #include <vector>
 #include "encode_decode_api_test.h"
@@ -1272,5 +1275,119 @@ TEST_F (DecodeParseCrashAPI, ParseOnlyCrash_General) {
   while (0);
 #endif
 
+}
+
+// Verify B-frame decode is deterministic across reinit; guards against stale
+// output caused by IncreasePicBuff clearing iRefCount of old pinned slots.
+namespace {
+static uint64_t Fnv1a64Frame (const uint8_t* y, int w, int h, int stride_y,
+                               const uint8_t* u, const uint8_t* v, int stride_uv) {
+  uint64_t hash = 14695981039346656037ull;
+  for (int row = 0; row < h; ++row) {
+    for (int col = 0; col < w; ++col) {
+      hash ^= y[row * stride_y + col];
+      hash *= 1099511628211ull;
+    }
+  }
+  for (int row = 0; row < h / 2; ++row) {
+    for (int col = 0; col < w / 2; ++col) {
+      hash ^= u[row * stride_uv + col];
+      hash *= 1099511628211ull;
+      hash ^= v[row * stride_uv + col];
+      hash *= 1099511628211ull;
+    }
+  }
+  return hash;
+}
+
+static std::vector<uint64_t> DecodeBFrameStreamHashes (ISVCDecoder* dec, const char* path) {
+  std::ifstream f (path, std::ios::binary);
+  if (!f.is_open()) return {};
+  std::vector<uint8_t> bs ((std::istreambuf_iterator<char> (f)), {});
+
+  std::vector<uint64_t> hashes;
+  size_t pos = 0;
+
+  auto decode_nal = [&] (const uint8_t* data, int len) {
+    uint8_t* dst[3] = {nullptr, nullptr, nullptr};
+    SBufferInfo info;
+    memset (&info, 0, sizeof (info));
+    dec->DecodeFrame2 (data, len, dst, &info);
+    if (info.iBufferStatus == 1) {
+      const int w = info.UsrData.sSystemBuffer.iWidth;
+      const int h = info.UsrData.sSystemBuffer.iHeight;
+      hashes.push_back (Fnv1a64Frame (dst[0], w, h,
+                                      info.UsrData.sSystemBuffer.iStride[0],
+                                      dst[1], dst[2],
+                                      info.UsrData.sSystemBuffer.iStride[1]));
+    }
+  };
+
+  while (pos + 4 < bs.size()) {
+    // find next start code
+    size_t next = pos + 4;
+    while (next + 3 < bs.size()) {
+      if ((bs[next] == 0 && bs[next+1] == 0 && bs[next+2] == 0 && bs[next+3] == 1) ||
+          (bs[next] == 0 && bs[next+1] == 0 && bs[next+2] == 1))
+        break;
+      ++next;
+    }
+    if (next + 3 >= bs.size()) next = bs.size();
+    decode_nal (bs.data() + pos, static_cast<int> (next - pos));
+    pos = next;
+  }
+
+  int32_t eos = 1;
+  dec->SetOption (DECODER_OPTION_END_OF_STREAM, &eos);
+  int32_t rem = 0;
+  dec->GetOption (DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER, &rem);
+  for (int32_t i = 0; i < rem; ++i) {
+    uint8_t* dst[3] = {nullptr, nullptr, nullptr};
+    SBufferInfo info;
+    memset (&info, 0, sizeof (info));
+    dec->FlushFrame (dst, &info);
+    if (info.iBufferStatus == 1) {
+      const int w = info.UsrData.sSystemBuffer.iWidth;
+      const int h = info.UsrData.sSystemBuffer.iHeight;
+      hashes.push_back (Fnv1a64Frame (dst[0], w, h,
+                                      info.UsrData.sSystemBuffer.iStride[0],
+                                      dst[1], dst[2],
+                                      info.UsrData.sSystemBuffer.iStride[1]));
+    }
+  }
+  return hashes;
+}
+} // namespace
+
+TEST (DecoderDpbGrowthStability, BFrameDecodeIsConsistentAcrossReinit) {
+  ISVCDecoder* dec = nullptr;
+  ASSERT_EQ (WelsCreateDecoder (&dec), 0);
+  ASSERT_NE (dec, nullptr);
+
+  SDecodingParam param;
+  memset (&param, 0, sizeof (param));
+  param.uiTargetDqLayer = UCHAR_MAX;
+  param.eEcActiveIdc    = ERROR_CON_SLICE_COPY;
+
+  ASSERT_EQ (dec->Initialize (&param), 0);
+  const std::vector<uint64_t> hashes1 =
+      DecodeBFrameStreamHashes (dec, "res/Cisco_Men_whisper_640x320_CABAC_Bframe_9.264");
+
+  dec->Uninitialize();
+  memset (&param, 0, sizeof (param));
+  param.uiTargetDqLayer = UCHAR_MAX;
+  param.eEcActiveIdc    = ERROR_CON_SLICE_COPY;
+  ASSERT_EQ (dec->Initialize (&param), 0);
+  const std::vector<uint64_t> hashes2 =
+      DecodeBFrameStreamHashes (dec, "res/Cisco_Men_whisper_640x320_CABAC_Bframe_9.264");
+
+  dec->Uninitialize();
+  WelsDestroyDecoder (dec);
+
+  ASSERT_GT (hashes1.size(), 0u) << "no frames decoded in pass 1";
+  ASSERT_EQ (hashes1.size(), hashes2.size()) << "frame count differs between passes";
+  for (size_t i = 0; i < hashes1.size(); ++i) {
+    EXPECT_EQ (hashes1[i], hashes2[i]) << "stale/wrong frame at index " << i;
+  }
 }
 
