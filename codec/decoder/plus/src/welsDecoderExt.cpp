@@ -148,6 +148,12 @@ CWelsDecoder::CWelsDecoder (void)
     m_pLastDecThrCtx (NULL),
     m_iLastBufferedIdx (0),
     m_iStreamSeqNum (0) {
+  memset (&m_sReoderingStatus, 0, sizeof (m_sReoderingStatus));
+  m_sReoderingStatus.iMinPOC = IMinInt32;
+  for (int32_t i = 0; i < 16; ++i) {
+    memset (&m_sPictInfoList[i], 0, sizeof (m_sPictInfoList[i]));
+    m_sPictInfoList[i].iPOC = IMinInt32;
+  }
 #ifdef OUTPUT_BIT_STREAM
   char chFileName[1024] = { 0 };  //for .264
   int iBufUsed = 0;
