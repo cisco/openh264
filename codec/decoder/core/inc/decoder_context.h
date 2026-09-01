@@ -544,6 +544,10 @@ typedef struct tagSWelsDecThreadCtx {
   SWelsDecEvent sSliceDecodeStart;
   SWelsDecEvent sSliceDecodeFinish;
   int32_t       iPicBuffIdx; //picBuff Index
+  // Per-thread snapshot of pPreviousDecodedPictureInDpb captured before sSliceDecodeFinish
+  // is signaled. Prevents concurrent workers from overwriting the shared pLastDecPicInfo
+  // field before BufferingReadyPicture() reads it.
+  PPicture      pPreviousDecodedPictureInDpb;
 } SWelsDecoderThreadCTX, *PWelsDecoderThreadCTX;
 
 static inline void ResetActiveSPSForEachLayer (PWelsDecoderContext pCtx) {
