@@ -36,6 +36,9 @@
 #include <assert.h>
 #include <signal.h>
 #include <stdarg.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 #if defined (ANDROID_NDK)
 #include <android/log.h>
 #endif
@@ -87,6 +90,13 @@ int     g_iEncodedFrame  = 0;
 #define HAVE_PROCESS_AFFINITY
 #endif
 #endif /* _WIN32 */
+
+#if defined(NODEFS)
+#define CWD "/workload/"
+#endif
+#if defined(MEMFS)
+#define CWD "testbin/workload/"
+#endif
 
 #if defined(__linux__) || defined(__unix__)
 #define _FILE_OFFSET_BITS 64
@@ -238,10 +248,22 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
       } else if (strTag[0].compare ("SourceHeight") == 0) {
         pSrcPic->iPicHeight = atoi (strTag[1].c_str());
       } else if (strTag[0].compare ("InputFile") == 0) {
+        string inputFile;
+#if defined(NODEFS) || defined(MEMFS)
+        inputFile = string(CWD) + strTag[1];
+#else
+        inputFile = strTag[1];
+#endif
         if (strTag[1].length() > 0)
-          sFileSet.strSeqFile = strTag[1];
+          sFileSet.strSeqFile = inputFile;
       } else if (strTag[0].compare ("OutputFile") == 0) {
-        sFileSet.strBsFile = strTag[1];
+        string outputFile; 
+#if defined(NODEFS) || defined(MEMFS)
+        outputFile = string(CWD) + strTag[1];
+#else
+        outputFile = strTag[1];
+#endif
+        sFileSet.strBsFile = outputFile;
       } else if (strTag[0].compare ("MaxFrameRate") == 0) {
         pSvcParam.fMaxFrameRate = (float)atof (strTag[1].c_str());
       } else if (strTag[0].compare ("FramesToBeEncoded") == 0) {
@@ -356,10 +378,17 @@ int ParseConfig (CReadConfig& cRdCfg, SSourcePicture* pSrcPic, SEncParamExt& pSv
           break;
         }
       } else if (strTag[0].compare ("LayerCfg") == 0) {
-        if (strTag[1].length() > 0)
-          sFileSet.strLayerCfgFile[iLayerCount] = strTag[1];
+        if (strTag[1].length() > 0) {
+          string cfgFilePath;
+#if defined(NODEFS) || defined(MEMFS)
+          cfgFilePath = string(CWD) + strTag[1];
+#else
+          cfgFilePath = strTag[1];
+#endif
+          sFileSet.strLayerCfgFile[iLayerCount] = cfgFilePath;
+          ++iLayerCount;
+        }
 //          pSvcParam.sDependencyLayers[iLayerCount].uiDependencyId = iLayerCount;
-        ++ iLayerCount;
       } else if (strTag[0].compare ("PrefixNALAddingCtrl") == 0) {
         int ctrl_flag = atoi (strTag[1].c_str());
         if (ctrl_flag > 1)
@@ -801,7 +830,13 @@ int ProcessEncoding (ISVCEncoder* pPtrEnc, int argc, char** argv, bool bConfigFi
   // if configure file exit, reading configure file firstly
   if (bConfigFile) {
     iParsedNum = 2;
-    cRdCfg.Openf (argv[1]);
+    string filePath;
+#if defined(NODEFS) || defined(MEMFS)
+    filePath = string(CWD) + string(argv[1]);
+#else
+    filePath = string(argv[1]);
+#endif
+    cRdCfg.Openf (filePath.c_str());
     if (!cRdCfg.ExistFile()) {
       fprintf (stderr, "Specified file: %s not exist, maybe invalid path or parameter settting.\n",
                cRdCfg.GetFileName().c_str());
@@ -1136,6 +1171,13 @@ int main (int argc, char** argv)
 
   /* Control-C handler */
   signal (SIGINT, SigIntHandler);
+
+#if defined(NODEFS)
+  EM_ASM(
+    FS.mkdir('/workload');
+    FS.mount(NODEFS, { root: '.' }, '/workload');
+  );
+#endif
 
   iRet = CreateSVCEncHandle (&pSVCEncoder);
   if (iRet) {

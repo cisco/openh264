@@ -27,6 +27,9 @@ runInputParamCheck()
   elif [  $# -eq 2 -a   "$1" = "BinaryCompare" ]
   then
     let "ParameterFlag=0"
+  elif [  $# -eq 2 -a   "$1" = "BinaryCompareWasm" ]
+  then
+    let "ParameterFlag=0"
   else
     let "ParameterFlag=1"
   fi
@@ -65,6 +68,7 @@ runMain()
 {
   local TestType=$1
   local TestBitStream=$2
+  export TestWasm=0
   runInputParamCheck  ${TestType}  ${TestBitStream}
   if [  ! $?  -eq 0  ]
   then
@@ -81,6 +85,14 @@ runMain()
   if [  "${TestType}"  = "BinaryCompare" ]
   then
     set -e
+    runBinaryTest ${TestBitStream} TravisTest
+    return $?
+  fi
+  if [  "${TestType}"  = "BinaryCompareWasm" ]
+  then
+    set -e
+    let "TestWasm=1"
+    TestType="BinaryCompare"
     runBinaryTest ${TestBitStream} TravisTest
     return $?
   fi
