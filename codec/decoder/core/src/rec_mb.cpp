@@ -738,29 +738,24 @@ int32_t GetInterBPred (uint8_t* pPredYCbCr[3], uint8_t* pTempPredYCbCr[3], PWels
       }
     }
   } else if (IS_INTER_16x8 (iMBType)) {
-    const sMCRefMember sMbRefBase = pMCRefMem;
-    const sMCRefMember sMbTempRefBase = pTempMCRefMem;
     for (int32_t i = 0; i < 2; ++i) {
       int32_t iPartIdx = i << 3;
       uint32_t listCount = 0;
       int32_t lastListIdx = LIST_0;
-      // Destinations must be derived fresh for each partition: advancing the
-      // shared pMCRefMem once per *list* moved it out of the macroblock.
-      sMCRefMember sRef = sMbRefBase;
-      sMCRefMember sTempRef = sMbTempRefBase;
-      if (i) {
-        sRef.pDstY += (iDstLineLuma << 3);
-        sRef.pDstU += (iDstLineChroma << 2);
-        sRef.pDstV += (iDstLineChroma << 2);
-        sTempRef.pDstY += (iDstLineLuma << 3);
-        sTempRef.pDstU += (iDstLineChroma << 2);
-        sTempRef.pDstV += (iDstLineChroma << 2);
-      }
+      // The partition offset belongs to the partition, not to the reference
+      // list, so both destinations are (re)set once here for each partition.
+      pMCRefMem.pDstY = pPredYCbCr[0] + (i ? (iDstLineLuma << 3) : 0);
+      pMCRefMem.pDstU = pPredYCbCr[1] + (i ? (iDstLineChroma << 2) : 0);
+      pMCRefMem.pDstV = pPredYCbCr[2] + (i ? (iDstLineChroma << 2) : 0);
+      pTempMCRefMem.pDstY = pTempPredYCbCr[0] + (i ? (iDstLineLuma << 3) : 0);
+      pTempMCRefMem.pDstU = pTempPredYCbCr[1] + (i ? (iDstLineChroma << 2) : 0);
+      pTempMCRefMem.pDstV = pTempPredYCbCr[2] + (i ? (iDstLineChroma << 2) : 0);
       for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
         if (IS_DIR (iMBType, i, listIdx)) {
-          // First list of this partition predicts into sRef, second into sTempRef,
-          // so the second BaseMC no longer overwrites the first list's result.
-          sMCRefMember* pTarget = (listCount == 0) ? &sRef : &sTempRef;
+          // The first list of a partition predicts into pMCRefMem and the second
+          // into pTempMCRefMem, so the second BaseMC() no longer overwrites the
+          // prediction made for the first list.
+          sMCRefMember* pTarget = (listCount == 0) ? &pMCRefMem : &pTempMCRefMem;
           lastListIdx = listIdx;
           iMVs[0] = pCurDqLayer->pDec->pMv[listIdx][iMBXY][iPartIdx][0];
           iMVs[1] = pCurDqLayer->pDec->pMv[listIdx][iMBXY][iPartIdx][1];
@@ -774,40 +769,36 @@ int32_t GetInterBPred (uint8_t* pPredYCbCr[3], uint8_t* pTempPredYCbCr[3], PWels
         iRefIndex0 = pCurDqLayer->pDec->pRefIndex[LIST_0][iMBXY][iPartIdx];
         iRefIndex1 = pCurDqLayer->pDec->pRefIndex[LIST_1][iMBXY][iPartIdx];
         if (pCurDqLayer->bUseWeightedBiPredIdc) {
-          BiWeightPrediction (pCurDqLayer, &sRef, &sTempRef, iRefIndex0, iRefIndex1, bWeightedBipredIdcIs1, 16, 8);
+          BiWeightPrediction (pCurDqLayer, &pMCRefMem, &pTempMCRefMem, iRefIndex0, iRefIndex1,
+                              bWeightedBipredIdcIs1, 16, 8);
         } else {
-          BiPrediction (pCurDqLayer, &sRef, &sTempRef, 16, 8);
+          BiPrediction (pCurDqLayer, &pMCRefMem, &pTempMCRefMem, 16, 8);
         }
       } else if (listCount == 1) {
         if (bWeightedBipredIdcIs1) {
           iRefIndex = pCurDqLayer->pDec->pRefIndex[lastListIdx][iMBXY][iPartIdx];
-          WeightPrediction (pCurDqLayer, &sRef, lastListIdx, iRefIndex, 16, 8);
+          WeightPrediction (pCurDqLayer, &pMCRefMem, lastListIdx, iRefIndex, 16, 8);
         }
       }
     }
   } else if (IS_INTER_8x16 (iMBType)) {
-    const sMCRefMember sMbRefBase = pMCRefMem;
-    const sMCRefMember sMbTempRefBase = pTempMCRefMem;
     for (int32_t i = 0; i < 2; ++i) {
       uint32_t listCount = 0;
       int32_t lastListIdx = LIST_0;
-      // Destinations must be derived fresh for each partition: advancing the
-      // shared pMCRefMem once per *list* moved it out of the macroblock.
-      sMCRefMember sRef = sMbRefBase;
-      sMCRefMember sTempRef = sMbTempRefBase;
-      if (i) {
-        sRef.pDstY += 8;
-        sRef.pDstU += 4;
-        sRef.pDstV += 4;
-        sTempRef.pDstY += 8;
-        sTempRef.pDstU += 4;
-        sTempRef.pDstV += 4;
-      }
+      // The partition offset belongs to the partition, not to the reference
+      // list, so both destinations are (re)set once here for each partition.
+      pMCRefMem.pDstY = pPredYCbCr[0] + (i ? 8 : 0);
+      pMCRefMem.pDstU = pPredYCbCr[1] + (i ? 4 : 0);
+      pMCRefMem.pDstV = pPredYCbCr[2] + (i ? 4 : 0);
+      pTempMCRefMem.pDstY = pTempPredYCbCr[0] + (i ? 8 : 0);
+      pTempMCRefMem.pDstU = pTempPredYCbCr[1] + (i ? 4 : 0);
+      pTempMCRefMem.pDstV = pTempPredYCbCr[2] + (i ? 4 : 0);
       for (int32_t listIdx = LIST_0; listIdx < LIST_A; ++listIdx) {
         if (IS_DIR (iMBType, i, listIdx)) {
-          // First list of this partition predicts into sRef, second into sTempRef,
-          // so the second BaseMC no longer overwrites the first list's result.
-          sMCRefMember* pTarget = (listCount == 0) ? &sRef : &sTempRef;
+          // The first list of a partition predicts into pMCRefMem and the second
+          // into pTempMCRefMem, so the second BaseMC() no longer overwrites the
+          // prediction made for the first list.
+          sMCRefMember* pTarget = (listCount == 0) ? &pMCRefMem : &pTempMCRefMem;
           lastListIdx = listIdx;
           iMVs[0] = pCurDqLayer->pDec->pMv[listIdx][iMBXY][i << 1][0];
           iMVs[1] = pCurDqLayer->pDec->pMv[listIdx][iMBXY][i << 1][1];
@@ -821,14 +812,15 @@ int32_t GetInterBPred (uint8_t* pPredYCbCr[3], uint8_t* pTempPredYCbCr[3], PWels
         iRefIndex0 = pCurDqLayer->pDec->pRefIndex[LIST_0][iMBXY][i << 1];
         iRefIndex1 = pCurDqLayer->pDec->pRefIndex[LIST_1][iMBXY][i << 1];
         if (pCurDqLayer->bUseWeightedBiPredIdc) {
-          BiWeightPrediction (pCurDqLayer, &sRef, &sTempRef, iRefIndex0, iRefIndex1, bWeightedBipredIdcIs1, 8, 16);
+          BiWeightPrediction (pCurDqLayer, &pMCRefMem, &pTempMCRefMem, iRefIndex0, iRefIndex1,
+                              bWeightedBipredIdcIs1, 8, 16);
         } else {
-          BiPrediction (pCurDqLayer, &sRef, &sTempRef, 8, 16);
+          BiPrediction (pCurDqLayer, &pMCRefMem, &pTempMCRefMem, 8, 16);
         }
       } else if (listCount == 1) {
         if (bWeightedBipredIdcIs1) {
           iRefIndex = pCurDqLayer->pDec->pRefIndex[lastListIdx][iMBXY][i << 1];
-          WeightPrediction (pCurDqLayer, &sRef, lastListIdx, iRefIndex, 8, 16);
+          WeightPrediction (pCurDqLayer, &pMCRefMem, lastListIdx, iRefIndex, 8, 16);
         }
       }
     }
