@@ -225,6 +225,20 @@ class ThreadDecoderInitTest : public ::testing::Test, public BaseThreadDecoderTe
 };
 
 TEST_F (ThreadDecoderInitTest, JustInit) {}
+
+// Regression test for SPARK-801586: repeated threaded sequence changes must
+// not trigger use-after-free in DPB reallocation paths.
+TEST_F (ThreadDecoderInitTest, ThreadedResolutionSwitchNoUseAfterFree) {
+#if defined(ANDROID_NDK)
+  const std::string kPrefix ("/sdcard/");
+#else
+  const std::string kPrefix ("");
+#endif
+  ASSERT_TRUE (ThreadDecodeResolutionSwitch (
+                 (kPrefix + "res/VID_1920x1080_cabac_temporal_direct.264").c_str(),
+                 (kPrefix + "res/QCIF_2P_I_allIPCM.264").c_str(), 100, NULL));
+}
+
 struct FileParam {
   const char* fileName;
   const char* hashStr;

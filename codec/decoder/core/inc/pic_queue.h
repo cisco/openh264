@@ -37,6 +37,10 @@
 
 #include "picture.h"
 
+namespace WelsCommon {
+class CMemoryAlign;
+}
+
 namespace WelsDec {
 
 #define   PICTURE_RESOLUTION_ALIGNMENT      32
@@ -46,6 +50,7 @@ typedef struct TagPicBuff {
   PPicture*      ppPic;
   int32_t        iCapacity;  // capacity size of queue
   int32_t        iCurrentIdx;
+  WelsCommon::CMemoryAlign* pMa;  // allocator that owns this buffer's memory; used to free it
 } SPicBuff, *PPicBuff;
 
 /*
