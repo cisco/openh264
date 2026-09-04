@@ -144,7 +144,7 @@ else
 endif
 
 if system == 'android'
-  add_project_link_arguments('-Wl,-z,max-page-size=16384', language: ['c', 'cpp'])
+  add_project_link_arguments('-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384', language: ['c', 'cpp'])
 endif
 
 use_asm_gen = false
