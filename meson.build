@@ -143,6 +143,10 @@ else
   error('FIXME: Unhandled system @0@'.format(system))
 endif
 
+if system == 'android'
+  add_project_link_arguments('-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384', language: ['c', 'cpp'])
+endif
+
 use_asm_gen = false
 if cpu_family in ['x86', 'x86_64']
   nasm = find_program('nasm')
