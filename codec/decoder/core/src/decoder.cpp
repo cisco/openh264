@@ -76,6 +76,7 @@ static int32_t CreatePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, cons
   if (NULL == pPicBuf) {
     return ERR_INFO_OUT_OF_MEMORY;
   }
+  pPicBuf->pMa = pMa;
 
   pPicBuf->ppPic = (PPicture*)pMa->WelsMallocz (kiSize * sizeof (PPicture), "PPicture*");
 
@@ -119,6 +120,7 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   if (NULL == pPicNewBuf) {
     return ERR_INFO_OUT_OF_MEMORY;
   }
+  pPicNewBuf->pMa = pMa;
 
   pPicNewBuf->ppPic = (PPicture*)pMa->WelsMallocz (kiNewSize * sizeof (PPicture), "PPicture*");
 
@@ -184,6 +186,7 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   if (NULL == pPicNewBuf) {
     return ERR_INFO_OUT_OF_MEMORY;
   }
+  pPicNewBuf->pMa = pMa;
 
   pPicNewBuf->ppPic = (PPicture*)pMa->WelsMallocz (kiNewSize * sizeof (PPicture), "PPicture*");
 
@@ -267,6 +270,10 @@ void DestroyPicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, CMemoryAlign*
     return;
 
   pPicBuf = *ppPicBuf;
+  // Free through the allocator that created this buffer, so per-context memory
+  // accounting stays balanced even when another thread's context tears it down.
+  if (pPicBuf->pMa != NULL)
+    pMa = pPicBuf->pMa;
   while (pPicBuf->ppPic != NULL) {
     int32_t iPicIdx = 0;
     while (iPicIdx < pPicBuf->iCapacity) {

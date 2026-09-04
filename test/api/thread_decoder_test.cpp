@@ -220,6 +220,23 @@ class ThreadDecoderInitTest : public ::testing::Test, public BaseThreadDecoderTe
 };
 
 TEST_F (ThreadDecoderInitTest, JustInit) {}
+
+// Regression test for cisco/openh264#3972 (SPARK-801586): guard threaded DPB
+// reallocation. Alternating IDR frames at two resolutions force the shared
+// decoded-picture buffer to be reallocated while worker threads are still
+// decoding; the unfixed decoder hit a heap-use-after-free. Decoding must stay
+// crash-free and error-free (DecodeFrame asserts dsErrorFree internally).
+TEST_F (ThreadDecoderInitTest, ThreadedResolutionSwitchNoUseAfterFree) {
+#if defined(ANDROID_NDK)
+  const std::string kPrefix ("/sdcard/");
+#else
+  const std::string kPrefix ("");
+#endif
+  ASSERT_TRUE (ThreadDecodeResolutionSwitch (
+                 (kPrefix + "res/VID_1920x1080_cabac_temporal_direct.264").c_str(),
+                 (kPrefix + "res/QCIF_2P_I_allIPCM.264").c_str(), 100, NULL));
+}
+
 struct FileParam {
   const char* fileName;
   const char* hashStr;
