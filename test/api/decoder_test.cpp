@@ -139,6 +139,7 @@ static const FileParam kFileParamArray[] = {
   {"res/VID_1280x544_cavlc_temporal_direct.264", "33bfa44b4a3c87fe28354cace1d4b99a03d2967d"},
   {"res/VID_1280x720_cavlc_temporal_direct.264", "4face6b5d73a378b6e564a831b49311c230158e4"},
   {"res/VID_1920x1080_cavlc_temporal_direct.264", "b35dc99604ea2a1fda5b84d1b9098cb7565dec8f"},
+  {"res/ltr_reorder_high_cabac.264", "f496a84291950422de2620e6e022a4ac47b099f1"},
 };
 
 INSTANTIATE_TEST_SUITE_P (DecodeFile, DecoderOutputTest,
