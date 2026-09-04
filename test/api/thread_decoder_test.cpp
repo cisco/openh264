@@ -7,6 +7,11 @@
 #include <string>
 #include <vector>
 
+#if !defined(_WIN32)
+#include <sys/mman.h>
+#include <unistd.h>
+#endif
+
 static void UpdateHashFromPlane (SHA1Context* ctx, const uint8_t* plane,
                                  int width, int height, int stride) {
   for (int i = 0; i < height; i++) {
@@ -470,4 +475,82 @@ TEST_F (ThreadDecoderReorderQueueRaceTest, BufferedPictureQueueDrainsAllFrames) 
 #endif
   ASSERT_FALSE (HasFatalFailure());
   EXPECT_EQ (iDecodedFrames_, 50);
+}
+
+// Regression coverage for the threaded ppDst post-return write.
+// In threaded decode, DecodeFrameNoDelay() hands the caller-owned ppDst
+// pointer array to a worker thread; decoding continues asynchronously and can
+// write into ppDst after the API call has already returned. If the caller's
+// storage is short-lived (e.g. freed or unmapped right after the call), that
+// late write is a use-after-free. The worker now writes into thread-owned
+// storage only, so the caller's page can be unmapped immediately after each
+// call without a crash.
+//
+// Iterations are capped: a separate, already-tracked AU-list counter overflow
+// in ResetCurrentAccessUnit surfaces around iteration 13 on this input
+// regardless of this fix, so this test stays inside that bound to isolate the
+// ppDst behavior under test.
+TEST (ThreadDecoderSecurityTest, DecodeFrameNoDelayNoPostReturnWriteToCallerPpDst) {
+#if defined(_WIN32)
+  GTEST_SKIP() << "mmap/munmap based lifetime stress is POSIX-only";
+#else
+  ISVCDecoder* decoder = NULL;
+  ASSERT_EQ (0, WelsCreateDecoder (&decoder));
+  ASSERT_TRUE (decoder != NULL);
+
+  SDecodingParam decParam;
+  memset (&decParam, 0, sizeof (decParam));
+  decParam.uiTargetDqLayer = UCHAR_MAX;
+  decParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
+  decParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
+  int32_t iThreadCount = 2;
+  decoder->SetOption (DECODER_OPTION_NUM_OF_THREADS, &iThreadCount);
+  ASSERT_EQ (0, decoder->Initialize (&decParam));
+
+  std::ifstream file ("res/BA_MW_D.264", std::ios::in | std::ios::binary);
+  ASSERT_TRUE (file.is_open());
+  std::vector<uint8_t> bitstream ((std::istreambuf_iterator<char> (file)), std::istreambuf_iterator<char>());
+  ASSERT_FALSE (bitstream.empty());
+
+  const size_t pageSize = static_cast<size_t> (sysconf (_SC_PAGESIZE));
+  const size_t chunkSize = 1200;
+  const int32_t kMaxIters = 12;
+
+  for (size_t off = 0, iter = 0; off < bitstream.size() && iter < static_cast<size_t> (kMaxIters);
+       off += chunkSize, ++iter) {
+    void* page = mmap (NULL, pageSize, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    ASSERT_NE (MAP_FAILED, page);
+
+    unsigned char** ppDst = reinterpret_cast<unsigned char**> (page);
+    memset (ppDst, 0, pageSize);
+
+    SBufferInfo dstInfo;
+    memset (&dstInfo, 0, sizeof (dstInfo));
+    int32_t len = static_cast<int32_t> (std::min (chunkSize, bitstream.size() - off));
+    DECODING_STATE rv = decoder->DecodeFrameNoDelay (bitstream.data() + off, len, ppDst, &dstInfo);
+    // The 1200-byte offsets are not NAL/AU aligned, so bitstream-parsing-level
+    // states (dsBitstreamError, dsDataErrorConcealed, ...) are expected with
+    // ERROR_CON_SLICE_COPY; only logic-level failures indicate a real problem.
+    EXPECT_EQ (0, rv & (dsInvalidArgument | dsInitialOptExpected | dsOutOfMemory));
+
+    munmap (page, pageSize);
+    usleep (5000);
+  }
+
+  // Drain pipelined in-flight frames before teardown so Uninitialize() does not
+  // free decoder state while a worker thread is still reconstructing.
+  uint8_t* dst[3] = {NULL, NULL, NULL};
+  SBufferInfo info;
+  int32_t endOfStream = 1;
+  decoder->SetOption (DECODER_OPTION_END_OF_STREAM, &endOfStream);
+  int32_t remaining = 0;
+  decoder->GetOption (DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER, &remaining);
+  for (int32_t i = 0; i < remaining; ++i) {
+    memset (&info, 0, sizeof (info));
+    decoder->FlushFrame (dst, &info);
+  }
+
+  decoder->Uninitialize();
+  WelsDestroyDecoder (decoder);
+#endif
 }
