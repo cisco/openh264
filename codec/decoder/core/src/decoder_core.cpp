@@ -1836,16 +1836,23 @@ void ResetCurrentAccessUnit (PWelsDecoderContext pCtx) {
     const uint32_t kuiActualNum = pCurAu->uiActualUnitsNum;
     // a more simpler method to do nal units list management prefered here
     const uint32_t kuiAvailNum  = pCurAu->uiAvailUnitsNum;
+    // Guard: counter mismatch after timeout-early-return can cause unsigned underflow.
+    if (kuiActualNum > kuiAvailNum) {
+      pCurAu->uiActualUnitsNum = pCurAu->uiAvailUnitsNum = 0;
+      return;
+    }
     const uint32_t kuiLeftNum   = kuiAvailNum - kuiActualNum;
+    // Guard: swap must stay within allocated list capacity.
+    const uint32_t kuiSwapLimit = (kuiAvailNum <= pCurAu->uiCountUnitsNum) ? kuiLeftNum : 0;
 
     // Swapping active nal unit nodes of succeeding AU with leading of list
-    while (iIdx < kuiLeftNum) {
+    while (iIdx < kuiSwapLimit) {
       PNalUnit t = pCurAu->pNalUnitsList[kuiActualNum + iIdx];
       pCurAu->pNalUnitsList[kuiActualNum + iIdx] = pCurAu->pNalUnitsList[iIdx];
       pCurAu->pNalUnitsList[iIdx] = t;
       ++ iIdx;
     }
-    pCurAu->uiActualUnitsNum = pCurAu->uiAvailUnitsNum = kuiLeftNum;
+    pCurAu->uiActualUnitsNum = pCurAu->uiAvailUnitsNum = kuiSwapLimit;
   }
 }
 

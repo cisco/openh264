@@ -471,3 +471,58 @@ TEST_F (ThreadDecoderReorderQueueRaceTest, BufferedPictureQueueDrainsAllFrames) 
   ASSERT_FALSE (HasFatalFailure());
   EXPECT_EQ (iDecodedFrames_, 50);
 }
+
+// Regression guard for the heap-buffer-overflow in ResetCurrentAccessUnit
+// introduced by #3983: the AU list must not overflow when the reference-wait
+// timeout fires repeatedly across many threaded decode calls.
+TEST (ThreadDecoderNalListBoundsTest, ResetAuListDoesNotOverflowOnRepeatedTimeouts) {
+  ISVCDecoder* dec = nullptr;
+  ASSERT_EQ (0, WelsCreateDecoder (&dec));
+  ASSERT_NE (dec, nullptr);
+
+  SDecodingParam p;
+  memset (&p, 0, sizeof (p));
+  p.uiTargetDqLayer  = UCHAR_MAX;
+  p.eEcActiveIdc     = ERROR_CON_SLICE_COPY;
+  p.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
+  int32_t iThreads = 2;
+  dec->SetOption (DECODER_OPTION_NUM_OF_THREADS, &iThreads);
+  ASSERT_EQ (0, dec->Initialize (&p));
+
+  // Read a B-frame stream whose AU accumulation at iter 13 triggers the OOB
+  // on unfixed builds (confirmed by ASAN bisect).
+  std::ifstream ifs ("res/BA_MW_D.264", std::ios::binary);
+  ASSERT_TRUE (ifs.is_open());
+  std::vector<uint8_t> bs ((std::istreambuf_iterator<char> (ifs)), {});
+  ASSERT_FALSE (bs.empty());
+
+  const size_t kChunk = 1200;
+  // 20 iterations comfortably past the iter-13 OOB threshold.
+  const int kIters = 20;
+  // dst must outlive the loop body: worker threads write ppDst asynchronously.
+  uint8_t* dst[3] = {nullptr, nullptr, nullptr};
+  for (int i = 0; i < kIters && static_cast<size_t> (i) * kChunk < bs.size(); ++i) {
+    SBufferInfo info;
+    memset (&info, 0, sizeof (info));
+    int32_t len = static_cast<int32_t> (std::min (kChunk, bs.size() - static_cast<size_t> (i) * kChunk));
+    DECODING_STATE rv = dec->DecodeFrameNoDelay (bs.data() + static_cast<size_t> (i) * kChunk, len, dst, &info);
+    // Non-fatal error codes (ref lost, EC) are acceptable; fatal errors are not.
+    const int32_t kFatalMask = dsInvalidArgument | dsInitialOptExpected | dsOutOfMemory | dsDstBufNeedExpan;
+    EXPECT_EQ (0, static_cast<int32_t> (rv) & kFatalMask) << "fatal decode error at iter " << i;
+  }
+
+  // Drain buffered frames before teardown to avoid worker-thread use-after-free.
+  int32_t iEos = 1;
+  dec->SetOption (DECODER_OPTION_END_OF_STREAM, &iEos);
+  int32_t iRemaining = 0;
+  dec->GetOption (DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER, &iRemaining);
+  for (int32_t i = 0; i < iRemaining; ++i) {
+    uint8_t* dst[3] = {nullptr, nullptr, nullptr};
+    SBufferInfo info;
+    memset (&info, 0, sizeof (info));
+    dec->FlushFrame (dst, &info);
+  }
+
+  dec->Uninitialize();
+  WelsDestroyDecoder (dec);
+}
