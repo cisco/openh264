@@ -1374,12 +1374,43 @@ DECODING_STATE CWelsDecoder::ParseAccessUnit (SWelsDecoderThreadCTX& sThreadCtx)
   int32_t iRet = DecodeFrame2WithCtx (sThreadCtx.pCtx, sThreadCtx.kpSrc, sThreadCtx.kiSrcLen, sThreadCtx.ppDst,
                                       &sThreadCtx.sDstInfo);
 
-  int32_t iErr = InitConstructAccessUnit (sThreadCtx.pCtx, &sThreadCtx.sDstInfo);
+  int32_t iErr = WelsDecodeInitAccessUnitStart (sThreadCtx.pCtx, &sThreadCtx.sDstInfo);
   if (ERR_NONE != iErr) {
     return (DECODING_STATE) (iRet | iErr);
   }
   if (sThreadCtx.pCtx->bNewSeqBegin) {
+    if (GetThreadCount (sThreadCtx.pCtx) > 1) {
+      // Wait for older workers before replacing shared DPB storage.
+      for (int32_t i = 0; i < m_DecCtxActiveCount; ++i) {
+        if (m_pDecThrCtxActive[i] != NULL && m_pDecThrCtxActive[i] != &sThreadCtx) {
+          WAIT_SEMAPHORE (&m_pDecThrCtxActive[i]->sThreadInfo.sIsIdle, WELS_DEC_THREAD_WAIT_INFINITE);
+          RELEASE_SEMAPHORE (&m_pDecThrCtxActive[i]->sThreadInfo.sIsIdle);
+        }
+      }
+      sThreadCtx.pCtx->pLastThreadCtx = NULL;
+    }
+    iErr = AllocPicBuffOnNewSeqBegin (sThreadCtx.pCtx);
+    if (ERR_NONE != iErr) {
+      return (DECODING_STATE) (iRet | iErr);
+    }
     m_pPicBuff = sThreadCtx.pCtx->pPicBuff;
+    // Keep sibling contexts from carrying stale DPB references.
+    for (int32_t i = 0; i < m_iCtxCount; ++i) {
+      if (&m_pDecThrCtx[i] != &sThreadCtx && m_pDecThrCtx[i].pCtx != NULL) {
+        m_pDecThrCtx[i].pCtx->pPicBuff = m_pPicBuff;
+        m_pDecThrCtx[i].pCtx->bHaveGotMemory = sThreadCtx.pCtx->bHaveGotMemory;
+        m_pDecThrCtx[i].pCtx->iPicQueueNumber = sThreadCtx.pCtx->iPicQueueNumber;
+        m_pDecThrCtx[i].pCtx->iImgWidthInPixel = sThreadCtx.pCtx->iImgWidthInPixel;
+        m_pDecThrCtx[i].pCtx->iImgHeightInPixel = sThreadCtx.pCtx->iImgHeightInPixel;
+        m_pDecThrCtx[i].pCtx->pDec = NULL;
+        m_pDecThrCtx[i].pCtx->pLastThreadCtx = NULL;
+        iErr = InitialDqLayersContext (m_pDecThrCtx[i].pCtx, sThreadCtx.pCtx->iImgWidthInPixel,
+                                       sThreadCtx.pCtx->iImgHeightInPixel);
+        if (ERR_NONE != iErr) {
+          return (DECODING_STATE) (iRet | iErr);
+        }
+      }
+    }
   } else if (bPicBuffChanged) {
     InitialDqLayersContext (sThreadCtx.pCtx, sThreadCtx.pCtx->pSps->iMbWidth << 4, sThreadCtx.pCtx->pSps->iMbHeight << 4);
   }

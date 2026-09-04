@@ -38,6 +38,8 @@ class BaseThreadDecoderTest {
   int32_t SetUp();
   void TearDown();
   bool ThreadDecodeFile (const char* fileName, Callback* cbk);
+  // Decode alternating IDR frames from two streams to force repeated sequence changes.
+  bool ThreadDecodeResolutionSwitch (const char* fileName1, const char* fileName2, int32_t iterations, Callback* cbk);
 
   bool Open (const char* fileName);
   ISVCDecoder* decoder_;

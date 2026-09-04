@@ -307,6 +307,58 @@ bool BaseThreadDecoderTest::ThreadDecodeFile (const char* fileName, Callback* cb
   return true;
 }
 
+static bool ReadFileToBuffer (const char* fileName, BufferedData& buf) {
+  std::ifstream file (fileName, std::ios::in | std::ios::binary);
+  if (!file.is_open())
+    return false;
+  char b;
+  for (;;) {
+    file.read (&b, 1);
+    if (file.gcount() != 1) // end of file
+      break;
+    if (!buf.PushBack (b))
+      return false;
+  }
+  return true;
+}
+
+bool BaseThreadDecoderTest::ThreadDecodeResolutionSwitch (const char* fileName1, const char* fileName2,
+    int32_t iterations, Callback* cbk) {
+  BufferedData buf1;
+  BufferedData buf2;
+  if (!ReadFileToBuffer (fileName1, buf1) || !ReadFileToBuffer (fileName2, buf2))
+    return false;
+
+  int32_t len1 = (int32_t) buf1.Length();
+  int32_t len2 = (int32_t) buf2.Length();
+  int32_t pos1 = 0;
+  int32_t pos2 = 0;
+  int32_t frameSize1 = ReadFrame (buf1.data(), len1, pos1);
+  int32_t frameSize2 = ReadFrame (buf2.data(), len2, pos2);
+  if (frameSize1 <= 0 || frameSize2 <= 0)
+    return false;
+
+  uiTimeStamp = 0;
+  memset (&sBufInfo, 0, sizeof (SBufferInfo));
+  for (int32_t i = 0; i < iterations; ++i) {
+    DecodeFrame (buf1.data(), frameSize1, cbk);
+    if (::testing::Test::HasFatalFailure())
+      return false;
+    DecodeFrame (buf2.data(), frameSize2, cbk);
+    if (::testing::Test::HasFatalFailure())
+      return false;
+  }
+
+  int32_t iEndOfStreamFlag = 1;
+  decoder_->SetOption (DECODER_OPTION_END_OF_STREAM, &iEndOfStreamFlag);
+  int32_t num_of_frames_in_buffer = 0;
+  decoder_->GetOption (DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER, &num_of_frames_in_buffer);
+  for (int32_t i = 0; i < num_of_frames_in_buffer; ++i) {
+    FlushFrame (cbk);
+  }
+  return true;
+}
+
 bool BaseThreadDecoderTest::Open (const char* fileName) {
   if (decodeStatus_ == OpenFile) {
     file_.open (fileName, std::ios_base::out | std::ios_base::binary);
