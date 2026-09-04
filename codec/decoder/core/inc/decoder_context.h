@@ -537,7 +537,6 @@ typedef struct tagSWelsDecThreadCtx {
   void* threadCtxOwner;
   uint8_t* kpSrc;
   int32_t kiSrcLen;
-  uint8_t* pDst[3];
   uint8_t** ppDst;
   SBufferInfo sDstInfo;
   PPicture pDec;
