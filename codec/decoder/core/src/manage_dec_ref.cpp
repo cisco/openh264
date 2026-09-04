@@ -735,6 +735,19 @@ static int32_t MMCOProcess (PWelsDecoderContext pCtx, PRefPic pRefPic, uint32_t 
     break;
   case MMCO_RESET:
     WelsResetRefPic (pCtx);
+    if (pRefPic != &pCtx->sRefPic) {
+      // WelsResetRefPic() hard-codes pCtx->sRefPic and does not
+      // touch the caller's active reference list. In the threaded predecessor
+      // handoff path (decoder_core.cpp), pRefPic points at pCtx->sTmpRefPic, a
+      // snapshot taken from pCtx->sRefPic before this call and later published
+      // to the successor thread context. Left untouched here, sTmpRefPic would
+      // keep pointers to pictures that WelsResetRefPic() just unreferenced
+      // (and that may already be recycled by PrefetchPic()), so the successor
+      // frame would inherit a stale/dangling reference list. Re-sync it to the
+      // freshly-cleared sRefPic; the entries were already unreffed once by
+      // WelsResetRefPic() above, so do not call SetUnRef again here.
+      *pRefPic = pCtx->sRefPic;
+    }
     pCtx->pLastDecPicInfo->bLastHasMmco5 = true;
     break;
   case MMCO_LONG:
