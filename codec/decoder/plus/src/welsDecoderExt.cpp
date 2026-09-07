@@ -140,6 +140,7 @@ CWelsDecoder::CWelsDecoder (void)
     m_iCpuCount (1),
     m_iThreadCount (0),
     m_iCtxCount (1),
+    m_bDecThreadsOpen (false),
     m_pPicBuff (NULL),
     m_bParamSetsLostFlag (false),
     m_bFreezeOutput (false),
@@ -286,6 +287,9 @@ long CWelsDecoder::Initialize (const SDecodingParam* pParam) {
 }
 
 long CWelsDecoder::Uninitialize() {
+  // stop the worker threads before freeing the contexts they still read,
+  // as the destructor and ThreadResetDecoder() do
+  CloseDecoderThreads();
   UninitDecoder();
 
   return ERR_NONE;
@@ -303,7 +307,11 @@ void CWelsDecoder::UninitDecoder (void) {
 }
 
 void CWelsDecoder::OpenDecoderThreads() {
+  if (m_bDecThreadsOpen) {
+    return;
+  }
   if (m_iThreadCount >= 1) {
+    m_bDecThreadsOpen = true;
     m_uiDecodeTimeStamp = 0;
     CREATE_SEMAPHORE (&m_sIsBusy, m_iThreadCount, m_iThreadCount, NULL);
     WelsMutexInit (&m_csDecoder);
@@ -333,6 +341,10 @@ void CWelsDecoder::OpenDecoderThreads() {
   }
 }
 void CWelsDecoder::CloseDecoderThreads() {
+  if (!m_bDecThreadsOpen) {
+    return;
+  }
+  m_bDecThreadsOpen = false;
   if (m_iThreadCount >= 1) {
     SET_EVENT (&m_sReleaseBufferEvent);
     for (int32_t i = 0; i < m_iThreadCount; i++) { //waiting the completion begun slices
