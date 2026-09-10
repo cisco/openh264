@@ -112,7 +112,7 @@ if ['linux', 'freebsd', 'android', 'ios', 'darwin'].contains(system)
   if ['ios', 'darwin', 'android'].contains(system)
     cpp_lib = '-lc++'
   endif
-elif system == 'windows'
+elif ['windows', 'cygwin'].contains(system)
   if cpu_family == 'x86'
     asm_format = 'win32'
     asm_args += ['-DPREFIX', '-DX86_32']
