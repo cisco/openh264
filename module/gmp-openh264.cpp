@@ -877,7 +877,7 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
       // numOfSequenceParameterSets, to Annex B format.
       const uint8_t* avcc = aCodecSpecific + offsetof(GMPVideoCodecH264, mAVCC.mNumSPS);
       // aCodecSpecificSize is only validated as a floor above.
-      // The AVCC SPS/PPS counts and 16-bit length fields are attacker-controlled,
+      // The AVCC SPS/PPS counts and 16-bit length fields must be validated,
       // so bound every read against the end of the codec-specific buffer; the
       // walking pointer must never read past the allocation.
       const uint8_t* const avccEnd = aCodecSpecific + aCodecSpecificSize;
