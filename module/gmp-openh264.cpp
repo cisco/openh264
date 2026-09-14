@@ -1067,11 +1067,11 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
     if (gmp_api_version_ >= kGMPVersion34) {
       decoded.uiInBsTimeStamp = inputFrame->TimeStamp();
     }
-    unsigned char* data[3] = {nullptr, nullptr, nullptr};
+    memset(data_, 0, sizeof(data_));
 
     dState = decoder_->DecodeFrameNoDelay (inputFrame->Buffer(),
                                      inputFrame->Size(),
-                                     data,
+                                     data_,
                                      &decoded);
 
     if (dState) {
@@ -1085,7 +1085,7 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
                                  &OpenH264VideoDecoder::Decode_m,
                                  inputFrame,
                                  &decoded,
-                                 data,
+                                 data_,
                                  renderTimeMs,
                                  valid));
   }
@@ -1204,6 +1204,8 @@ class OpenH264VideoDecoder : public GMPVideoDecoder, public RefCounted {
   FrameStats stats_;
   uint32_t gmp_api_version_;
   bool shutting_down;
+  // Make data_, used in Decode_w(), live as long as the class object.
+  unsigned char* data_[3];
 };
 
 extern "C" {
