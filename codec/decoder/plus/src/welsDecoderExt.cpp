@@ -1386,6 +1386,14 @@ DECODING_STATE CWelsDecoder::ParseAccessUnit (SWelsDecoderThreadCTX& sThreadCtx)
           RELEASE_SEMAPHORE (&m_pDecThrCtxActive[i]->sThreadInfo.sIsIdle);
         }
       }
+      for (int32_t i = 0; i < m_iCtxCount; ++i) {
+        //Past the barrier nothing is decoding and the chain is cut for every context, so a
+        //hand-off signal still raised has lost the consumer that would have reset it. Left
+        //raised, the next frame that waits on that worker passes the wait at once and marks
+        //a picture that has not been decoded.
+        if (m_pDecThrCtx[i].pCtx != NULL)
+          RESET_EVENT (&m_pDecThrCtx[i].sSliceDecodeStart);
+      }
       sThreadCtx.pCtx->pLastThreadCtx = NULL;
     }
     iErr = AllocPicBuffOnNewSeqBegin (sThreadCtx.pCtx);
