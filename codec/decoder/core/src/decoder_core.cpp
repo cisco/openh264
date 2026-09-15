@@ -2664,6 +2664,13 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         for (uint32_t uiRow = 0; uiRow < kuiRows; ++uiRow)
           RESET_EVENT (&pCtx->pDec->pReadyEvent[uiRow]);
       }
+      //The pad queue spans the picture, so it is initialised where the picture is taken.
+      //Keying it off first_mb_in_slice == 0 was not safe: that slice need not be the first
+      //to arrive -- it can be lost, and arbitrary slice order and FMO both deliver others
+      //first -- and a queue still holding iPadQCap == 0 pops an index it never stored and
+      //drives its count negative on the first push.
+      if (pCtx->pDec != NULL)
+        WelsDbkPadQInit (pCtx, (pCtx->pDec->iWidthInPixel + 15) >> 4);
       if (pLastThreadCtx != NULL) {
         if (pLastThreadCtx->pDec != NULL) {
           pLastThreadCtx->pDec->bUsedAsRef = pLastThreadCtx->pCtx->uiNalRefIdc > 0;

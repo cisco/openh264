@@ -1822,9 +1822,6 @@ int32_t WelsDecodeAndConstructSlice (PWelsDecoderContext pCtx) {
 
   SDbkDelayQ sDbkQ;
   DbkQInit (sDbkQ, pCurDqLayer->iMbWidth);
-  if (pSliceHeader->iFirstMbInSlice == 0)
-    WelsDbkPadQInit (pCtx, pCurDqLayer->iMbWidth);
-
   do {
     if ((-1 == iNextMbXyIndex) || (iNextMbXyIndex >= kiCountNumMb)) { // slice group boundary or end of a frame
       break;
