@@ -104,6 +104,7 @@ struct SPicture {
   int8_t (*pRefIndex[LIST_A])[MB_BLOCK4x4_NUM]; //used for direct mode
   struct SPicture* pRefPic[LIST_A][17];  //ref pictures used for direct mode
   SWelsDecEvent* pReadyEvent;  //MB line ready event
+  int32_t* pRowMbDone;         //macroblocks padded so far in each MB row
 
 };// "Picture" declaration is comflict with Mac system
 

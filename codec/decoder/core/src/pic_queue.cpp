@@ -130,8 +130,10 @@ PPicture AllocPicture (PWelsDecoderContext pCtx, const int32_t kiPicWidth, const
     for (uint32_t i = 0; i < uiMbHeight; ++i) {
       CREATE_EVENT (&pPic->pReadyEvent[i], 1, 0, NULL);
     }
+    pPic->pRowMbDone = (int32_t*)pMa->WelsMallocz (uiMbHeight * sizeof (int32_t), "pPic->pRowMbDone");
   } else {
     pPic->pReadyEvent = NULL;
+    pPic->pRowMbDone = NULL;
   }
 
   return pPic;
@@ -177,6 +179,10 @@ void FreePicture (PPicture pPic, CMemoryAlign* pMa) {
       }
       pMa->WelsFree (pPic->pReadyEvent, "pPic->pReadyEvent");
       pPic->pReadyEvent = NULL;
+    }
+    if (pPic->pRowMbDone != NULL) {
+      pMa->WelsFree (pPic->pRowMbDone, "pPic->pRowMbDone");
+      pPic->pRowMbDone = NULL;
     }
     pMa->WelsFree (pPic, "pPic");
     pPic = NULL;

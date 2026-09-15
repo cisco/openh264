@@ -1655,8 +1655,13 @@ static void DbkPadOne (PWelsDecoderContext pCtx, PDqLayer pCurDqLayer, int32_t i
                      pCurDqLayer->iMbHeight);
     }
   }
-  if (GetThreadCount (pCtx) > 1 && pCurDqLayer->iMbX == pCurDqLayer->iMbWidth - 1)
-    SET_EVENT (&pCtx->pDec->pReadyEvent[pCurDqLayer->iMbY]);
+  if (GetThreadCount (pCtx) > 1 && pCtx->pDec->pRowMbDone != NULL) {
+    //Announce the row once every macroblock in it has been padded. Reaching the last column
+    //is not the same thing: with more than one slice group FmoNextMb() can visit it while
+    //another group still owns undecoded macroblocks in the row, and a slice can end mid-row.
+    if (++pCtx->pDec->pRowMbDone[pCurDqLayer->iMbY] >= pCurDqLayer->iMbWidth)
+      SET_EVENT (&pCtx->pDec->pReadyEvent[pCurDqLayer->iMbY]);
+  }
   pCurDqLayer->iMbX = iSaveX;
   pCurDqLayer->iMbY = iSaveY;
   pCurDqLayer->iMbXyIndex = iSaveXy;

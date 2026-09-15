@@ -2663,6 +2663,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         const uint32_t kuiRows = (pCtx->pDec->iHeightInPixel + 15) >> 4;
         for (uint32_t uiRow = 0; uiRow < kuiRows; ++uiRow)
           RESET_EVENT (&pCtx->pDec->pReadyEvent[uiRow]);
+        if (pCtx->pDec->pRowMbDone != NULL)
+          memset (pCtx->pDec->pRowMbDone, 0, kuiRows * sizeof (int32_t));
       }
       //The pad queue spans the picture, so it is initialised where the picture is taken.
       //Keying it off first_mb_in_slice == 0 was not safe: that slice need not be the first
@@ -2721,6 +2723,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
         for (uint32_t i = 0; i < uiMbHeight; ++i) {
           RESET_EVENT (&pCtx->pDec->pReadyEvent[i]);
         }
+        if (pCtx->pDec->pRowMbDone != NULL)
+          memset (pCtx->pDec->pRowMbDone, 0, uiMbHeight * sizeof (int32_t));
       }
       pCtx->pDec->bNewSeqBegin = pCtx->bNewSeqBegin; //set flag for start decoding
     } else if (pCtx->iTotalNumMbRec == 0) { //pDec != NULL, already start
