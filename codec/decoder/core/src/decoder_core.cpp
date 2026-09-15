@@ -2666,6 +2666,12 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
       isNewFrame = pCtx->pDec == NULL;
     }
     if (pCtx->pDec == NULL) {
+      //Drop pins this context still holds from a frame that returned early. PinRefPics()
+      //releases them as well, but it runs after PrefetchPic(), and a pinned picture is
+      //exactly what PrefetchPic() will not hand out: pins left by an error return shrink
+      //the pool it draws from, and it fails before reaching that release.
+      if (iThreadCount > 1)
+        ReleasePinnedRefPics (pCtx);
       //make call PrefetchPic first before updating reference lists in threaded mode
       //this prevents from possible thread-decoding hanging
       pCtx->pDec = PrefetchPic (pCtx->pPicBuff);
