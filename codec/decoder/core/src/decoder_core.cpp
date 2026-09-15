@@ -2545,7 +2545,7 @@ static void SnapshotRefMarkInfo (PWelsDecoderContext pCtx, PWelsDecoderThreadCTX
 
 //Drop the pins taken for the previous frame. Idempotent, so a frame that exited early
 //cannot leak them: the next frame's PinRefPics() clears whatever is still held.
-static void ReleasePinnedRefPics (PWelsDecoderContext pCtx) {
+static void ReleasePinnedRefPicsLocked (PWelsDecoderContext pCtx) {
   for (int32_t i = 0; i < pCtx->iPinnedRefCount; ++i) {
     PPicture pPin = pCtx->pPinnedRef[i];
     if (pPin != NULL && pPin->iPinCount > 0) {
@@ -2559,11 +2559,18 @@ static void ReleasePinnedRefPics (PWelsDecoderContext pCtx) {
   pCtx->iPinnedRefCount = 0;
 }
 
+static void ReleasePinnedRefPics (PWelsDecoderContext pCtx) {
+  DpbRefLock (pCtx);
+  ReleasePinnedRefPicsLocked (pCtx);
+  DpbRefUnlock (pCtx);
+}
+
 //Hold the pictures this frame's slices can address through ref_idx. Anything still in the
 //DPB is already safe from PrefetchPic(), which skips pictures marked bUsedAsRef; what needs
 //holding is a picture that a later frame drops from the DPB while this one still lists it.
 static void PinRefPics (PWelsDecoderContext pCtx) {
-  ReleasePinnedRefPics (pCtx);
+  DpbRefLock (pCtx);
+  ReleasePinnedRefPicsLocked (pCtx);
   const int32_t kiMax = (int32_t) (sizeof (pCtx->pPinnedRef) / sizeof (pCtx->pPinnedRef[0]));
   for (int32_t iList = LIST_0; iList < LIST_A; ++iList) {
     //The per-slice WelsInitRefList() rebuilds pRefList out of the short and long term
@@ -2586,12 +2593,15 @@ static void PinRefPics (PWelsDecoderContext pCtx) {
       }
       if (bSeen)
         continue;
-      if (pCtx->iPinnedRefCount >= kiMax)
+      if (pCtx->iPinnedRefCount >= kiMax) {
+        DpbRefUnlock (pCtx);
         return;
+      }
       ++pPin->iPinCount;
       pCtx->pPinnedRef[pCtx->iPinnedRefCount++] = pPin;
     }
   }
+  DpbRefUnlock (pCtx);
 }
 
 //Whether *this* picture carried memory_management_control_operation 5, read from its own
@@ -2670,11 +2680,13 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
       //releases them as well, but it runs after PrefetchPic(), and a pinned picture is
       //exactly what PrefetchPic() will not hand out: pins left by an error return shrink
       //the pool it draws from, and it fails before reaching that release.
+      DpbRefLock (pCtx);
       if (iThreadCount > 1)
-        ReleasePinnedRefPics (pCtx);
+        ReleasePinnedRefPicsLocked (pCtx);
       //make call PrefetchPic first before updating reference lists in threaded mode
       //this prevents from possible thread-decoding hanging
       pCtx->pDec = PrefetchPic (pCtx->pPicBuff);
+      DpbRefUnlock (pCtx);
       //Clear the recycled buffer's row-ready flags before anything can see it as a
       //reference. They still carry the signalled state from the buffer's previous frame,
       //and a consumer that reads them in the meantime skips a wait it needed.
@@ -2704,7 +2716,9 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
               }
             }
             pLastThreadCtx->pCtx->sTmpRefPic = pLastThreadCtx->pCtx->sRefPic;
+            DpbRefLock (pCtx);
             WelsMarkAsRef (pLastThreadCtx->pCtx, pLastThreadCtx->pDec, &pLastThreadCtx->sRefMarkInfo);
+            DpbRefUnlock (pCtx);
             pCtx->sRefPic = pLastThreadCtx->pCtx->sTmpRefPic;
           } else {
             pCtx->sRefPic = pLastThreadCtx->pCtx->sRefPic;
@@ -2719,7 +2733,9 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
       //WelsResetRefPic needs to be called when a new sequence is encountered
       //Otherwise artifacts is observed in decoded yuv in couple of unit tests with multiple-slice frame
       if (GetThreadCount (pCtx) > 1 && pCtx->bNewSeqBegin) {
+        DpbRefLock (pCtx);
         WelsResetRefPic (pCtx);
+        DpbRefUnlock (pCtx);
       }
       if (pCtx->iTotalNumMbRec != 0)
         pCtx->iTotalNumMbRec = 0;
@@ -3023,7 +3039,9 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
               ++i;
             }
           }
+          DpbRefLock (pCtx);
           iRet = WelsMarkAsRef (pCtx);
+          DpbRefUnlock (pCtx);
           if (iRet != ERR_NONE) {
             if (iRet == ERR_INFO_DUPLICATE_FRAME_NUM)
               pCtx->iErrorCode |= dsBitstreamError;

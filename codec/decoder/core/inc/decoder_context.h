@@ -605,6 +605,19 @@ static inline int32_t GetThreadCount (PWelsDecoderContext pCtx) {
   }
   return iThreadCount;
 }
+//Pin acquisition, pin release, and the decision in SetUnRef() that resets a picture when
+//iRefCount and iPinCount are both zero have to be serialized against each other and against
+//the release on the output path, which makes the iRefCount half of that same decision.
+//m_csDecoder is the lock that path already holds to do it, and pCsDecoder points at it. It is
+//NULL for a context driven without the plus layer, which has no worker threads either.
+static inline void DpbRefLock (PWelsDecoderContext pCtx) {
+  if (pCtx->pCsDecoder != NULL && GetThreadCount (pCtx) > 1)
+    WelsMutexLock (pCtx->pCsDecoder);
+}
+static inline void DpbRefUnlock (PWelsDecoderContext pCtx) {
+  if (pCtx->pCsDecoder != NULL && GetThreadCount (pCtx) > 1)
+    WelsMutexUnlock (pCtx->pCsDecoder);
+}
 //GetPrevFrameNum only applies when thread count >= 2
 static inline int32_t GetPrevFrameNum (PWelsDecoderContext pCtx) {
   if (pCtx->uiDecodingTimeStamp > 0) {

@@ -158,7 +158,9 @@ static int32_t WelsCheckAndRecoverForFutureDecoding (PWelsDecoderContext pCtx) {
           && pCtx->eSliceType != SI_SLICE)) {
     if (pCtx->pParam->eEcActiveIdc !=
         ERROR_CON_DISABLE) { //IDR lost!, recover it for future decoding with data all set to 0
+      DpbRefLock (pCtx);
       PPicture pRef = PrefetchPic (pCtx->pPicBuff);
+      DpbRefUnlock (pCtx);
       if (pRef != NULL) {
         // IDR lost, set new
         pRef->bIsComplete = false; // Set complete flag to false for lost IDR ref picture
