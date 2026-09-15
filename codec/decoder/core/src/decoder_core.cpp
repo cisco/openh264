@@ -2289,7 +2289,6 @@ int32_t WelsDecodeInitAccessUnitStart (PWelsDecoderContext pCtx, SBufferInfo* pD
   int32_t iErr = ERR_NONE;
   PAccessUnit pCurAu = pCtx->pAccessUnitList;
   pCtx->bAuReadyFlag = false;
-  pCtx->pLastDecPicInfo->bLastHasMmco5 = false;
   bool bTmpNewSeqBegin = CheckNewSeqBeginAndUpdateActiveLayerSps (pCtx);
   if (bTmpNewSeqBegin) {
     if (pCtx->pStreamSeqNum)
@@ -2593,6 +2592,20 @@ static void PinRefPics (PWelsDecoderContext pCtx) {
       pCtx->pPinnedRef[pCtx->iPinnedRefCount++] = pPin;
     }
   }
+}
+
+//Whether *this* picture carried memory_management_control_operation 5, read from its own
+//dec_ref_pic_marking() rather than from the shared SWelsLastDecPicInfo. Every worker context
+//points at the same structure, so a flag set during one frame's marking can be cleared by the
+//caller thread parsing a later access unit before the frame that needs it reads it back.
+static bool SliceHasMmco5 (PSliceHeader pSh) {
+  if (pSh == NULL || !pSh->sRefMarking.bAdaptiveRefPicMarkingModeFlag)
+    return false;
+  for (int32_t i = 0; i < MAX_MMCO_COUNT && pSh->sRefMarking.sMmcoRef[i].uiMmcoType != MMCO_END; ++i) {
+    if (pSh->sRefMarking.sMmcoRef[i].uiMmcoType == MMCO_RESET)
+      return true;
+  }
+  return false;
 }
 
 int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferInfo* pDstInfo) {
@@ -3029,7 +3042,7 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
     // need update frame_num due current frame is well decoded
     if (pCurAu->pNalUnitsList[pCurAu->uiStartPos]->sNalHeaderExt.sNalUnitHeader.uiNalRefIdc > 0)
       pCtx->pLastDecPicInfo->iPrevFrameNum = pSh->iFrameNum;
-    if (pCtx->pLastDecPicInfo->bLastHasMmco5)
+    if (SliceHasMmco5 (pSh))
       pCtx->pLastDecPicInfo->iPrevFrameNum = 0;
     if (iThreadCount > 1) {
       int32_t  id = pThreadCtx->sThreadInfo.uiThrNum;
@@ -3116,7 +3129,7 @@ bool CheckAndFinishLastPic (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferIn
     pCtx->pDec = NULL;
     if (pAu->pNalUnitsList[pAu->uiStartPos]->sNalHeaderExt.sNalUnitHeader.uiNalRefIdc > 0)
       pCtx->pLastDecPicInfo->iPrevFrameNum = pCtx->pLastDecPicInfo->sLastSliceHeader.iFrameNum; //save frame_num
-    if (pCtx->pLastDecPicInfo->bLastHasMmco5)
+    if (SliceHasMmco5 (&pCtx->pLastDecPicInfo->sLastSliceHeader))
       pCtx->pLastDecPicInfo->iPrevFrameNum = 0;
   }
   return ERR_NONE;

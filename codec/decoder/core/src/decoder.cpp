@@ -407,7 +407,6 @@ void WelsDecoderLastDecPicInfoDefaults (SWelsLastDecPicInfo& sLastDecPicInfo) {
   sLastDecPicInfo.iPrevPicOrderCntLsb = 0;
   sLastDecPicInfo.pPreviousDecodedPictureInDpb = NULL;
   sLastDecPicInfo.iPrevFrameNum = -1;
-  sLastDecPicInfo.bLastHasMmco5 = false;
   sLastDecPicInfo.uiDecodingTimeStamp = 0;
 }
 

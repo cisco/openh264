@@ -777,7 +777,6 @@ static int32_t MMCOProcess (PWelsDecoderContext pCtx, PRefPic pRefPic, PPicture 
     }
     if (pbHasMmco5 != NULL)
       *pbHasMmco5 = true;
-    pCtx->pLastDecPicInfo->bLastHasMmco5 = true;
     break;
   case MMCO_LONG:
     if (iLongTermFrameIdx > pRefPic->iMaxLongTermFrameIdx) {

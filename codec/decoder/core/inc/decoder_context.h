@@ -280,7 +280,6 @@ typedef struct tagSWelsLastDecPicInfo {
   int32_t           iPrevPicOrderCntLsb;
   PPicture          pPreviousDecodedPictureInDpb; //pointer to previously decoded picture in DPB for error concealment
   int32_t           iPrevFrameNum;// frame number of previous frame well decoded for non-truncated mode yet
-  bool              bLastHasMmco5;
   uint32_t          uiDecodingTimeStamp; //represent relative decoding time stamps
 } SWelsLastDecPicInfo, *PWelsLastDecPicInfo;
 
