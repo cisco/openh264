@@ -187,6 +187,59 @@ TEST_F (ThreadDecoderHangRegressionTest, Static264ThreeDecodeCallsDoNotDeadlock)
   WelsDestroyDecoder (decoder);
 }
 
+// Length of the NAL unit at pos, up to the next start code.
+static int32_t NalUnitLengthAt (const uint8_t* buf, int32_t size, int32_t pos) {
+  for (int32_t i = pos + 3; i + 2 < size; ++i) {
+    if (buf[i] == 0 && buf[i + 1] == 0 && buf[i + 2] == 1) {
+      return (buf[i - 1] == 0) ? i - 1 - pos : i - pos;
+    }
+  }
+  return size - pos;
+}
+
+class ThreadDecoderTeardownTest : public ::testing::Test {
+};
+
+// An application stopping mid-stream calls Uninitialize() with worker threads
+// live and the output queue undrained. Uninitialize() used to free the
+// per-thread contexts under the workers and crash.
+TEST_F (ThreadDecoderTeardownTest, UninitializeWithoutDrainingDoesNotCrash) {
+  std::ifstream file ("res/BA_MW_D.264", std::ios::in | std::ios::binary);
+  ASSERT_TRUE (file.is_open());
+  std::vector<uint8_t> bitstream ((std::istreambuf_iterator<char> (file)), std::istreambuf_iterator<char> ());
+  ASSERT_FALSE (bitstream.empty());
+  const int32_t fileSize = static_cast<int32_t> (bitstream.size());
+
+  for (int threadCount = 2; threadCount <= 3; ++threadCount) {
+    ISVCDecoder* decoder = NULL;
+    ASSERT_EQ (0, WelsCreateDecoder (&decoder));
+    ASSERT_TRUE (decoder != NULL);
+    decoder->SetOption (DECODER_OPTION_NUM_OF_THREADS, &threadCount);
+
+    SDecodingParam decodingParam;
+    std::memset (&decodingParam, 0, sizeof (SDecodingParam));
+    decodingParam.uiTargetDqLayer = UCHAR_MAX;
+    decodingParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
+    decodingParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
+    ASSERT_EQ (0, decoder->Initialize (&decodingParam));
+
+    uint8_t* dst[3] = {NULL, NULL, NULL};
+    SBufferInfo info;
+    unsigned long long timeStamp = 0;
+    for (int32_t pos = 0; pos < fileSize;) {
+      const int32_t len = NalUnitLengthAt (bitstream.data(), fileSize, pos);
+      ASSERT_GT (len, 0);
+      std::memset (&info, 0, sizeof (info));
+      info.uiInBsTimeStamp = ++timeStamp;
+      decoder->DecodeFrameNoDelay (bitstream.data() + pos, len, dst, &info);
+      pos += len;
+    }
+
+    decoder->Uninitialize();
+    WelsDestroyDecoder (decoder);
+  }
+}
+
 class ThreadDecoderCapabilityTest : public ::testing::Test {
  public:
   virtual void SetUp() {}
