@@ -153,6 +153,7 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
     pPicNewBuf->ppPic[i]->bUsedAsRef = false;
     pPicNewBuf->ppPic[i]->bIsLongRef = false;
     pPicNewBuf->ppPic[i]->iRefCount = 0;
+    pPicNewBuf->ppPic[i]->iPinCount = 0;
     pPicNewBuf->ppPic[i]->pSetUnRef = NULL;
     pPicNewBuf->ppPic[i]->bIsComplete = false;
   }
@@ -242,6 +243,7 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
     pPicNewBuf->ppPic[i]->bUsedAsRef = false;
     pPicNewBuf->ppPic[i]->bIsLongRef = false;
     pPicNewBuf->ppPic[i]->iRefCount = 0;
+    pPicNewBuf->ppPic[i]->iPinCount = 0;
     pPicNewBuf->ppPic[i]->pSetUnRef = NULL;
     pPicNewBuf->ppPic[i]->bIsComplete = false;
   }
@@ -334,6 +336,7 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
   pCtx->bFreezeOutput = true;
 
   pCtx->iFrameNum                 = -1;
+  pCtx->iPinnedRefCount           = 0;
   pCtx->pLastDecPicInfo->iPrevFrameNum             = -1;
   pCtx->iErrorCode                = ERR_NONE;
 
@@ -396,7 +399,6 @@ void WelsDecoderLastDecPicInfoDefaults (SWelsLastDecPicInfo& sLastDecPicInfo) {
   sLastDecPicInfo.iPrevPicOrderCntLsb = 0;
   sLastDecPicInfo.pPreviousDecodedPictureInDpb = NULL;
   sLastDecPicInfo.iPrevFrameNum = -1;
-  sLastDecPicInfo.bLastHasMmco5 = false;
   sLastDecPicInfo.uiDecodingTimeStamp = 0;
 }
 
