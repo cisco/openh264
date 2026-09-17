@@ -1,6 +1,7 @@
 ;*!
 ;* \copy
 ;*     Copyright (c)  2009-2013, Cisco Systems
+;*     Copyright (c)  2026, Richard Ben Aleya
 ;*     All rights reserved.
 ;*
 ;*     Redistribution and use in source and binary forms, with or without
@@ -114,4 +115,47 @@ WELS_EXTERN WelsI16x16LumaPredV_sse2
     movdqa  [r0+240], xmm0
 
     ret
+
+%ifdef HAVE_AVX2
+;***********************************************************************
+; void WelsI16x16LumaPredV_avx2(uint8_t *pred, uint8_t *pRef, int32_t stride);
+;***********************************************************************
+WELS_EXTERN WelsI16x16LumaPredV_avx2
+    %assign push_num 0
+    LOAD_3_PARA
+    SIGN_EXTENSION r2, r2d
+    sub     r1, r2
+    vbroadcasti128 ymm0, [r1]
+    vmovdqu [r0],      ymm0
+    vmovdqu [r0+32],   ymm0
+    vmovdqu [r0+64],   ymm0
+    vmovdqu [r0+96],   ymm0
+    vmovdqu [r0+128],  ymm0
+    vmovdqu [r0+160],  ymm0
+    vmovdqu [r0+192],  ymm0
+    vmovdqu [r0+224],  ymm0
+    vzeroupper
+    ret
+
+;***********************************************************************
+; void WelsI16x16LumaPredH_avx2(uint8_t *pred, uint8_t *pRef, int32_t stride);
+;***********************************************************************
+WELS_EXTERN WelsI16x16LumaPredH_avx2
+    %assign push_num 0
+    LOAD_3_PARA
+    SIGN_EXTENSION r2, r2d
+    dec r1
+    %assign h_row 0
+    %rep 16
+        %if h_row > 0
+        add     r1, r2
+        %endif
+        vpbroadcastb xmm0, [r1]
+        vmovdqa [r0 + h_row * 16], xmm0
+        %assign h_row h_row + 1
+    %endrep
+    vzeroupper
+    ret
+
+%endif ; HAVE_AVX2
 

@@ -1,6 +1,7 @@
 /*!
  * \copy
  *     Copyright (c)  2009-2013, Cisco Systems
+ *     Copyright (c)  2026, Richard Ben Aleya
  *     All rights reserved.
  *
  *     Redistribution and use in source and binary forms, with or without
@@ -719,6 +720,15 @@ void WelsInitIntraPredFuncs (SWelsFuncPtrList* pFuncList, const uint32_t kuiCpuF
     pFuncList->pfGetChromaPred[C_PRED_V]    = WelsIChromaPredV_sse2;
     pFuncList->pfGetChromaPred[C_PRED_P]    = WelsIChromaPredPlane_sse2;
   }
+#if defined(HAVE_AVX2)
+  if (kuiCpuFlag & WELS_CPU_AVX2) {
+    pFuncList->pfGetLumaI16x16Pred[I16_PRED_V]  = WelsI16x16LumaPredV_avx2;
+    pFuncList->pfGetLumaI16x16Pred[I16_PRED_H]  = WelsI16x16LumaPredH_avx2;
+    pFuncList->pfGetLumaI16x16Pred[I16_PRED_DC] = WelsI16x16LumaPredDc_avx2;
+    pFuncList->pfGetLumaI16x16Pred[I16_PRED_P]  = WelsI16x16LumaPredPlane_avx2;
+    pFuncList->pfGetChromaPred[C_PRED_V]         = WelsIChromaPredV_avx2;
+  }
+#endif//HAVE_AVX2
 #endif
 
 #if defined(HAVE_MMI)
