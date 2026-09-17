@@ -34,6 +34,7 @@ cpp_sources = [
 ]
 
 objs_asm = []
+libs_asm = []
 if cpu_family in ['x86', 'x86_64']
   asm_sources = [
     'core/x86/coeff.asm',
@@ -75,14 +76,24 @@ elif cpu_family == 'aarch64'
     cpp_sources += asm_sources
   endif
 elif cpu_family in ['loongarch32', 'loongarch64']
-  asm_sources = [
+  lsx_sources = [
     'core/loongarch/quant_lsx.c',
     'core/loongarch/get_intra_predictor_lsx.c',
-    'core/loongarch/dct_lasx.c',
     'core/loongarch/svc_motion_estimate_lsx.c',
+  ]
+  lasx_sources = [
+    'core/loongarch/dct_lasx.c',
     'core/loongarch/sample_lasx.c',
   ]
-  cpp_sources += asm_sources
+  libencoder_lsx = static_library('encoder_lsx', lsx_sources,
+    include_directories: [inc, processing_inc, encoder_inc, casm_inc],
+    dependencies: deps,
+	c_args: '-mlsx')
+  libencoder_lasx = static_library('encoder_lasx', lasx_sources,
+    include_directories: [inc, processing_inc, encoder_inc, casm_inc],
+    dependencies: deps,
+	c_args: '-mlasx')
+  libs_asm = [libencoder_lsx, libencoder_lasx]
 elif cpu_family == 'riscv64'
   asm_sources = []
 elif cpu_family == 'ppc'
@@ -95,4 +106,5 @@ endif
 
 libencoder = static_library('encoder', cpp_sources, objs_asm,
   include_directories: [inc, processing_inc, encoder_inc, casm_inc],
+  link_whole: libs_asm,
   dependencies: deps)
