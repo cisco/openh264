@@ -49,9 +49,16 @@
 #define _PARSE_NALHRD_VCLHRD_PARAMS_ 1
 
 namespace WelsDec {
+
+// External declarations for NEON-optimized version
+#if defined(HAVE_NEON_AARCH64) && defined(__aarch64__)
+extern "C" uint8_t* DetectStartCodePrefixNEON(const uint8_t* kpBuf, int32_t* pOffset, int32_t iBufSize);
+#endif
+
 /*!
  *************************************************************************************
- * \brief   Start Code Prefix (0x 00 00 00 01) detection
+ * \brief   C implementation of Start Code Prefix (0x 00 00 00 01) detection
+ *          (extern "C" to allow calling from assembly)
  *
  * \param   pBuf        bitstream payload buffer
  * \param   pOffset     offset between NAL rbsp and original bitsteam that
@@ -63,7 +70,7 @@ namespace WelsDec {
  * \note    N/A
  *************************************************************************************
  */
-uint8_t* DetectStartCodePrefix (const uint8_t* kpBuf, int32_t* pOffset, int32_t iBufSize) {
+uint8_t* DetectStartCodePrefixC (const uint8_t* kpBuf, int32_t* pOffset, int32_t iBufSize) {
   uint8_t* pBits = (uint8_t*)kpBuf;
 
   do {
