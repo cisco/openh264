@@ -603,6 +603,7 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
   void Encode_w (GMPVideoi420Frame* inputImage,
                  GMPVideoFrameType frame_type) {
     SFrameBSInfo encoded;
+    memset (&encoded, 0, sizeof (encoded));
 
     if (frame_type  == kGMPKeyFrame) {
       encoder_->ForceIntraFrame (true);
@@ -633,8 +634,16 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
     const SSourcePicture* pics = &src;
 
     int result = encoder_->EncodeFrame (pics, &encoded);
-    if (result != cmResultSuccess) {
-      GMPLOG (GL_ERROR, "Couldn't encode frame. Error = " << result);
+    if (result != cmResultSuccess || encoded.eFrameType == videoFrameTypeInvalid) {
+      GMPLOG (GL_ERROR, "Couldn't encode frame. Error = "
+              << result
+              << " Type = "
+              << encoded.eFrameType);
+      TrySyncRunOnMainThread (WrapTask (
+                                   this,
+                                   &OpenH264VideoEncoder::EncodeFailed_m,
+                                   inputImage));
+      return;
     }
 
 
@@ -660,11 +669,10 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
       break;
     case videoFrameTypeIPMixed://this type is currently not suppported
     case videoFrameTypeInvalid:
-      GMPLOG (GL_ERROR, "Couldn't encode frame. Type = "
-              << encoded.eFrameType);
-      break;
     default:
       // The API is defined as returning a type.
+      GMPLOG (GL_ERROR, "Couldn't encode frame. Type = "
+              << encoded.eFrameType);
       assert (false);
       break;
     }
@@ -776,6 +784,12 @@ class OpenH264VideoEncoder : public GMPVideoEncoder, public RefCounted {
   // These frames must be destroyed on the main thread.
   void DestroyInputFrame_m (GMPVideoi420Frame* frame) {
     frame->Destroy();
+  }
+
+  // The frame must be destroyed, and the error reported, on the main thread.
+  void EncodeFailed_m (GMPVideoi420Frame* frame) {
+    frame->Destroy();
+    Error (GMPEncodeErr);
   }
 
 
