@@ -635,6 +635,106 @@ TEST_F(EncoderInitTest, CustomChromaPlaneStridesInvalidSrc) {
   ASSERT_EQ(cmUnsupportedData, rv);
 }
 
+// A source picture is allowed to exceed the per-frame macroblock limit as long
+// as the spatial layer it is coded into does not: the preprocessor downsamples
+// the input before it is encoded. MAX_MBS_PER_FRAME bounds the coded frame, not
+// the picture handed to EncodeFrame, and callers rely on that to encode a large
+// capture into a smaller stream while leaving iPicWidth/iPicHeight at the
+// capture size.
+TEST_F(EncoderInitTest, SourceLargerThanMaxMbsPerFrame) {
+  // MAX_MBS_PER_FRAME (36864) macroblocks of 16x16 luma samples. Spelled out
+  // here because the limit lives in an internal header.
+  const int kMaxPixelsPerFrame = 36864 * 256;
+  const int kLayerWidth = 2048;
+  const int kLayerHeight = 1280;
+
+  SEncParamExt param;
+  encoder_->GetDefaultParams(&param);
+
+  param.iUsageType = CAMERA_VIDEO_REAL_TIME;
+  param.iPicWidth = 4096;
+  param.iPicHeight = 2560;
+  param.fMaxFrameRate = 30.0f;
+  param.iSpatialLayerNum = 1;
+  param.iRCMode = RC_OFF_MODE;
+
+  ASSERT_GT(param.iPicWidth * param.iPicHeight, kMaxPixelsPerFrame);
+  ASSERT_LE(kLayerWidth * kLayerHeight, kMaxPixelsPerFrame);
+
+  param.sSpatialLayers[0].iVideoWidth = kLayerWidth;
+  param.sSpatialLayers[0].iVideoHeight = kLayerHeight;
+  param.sSpatialLayers[0].fFrameRate = param.fMaxFrameRate;
+  param.sSpatialLayers[0].sSliceArgument.uiSliceMode = SM_SINGLE_SLICE;
+  param.sSpatialLayers[0].iDLayerQp = 26;
+
+  int rv = encoder_->InitializeExt(&param);
+  ASSERT_EQ(0, rv);
+
+  const int strideY = param.iPicWidth;
+  const int strideUV = param.iPicWidth >> 1;
+  std::vector<uint8_t> bufY(strideY * param.iPicHeight);
+  std::vector<uint8_t> bufU(strideUV * (param.iPicHeight >> 1));
+  std::vector<uint8_t> bufV(strideUV * (param.iPicHeight >> 1));
+  GeneratePattern(bufY.data(), strideY, bufU.data(), strideUV, bufV.data(),
+                  strideUV, param.iPicWidth, param.iPicHeight);
+
+  SSourcePicture pic;
+  memset(&pic, 0, sizeof(SSourcePicture));
+  pic.iPicWidth = param.iPicWidth;
+  pic.iPicHeight = param.iPicHeight;
+  pic.iColorFormat = videoFormatI420;
+  pic.iStride[0] = strideY;
+  pic.iStride[1] = strideUV;
+  pic.iStride[2] = strideUV;
+  pic.pData[0] = bufY.data();
+  pic.pData[1] = bufU.data();
+  pic.pData[2] = bufV.data();
+
+  SFrameBSInfo info;
+  memset(&info, 0, sizeof(SFrameBSInfo));
+  rv = encoder_->EncodeFrame(&pic, &info);
+  ASSERT_EQ(0, rv);
+  ASSERT_EQ(videoFrameTypeIDR, info.eFrameType);
+
+  int len = 0;
+  for (int i = 0; i < info.iLayerNum; ++i) {
+    const SLayerBSInfo& layerInfo = info.sLayerInfo[i];
+    for (int j = 0; j < layerInfo.iNalCount; ++j) {
+      len += layerInfo.pNalLengthInByte[j];
+    }
+  }
+  ASSERT_GT(len, 0);
+
+  // The coded frame must carry the layer geometry, not the source geometry.
+  ISVCDecoder* decoder = nullptr;
+  rv = WelsCreateDecoder(&decoder);
+  ASSERT_EQ(0, rv);
+  ASSERT_TRUE(decoder != nullptr);
+
+  SDecodingParam decParam;
+  memset(&decParam, 0, sizeof(SDecodingParam));
+  decParam.uiTargetDqLayer = UCHAR_MAX;
+  decParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
+  decParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
+  rv = decoder->Initialize(&decParam);
+  ASSERT_EQ(0, rv);
+
+  unsigned char* pData[3] = {nullptr};
+  SBufferInfo dstBufInfo;
+  memset(&dstBufInfo, 0, sizeof(SBufferInfo));
+  rv = decoder->DecodeFrame2(info.sLayerInfo[0].pBsBuf, len, pData, &dstBufInfo);
+  ASSERT_EQ(0, rv);
+  if (dstBufInfo.iBufferStatus == 0) {
+    rv = decoder->DecodeFrame2(nullptr, 0, pData, &dstBufInfo);
+    ASSERT_EQ(0, rv);
+  }
+  ASSERT_EQ(1, dstBufInfo.iBufferStatus);
+  EXPECT_EQ(kLayerWidth, dstBufInfo.UsrData.sSystemBuffer.iWidth);
+  EXPECT_EQ(kLayerHeight, dstBufInfo.UsrData.sSystemBuffer.iHeight);
+
+  WelsDestroyDecoder(decoder);
+}
+
 // SSourcePicture.bPsnrY/U/V asks for the PSNR of a single frame and the result
 // is handed back in SLayerBSInfo.rPsnr. 176 is not a multiple of 32, so the
 // luma plane covers both the vectorized part of WelsCalcPsnr and the columns
