@@ -128,6 +128,36 @@ void WelsResetRefPic (PWelsDecoderContext pCtx) {
   pRefPic->uiLongRefCount[LIST_0] = 0;
 }
 
+//Release what a whole-struct copy of SRefPic is about to drop. Every picture the destination
+//still lists, and the source does not, leaves the reference lists when the copy lands; without
+//this it keeps bUsedAsRef set with no list entry and no armed unref, and its buffer never
+//returns to the pool.
+void WelsReleaseDroppedRefs (PRefPic pDst, PRefPic pSrc) {
+  if (pDst == NULL || pSrc == NULL || pDst == pSrc)
+    return;
+  PPicture pHeld[MAX_DPB_COUNT * 2];
+  int32_t iHeld = 0;
+  for (int32_t i = 0; i < (int32_t) pDst->uiShortRefCount[LIST_0] && iHeld < MAX_DPB_COUNT * 2; ++i)
+    if (pDst->pShortRefList[LIST_0][i] != NULL)
+      pHeld[iHeld++] = pDst->pShortRefList[LIST_0][i];
+  for (int32_t i = 0; i < (int32_t) pDst->uiLongRefCount[LIST_0] && iHeld < MAX_DPB_COUNT * 2; ++i)
+    if (pDst->pLongRefList[LIST_0][i] != NULL)
+      pHeld[iHeld++] = pDst->pLongRefList[LIST_0][i];
+
+  for (int32_t i = 0; i < iHeld; ++i) {
+    PPicture pPic = pHeld[i];
+    if (!pPic->bUsedAsRef)
+      continue;
+    bool bKept = false;
+    for (int32_t j = 0; !bKept && j < (int32_t) pSrc->uiShortRefCount[LIST_0]; ++j)
+      bKept = (pSrc->pShortRefList[LIST_0][j] == pPic);
+    for (int32_t j = 0; !bKept && j < (int32_t) pSrc->uiLongRefCount[LIST_0]; ++j)
+      bKept = (pSrc->pLongRefList[LIST_0][j] == pPic);
+    if (!bKept)
+      SetUnRef (pPic);
+  }
+}
+
 void WelsResetRefPicWithoutUnRef (PWelsDecoderContext pCtx) {
   int32_t i = 0;
   PRefPic pRefPic = &pCtx->sRefPic;
