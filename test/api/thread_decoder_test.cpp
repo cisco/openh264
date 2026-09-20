@@ -119,6 +119,329 @@ static int32_t ReadFrameForHangRegression (uint8_t* pBuf, const int32_t& iFileSi
   return bytesAvailable;
 }
 
+struct SpsInfoForRefQueueSwitch {
+  int32_t iWidth;
+  int32_t iHeight;
+  int32_t iNumRefFrames;
+};
+
+class CBitReaderForRefQueueSwitch {
+ public:
+  CBitReaderForRefQueueSwitch (const uint8_t* pData, const size_t iDataSize)
+    : pData_ (pData), iBitLength_ (iDataSize * 8), iBitPos_ (0) {
+  }
+
+  bool ReadBit (uint32_t* pBit) {
+    if (pBit == NULL || iBitPos_ >= iBitLength_) {
+      return false;
+    }
+
+    const size_t iByteOffset = iBitPos_ >> 3;
+    const int32_t iBitOffset = 7 - static_cast<int32_t> (iBitPos_ & 7);
+    *pBit = (pData_[iByteOffset] >> iBitOffset) & 1;
+    ++iBitPos_;
+    return true;
+  }
+
+  bool ReadBits (const int32_t iNumBits, uint32_t* pValue) {
+    if (pValue == NULL || iNumBits <= 0 || iNumBits > 32) {
+      return false;
+    }
+
+    uint32_t uiValue = 0;
+    for (int32_t i = 0; i < iNumBits; ++i) {
+      uint32_t uiBit = 0;
+      if (!ReadBit (&uiBit)) {
+        return false;
+      }
+      uiValue = (uiValue << 1) | uiBit;
+    }
+
+    *pValue = uiValue;
+    return true;
+  }
+
+  bool ReadUe (uint32_t* pValue) {
+    if (pValue == NULL) {
+      return false;
+    }
+
+    int32_t iLeadingZeros = 0;
+    uint32_t uiBit = 0;
+    while (true) {
+      if (!ReadBit (&uiBit)) {
+        return false;
+      }
+      if (uiBit == 1) {
+        break;
+      }
+      ++iLeadingZeros;
+      if (iLeadingZeros > 31) {
+        return false;
+      }
+    }
+
+    if (iLeadingZeros == 0) {
+      *pValue = 0;
+      return true;
+    }
+
+    uint32_t uiInfoBits = 0;
+    if (!ReadBits (iLeadingZeros, &uiInfoBits)) {
+      return false;
+    }
+
+    *pValue = ((1u << iLeadingZeros) - 1u) + uiInfoBits;
+    return true;
+  }
+
+  bool ReadSe (int32_t* pValue) {
+    if (pValue == NULL) {
+      return false;
+    }
+
+    uint32_t uiUeValue = 0;
+    if (!ReadUe (&uiUeValue)) {
+      return false;
+    }
+
+    if (uiUeValue & 1) {
+      *pValue = static_cast<int32_t> ((uiUeValue + 1) >> 1);
+    } else {
+      *pValue = -static_cast<int32_t> (uiUeValue >> 1);
+    }
+    return true;
+  }
+
+ private:
+  const uint8_t* pData_;
+  size_t iBitLength_;
+  size_t iBitPos_;
+};
+
+static bool SkipScalingListForRefQueueSwitch (CBitReaderForRefQueueSwitch& sBitReader, const int32_t iListSize) {
+  int32_t iLastScale = 8;
+  int32_t iNextScale = 8;
+
+  for (int32_t i = 0; i < iListSize; ++i) {
+    if (iNextScale != 0) {
+      int32_t iDeltaScale = 0;
+      if (!sBitReader.ReadSe (&iDeltaScale)) {
+        return false;
+      }
+      iNextScale = (iLastScale + iDeltaScale + 256) % 256;
+    }
+    iLastScale = (iNextScale == 0) ? iLastScale : iNextScale;
+  }
+  return true;
+}
+
+static size_t GetStartCodeLengthForRefQueueSwitch (const uint8_t* pData, const size_t iDataSize) {
+  if (iDataSize >= 4 && pData[0] == 0 && pData[1] == 0 && pData[2] == 0 && pData[3] == 1) {
+    return 4;
+  }
+  if (iDataSize >= 3 && pData[0] == 0 && pData[1] == 0 && pData[2] == 1) {
+    return 3;
+  }
+  return 0;
+}
+
+static bool ExtractFirstSpsRbspForRefQueueSwitch (const std::vector<uint8_t>& bitstream, std::vector<uint8_t>* pRbsp) {
+  if (pRbsp == NULL || bitstream.empty()) {
+    return false;
+  }
+
+  const size_t iBitstreamSize = bitstream.size();
+  size_t i = 0;
+  while (i + 3 < iBitstreamSize) {
+    const size_t iStartCodeLength = GetStartCodeLengthForRefQueueSwitch (&bitstream[i], iBitstreamSize - i);
+    if (iStartCodeLength == 0) {
+      ++i;
+      continue;
+    }
+
+    const size_t iNalStart = i + iStartCodeLength;
+    size_t iNalEnd = iBitstreamSize;
+    for (size_t j = iNalStart; j + 3 < iBitstreamSize; ++j) {
+      if (GetStartCodeLengthForRefQueueSwitch (&bitstream[j], iBitstreamSize - j) != 0) {
+        iNalEnd = j;
+        break;
+      }
+    }
+
+    if (iNalStart < iNalEnd && (bitstream[iNalStart] & 0x1F) == 7) {
+      pRbsp->clear();
+      for (size_t k = iNalStart + 1; k < iNalEnd; ++k) {
+        if (k + 2 < iNalEnd && bitstream[k] == 0 && bitstream[k + 1] == 0 && bitstream[k + 2] == 3) {
+          pRbsp->push_back (0);
+          pRbsp->push_back (0);
+          k += 2;
+          continue;
+        }
+        pRbsp->push_back (bitstream[k]);
+      }
+      return !pRbsp->empty();
+    }
+
+    i = iNalEnd;
+  }
+
+  return false;
+}
+
+static bool ParseSpsForRefQueueSwitch (const std::vector<uint8_t>& rbsp, SpsInfoForRefQueueSwitch* pSpsInfo) {
+  if (pSpsInfo == NULL || rbsp.empty()) {
+    return false;
+  }
+
+  CBitReaderForRefQueueSwitch sBitReader (rbsp.data(), rbsp.size());
+
+  uint32_t uiProfileIdc = 0;
+  uint32_t uiTmp = 0;
+  if (!sBitReader.ReadBits (8, &uiProfileIdc) || !sBitReader.ReadBits (8, &uiTmp)
+      || !sBitReader.ReadBits (8, &uiTmp) || !sBitReader.ReadUe (&uiTmp)) {
+    return false;
+  }
+
+  uint32_t uiChromaFormatIdc = 1;
+  if (uiProfileIdc == 100 || uiProfileIdc == 110 || uiProfileIdc == 122 || uiProfileIdc == 244
+      || uiProfileIdc == 44 || uiProfileIdc == 83 || uiProfileIdc == 86 || uiProfileIdc == 118
+      || uiProfileIdc == 128 || uiProfileIdc == 138 || uiProfileIdc == 139 || uiProfileIdc == 134
+      || uiProfileIdc == 135) {
+    if (!sBitReader.ReadUe (&uiChromaFormatIdc)) {
+      return false;
+    }
+    if (uiChromaFormatIdc == 3 && !sBitReader.ReadBit (&uiTmp)) {
+      return false;
+    }
+    if (!sBitReader.ReadUe (&uiTmp) || !sBitReader.ReadUe (&uiTmp) || !sBitReader.ReadBit (&uiTmp)) {
+      return false;
+    }
+
+    uint32_t uiScalingMatrixPresent = 0;
+    if (!sBitReader.ReadBit (&uiScalingMatrixPresent)) {
+      return false;
+    }
+    if (uiScalingMatrixPresent != 0) {
+      const int32_t iScalingListCount = (uiChromaFormatIdc != 3) ? 8 : 12;
+      for (int32_t i = 0; i < iScalingListCount; ++i) {
+        uint32_t uiScalingListPresent = 0;
+        if (!sBitReader.ReadBit (&uiScalingListPresent)) {
+          return false;
+        }
+        if (uiScalingListPresent != 0 && !SkipScalingListForRefQueueSwitch (sBitReader, i < 6 ? 16 : 64)) {
+          return false;
+        }
+      }
+    }
+  }
+
+  uint32_t uiPicOrderCntType = 0;
+  if (!sBitReader.ReadUe (&uiTmp) || !sBitReader.ReadUe (&uiPicOrderCntType)) {
+    return false;
+  }
+  if (uiPicOrderCntType == 0) {
+    if (!sBitReader.ReadUe (&uiTmp)) {
+      return false;
+    }
+  } else if (uiPicOrderCntType == 1) {
+    int32_t iTmpSe = 0;
+    uint32_t uiCycleCount = 0;
+    if (!sBitReader.ReadBit (&uiTmp) || !sBitReader.ReadSe (&iTmpSe)
+        || !sBitReader.ReadSe (&iTmpSe) || !sBitReader.ReadUe (&uiCycleCount)) {
+      return false;
+    }
+    for (uint32_t i = 0; i < uiCycleCount; ++i) {
+      if (!sBitReader.ReadSe (&iTmpSe)) {
+        return false;
+      }
+    }
+  }
+
+  uint32_t uiNumRefFrames = 0;
+  if (!sBitReader.ReadUe (&uiNumRefFrames) || !sBitReader.ReadBit (&uiTmp)) {
+    return false;
+  }
+
+  uint32_t uiPicWidthInMbsMinus1 = 0;
+  uint32_t uiPicHeightInMapUnitsMinus1 = 0;
+  uint32_t uiFrameMbsOnlyFlag = 0;
+  if (!sBitReader.ReadUe (&uiPicWidthInMbsMinus1) || !sBitReader.ReadUe (&uiPicHeightInMapUnitsMinus1)
+      || !sBitReader.ReadBit (&uiFrameMbsOnlyFlag)) {
+    return false;
+  }
+
+  if (uiFrameMbsOnlyFlag == 0 && !sBitReader.ReadBit (&uiTmp)) {
+    return false;
+  }
+  if (!sBitReader.ReadBit (&uiTmp)) {
+    return false;
+  }
+
+  uint32_t uiFrameCroppingFlag = 0;
+  uint32_t uiCropLeft = 0;
+  uint32_t uiCropRight = 0;
+  uint32_t uiCropTop = 0;
+  uint32_t uiCropBottom = 0;
+  if (!sBitReader.ReadBit (&uiFrameCroppingFlag)) {
+    return false;
+  }
+  if (uiFrameCroppingFlag != 0) {
+    if (!sBitReader.ReadUe (&uiCropLeft) || !sBitReader.ReadUe (&uiCropRight)
+        || !sBitReader.ReadUe (&uiCropTop) || !sBitReader.ReadUe (&uiCropBottom)) {
+      return false;
+    }
+  }
+
+  const int32_t iFrameMbsFactor = 2 - static_cast<int32_t> (uiFrameMbsOnlyFlag);
+  int32_t iCropUnitX = 1;
+  int32_t iCropUnitY = iFrameMbsFactor;
+  if (uiChromaFormatIdc == 1) {
+    iCropUnitX = 2;
+    iCropUnitY = 2 * iFrameMbsFactor;
+  } else if (uiChromaFormatIdc == 2) {
+    iCropUnitX = 2;
+  } else if (uiChromaFormatIdc == 3) {
+    iCropUnitY = iFrameMbsFactor;
+  }
+
+  int32_t iWidth = static_cast<int32_t> ((uiPicWidthInMbsMinus1 + 1) * 16);
+  int32_t iHeight = static_cast<int32_t> (iFrameMbsFactor * (uiPicHeightInMapUnitsMinus1 + 1) * 16);
+  iWidth -= static_cast<int32_t> ((uiCropLeft + uiCropRight) * iCropUnitX);
+  iHeight -= static_cast<int32_t> ((uiCropTop + uiCropBottom) * iCropUnitY);
+  if (iWidth <= 0 || iHeight <= 0) {
+    return false;
+  }
+
+  pSpsInfo->iWidth = iWidth;
+  pSpsInfo->iHeight = iHeight;
+  pSpsInfo->iNumRefFrames = static_cast<int32_t> (uiNumRefFrames);
+  return true;
+}
+
+static bool ReadSpsInfoFromBitstreamForRefQueueSwitch (const char* pFileName, SpsInfoForRefQueueSwitch* pSpsInfo) {
+  if (pFileName == NULL || pSpsInfo == NULL) {
+    return false;
+  }
+
+  std::ifstream file (pFileName, std::ios::in | std::ios::binary);
+  if (!file.is_open()) {
+    return false;
+  }
+
+  std::vector<uint8_t> bitstream ((std::istreambuf_iterator<char> (file)), std::istreambuf_iterator<char> ());
+  if (bitstream.empty()) {
+    return false;
+  }
+
+  std::vector<uint8_t> spsRbsp;
+  if (!ExtractFirstSpsRbspForRefQueueSwitch (bitstream, &spsRbsp)) {
+    return false;
+  }
+
+  return ParseSpsForRefQueueSwitch (spsRbsp, pSpsInfo);
+}
+
 class ThreadDecoderHangRegressionTest : public ::testing::Test {
 };
 
@@ -220,6 +543,43 @@ class ThreadDecoderInitTest : public ::testing::Test, public BaseThreadDecoderTe
 };
 
 TEST_F (ThreadDecoderInitTest, JustInit) {}
+
+// Regression test for SPARK-801586: repeated threaded sequence changes must
+// not trigger use-after-free in DPB reallocation paths.
+TEST_F (ThreadDecoderInitTest, ThreadedResolutionSwitchNoUseAfterFree) {
+#if defined(ANDROID_NDK)
+  const std::string kPrefix ("/sdcard/");
+#else
+  const std::string kPrefix ("");
+#endif
+  ASSERT_TRUE (ThreadDecodeResolutionSwitch (
+                 (kPrefix + "res/VID_1920x1080_cabac_temporal_direct.264").c_str(),
+                 (kPrefix + "res/QCIF_2P_I_allIPCM.264").c_str(), 100, NULL));
+}
+
+// Regression guard for the same-resolution DPB queue resize path. The selected
+// streams are both 176x144 but have different SPS num_ref_frames values.
+TEST_F (ThreadDecoderInitTest, ThreadedSameResolutionRefQueueResizeNoUseAfterFree) {
+#if defined(ANDROID_NDK)
+  const std::string kPrefix ("/sdcard/");
+#else
+  const std::string kPrefix ("");
+#endif
+
+  const std::string kLowRefStream = kPrefix + "res/BA1_Sony_D.jsv";
+  const std::string kHighRefStream = kPrefix + "res/BA_MW_D.264";
+
+  SpsInfoForRefQueueSwitch sLowRef = {0, 0, 0};
+  SpsInfoForRefQueueSwitch sHighRef = {0, 0, 0};
+  ASSERT_TRUE (ReadSpsInfoFromBitstreamForRefQueueSwitch (kLowRefStream.c_str(), &sLowRef));
+  ASSERT_TRUE (ReadSpsInfoFromBitstreamForRefQueueSwitch (kHighRefStream.c_str(), &sHighRef));
+  ASSERT_EQ (sLowRef.iWidth, sHighRef.iWidth);
+  ASSERT_EQ (sLowRef.iHeight, sHighRef.iHeight);
+  ASSERT_NE (sLowRef.iNumRefFrames, sHighRef.iNumRefFrames);
+
+  ASSERT_TRUE (ThreadDecodeResolutionSwitch (kLowRefStream.c_str(), kHighRefStream.c_str(), 300, NULL));
+}
+
 struct FileParam {
   const char* fileName;
   const char* hashStr;

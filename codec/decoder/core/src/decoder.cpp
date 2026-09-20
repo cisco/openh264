@@ -76,6 +76,7 @@ static int32_t CreatePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, cons
   if (NULL == pPicBuf) {
     return ERR_INFO_OUT_OF_MEMORY;
   }
+  pPicBuf->pMa = pMa;
 
   pPicBuf->ppPic = (PPicture*)pMa->WelsMallocz (kiSize * sizeof (PPicture), "PPicture*");
 
@@ -114,11 +115,13 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   }
 
   CMemoryAlign* pMa = pCtx->pMemAlign;
+  CMemoryAlign* pOldMa = (pPicOldBuf != NULL && pPicOldBuf->pMa != NULL) ? pPicOldBuf->pMa : pMa;
   pPicNewBuf = (PPicBuff)pMa->WelsMallocz (sizeof (SPicBuff), "PPicBuff");
 
   if (NULL == pPicNewBuf) {
     return ERR_INFO_OUT_OF_MEMORY;
   }
+  pPicNewBuf->pMa = pMa;
 
   pPicNewBuf->ppPic = (PPicture*)pMa->WelsMallocz (kiNewSize * sizeof (PPicture), "PPicture*");
 
@@ -158,12 +161,12 @@ static int32_t IncreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   }
 // remove old PicBuf
   if (pPicOldBuf->ppPic != NULL) {
-    pMa->WelsFree (pPicOldBuf->ppPic, "pPicOldBuf->queue");
+    pOldMa->WelsFree (pPicOldBuf->ppPic, "pPicOldBuf->queue");
     pPicOldBuf->ppPic = NULL;
   }
   pPicOldBuf->iCapacity = 0;
   pPicOldBuf->iCurrentIdx = 0;
-  pMa->WelsFree (pPicOldBuf, "pPicOldBuf");
+  pOldMa->WelsFree (pPicOldBuf, "pPicOldBuf");
   pPicOldBuf = NULL;
   return ERR_NONE;
 }
@@ -178,12 +181,14 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   }
 
   CMemoryAlign* pMa = pCtx->pMemAlign;
+  CMemoryAlign* pOldMa = (pPicOldBuf != NULL && pPicOldBuf->pMa != NULL) ? pPicOldBuf->pMa : pMa;
 
   pPicNewBuf = (PPicBuff)pMa->WelsMallocz (sizeof (SPicBuff), "PPicBuff");
 
   if (NULL == pPicNewBuf) {
     return ERR_INFO_OUT_OF_MEMORY;
   }
+  pPicNewBuf->pMa = pMa;
 
   pPicNewBuf->ppPic = (PPicture*)pMa->WelsMallocz (kiNewSize * sizeof (PPicture), "PPicture*");
 
@@ -228,7 +233,7 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   for (iPicIdx = iDelIdx; iPicIdx < kiOldSize; iPicIdx++) {
     if (iPrevPicIdx != iPicIdx) {
       if (pPicOldBuf->ppPic[iPicIdx] != NULL) {
-        FreePicture (pPicOldBuf->ppPic[iPicIdx], pMa);
+        FreePicture (pPicOldBuf->ppPic[iPicIdx], pOldMa);
         pPicOldBuf->ppPic[iPicIdx] = NULL;
       }
     }
@@ -247,12 +252,12 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   }
   // remove old PicBuf
   if (pPicOldBuf->ppPic != NULL) {
-    pMa->WelsFree (pPicOldBuf->ppPic, "pPicOldBuf->queue");
+    pOldMa->WelsFree (pPicOldBuf->ppPic, "pPicOldBuf->queue");
     pPicOldBuf->ppPic = NULL;
   }
   pPicOldBuf->iCapacity = 0;
   pPicOldBuf->iCurrentIdx = 0;
-  pMa->WelsFree (pPicOldBuf, "pPicOldBuf");
+  pOldMa->WelsFree (pPicOldBuf, "pPicOldBuf");
   pPicOldBuf = NULL;
 
   return ERR_NONE;
@@ -267,6 +272,9 @@ void DestroyPicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, CMemoryAlign*
     return;
 
   pPicBuf = *ppPicBuf;
+  // Free through the allocator that created this buffer.
+  if (pPicBuf->pMa != NULL)
+    pMa = pPicBuf->pMa;
   while (pPicBuf->ppPic != NULL) {
     int32_t iPicIdx = 0;
     while (iPicIdx < pPicBuf->iCapacity) {
