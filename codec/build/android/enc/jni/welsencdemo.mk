@@ -44,6 +44,7 @@ LOCAL_C_INCLUDES := \
 # Compile Flags and Link Libraries
 #
 LOCAL_CFLAGS := -DANDROID_NDK
+LOCAL_LDFLAGS += -Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384
 
 LOCAL_LDLIBS := -llog
 LOCAL_SHARED_LIBRARIES := wels
