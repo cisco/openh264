@@ -132,16 +132,30 @@ void WelsResetRefPic (PWelsDecoderContext pCtx) {
 //still lists, and the source does not, leaves the reference lists when the copy lands; without
 //this it keeps bUsedAsRef set with no list entry and no armed unref, and its buffer never
 //returns to the pool.
-void WelsReleaseDroppedRefs (PRefPic pDst, PRefPic pSrc) {
-  if (pDst == NULL || pSrc == NULL || pDst == pSrc)
+//Is this pointer still one of the pictures the buffer owns? A context that has been overtaken
+//by a DPB reallocation can list pictures that no longer exist, and those must not be touched.
+static bool IsLivePicture (PPicBuff pPicBuf, PPicture pPic) {
+  if (pPicBuf == NULL || pPic == NULL)
+    return false;
+  for (int32_t i = 0; i < pPicBuf->iCapacity; ++i) {
+    if (pPicBuf->ppPic[i] == pPic)
+      return true;
+  }
+  return false;
+}
+
+void WelsReleaseDroppedRefs (PPicBuff pPicBuf, PRefPic pDst, PRefPic pSrc) {
+  if (pPicBuf == NULL || pDst == NULL || pSrc == NULL || pDst == pSrc)
     return;
+  const int32_t kiShort = WELS_MIN ((int32_t) pDst->uiShortRefCount[LIST_0], MAX_DPB_COUNT);
+  const int32_t kiLong  = WELS_MIN ((int32_t) pDst->uiLongRefCount[LIST_0], MAX_DPB_COUNT);
   PPicture pHeld[MAX_DPB_COUNT * 2];
   int32_t iHeld = 0;
-  for (int32_t i = 0; i < (int32_t) pDst->uiShortRefCount[LIST_0] && iHeld < MAX_DPB_COUNT * 2; ++i)
-    if (pDst->pShortRefList[LIST_0][i] != NULL)
+  for (int32_t i = 0; i < kiShort; ++i)
+    if (IsLivePicture (pPicBuf, pDst->pShortRefList[LIST_0][i]))
       pHeld[iHeld++] = pDst->pShortRefList[LIST_0][i];
-  for (int32_t i = 0; i < (int32_t) pDst->uiLongRefCount[LIST_0] && iHeld < MAX_DPB_COUNT * 2; ++i)
-    if (pDst->pLongRefList[LIST_0][i] != NULL)
+  for (int32_t i = 0; i < kiLong; ++i)
+    if (IsLivePicture (pPicBuf, pDst->pLongRefList[LIST_0][i]))
       pHeld[iHeld++] = pDst->pLongRefList[LIST_0][i];
 
   for (int32_t i = 0; i < iHeld; ++i) {
@@ -149,9 +163,11 @@ void WelsReleaseDroppedRefs (PRefPic pDst, PRefPic pSrc) {
     if (!pPic->bUsedAsRef)
       continue;
     bool bKept = false;
-    for (int32_t j = 0; !bKept && j < (int32_t) pSrc->uiShortRefCount[LIST_0]; ++j)
+    const int32_t kiSrcShort = WELS_MIN ((int32_t) pSrc->uiShortRefCount[LIST_0], MAX_DPB_COUNT);
+    const int32_t kiSrcLong  = WELS_MIN ((int32_t) pSrc->uiLongRefCount[LIST_0], MAX_DPB_COUNT);
+    for (int32_t j = 0; !bKept && j < kiSrcShort; ++j)
       bKept = (pSrc->pShortRefList[LIST_0][j] == pPic);
-    for (int32_t j = 0; !bKept && j < (int32_t) pSrc->uiLongRefCount[LIST_0]; ++j)
+    for (int32_t j = 0; !bKept && j < kiSrcLong; ++j)
       bKept = (pSrc->pLongRefList[LIST_0][j] == pPic);
     if (!bKept)
       SetUnRef (pPic);

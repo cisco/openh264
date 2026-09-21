@@ -49,7 +49,7 @@ namespace WelsDec {
 
 void  WelsResetRefPic (PWelsDecoderContext pCtx);
 void  WelsResetRefPicWithoutUnRef (PWelsDecoderContext pCtx);
-void  WelsReleaseDroppedRefs (PRefPic pDst, PRefPic pSrc);
+void  WelsReleaseDroppedRefs (PPicBuff pPicBuf, PRefPic pDst, PRefPic pSrc);
 int32_t WelsInitRefList (PWelsDecoderContext pCtx, int32_t iPoc);
 int32_t WelsInitBSliceRefList (PWelsDecoderContext pCtx, int32_t iPoc);
 int32_t WelsReorderRefList (PWelsDecoderContext pCtx);
