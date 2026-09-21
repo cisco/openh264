@@ -86,9 +86,7 @@ jobs:
           arch: x86_64
           target: default
           script: |
-            apk="$(find test/build/android/build/outputs/apk -name '*-debug.apk' -type f -print -quit)"
-            test -n "$apk"
-            adb install -r -g "$apk"
+            apk="$(find test/build/android/build/outputs/apk -name '*-debug.apk' -type f -print -quit)"; test -n "$apk"; adb install -r -g "$apk"
             adb push res /sdcard/res
             adb shell rm -f /sdcard/codec_unittest.xml
             adb shell am start -W -n com.cisco.codec.unittest/.MainActivity
