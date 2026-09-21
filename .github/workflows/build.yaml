@@ -42,6 +42,7 @@ jobs:
     timeout-minutes: 45
     env:
       NDK_VERSION: 27.2.12479018
+      PACKAGING_NDK_VERSION: 20.1.5948944
     steps:
       - uses: actions/checkout@v4
       - uses: gradle/actions/setup-gradle@v4
@@ -53,6 +54,7 @@ jobs:
         run: |
           "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" \
             "ndk;$NDK_VERSION" \
+            "ndk;$PACKAGING_NDK_VERSION" \
             "platforms;android-29" \
             "build-tools;29.0.3"
       - name: Build Android unit tests
@@ -71,9 +73,9 @@ jobs:
             APP_ABI=x86_64 \
             APP_PLATFORM=android-21 \
             NDK_TOOLCHAIN_VERSION=clang
-          JAVA_HOME="$JAVA_HOME_8_X64" gradle --no-daemon \
-            unittest:assembleDebug \
-            -x :unittest:stripDebugDebugSymbols
+          JAVA_HOME="$JAVA_HOME_8_X64" \
+            ANDROID_NDK_HOME="$ANDROID_SDK_ROOT/ndk/$PACKAGING_NDK_VERSION" \
+            gradle --no-daemon unittest:assembleDebug
       - name: Enable KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -91,18 +93,8 @@ jobs:
             adb shell rm -f /sdcard/codec_unittest.xml
             adb shell am start -W -n com.cisco.codec.unittest/.MainActivity
             timeout 20m bash -c 'while adb shell pidof com.cisco.codec.unittest >/dev/null 2>&1; do sleep 2; done'
-            adb pull /sdcard/codec_unittest.xml codec_unittest.xml
-            python3 - <<'PY'
-            import sys
-            import xml.etree.ElementTree as ET
-
-            result = ET.parse("codec_unittest.xml").getroot()
-            tests = int(result.attrib.get("tests", 0))
-            failures = int(result.attrib.get("failures", 0))
-            errors = int(result.attrib.get("errors", 0))
-            print(f"Android unit tests: {tests} tests, {failures} failures, {errors} errors")
-            sys.exit(1 if failures or errors else 0)
-            PY
+            adb pull /sdcard/codec_unittest.xml codec_unittest.xml || { adb logcat -d -v threadtime AndroidRuntime:E linker:E libc:E codec_unittest:V '*:S'; exit 1; }
+            python3 -c 'import sys, xml.etree.ElementTree as ET; result = ET.parse("codec_unittest.xml").getroot(); tests = int(result.attrib.get("tests", 0)); failures = int(result.attrib.get("failures", 0)); errors = int(result.attrib.get("errors", 0)); print(f"Android unit tests: {tests} tests, {failures} failures, {errors} errors"); sys.exit(1 if failures or errors else 0)'
       - name: Upload Android unit-test report
         if: always()
         uses: actions/upload-artifact@v4
