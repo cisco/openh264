@@ -37,6 +37,39 @@ jobs:
       - run: LDFLAGS=-fsanitize=address CFLAGS=-fsanitize=address make -j$(nproc)
       - run: ./codec_unittest
 
+  android:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [arm, arm64, x86, x86_64]
+    env:
+      NDK_VERSION: 27.2.12479018
+    steps:
+      - uses: actions/checkout@v3
+      - run: sudo apt-get update -qq
+      - run: sudo apt-get install -qq nasm
+      - name: Install Android NDK
+        run: sdkmanager "ndk;$NDK_VERSION"
+      - name: Build Android library
+        run: |
+          make -j$(nproc) libraries \
+            OS=android \
+            ARCH=${{ matrix.arch }} \
+            TARGET=android-21 \
+            NDKLEVEL=21 \
+            NDKROOT="$ANDROID_SDK_ROOT/ndk/$NDK_VERSION"
+      - name: Verify 16 KB ELF alignment
+        run: |
+          readelf="$ANDROID_SDK_ROOT/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf"
+          bad_alignments="$($readelf -lW libopenh264.so | awk '$1 == "LOAD" && $NF != "0x4000" { print }')"
+          if [[ -n "$bad_alignments" ]]; then
+            echo "LOAD segments without 16 KB alignment:"
+            echo "$bad_alignments"
+            exit 1
+          fi
+          $readelf -lW libopenh264.so
+
   windows:
     runs-on: windows-2022
     steps:
