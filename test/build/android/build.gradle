@@ -9,8 +9,4 @@ android {
         java.srcDir "src"
         jniLibs.srcDir "libs"
     }
-
-    packagingOptions {
-        doNotStrip "**/*.so"
-    }
 }
