@@ -795,3 +795,170 @@ TEST_F (EncodeDecodeTestAPI, Engine_SVC_Switch_P) {
 }
 
 
+
+// Regression test for issue #3872: single-threaded decode with a low
+// max_num_ref_frames (SPS iNumRefFrames) leaks one picture-queue slot per
+// decoded frame. BufferingReadyPicture() (welsDecoderExt.cpp) pins the
+// "previous decoded picture" for possible error-concealment use
+// ("if (GetThreadCount(pCtx) <= 1) ++pPrevPic->iRefCount;"), but nothing
+// ever releases that pin: DecodeCurrentAccessUnit() (decoder_core.cpp)
+// overwrites the pointer identifying that picture on every frame without
+// decrementing the outgoing one first. Before the fix, this clip (a real
+// VA-API-encoded capture, max_num_ref_frames=1, 45 pictures across two IDR
+// cycles) fails partway through with dsOutOfMemory (16384) then
+// dsNoParamSets (16) on every frame after; after the fix, it decodes
+// cleanly regardless of length. Reproduction requires single-threaded
+// decode specifically (the pin is only taken when GetThreadCount(pCtx) <=
+// 1), which is why this was hard to pin down from third-party reports
+// using players that default to multi-threaded decode.
+//
+// This does not go through BaseDecoderTest::DecodeFile(): that helper
+// calls DecodeFrame2() and only flushes the reorder buffer once at
+// end-of-stream, which does not exercise BufferingReadyPicture() the same
+// way a caller doing a FlushFrame() after every no-output decode does (as
+// e.g. the widely-used openh264 Rust binding's default Flush::Flush mode
+// does, which is how this bug was actually hit in production). The loop
+// below drives the decoder the same way, split by Annex-B start code.
+class Issue3872RegressionTest : public ::testing::Test {
+ public:
+  void SetUp() override {
+    ASSERT_EQ (0, WelsCreateDecoder (&decoder_));
+    ASSERT_NE (nullptr, decoder_);
+    SDecodingParam param;
+    memset (&param, 0, sizeof (param));
+    ASSERT_EQ (0, decoder_->Initialize (&param));
+    int numThreads = 0;
+    decoder_->SetOption (DECODER_OPTION_NUM_OF_THREADS, &numThreads);
+  }
+  void TearDown() override {
+    if (decoder_ != nullptr) {
+      decoder_->Uninitialize();
+      WelsDestroyDecoder (decoder_);
+    }
+  }
+
+ protected:
+  ISVCDecoder* decoder_ = nullptr;
+};
+
+namespace {
+struct Nal {
+  const uint8_t* data; // includes start code
+  size_t len;
+};
+
+std::vector<Nal> SplitAnnexBNals (const uint8_t* buf, size_t size) {
+  std::vector<Nal> nals;
+  std::vector<size_t> starts;
+  size_t i = 0;
+  while (i + 2 < size) {
+    if (buf[i] == 0 && buf[i + 1] == 0 && buf[i + 2] == 1) {
+      starts.push_back (i);
+      i += 3;
+    } else if (i + 3 < size && buf[i] == 0 && buf[i + 1] == 0 && buf[i + 2] == 0 && buf[i + 3] == 1) {
+      starts.push_back (i);
+      i += 4;
+    } else {
+      i++;
+    }
+  }
+  for (size_t k = 0; k < starts.size(); k++) {
+    size_t s = starts[k];
+    size_t e = (k + 1 < starts.size()) ? starts[k + 1] : size;
+    nals.push_back ({buf + s, e - s});
+  }
+  return nals;
+}
+}  // namespace
+
+TEST_F (Issue3872RegressionTest, SingleRefFrameLongGopDecodesCleanly) {
+  std::ifstream file ("res/issue3872_repro.264", std::ios::in | std::ios::binary);
+  ASSERT_TRUE (file.is_open());
+  std::vector<uint8_t> buf ((std::istreambuf_iterator<char> (file)), std::istreambuf_iterator<char>());
+  ASSERT_GT (buf.size(), 0u);
+
+  std::vector<Nal> nals = SplitAnnexBNals (buf.data(), buf.size());
+  int pictureIdx = -1;
+  for (const Nal& nal : nals) {
+    int nalType = nal.data[nal.len > 3 && nal.data[2] == 1 ? 3 : 4] & 0x1F;
+    bool isSlice = (nalType == 1 || nalType == 5);
+    if (isSlice) pictureIdx++;
+
+    uint8_t* data[3] = {nullptr, nullptr, nullptr};
+    SBufferInfo bufInfo;
+    memset (&bufInfo, 0, sizeof (bufInfo));
+    DECODING_STATE st = decoder_->DecodeFrameNoDelay (nal.data, (int) nal.len, data, &bufInfo);
+    ASSERT_EQ (dsErrorFree, st) << "decode failed at picture " << pictureIdx
+        << " (this is issue #3872 if it reappears)";
+
+    if (st == dsErrorFree && bufInfo.iBufferStatus == 0) {
+      int numFramesRemaining = 0;
+      long getRv = decoder_->GetOption (DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER, &numFramesRemaining);
+      if (getRv == 0 && numFramesRemaining > 0) {
+        uint8_t* fdata[3] = {nullptr, nullptr, nullptr};
+        SBufferInfo finfo;
+        memset (&finfo, 0, sizeof (finfo));
+        DECODING_STATE flushSt = decoder_->FlushFrame (fdata, &finfo);
+        ASSERT_EQ (dsErrorFree, flushSt) << "flush failed at picture " << pictureIdx
+            << " (this is issue #3872 if it reappears)";
+      }
+    }
+  }
+  ASSERT_GT (pictureIdx, 0);
+}
+
+// Companion regression test for the fix to issue #3872: the picture-queue
+// leak fix must not corrupt reference counting on B-slice/reordering
+// content. BufferingReadyPicture() (welsDecoderExt.cpp) pins the "previous
+// decoded picture" only when the picture just decoded is immediately
+// output-ready (iBufferStatus == 1); for B-slice streams, some pictures are
+// instead delivered through ReorderPicturesInDisplay()'s immediate-output
+// fast path (matched by display order via bHasBSlice/POC), which never
+// calls BufferingReadyPicture() for that picture at all. A fix that infers
+// "was this picture pinned" purely from decoder-core state (whether a
+// newer picture has been decoded since) cannot see that fast-path
+// decision, and releases pins that were never taken -- decrementing an
+// already-zero or already-negative reference count and returning a
+// still-needed picture to the free pool early. This clip (a real
+// x264-encoded stream with B-frames, multiple reference frames, and
+// B-pyramid enabled, so pictures are genuinely delivered out of decode
+// order) exercises exactly that path. It decodes cleanly both before and
+// after the #3872 fix on unmodified upstream code; a regression in the fix
+// itself is expected to still report dsErrorFree here (reference-count
+// corruption on a bounded picture pool does not always surface as a
+// decode error), so this test is a coverage floor, not a full guarantee --
+// it is meant to be run under a reference-counting or memory checker
+// (ASan/MSan or an instrumented build) to catch the corruption directly.
+TEST_F (Issue3872RegressionTest, BSliceReorderingDoesNotCorruptRefCounts) {
+  std::ifstream file ("res/issue3872_bframe_repro.264", std::ios::in | std::ios::binary);
+  ASSERT_TRUE (file.is_open());
+  std::vector<uint8_t> buf ((std::istreambuf_iterator<char> (file)), std::istreambuf_iterator<char>());
+  ASSERT_GT (buf.size(), 0u);
+
+  std::vector<Nal> nals = SplitAnnexBNals (buf.data(), buf.size());
+  int pictureIdx = -1;
+  for (const Nal& nal : nals) {
+    int nalType = nal.data[nal.len > 3 && nal.data[2] == 1 ? 3 : 4] & 0x1F;
+    bool isSlice = (nalType == 1 || nalType == 5);
+    if (isSlice) pictureIdx++;
+
+    uint8_t* data[3] = {nullptr, nullptr, nullptr};
+    SBufferInfo bufInfo;
+    memset (&bufInfo, 0, sizeof (bufInfo));
+    DECODING_STATE st = decoder_->DecodeFrameNoDelay (nal.data, (int) nal.len, data, &bufInfo);
+    ASSERT_EQ (dsErrorFree, st) << "decode failed at picture " << pictureIdx;
+
+    if (st == dsErrorFree && bufInfo.iBufferStatus == 0) {
+      int numFramesRemaining = 0;
+      long getRv = decoder_->GetOption (DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER, &numFramesRemaining);
+      if (getRv == 0 && numFramesRemaining > 0) {
+        uint8_t* fdata[3] = {nullptr, nullptr, nullptr};
+        SBufferInfo finfo;
+        memset (&finfo, 0, sizeof (finfo));
+        DECODING_STATE flushSt = decoder_->FlushFrame (fdata, &finfo);
+        ASSERT_EQ (dsErrorFree, flushSt) << "flush failed at picture " << pictureIdx;
+      }
+    }
+  }
+  ASSERT_GT (pictureIdx, 0);
+}
