@@ -51,8 +51,8 @@ endif
 CFLAGS += -isystem $(NDKROOT)/sysroot/usr/include -isystem $(NDKROOT)/sysroot/usr/include/$(TOOLCHAIN_NAME) -D__ANDROID_API__=$(NDKLEVEL)
 CXXFLAGS += -fno-rtti -fno-exceptions
 LDFLAGS += --sysroot=$(SYSROOT)
-SHLDFLAGS = -Wl,--no-undefined -Wl,-z,relro -Wl,-z,now -Wl,-soname,lib$(PROJECT_NAME).so
-UTSHLDFLAGS = -Wl,-soname,libut.so
+SHLDFLAGS = -Wl,--no-undefined -Wl,-z,relro -Wl,-z,now -Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384 -Wl,-soname,lib$(PROJECT_NAME).so
+UTSHLDFLAGS = -Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384 -Wl,-soname,libut.so
 
 ifeq ($(NDK_TOOLCHAIN_VERSION), clang)
   HOST_OS = $(shell uname -s | tr [A-Z] [a-z])
