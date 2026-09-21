@@ -3,6 +3,10 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 29
 
+    if (System.getenv("PACKAGING_NDK_VERSION")) {
+        ndkVersion System.getenv("PACKAGING_NDK_VERSION")
+    }
+
     sourceSets.main {
         manifest.srcFile "AndroidManifest.xml"
         res.srcDir "res"

@@ -62,7 +62,7 @@ public class MainActivity extends Activity {
 
   static {
     try {
-      System.loadLibrary ("stlport_shared");
+      System.loadLibrary ("c++_shared");
       //System.loadLibrary("openh264");
       System.loadLibrary ("ut");
       System.loadLibrary ("utDemo");

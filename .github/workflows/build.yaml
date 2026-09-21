@@ -37,6 +37,70 @@ jobs:
       - run: LDFLAGS=-fsanitize=address CFLAGS=-fsanitize=address make -j$(nproc)
       - run: ./codec_unittest
 
+  android-unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      NDK_VERSION: 27.2.12479018
+      PACKAGING_NDK_VERSION: 20.1.5948944
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 5.6.4
+      - run: sudo apt-get update -qq
+      - run: sudo apt-get install -qq nasm
+      - name: Install Android build dependencies
+        run: |
+          "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" \
+            "ndk;$NDK_VERSION" \
+            "ndk;$PACKAGING_NDK_VERSION" \
+            "platforms;android-29" \
+            "build-tools;29.0.3"
+      - name: Build Android unit tests
+        run: |
+          make gtest-bootstrap
+          make -j$(nproc) libut.so \
+            OS=android \
+            ARCH=x86_64 \
+            TARGET=android-21 \
+            NDKLEVEL=21 \
+            ENABLEPIC=Yes \
+            NDKROOT="$ANDROID_SDK_ROOT/ndk/$NDK_VERSION"
+          "$ANDROID_SDK_ROOT/ndk/$NDK_VERSION/ndk-build" \
+            -C test/build/android \
+            -B \
+            APP_ABI=x86_64 \
+            APP_PLATFORM=android-21 \
+            NDK_TOOLCHAIN_VERSION=clang
+          JAVA_HOME="$JAVA_HOME_8_X64" gradle --no-daemon unittest:assembleDebug
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Run Android unit tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          arch: x86_64
+          target: default
+          script: |
+            apk="$(find test/build/android/build/outputs/apk -name '*-debug.apk' -type f -print -quit)"; test -n "$apk"; adb install -r -g "$apk"
+            adb push res /sdcard/res
+            adb shell rm -f /sdcard/codec_unittest.xml
+            adb shell am start -W -n com.cisco.codec.unittest/.MainActivity
+            timeout 20m bash -c 'while adb shell pidof com.cisco.codec.unittest >/dev/null 2>&1; do sleep 2; done'
+            adb pull /sdcard/codec_unittest.xml codec_unittest.xml || { adb logcat -d -v threadtime AndroidRuntime:E linker:E libc:E codec_unittest:V '*:S'; exit 1; }
+            python3 -c 'import sys, xml.etree.ElementTree as ET; result = ET.parse("codec_unittest.xml").getroot(); tests = int(result.attrib.get("tests", 0)); failures = int(result.attrib.get("failures", 0)); errors = int(result.attrib.get("errors", 0)); print(f"Android unit tests: {tests} tests, {failures} failures, {errors} errors"); sys.exit(1 if failures or errors else 0)'
+      - name: Upload Android unit-test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-unit-test-report
+          path: codec_unittest.xml
+          if-no-files-found: warn
+
   windows:
     runs-on: windows-2022
     steps:
