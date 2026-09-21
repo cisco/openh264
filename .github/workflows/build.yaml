@@ -129,6 +129,17 @@ jobs:
       - run: ninja -C builddir -v
       - run: meson test -C builddir -v
 
+  ios:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        arch: [arm64, x86_64]
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install nasm
+      - run: make -j$(sysctl -n hw.ncpu) libraries OS=ios ARCH=${{ matrix.arch }} SDK_MIN=12.0
+      - run: test -f libopenh264.a
+
   linux-cross-arm:
     runs-on: ubuntu-latest
     steps:
