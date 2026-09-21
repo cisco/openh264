@@ -59,6 +59,7 @@ jobs:
             ARCH=${{ matrix.arch }} \
             TARGET=android-21 \
             NDKLEVEL=21 \
+            ENABLEPIC=Yes \
             NDKROOT="$ANDROID_SDK_ROOT/ndk/$NDK_VERSION"
       - name: Verify 16 KB ELF alignment
         run: |
