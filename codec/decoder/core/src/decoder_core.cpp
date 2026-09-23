@@ -2591,14 +2591,20 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
             }
             pLastThreadCtx->pCtx->sTmpRefPic = pLastThreadCtx->pCtx->sRefPic;
             WelsMarkAsRef (pLastThreadCtx->pCtx, pLastThreadCtx->pDec);
+            //The assignment below replaces these lists wholesale; release what it drops.
+            WelsReleaseDroppedRefs (pCtx->pPicBuff, &pCtx->sRefPic, &pLastThreadCtx->pCtx->sTmpRefPic);
             pCtx->sRefPic = pLastThreadCtx->pCtx->sTmpRefPic;
           } else {
+            //The assignment below replaces these lists wholesale; release what it drops.
+            WelsReleaseDroppedRefs (pCtx->pPicBuff, &pCtx->sRefPic, &pLastThreadCtx->pCtx->sRefPic);
             pCtx->sRefPic = pLastThreadCtx->pCtx->sRefPic;
           }
         } else {
           // The cached last-thread picture no longer maps to a live buffer
           // entry (DPB was freed/reallocated).  Copy reference state without
           // marking a stale picture as reference.
+          //The assignment below replaces these lists wholesale; release what it drops.
+          WelsReleaseDroppedRefs (pCtx->pPicBuff, &pCtx->sRefPic, &pLastThreadCtx->pCtx->sRefPic);
           pCtx->sRefPic = pLastThreadCtx->pCtx->sRefPic;
         }
       }
