@@ -166,7 +166,7 @@ TEST (DecodeMbAuxTest, WelsDequantIHadamard2x2Dc) {
   int16_t iMF;
   iMF = rand() & 127;
   for (int i = 0; i < 4; i++)
-    iDct[i] = iRefDct[i] = (rand() & ((1 << 12) - 1)) - (1 << 11);
+    iDct[i] = iRefDct[i] = (rand() & 65535) - 32768;
   WelsDequantHadamard2x2DcAnchor (iRefDct, iMF);
   WelsDequantIHadamard2x2Dc (iDct, iMF);
   bool ok = true;
@@ -210,6 +210,12 @@ void TestIDctT4Rec (PIDctFunc func) {
   ENFORCE_STACK_ALIGN_1D (int16_t, iDct, 16, 16);
   ENFORCE_STACK_ALIGN_1D (uint8_t, iPred, 16 * FDEC_STRIDE, 16);
   ENFORCE_STACK_ALIGN_1D (uint8_t, iRec, 16 * FDEC_STRIDE, 16);
+  //The kernels load whole rows of the prediction, not just the corner the comparison
+  //reads, so the rest must not be uninitialised stack. Clearing rather than widening
+  //the random fill keeps the number of rand() draws the same.
+  memset (iPred, 0, 16 * FDEC_STRIDE);
+  memset (iRec, 0, 16 * FDEC_STRIDE);
+  memset (iRefDst, 0, sizeof (iRefDst));
   //The transform gains at most 3.5 per stage, 12.25 over both, so coefficients within
   //2^11 keep the intermediates inside int16. Beyond that the kernels diverge: x86 rounds
   //with paddw and wraps, LASX rounds with xvsrari.h and does not. H.264 bounds the
@@ -275,6 +281,12 @@ void TestIDctFourT4Rec (PIDctFunc func) {
   ENFORCE_STACK_ALIGN_1D (int16_t, iDct, 64, 16);
   ENFORCE_STACK_ALIGN_1D (uint8_t, iPred, 16 * FDEC_STRIDE, 16);
   ENFORCE_STACK_ALIGN_1D (uint8_t, iRec, 16 * FDEC_STRIDE, 16);
+  //The kernels load whole rows of the prediction, not just the corner the comparison
+  //reads, so the rest must not be uninitialised stack. Clearing rather than widening
+  //the random fill keeps the number of rand() draws the same.
+  memset (iPred, 0, 16 * FDEC_STRIDE);
+  memset (iRec, 0, 16 * FDEC_STRIDE);
+  memset (iRefDst, 0, sizeof (iRefDst));
   //The transform gains at most 3.5 per stage, 12.25 over both, so coefficients within
   //2^11 keep the intermediates inside int16. Beyond that the kernels diverge: x86 rounds
   //with paddw and wraps, LASX rounds with xvsrari.h and does not. H.264 bounds the
@@ -343,7 +355,7 @@ TEST (DecodeMbAuxTest, WelsIDctRecI16x16Dc_c) {
 
   for (int i = 0; i < 4; i++)
     for (int j = 0; j < 4; j++)
-      iRefDct[i][j] = iDct[i * 4 + j] = (rand() & ((1 << 12) - 1)) - (1 << 11);
+      iRefDct[i][j] = iDct[i * 4 + j] = (rand() & 65535) - 32768;
   WelsIDctRecI16x16DcAnchor (iRefDst, iRefDct);
   WelsIDctRecI16x16Dc_c (iRec, FDEC_STRIDE, iPred, FDEC_STRIDE, iDct);
   int ok = -1;
