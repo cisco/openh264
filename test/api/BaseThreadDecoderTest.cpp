@@ -139,7 +139,8 @@ static void Process (SBufferInfo* pInfo, FILE* pFp) {
 }
 
 BaseThreadDecoderTest::BaseThreadDecoderTest()
-  : decoder_ (NULL), uiTimeStamp (0), pYuvFile (NULL), bEnableYuvDumpTest (false), decodeStatus_ (OpenFile) {
+  : decoder_ (NULL), bDrainByFlushOnly (false), uiTimeStamp (0), pYuvFile (NULL),
+    bEnableYuvDumpTest (false), decodeStatus_ (OpenFile) {
 }
 
 int32_t BaseThreadDecoderTest::SetUp() {
@@ -296,10 +297,26 @@ bool BaseThreadDecoderTest::ThreadDecodeFile (const char* fileName, Callback* cb
   decoder_->SetOption (DECODER_OPTION_END_OF_STREAM, &iEndOfStreamFlag);
 
   // Flush out last frames in decoder buffer
-  int32_t num_of_frames_in_buffer = 0;
-  decoder_->GetOption (DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER, &num_of_frames_in_buffer);
-  for (int32_t i = 0; i < num_of_frames_in_buffer; ++i) {
-    FlushFrame (cbk);
+  if (bDrainByFlushOnly) {
+    // Drain the way a caller that does not ask for a count has to: keep flushing until a
+    // call produces nothing. Asking for DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER
+    // first waits for the workers on its own, so it hides whether FlushFrame() waits.
+    for (;;) {
+      memset (&sBufInfo, 0, sizeof (SBufferInfo));
+      FlushFrame (cbk);
+      if (::testing::Test::HasFatalFailure()) {
+        return false;
+      }
+      if (sBufInfo.iBufferStatus != 1) {
+        break;
+      }
+    }
+  } else {
+    int32_t num_of_frames_in_buffer = 0;
+    decoder_->GetOption (DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER, &num_of_frames_in_buffer);
+    for (int32_t i = 0; i < num_of_frames_in_buffer; ++i) {
+      FlushFrame (cbk);
+    }
   }
   if (bEnableYuvDumpTest) {
     fclose (pYuvFile);
