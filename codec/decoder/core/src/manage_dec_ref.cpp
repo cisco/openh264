@@ -133,6 +133,52 @@ void WelsResetRefPic (PWelsDecoderContext pCtx) {
   pRefPic->uiLongRefCount[LIST_0] = 0;
 }
 
+//Release what a whole-struct copy of SRefPic is about to drop. Every picture the destination
+//still lists, and the source does not, leaves the reference lists when the copy lands; without
+//this it keeps bUsedAsRef set with no list entry and no armed unref, and its buffer never
+//returns to the pool.
+//Is this pointer still one of the pictures the buffer owns? A context that has been overtaken
+//by a DPB reallocation can list pictures that no longer exist, and those must not be touched.
+static bool IsLivePicture (PPicBuff pPicBuf, PPicture pPic) {
+  if (pPicBuf == NULL || pPic == NULL)
+    return false;
+  for (int32_t i = 0; i < pPicBuf->iCapacity; ++i) {
+    if (pPicBuf->ppPic[i] == pPic)
+      return true;
+  }
+  return false;
+}
+
+void WelsReleaseDroppedRefs (PPicBuff pPicBuf, PRefPic pDst, PRefPic pSrc) {
+  if (pPicBuf == NULL || pDst == NULL || pSrc == NULL || pDst == pSrc)
+    return;
+  const int32_t kiShort = WELS_MIN ((int32_t) pDst->uiShortRefCount[LIST_0], MAX_DPB_COUNT);
+  const int32_t kiLong  = WELS_MIN ((int32_t) pDst->uiLongRefCount[LIST_0], MAX_DPB_COUNT);
+  PPicture pHeld[MAX_DPB_COUNT * 2];
+  int32_t iHeld = 0;
+  for (int32_t i = 0; i < kiShort; ++i)
+    if (IsLivePicture (pPicBuf, pDst->pShortRefList[LIST_0][i]))
+      pHeld[iHeld++] = pDst->pShortRefList[LIST_0][i];
+  for (int32_t i = 0; i < kiLong; ++i)
+    if (IsLivePicture (pPicBuf, pDst->pLongRefList[LIST_0][i]))
+      pHeld[iHeld++] = pDst->pLongRefList[LIST_0][i];
+
+  for (int32_t i = 0; i < iHeld; ++i) {
+    PPicture pPic = pHeld[i];
+    if (!pPic->bUsedAsRef)
+      continue;
+    bool bKept = false;
+    const int32_t kiSrcShort = WELS_MIN ((int32_t) pSrc->uiShortRefCount[LIST_0], MAX_DPB_COUNT);
+    const int32_t kiSrcLong  = WELS_MIN ((int32_t) pSrc->uiLongRefCount[LIST_0], MAX_DPB_COUNT);
+    for (int32_t j = 0; !bKept && j < kiSrcShort; ++j)
+      bKept = (pSrc->pShortRefList[LIST_0][j] == pPic);
+    for (int32_t j = 0; !bKept && j < kiSrcLong; ++j)
+      bKept = (pSrc->pLongRefList[LIST_0][j] == pPic);
+    if (!bKept)
+      SetUnRef (pPic);
+  }
+}
+
 void WelsResetRefPicWithoutUnRef (PWelsDecoderContext pCtx) {
   int32_t i = 0;
   PRefPic pRefPic = &pCtx->sRefPic;

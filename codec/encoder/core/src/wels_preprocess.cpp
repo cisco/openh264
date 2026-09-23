@@ -1446,14 +1446,18 @@ int32_t  CWelsPreProcess::WelsMoveMemoryWrapper (SWelsSvcCodingParam* pSvcParam,
   const int32_t kiDstStrideV = pDstPic->iLineSize[2];
 
   if (pSrcY) {
-    if (iSrcWidth <= 0 || iSrcHeight <= 0 || (iSrcWidth * iSrcHeight > (MAX_MBS_PER_FRAME << 8)))
+    if (iSrcWidth <= 0 || iSrcHeight <= 0)
+      return ENC_RETURN_INVALIDINPUT;
+    if (iSrcWidth > pDstPic->iWidthInPixel || iSrcHeight > pDstPic->iHeightInPixel)
       return ENC_RETURN_INVALIDINPUT;
     if (kiSrcTopOffsetY >= iSrcHeight || kiSrcLeftOffsetY >= iSrcWidth || iSrcWidth > kiSrcStrideY
         || (iSrcWidth >> 1) > kiSrcStrideU || (iSrcWidth >> 1) > kiSrcStrideV)
       return ENC_RETURN_INVALIDINPUT;
   }
   if (pDstY) {
-    if (kiTargetWidth <= 0 || kiTargetHeight <= 0 || (kiTargetWidth * kiTargetHeight > (MAX_MBS_PER_FRAME << 8)))
+    if (kiTargetWidth <= 0 || kiTargetHeight <= 0)
+      return ENC_RETURN_INVALIDINPUT;
+    if (kiTargetWidth > pDstPic->iWidthInPixel || kiTargetHeight > pDstPic->iHeightInPixel)
       return ENC_RETURN_INVALIDINPUT;
     if (kiTargetWidth > kiDstStrideY || (kiTargetWidth >> 1) > kiDstStrideU || (kiTargetWidth >> 1) > kiDstStrideV)
       return ENC_RETURN_INVALIDINPUT;
