@@ -19,6 +19,7 @@ cpp_sources = [
 ]
 
 objs_asm = []
+libs_asm = []
 if cpu_family in ['x86', 'x86_64']
   asm_sources = [
     'src/x86/denoisefilter.asm',
@@ -51,11 +52,21 @@ elif cpu_family == 'aarch64'
     cpp_sources += asm_sources
   endif
 elif cpu_family in ['loongarch32', 'loongarch64']
-  asm_sources = [
+  lsx_sources = [
     'src/loongarch/vaa_lsx.c',
+  ]
+  lasx_sources = [
     'src/loongarch/vaa_lasx.c',
   ]
-  cpp_sources += asm_sources
+  libprocessing_lsx = static_library('processingi_lsx', lsx_sources,
+    include_directories: [inc, processing_inc, casm_inc],
+    dependencies: deps,
+	c_args: '-mlsx')
+  libprocessing_lasx = static_library('processingi_lasx', lasx_sources,
+    include_directories: [inc, processing_inc, casm_inc],
+    dependencies: deps,
+	c_args: '-mlasx')
+  libs_asm = [libprocessing_lsx, libprocessing_lasx]
 elif cpu_family == 'riscv64'
   asm_sources = []
 elif cpu_family == 'ppc'
@@ -68,4 +79,5 @@ endif
 
 libprocessing = static_library('processing', cpp_sources, objs_asm,
   include_directories: [inc, processing_inc, casm_inc],
+  link_whole: libs_asm,
   dependencies: deps)
