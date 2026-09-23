@@ -166,7 +166,7 @@ TEST (DecodeMbAuxTest, WelsDequantIHadamard2x2Dc) {
   int16_t iMF;
   iMF = rand() & 127;
   for (int i = 0; i < 4; i++)
-    iDct[i] = iRefDct[i] = (rand() & 65535) - 32768;
+    iDct[i] = iRefDct[i] = (rand() & ((1 << 12) - 1)) - (1 << 11);
   WelsDequantHadamard2x2DcAnchor (iRefDct, iMF);
   WelsDequantIHadamard2x2Dc (iDct, iMF);
   bool ok = true;
@@ -210,9 +210,13 @@ void TestIDctT4Rec (PIDctFunc func) {
   ENFORCE_STACK_ALIGN_1D (int16_t, iDct, 16, 16);
   ENFORCE_STACK_ALIGN_1D (uint8_t, iPred, 16 * FDEC_STRIDE, 16);
   ENFORCE_STACK_ALIGN_1D (uint8_t, iRec, 16 * FDEC_STRIDE, 16);
+  //The transform gains at most 3.5 per stage, 12.25 over both, so coefficients within
+  //2^11 keep the intermediates inside int16. Beyond that the kernels diverge: x86 rounds
+  //with paddw and wraps, LASX rounds with xvsrari.h and does not. H.264 bounds the
+  //intermediates to int16 for a conforming stream, so those inputs cannot occur.
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
-      iRefDct[i * 4 + j] = iDct[i * 4 + j] = (rand() & 65535) - 32768;
+      iRefDct[i * 4 + j] = iDct[i * 4 + j] = (rand() & ((1 << 12) - 1)) - (1 << 11);
       iPred[i * FDEC_STRIDE + j] = iRefDst[i * FDEC_STRIDE + j] = rand() & 255;
     }
   }
@@ -271,9 +275,13 @@ void TestIDctFourT4Rec (PIDctFunc func) {
   ENFORCE_STACK_ALIGN_1D (int16_t, iDct, 64, 16);
   ENFORCE_STACK_ALIGN_1D (uint8_t, iPred, 16 * FDEC_STRIDE, 16);
   ENFORCE_STACK_ALIGN_1D (uint8_t, iRec, 16 * FDEC_STRIDE, 16);
+  //The transform gains at most 3.5 per stage, 12.25 over both, so coefficients within
+  //2^11 keep the intermediates inside int16. Beyond that the kernels diverge: x86 rounds
+  //with paddw and wraps, LASX rounds with xvsrari.h and does not. H.264 bounds the
+  //intermediates to int16 for a conforming stream, so those inputs cannot occur.
   for (int k = 0; k < 4; k++)
     for (int i = 0; i < 16; i++)
-      iRefDct[k][i] = iDct[k * 16 + i] = (rand() & 65535) - 32768;
+      iRefDct[k][i] = iDct[k * 16 + i] = (rand() & ((1 << 12) - 1)) - (1 << 11);
 
   for (int i = 0; i < 8; i++)
     for (int j = 0; j < 8; j++)
@@ -335,7 +343,7 @@ TEST (DecodeMbAuxTest, WelsIDctRecI16x16Dc_c) {
 
   for (int i = 0; i < 4; i++)
     for (int j = 0; j < 4; j++)
-      iRefDct[i][j] = iDct[i * 4 + j] = (rand() & 65535) - 32768;
+      iRefDct[i][j] = iDct[i * 4 + j] = (rand() & ((1 << 12) - 1)) - (1 << 11);
   WelsIDctRecI16x16DcAnchor (iRefDst, iRefDct);
   WelsIDctRecI16x16Dc_c (iRec, FDEC_STRIDE, iPred, FDEC_STRIDE, iDct);
   int ok = -1;
