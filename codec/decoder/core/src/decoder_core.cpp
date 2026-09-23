@@ -2919,6 +2919,12 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
             //it must not read these from this context: signalling below releases it, and
             //this context is handed a later access unit as soon as this frame is done.
             SnapshotRefMarkInfo (pCtx, pThreadCtx, pCurAu);
+            //Re-pin now that InitRefPicList() has run. The pins taken where the picture was
+            //fetched predate it, so a picture the list construction added since -- the one
+            //WelsCheckAndRecoverForFutureDecoding() allocates when the IDR was lost -- is not
+            //among them, and the successor released just below could reset it while this
+            //frame is still predicting from it.
+            PinRefPics (pCtx);
             SET_EVENT (&pThreadCtx->sSliceDecodeStart);
           }
           iRet = WelsDecodeAndConstructSlice (pCtx);
