@@ -277,7 +277,6 @@ void BaseMC (PWelsDecoderContext pCtx, sMCRefMember* pMCRefMem, const int32_t& l
         return;
       }
     }
-    pCtx->lastReadyHeightOffset[listIdx][iRefIdx] = offset;
   }
 
   int32_t iSrcPixOffsetLuma = (iFullMVx >> 2) + (iFullMVy >> 2) * pMCRefMem->iSrcLineLuma;
