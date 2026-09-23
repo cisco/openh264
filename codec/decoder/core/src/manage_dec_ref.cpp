@@ -108,10 +108,11 @@ static void SetUnRef (PPicture pRef) {
 // 1.sps arrived that is new sequence starting
 // 2.IDR NAL i.e. 1st layer in IDR AU
 
-void WelsResetRefPic (PWelsDecoderContext pCtx) {
+//Clear one reference list, unreferencing what leaves it. A picture another frame still holds
+//a pin on keeps its unref deferred until that pin drops, as everywhere else.
+static void ResetRefPicList (PRefPic pRefPic) {
   int32_t i = 0;
-  PRefPic pRefPic = &pCtx->sRefPic;
-  pCtx->sRefPic.uiLongRefCount[LIST_0] = pCtx->sRefPic.uiShortRefCount[LIST_0] = 0;
+  pRefPic->uiLongRefCount[LIST_0] = pRefPic->uiShortRefCount[LIST_0] = 0;
 
   pRefPic->uiRefCount[LIST_0] = 0;
   pRefPic->uiRefCount[LIST_1] = 0;
@@ -131,6 +132,10 @@ void WelsResetRefPic (PWelsDecoderContext pCtx) {
     }
   }
   pRefPic->uiLongRefCount[LIST_0] = 0;
+}
+
+void WelsResetRefPic (PWelsDecoderContext pCtx) {
+  ResetRefPicList (&pCtx->sRefPic);
 }
 
 //Release what a whole-struct copy of SRefPic is about to drop. Every picture the destination
@@ -809,20 +814,12 @@ static int32_t MMCOProcess (PWelsDecoderContext pCtx, PRefPic pRefPic, PPicture 
     }
     break;
   case MMCO_RESET:
-    WelsResetRefPic (pCtx);
-    if (pRefPic != &pCtx->sRefPic) {
-      // WelsResetRefPic() hard-codes pCtx->sRefPic and does not
-      // touch the caller's active reference list. In the threaded predecessor
-      // handoff path (decoder_core.cpp), pRefPic points at pCtx->sTmpRefPic, a
-      // snapshot taken from pCtx->sRefPic before this call and later published
-      // to the successor thread context. Left untouched here, sTmpRefPic would
-      // keep pointers to pictures that WelsResetRefPic() just unreferenced
-      // (and that may already be recycled by PrefetchPic()), so the successor
-      // frame would inherit a stale/dangling reference list. Re-sync it to the
-      // freshly-cleared sRefPic; the entries were already unreffed once by
-      // WelsResetRefPic() above, so do not call SetUnRef again here.
-      *pRefPic = pCtx->sRefPic;
-    }
+    //Reset the list this marking was handed, not the context's own. On the threaded handoff
+    //pRefPic is the predecessor's snapshot while pCtx->sRefPic is that worker's live list:
+    //it signalled sSliceDecodeStart, not completion, so it may still be decoding later
+    //slices against it. Clearing it from here would take its references away mid-frame.
+    //Single-threaded decoding passes &pCtx->sRefPic, so it is unaffected.
+    ResetRefPicList (pRefPic);
     if (pbHasMmco5 != NULL)
       *pbHasMmco5 = true;
     break;
