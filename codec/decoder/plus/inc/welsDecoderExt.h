@@ -110,8 +110,9 @@ class CWelsDecoder : public ISVCDecoder {
   virtual long EXTAPI GetOption (DECODER_OPTION eOptID, void* pOption);
 
  public:
+  //bCanResetDecoder is false when called on a decoding worker, which must not reset.
   DECODING_STATE DecodeFrame2WithCtx (PWelsDecoderContext pCtx, const unsigned char* kpSrc, const int kiSrcLen,
-                                      unsigned char** ppDst, SBufferInfo* pDstInfo);
+                                      unsigned char** ppDst, SBufferInfo* pDstInfo, bool bCanResetDecoder = true);
   DECODING_STATE ParseAccessUnit (SWelsDecoderThreadCTX& sThreadCtx);
 
  private:
