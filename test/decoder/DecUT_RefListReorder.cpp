@@ -39,7 +39,7 @@ class RefListReorderTest : public ::testing::Test {
     }
     sRefPic.uiLongRefCount[LIST_0] = kLongRefCount;
     sRefPic.uiShortRefCount[LIST_0] = 0;
-    sRefPic.uiRefCount[LIST_0] = 0;
+    sRefPic.uiRefCount[LIST_0] = kLongRefCount;
 
     // A single long-term reorder command requesting long_term_pic_num == kTargetFrameIdx,
     // terminated by idc == 3.
@@ -75,7 +75,7 @@ class RefListReorderTest : public ::testing::Test {
 };
 
 // The long-term reorder command asks for the reference with LongTermFrameIdx == 2 to be placed
-// first.
+// first, preserving the order of the remaining references.
 TEST_F (RefListReorderTest, LongTermReorderMatchesByFrameIdx) {
   int32_t iRet = WelsReorderRefList2 (m_pCtx);
   ASSERT_EQ (iRet, ERR_NONE);
@@ -84,6 +84,12 @@ TEST_F (RefListReorderTest, LongTermReorderMatchesByFrameIdx) {
   ASSERT_TRUE (pFirst != NULL);
   EXPECT_TRUE (pFirst->bIsLongRef);
   EXPECT_EQ (pFirst->iLongTermFrameIdx, kTargetFrameIdx);
+
+  const SRefPic& sRefPic = m_pCtx->sRefPic;
+  EXPECT_EQ (sRefPic.pRefList[LIST_0][0], &m_aPics[kTargetFrameIdx]);
+  EXPECT_EQ (sRefPic.pRefList[LIST_0][1], &m_aPics[0]);
+  EXPECT_EQ (sRefPic.pRefList[LIST_0][2], &m_aPics[1]);
+  EXPECT_EQ (sRefPic.uiRefCount[LIST_0], kLongRefCount);
 }
 
 } // anonymous namespace
