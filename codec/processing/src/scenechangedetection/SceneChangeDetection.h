@@ -225,6 +225,16 @@ class CSceneChangeDetection : public IStrategy {
     m_sLocalParam.iCurStride = pSrcPixMap->iStride[0];
     m_sLocalParam.pStaticBlockIdc = m_sSceneChangeParam.pStaticBlockIdc;
 
+    // The 8x8 block grid used below is derived from the source (current) frame,
+    // while the SAD calculation reads from the reference/destination buffer.
+    // If that buffer is too small to hold the source-sized grid, the SAD loop
+    // in CSceneChangeDetectorVideo::operator() would read out of bounds.
+    // Reject such mismatched inputs here.
+    if (((m_sLocalParam.iBlock8x8Width << 3) > pRefPixMap->iStride[0])
+        || ((m_sLocalParam.iBlock8x8Height << 3) > pRefPixMap->sRect.iRectHeight)) {
+      return RET_INVALIDPARAM;
+    }
+
     int32_t iBlock8x8Num = m_sLocalParam.iBlock8x8Width * m_sLocalParam.iBlock8x8Height;
     int32_t iSceneChangeThresholdLarge = WelsStaticCast (int32_t,
                                          m_cDetector.GetSceneChangeMotionRatioLarge() * iBlock8x8Num + 0.5f + PESN);
