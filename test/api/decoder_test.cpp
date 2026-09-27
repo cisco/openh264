@@ -45,6 +45,12 @@ class DecoderInitTest : public ::testing::Test, public BaseDecoderTest {
 
 TEST_F (DecoderInitTest, JustInit) {}
 
+TEST_F (DecoderInitTest, SetThreadCountPostInitFails) {
+  int iThreadCount = 2;
+  long rv = decoder_->SetOption (DECODER_OPTION_NUM_OF_THREADS, &iThreadCount);
+  EXPECT_NE (0, rv);
+}
+
 struct FileParam {
   const char* fileName;
   const char* hashStr;
