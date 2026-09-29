@@ -1065,10 +1065,10 @@ void CWelsDecoder::ReleaseBufferedReadyPictureReorder (PWelsDecoderContext pCtx,
   // BufferingReadyPicture() publication on the shared m_sPictInfoList /
   // m_sReoderingStatus queue state.
   if (m_iThreadCount >= 1) WelsMutexLock (&m_csDecoder);
-  PPicBuff pPicBuff = pCtx ? pCtx->pPicBuff : m_pPicBuff;
   if (pCtx == NULL && m_iThreadCount <= 1) {
     pCtx = m_pDecThrCtx[0].pCtx;
   }
+  PPicBuff pPicBuff = pCtx ? pCtx->pPicBuff : m_pPicBuff;
   if (m_sReoderingStatus.iNumOfPicts > 0) {
     m_sReoderingStatus.iMinPOC = IMinInt32;
     int32_t firstValidIdx = -1;
@@ -1140,6 +1140,9 @@ void CWelsDecoder::ReleaseBufferedReadyPictureNoReorder(PWelsDecoderContext pCtx
   // BufferingReadyPicture() publication on the shared m_sPictInfoList /
   // m_sReoderingStatus queue state.
   if (m_iThreadCount >= 1) WelsMutexLock (&m_csDecoder);
+  if (pCtx == NULL && m_iThreadCount <= 1) {
+    pCtx = m_pDecThrCtx[0].pCtx;
+  }
   int32_t firstValidIdx = -1;
   uint32_t uiDecodingTimeStamp = 0;
   for (int32_t i = 0; i <= m_sReoderingStatus.iLargestBufferedPicIndex; ++i) {
