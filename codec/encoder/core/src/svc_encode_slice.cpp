@@ -1785,6 +1785,14 @@ bool DynSlcJudgeSliceBoundaryStepBack (void* pCtx, void* pSlice, SSliceCtx* pSli
     //  tmp change is:  iMaxSliceNumConstraint is alway set to be MAXSLICENUM, will not change even reallocate
     AddSliceBoundary (pEncCtx, pCurSlice, pSliceCtx, pCurMb, iCurMbIdx, kiEndMbIdxOfPartition);
     ++ pSliceCtx->iSliceNumInFrame;
+    if (pSliceCtx->iSliceNumInFrame >= pSliceCtx->iMaxSliceNumConstraint) {
+      /* Engage the size-control guard: bDynamicSlicingSliceSizeCtrlFlag is
+       * read in three places (QPs forced to the upper bound, slice boundary
+       * step-back) but is never assigned anywhere, so the slice-count cap
+       * can never engage and slice/NAL growth relies solely on buffer
+       * reallocation. */
+      pCurSlice->bDynamicSlicingSliceSizeCtrlFlag = true;
+    }
 
     if (pEncCtx->pSvcParam->iMultipleThreadIdc > 1) {
       WelsMutexUnlock (&pEncCtx->pSliceThreading->mutexSliceNumUpdate);
