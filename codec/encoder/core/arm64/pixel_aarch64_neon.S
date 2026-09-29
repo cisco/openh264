@@ -198,14 +198,23 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsSampleSad16x8_AArch64_neon
     sxtw    x3, w3
     ld1     {v0.16b}, [x0], x1
     ld1     {v1.16b}, [x2], x3
-    uabdl   v2.8h, v0.8b, v1.8b
-    uabal2  v2.8h, v0.16b, v1.16b
-.rept 7
+    uabd    v0.16b, v0.16b, v1.16b
+    uaddlp  v2.8h, v0.16b
+    ld1     {v3.16b}, [x0], x1
+    ld1     {v4.16b}, [x2], x3
+    uabd    v3.16b, v3.16b, v4.16b
+    uaddlp  v5.8h, v3.16b
+.rept 3
     ld1     {v0.16b}, [x0], x1
     ld1     {v1.16b}, [x2], x3
-    uabal   v2.8h, v0.8b, v1.8b
-    uabal2  v2.8h, v0.16b, v1.16b
+    ld1     {v3.16b}, [x0], x1
+    ld1     {v4.16b}, [x2], x3
+    uabd    v0.16b, v0.16b, v1.16b
+    uabd    v3.16b, v3.16b, v4.16b
+    uadalp  v2.8h, v0.16b
+    uadalp  v5.8h, v3.16b
 .endr
+    add     v2.8h, v2.8h, v5.8h
     CALC_AND_STORE_SAD
 WELS_ASM_AARCH64_FUNC_END
 
@@ -214,14 +223,23 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsSampleSad16x16_AArch64_neon
     sxtw    x3, w3
     ld1     {v0.16b}, [x0], x1
     ld1     {v1.16b}, [x2], x3
-    uabdl   v2.8h, v0.8b, v1.8b
-    uabal2  v2.8h, v0.16b, v1.16b
-.rept 15
+    uabd    v0.16b, v0.16b, v1.16b
+    uaddlp  v2.8h, v0.16b
+    ld1     {v3.16b}, [x0], x1
+    ld1     {v4.16b}, [x2], x3
+    uabd    v3.16b, v3.16b, v4.16b
+    uaddlp  v5.8h, v3.16b
+.rept 7
     ld1     {v0.16b}, [x0], x1
     ld1     {v1.16b}, [x2], x3
-    uabal   v2.8h, v0.8b, v1.8b
-    uabal2  v2.8h, v0.16b, v1.16b
+    ld1     {v3.16b}, [x0], x1
+    ld1     {v4.16b}, [x2], x3
+    uabd    v0.16b, v0.16b, v1.16b
+    uabd    v3.16b, v3.16b, v4.16b
+    uadalp  v2.8h, v0.16b
+    uadalp  v5.8h, v3.16b
 .endr
+    add     v2.8h, v2.8h, v5.8h
     CALC_AND_STORE_SAD
 WELS_ASM_AARCH64_FUNC_END
 
