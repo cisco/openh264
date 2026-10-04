@@ -3,6 +3,8 @@
 #include "decode_mb_aux.h"
 #include "deblocking.h"
 #include "cpu.h"
+#include "rec_mb.h"
+#include "mc.h"
 using namespace WelsDec;
 
 namespace {
@@ -341,3 +343,68 @@ GENERATE_IDCTRESADDPRED8x8 (IdctResAddPred8x8_c, 0);
 #if defined(HAVE_LSX)
 GENERATE_IDCTRESADDPRED8x8 (IdctResAddPred8x8_lsx, WELS_CPU_LSX)
 #endif
+
+// Synthetic regression for B_Bi_4x4, including all four enclosing 8x8 regions.
+// No bitstream or external reference decoder is needed for integer-pixel MC.
+
+TEST (DecoderPrediction, Bi4x4TemporaryLumaUsesSubpartitionOffset) {
+  SWelsDecoderContext sContext = {};
+  SDqLayer sLayer = {};
+  SPicture sDecoded = {};
+  SPicture sReference[2] = {};
+  SPps sPps = {};
+  uint32_t uiMbType[1] = {MB_TYPE_8x8};
+  uint32_t uiSubMbType[1][4];
+  int16_t iMv[2][1][16][2] = {};
+  int8_t iRefIdx[2][1][16] = {};
+  uint8_t uiReference[2][3][32 * 32];
+  uint8_t uiPred[3][32 * 32];
+  uint8_t uiTemp[3][32 * 32];
+  uint8_t* pPred[3] = {uiPred[0], uiPred[1], uiPred[2]};
+  uint8_t* pTemp[3] = {uiTemp[0], uiTemp[1], uiTemp[2]};
+  sContext.pCurDqLayer = &sLayer;
+  sContext.pDec = &sDecoded;
+  sLayer.pDec = &sDecoded;
+  sLayer.pSubMbType = uiSubMbType;
+  sLayer.sLayerInfo.pPps = &sPps;
+  sLayer.sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.iMbWidth = 1;
+  sLayer.sLayerInfo.sSliceInLayer.sSliceHeaderExt.sSliceHeader.iMbHeight = 1;
+  sDecoded.pMbType = uiMbType;
+  for (int32_t i = 0; i < 4; ++i) {
+    uiSubMbType[0][i] = SUB_MB_TYPE_4x4 | MB_TYPE_P0L0 | MB_TYPE_P0L1;
+  }
+  for (int32_t l = 0; l < 2; ++l) {
+    sDecoded.pMv[l] = iMv[l];
+    sDecoded.pRefIndex[l] = iRefIdx[l];
+    sContext.sRefPic.pRefList[l][0] = &sReference[l];
+    for (int32_t p = 0; p < 3; ++p) {
+      sDecoded.iLinesize[p] = 32;
+      sReference[l].iLinesize[p] = 32;
+      sReference[l].pData[p] = uiReference[l][p];
+      for (int32_t y = 0; y < 32; ++y) {
+        for (int32_t x = 0; x < 32; ++x) {
+          uiReference[l][p][y * 32 + x] = l ? 120 + x + y : 40;
+        }
+      }
+    }
+  }
+  int32_t iCoreCount = 1;
+  uint32_t uiCpu[2] = {0, WelsCPUFeatureDetect (&iCoreCount)};
+  for (int32_t c = 0; c < 2; ++c) {
+    memset (uiPred, 0xdd, sizeof (uiPred));
+    memset (uiTemp, 0xdd, sizeof (uiTemp));
+    WelsCommon::InitMcFunc (&sContext.sMcFunc, uiCpu[c]);
+    ASSERT_EQ (ERR_NONE, GetInterBPred (pPred, pTemp, &sContext));
+    for (int32_t p = 0; p < 3; ++p) {
+      int32_t iSize = p == 0 ? 16 : 8;
+      for (int32_t y = 0; y < 32; ++y) {
+        for (int32_t x = 0; x < 32; ++x) {
+          int32_t iExpected = x < iSize && y < iSize ? (160 + x + y + 1) >> 1 : 0xdd;
+          EXPECT_EQ (iExpected, uiPred[p][y * 32 + x]) << c << " " << p << " " << x << " " << y;
+          int32_t iTempExpected = x < iSize && y < iSize ? 120 + x + y : 0xdd;
+          EXPECT_EQ (iTempExpected, uiTemp[p][y * 32 + x]) << c << " " << p << " " << x << " " << y;
+        }
+      }
+    }
+  }
+}
