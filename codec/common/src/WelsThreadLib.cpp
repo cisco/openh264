@@ -131,9 +131,14 @@ WELS_THREAD_ERROR_CODE    WelsEventOpen (WELS_EVENT* event, const char* event_na
 }
 
 WELS_THREAD_ERROR_CODE    WelsEventSignal (WELS_EVENT* event, WELS_MUTEX *pMutex, int* iCondition) {
-  (*iCondition) --;
-  if ((*iCondition) <= 0) {
-    if (SetEvent (*event)) {
+  WelsMutexLock (pMutex);
+  const bool bSignal = (-- (*iCondition) <= 0);
+  // Unlock pMutex before signaling hEvent, as the woken thread may immediately
+  // destroy the object that owns pMutex, event, and iCondition.
+  WELS_EVENT hEvent = *event;
+  WelsMutexUnlock (pMutex);
+  if (bSignal && hEvent != NULL) {
+    if (SetEvent (hEvent)) {
       return WELS_THREAD_ERROR_OK;
     }
   }
@@ -312,26 +317,29 @@ void WelsSleep (uint32_t dwMilliSecond) {
 WELS_THREAD_ERROR_CODE   WelsEventSignal (WELS_EVENT* event, WELS_MUTEX *pMutex, int* iCondition) {
   WELS_THREAD_ERROR_CODE err = 0;
   //fprintf( stderr, "before signal it, event=%x iCondition= %d..\n", event, *iCondition );
-#ifdef __APPLE__
   WelsMutexLock (pMutex);
-  (*iCondition) --;
-  WelsMutexUnlock (pMutex);
-  if ((*iCondition) <= 0) {
-  err = pthread_cond_signal (event);
-  //fprintf( stderr, "signal it, event=%x iCondition= %d..\n",event, *iCondition );
-
+  const bool bSignal = (-- (*iCondition) <= 0);
+#ifdef __APPLE__
+  // On macOS, WELS_EVENT is a pthread_cond_t and WelsEventWait re-acquires pMutex
+  // before returning, so keep pMutex locked across the condition update and signal.
+  if (bSignal) {
+    err = pthread_cond_signal (event);
+    //fprintf( stderr, "signal it, event=%x iCondition= %d..\n",event, *iCondition );
   }
+  WelsMutexUnlock (pMutex);
 #else
-    (*iCondition) --;
-    if ((*iCondition) <= 0) {
+  // Unlock pMutex before sem_post, as the woken thread waiting in sem_wait
+  // does not acquire pMutex and may immediately destroy the owner of pMutex.
+  WELS_EVENT hEvent = *event;
+  WelsMutexUnlock (pMutex);
+  if (bSignal && hEvent != NULL) {
 //  int32_t val = 0;
 //  sem_getvalue(event, &val);
 //  fprintf( stderr, "before signal it, val= %d..\n",val );
-  if (event != NULL)
-    err = sem_post (*event);
+    err = sem_post (hEvent);
 //  sem_getvalue(event, &val);
     //fprintf( stderr, "signal it, event=%x iCondition= %d..\n",event, *iCondition );
-    }
+  }
 #endif
   //fprintf( stderr, "after signal it, event=%x  iCondition= %d..\n",event, *iCondition );
   return err;
