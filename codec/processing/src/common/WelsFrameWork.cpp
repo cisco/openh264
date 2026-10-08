@@ -235,7 +235,7 @@ bool  CVpFrameWork::CheckValid (EMethods eMethod, SPixMap& pSrcPixMap, SPixMap& 
   if (pSrcPixMap.pPixel[0]) {
     const int32_t kiSrcChromaWidth = pSrcPixMap.sRect.iRectWidth >> 1;
     if (pSrcPixMap.sRect.iRectWidth <= 0 || pSrcPixMap.sRect.iRectHeight <= 0
-        || pSrcPixMap.sRect.iRectWidth * pSrcPixMap.sRect.iRectHeight > (MAX_MBS_PER_FRAME << 8))
+        || static_cast<int64_t> (pSrcPixMap.sRect.iRectWidth) * pSrcPixMap.sRect.iRectHeight > (MAX_MBS_PER_FRAME << 8))
       goto exit;
     if (pSrcPixMap.sRect.iRectTop >= pSrcPixMap.sRect.iRectHeight
         || pSrcPixMap.sRect.iRectLeft >= pSrcPixMap.sRect.iRectWidth || pSrcPixMap.sRect.iRectWidth > pSrcPixMap.iStride[0])
@@ -250,7 +250,7 @@ bool  CVpFrameWork::CheckValid (EMethods eMethod, SPixMap& pSrcPixMap, SPixMap& 
   if (pDstPixMap.pPixel[0]) {
     const int32_t kiDstChromaWidth = pDstPixMap.sRect.iRectWidth >> 1;
     if (pDstPixMap.sRect.iRectWidth <= 0 || pDstPixMap.sRect.iRectHeight <= 0
-        || pDstPixMap.sRect.iRectWidth * pDstPixMap.sRect.iRectHeight > (MAX_MBS_PER_FRAME << 8))
+        || static_cast<int64_t> (pDstPixMap.sRect.iRectWidth) * pDstPixMap.sRect.iRectHeight > (MAX_MBS_PER_FRAME << 8))
       goto exit;
     if (pDstPixMap.sRect.iRectTop >= pDstPixMap.sRect.iRectHeight
         || pDstPixMap.sRect.iRectLeft >= pDstPixMap.sRect.iRectWidth || pDstPixMap.sRect.iRectWidth > pDstPixMap.iStride[0])
