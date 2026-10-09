@@ -113,41 +113,41 @@
 .endm
 
 .macro CALC_ABS_16X8_1 arg0, arg1
-    uab\arg1\()l  \arg0, v0.8b, v16.8b
-    uabal2  \arg0, v0.16b,v16.16b
-    uabal   \arg0, v1.8b, v17.8b
-    uabal2  \arg0, v1.16b,v17.16b
-    uabal   \arg0, v2.8b, v18.8b
-    uabal2  \arg0, v2.16b,v18.16b
-    uabal   \arg0, v3.8b, v19.8b
-    uabal2  \arg0, v3.16b,v19.16b
-    uabal   \arg0, v4.8b, v20.8b
-    uabal2  \arg0, v4.16b,v20.16b
-    uabal   \arg0, v5.8b, v21.8b
-    uabal2  \arg0, v5.16b,v21.16b
-    uabal   \arg0, v6.8b, v22.8b
-    uabal2  \arg0, v6.16b,v22.16b
-    uabal   \arg0, v7.8b, v23.8b
-    uabal2  \arg0, v7.16b,v23.16b
+    uabd    v26.16b, v0.16b, v16.16b
+    \arg1  \arg0, v26.16b
+    uabd    v26.16b, v1.16b, v17.16b
+    uadalp  \arg0, v26.16b
+    uabd    v26.16b, v2.16b, v18.16b
+    uadalp  \arg0, v26.16b
+    uabd    v26.16b, v3.16b, v19.16b
+    uadalp  \arg0, v26.16b
+    uabd    v26.16b, v4.16b, v20.16b
+    uadalp  \arg0, v26.16b
+    uabd    v26.16b, v5.16b, v21.16b
+    uadalp  \arg0, v26.16b
+    uabd    v26.16b, v6.16b, v22.16b
+    uadalp  \arg0, v26.16b
+    uabd    v26.16b, v7.16b, v23.16b
+    uadalp  \arg0, v26.16b
 .endm
 
 .macro CALC_ABS_16X8_2 arg0
-    uab\arg0\()l  v29.8h, v0.8b, v18.8b
-    uabal2  v29.8h, v0.16b,v18.16b
-    uabal   v29.8h, v1.8b, v19.8b
-    uabal2  v29.8h, v1.16b,v19.16b
-    uabal   v29.8h, v2.8b, v20.8b
-    uabal2  v29.8h, v2.16b,v20.16b
-    uabal   v29.8h, v3.8b, v21.8b
-    uabal2  v29.8h, v3.16b,v21.16b
-    uabal   v29.8h, v4.8b, v22.8b
-    uabal2  v29.8h, v4.16b,v22.16b
-    uabal   v29.8h, v5.8b, v23.8b
-    uabal2  v29.8h, v5.16b,v23.16b
-    uabal   v29.8h, v6.8b, v24.8b
-    uabal2  v29.8h, v6.16b,v24.16b
-    uabal   v29.8h, v7.8b, v25.8b
-    uabal2  v29.8h, v7.16b,v25.16b
+    uabd    v26.16b, v0.16b, v18.16b
+    \arg0  v29.8h, v26.16b
+    uabd    v26.16b, v1.16b, v19.16b
+    uadalp  v29.8h, v26.16b
+    uabd    v26.16b, v2.16b, v20.16b
+    uadalp  v29.8h, v26.16b
+    uabd    v26.16b, v3.16b, v21.16b
+    uadalp  v29.8h, v26.16b
+    uabd    v26.16b, v4.16b, v22.16b
+    uadalp  v29.8h, v26.16b
+    uabd    v26.16b, v5.16b, v23.16b
+    uadalp  v29.8h, v26.16b
+    uabd    v26.16b, v6.16b, v24.16b
+    uadalp  v29.8h, v26.16b
+    uabd    v26.16b, v7.16b, v25.16b
+    uadalp  v29.8h, v26.16b
 .endm
 
 WELS_ASM_AARCH64_FUNC_BEGIN WelsSampleSad4x4_AArch64_neon
@@ -354,16 +354,16 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsSampleSadFour16x8_AArch64_neon
     ld1     {v24.16b}, [x0], x3
     ld1     {v25.16b}, [x0]
 
-    CALC_ABS_16X8_1 v28.8h, d
-    CALC_ABS_16X8_2 d
+    CALC_ABS_16X8_1 v28.8h, uaddlp
+    CALC_ABS_16X8_2 uaddlp
 
     sub     x0, x2, #1
     LOAD_16X8_2 x0
-    CALC_ABS_16X8_1 v30.8h, d
+    CALC_ABS_16X8_1 v30.8h, uaddlp
 
     add     x0, x2, #1
     LOAD_16X8_2 x0
-    CALC_ABS_16X8_1 v31.8h, d
+    CALC_ABS_16X8_1 v31.8h, uaddlp
 
     CALC_AND_STORE_SAD_FOUR
 WELS_ASM_AARCH64_FUNC_END
@@ -378,16 +378,16 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsSampleSadFour16x16_AArch64_neon
     ld1     {v24.16b}, [x5], x3
     ld1     {v25.16b}, [x5], x3
 
-    CALC_ABS_16X8_1 v28.8h, d
-    CALC_ABS_16X8_2 d
+    CALC_ABS_16X8_1 v28.8h, uaddlp
+    CALC_ABS_16X8_2 uaddlp
 
     sub     x6, x2, #1
     LOAD_16X8_2 x6
-    CALC_ABS_16X8_1 v30.8h, d
+    CALC_ABS_16X8_1 v30.8h, uaddlp
 
     add     x7, x2, #1
     LOAD_16X8_2 x7
-    CALC_ABS_16X8_1 v31.8h, d
+    CALC_ABS_16X8_1 v31.8h, uaddlp
 
     LOAD_16X8_1
     sub     x5, x5, x3
@@ -396,14 +396,14 @@ WELS_ASM_AARCH64_FUNC_BEGIN WelsSampleSadFour16x16_AArch64_neon
     ld1     {v24.16b}, [x5], x3
     ld1     {v25.16b}, [x5]
 
-    CALC_ABS_16X8_1 v28.8h, a
-    CALC_ABS_16X8_2 a
+    CALC_ABS_16X8_1 v28.8h, uadalp
+    CALC_ABS_16X8_2 uadalp
 
     LOAD_16X8_2 x6
-    CALC_ABS_16X8_1 v30.8h, a
+    CALC_ABS_16X8_1 v30.8h, uadalp
 
     LOAD_16X8_2 x7
-    CALC_ABS_16X8_1 v31.8h, a
+    CALC_ABS_16X8_1 v31.8h, uadalp
 
     CALC_AND_STORE_SAD_FOUR
 WELS_ASM_AARCH64_FUNC_END

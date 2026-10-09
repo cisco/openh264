@@ -694,6 +694,50 @@ TEST_F (SadSatdAssemblyFuncTest, Sad16_AArch64_neon_StridesAndExtremes) {
   }
 }
 
+TEST_F (SadSatdAssemblyFuncTest, SadFour16_AArch64_neon_StridesAndExtremes) {
+  if (0 == (m_uiCpuFeatureFlag & WELS_CPU_NEON))
+    return;
+  const int32_t kiStrides[] = {16, 23, 32, -16, -23, -32};
+  for (int iPattern = 0; iPattern < 4; ++iPattern) {
+    for (int i = 0; i < (PIXEL_STRIDE << 5); ++i) {
+      if (iPattern == 0) {
+        m_pPixSrcA[i] = 0;
+        m_pPixSrcB[i] = 255;
+      } else if (iPattern == 1) {
+        m_pPixSrcA[i] = 255;
+        m_pPixSrcB[i] = 0;
+      } else if (iPattern == 2) {
+        m_pPixSrcA[i] = 127;
+        m_pPixSrcB[i] = 127;
+      } else {
+        m_pPixSrcA[i] = rand() % 256;
+        m_pPixSrcB[i] = rand() % 256;
+      }
+    }
+    for (int32_t iStrideA : kiStrides) {
+      for (int32_t iStrideB : kiStrides) {
+        for (int iOffset = 0; iOffset < 16; ++iOffset) {
+          uint8_t* pA = m_pPixSrcA + iOffset + (iStrideA < 0 ? -15 * iStrideA : 0);
+          uint8_t* pB = m_pPixSrcB + iOffset + (iStrideB < 0 ? 16 * -iStrideB : 32);
+          int32_t sadC[4];
+          int32_t sadNeon[4];
+          WelsSampleSadFour16x8_c (pA, iStrideA, pB, iStrideB, sadC);
+          WelsSampleSadFour16x8_AArch64_neon (pA, iStrideA, pB, iStrideB, sadNeon);
+          for (int iSad = 0; iSad < 4; ++iSad)
+            EXPECT_EQ (sadC[iSad], sadNeon[iSad]) << "pattern=" << iPattern << " strideA=" << iStrideA
+                                                  << " strideB=" << iStrideB << " offset=" << iOffset;
+
+          WelsSampleSadFour16x16_c (pA, iStrideA, pB, iStrideB, sadC);
+          WelsSampleSadFour16x16_AArch64_neon (pA, iStrideA, pB, iStrideB, sadNeon);
+          for (int iSad = 0; iSad < 4; ++iSad)
+            EXPECT_EQ (sadC[iSad], sadNeon[iSad]) << "pattern=" << iPattern << " strideA=" << iStrideA
+                                                  << " strideB=" << iStrideB << " offset=" << iOffset;
+        }
+      }
+    }
+  }
+}
+
 GENERATE_Sad4x4_UT (WelsSampleSatd4x4_AArch64_neon, WelsSampleSatd4x4_c, WELS_CPU_NEON)
 GENERATE_Sad8x8_UT (WelsSampleSatd8x8_AArch64_neon, WelsSampleSatd8x8_c, WELS_CPU_NEON)
 GENERATE_Sad8x16_UT (WelsSampleSatd8x16_AArch64_neon, WelsSampleSatd8x16_c, WELS_CPU_NEON)
