@@ -121,6 +121,12 @@ void CWelsThreadPool::RemoveInstance() {
       m_pThreadPoolSelf = NULL;
     }
     //fprintf(stdout, "m_iRefCount=%d, IdleThreadNum=%d, BusyThreadNum=%d, WaitedTask=%d\n", m_iRefCount, GetIdleThreadNum(), GetBusyThreadNum(), GetWaitedTaskNum());
+  } else {
+    // Synchronize with OnTaskStop(): if a worker thread just signaled the last task
+    // of the caller being torn down, it still holds m_cLockBusyTasks until
+    // OnTaskExecuted() returns. Acquiring the lock here ensures the worker has
+    // exited OnTaskExecuted() before the caller destroys the task sink and tasks.
+    CWelsAutoLock cBusyLock (m_cLockBusyTasks);
   }
 }
 
@@ -140,13 +146,23 @@ WELS_THREAD_ERROR_CODE CWelsThreadPool::OnTaskStart (CWelsTaskThread* pThread, I
 WELS_THREAD_ERROR_CODE CWelsThreadPool::OnTaskStop (CWelsTaskThread* pThread, IWelsTask* pTask) {
   //fprintf(stdout, "CWelsThreadPool::OnTaskStop 0: Task %x at Thread %x Finished\n", pTask, pThread);
 
-  RemoveThreadFromBusyList (pThread);
+  // Return pThread to the idle queue before removing it from m_cBusyThreads so
+  // StopAllRunning() sees it in m_cIdleThreads as soon as GetBusyThreadNum() == 0.
+  // The pool thread cannot re-dispatch pThread until CWelsTaskThread::ExecuteTask()
+  // releases m_cLockTask after OnTaskStop() returns.
   AddThreadToIdleQueue (pThread);
 
-  if (pTask && pTask->GetSink()) {
-    //fprintf(stdout, "CWelsThreadPool::OnTaskStop 1: Task %x at Thread %x Finished, m_pSink=%x\n", pTask, pThread, pTask->GetSink());
-    pTask->GetSink()->OnTaskExecuted();
-    ////fprintf(stdout, "CWelsThreadPool::OnTaskStop 1: Task %x at Thread %x Finished, m_pSink=%x\n", pTask, pThread, pTask->GetSink());
+  {
+    // Hold the pool-owned m_cLockBusyTasks across OnTaskExecuted() and busy-list
+    // removal so that RemoveInstance() / StopAllRunning() will wait until the
+    // worker is completely done using pTask and its sink.
+    CWelsAutoLock cLock (m_cLockBusyTasks);
+    if (pTask && pTask->GetSink()) {
+      //fprintf(stdout, "CWelsThreadPool::OnTaskStop 1: Task %x at Thread %x Finished, m_pSink=%x\n", pTask, pThread, pTask->GetSink());
+      pTask->GetSink()->OnTaskExecuted();
+      ////fprintf(stdout, "CWelsThreadPool::OnTaskStop 1: Task %x at Thread %x Finished, m_pSink=%x\n", pTask, pThread, pTask->GetSink());
+    }
+    m_cBusyThreads->erase (pThread);
   }
   //if (m_pSink) {
   //  m_pSink->OnTaskExecuted (pTask);
@@ -306,15 +322,6 @@ WELS_THREAD_ERROR_CODE CWelsThreadPool::AddThreadToBusyList (CWelsTaskThread* pT
   return WELS_THREAD_ERROR_OK;
 }
 
-WELS_THREAD_ERROR_CODE CWelsThreadPool::RemoveThreadFromBusyList (CWelsTaskThread* pThread) {
-  CWelsAutoLock cLock (m_cLockBusyTasks);
-  if (m_cBusyThreads->erase (pThread)) {
-    return WELS_THREAD_ERROR_OK;
-  } else {
-    return WELS_THREAD_ERROR_GENERAL;
-  }
-}
-
 bool  CWelsThreadPool::AddTaskToWaitedList (IWelsTask* pTask) {
   CWelsAutoLock  cLock (m_cLockWaitedTasks);
 
@@ -336,6 +343,7 @@ CWelsTaskThread*   CWelsThreadPool::GetIdleThread() {
 }
 
 int32_t  CWelsThreadPool::GetBusyThreadNum() {
+  CWelsAutoLock cLock (m_cLockBusyTasks);
   return (m_cBusyThreads?m_cBusyThreads->size():0);
 }
 
@@ -370,6 +378,7 @@ void  CWelsThreadPool::ClearWaitedTasks() {
   while (0 != m_cWaitedTasks->size()) {
     pTask = m_cWaitedTasks->begin();
     if (pTask->GetSink()) {
+      CWelsAutoLock cBusyLock (m_cLockBusyTasks);
       pTask->GetSink()->OnTaskCancelled();
     }
     m_cWaitedTasks->pop_front();
