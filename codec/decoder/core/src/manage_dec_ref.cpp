@@ -921,6 +921,11 @@ static int32_t AddShortTermToList (PRefPic pRefPic, PPicture pPic) {
     memmove (&pRefPic->pShortRefList[LIST_0][1], &pRefPic->pShortRefList[LIST_0][0],
              pRefPic->uiShortRefCount[LIST_0]*sizeof (PPicture));//confirmed_safe_unsafe_usage
   }
+
+  if (pRefPic->uiShortRefCount[LIST_0] >= MAX_REF_PIC_COUNT) {
+    return ERR_INFO_OUT_OF_MEMORY;
+  }
+
   pRefPic->pShortRefList[LIST_0][0] = pPic;
   pRefPic->uiShortRefCount[LIST_0]++;
   return ERR_NONE;
