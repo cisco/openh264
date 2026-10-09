@@ -128,6 +128,13 @@ class CWelsDecoder : public ISVCDecoder {
   PWelsDecoderThreadCTX   m_pDecThrCtx;
   PWelsDecoderThreadCTX   m_pLastDecThrCtx;
   int32_t                 m_iLastBufferedIdx;
+  // Single-threaded EC-survival pin taken by BufferingReadyPicture() on the
+  // picture it just buffered (see BufferingReadyPicture()'s comment). Tracked
+  // here, at the same place the pin is taken, so the matching release can be
+  // gated on the identical condition instead of being reconstructed from
+  // decoder-core state that does not know whether a given picture was ever
+  // actually buffered (issue #3872).
+  PPicture                m_pECPinnedPic;
   WELS_MUTEX              m_csDecoder;
   SWelsDecEvent           m_sBufferingEvent;
   SWelsDecEvent           m_sReleaseBufferEvent;
