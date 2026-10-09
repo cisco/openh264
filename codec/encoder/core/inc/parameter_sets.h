@@ -56,8 +56,6 @@ int32_t         iLog2MaxPocLsb;
 // int8_t          iOffsetForRefFrame[256];
 SCropOffset     sFrameCrop;
 int16_t         iNumRefFrames;
-// uint32_t        uiNumUnitsInTick;
-// uint32_t        uiTimeScale;
 
 uint8_t         uiProfileIdc;
 uint8_t         iLevelIdc;
@@ -76,21 +74,23 @@ bool            bGapsInFrameNumValueAllowedFlag;
 bool            bFrameCroppingFlag;
 
 bool            bVuiParamPresentFlag;
-// bool            bTimingInfoPresentFlag;
-// bool            bFixedFrameRateFlag;
 
-// Note: members bVideoSignalTypePresent through uiColorMatrix below are also defined in SSpatialLayerConfig in codec_app_def.h,
+// Note: members bVideoSignalTypePresent through bFixedFrameRateFlag below are also defined in SSpatialLayerConfig in codec_app_def.h,
 // along with definitions for enumerators EVideoFormatSPS, EColorPrimaries, ETransferCharacteristics, and EColorMatrix.
-bool	bVideoSignalTypePresent;	// false => do not write any of the following information to the header
-uint8_t	uiVideoFormat;				// EVideoFormatSPS; 3 bits in header; 0-5 => component, kpal, ntsc, secam, mac, undef
-bool	bFullRange;					// false => analog video data range [16, 235]; true => full data range [0,255]
-bool	bColorDescriptionPresent;	// false => do not write any of the following three items to the header
-uint8_t	uiColorPrimaries;			// EColorPrimaries; 8 bits in header; 0 - 9 => ???, bt709, undef, ???, bt470m, bt470bg,
+bool	 bVideoSignalTypePresent;	// false => do not write any of the following information to the header
+uint8_t	 uiVideoFormat;				// EVideoFormatSPS; 3 bits in header; 0-5 => component, kpal, ntsc, secam, mac, undef
+bool	 bFullRange;				// false => analog video data range [16, 235]; true => full data range [0,255]
+bool	 bColorDescriptionPresent;	// false => do not write any of the following three items to the header
+uint8_t	 uiColorPrimaries;			// EColorPrimaries; 8 bits in header; 0 - 9 => ???, bt709, undef, ???, bt470m, bt470bg,
                                     //    smpte170m, smpte240m, film, bt2020
-uint8_t	uiTransferCharacteristics;	// ETransferCharacteristics; 8 bits in header; 0 - 15 => ???, bt709, undef, ???, bt470m, bt470bg, smpte170m,
+uint8_t	 uiTransferCharacteristics;	// ETransferCharacteristics; 8 bits in header; 0 - 15 => ???, bt709, undef, ???, bt470m, bt470bg, smpte170m,
                                     //   smpte240m, linear, log100, log316, iec61966-2-4, bt1361e, iec61966-2-1, bt2020-10, bt2020-12
-uint8_t	uiColorMatrix;				// EColorMatrix; 8 bits in header (corresponds to FFmpeg "colorspace"); 0 - 10 => GBR, bt709,
+uint8_t	 uiColorMatrix;				// EColorMatrix; 8 bits in header (corresponds to FFmpeg "colorspace"); 0 - 10 => GBR, bt709,
                                     //   undef, ???, fcc, bt470bg, smpte170m, smpte240m, YCgCo, bt2020nc, bt2020c
+bool     bTimingInfoPresentFlag;    // false => do not write any of the following three items to the header
+uint32_t uiNumUnitsInTick;          // clock tick time units: e.g. 1001 for a frame rate of 29.97 (30 000 ÷ 1001 Hz)
+uint32_t uiTimeScale;               // clock tick time scale: e.g. 60 000 for a frame rate of 29.97 (30 000 ÷ 1001 Hz)
+bool     bFixedFrameRateFlag;       // true => temporal distance between consecutive pictures in output order is constrained
 
 bool            bConstraintSet0Flag;
 bool            bConstraintSet1Flag;

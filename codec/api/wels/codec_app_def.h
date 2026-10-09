@@ -479,6 +479,10 @@ typedef struct {
   unsigned char
   uiColorMatrix;        // EColorMatrix; 8 bits in header (corresponds to FFmpeg "colorspace"); 0 - 10 => GBR, bt709,
   //   undef, ???, fcc, bt470bg, smpte170m, smpte240m, YCgCo, bt2020nc, bt2020c
+  bool bTimingInfoPresentFlag; // false => do not write any of the following three items to the header
+  unsigned uiNumUnitsInTick;   // clock tick time units: e.g. 1001 for a frame rate of 29.97 (30 000 ÷ 1001 Hz)
+  unsigned uiTimeScale;        // clock tick time scale: e.g. 60 000 for a frame rate of 29.97 (30 000 ÷ 1001 Hz)
+  bool bFixedFrameRateFlag;    // true => temporal distance between consecutive pictures in output order is constrained
 
   bool bAspectRatioPresent; ///< aspect ratio present in VUI
   ESampleAspectRatio eAspectRatio; ///< aspect ratio idc
