@@ -603,7 +603,7 @@ int32_t WelsReorderRefList2 (PWelsDecoderContext pCtx) {
           iPredFrameNum = pRefPicListReorderSyn->sReorderingSyn[listIdx][i].uiLongTermPicNum;
           for (j = 0; j < iLongRefCount; j++) {
             if (ppLongRefList[j] != NULL) {
-              if (ppLongRefList[j]->uiLongTermPicNum == (uint32_t)iPredFrameNum) {
+              if (ppLongRefList[j]->iLongTermFrameIdx == iPredFrameNum) {
                 ppRefList[iCount++] = ppLongRefList[j];
                 break;
               }
@@ -612,7 +612,7 @@ int32_t WelsReorderRefList2 (PWelsDecoderContext pCtx) {
           k = iCount;
           for (j = k; j <= iRefCount; j++) {
             if (ppRefList[j] != NULL) {
-              if (!ppRefList[j]->bIsLongRef || ppRefList[j]->uiLongTermPicNum != (uint32_t)iPredFrameNum)
+              if (!ppRefList[j]->bIsLongRef || ppRefList[j]->iLongTermFrameIdx != iPredFrameNum)
                 ppRefList[k++] = ppRefList[j];
             }
           }
