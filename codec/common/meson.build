@@ -18,6 +18,7 @@ cpp_sources = [
 ]
 
 objs_asm = []
+libs_asm = []
 if cpu_family in ['x86', 'x86_64']
   asm_sources = [
     'x86/cpuid.asm',
@@ -59,16 +60,26 @@ elif cpu_family == 'aarch64'
     cpp_sources += asm_sources
   endif
 elif cpu_family in ['loongarch32', 'loongarch64']
-  asm_sources = [
+  lsx_sources = [
     'loongarch/copy_mb_lsx.c',
     'loongarch/deblock_lsx.c',
     'loongarch/intra_pred_com_lsx.c',
-    'loongarch/intra_pred_com_lasx.c',
     'loongarch/mc_chroma_lsx.c',
     'loongarch/mc_horver_lsx.c',
+  ]
+  lasx_sources = [
+    'loongarch/intra_pred_com_lasx.c',
     'loongarch/satd_sad_lasx.c',
   ]
-  cpp_sources += asm_sources
+  libcommon_lsx = static_library('common_lsx', lsx_sources,
+    include_directories: [inc, casm_inc],
+    dependencies: deps,
+    c_args: ['-mlsx'])
+  libcommon_lasx = static_library('common_lasx', lasx_sources,
+    include_directories: [inc, casm_inc],
+    dependencies: deps,
+    c_args: ['-mlasx'])
+  libs_asm = [libcommon_lsx, libcommon_lasx]
 elif cpu_family == 'riscv64'
   asm_sources = []
 elif cpu_family == 'ppc'
@@ -81,4 +92,5 @@ endif
 
 libcommon = static_library('common', cpp_sources, objs_asm,
   include_directories: [inc, casm_inc],
+  link_whole: libs_asm,
   dependencies: deps)
