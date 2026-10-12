@@ -1313,6 +1313,11 @@ int32_t CalculateNewSliceNum (sWelsEncCtx* pCtx,
                              - pCtx->pCurDqLayer->FirstMbIdxOfPartition[iPartitionID] + 1;
   int32_t iLeftMBNum       = pCtx->pCurDqLayer->EndMbIdxOfPartition[iPartitionID]
                              - pCtx->pCurDqLayer->LastCodedMbIdxOfPartition[iPartitionID] + 1;
+  if (iMBNumInPatition <= 0) {
+    /* An empty partition (thread count not below the MB count) would divide
+     * by zero below; reject instead of crashing the encoder. */
+    return ENC_RETURN_INVALIDINPUT;
+  }
   int32_t iIncreaseSlicNum = (iLeftMBNum * INT_MULTIPLY / iMBNumInPatition) * iMaxSliceNumOld;
 
   iIncreaseSlicNum  = (0 == (iIncreaseSlicNum / INT_MULTIPLY)) ? 1 : (iIncreaseSlicNum / INT_MULTIPLY);
