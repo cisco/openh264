@@ -63,6 +63,8 @@ int32_t WelsTargetSliceConstruction (PWelsDecoderContext pCtx); //construction b
 
 int32_t WelsDecodeSlice (PWelsDecoderContext pCtx, bool bFirstSliceInLayer, PNalUnit pNalCur);
 int32_t WelsDecodeAndConstructSlice (PWelsDecoderContext pCtx);
+void WelsDbkPadQInit (PWelsDecoderContext pCtx, int32_t iMbWidth);
+void WelsDbkPadQFlush (PWelsDecoderContext pCtx);
 
 int32_t WelsTargetMbConstruction (PWelsDecoderContext pCtx);
 

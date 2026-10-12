@@ -478,7 +478,9 @@ void DoErrorConSliceMVCopy (PWelsDecoderContext pCtx) {
 
 //Mark erroneous frame as Ref Pic into DPB
 int32_t MarkECFrameAsRef (PWelsDecoderContext pCtx) {
+  DpbRefLock (pCtx);
   int32_t iRet = WelsMarkAsRef (pCtx);
+  DpbRefUnlock (pCtx);
   // Under EC mode, the ERR_INFO_DUPLICATE_FRAME_NUM does not need to be process
   if (iRet != ERR_NONE) {
     return iRet;

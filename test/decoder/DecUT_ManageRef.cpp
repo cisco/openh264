@@ -110,8 +110,11 @@ TEST_F (ManageDecRefMmco5Test, Mmco5ResetInvalidatesThreadedSnapshot) {
         << "stale reference picture pointer leaked into sTmpRefPic after MMCO5 reset";
   }
 
-  // sRefPic (the persistent, non-threaded list) is always cleared directly
-  // by WelsResetRefPic(), independent of this fix.
-  EXPECT_EQ (0u, ctx_.sRefPic.uiShortRefCount[LIST_0]);
-  EXPECT_EQ (0u, ctx_.sRefPic.uiLongRefCount[LIST_0]);
+  // sRefPic is the predecessor worker's live list. On the threaded handoff the successor
+  // performs this marking after only sSliceDecodeStart, so the predecessor may still be
+  // decoding later slices against it: the reset must confine itself to the snapshot it was
+  // given and leave that list as it found it.
+  EXPECT_EQ (1u, ctx_.sRefPic.uiShortRefCount[LIST_0])
+      << "MMCO5 reset cleared the predecessor's live reference list";
+  EXPECT_EQ (&stalePic_, ctx_.sRefPic.pShortRefList[LIST_0][0]);
 }

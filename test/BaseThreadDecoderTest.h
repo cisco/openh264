@@ -44,6 +44,11 @@ class BaseThreadDecoderTest {
   bool Open (const char* fileName);
   ISVCDecoder* decoder_;
 
+ protected:
+  //Drain by flushing until a call produces nothing, instead of asking how many frames are
+  //left first. Only this order exercises the wait inside FlushFrame().
+  bool bDrainByFlushOnly;
+
  private:
   void DecodeFrame (const uint8_t* src, size_t sliceSize, Callback* cbk);
   void FlushFrame (Callback* cbk);

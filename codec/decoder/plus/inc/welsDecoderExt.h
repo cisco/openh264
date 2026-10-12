@@ -150,8 +150,7 @@ class CWelsDecoder : public ISVCDecoder {
 
   void OutputStatisticsLog (SDecoderStatistics& sDecoderStatistics);
   DECODING_STATE ReorderPicturesInDisplay (PWelsDecoderContext pCtx, unsigned char** ppDst, SBufferInfo* pDstInfo);
-  int ThreadDecodeFrameInternal (const unsigned char* kpSrc, const int kiSrcLen, unsigned char** ppDst,
-                                 SBufferInfo* pDstInfo);
+  int ThreadDecodeFrameInternal (const unsigned char* kpSrc, const int kiSrcLen, SBufferInfo* pDstInfo);
   void BufferingReadyPicture (PWelsDecoderContext pCtx, unsigned char** ppDst, SBufferInfo* pDstInfo);
   void ReleaseBufferedReadyPictureReorder (PWelsDecoderContext pCtx, unsigned char** ppDst, SBufferInfo* pDstInfo, bool isFlush = false);
   void ReleaseBufferedReadyPictureNoReorder (PWelsDecoderContext pCtx, unsigned char** ppDst, SBufferInfo* pDstInfo);

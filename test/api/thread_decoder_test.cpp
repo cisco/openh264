@@ -803,6 +803,41 @@ TEST_F (ThreadDecoderPreviousPicRaceTest, ThreadedOutputIsConsistent) {
 // error-free and the decoded frame count is stable across runs. This exercises
 // the guarded enqueue/dequeue path and guards against output regression from
 // the added locking.
+// FlushFrame() waits for the workers to go idle before it reports the queue empty. A caller
+// that drains by flushing until nothing comes out -- libavcodec's libopenh264dec.c does -- would
+// otherwise stop while a worker is still on its way to BufferingReadyPicture() and lose the
+// frames it had not published yet. Every other threaded test asks for
+// DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER first, and that query waits by itself, so
+// none of them can tell whether FlushFrame() does.
+class ThreadDecoderFlushDrainTest : public ThreadDecoderInitTest,
+  public BaseThreadDecoderTest::Callback {
+ public:
+  virtual void SetUp() {
+    ThreadDecoderInitTest::SetUp();
+    iDecodedFrames_ = 0;
+    bDrainByFlushOnly = true;
+  }
+  virtual void onDecodeFrame (const Frame& frame) {
+    if (frame.y.data != NULL && frame.u.data != NULL && frame.v.data != NULL) {
+      ++iDecodedFrames_;
+    }
+  }
+ protected:
+  int iDecodedFrames_;
+};
+
+TEST_F (ThreadDecoderFlushDrainTest, FlushOnlyDrainProducesAllFrames) {
+  const char* kFileName = "res/Adobe_PDF_sample_a_1024x768_50Frms.264";
+#if defined(ANDROID_NDK)
+  std::string filename = std::string ("/sdcard/") + kFileName;
+  ASSERT_TRUE (ThreadDecodeFile (filename.c_str(), this));
+#else
+  ASSERT_TRUE (ThreadDecodeFile (kFileName, this));
+#endif
+  ASSERT_FALSE (HasFatalFailure());
+  EXPECT_EQ (iDecodedFrames_, 50);
+}
+
 class ThreadDecoderReorderQueueRaceTest : public ThreadDecoderInitTest,
   public BaseThreadDecoderTest::Callback {
  public:
