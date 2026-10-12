@@ -1,6 +1,7 @@
 ;*!
 ;* \copy
 ;*     Copyright (c)  2009-2013, Cisco Systems
+;*     Copyright (c)  2026, Richard Ben Aleya
 ;*     All rights reserved.
 ;*
 ;*     Redistribution and use in source and binary forms, with or without
@@ -1127,3 +1128,219 @@ WELS_EXTERN WelsI16x16LumaPredDc_sse2
     pop r4
     pop r3
     ret
+
+%ifdef HAVE_AVX2
+
+;***********************************************************************
+; void WelsI16x16LumaPredDc_avx2(uint8_t *pred, uint8_t *pRef, int32_t stride);
+;***********************************************************************
+WELS_EXTERN WelsI16x16LumaPredDc_avx2
+    push r3
+    push r4
+    %assign push_num 2
+    LOAD_3_PARA
+    SIGN_EXTENSION r2, r2d
+    sub         r1, r2
+    vmovdqa     xmm0, [r1]
+    vpxor       xmm1, xmm1, xmm1
+    vpsadbw     xmm0, xmm0, xmm1
+    vpsrldq     xmm1, xmm0, 8
+    vpaddw      xmm0, xmm0, xmm1
+
+    movzx       r3, byte [r1+r2-0x01]
+    movzx       r4, byte [r1+2*r2-0x01]
+    add         r3, r4
+    lea         r1, [r1+r2]
+    LOAD_2_LEFT_AND_ADD
+    LOAD_2_LEFT_AND_ADD
+    LOAD_2_LEFT_AND_ADD
+    LOAD_2_LEFT_AND_ADD
+    LOAD_2_LEFT_AND_ADD
+    LOAD_2_LEFT_AND_ADD
+    LOAD_2_LEFT_AND_ADD
+    add         r3, 0x10
+    vmovd       xmm1, r3d
+    vpaddw      xmm0, xmm0, xmm1
+    vpsrld      xmm0, xmm0, 5
+    vpbroadcastb ymm0, xmm0
+
+    vmovdqu     [r0],      ymm0
+    vmovdqu     [r0+32],   ymm0
+    vmovdqu     [r0+64],   ymm0
+    vmovdqu     [r0+96],   ymm0
+    vmovdqu     [r0+128],  ymm0
+    vmovdqu     [r0+160],  ymm0
+    vmovdqu     [r0+192],  ymm0
+    vmovdqu     [r0+224],  ymm0
+    vzeroupper
+    pop r4
+    pop r3
+    ret
+
+;***********************************************************************
+; void WelsI16x16LumaPredPlane_avx2(uint8_t *pred, uint8_t *pRef, int32_t stride);
+;***********************************************************************
+WELS_EXTERN WelsI16x16LumaPredPlane_avx2
+    push r3
+    push r4
+    %assign push_num 2
+    INIT_X86_32_PIC r5
+    LOAD_3_PARA
+    PUSH_XMM 6
+    SIGN_EXTENSION r2, r2d
+    sub     r1, 1
+    sub     r1, r2
+
+    ; Compute H (horizontal gradient of top row)
+    vpxor       xmm7, xmm7, xmm7
+    vmovq       xmm0, [r1]
+    vmovdqa     xmm5, [pic(sse2_plane_dec)]
+    vpunpcklbw  xmm0, xmm0, xmm7
+    vpmullw     xmm0, xmm0, xmm5
+    vmovq       xmm1, [r1 + 9]
+    vmovdqa     xmm6, [pic(sse2_plane_inc)]
+    vpunpcklbw  xmm1, xmm1, xmm7
+    vpmullw     xmm1, xmm1, xmm6
+    vpsubw      xmm1, xmm1, xmm0
+
+    ; Horizontal sum -> H
+    vpsrldq     xmm0, xmm1, 8
+    vpaddw      xmm1, xmm1, xmm0
+    vpsrldq     xmm0, xmm1, 4
+    vpaddw      xmm1, xmm1, xmm0
+    vpsrldq     xmm0, xmm1, 2
+    vpaddw      xmm1, xmm1, xmm0
+
+    vmovd       r3d, xmm1
+    movsx       r3, r3w
+    imul        r3, 5
+    add         r3, 32
+    sar         r3, 6           ; b = (5 * H + 32) >> 6
+    vmovd       xmm1, r3d
+    vpbroadcastw ymm1, xmm1    ; ymm1 = b (16 words)
+
+    ; Load top[15]
+    movzx       r4, BYTE [r1+16]
+
+    ; Load upper column (rows 0-7 of left border) using VEX instructions
+    sub         r1, 3
+    vmovd       xmm0, [r1]
+    vmovd       xmm2, [r1+r2]
+    vpunpcklbw  xmm0, xmm0, xmm2
+    lea         r1, [r1+2*r2]
+    vmovd       xmm3, [r1]
+    vmovd       xmm2, [r1+r2]
+    vpunpcklbw  xmm3, xmm3, xmm2
+    vpunpcklwd  xmm0, xmm0, xmm3
+    lea         r1, [r1+2*r2]
+    vmovd       xmm4, [r1]
+    vmovd       xmm2, [r1+r2]
+    vpunpcklbw  xmm4, xmm4, xmm2
+    lea         r1, [r1+2*r2]
+    vmovd       xmm3, [r1]
+    vmovd       xmm2, [r1+r2]
+    lea         r1, [r1+2*r2]
+    vpunpcklbw  xmm3, xmm3, xmm2
+    vpunpcklwd  xmm4, xmm4, xmm3
+    vpunpckhdq  xmm0, xmm0, xmm4
+
+    ; Get left[15*stride]
+    add         r1, 3
+    movzx       r3, BYTE [r1+8*r2]
+    add         r4, r3
+    shl         r4, 4           ; a = (left[15*stride] + top[15]) << 4
+
+    ; Load lower column (rows 8-15 of left border) using VEX instructions
+    sub         r1, 3
+    add         r1, r2
+    vmovd       xmm7, [r1]
+    vmovd       xmm2, [r1+r2]
+    vpunpcklbw  xmm7, xmm7, xmm2
+    lea         r1, [r1+2*r2]
+    vmovd       xmm3, [r1]
+    vmovd       xmm2, [r1+r2]
+    vpunpcklbw  xmm3, xmm3, xmm2
+    vpunpcklwd  xmm7, xmm7, xmm3
+    lea         r1, [r1+2*r2]
+    vmovd       xmm4, [r1]
+    vmovd       xmm2, [r1+r2]
+    vpunpcklbw  xmm4, xmm4, xmm2
+    lea         r1, [r1+2*r2]
+    vmovd       xmm3, [r1]
+    vmovd       xmm2, [r1+r2]
+    lea         r1, [r1+2*r2]
+    vpunpcklbw  xmm3, xmm3, xmm2
+    vpunpcklwd  xmm4, xmm4, xmm3
+    vpunpckhdq  xmm7, xmm7, xmm4
+
+    ; Compute V gradient
+    vpxor       xmm4, xmm4, xmm4
+    vpunpckhbw  xmm0, xmm0, xmm4
+    vpmullw     xmm0, xmm0, xmm5
+    vpunpckhbw  xmm7, xmm7, xmm4
+    vpmullw     xmm7, xmm7, xmm6
+    vpsubw      xmm7, xmm7, xmm0
+
+    ; Horizontal sum -> V
+    vpsrldq     xmm0, xmm7, 8
+    vpaddw      xmm7, xmm7, xmm0
+    vpsrldq     xmm0, xmm7, 4
+    vpaddw      xmm7, xmm7, xmm0
+    vpsrldq     xmm0, xmm7, 2
+    vpaddw      xmm7, xmm7, xmm0
+
+    vmovd       r3d, xmm7
+    movsx       r3, r3w
+    imul        r3, 5
+    add         r3, 32
+    sar         r3, 6           ; c = (5 * V + 32) >> 6
+    vmovd       xmm4, r3d
+    vpbroadcastw ymm4, xmm4    ; ymm4 = c (16 words)
+
+    ; s = a + 16 + (-7)*c
+    add         r4, 16
+    imul        r3, -7
+    add         r3, r4
+    vmovd       xmm0, r3d
+    vpbroadcastw ymm0, xmm0    ; ymm0 = s (16 words)
+
+    ; Build 256-bit multiplier: [-7,-6,-5,-4,-3,-2,-1,0 | 1,2,3,4,5,6,7,8]
+    vmovdqa     xmm5, [pic(sse2_plane_inc_minus)]
+    vinserti128 ymm5, ymm5, [pic(sse2_plane_inc)], 1
+
+    xor         r3, r3
+.loop_plane_avx2:
+    vpmullw     ymm2, ymm1, ymm5       ; b * [-7..8]
+    vpaddw      ymm2, ymm2, ymm0       ; + s
+    vpsraw      ymm2, ymm2, 5          ; >> 5
+    vpackuswb   ymm2, ymm2, ymm2       ; pack to bytes (within each lane)
+    vpermq      ymm2, ymm2, 0x08       ; gather low qwords from each lane
+    vmovdqu     [r0], xmm2             ; store 16 bytes
+    vpaddw      ymm0, ymm0, ymm4       ; s += c
+    add         r0, 16
+    inc         r3
+    cmp         r3, 16
+    jnz         .loop_plane_avx2
+
+    vzeroupper
+    POP_XMM
+    DEINIT_X86_32_PIC
+    pop r4
+    pop r3
+    ret
+
+;***********************************************************************
+; void WelsIChromaPredV_avx2(uint8_t *pred, uint8_t *pRef, int32_t stride);
+;***********************************************************************
+WELS_EXTERN WelsIChromaPredV_avx2
+    %assign push_num 0
+    LOAD_3_PARA
+    SIGN_EXTENSION r2, r2d
+    sub     r1, r2
+    vpbroadcastq ymm0, [r1]
+    vmovdqu [r0],    ymm0
+    vmovdqu [r0+32], ymm0
+    vzeroupper
+    ret
+
+%endif ; HAVE_AVX2
