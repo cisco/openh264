@@ -44,6 +44,10 @@
 #if defined (ANDROID_NDK)
 #include <android/log.h>
 #endif
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 #include "codec_def.h"
 #include "codec_app_def.h"
 #include "codec_api.h"
@@ -58,6 +62,13 @@ using namespace std;
 double g_dDecTime = 0.0;
 float  g_fDecFPS = 0.0;
 int    g_iDecodedFrameNum = 0;
+#endif
+
+#if defined(NODEFS)
+#define CWD "/workload/"
+#endif
+#if defined(MEMFS)
+#define CWD "testbin/workload/"
 #endif
 
 #if defined(ANDROID_NDK)
@@ -255,7 +266,7 @@ void H264DecodeInstance (ISVCDecoder* pDecoder, const char* kpH264FileName, cons
   if (kpH264FileName) {
     pH264File = fopen (kpH264FileName, "rb");
     if (pH264File == NULL) {
-      fprintf (stderr, "Can not open h264 source file, check its legal path related please..\n");
+      fprintf (stderr, "Can not open h264 source file: %s, check its legal path related please..\n", kpH264FileName);
       return;
     }
     fprintf (stderr, "H264 source file name: %s..\n", kpH264FileName);
@@ -503,6 +514,13 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
   sDecParam.sVideoProperty.size = sizeof (sDecParam.sVideoProperty);
   sDecParam.eEcActiveIdc = ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE;
 
+#if defined(NODEFS)
+  EM_ASM(
+    FS.mkdir('/workload');
+    FS.mount(NODEFS, { root: '.' }, '/workload');
+  );
+#endif
+
   if (iArgC < 2) {
     printf ("usage 1: h264dec.exe welsdec.cfg\n");
     printf ("usage 2: h264dec.exe welsdec.264 out.yuv\n");
@@ -510,7 +528,13 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
     return 1;
   } else if (iArgC == 2) {
     if (strstr (pArgV[1], ".cfg")) { // read config file //confirmed_safe_unsafe_usage
-      CReadConfig cReadCfg (pArgV[1]);
+      string cfgFilePath;
+#if defined(NODEFS) || defined(MEMFS)
+      cfgFilePath = string(CWD) + string(pArgV[1]);
+#else 
+      cfgFilePath = string(pArgV[1]);
+#endif
+      CReadConfig cReadCfg (cfgFilePath.c_str());
       string strTag[4];
       string strReconFile ("");
 
@@ -552,14 +576,23 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
       }
     } else if (strstr (pArgV[1],
                        ".264")) { // no output dump yuv file, just try to render the decoded pictures //confirmed_safe_unsafe_usage
+#if defined(NODEFS) || defined(MEMFS)
+      strInputFile = string(CWD) + string(pArgV[1]);
+#else
       strInputFile = pArgV[1];
+#endif
       sDecParam.uiTargetDqLayer = (uint8_t) - 1;
       sDecParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
       sDecParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
     }
   } else { //iArgC > 2
+#if defined(NODEFS) || defined(MEMFS)
+    strInputFile = string(CWD) + string(pArgV[1]);
+    strOutputFile = string(CWD) + string(pArgV[2]);
+#else
     strInputFile = pArgV[1];
     strOutputFile = pArgV[2];
+#endif
     sDecParam.uiTargetDqLayer = (uint8_t) - 1;
     sDecParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
     sDecParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
@@ -569,7 +602,11 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
 
         if (!strcmp (cmd, "-options")) {
           if (i + 1 < iArgC)
+#if defined(NODEFS) || defined(MEMFS)
+            strOptionFile = string(CWD) + string(pArgV[++i]);
+#else         
             strOptionFile = pArgV[++i];
+#endif
           else {
             printf ("options file not specified.\n");
             return 1;
@@ -583,7 +620,11 @@ int32_t main (int32_t iArgC, char* pArgV[]) {
           }
         } else if (!strcmp (cmd, "-length")) {
           if (i + 1 < iArgC)
+#if defined(NODEFS) || defined(MEMFS)
+            strLengthFile = string(CWD) + string(pArgV[++i]);
+#else
             strLengthFile = pArgV[++i];
+#endif
           else {
             printf ("lenght file not specified.\n");
             return 1;

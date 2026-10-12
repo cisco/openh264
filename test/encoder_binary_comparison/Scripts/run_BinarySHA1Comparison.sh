@@ -171,9 +171,14 @@ runEncodeOneCase()
     do
         EncoderCommand="${EncoderCommand} ${aEncoderCommandSet[$i]}  ${aEncoderCommandValue[$i]} "
     done
-
-    EncoderCommand="./h264enc welsenc.cfg -lconfig 0 layer0.cfg -lconfig 1 layer1.cfg -lconfig 2 layer2.cfg  -lconfig 3 layer3.cfg \
+    if [ "$TestWasm" = "0" ]
+    then
+        EncoderCommand="./h264enc welsenc.cfg -lconfig 0 layer0.cfg -lconfig 1 layer1.cfg -lconfig 2 layer2.cfg  -lconfig 3 layer3.cfg \
                     -bf ${BitStreamFile} -org ${TestSequencePath}/${TestYUVName} ${RecParam} ${EncoderCommand}"
+    else 
+        EncoderCommand="node ./h264enc.js welsenc.cfg -lconfig 0 layer0.cfg -lconfig 1 layer1.cfg -lconfig 2 layer2.cfg  -lconfig 3 layer3.cfg \
+                    -bf ${BitStreamFile} -org ${TestSequencePath}/${TestYUVName} ${RecParam} ${EncoderCommand}"
+    fi
     echo -e "\n---------------Encode One Case-------------------------------------------"
     echo -e "case encode command is : \n ${EncoderCommand} "
 
