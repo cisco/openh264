@@ -913,7 +913,14 @@ static int32_t AddShortTermToList (PRefPic pRefPic, PPicture pPic) {
       }
       if (pPic->iFrameNum == pRefPic->pShortRefList[LIST_0][iPos]->iFrameNum) {
         // Replace the previous ref pic with the new one with the same frame_num
+        PPicture pDisplaced = pRefPic->pShortRefList[LIST_0][iPos];
         pRefPic->pShortRefList[LIST_0][iPos] = pPic;
+        if (pDisplaced != pPic) {
+          //The displaced picture leaves the reference list here and nothing takes it out
+          //again, so without this it keeps bUsedAsRef and PrefetchPic() never sees its buffer
+          //free. Release it the way every other removal from this list does.
+          SetUnRef (pDisplaced);
+        }
         return ERR_INFO_DUPLICATE_FRAME_NUM;
       }
     }
