@@ -1010,7 +1010,7 @@ int32_t GetInterBPred (uint8_t* pPredYCbCr[3], uint8_t* pTempPredYCbCr[3], PWels
             iMVs[1] = pCurDqLayer->pDec->pMv[LIST_0][iMBXY][iIIdx + iJIdx][1];
             BaseMC (pCtx, &pMCRefMem, LIST_0, iRefIndex0, iXOffset + iBlk4X, iYOffset + iBlk4Y, pMCFunc, 4, 4, iMVs);
 
-            pTempMCRefMem.pDstY = pDstY2 + iBlk8X + iBlk8Y * iDstLineLuma;
+            pTempMCRefMem.pDstY = pDstY2 + iBlk4X + iBlk4Y * iDstLineLuma;
             pTempMCRefMem.pDstU = pDstU2 + iUVLineStride;
             pTempMCRefMem.pDstV = pDstV2 + iUVLineStride;;
 
