@@ -59,6 +59,9 @@ class  CWelsThreadPool : public CWelsThread, public IWelsTaskThreadSink {
   static WELS_THREAD_ERROR_CODE SetThreadNum (int32_t iMaxThreadNum);
 
   static CWelsThreadPool* AddReference();
+  // After RemoveInstance() returns, the pool will not call into any sink or
+  // touch any task that was queued by the caller. Sinks must therefore not
+  // call AddReference()/RemoveInstance()/IsReferenced() from within callbacks.
   void RemoveInstance();
 
   static bool IsReferenced();
@@ -84,7 +87,6 @@ class  CWelsThreadPool : public CWelsThread, public IWelsTaskThreadSink {
   void           DestroyThread (CWelsTaskThread* pThread);
   WELS_THREAD_ERROR_CODE AddThreadToIdleQueue (CWelsTaskThread* pThread);
   WELS_THREAD_ERROR_CODE AddThreadToBusyList (CWelsTaskThread* pThread);
-  WELS_THREAD_ERROR_CODE RemoveThreadFromBusyList (CWelsTaskThread* pThread);
   bool           AddTaskToWaitedList (IWelsTask* pTask);
   CWelsTaskThread*   GetIdleThread();
   IWelsTask*         GetWaitedTask();
@@ -110,7 +112,7 @@ class  CWelsThreadPool : public CWelsThread, public IWelsTaskThreadSink {
   CWelsLock   m_cLockPool;
   CWelsLock   m_cLockWaitedTasks;
   CWelsLock   m_cLockIdleTasks;
-  CWelsLock   m_cLockBusyTasks;
+  CWelsLock   m_cLockBusyTasks; // guards m_cBusyThreads and serializes sink callbacks
 
   DISALLOW_COPY_AND_ASSIGN (CWelsThreadPool);
 };

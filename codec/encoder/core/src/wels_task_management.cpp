@@ -124,10 +124,14 @@ WelsErrorType CWelsTaskManageBase::Init (sWelsEncCtx* pEncCtx) {
 }
 
 void   CWelsTaskManageBase::Uninit() {
-  DestroyTasks();
   //fprintf(stdout, "m_pThreadPool = m_pThreadPool->RemoveInstance\n");
-  if (m_pThreadPool)
+  if (m_pThreadPool) {
+    // Release the thread pool reference first to ensure no worker thread is
+    // still inside OnTaskExecuted() before destroying tasks, events, and mutexes.
     m_pThreadPool->RemoveInstance();
+    m_pThreadPool = NULL;
+  }
+  DestroyTasks();
   //WELS_DELETE_OP (m_pThreadPool);
 
   //fprintf(stdout, "m_pThreadPool = m_pThreadPool->RemoveInstance2\n");
@@ -200,7 +204,6 @@ void CWelsTaskManageBase::DestroyTasks() {
 
 void  CWelsTaskManageBase::OnTaskMinusOne() {
   //fprintf(stdout, "OnTaskMinusOne event %x m_iWaitTaskNum=%d\n", &m_hEventMutex, m_iWaitTaskNum);
-  WelsCommon::CWelsAutoLock cAutoLock (m_cWaitTaskNumLock);
   WelsEventSignal (&m_hTaskEvent, &m_hEventMutex, &m_iWaitTaskNum);
   /*WelsMutexLock(&m_hEventMutex);
   m_iWaitTaskNum --;

@@ -145,3 +145,85 @@ TEST_F(CThreadPoolTestFixture, PartialInitLeakUAF) {
 
   WelsThreadPoolTestUtil::SendSignalToOtherThreads();
 }
+
+namespace {
+
+class CSyncEvent {
+ public:
+  CSyncEvent() : m_iCond (1) {
+    WelsMutexInit (&m_hMutex);
+    WelsEventOpen (&m_hEvent);
+  }
+  ~CSyncEvent() {
+    WelsEventClose (&m_hEvent);
+    WelsMutexDestroy (&m_hMutex);
+  }
+  void Signal() {
+    WelsEventSignal (&m_hEvent, &m_hMutex, &m_iCond);
+  }
+  void Wait() {
+    WelsEventWait (&m_hEvent, &m_hMutex, m_iCond);
+  }
+
+ private:
+  WELS_EVENT m_hEvent;
+  WELS_MUTEX m_hMutex;
+  int m_iCond;
+};
+
+class CImmediateTask : public IWelsTask {
+ public:
+  explicit CImmediateTask (WelsCommon::IWelsTaskSink* pSink) : IWelsTask (pSink) {}
+  virtual ~CImmediateTask() {}
+  virtual int32_t Execute() {
+    return cmResultSuccess;
+  }
+};
+
+// Sink whose OnTaskExecuted() signals the test thread upon entry and waits
+// until the test thread is ready to call RemoveInstance() before lingering.
+class CLingeringSink : public CThreadPoolTest {
+ public:
+  CLingeringSink() : m_iCallbacksReturned (0) {}
+
+  virtual int32_t OnTaskExecuted() {
+    int32_t iRet = CThreadPoolTest::OnTaskExecuted();
+    m_cCallbackEntered.Signal();
+    m_cRemoveStarted.Wait();
+    WelsSleep (5);
+    m_iCallbacksReturned ++;
+    return iRet;
+  }
+
+  CSyncEvent m_cCallbackEntered;
+  CSyncEvent m_cRemoveStarted;
+  volatile int32_t m_iCallbacksReturned;
+};
+
+} // namespace
+
+// Once RemoveInstance() has returned, the pool must no longer be inside any
+// callback of the caller's sink, even when other references keep the pool and
+// its worker threads alive.
+TEST (CThreadPoolTest, NoCallbackInFlightAfterRemoveInstance) {
+  CWelsThreadPool* pKeepAlive = CWelsThreadPool::AddReference();
+  ASSERT_TRUE (pKeepAlive != NULL);
+
+  for (int32_t i = 0; i < 5; i++) {
+    CLingeringSink cSink;
+    CImmediateTask cTask (&cSink);
+    CWelsThreadPool* pPool = CWelsThreadPool::AddReference();
+    ASSERT_TRUE (pPool != NULL);
+    ASSERT_EQ (WELS_THREAD_ERROR_OK, pPool->QueueTask (&cTask));
+    cSink.m_cCallbackEntered.Wait();
+    cSink.m_cRemoveStarted.Signal();
+    pPool->RemoveInstance();
+    EXPECT_EQ (1, cSink.m_iCallbacksReturned) << "iteration " << i;
+    while (cSink.m_iCallbacksReturned < 1) {
+      WelsSleep (1);  // keep cSink alive until the worker is done with it
+    }
+  }
+
+  pKeepAlive->RemoveInstance();
+}
+
