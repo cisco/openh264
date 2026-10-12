@@ -363,3 +363,80 @@ TEST (ErrorConTest, DoErrorConSliceCopyResolutionMismatchFallsBackToFill) {
                128));
   FreeInputData (pECCtx);
 }
+
+// Regression tests for issue #3925: NeedErrorCon must not scan pMbCorrectlyDecodedFlag
+// beyond the current picture / allocated buffer when pCtx->pSps has switched to a larger
+// resolution. The flag storage is over-allocated and the tail is marked "not decoded", so
+// an unbounded scan returns true instead of reading out of bounds.
+#define EC_SMALL_MB_W 7
+#define EC_SMALL_MB_H 4
+#define EC_LARGE_MB_W 10
+#define EC_LARGE_MB_H 10
+
+typedef struct TagNeedECCtx {
+  SWelsDecoderContext* pCtx;
+  SSps sSps;
+  SPicture sPic;
+  SDqLayer sDqLayer;
+  bool* pSMbFlag;
+  bool* pPicFlag;
+} SNeedECCtx;
+
+static void InitNeedECCtx (SNeedECCtx& sNeedEC) {
+  const int32_t kiSmallMbNum = EC_SMALL_MB_W * EC_SMALL_MB_H;
+  const int32_t kiLargeMbNum = EC_LARGE_MB_W * EC_LARGE_MB_H;
+  memset (&sNeedEC, 0, sizeof (sNeedEC));
+  sNeedEC.pCtx = (PWelsDecoderContext) WelsMallocz (sizeof (SWelsDecoderContext), "sNeedEC.pCtx");
+  sNeedEC.pSMbFlag = (bool*) WelsMallocz (kiLargeMbNum * sizeof (bool), "sNeedEC.pSMbFlag");
+  sNeedEC.pPicFlag = (bool*) WelsMallocz (kiLargeMbNum * sizeof (bool), "sNeedEC.pPicFlag");
+  ASSERT_TRUE (sNeedEC.pCtx != NULL && sNeedEC.pSMbFlag != NULL && sNeedEC.pPicFlag != NULL);
+  memset (sNeedEC.pSMbFlag, 1, kiSmallMbNum * sizeof (bool)); // tail stays "not decoded"
+  memset (sNeedEC.pPicFlag, 1, kiSmallMbNum * sizeof (bool));
+
+  // The picture being finished was started with the small SPS...
+  sNeedEC.pCtx->sMb.iMbWidth = EC_SMALL_MB_W;
+  sNeedEC.pCtx->sMb.iMbHeight = EC_SMALL_MB_H;
+  sNeedEC.pCtx->sMb.pMbCorrectlyDecodedFlag[0] = sNeedEC.pSMbFlag;
+  sNeedEC.sPic.iMbNum = kiSmallMbNum;
+  sNeedEC.sPic.pMbCorrectlyDecodedFlag = sNeedEC.pPicFlag;
+  sNeedEC.pCtx->pDec = &sNeedEC.sPic;
+  sNeedEC.pCtx->pCurDqLayer = &sNeedEC.sDqLayer;
+  // ...but the active SPS now describes a larger frame.
+  sNeedEC.sSps.iMbWidth = EC_LARGE_MB_W;
+  sNeedEC.sSps.iMbHeight = EC_LARGE_MB_H;
+  sNeedEC.pCtx->pSps = &sNeedEC.sSps;
+}
+
+static void FreeNeedECCtx (SNeedECCtx& sNeedEC) {
+  WELS_SAFE_FREE (sNeedEC.pPicFlag, "sNeedEC.pPicFlag");
+  WELS_SAFE_FREE (sNeedEC.pSMbFlag, "sNeedEC.pSMbFlag");
+  WELS_SAFE_FREE (sNeedEC.pCtx, "sNeedEC.pCtx");
+}
+
+TEST (ErrorConTest, NeedErrorConBoundedBySMbBufferOnSpsChange) {
+  SNeedECCtx sNeedEC;
+  InitNeedECCtx (sNeedEC);
+  sNeedEC.sDqLayer.pMbCorrectlyDecodedFlag = sNeedEC.pSMbFlag;
+  sNeedEC.sPic.iMbNum = EC_LARGE_MB_W * EC_LARGE_MB_H; // only the sMb allocation bounds the scan
+  EXPECT_FALSE (NeedErrorCon (sNeedEC.pCtx));
+  FreeNeedECCtx (sNeedEC);
+}
+
+TEST (ErrorConTest, NeedErrorConBoundedByPictureMbNumOnSpsChange) {
+  SNeedECCtx sNeedEC;
+  InitNeedECCtx (sNeedEC);
+  sNeedEC.sDqLayer.pMbCorrectlyDecodedFlag = sNeedEC.pPicFlag; // threaded path uses the picture's flags
+  sNeedEC.pCtx->sMb.iMbWidth = EC_LARGE_MB_W;
+  sNeedEC.pCtx->sMb.iMbHeight = EC_LARGE_MB_H;
+  EXPECT_FALSE (NeedErrorCon (sNeedEC.pCtx));
+  FreeNeedECCtx (sNeedEC);
+}
+
+TEST (ErrorConTest, NeedErrorConStillDetectsMissingMbs) {
+  SNeedECCtx sNeedEC;
+  InitNeedECCtx (sNeedEC);
+  sNeedEC.sDqLayer.pMbCorrectlyDecodedFlag = sNeedEC.pSMbFlag;
+  sNeedEC.pSMbFlag[EC_SMALL_MB_W * EC_SMALL_MB_H - 1] = false;
+  EXPECT_TRUE (NeedErrorCon (sNeedEC.pCtx));
+  FreeNeedECCtx (sNeedEC);
+}

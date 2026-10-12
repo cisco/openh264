@@ -492,9 +492,19 @@ int32_t MarkECFrameAsRef (PWelsDecoderContext pCtx) {
 
 bool NeedErrorCon (PWelsDecoderContext pCtx) {
   bool bNeedEC = false;
+  bool* pMbCorrectlyDecodedFlag = pCtx->pCurDqLayer->pMbCorrectlyDecodedFlag;
+  if (pMbCorrectlyDecodedFlag == NULL)
+    return false;
   int32_t iMbNum = pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight;
+  // pCtx->pSps may have been replaced by an SPS with a different resolution after the
+  // current picture started, so never scan beyond the MBs of the picture being decoded
+  // or beyond the flag buffer that was actually allocated.
+  if (pCtx->pDec != NULL)
+    iMbNum = WELS_MIN (iMbNum, pCtx->pDec->iMbNum);
+  if (pCtx->pDec == NULL || pMbCorrectlyDecodedFlag != pCtx->pDec->pMbCorrectlyDecodedFlag)
+    iMbNum = WELS_MIN (iMbNum, pCtx->sMb.iMbWidth * pCtx->sMb.iMbHeight);
   for (int32_t i = 0; i < iMbNum; ++i) {
-    if (!pCtx->pCurDqLayer->pMbCorrectlyDecodedFlag[i]) {
+    if (!pMbCorrectlyDecodedFlag[i]) {
       bNeedEC = true;
       break;
     }
