@@ -243,6 +243,9 @@ static int32_t DecreasePicBuff (PWelsDecoderContext pCtx, PPicBuff* ppPicBuf, co
   pPicNewBuf->iCapacity = kiNewSize;
   * ppPicBuf             = pPicNewBuf;
 
+  // Every iRefCount is zeroed below, which also drops the EC-survival pin, and
+  // the picture holding it may be one of the freed ones.
+  pCtx->pLastDecPicInfo->pECPinnedPicture = NULL;
   for (int32_t i = 0; i < pPicNewBuf->iCapacity; i++) {
     pPicNewBuf->ppPic[i]->bUsedAsRef = false;
     pPicNewBuf->ppPic[i]->bIsLongRef = false;
@@ -357,6 +360,7 @@ void WelsDecoderDefaults (PWelsDecoderContext pCtx, SLogContext* pLogCtx) {
 
   //pCtx->sSpsPpsCtx.bAvcBasedFlag             = true;
   pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb = NULL;
+  pCtx->pLastDecPicInfo->pECPinnedPicture = NULL;
   pCtx->pDecoderStatistics->iAvgLumaQp = -1;
   pCtx->pDecoderStatistics->iStatisticsLogInterval = 1000;
   pCtx->bUseScalingList = false;
@@ -403,6 +407,7 @@ void WelsDecoderLastDecPicInfoDefaults (SWelsLastDecPicInfo& sLastDecPicInfo) {
   sLastDecPicInfo.iPrevPicOrderCntMsb = 0;
   sLastDecPicInfo.iPrevPicOrderCntLsb = 0;
   sLastDecPicInfo.pPreviousDecodedPictureInDpb = NULL;
+  sLastDecPicInfo.pECPinnedPicture = NULL;
   sLastDecPicInfo.iPrevFrameNum = -1;
   sLastDecPicInfo.bLastHasMmco5 = false;
   sLastDecPicInfo.uiDecodingTimeStamp = 0;
@@ -531,6 +536,7 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
 
 
     pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb = NULL;
+    pCtx->pLastDecPicInfo->pECPinnedPicture = NULL; // freed with the pool above
 
     // currently only active for LIST_0 due to have no B frames
     iErr = CreatePicBuff (pCtx, &pCtx->pPicBuff, iPicQueueSize, kiPicWidth, kiPicHeight);

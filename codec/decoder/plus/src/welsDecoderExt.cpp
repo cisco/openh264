@@ -1044,7 +1044,32 @@ void CWelsDecoder::BufferingReadyPicture (PWelsDecoderContext pCtx, unsigned cha
                            : pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb;
         if (pPrevPic != NULL) {
           m_sPictInfoList[i].iPicBuffIdx = pPrevPic->iPicBuffIdx;
-          if (GetThreadCount (pCtx) <= 1) ++pPrevPic->iRefCount;
+          // Release the previous EC-survival pin and take the new one as a
+          // single transition, only when the pinned identity actually
+          // changes. The pin is recorded in pLastDecPicInfo, next to
+          // pPreviousDecodedPictureInDpb, and is set only here, so this is
+          // the sole place that knows whether an earlier picture actually
+          // holds it (issue #3872): decoder_core.cpp cannot tell, because
+          // whether a given decoded picture ever reaches this function
+          // depends on the immediate-output fast path above in
+          // ReorderPicturesInDisplay(), which is wrapper-only state. Gating
+          // on identity also makes this a no-op when this function runs
+          // again for the same picture (e.g. DecodeFrameNoDelay's paired
+          // instant-flush call), instead of pinning it a second time with
+          // no matching release. The decoder core clears the pin wherever it
+          // frees the picture pool or zeroes the reference counts, so it
+          // never points at a freed picture.
+          PPicture& pPinnedPic = pCtx->pLastDecPicInfo->pECPinnedPicture;
+          if (GetThreadCount (pCtx) <= 1 && pPinnedPic != pPrevPic) {
+            if (pPinnedPic != NULL) {
+              --pPinnedPic->iRefCount;
+              if (pPinnedPic->iRefCount <= 0 && pPinnedPic->pSetUnRef) {
+                pPinnedPic->pSetUnRef (pPinnedPic);
+              }
+            }
+            ++pPrevPic->iRefCount;
+            pPinnedPic = pPrevPic;
+          }
         }
       }
       m_iLastBufferedIdx = i;
