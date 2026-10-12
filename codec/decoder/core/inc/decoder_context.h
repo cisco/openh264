@@ -548,6 +548,10 @@ typedef struct tagSWelsDecThreadCtx {
   // is signaled. Prevents concurrent workers from overwriting the shared pLastDecPicInfo
   // field before BufferingReadyPicture() reads it.
   PPicture      pPreviousDecodedPictureInDpb;
+  //Set by this worker when an error needs ResetDecoder(), which a worker cannot perform
+  //itself. Read by the thread that called the API, after that thread has taken this worker's
+  //sIsIdle -- the worker releases it after returning, so the semaphore orders the two.
+  bool          bNeedsReset;
 } SWelsDecoderThreadCTX, *PWelsDecoderThreadCTX;
 
 static inline void ResetActiveSPSForEachLayer (PWelsDecoderContext pCtx) {
