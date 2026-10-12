@@ -229,7 +229,16 @@ int32_t WelsWriteVUI (SWelsSPS* pSps, SBitStringAux* pBitStringAux) {
   }//write video signal type info to header
 
   BsWriteOneBit (pLocalBitStringAux, false); //chroma_loc_info_present_flag
-  BsWriteOneBit (pLocalBitStringAux, false); //timing_info_present_flag
+
+  BsWriteOneBit (pLocalBitStringAux, pSps->bTimingInfoPresentFlag); //timing_info_present_flag
+  if (pSps->bTimingInfoPresentFlag) {
+    //write timing info to header
+
+    BsWriteBits (pLocalBitStringAux, 32, pSps->uiNumUnitsInTick);
+    BsWriteBits (pLocalBitStringAux, 32, pSps->uiTimeScale);
+    BsWriteOneBit (pLocalBitStringAux, pSps->bFixedFrameRateFlag);
+  }//write timing info to header
+
   BsWriteOneBit (pLocalBitStringAux, false); //nal_hrd_parameters_present_flag
   BsWriteOneBit (pLocalBitStringAux, false); //vcl_hrd_parameters_present_flag
   BsWriteOneBit (pLocalBitStringAux, false); //pic_struct_present_flag
@@ -558,6 +567,10 @@ int32_t WelsInitSps (SWelsSPS* pSps, SSpatialLayerConfig* pLayerParam, SSpatialL
   pSps->uiColorPrimaries =          pLayerParam->uiColorPrimaries;
   pSps->uiTransferCharacteristics = pLayerParam->uiTransferCharacteristics;
   pSps->uiColorMatrix =             pLayerParam->uiColorMatrix;
+  pSps->bTimingInfoPresentFlag =    pLayerParam->bTimingInfoPresentFlag;
+  pSps->uiNumUnitsInTick =          pLayerParam->uiNumUnitsInTick;
+  pSps->uiTimeScale =               pLayerParam->uiTimeScale;
+  pSps->bFixedFrameRateFlag =       pLayerParam->bFixedFrameRateFlag;
 
   return 0;
 }
