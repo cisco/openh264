@@ -115,7 +115,10 @@ int SemWait (SWelsDecSemphore* s, int32_t timeout) {
 }
 
 void SemRelease (SWelsDecSemphore* s, long* prevcount) {
-  ReleaseSemaphore (s->h, 1, prevcount);
+  LONG _prevcount;
+
+  ReleaseSemaphore (s->h, 1, &_prevcount);
+  *prevcount = _prevcount;
 }
 
 void SemDestroy (SWelsDecSemphore* s) {
