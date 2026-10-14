@@ -1457,7 +1457,7 @@ void  CWelsPreProcess::WelsMoveMemoryWrapper (SWelsSvcCodingParam* pSvcParam, SP
         pSrcY += kiSrcStrideY;
       }
       for (int i = 0; i < iSrcHeight / 2; ++i) {
-        for (int j = 0; j < kiDstStrideUV; ++j) {
+        for (int j = 0; j < iSrcWidth / 2; ++j) {
           pDstU[i * kiDstStrideUV + j] = pSrcU[i * kiSrcStrideUV + j * 2];
           pDstV[i * kiDstStrideUV + j] = pSrcU[i * kiSrcStrideUV + j * 2 + 1];
         }
