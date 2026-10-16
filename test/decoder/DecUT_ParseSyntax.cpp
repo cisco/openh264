@@ -151,6 +151,8 @@ class DecoderParseSyntaxTest : public ::testing::Test {
   //I_PCM CAVLC bounds handling
   void TestIPcmCavlcRegression();
   void TestIPcmCavlcTruncated();
+  //I_PCM parse-only pointer handling
+  void TestParseOnlyIPcm();
   //Do whole tests here
   void DecoderParseSyntaxTestAll();
 
@@ -439,6 +441,23 @@ void DecoderParseSyntaxTest::TestSpecificBsError() {
   Uninit();
 }
 
+// In parse-only mode pDec->pData is NULL (no reconstruction buffer). The I_PCM
+// macroblock handlers must not form pData[n] + offset pointers in that mode;
+// doing so is undefined behavior (null pointer + non-zero offset), caught by
+// -fsanitize=undefined. CVPCMNL1_SVA_C.264 exercises the CAVLC paths
+// (WelsActualDecodeMbCavlc{I,P,B}Slice) and test_cif_I_CABAC_PCM.264 the CABAC
+// path (ParseIPCMInfoCabac).
+void DecoderParseSyntaxTest::TestParseOnlyIPcm() {
+  const char* kaFiles[2] = { "res/CVPCMNL1_SVA_C.264", "res/test_cif_I_CABAC_PCM.264" };
+  for (int32_t i = 0; i < 2; ++i) {
+    m_sDecParam.bParseOnly = true;
+    m_sDecParam.eEcActiveIdc = ERROR_CON_DISABLE;
+    ASSERT_EQ (m_pDec->Initialize (&m_sDecParam), ERR_NONE);
+    ASSERT_TRUE (ParseBs (kaFiles[i], CorrectParseOnly));
+    m_pDec->Uninitialize();
+  }
+}
+
 // Regression: a valid CAVLC stream that uses I_PCM macroblocks must keep
 // decoding correctly after the I_PCM 384-byte bounds check was added.
 // CVPCMNL1_SVA_C.264 is a CAVLC I_PCM conformance stream (exercises the
@@ -562,6 +581,7 @@ TEST_F (DecoderParseSyntaxTest, DecoderParseSyntaxTestAll) {
   TestSpecificBsError();
   TestIPcmCavlcRegression();
   TestIPcmCavlcTruncated();
+  TestParseOnlyIPcm();
 }
 
 TEST (DecoderFmoSecurityTest, RejectsOversizedRunLengthBeforeIndexWrap) {
