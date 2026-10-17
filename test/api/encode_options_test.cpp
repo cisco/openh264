@@ -2176,6 +2176,31 @@ TEST_F (EncodeDecodeTestAPI, UnsupportedVideoSizeInput) {
 
 }
 
+TEST_F (EncodeDecodeTestAPI, CabacBitstreamBufferOverflow) {
+  int iWidth       = 320;
+  int iHeight      = 240;
+  float fFrameRate = 30;
+  int iSliceNum    = 1;
+  int iRet;
+
+  SEncParamExt sParam;
+  prepareParamDefault (1, iSliceNum, iWidth, iHeight, fFrameRate, &sParam);
+  sParam.iEntropyCodingModeFlag = 1;
+  sParam.iMinQp = 0;
+  sParam.sSpatialLayers[0].uiProfileIdc = PRO_HIGH;
+  sParam.sSpatialLayers[0].iDLayerQp = 0;
+  iRet = encoder_->InitializeExt (&sParam);
+  ASSERT_TRUE (iRet == cmResultSuccess) << "InitializeExt: iRet = " << iRet;
+
+  ASSERT_TRUE (InitialEncDec (iWidth, iHeight));
+  // at QP 0 this picture codes to more CABAC data than the bitstream buffer holds
+  for (size_t i = 0; i < buf_.Length(); i++)
+    buf_.data()[i] = (rand() & 1) ? 255 : 0;
+
+  iRet = encoder_->EncodeFrame (&EncPic, &info);
+  ASSERT_TRUE (iRet == cmResultSuccess || iRet == cmMallocMemeError) << "rv = " << iRet;
+}
+
 TEST_F (EncodeDecodeTestAPI,  ScreenContent_LosslessLink0_EnableLongTermReference) {
   int iWidth       = 2882;
   int iHeight      = 1808;

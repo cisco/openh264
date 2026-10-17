@@ -732,6 +732,10 @@ int32_t WelsSpatialWriteMbSynCabac (sWelsEncCtx* pEncCtx, SSlice* pSlice, SMB* p
   if (!IS_INTRA (pCurMb->uiMbType))
     pCurMb->uiChromPredMode = 0;
 
+  // the CABAC writer does not check m_pBufEnd, keep the same per-MB headroom as CheckBitstreamBuffer()
+  if (pCabacCtx->m_pBufEnd - pCabacCtx->m_pBufCur - 1 < MAX_MACROBLOCK_SIZE_IN_BYTE_x2)
+    return ENC_RETURN_VLCOVERFLOWFOUND;
+
   return iRet;
 }
 
