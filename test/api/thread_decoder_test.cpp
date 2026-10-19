@@ -557,6 +557,19 @@ TEST_F (ThreadDecoderInitTest, ThreadedResolutionSwitchNoUseAfterFree) {
                  (kPrefix + "res/QCIF_2P_I_allIPCM.264").c_str(), 100, NULL));
 }
 
+// Regression test for WelsRequestMem(): a threaded sequence change that reallocates the DPB
+// after P frames must empty the reference lists of every thread context, so that no later
+// reset of those lists touches pictures of the freed buffer.
+TEST_F (ThreadDecoderInitTest, ThreadedResolutionSwitchAfterRefFramesNoUseAfterFree) {
+#if defined(ANDROID_NDK)
+  const std::string kPrefix ("/sdcard/");
+#else
+  const std::string kPrefix ("");
+#endif
+  ASSERT_TRUE (ThreadDecodeFile ((kPrefix + "res/BA_MW_D.264").c_str(), NULL));
+  ASSERT_TRUE (ThreadDecodeFile ((kPrefix + "res/test_cif_P_CABAC_slice.264").c_str(), NULL));
+}
+
 // Regression guard for the same-resolution DPB queue resize path. The selected
 // streams are both 176x144 but have different SPS num_ref_frames values.
 TEST_F (ThreadDecoderInitTest, ThreadedSameResolutionRefQueueResizeNoUseAfterFree) {
