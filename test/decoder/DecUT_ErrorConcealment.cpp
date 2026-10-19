@@ -3,6 +3,7 @@
 #include "wels_common_basis.h"
 #include "memory_align.h"
 #include "error_concealment.h"
+#include "mc.h"
 #include "ls_defines.h"
 #include "cpu.h"
 
@@ -41,7 +42,7 @@ void FreeInputData (PECInputCtx pECCtx) {
   }
 }
 
-int32_t InitAndAllocInputData (PECInputCtx& pECCtx) {
+int32_t InitAndAllocInputData (PECInputCtx& pECCtx, int32_t iMbWidth = 0, int32_t iMbHeight = 0) {
   FreeInputData (pECCtx);
 
   pECCtx = (PECInputCtx) WelsMallocz (sizeof (SECInputCtx), "pECCtx");
@@ -49,8 +50,9 @@ int32_t InitAndAllocInputData (PECInputCtx& pECCtx) {
     return 1;
   memset (pECCtx, 0, sizeof (SECInputCtx));
 
-  pECCtx->iMbWidth = rand() % (MAX_MB_WIDTH - 1) + 1; //give a constrained max width
-  pECCtx->iMbHeight = rand() % (MAX_MB_HEIGHT - 1) + 1; //give a constrained max height
+  //give a constrained max width and height unless the caller asks for a fixed size
+  pECCtx->iMbWidth = iMbWidth > 0 ? iMbWidth : rand() % (MAX_MB_WIDTH - 1) + 1;
+  pECCtx->iMbHeight = iMbHeight > 0 ? iMbHeight : rand() % (MAX_MB_HEIGHT - 1) + 1;
   pECCtx->iLinesize[0] = pECCtx->iMbWidth << 4;
   pECCtx->iLinesize[1] = pECCtx->iLinesize[2] = pECCtx->iLinesize[0] >> 1;
 
@@ -361,5 +363,76 @@ TEST (ErrorConTest, DoErrorConSliceCopyResolutionMismatchFallsBackToFill) {
                pECCtx->sWelsPic.iLinesize[0],
                pECCtx->sWelsPic.iHeightInPixel,
                128));
+  FreeInputData (pECCtx);
+}
+
+TEST (ErrorConTest, DoErrorConSliceMVCopyResolutionMismatchFallsBackToFill) {
+  PECInputCtx pECCtx = NULL;
+  if (InitAndAllocInputData (pECCtx)) {
+    FreeInputData (pECCtx);
+    return;
+  }
+
+  pECCtx->pCtx->pParam->eEcActiveIdc = ERROR_CON_SLICE_MV_COPY_CROSS_IDR;
+  InitECCopyData (pECCtx);
+  pECCtx->pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt.bIdrFlag = 0;
+  pECCtx->pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb = &pECCtx->sSrcPic;
+
+  memset (pECCtx->pMbCorrectlyDecodedFlag, 0, pECCtx->iMbWidth * pECCtx->iMbHeight * sizeof (bool));
+  pECCtx->sSrcPic.iHeightInPixel += 16; // use += so value stays > 0 even when iMbHeight==1
+  memset (pECCtx->sWelsPic.pData[0], 7, pECCtx->iMbWidth * pECCtx->iMbHeight * 256 * 3 / 2);
+
+  DoErrorConSliceMVCopy (pECCtx->pCtx);
+
+  EXPECT_TRUE (IsPictureFilledWithValueI420 (pECCtx->sWelsPic.pData[0],
+               pECCtx->sWelsPic.iLinesize[0],
+               pECCtx->sWelsPic.iHeightInPixel,
+               128));
+  FreeInputData (pECCtx);
+}
+
+TEST (ErrorConTest, DoErrorConSliceMVCopyClampsMvToBottomCrop) {
+  PECInputCtx pECCtx = NULL;
+  if (InitAndAllocInputData (pECCtx, 4, 4)) { //64x64, the bottom 8 lines cropped
+    FreeInputData (pECCtx);
+    return;
+  }
+
+  pECCtx->pCtx->pParam->eEcActiveIdc = ERROR_CON_SLICE_MV_COPY_CROSS_IDR;
+  InitECCopyData (pECCtx);
+  InitMcFunc (&pECCtx->pCtx->sMcFunc, pECCtx->pCtx->uiCpuFlag);
+  pECCtx->pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt.bIdrFlag = 0;
+  pECCtx->pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb = &pECCtx->sSrcPic;
+  pECCtx->pCtx->pSps->bFrameCroppingFlag = true;
+  pECCtx->pCtx->sFrameCrop.iBottomOffset = 4;
+
+  //each line of the source picture holds its line number
+  const int32_t kiHeight = pECCtx->iMbHeight * 16;
+  for (int32_t i = 0; i < kiHeight; ++i) {
+    memset (pECCtx->sSrcPic.pData[0] + i * pECCtx->iLinesize[0], i, pECCtx->iLinesize[0]);
+  }
+  for (int32_t i = 0; i < kiHeight / 2; ++i) {
+    memset (pECCtx->sSrcPic.pData[1] + i * pECCtx->iLinesize[1], i, pECCtx->iLinesize[1]);
+    memset (pECCtx->sSrcPic.pData[2] + i * pECCtx->iLinesize[2], i, pECCtx->iLinesize[2]);
+  }
+
+  //only the bottom left MB is lost, and the correct MBs moved 8 lines down
+  memset (pECCtx->pMbCorrectlyDecodedFlag, 1, pECCtx->iMbWidth * pECCtx->iMbHeight * sizeof (bool));
+  pECCtx->pMbCorrectlyDecodedFlag[(pECCtx->iMbHeight - 1) * pECCtx->iMbWidth] = false;
+  pECCtx->pCtx->pECRefPic[0] = &pECCtx->sSrcPic;
+  pECCtx->pCtx->iECMVs[0][0] = 0;
+  pECCtx->pCtx->iECMVs[0][1] = 8 * 4;
+
+  DoErrorConSliceMVCopy (pECCtx->pCtx);
+
+  //the MV is clamped to the last 16 lines above the crop, lines 40..55
+  const int32_t kiMbY = kiHeight - 16;
+  for (int32_t i = 0; i < 16; ++i) {
+    EXPECT_EQ (pECCtx->sWelsPic.pData[0][ (kiMbY + i) * pECCtx->iLinesize[0]], kiMbY - 8 + i);
+  }
+  for (int32_t i = 0; i < 8; ++i) {
+    EXPECT_EQ (pECCtx->sWelsPic.pData[1][ (kiMbY / 2 + i) * pECCtx->iLinesize[1]], kiMbY / 2 - 4 + i);
+    EXPECT_EQ (pECCtx->sWelsPic.pData[2][ (kiMbY / 2 + i) * pECCtx->iLinesize[2]], kiMbY / 2 - 4 + i);
+  }
   FreeInputData (pECCtx);
 }

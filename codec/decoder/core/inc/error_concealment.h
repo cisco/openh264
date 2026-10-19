@@ -45,6 +45,8 @@
 namespace WelsDec {
 //Initialize error concealment
 void InitErrorCon (PWelsDecoderContext pCtx);
+//Judge if pSrcPic matches pDstPic in size and stride, so EC can copy from it
+bool IsEcRefPicCompatible (const PWelsDecoderContext pCtx, const PPicture pDstPic, const PPicture pSrcPic);
 //Do error concealment using frame copy method
 void DoErrorConFrameCopy (PWelsDecoderContext pCtx);
 //Do error concealment using slice copy method
