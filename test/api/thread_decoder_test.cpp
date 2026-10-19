@@ -886,3 +886,75 @@ TEST (ThreadDecoderNalListBoundsTest, ResetAuListDoesNotOverflowOnRepeatedTimeou
   dec->Uninitialize();
   WelsDestroyDecoder (dec);
 }
+
+// Regression guard for CheckAndFinishLastPic(): with threads, a non-VCL NAL that
+// ends the access unit in the middle of a DecodeFrameNoDelay() buffer must not
+// make it construct the access unit on the calling thread, before the worker
+// hand-off and before the picture buffer existed.
+TEST (ThreadDecoderTrailingNonVclTest, DelimiterAndSeiAfterSlicesDecodeAllFrames) {
+  std::ifstream ifs ("res/Adobe_PDF_sample_a_1024x768_50Frms.264", std::ios::binary);
+  ASSERT_TRUE (ifs.is_open());
+  std::vector<uint8_t> bs ((std::istreambuf_iterator<char> (ifs)), {});
+  ASSERT_FALSE (bs.empty());
+
+  ISVCDecoder* dec = nullptr;
+  ASSERT_EQ (0, WelsCreateDecoder (&dec));
+  ASSERT_NE (dec, nullptr);
+
+  SDecodingParam p;
+  memset (&p, 0, sizeof (p));
+  p.uiTargetDqLayer  = UCHAR_MAX;
+  p.eEcActiveIdc     = ERROR_CON_SLICE_COPY;
+  p.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_DEFAULT;
+  int32_t iThreads = 2;
+  dec->SetOption (DECODER_OPTION_NUM_OF_THREADS, &iThreads);
+  ASSERT_EQ (0, dec->Initialize (&p));
+
+  // Each call carries one frame followed by the access unit delimiter and a
+  // user data SEI of the next access unit, as a splitter that cuts before a
+  // picture's first slice produces. The delimiter is then not the last NAL.
+  const uint8_t kAudSei[] = {
+    0, 0, 0, 1, 0x09, 0xf0,
+    0, 0, 0, 1, 0x06, 0x05, 0x10,
+    0x5a, 0x1e, 0x4b, 0x7d, 0x2c, 0x91, 0x46, 0xe3, 0xa8, 0x37, 0x6f, 0xd2, 0x15, 0xc9, 0x84, 0xbb,
+    0x80
+  };
+  const int32_t kFileSize = static_cast<int32_t> (bs.size());
+  // dst must outlive the loop body: worker threads write ppDst asynchronously.
+  uint8_t* dst[3] = {nullptr, nullptr, nullptr};
+  int32_t iDecodedFrames = 0;
+  int32_t iPos = 0;
+  for (int32_t i = 0; iPos < kFileSize; ++i) {
+    int32_t iFrameSize = ReadFrameForHangRegression (bs.data(), kFileSize, iPos);
+    EXPECT_GT (iFrameSize, 0);
+    if (iFrameSize <= 0)
+      break;
+    std::vector<uint8_t> buf (bs.begin() + iPos, bs.begin() + iPos + iFrameSize);
+    buf.insert (buf.end(), kAudSei, kAudSei + sizeof (kAudSei));
+    iPos += iFrameSize;
+
+    SBufferInfo info;
+    memset (&info, 0, sizeof (info));
+    info.uiInBsTimeStamp = i + 1;
+    DECODING_STATE rv = dec->DecodeFrameNoDelay (buf.data(), static_cast<int32_t> (buf.size()), dst, &info);
+    EXPECT_EQ (dsErrorFree, rv) << "decode error at call " << i;
+    if (info.iBufferStatus == 1 && info.pDst[0] != nullptr)
+      ++iDecodedFrames;
+  }
+
+  int32_t iEos = 1;
+  dec->SetOption (DECODER_OPTION_END_OF_STREAM, &iEos);
+  int32_t iRemaining = 0;
+  dec->GetOption (DECODER_OPTION_NUM_OF_FRAMES_REMAINING_IN_BUFFER, &iRemaining);
+  for (int32_t i = 0; i < iRemaining; ++i) {
+    SBufferInfo info;
+    memset (&info, 0, sizeof (info));
+    dec->FlushFrame (dst, &info);
+    if (info.iBufferStatus == 1 && info.pDst[0] != nullptr)
+      ++iDecodedFrames;
+  }
+  EXPECT_EQ (50, iDecodedFrames);
+
+  dec->Uninitialize();
+  WelsDestroyDecoder (dec);
+}
