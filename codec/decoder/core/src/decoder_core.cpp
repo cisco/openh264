@@ -2968,7 +2968,9 @@ bool CheckAndFinishLastPic (PWelsDecoderContext pCtx, uint8_t** ppDst, SBufferIn
       bAuBoundaryFlag = !! (pCtx->sSpsPpsCtx.iOverwriteFlags & OVERWRITE_PPS);
     }
     if (bAuBoundaryFlag && pCtx->pAccessUnitList->uiAvailUnitsNum != 0) { //Construct remaining data first
-      ConstructAccessUnit (pCtx, ppDst, pDstInfo);
+      if (GetThreadCount (pCtx) <= 1) {
+        ConstructAccessUnit (pCtx, ppDst, pDstInfo);
+      }
     }
   }
 
