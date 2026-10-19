@@ -54,7 +54,7 @@ static inline int32_t GetEcPicHeightInPixel (const PWelsDecoderContext pCtx, con
   return pCtx->pSps->iMbHeight << 4;
 }
 
-static inline bool IsEcRefPicCompatible (const PWelsDecoderContext pCtx, const PPicture pDstPic, const PPicture pSrcPic) {
+bool IsEcRefPicCompatible (const PWelsDecoderContext pCtx, const PPicture pDstPic, const PPicture pSrcPic) {
   if (pDstPic == NULL || pSrcPic == NULL) {
     return false;
   }
@@ -71,6 +71,22 @@ static inline bool IsEcRefPicCompatible (const PWelsDecoderContext pCtx, const P
   return pSrcPic->iLinesize[0] >= pDstPic->iLinesize[0]
          && pSrcPic->iLinesize[1] >= pDstPic->iLinesize[1]
          && pSrcPic->iLinesize[2] >= pDstPic->iLinesize[2];
+}
+
+// Source picture for EC of pCtx->pDec, or NULL when the EC has to fill in data instead:
+// no copy across an IDR for the methods without cross IDR, and no copy from a picture
+// whose size or stride does not match the picture being concealed.
+static inline PPicture GetEcSrcPic (const PWelsDecoderContext pCtx) {
+  PPicture pDstPic = pCtx->pDec;
+  PPicture pSrcPic = pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb;
+  if (((pCtx->pParam->eEcActiveIdc == ERROR_CON_FRAME_COPY) || (pCtx->pParam->eEcActiveIdc == ERROR_CON_SLICE_COPY))
+      && (pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt.bIdrFlag)) {
+    return NULL; //no cross IDR method, should fill in data instead of copy
+  }
+  if (!IsEcRefPicCompatible (pCtx, pDstPic, pSrcPic)) {
+    return NULL;
+  }
+  return pSrcPic;
 }
 
 //Init
@@ -124,16 +140,11 @@ void InitErrorCon (PWelsDecoderContext pCtx) {
 //Do error concealment using frame copy method
 void DoErrorConFrameCopy (PWelsDecoderContext pCtx) {
   PPicture pDstPic = pCtx->pDec;
-  PPicture pSrcPic = pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb;
+  PPicture pSrcPic = GetEcSrcPic (pCtx);
   int32_t iHeightInPixelY = GetEcPicHeightInPixel (pCtx, pDstPic);
   int32_t iStrideY = pDstPic->iLinesize[0];
   int32_t iStrideUV = pDstPic->iLinesize[1];
   pCtx->pDec->iMbEcedNum = pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight;
-  if ((pCtx->pParam->eEcActiveIdc == ERROR_CON_FRAME_COPY) && (pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt.bIdrFlag))
-    pSrcPic = NULL; //no cross IDR method, should fill in data instead of copy
-  if (!IsEcRefPicCompatible (pCtx, pDstPic, pSrcPic)) {
-    pSrcPic = NULL;
-  }
   if (pSrcPic == NULL) { //no ref pic, assign specific data to picture
     memset (pDstPic->pData[0], 128, iHeightInPixelY * iStrideY);
     memset (pDstPic->pData[1], 128, (iHeightInPixelY >> 1) * iStrideUV);
@@ -153,12 +164,7 @@ void DoErrorConSliceCopy (PWelsDecoderContext pCtx) {
   int32_t iMbWidth = (int32_t) pCtx->pSps->iMbWidth;
   int32_t iMbHeight = (int32_t) pCtx->pSps->iMbHeight;
   PPicture pDstPic = pCtx->pDec;
-  PPicture pSrcPic = pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb;
-  if ((pCtx->pParam->eEcActiveIdc == ERROR_CON_SLICE_COPY) && (pCtx->pCurDqLayer->sLayerInfo.sNalHeaderExt.bIdrFlag))
-    pSrcPic = NULL; //no cross IDR method, should fill in data instead of copy
-  if (!IsEcRefPicCompatible (pCtx, pDstPic, pSrcPic)) {
-    pSrcPic = NULL;
-  }
+  PPicture pSrcPic = GetEcSrcPic (pCtx);
 
   //uint8_t *pDstData[3], *pSrcData[3];
   bool* pMbCorrectlyDecodedFlag = pCtx->pCurDqLayer->pMbCorrectlyDecodedFlag;
@@ -269,7 +275,7 @@ void DoMbECMvCopy (PWelsDecoderContext pCtx, PPicture pDec, PPicture pRef, int32
       iPicWidthLeftLimit = 0 + pCtx->sFrameCrop.iLeftOffset * 2;
       iPicWidthRightLimit = (pMCRefMem->iPicWidth - pCtx->sFrameCrop.iRightOffset * 2);
       iPicHeightTopLimit = 0 + pCtx->sFrameCrop.iTopOffset * 2;
-      iPicHeightBottomLimit = (pMCRefMem->iPicHeight - pCtx->sFrameCrop.iTopOffset * 2);
+      iPicHeightBottomLimit = (pMCRefMem->iPicHeight - pCtx->sFrameCrop.iBottomOffset * 2);
     }
     // further make sure no need to expand picture
     int32_t iMinLeftOffset = (iPicWidthLeftLimit + 2) * (1 << 2);
@@ -419,7 +425,7 @@ void DoErrorConSliceMVCopy (PWelsDecoderContext pCtx) {
   int32_t iMbWidth = (int32_t) pCtx->pSps->iMbWidth;
   int32_t iMbHeight = (int32_t) pCtx->pSps->iMbHeight;
   PPicture pDstPic = pCtx->pDec;
-  PPicture pSrcPic = pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb;
+  PPicture pSrcPic = GetEcSrcPic (pCtx);
 
   bool* pMbCorrectlyDecodedFlag = pCtx->pCurDqLayer->pMbCorrectlyDecodedFlag;
   int32_t iMbXyIndex;
