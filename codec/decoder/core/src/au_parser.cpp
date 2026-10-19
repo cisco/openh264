@@ -1133,7 +1133,8 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
     pSps->sFrameCrop.iLeftOffset = uiCode;
     WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //frame_crop_right_offset
     pSps->sFrameCrop.iRightOffset = uiCode;
-    if ((pSps->sFrameCrop.iLeftOffset + pSps->sFrameCrop.iRightOffset) > ((int32_t)pSps->iMbWidth * 16 / 2)) {
+    if (pSps->sFrameCrop.iLeftOffset < 0 || pSps->sFrameCrop.iRightOffset < 0 ||
+        ((int64_t)pSps->sFrameCrop.iLeftOffset + pSps->sFrameCrop.iRightOffset) > ((int64_t)pSps->iMbWidth * 16 / 2)) {
       WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "frame_crop_left_offset + frame_crop_right_offset exceeds limits!");
       return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_CROPPING_DATA);
     }
@@ -1141,8 +1142,9 @@ int32_t ParseSps (PWelsDecoderContext pCtx, PBitStringAux pBsAux, int32_t* pPicW
     pSps->sFrameCrop.iTopOffset = uiCode;
     WELS_READ_VERIFY (BsGetUe (pBs, &uiCode)); //frame_crop_bottom_offset
     pSps->sFrameCrop.iBottomOffset = uiCode;
-    if ((pSps->sFrameCrop.iTopOffset + pSps->sFrameCrop.iBottomOffset) > ((int32_t)pSps->iMbHeight * 16 / 2)) {
-      WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "frame_crop_top_offset + frame_crop_right_offset exceeds limits!");
+    if (pSps->sFrameCrop.iTopOffset < 0 || pSps->sFrameCrop.iBottomOffset < 0 ||
+        ((int64_t)pSps->sFrameCrop.iTopOffset + pSps->sFrameCrop.iBottomOffset) > ((int64_t)pSps->iMbHeight * 16 / 2)) {
+      WelsLog (& (pCtx->sLogCtx), WELS_LOG_ERROR, "frame_crop_top_offset + frame_crop_bottom_offset exceeds limits!");
       return GENERATE_ERROR_NO (ERR_LEVEL_PARAM_SETS, ERR_INFO_INVALID_CROPPING_DATA);
     }
   } else {
