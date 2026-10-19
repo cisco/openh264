@@ -79,6 +79,7 @@ int32_t MemInitNalList (PAccessUnit* ppAu, const uint32_t kuiSize, CMemoryAlign*
   (*ppAu)->uiStartPos           = 0;
   (*ppAu)->uiEndPos             = 0;
   (*ppAu)->bCompletedAuFlag     = false;
+  (*ppAu)->pExpandedBlock       = NULL;
 
   return ERR_NONE;
 }
@@ -87,6 +88,12 @@ int32_t MemFreeNalList (PAccessUnit* ppAu, CMemoryAlign* pMa) {
   if (ppAu != NULL) {
     PAccessUnit pAu = *ppAu;
     if (pAu != NULL) {
+      uint8_t* pBlock = (uint8_t*)pAu->pExpandedBlock;
+      while (pBlock != NULL) { // blocks added by ExpandNalUnitList, latest first
+        uint8_t* pPrevBlock = * ((uint8_t**)pBlock);
+        pMa->WelsFree (pBlock, "Access Unit expanded");
+        pBlock = pPrevBlock;
+      }
       pMa->WelsFree (pAu, "Access Unit");
       *ppAu = NULL;
     }
@@ -95,29 +102,44 @@ int32_t MemFreeNalList (PAccessUnit* ppAu, CMemoryAlign* pMa) {
 }
 
 
+/*
+ *  ExpandNalUnitList
+ *  Grow the list of NAL Unit pointers to kiExpSize and add new NAL Units for the new entries.
+ *  NAL Units already in the list stay where they are until MemFreeNalList: decoding keeps pointers
+ *  into them (pCtx->pNalCur, pCtx->pSliceHeader, the current dq layer's ref marking and reordering).
+ */
 int32_t ExpandNalUnitList (PAccessUnit* ppAu, const int32_t kiOrgSize, const int32_t kiExpSize, CMemoryAlign* pMa) {
   if (kiExpSize <= kiOrgSize)
     return ERR_INFO_INVALID_PARAM;
   else {
-    PAccessUnit pTmp = NULL;
+    PAccessUnit pAu = *ppAu;
+    uint8_t* pBase = NULL, *pPtr = NULL;
+    PNalUnit* pNalUnitsList = NULL;
     int32_t iIdx = 0;
-    int32_t iRet = ERR_NONE;
-    if ((iRet = MemInitNalList (&pTmp, kiExpSize, pMa)) != ERR_NONE) // request new list with expanding
-      return iRet;
+    const uint32_t kuiSizeBlockLink = WELS_ALIGN (sizeof (uint8_t*), 16); // keeps the NAL Units after it aligned
+    const uint32_t kuiSizeNalUnit = sizeof (SNalUnit);
+    const uint32_t kuiSizeNalUnits = (kiExpSize - kiOrgSize) * kuiSizeNalUnit;
+    const uint32_t kuiSizeNalUnitPtr = kiExpSize * sizeof (PNalUnit);
+    const uint32_t kuiCountSize = kuiSizeBlockLink + kuiSizeNalUnits + kuiSizeNalUnitPtr;
 
-    do {
-      memcpy (pTmp->pNalUnitsList[iIdx], (*ppAu)->pNalUnitsList[iIdx], sizeof (SNalUnit)); //confirmed_safe_unsafe_usage
-      ++ iIdx;
-    } while (iIdx < kiOrgSize);
+    pBase = (uint8_t*)pMa->WelsMallocz (kuiCountSize, "Access Unit expanded");
+    if (pBase == NULL)
+      return ERR_INFO_OUT_OF_MEMORY;
+    pPtr = pBase;
+    * ((uint8_t**)pPtr) = (uint8_t*)pAu->pExpandedBlock; // chain to the block expanded before, freed in MemFreeNalList
+    pPtr += kuiSizeBlockLink;
+    pNalUnitsList = (PNalUnit*) (pPtr + kuiSizeNalUnits);
 
-    pTmp->uiCountUnitsNum       = kiExpSize;
-    pTmp->uiAvailUnitsNum       = (*ppAu)->uiAvailUnitsNum;
-    pTmp->uiActualUnitsNum      = (*ppAu)->uiActualUnitsNum;
-    pTmp->uiEndPos              = (*ppAu)->uiEndPos;
-    pTmp->bCompletedAuFlag      = (*ppAu)->bCompletedAuFlag;
+    for (iIdx = 0; iIdx < kiOrgSize; ++ iIdx) // keep the NAL Units in place, in their current order
+      pNalUnitsList[iIdx] = pAu->pNalUnitsList[iIdx];
+    for (; iIdx < kiExpSize; ++ iIdx) {
+      pNalUnitsList[iIdx] = (PNalUnit)pPtr;
+      pPtr += kuiSizeNalUnit;
+    }
 
-    MemFreeNalList (ppAu, pMa); // free old list
-    *ppAu = pTmp;
+    pAu->pNalUnitsList          = pNalUnitsList;
+    pAu->uiCountUnitsNum        = kiExpSize;
+    pAu->pExpandedBlock         = pBase;
     return ERR_NONE;
   }
 }
