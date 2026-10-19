@@ -468,6 +468,24 @@ static inline int32_t GetTargetRefListSize (PWelsDecoderContext pCtx) {
 }
 
 /*
+ *  drop what every thread context still points at in the shared picture buffer, before that buffer is freed
+ */
+static void ResetThreadRefPicLists (PWelsDecoderContext pCtx) {
+  PWelsDecoderThreadCTX pThreadCtx = (PWelsDecoderThreadCTX) (pCtx->pThreadCtx);
+  int32_t iThreadCount = pThreadCtx->sThreadInfo.uiThrMaxNum;
+  int32_t iId = pThreadCtx->sThreadInfo.uiThrNum;
+  for (int32_t i = 0; i < iThreadCount; ++i) {
+    PWelsDecoderContext pThrCtx = pThreadCtx[i - iId].pCtx;
+    //The pictures go with the buffer, so the lists are emptied without unreferencing them.
+    if (pThrCtx != NULL) {
+      WelsResetRefPicWithoutUnRef (pThrCtx);
+      memset (pThrCtx->sRefPic.pRefList, 0, sizeof (pThrCtx->sRefPic.pRefList));
+    }
+    pThreadCtx[i - iId].pPreviousDecodedPictureInDpb = NULL;
+  }
+}
+
+/*
  *  request memory blocks for decoder avc part
  */
 int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const int32_t kiMbHeight,
@@ -526,6 +544,11 @@ int32_t WelsRequestMem (PWelsDecoderContext pCtx, const int32_t kiMbWidth, const
     // for Recycled_Pic_Queue
     PPicBuff* ppPic = &pCtx->pPicBuff;
     if (NULL != ppPic && NULL != *ppPic) {
+      //With threads, the reset above is skipped and every thread context may still list pictures of this buffer.
+      //CWelsDecoder::ParseAccessUnit() has waited for those threads to go idle; drop the lists so that no later
+      //reset or hand-off of them reads freed pictures.
+      if (GetThreadCount (pCtx) > 1)
+        ResetThreadRefPicLists (pCtx);
       DestroyPicBuff (pCtx, ppPic, pMa);
     }
 
