@@ -1391,3 +1391,49 @@ TEST (DecoderDpbGrowthStability, BFrameDecodeIsConsistentAcrossReinit) {
   }
 }
 
+
+// A High profile stream without B-frames whose picture order count steps by
+// two, as some hardware encoders write it: the decoder holds each picture back,
+// and a low-latency caller takes it with FlushFrame. Each flush has to return
+// the picture's buffer, or the pool runs dry after a few pictures.
+TEST (DecoderFlushFrame, FlushAfterEachAccessUnitKeepsDecoding) {
+  std::ifstream f ("res/High_POC_step2_32x32_30frames.264", std::ios::binary);
+  ASSERT_TRUE (f.is_open());
+  std::vector<uint8_t> bs ((std::istreambuf_iterator<char> (f)), {});
+  std::vector<size_t> starts;
+  for (size_t i = 0; i + 4 <= bs.size(); ++i) {
+    if (bs[i] == 0 && bs[i + 1] == 0 && bs[i + 2] == 0 && bs[i + 3] == 1)
+      starts.push_back (i);
+  }
+  starts.push_back (bs.size());
+
+  ISVCDecoder* dec = nullptr;
+  ASSERT_EQ (WelsCreateDecoder (&dec), 0);
+  SDecodingParam param;
+  memset (&param, 0, sizeof (param));
+  param.uiTargetDqLayer = UCHAR_MAX;
+  ASSERT_EQ (dec->Initialize (&param), 0);
+
+  int32_t units = 0, pictures = 0;
+  size_t unit = 0;
+  for (size_t k = 0; k + 1 < starts.size(); ++k) {
+    const int32_t type = bs[starts[k] + 4] & 0x1f;
+    if (type != 1 && type != 5)
+      continue;
+    uint8_t* dst[3] = {nullptr, nullptr, nullptr};
+    SBufferInfo info;
+    memset (&info, 0, sizeof (info));
+    int32_t state = dec->DecodeFrameNoDelay (bs.data() + unit, static_cast<int32_t> (starts[k + 1] - unit), dst, &info);
+    if (info.iBufferStatus != 1)
+      state |= dec->FlushFrame (dst, &info);
+    EXPECT_EQ (state, dsErrorFree) << "access unit " << units;
+    EXPECT_EQ (info.iBufferStatus, 1) << "access unit " << units;
+    pictures += info.iBufferStatus == 1;
+    ++units;
+    unit = starts[k + 1];
+  }
+  dec->Uninitialize();
+  WelsDestroyDecoder (dec);
+  EXPECT_EQ (units, 30);
+  EXPECT_EQ (pictures, units);
+}
