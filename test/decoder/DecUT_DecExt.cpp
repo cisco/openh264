@@ -39,6 +39,8 @@ class DecoderInterfaceTest : public ::testing::Test {
   void TestInitUninit();
   //Test parse only API
   void TestParseOnlyAPI();
+  //DECODER_OPTION_NUM_OF_THREADS
+  void TestNumOfThreads();
   //DECODER_OPTION_END_OF_STREAM
   void TestEndOfStream();
   //DECODER_OPTION_VCL_NAL
@@ -333,6 +335,29 @@ void DecoderInterfaceTest::TestParseOnlyAPI() {
     m_pDec->Uninitialize();
   }
 
+}
+
+//DECODER_OPTION_NUM_OF_THREADS
+void DecoderInterfaceTest::TestNumOfThreads() {
+  CM_RETURN eRet;
+  int32_t iThreads = 2;
+  int32_t iRet = ERR_NONE;
+
+  m_pDec->Uninitialize();
+
+  // Set option before Initialize succeeds
+  eRet = (CM_RETURN) m_pDec->SetOption (DECODER_OPTION_NUM_OF_THREADS, &iThreads);
+  EXPECT_EQ (eRet, cmResultSuccess);
+
+  // Initialize decoder
+  iRet = ValidInit();
+  ASSERT_EQ (iRet, ERR_NONE);
+
+  // Set option after Initialize fails
+  eRet = (CM_RETURN) m_pDec->SetOption (DECODER_OPTION_NUM_OF_THREADS, &iThreads);
+  EXPECT_EQ (eRet, cmInitParaError);
+
+  m_pDec->Uninitialize();
 }
 
 //DECODER_OPTION_END_OF_STREAM
@@ -663,6 +688,8 @@ TEST_F (DecoderInterfaceTest, DecoderInterfaceAll) {
 
   //Initialize Uninitialize
   TestInitUninit();
+  //DECODER_OPTION_NUM_OF_THREADS
+  TestNumOfThreads();
   //DECODER_OPTION_END_OF_STREAM
   TestEndOfStream();
   //DECODER_OPTION_VCL_NAL
