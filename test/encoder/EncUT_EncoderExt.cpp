@@ -681,6 +681,38 @@ TEST_F (EncoderInterfaceTest, HighBitrateIdrTargetBits) {
   pPtrEnc->Uninitialize();
 }
 
+TEST_F (EncoderInterfaceTest, HighBitrateTimestampTargetBits) {
+  SEncParamExt sEncParamExt;
+  pPtrEnc->GetDefaultParams (&sEncParamExt);
+  sEncParamExt.iUsageType = CAMERA_VIDEO_REAL_TIME;
+  sEncParamExt.iPicWidth = 1280;
+  sEncParamExt.iPicHeight = 720;
+  sEncParamExt.iTargetBitrate = 60000000;
+  sEncParamExt.fMaxFrameRate = 30.0f;
+  sEncParamExt.iRCMode = RC_TIMESTAMP_MODE;
+  sEncParamExt.iTemporalLayerNum = 1;
+  sEncParamExt.iSpatialLayerNum = 1;
+  sEncParamExt.sSpatialLayers[0].iVideoWidth = sEncParamExt.iPicWidth;
+  sEncParamExt.sSpatialLayers[0].iVideoHeight = sEncParamExt.iPicHeight;
+  sEncParamExt.sSpatialLayers[0].iSpatialBitrate = sEncParamExt.iTargetBitrate;
+  sEncParamExt.sSpatialLayers[0].fFrameRate = sEncParamExt.fMaxFrameRate;
+
+  int iResult = pPtrEnc->InitializeExt (&sEncParamExt);
+  EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+
+  PrepareOneSrcFrame();
+
+  // The IDR frame sizes the skip/padding buffers in WelsRcFrameDelayJudgeTimeStamp,
+  // the P frame takes the GOP-weighted path in RcDecideTargetBitsTimestamp.
+  for (int i = 0; i < 2; i++) {
+    iResult = pPtrEnc->EncodeFrame (pSrcPic, &sFbi);
+    EXPECT_EQ (iResult, static_cast<int> (cmResultSuccess));
+    pSrcPic->uiTimeStamp += 33;
+  }
+
+  pPtrEnc->Uninitialize();
+}
+
 TEST_F (EncoderInterfaceTest, BasicInitializeTestAutoAdjustment) {
   SEncParamBase sEncParamBase;
 
