@@ -27,9 +27,9 @@ TEST (MemoryAlignTest, GetCacheLineSize_MaxUINT) {
 //Tests of WelsGetCacheLineSize End
 //Tests of WelsMallocAndFree Begin
 TEST (MemoryAlignTest, WelsMallocAndFreeOnceFunctionVerify) {
-  const uint32_t kuiTargetAlignSize[4] = {32, 16, 64, 8};
+  const uint32_t kuiTargetAlignSize[5] = {32, 16, 64, 8, 48};
   const uint32_t kuiZero = 0;
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < 5; i++) {
     const uint32_t kuiTestAlignSize = kuiTargetAlignSize[i];
     const uint32_t kuiTestDataSize  = abs (rand());
 
@@ -42,7 +42,7 @@ TEST (MemoryAlignTest, WelsMallocAndFreeOnceFunctionVerify) {
     const uint32_t kuiExpectedSize      = sizeof (void**) + sizeof (int32_t) + kuiExtraAlignSize + uiSize;
     uint8_t* pUnitTestData = static_cast<uint8_t*> (cTestMa.WelsMalloc (uiSize, strUnitTestTag));
     if (pUnitTestData != NULL) {
-      ASSERT_TRUE ((((uintptr_t) (pUnitTestData)) & kuiExtraAlignSize) == 0);
+      ASSERT_TRUE (((uintptr_t) pUnitTestData % kuiUsedCacheLineSize) == 0);
       EXPECT_EQ (kuiExpectedSize, cTestMa.WelsGetMemoryUsage());
       cTestMa.WelsFree (pUnitTestData, strUnitTestTag);
       EXPECT_EQ (kuiZero, cTestMa.WelsGetMemoryUsage());

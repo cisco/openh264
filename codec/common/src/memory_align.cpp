@@ -91,7 +91,7 @@ void* WelsMalloc (const uint32_t kuiSize, const char* kpTag, const uint32_t kiAl
 #endif
   uint8_t* pAlignedBuffer;
   pAlignedBuffer = pBuf + kiAlignedBytes + kiSizeOfVoidPointer + kiSizeOfInt;
-  pAlignedBuffer -= ((uintptr_t) pAlignedBuffer & kiAlignedBytes);
+  pAlignedBuffer -= ((uintptr_t) pAlignedBuffer % kiAlign);
   * ((void**) (pAlignedBuffer - kiSizeOfVoidPointer)) = pBuf;
   * ((int32_t*) (pAlignedBuffer - (kiSizeOfVoidPointer + kiSizeOfInt))) = kiPayloadSize;
 
