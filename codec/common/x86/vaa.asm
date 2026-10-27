@@ -101,7 +101,7 @@
     punpcklwd %1, %2
     punpckhwd %3, %4
     punpcklwd %1, %3
-    psraw %1, $04
+    psraw %1, 0x04
 %endmacro
 
 %macro VAA_AVG_BLOCK_SSSE3 6 ; dst, t0, t1, t2, t3, t4
@@ -129,7 +129,7 @@
     paddw %2, %4    ; block 2, 3
     phaddw %1, %2   ; block[0]: 0-15, 16-31; block[1]: 32-47, 48-63; ..
     phaddw %1, xmm7 ; block[0]: 0-15; block[1]: 16-31; block[2]: 32-47; block[3]: 48-63; ....
-    psraw %1, $04
+    psraw %1, 0x04
 %endmacro
 
 
@@ -167,12 +167,12 @@ WELS_EXTERN AnalysisVaaInfoIntra_sse2
 
 
     mov r2,r1
-    sal r2,$01   ;r2 = 2*iLineSize
+    sal r2,0x01 ;r2 = 2*iLineSize
     mov r3,r2
     add r3,r1   ;r3 = 3*iLineSize
 
     mov r4,r2
-    sal r4,$01   ;r4 = 4*iLineSize
+    sal r4,0x01 ;r4 = 4*iLineSize
 
     pxor xmm7, xmm7
 
@@ -220,7 +220,7 @@ WELS_EXTERN AnalysisVaaInfoIntra_sse2
     and r2, 0ffffh      ; effective low work truncated
     mov r3, r2
     imul r2, r3
-    sar r2, $04
+    sar r2, 0x04
     movd retrd, xmm1
     sub retrd, r2d
 
@@ -262,12 +262,12 @@ WELS_EXTERN AnalysisVaaInfoIntra_ssse3
 
 
     mov r2,r1
-    sal r2,$01   ;r2 = 2*iLineSize
+    sal r2,0x01 ;r2 = 2*iLineSize
     mov r3,r2
     add r3,r1   ;r3 = 3*iLineSize
 
     mov r4,r2
-    sal r4,$01   ;r4 = 4*iLineSize
+    sal r4,0x01 ;r4 = 4*iLineSize
 
     pxor xmm7, xmm7
 
@@ -316,7 +316,7 @@ WELS_EXTERN AnalysisVaaInfoIntra_ssse3
     and r2, 0ffffh          ; effective low work truncated
     mov r3, r2
     imul r2, r3
-    sar r2, $04
+    sar r2, 0x04
     movd retrd, xmm1
     sub retrd, r2d
 

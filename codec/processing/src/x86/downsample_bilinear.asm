@@ -132,7 +132,7 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx32_sse
     push r12
     mov r12, r4
 %endif
-    sar r5, $01            ; iSrcHeight >> 1
+    sar r5, 0x01           ; iSrcHeight >> 1
 
 .yloops1:
 %ifdef X86_32
@@ -140,9 +140,9 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx32_sse
 %else
     mov r4, r12
 %endif
-    sar r4, $01            ; iSrcWidth >> 1
+    sar r4, 0x01           ; iSrcWidth >> 1
     mov r6, r4        ; iDstWidth restored at ebx
-    sar r4, $04            ; (iSrcWidth >> 1) / 16     ; loop count = num_of_mb
+    sar r4, 0x04           ; (iSrcWidth >> 1) / 16     ; loop count = num_of_mb
     neg r6             ; - (iSrcWidth >> 1)
     ; each loop = source bandwidth: 32 bytes
 .xloops1:
@@ -293,7 +293,7 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx16_sse
     push r12
     mov r12, r4
 %endif
-    sar r5, $01            ; iSrcHeight >> 1
+    sar r5, 0x01           ; iSrcHeight >> 1
 
 .yloops2:
 %ifdef X86_32
@@ -301,9 +301,9 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx16_sse
 %else
     mov r4, r12
 %endif
-    sar r4, $01            ; iSrcWidth >> 1
+    sar r4, 0x01           ; iSrcWidth >> 1
     mov r6, r4        ; iDstWidth restored at ebx
-    sar r4, $03            ; (iSrcWidth >> 1) / 8     ; loop count = num_of_mb
+    sar r4, 0x03           ; (iSrcWidth >> 1) / 8     ; loop count = num_of_mb
     neg r6             ; - (iSrcWidth >> 1)
     ; each loop = source bandwidth: 16 bytes
 .xloops2:
@@ -405,7 +405,7 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx8_sse
     push r12
     mov r12, r4
 %endif
-    sar r5, $01            ; iSrcHeight >> 1
+    sar r5, 0x01           ; iSrcHeight >> 1
 
 .yloops3:
 %ifdef X86_32
@@ -413,9 +413,9 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx8_sse
 %else
     mov r4, r12
 %endif
-    sar r4, $01            ; iSrcWidth >> 1
+    sar r4, 0x01           ; iSrcWidth >> 1
     mov r6, r4        ; iDstWidth restored at ebx
-    sar r4, $02            ; (iSrcWidth >> 1) / 4     ; loop count = num_of_mb
+    sar r4, 0x02           ; (iSrcWidth >> 1) / 4     ; loop count = num_of_mb
     neg r6             ; - (iSrcWidth >> 1)
     ; each loop = source bandwidth: 8 bytes
 .xloops3:
@@ -504,11 +504,11 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx32_ssse3
     push r12
     mov r12, r4
 %endif
-    sar r5, $01            ; iSrcHeight >> 1
+    sar r5, 0x01           ; iSrcHeight >> 1
 
     WELS_DB1 xmm3
     WELS_Zero xmm2
-    sar r4, $01            ; iSrcWidth >> 1
+    sar r4, 0x01           ; iSrcWidth >> 1
     add r0, r4             ; pDst += iSrcWidth >> 1
 
 .yloops4:
@@ -517,7 +517,7 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx32_ssse3
 %else
     mov r4, r12
 %endif
-    sar r4, $01            ; iSrcWidth >> 1
+    sar r4, 0x01           ; iSrcWidth >> 1
     neg r4                 ; -(iSrcWidth >> 1)
     mov r6, r4
     align 16
@@ -579,11 +579,11 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx16_ssse3
     push r12
     mov r12, r4
 %endif
-    sar r5, $01            ; iSrcHeight >> 1
+    sar r5, 0x01           ; iSrcHeight >> 1
     WELS_DB1 xmm3
     WELS_Zero xmm2
     add r2, r4             ; pSrc += iSrcWidth
-    sar r4, $01            ; iSrcWidth >> 1
+    sar r4, 0x01           ; iSrcWidth >> 1
     add r0, r4             ; pDst += iSrcWidth >> 1
 
 .yloops5:
@@ -592,7 +592,7 @@ WELS_EXTERN DyadicBilinearDownsamplerWidthx16_ssse3
 %else
     mov r4, r12
 %endif
-    sar r4, $01            ; iSrcWidth >> 1
+    sar r4, 0x01           ; iSrcWidth >> 1
     neg r4                 ; -(iSrcWidth >> 1)
     lea r6, [r2+r3]        ; pSrc + iSrcStride
     align 16
@@ -1958,7 +1958,7 @@ WELS_EXTERN DyadicBilinearQuarterDownsampler_sse
     push r12
     mov r12, r4
 %endif
-    sar r5, $02            ; iSrcHeight >> 2
+    sar r5, 0x02           ; iSrcHeight >> 2
 
     mov r6, r1             ;Save the tailer for the unasigned size
     imul r6, r5
@@ -2129,7 +2129,7 @@ WELS_EXTERN DyadicBilinearQuarterDownsampler_ssse3
     push r12
     mov r12, r4
 %endif
-    sar r5, $02            ; iSrcHeight >> 2
+    sar r5, 0x02           ; iSrcHeight >> 2
 
     mov r6, r1             ;Save the tailer for the unasigned size
     imul r6, r5
@@ -2142,9 +2142,9 @@ WELS_EXTERN DyadicBilinearQuarterDownsampler_ssse3
 
 .yloops_quarter_sse3:
     ;mov eax, [esp+40]   ; iSrcWidth
-    ;sar eax, $02            ; iSrcWidth >> 2
+    ;sar eax, 0x02           ; iSrcWidth >> 2
     ;mov ebx, eax        ; iDstWidth restored at ebx
-    ;sar eax, $04            ; (iSrcWidth >> 2) / 16     ; loop count = num_of_mb
+    ;sar eax, 0x04           ; (iSrcWidth >> 2) / 16     ; loop count = num_of_mb
     ;neg ebx             ; - (iSrcWidth >> 2)
 %ifdef X86_32
     mov r4, arg5
@@ -2241,7 +2241,7 @@ WELS_EXTERN DyadicBilinearQuarterDownsampler_sse4
     push r12
     mov r12, r4
 %endif
-    sar r5, $02            ; iSrcHeight >> 2
+    sar r5, 0x02           ; iSrcHeight >> 2
 
     mov r6, r1             ;Save the tailer for the unasigned size
     imul r6, r5

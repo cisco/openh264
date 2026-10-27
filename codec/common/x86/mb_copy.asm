@@ -364,7 +364,7 @@ WELS_EXTERN UpdateMbMv_sse2
     LOAD_2_PARA
 
     movd xmm0, r1d  ; _mv
-    pshufd xmm1, xmm0, $00
+    pshufd xmm1, xmm0, 0x00
     movdqa [r0     ], xmm1
     movdqa [r0+0x10], xmm1
     movdqa [r0+0x20], xmm1

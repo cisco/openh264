@@ -142,17 +142,17 @@ SECTION .text
 
 %macro MMX_SumSubMul2 3
     movq    %3, %1
-    psllw   %1, $01
+    psllw   %1, 0x01
     paddw   %1, %2
-    psllw   %2, $01
+    psllw   %2, 0x01
     psubw   %3, %2
 %endmacro
 
 %macro MMX_SumSubDiv2 3
     movq    %3, %2
-    psraw   %3, $01
+    psraw   %3, 0x01
     paddw   %3, %1
-    psraw   %1, $01
+    psraw   %1, 0x01
     psubw   %1, %2
 %endmacro
 
@@ -180,7 +180,7 @@ SECTION .text
     movd       %2, %6
     punpcklbw  %2, %4
     paddw      %1, %3
-    psraw      %1, $06
+    psraw      %1, 0x06
     paddsw     %1, %2
     packuswb   %1, %2
     movd       %5, %1
@@ -289,20 +289,20 @@ WELS_EXTERN WelsIDctT4Rec_mmx
 %macro SSE2_SumSubDiv2 4
     movdqa  %4, %1
     movdqa  %3, %2
-    psraw   %2, $01
-    psraw   %4, $01
+    psraw   %2, 0x01
+    psraw   %4, 0x01
     paddw   %1, %2
     psubw   %4, %3
 %endmacro
 
 %macro SSE2_StoreDiff16p 9
     paddw       %1, %4
-    psraw       %1, $06
+    psraw       %1, 0x06
     movq        %3, %7
     punpcklbw   %3, %5
     paddsw      %1, %3
     paddw       %2, %4
-    psraw       %2, $06
+    psraw       %2, 0x06
     movq        %3, %9
     punpcklbw   %3, %5
     paddsw      %2, %3
@@ -358,7 +358,7 @@ WELS_EXTERN WelsIDctT4Rec_mmx
 %macro SSE2_Load8DC 6
     movdqa      %1,     %6      ; %1 = dc0 dc1
     paddw       %1,     %5
-    psraw       %1,     $06     ; (dc + 32) >> 6
+    psraw       %1,     0x06    ; (dc + 32) >> 6
 
     movdqa      %2,     %1
     psrldq      %2,     4
