@@ -7,6 +7,7 @@ test_sources = [
   'DecUT_IntraPrediction.cpp',
   'DecUT_ParseSyntax.cpp',
   'DecUT_PredMv.cpp',
+  'DecUT_RefListReorder.cpp',
 ]
 
 e = executable('test_decoder', test_sources,
