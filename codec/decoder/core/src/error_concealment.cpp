@@ -491,6 +491,9 @@ int32_t MarkECFrameAsRef (PWelsDecoderContext pCtx) {
 }
 
 bool NeedErrorCon (PWelsDecoderContext pCtx) {
+  if (pCtx == NULL || pCtx->pSps == NULL || pCtx->pCurDqLayer == NULL || pCtx->pCurDqLayer->pMbCorrectlyDecodedFlag == NULL) {
+    return false;
+  }
   bool bNeedEC = false;
   int32_t iMbNum = pCtx->pSps->iMbWidth * pCtx->pSps->iMbHeight;
   for (int32_t i = 0; i < iMbNum; ++i) {
