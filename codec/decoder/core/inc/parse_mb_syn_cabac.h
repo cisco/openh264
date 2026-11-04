@@ -67,9 +67,10 @@ int32_t ParseCbpInfoCabac (PWelsDecoderContext pCtx, PWelsNeighAvail pNeighAvail
 int32_t ParseDeltaQpCabac (PWelsDecoderContext pCtx, int32_t& iQpDelta);
 int32_t ParseCbfInfoCabac (PWelsNeighAvail pNeighAvail, uint8_t* pNzcCache, int32_t index, int32_t iResProperty,
                            PWelsDecoderContext pCtx, uint32_t& uiCbpBit);
-int32_t ParseSignificantMapCabac (int32_t* pSignificantMap, int32_t iResProperty, PWelsDecoderContext pCtx,
-                                  uint32_t& uiBinVal);
-int32_t ParseSignificantCoeffCabac (int32_t* significant, int32_t iResProperty, PWelsDecoderContext pCtx);
+int32_t ParseSignificantMapCabac (uint8_t* pSigPos, int32_t iResProperty, PWelsDecoderContext pCtx,
+                                  uint32_t& uiCoeffNum);
+int32_t ParseSignificantCoeffCabac (int32_t* pLevel, uint32_t uiCoeffNum, int32_t iResProperty,
+                                    PWelsDecoderContext pCtx);
 int32_t ParseResidualBlockCabac (PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroCountCache, SBitStringAux* pBsAux,
                                  int32_t index, int32_t iMaxNumCoeff, const uint8_t* pScanTable, int32_t iResProperty, int16_t* sTCoeff, uint8_t uiQp,
                                  PWelsDecoderContext pCtx);

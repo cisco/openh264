@@ -79,6 +79,9 @@ static const uint8_t g_kRenormTable256[256] = {
 };
 
 
+#define WELS_CABAC_HALF    0x01FE
+#define WELS_CABAC_QUARTER 0x0100
+
 //1. CABAC context initialization
 void WelsCabacGlobalInit (PWelsDecoderContext pCabacCtx);
 void WelsCabacContextInit (PWelsDecoderContext  pCtx, uint8_t eSliceType, int32_t iCabacInitIdc, int32_t iQp);
@@ -88,9 +91,87 @@ int32_t InitCabacDecEngineFromBS (PWelsCabacDecEngine pDecEngine, SBitStringAux*
 void RestoreCabacDecEngineToBS (PWelsCabacDecEngine pDecEngine, SBitStringAux* pBsAux);
 //3. actual decoding
 int32_t Read32BitsCabac (PWelsCabacDecEngine pDecEngine, uint32_t& uiValue, int32_t& iNumBitsRead);
-int32_t DecodeBinCabac (PWelsCabacDecEngine pDecEngine, PWelsCabacCtx pBinCtx, uint32_t& uiBit);
-int32_t DecodeBypassCabac (PWelsCabacDecEngine pDecEngine, uint32_t& uiBinVal);
 int32_t  DecodeTerminateCabac (PWelsCabacDecEngine pDecEngine, uint32_t& uiBinVal);
+
+// DecodeBinCabac() and DecodeBypassCabac() run once per bin, i.e. many times per macroblock, and
+// are called from parse_mb_syn_cabac.cpp. They are defined inline here so the compiler can inline
+// them into the syntax element parsers instead of paying for a cross-file call for every bin; only
+// the rare bitstream refill (Read32BitsCabac) stays out of line.
+static inline int32_t DecodeBinCabac (PWelsCabacDecEngine pDecEngine, PWelsCabacCtx pBinCtx, uint32_t& uiBinVal) {
+  int32_t iErrorInfo = ERR_NONE;
+  uint32_t uiState = pBinCtx->uiState;
+  uiBinVal = pBinCtx->uiMPS;
+  uint64_t uiOffset = pDecEngine->uiOffset;
+  uint64_t uiRange = pDecEngine->uiRange;
+
+  int32_t iRenorm = 1;
+  uint32_t uiRangeLPS = g_kuiCabacRangeLps[uiState][ (uiRange >> 6) & 0x03];
+  uiRange -= uiRangeLPS;
+  if (uiOffset >= (uiRange << pDecEngine->iBitsLeft)) { //LPS
+    uiOffset -= (uiRange << pDecEngine->iBitsLeft);
+    uiBinVal ^= 0x0001;
+    if (!uiState)
+      pBinCtx->uiMPS ^= 0x01;
+    pBinCtx->uiState = g_kuiStateTransTable[uiState][0];
+    iRenorm = g_kRenormTable256[uiRangeLPS];
+    uiRange = (uiRangeLPS << iRenorm);
+  } else {  //MPS
+    pBinCtx->uiState = g_kuiStateTransTable[uiState][1];
+    if (uiRange >= WELS_CABAC_QUARTER) {
+      pDecEngine->uiRange = uiRange;
+      return ERR_NONE;
+    } else {
+      uiRange <<= 1;
+    }
+  }
+  //Renorm
+  pDecEngine->uiRange = uiRange;
+  pDecEngine->iBitsLeft -= iRenorm;
+  if (pDecEngine->iBitsLeft > 0) {
+    pDecEngine->uiOffset = uiOffset;
+    return ERR_NONE;
+  }
+  uint32_t uiVal = 0;
+  int32_t iNumBitsRead = 0;
+  iErrorInfo = Read32BitsCabac (pDecEngine, uiVal, iNumBitsRead);
+  pDecEngine->uiOffset = (uiOffset << iNumBitsRead) | uiVal;
+  pDecEngine->iBitsLeft += iNumBitsRead;
+  if (iErrorInfo && pDecEngine->iBitsLeft < 0) {
+    return iErrorInfo;
+  }
+  return ERR_NONE;
+}
+
+static inline int32_t DecodeBypassCabac (PWelsCabacDecEngine pDecEngine, uint32_t& uiBinVal) {
+  int32_t iErrorInfo = ERR_NONE;
+  int32_t iBitsLeft = pDecEngine->iBitsLeft;
+  uint64_t uiOffset = pDecEngine->uiOffset;
+  uint64_t uiRangeValue;
+
+
+  if (iBitsLeft <= 0) {
+    uint32_t uiVal = 0;
+    int32_t iNumBitsRead = 0;
+    iErrorInfo = Read32BitsCabac (pDecEngine, uiVal, iNumBitsRead);
+    uiOffset = (uiOffset << iNumBitsRead) | uiVal;
+    iBitsLeft = iNumBitsRead;
+    if (iErrorInfo && iBitsLeft == 0) {
+      return iErrorInfo;
+    }
+  }
+  iBitsLeft--;
+  uiRangeValue = (pDecEngine->uiRange << iBitsLeft);
+  if (uiOffset >= uiRangeValue) {
+    pDecEngine->iBitsLeft = iBitsLeft;
+    pDecEngine->uiOffset = uiOffset - uiRangeValue;
+    uiBinVal = 1;
+    return ERR_NONE;
+  }
+  pDecEngine->iBitsLeft = iBitsLeft;
+  pDecEngine->uiOffset = uiOffset;
+  uiBinVal = 0;
+  return ERR_NONE;
+}
 
 //4. unary parsing
 int32_t DecodeUnaryBinCabac (PWelsCabacDecEngine pDecEngine, PWelsCabacCtx pBinCtx, int32_t iCtxOffset,
@@ -101,8 +182,6 @@ int32_t DecodeExpBypassCabac (PWelsCabacDecEngine pDecEngine, int32_t iCount, ui
 uint32_t DecodeUEGLevelCabac (PWelsCabacDecEngine pDecEngine, PWelsCabacCtx pBinCtx, uint32_t& uiBinVal);
 int32_t DecodeUEGMvCabac (PWelsCabacDecEngine pDecEngine, PWelsCabacCtx pBinCtx, uint32_t iMaxC,  uint32_t& uiCode);
 
-#define WELS_CABAC_HALF    0x01FE
-#define WELS_CABAC_QUARTER 0x0100
 #define WELS_CABAC_FALSE_RETURN(iErrorInfo) \
 if(iErrorInfo) { \
   return iErrorInfo; \
