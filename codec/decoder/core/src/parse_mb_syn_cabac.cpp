@@ -1316,82 +1316,87 @@ int32_t ParseCbfInfoCabac (PWelsNeighAvail pNeighAvail, uint8_t* pNzcCache, int3
   return ERR_NONE;
 }
 
-int32_t ParseSignificantMapCabac (int32_t* pSignificantMap, int32_t iResProperty, PWelsDecoderContext pCtx,
+// Parses significant_coeff_flag / last_significant_coeff_flag of one block. Instead of a 0/1 map
+// over all positions, the scan positions of the significant coefficients are returned in
+// pSigPos[0..uiCoeffNum-1] (ascending), so the level parsing and dequantization below only
+// visit the coefficients that are actually coded.
+int32_t ParseSignificantMapCabac (uint8_t* pSigPos, int32_t iResProperty, PWelsDecoderContext pCtx,
                                   uint32_t& uiCoeffNum) {
   uint32_t uiCode;
+  PWelsCabacDecEngine pDecEngine = pCtx->pCabacDecEngine;
 
   PWelsCabacCtx pMapCtx  = pCtx->pCabacCtx + (iResProperty == LUMA_DC_AC_8 ? NEW_CTX_OFFSET_MAP_8x8 : NEW_CTX_OFFSET_MAP)
                            + g_kBlockCat2CtxOffsetMap [iResProperty];
   PWelsCabacCtx pLastCtx = pCtx->pCabacCtx + (iResProperty == LUMA_DC_AC_8 ? NEW_CTX_OFFSET_LAST_8x8 :
                            NEW_CTX_OFFSET_LAST) + g_kBlockCat2CtxOffsetLast[iResProperty];
 
-
+  const int32_t iMaxPos = g_kMaxPos[iResProperty];
+  uint32_t uiNum = 0;
   int32_t i;
-  uiCoeffNum = 0;
-  int32_t i0 = 0;
-  int32_t i1 = g_kMaxPos[iResProperty];
 
-  int32_t iCtx;
-
-  for (i = i0; i < i1; ++i) {
-    iCtx = (iResProperty == LUMA_DC_AC_8 ? g_kuiIdx2CtxSignificantCoeffFlag8x8[i] : i);
-    //read significant
-    WELS_READ_VERIFY (DecodeBinCabac (pCtx->pCabacDecEngine, pMapCtx + iCtx, uiCode));
-    if (uiCode) {
-      * (pSignificantMap++) = 1;
-      ++ uiCoeffNum;
-      //read last significant
-      iCtx = (iResProperty == LUMA_DC_AC_8 ? g_kuiIdx2CtxLastSignificantCoeffFlag8x8[i] : i);
-      WELS_READ_VERIFY (DecodeBinCabac (pCtx->pCabacDecEngine, pLastCtx + iCtx, uiCode));
+  if (iResProperty == LUMA_DC_AC_8) {
+    for (i = 0; i < iMaxPos; ++i) {
+      WELS_READ_VERIFY (DecodeBinCabac (pDecEngine, pMapCtx + g_kuiIdx2CtxSignificantCoeffFlag8x8[i], uiCode));
       if (uiCode) {
-        memset (pSignificantMap, 0, (i1 - i) * sizeof (int32_t));
-        return ERR_NONE;
+        pSigPos[uiNum++] = (uint8_t)i;
+        WELS_READ_VERIFY (DecodeBinCabac (pDecEngine, pLastCtx + g_kuiIdx2CtxLastSignificantCoeffFlag8x8[i], uiCode));
+        if (uiCode) {
+          uiCoeffNum = uiNum;
+          return ERR_NONE;
+        }
       }
-    } else
-      * (pSignificantMap++) = 0;
+    }
+  } else {
+    for (i = 0; i < iMaxPos; ++i) {
+      WELS_READ_VERIFY (DecodeBinCabac (pDecEngine, pMapCtx + i, uiCode));
+      if (uiCode) {
+        pSigPos[uiNum++] = (uint8_t)i;
+        WELS_READ_VERIFY (DecodeBinCabac (pDecEngine, pLastCtx + i, uiCode));
+        if (uiCode) {
+          uiCoeffNum = uiNum;
+          return ERR_NONE;
+        }
+      }
+    }
   }
 
-  //deal with last pSignificantMap if no data
-  //if(i < i1+1)
-  {
-    *pSignificantMap = 1;
-    ++uiCoeffNum;
-  }
-
+  // No last_significant_coeff_flag was set: the last position is significant.
+  pSigPos[uiNum++] = (uint8_t)iMaxPos;
+  uiCoeffNum = uiNum;
   return ERR_NONE;
 }
 
-int32_t ParseSignificantCoeffCabac (int32_t* pSignificant, int32_t iResProperty, PWelsDecoderContext pCtx) {
+// Parses the levels (coeff_abs_level_minus1 and sign) of the uiCoeffNum significant coefficients,
+// in reverse scan order as required by the standard. pLevel[k] receives the level of the
+// coefficient at scan position pSigPos[k].
+int32_t ParseSignificantCoeffCabac (int32_t* pLevel, uint32_t uiCoeffNum, int32_t iResProperty,
+                                    PWelsDecoderContext pCtx) {
   uint32_t uiCode;
+  PWelsCabacDecEngine pDecEngine = pCtx->pCabacDecEngine;
   PWelsCabacCtx pOneCtx = pCtx->pCabacCtx + (iResProperty == LUMA_DC_AC_8 ? NEW_CTX_OFFSET_ONE_8x8 : NEW_CTX_OFFSET_ONE) +
                           g_kBlockCat2CtxOffsetOne[iResProperty];
   PWelsCabacCtx pAbsCtx = pCtx->pCabacCtx + (iResProperty == LUMA_DC_AC_8 ? NEW_CTX_OFFSET_ABS_8x8 : NEW_CTX_OFFSET_ABS) +
                           g_kBlockCat2CtxOffsetAbs[iResProperty];
 
-  const int16_t iMaxType = g_kMaxC2[iResProperty];
-  int32_t i = g_kMaxPos[iResProperty];
-  int32_t* pCoff = pSignificant + i;
+  const int32_t iMaxType = g_kMaxC2[iResProperty];
   int32_t c1 = 1;
   int32_t c2 = 0;
-  for (; i >= 0; --i) {
-    if (*pCoff != 0) {
-      WELS_READ_VERIFY (DecodeBinCabac (pCtx->pCabacDecEngine, pOneCtx + c1, uiCode));
-      *pCoff += uiCode;
-      if (*pCoff == 2) {
-        WELS_READ_VERIFY (DecodeUEGLevelCabac (pCtx->pCabacDecEngine, pAbsCtx + c2, uiCode));
-        *pCoff += uiCode;
-        ++c2;
-        c2 = WELS_MIN (c2, iMaxType);
-        c1 = 0;
-      } else if (c1) {
-        ++c1;
-        c1 = WELS_MIN (c1, 4);
-      }
-      WELS_READ_VERIFY (DecodeBypassCabac (pCtx->pCabacDecEngine, uiCode));
-      if (uiCode)
-        *pCoff = - *pCoff;
+  for (int32_t k = (int32_t)uiCoeffNum - 1; k >= 0; --k) {
+    int32_t iLevel;
+    WELS_READ_VERIFY (DecodeBinCabac (pDecEngine, pOneCtx + c1, uiCode));
+    iLevel = 1 + (int32_t)uiCode;
+    if (iLevel == 2) {
+      WELS_READ_VERIFY (DecodeUEGLevelCabac (pDecEngine, pAbsCtx + c2, uiCode));
+      iLevel += uiCode;
+      ++c2;
+      c2 = WELS_MIN (c2, iMaxType);
+      c1 = 0;
+    } else if (c1) {
+      ++c1;
+      c1 = WELS_MIN (c1, 4);
     }
-    pCoff--;
+    WELS_READ_VERIFY (DecodeBypassCabac (pDecEngine, uiCode));
+    pLevel[k] = uiCode ? -iLevel : iLevel;
   }
   return ERR_NONE;
 }
@@ -1400,37 +1405,28 @@ int32_t ParseResidualBlockCabac8x8 (PWelsNeighAvail pNeighAvail, uint8_t* pNonZe
                                     int32_t iIndex, int32_t iMaxNumCoeff, const uint8_t* pScanTable, int32_t iResProperty,
                                     short* sTCoeff, /*int mb_mode*/ uint8_t uiQp, PWelsDecoderContext pCtx) {
   uint32_t uiTotalCoeffNum = 0;
-  uint32_t uiCbpBit;
-  int32_t pSignificantMap[64] = {0};
+  uint8_t pSigPos[64];
+  int32_t pLevel[64];
 
   int32_t iMbResProperty = 0;
   GetMbResProperty (&iMbResProperty, &iResProperty, false);
   const uint16_t* pDeQuantMul = (pCtx->bUseScalingList) ? pCtx->pDequant_coeff8x8[iMbResProperty - 6][uiQp] :
                                 g_kuiDequantCoeff8x8[uiQp];
 
-  uiCbpBit = 1; // for 8x8, MaxNumCoeff == 64 && uiCbpBit == 1
-  if (uiCbpBit) { //has coeff
-    WELS_READ_VERIFY (ParseSignificantMapCabac (pSignificantMap, iResProperty, pCtx, uiTotalCoeffNum));
-    WELS_READ_VERIFY (ParseSignificantCoeffCabac (pSignificantMap, iResProperty, pCtx));
-  }
+  // for 8x8, MaxNumCoeff == 64 and coded_block_flag is always 1
+  WELS_READ_VERIFY (ParseSignificantMapCabac (pSigPos, iResProperty, pCtx, uiTotalCoeffNum));
+  WELS_READ_VERIFY (ParseSignificantCoeffCabac (pLevel, uiTotalCoeffNum, iResProperty, pCtx));
 
   pNonZeroCountCache[g_kCacheNzcScanIdx[iIndex]] =
     pNonZeroCountCache[g_kCacheNzcScanIdx[iIndex + 1]] =
       pNonZeroCountCache[g_kCacheNzcScanIdx[iIndex + 2]] =
         pNonZeroCountCache[g_kCacheNzcScanIdx[iIndex + 3]] = (uint8_t)uiTotalCoeffNum;
-  if (uiTotalCoeffNum == 0) {
-    return ERR_NONE;
-  }
-  int32_t j = 0, i;
   if (iResProperty == LUMA_DC_AC_8) {
-    do {
-      if (pSignificantMap[j] != 0) {
-        i = pScanTable[ j ];
-        sTCoeff[i] = uiQp >= 36 ? ((pSignificantMap[j] * pDeQuantMul[i]) * (1 << (uiQp / 6 - 6))) : ((
-                       pSignificantMap[j] * pDeQuantMul[i] + (1 << (5 - uiQp / 6))) >> (6 - uiQp / 6));
-      }
-      ++j;
-    } while (j < 64);
+    for (uint32_t k = 0; k < uiTotalCoeffNum; ++k) {
+      const int32_t i = pScanTable[pSigPos[k]];
+      sTCoeff[i] = uiQp >= 36 ? ((pLevel[k] * pDeQuantMul[i]) * (1 << (uiQp / 6 - 6))) : ((
+                     pLevel[k] * pDeQuantMul[i] + (1 << (5 - uiQp / 6))) >> (6 - uiQp / 6));
+    }
   }
 
   return ERR_NONE;
@@ -1443,7 +1439,8 @@ int32_t ParseResidualBlockCabac (PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroC
   int32_t iCurNzCacheIdx;
   uint32_t uiTotalCoeffNum = 0;
   uint32_t uiCbpBit;
-  int32_t pSignificantMap[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  uint8_t pSigPos[16];
+  int32_t pLevel[16];
 
   int32_t iMbResProperty = 0;
   GetMbResProperty (&iMbResProperty, &iResProperty, false);
@@ -1452,8 +1449,8 @@ int32_t ParseResidualBlockCabac (PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroC
 
   WELS_READ_VERIFY (ParseCbfInfoCabac (pNeighAvail, pNonZeroCountCache, iIndex, iResProperty, pCtx, uiCbpBit));
   if (uiCbpBit) { //has coeff
-    WELS_READ_VERIFY (ParseSignificantMapCabac (pSignificantMap, iResProperty, pCtx, uiTotalCoeffNum));
-    WELS_READ_VERIFY (ParseSignificantCoeffCabac (pSignificantMap, iResProperty, pCtx));
+    WELS_READ_VERIFY (ParseSignificantMapCabac (pSigPos, iResProperty, pCtx, uiTotalCoeffNum));
+    WELS_READ_VERIFY (ParseSignificantCoeffCabac (pLevel, uiTotalCoeffNum, iResProperty, pCtx));
   }
 
   iCurNzCacheIdx = g_kCacheNzcScanIdx[iIndex];
@@ -1461,41 +1458,42 @@ int32_t ParseResidualBlockCabac (PWelsNeighAvail pNeighAvail, uint8_t* pNonZeroC
   if (uiTotalCoeffNum == 0) {
     return ERR_NONE;
   }
-  int32_t j = 0;
-  if (iResProperty == I16_LUMA_DC) {
-    do {
-      sTCoeff[pScanTable[j]] = pSignificantMap[j];
-      ++j;
-    } while (j < 16);
-    WelsLumaDcDequantIdct (sTCoeff, uiQp, pCtx);
-  } else if (iResProperty == CHROMA_DC_U || iResProperty == CHROMA_DC_V) {
-    do {
-      sTCoeff[pScanTable[j]] = pSignificantMap[j];
-      ++j;
-    } while (j < 4);
-    //iHadamard2x2
-    WelsChromaDcIdct (sTCoeff);
-    //scaling
-    if (!pCtx->bUseScalingList) {
-      for (j = 0; j < 4; ++j) {
-        sTCoeff[pScanTable[j]] = (int16_t) ((int64_t)sTCoeff[pScanTable[j]] * (int64_t)pDeQuantMul[0] >> 1);
-      }
-    } else { //with scaling list
-      for (j = 0; j < 4; ++j) {
-        sTCoeff[pScanTable[j]] = (int16_t) ((int64_t)sTCoeff[pScanTable[j]] * (int64_t)pDeQuantMul[0] >> 5);
+  uint32_t k;
+  if (iResProperty == I16_LUMA_DC || iResProperty == CHROMA_DC_U || iResProperty == CHROMA_DC_V) {
+    // The DC transforms read every position, so write the zeros as well.
+    const int32_t iNumDc = (iResProperty == I16_LUMA_DC) ? 16 : 4;
+    for (int32_t j = 0; j < iNumDc; ++j)
+      sTCoeff[pScanTable[j]] = 0;
+    for (k = 0; k < uiTotalCoeffNum; ++k)
+      sTCoeff[pScanTable[pSigPos[k]]] = (short)pLevel[k];
+    if (iResProperty == I16_LUMA_DC) {
+      WelsLumaDcDequantIdct (sTCoeff, uiQp, pCtx);
+    } else {
+      //iHadamard2x2
+      WelsChromaDcIdct (sTCoeff);
+      //scaling
+      if (!pCtx->bUseScalingList) {
+        for (int32_t j = 0; j < 4; ++j) {
+          sTCoeff[pScanTable[j]] = (int16_t) ((int64_t)sTCoeff[pScanTable[j]] * (int64_t)pDeQuantMul[0] >> 1);
+        }
+      } else { //with scaling list
+        for (int32_t j = 0; j < 4; ++j) {
+          sTCoeff[pScanTable[j]] = (int16_t) ((int64_t)sTCoeff[pScanTable[j]] * (int64_t)pDeQuantMul[0] >> 5);
+        }
       }
     }
   } else { //luma ac, chroma ac
-    do {
-      if (pSignificantMap[j] != 0) {
-        if (!pCtx->bUseScalingList) {
-          sTCoeff[pScanTable[j]] = pSignificantMap[j] * pDeQuantMul[pScanTable[j] & 0x07];
-        } else {
-          sTCoeff[pScanTable[j]] = (int16_t) (((int64_t)pSignificantMap[j] * (int64_t)pDeQuantMul[pScanTable[j]] + 8) >> 4);
-        }
+    if (!pCtx->bUseScalingList) {
+      for (k = 0; k < uiTotalCoeffNum; ++k) {
+        const int32_t i = pScanTable[pSigPos[k]];
+        sTCoeff[i] = pLevel[k] * pDeQuantMul[i & 0x07];
       }
-      ++j;
-    } while (j < 16);
+    } else {
+      for (k = 0; k < uiTotalCoeffNum; ++k) {
+        const int32_t i = pScanTable[pSigPos[k]];
+        sTCoeff[i] = (int16_t) (((int64_t)pLevel[k] * (int64_t)pDeQuantMul[i] + 8) >> 4);
+      }
+    }
   }
   return ERR_NONE;
 }
