@@ -75,6 +75,10 @@ elif cpu_family == 'ppc'
   asm_sources = []
 elif cpu_family == 'ppc64'
   asm_sources = []
+elif cpu_family == 'mips'
+  asm_sources = []
+elif cpu_family == 'mips64'
+  asm_sources = []
 else
   error('Unsupported cpu_family @0@'.format(cpu_family))
 endif
