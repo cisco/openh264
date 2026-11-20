@@ -66,7 +66,9 @@ void CWelsThread::Thread() {
       break;
     }
 
+    WelsMutexLock (&m_hMutex);
     m_iConVar = 1;
+    WelsMutexUnlock (&m_hMutex);
     ExecuteTask();//in ExecuteTask there will be OnTaskStop which opens the potential new Signaling of next run, so the setting of m_iConVar = 1 should be before ExecuteTask()
   }
 
