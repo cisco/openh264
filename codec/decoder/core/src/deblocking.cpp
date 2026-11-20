@@ -1180,8 +1180,8 @@ void WelsDeblockingMb (PDqLayer pCurDqLayer, PDeblockingFilter  pFilter, int32_t
     } else {
       * (uint32_t*)nBS[1][0] = 0;
     }
-    //SKIP MB_16x16 or others
-    if (IS_SKIP (iCurMbType)) {
+    // P-skip is uniform 16x16; B-direct can have different internal motion.
+    if (IS_SKIP (iCurMbType) && !bBSlice) {
       * (uint32_t*)nBS[0][1] = * (uint32_t*)nBS[0][2] = * (uint32_t*)nBS[0][3] =
                                  * (uint32_t*)nBS[1][1] = * (uint32_t*)nBS[1][2] = * (uint32_t*)nBS[1][3] = 0;
     } else {
