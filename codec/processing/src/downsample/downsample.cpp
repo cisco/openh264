@@ -46,7 +46,10 @@ CDownsampling::CDownsampling (int32_t iCpuFlag) {
   WelsMemset (&m_pfDownsample, 0, sizeof (m_pfDownsample));
   InitDownsampleFuncs (m_pfDownsample, m_iCPUFlag);
   WelsMemset(m_pSampleBuffer,0,sizeof(m_pSampleBuffer));
-  m_bNoSampleBuffer = AllocateSampleBuffer();
+  // The sample buffers are sized for 1920x1088 but only used by Process(),
+  // which many configurations (e.g. a single spatial layer) never call, so
+  // allocate them on first use.
+  m_bNoSampleBuffer = false;
 }
 
 CDownsampling::~CDownsampling() {
@@ -154,6 +157,9 @@ EResult CDownsampling::Process (int32_t iType, SPixMap* pSrcPixMap, SPixMap* pDs
 
   if (iSrcWidthY <= iDstWidthY || iSrcHeightY <= iDstHeightY) {
     return RET_INVALIDPARAM;
+  }
+  if (!m_bNoSampleBuffer && m_pSampleBuffer[0][0] == NULL) {
+    m_bNoSampleBuffer = AllocateSampleBuffer();
   }
   if ((iSrcWidthY >> 1) > MAX_SAMPLE_WIDTH || (iSrcHeightY >> 1) > MAX_SAMPLE_HEIGHT || m_bNoSampleBuffer) {
     if ((iSrcWidthY >> 1) == iDstWidthY && (iSrcHeightY >> 1) == iDstHeightY) {
