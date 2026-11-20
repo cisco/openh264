@@ -111,7 +111,8 @@ static DECODING_STATE  ConstructAccessUnit (CWelsDecoder* pWelsDecoder, PWelsDec
   if (GetThreadCount (pThrCtx->pCtx) > 1) {
     RESET_EVENT (&pThrCtx->sSliceDecodeFinish);
   }
-  iRet |= pWelsDecoder->DecodeFrame2WithCtx (pThrCtx->pCtx, NULL, 0, pThrCtx->ppDst, &pThrCtx->sDstInfo);
+  //false: this runs on a decoding worker, which must not reset the decoder.
+  iRet |= pWelsDecoder->DecodeFrame2WithCtx (pThrCtx->pCtx, NULL, 0, pThrCtx->ppDst, &pThrCtx->sDstInfo, false);
 
   //WelsMutexUnlock (&pWelsDecoder->m_csDecoder);
   return (DECODING_STATE)iRet;
@@ -323,6 +324,7 @@ void CWelsDecoder::OpenDecoderThreads() {
       m_pDecThrCtx[i].kiSrcLen = 0;
       m_pDecThrCtx[i].ppDst = NULL;
       m_pDecThrCtx[i].pDec = NULL;
+      m_pDecThrCtx[i].bNeedsReset = false;
       CREATE_EVENT (&m_pDecThrCtx[i].sImageReady, 1, 0, NULL);
       CREATE_EVENT (&m_pDecThrCtx[i].sSliceDecodeStart, 1, 0, NULL);
       CREATE_EVENT (&m_pDecThrCtx[i].sSliceDecodeFinish, 1, 0, NULL);
@@ -756,7 +758,7 @@ DECODING_STATE CWelsDecoder::DecodeFrameNoDelay (const unsigned char* kpSrc,
 DECODING_STATE CWelsDecoder::DecodeFrame2WithCtx (PWelsDecoderContext pDecContext, const unsigned char* kpSrc,
     const int kiSrcLen,
     unsigned char** ppDst,
-    SBufferInfo* pDstInfo) {
+    SBufferInfo* pDstInfo, bool bCanResetDecoder) {
   if (pDecContext == NULL || pDecContext->pParam == NULL) {
     if (m_pWelsTrace != NULL) {
       WelsLog (&m_pWelsTrace->m_sLogCtx, WELS_LOG_ERROR, "Call DecodeFrame2 without Initialize.\n");
@@ -839,6 +841,15 @@ DECODING_STATE CWelsDecoder::DecodeFrame2WithCtx (PWelsDecoderContext pDecContex
 
     eNalType = pDecContext->sCurNalHead.eNalUnitType;
     if (pDecContext->iErrorCode & dsOutOfMemory) {
+      if (!bCanResetDecoder) {
+        //On a decoding worker. Resetting from here deadlocks: ThreadResetDecoder() calls
+        //CloseDecoderThreads(), which waits for every worker to go idle, this one included,
+        //and this one goes idle only after returning. Let the caller's thread do it.
+        if (pDecContext->pThreadCtx != NULL)
+          ((PWelsDecoderThreadCTX)pDecContext->pThreadCtx)->bNeedsReset = true;
+        if (pDstInfo) pDstInfo->iBufferStatus = 0;
+        return dsOutOfMemory;
+      }
       if (ResetDecoder (pDecContext)) {
         if (pDstInfo) pDstInfo->iBufferStatus = 0;
         return dsOutOfMemory;
@@ -846,6 +857,15 @@ DECODING_STATE CWelsDecoder::DecodeFrame2WithCtx (PWelsDecoderContext pDecContex
       return dsErrorFree;
     }
     if (pDecContext->iErrorCode & dsRefListNullPtrs) {
+      if (!bCanResetDecoder) {
+        //On a decoding worker. Resetting from here deadlocks: ThreadResetDecoder() calls
+        //CloseDecoderThreads(), which waits for every worker to go idle, this one included,
+        //and this one goes idle only after returning. Let the caller's thread do it.
+        if (pDecContext->pThreadCtx != NULL)
+          ((PWelsDecoderThreadCTX)pDecContext->pThreadCtx)->bNeedsReset = true;
+        if (pDstInfo) pDstInfo->iBufferStatus = 0;
+        return dsRefListNullPtrs;
+      }
       if (ResetDecoder (pDecContext)) {
         if (pDstInfo) pDstInfo->iBufferStatus = 0;
         return dsRefListNullPtrs;
@@ -1446,6 +1466,20 @@ int CWelsDecoder::ThreadDecodeFrameInternal (const unsigned char* kpSrc, const i
   }
 
   WAIT_SEMAPHORE (&m_pDecThrCtx[signal].sThreadInfo.sIsIdle, WELS_DEC_THREAD_WAIT_INFINITE);
+
+  if (m_pDecThrCtx[signal].bNeedsReset) {
+    //This worker hit an error it could not reset from. We are on the thread that called the
+    //API, so CloseDecoderThreads() can wait for the workers here. Give the semaphore back
+    //first -- it takes the same one -- and take a copy of the context, since the reset
+    //destroys and rebuilds m_pDecThrCtx.
+    PWelsDecoderContext pResetCtx = m_pDecThrCtx[signal].pCtx;
+    const int32_t iErrorCode = pResetCtx != NULL ? pResetCtx->iErrorCode : 0;
+    m_pDecThrCtx[signal].bNeedsReset = false;
+    RELEASE_SEMAPHORE (&m_pDecThrCtx[signal].sThreadInfo.sIsIdle);
+    ResetDecoder (pResetCtx);
+    if (pDstInfo) pDstInfo->iBufferStatus = 0;
+    return (iErrorCode & dsOutOfMemory) ? dsOutOfMemory : dsRefListNullPtrs;
+  }
 
   for (i = 0; i < m_DecCtxActiveCount; ++i) {
     if (m_pDecThrCtxActive[i] == &m_pDecThrCtx[signal]) {
