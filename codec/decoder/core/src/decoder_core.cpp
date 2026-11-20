@@ -194,6 +194,7 @@ static inline int32_t DecodeFrameConstruction (PWelsDecoderContext pCtx, uint8_t
              "DecodeFrameConstruction(): iTotalNumMbRec:%d, total_num_mb_sps:%d, cur_layer_mb_width:%d, cur_layer_mb_height:%d ",
              pCtx->iTotalNumMbRec, kiTotalNumMbInCurLayer, pCurDq->iMbWidth, pCurDq->iMbHeight);
     bFrameCompleteFlag = false; //return later after output buffer is done
+    pCtx->pDec->bIsComplete = false;
     if (pCtx->bInstantDecFlag) { //no-delay decoding, wait for new slice
       return ERR_INFO_MB_NUM_INADEQUATE;
     }
@@ -2834,7 +2835,8 @@ int32_t DecodeCurrentAccessUnit (PWelsDecoderContext pCtx, uint8_t** ppDst, SBuf
     }
 
     // Set the current dec picture complete flag. The flag will be reset when current picture need do ErrorCon.
-    pCtx->pDec->bIsComplete = bAllRefComplete;
+    int32_t iTotalMbInLayer = dq_cur ? (dq_cur->iMbWidth * dq_cur->iMbHeight) : 0;
+    pCtx->pDec->bIsComplete = bAllRefComplete && (iTotalMbInLayer == 0 || pCtx->iTotalNumMbRec == iTotalMbInLayer);
     if (!pCtx->pDec->bIsComplete) {  // Ref pictures ECed, result in ECed
       pCtx->iErrorCode |= dsDataErrorConcealed;
     }

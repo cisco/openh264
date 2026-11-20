@@ -886,3 +886,14 @@ TEST (ThreadDecoderNalListBoundsTest, ResetAuListDoesNotOverflowOnRepeatedTimeou
   dec->Uninitialize();
   WelsDestroyDecoder (dec);
 }
+
+// Regression test for Issue #4032:
+// Threaded decoding of res/Error_I_P.264 must not stall on odd thread counts.
+TEST_F (ThreadDecoderPreviousPicRaceTest, DecodeErrorStreamWithOddThreadsDoesNotStall) {
+  const char* kFile = "res/Error_I_P.264";
+  const int kThreadCounts[] = {3, 5};
+  for (int threads : kThreadCounts) {
+    std::string digest = DecodeFile (kFile, threads);
+    EXPECT_FALSE (digest.empty()) << "Decode failed on thread count " << threads;
+  }
+}

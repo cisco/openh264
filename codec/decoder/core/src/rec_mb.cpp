@@ -255,13 +255,14 @@ void BaseMC (PWelsDecoderContext pCtx, sMCRefMember* pMCRefMem, const int32_t& l
   if (GetThreadCount (pCtx) > 1 && iRefIdx >= 0) {
     // wait for the lines of reference macroblock (3 + 16).
     PPicture pRefPic = pCtx->sRefPic.pRefList[listIdx][iRefIdx];
-    if (pCtx->bNewSeqBegin && (pCtx->iErrorCode & dsRefLost)) {
+    if ((pCtx->iErrorCode & dsRefLost) || (pCtx->bNewSeqBegin && (pCtx->iErrorCode & dsRefLost))) {
       //set event if refpic is lost to prevent from infinite waiting.
       if (!pRefPic->pReadyEvent[0].isSignaled) {
         for (uint32_t ln = 0; ln < pCtx->sMb.iMbHeight; ++ln) {
           SET_EVENT (&pRefPic->pReadyEvent[ln]);
         }
       }
+      return;
     }
     int32_t offset = (iFullMVy >> 2) + iBlkHeight + 3 + 16;
     if (offset > pCtx->lastReadyHeightOffset[listIdx][iRefIdx]) {
@@ -269,6 +270,9 @@ void BaseMC (PWelsDecoderContext pCtx, sMCRefMember* pMCRefMem, const int32_t& l
       if (pRefPic->pReadyEvent[down_line].isSignaled != 1) {
         if (WAIT_EVENT (&pRefPic->pReadyEvent[down_line], WELS_DEC_THREAD_WAIT_TIMEOUT_MS) != WELS_DEC_THREAD_WAIT_SIGNALED) {
           pCtx->iErrorCode |= dsRefLost;
+          for (uint32_t ln = 0; ln < pCtx->sMb.iMbHeight; ++ln) {
+            SET_EVENT (&pRefPic->pReadyEvent[ln]);
+          }
           return;
         }
       }
