@@ -72,6 +72,7 @@ typedef struct TagAccessUnits {
   uint32_t                uiStartPos;
   uint32_t                uiEndPos;
   bool                    bCompletedAuFlag;       // Indicate whether it is a completed AU
+  void*                   pExpandedBlock;         // latest block malloced by ExpandNalUnitList, chained to the ones before it
 } SAccessUnit, *PAccessUnit;
 
 } // namespace WelsDec

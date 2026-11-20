@@ -6,6 +6,7 @@
 #include "decoder_core.h"
 #include "error_concealment.h"
 #include "fmo.h"
+#include "memmgr_nal_unit.h"
 #include "welsCodecTrace.h"
 #include "../../common/src/welsCodecTrace.cpp"
 
@@ -766,3 +767,43 @@ TEST_F (DecoderParseSyntaxTest, WelsDecodeBsRejectsWrapIntoQueuedSlice) {
   Uninit();
 }
 
+// MemGetNextNal grows the NAL Unit list once an AU holds more NAL Units than it was sized for.
+// The NAL Units handed out before must stay valid and unchanged: decoding keeps pointers into
+// them, such as pCtx->pSliceHeader (issue #3684).
+TEST (DecoderNalUnitListTest, ExpandNalUnitListKeepsNalUnitsInPlace) {
+  CMemoryAlign cMemoryAlign (16);
+  PAccessUnit pAu = NULL;
+  ASSERT_EQ (ERR_NONE, MemInitNalList (&pAu, MAX_NAL_UNIT_NUM_IN_AU, &cMemoryAlign));
+  ASSERT_TRUE (pAu != NULL);
+
+  const uint32_t kuiOrgCount = pAu->uiCountUnitsNum;
+  ASSERT_EQ ((uint32_t)MAX_NAL_UNIT_NUM_IN_AU, kuiOrgCount);
+  PNalUnit pNalUnits[MAX_NAL_UNIT_NUM_IN_AU];
+  for (uint32_t i = 0; i < kuiOrgCount; i++) {
+    pNalUnits[i] = MemGetNextNal (&pAu, &cMemoryAlign);
+    ASSERT_TRUE (pNalUnits[i] != NULL);
+    pNalUnits[i]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.iPicOrderCntLsb = i + 1;
+  }
+  PSliceHeader pSliceHeader = &pNalUnits[0]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader;
+
+  // Enough NAL Units to grow the list twice, the second time from an already grown list.
+  const uint32_t kuiMoreCount = (MAX_NAL_UNIT_NUM_IN_AU >> 1) + 1;
+  for (uint32_t i = 0; i < kuiMoreCount; i++) {
+    PNalUnit pNalUnit = MemGetNextNal (&pAu, &cMemoryAlign);
+    ASSERT_TRUE (pNalUnit != NULL);
+    for (uint32_t j = 0; j < kuiOrgCount; j++)
+      EXPECT_NE (pNalUnits[j], pNalUnit);
+  }
+  EXPECT_EQ (kuiOrgCount + kuiMoreCount, pAu->uiAvailUnitsNum);
+  EXPECT_GE (pAu->uiCountUnitsNum, pAu->uiAvailUnitsNum);
+
+  for (uint32_t i = 0; i < kuiOrgCount; i++) {
+    ASSERT_EQ (pNalUnits[i], pAu->pNalUnitsList[i]);
+    EXPECT_EQ ((int32_t) (i + 1), pNalUnits[i]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.iPicOrderCntLsb);
+  }
+  pSliceHeader->iPicOrderCntLsb = 0; // as ParseDecRefPicMarking does on MMCO 5
+  EXPECT_EQ (0, pAu->pNalUnitsList[0]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.iPicOrderCntLsb);
+
+  EXPECT_EQ (ERR_NONE, MemFreeNalList (&pAu, &cMemoryAlign));
+  EXPECT_TRUE (pAu == NULL);
+}
