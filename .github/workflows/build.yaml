@@ -142,28 +142,65 @@ jobs:
 
   linux-cross-arm:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - arch: armv7
+            cc: arm-linux-gnueabihf-gcc
+            cxx: arm-linux-gnueabihf-g++
+            qemu: ''
+          - arch: aarch64
+            cc: aarch64-linux-gnu-gcc
+            cxx: aarch64-linux-gnu-g++
+            qemu: qemu-aarch64 -L /usr/aarch64-linux-gnu/
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: sudo apt-get update -qq
-      - run: sudo apt-get install -qq g++-arm-linux-gnueabihf g++-aarch64-linux-gnu qemu-user
-      - run: arm-linux-gnueabihf-g++ --version
+      - run: sudo apt-get install -qq ccache g++-arm-linux-gnueabihf g++-aarch64-linux-gnu qemu-user
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ccache
+          key: ccache-linux-${{ matrix.arch }}-${{ hashFiles('Makefile') }}
+          restore-keys: ccache-linux-${{ matrix.arch }}-
+      - uses: actions/cache@v4
+        with:
+          path: |
+            gmp-api
+            gtest
+          key: cross-deps-${{ hashFiles('Makefile') }}
       - run: make gmp-bootstrap
       - run: make gtest-bootstrap
-      - run: CFLAGS=-Werror make -j$(nproc) ARCH=armv7 CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++
-      - run: CFLAGS=-Werror make clean
-      - run: CFLAGS=-Werror make -j$(nproc) ARCH=aarch64 CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
-      - run: qemu-aarch64 -L /usr/aarch64-linux-gnu/ ./codec_unittest
+      - run: |
+          export CC="ccache ${{ matrix.cc }}"
+          export CXX="ccache ${{ matrix.cxx }}"
+          CFLAGS=-Werror make -j$(nproc) ARCH=${{ matrix.arch }}
+      - if: matrix.qemu != ''
+        run: ${{ matrix.qemu }} ./codec_unittest
 
   linux-cross-loongarch64:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: sudo apt-get update -qq
-      - run: sudo apt-get install -qq gcc-14-loongarch64-linux-gnu g++-14-loongarch64-linux-gnu qemu-user-static
+      - run: sudo apt-get install -qq ccache gcc-14-loongarch64-linux-gnu g++-14-loongarch64-linux-gnu qemu-user-static
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ccache
+          key: ccache-linux-loongarch64-${{ hashFiles('Makefile') }}
+          restore-keys: ccache-linux-loongarch64-
+      - uses: actions/cache@v4
+        with:
+          path: |
+            gmp-api
+            gtest
+          key: cross-deps-${{ hashFiles('Makefile') }}
       - run: loongarch64-linux-gnu-g++-14 --version
       - run: make gmp-bootstrap
       - run: make gtest-bootstrap
-      - run: CFLAGS=-Werror make -j$(nproc) ARCH=loongarch64 CC=loongarch64-linux-gnu-gcc-14 CXX=loongarch64-linux-gnu-g++-14
+      - run: |
+          export CC="ccache loongarch64-linux-gnu-gcc-14"
+          export CXX="ccache loongarch64-linux-gnu-g++-14"
+          CFLAGS=-Werror make -j$(nproc) ARCH=loongarch64
       - run: qemu-loongarch64-static -L /usr/loongarch64-linux-gnu/ ./codec_unittest
 
   macos-cross-arm64:
