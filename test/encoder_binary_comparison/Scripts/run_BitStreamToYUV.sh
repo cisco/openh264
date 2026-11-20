@@ -64,7 +64,14 @@ run_BitStream2YUV()
         return 1
     fi
     #decode bitstream
-    ./h264dec  ${BitStreamName}  ${OutputYUVName} 2> ${LogFile}
+    echo "running decode test, printing pwd..."
+    echo $(pwd)
+    if [ "$TestWasm" = "0" ]
+    then
+        ./h264dec  ${BitStreamName}  ${OutputYUVName} 2> ${LogFile}
+    else
+        node ./h264dec.js ${BitStreamName}  ${OutputYUVName} 2> ${LogFile}
+    fi
     return 0
 }
 

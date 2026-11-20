@@ -16,5 +16,13 @@ $(H264DEC_SRCDIR)/%.$(OBJ): $(H264DEC_SRCDIR)/%.cpp
 h264dec$(EXEEXT): $(H264DEC_OBJS) $(H264DEC_DEPS)
 	$(QUIET_CXX)$(CXX) $(CXX_LINK_O) $(H264DEC_OBJS) $(H264DEC_LDFLAGS) $(LDFLAGS)
 
+h264dec.html: $(H264DEC_OBJS) $(H264DEC_DEPS)
+	$(QUIET_CXX)$(CXX) $(CXX_LINK_O) $(H264DEC_OBJS) $(H264DEC_LDFLAGS) $(LDFLAGS)
+
+ifeq ($(OS), wasm)
+binaries: h264dec.html
+BINARIES += h264dec.html
+else
 binaries: h264dec$(EXEEXT)
 BINARIES += h264dec$(EXEEXT)
+endif
