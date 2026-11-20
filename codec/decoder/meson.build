@@ -43,6 +43,7 @@ elif cpu_family == 'aarch64'
   asm_sources = [
     'core/arm64/block_add_aarch64_neon.S',
     'core/arm64/intra_pred_aarch64_neon.S',
+    'core/arm64/au_parser_aarch64_neon.S',
   ]
   if use_asm_gen
     objs_asm = asm_gen.process(asm_sources)

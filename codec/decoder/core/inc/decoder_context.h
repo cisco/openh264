@@ -145,6 +145,8 @@ typedef void (*PExpandPictureFunc) (uint8_t* pDst, const int32_t kiStride, const
 
 typedef void (*PGetIntraPred8x8Func) (uint8_t* pPred, const int32_t kiLumaStride, bool bTLAvail, bool bTRAvail);
 
+typedef uint8_t* (*PDetectStartCodePrefixFunc) (const uint8_t* kpBuf, int32_t* pOffset, int32_t iBufSize);
+
 /**/
 typedef struct TagRefPic {
   PPicture      pRefList[LIST_A][MAX_DPB_COUNT];    // reference picture marking plus FIFO scheme
@@ -464,6 +466,8 @@ typedef struct TagWelsDecoderContext {
 
   /* For Block */
   SBlockFunc          sBlockFunc;
+
+  PDetectStartCodePrefixFunc pfDetectStartCodePrefix;
 
   int32_t iCurSeqIntervalTargetDependId;
   int32_t iCurSeqIntervalMaxPicWidth;
