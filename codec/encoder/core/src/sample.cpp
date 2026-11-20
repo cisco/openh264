@@ -1,6 +1,7 @@
 /*!
  * \copy
  *     Copyright (c)  2009-2013, Cisco Systems
+ *     Copyright (c)  2026, Richard Ben Aleya
  *     All rights reserved.
  *
  *     Redistribution and use in source and binary forms, with or without
@@ -410,6 +411,16 @@ void WelsInitSampleSadFunc (SWelsFuncPtrList* pFuncList, uint32_t uiCpuFlag) {
     pFuncList->sSampleDealingFuncs.pfSampleSatd[BLOCK_16x8]  = WelsSampleSatd16x8_avx2;
     pFuncList->sSampleDealingFuncs.pfSampleSatd[BLOCK_8x16]  = WelsSampleSatd8x16_avx2;
     pFuncList->sSampleDealingFuncs.pfSampleSatd[BLOCK_8x8]   = WelsSampleSatd8x8_avx2;
+
+    pFuncList->sSampleDealingFuncs.pfSampleSad[BLOCK_16x16] = WelsSampleSad16x16_avx2;
+    pFuncList->sSampleDealingFuncs.pfSampleSad[BLOCK_16x8 ] = WelsSampleSad16x8_avx2;
+    pFuncList->sSampleDealingFuncs.pfSampleSad[BLOCK_8x16]  = WelsSampleSad8x16_avx2;
+    pFuncList->sSampleDealingFuncs.pfSampleSad[BLOCK_8x8]   = WelsSampleSad8x8_avx2;
+
+    pFuncList->sSampleDealingFuncs.pfSample4Sad[BLOCK_16x16] = WelsSampleSadFour16x16_avx2;
+    pFuncList->sSampleDealingFuncs.pfSample4Sad[BLOCK_16x8]  = WelsSampleSadFour16x8_avx2;
+    pFuncList->sSampleDealingFuncs.pfSample4Sad[BLOCK_8x16]  = WelsSampleSadFour8x16_avx2;
+    pFuncList->sSampleDealingFuncs.pfSample4Sad[BLOCK_8x8]   = WelsSampleSadFour8x8_avx2;
   }
 #endif
 #endif //(X86_ASM)

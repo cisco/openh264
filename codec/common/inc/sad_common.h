@@ -1,6 +1,7 @@
 /*!
  * \copy
  *     Copyright (c)  2013, Cisco Systems
+ *     Copyright (c)  2026, Richard Ben Aleya
  *     All rights reserved.
  *
  *     Redistribution and use in source and binary forms, with or without
@@ -72,6 +73,18 @@ void WelsSampleSadFour16x8_sse2 (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*)
 void WelsSampleSadFour8x16_sse2 (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*);
 void WelsSampleSadFour8x8_sse2 (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*);
 void WelsSampleSadFour4x4_sse2 (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*);
+
+#if defined(HAVE_AVX2)
+int32_t WelsSampleSad16x16_avx2 (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSad16x8_avx2 (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSad8x16_avx2 (uint8_t*, int32_t, uint8_t*, int32_t);
+int32_t WelsSampleSad8x8_avx2 (uint8_t*, int32_t, uint8_t*, int32_t);
+
+void WelsSampleSadFour16x16_avx2 (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*);
+void WelsSampleSadFour16x8_avx2 (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*);
+void WelsSampleSadFour8x16_avx2 (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*);
+void WelsSampleSadFour8x8_avx2 (uint8_t*, int32_t, uint8_t*, int32_t, int32_t*);
+#endif
 
 #endif//X86_ASM
 
