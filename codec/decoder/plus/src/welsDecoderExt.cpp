@@ -489,6 +489,9 @@ long CWelsDecoder::SetOption (DECODER_OPTION eOptID, void* pOption) {
   int iVal = 0;
   if (eOptID == DECODER_OPTION_NUM_OF_THREADS) {
     if (pOption != NULL) {
+      if (m_pDecThrCtx != NULL && m_pDecThrCtx[0].pCtx != NULL) {
+        return cmInitParaError;
+      }
       int32_t threadCount = * ((int32_t*)pOption);
       if (threadCount < 0) threadCount = 0;
       if (threadCount > m_iCpuCount) {
