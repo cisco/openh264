@@ -639,7 +639,7 @@ void RcDecideTargetBitsTimestamp (sWelsEncCtx* pEncCtx) {
       SSpatialLayerInternal* pDLayerParamInternal = &pEncCtx->pSvcParam->sDependencyLayers[pEncCtx->uiDependencyId];
       const int32_t kiGopSize   = (1 << pDLayerParamInternal->iDecompositionStages);
       int32_t iAverageFrameSize = (int32_t) ((double) (pDLayerParam->iSpatialBitrate) / (double) (pDLayerParam->fFrameRate));
-      const int32_t kiGopBits   = iAverageFrameSize * kiGopSize;
+      const int64_t kiGopBits   = static_cast<int64_t> (iAverageFrameSize) * kiGopSize;
       pWelsSvcRc->iTargetBits = WELS_DIV_ROUND (pTOverRc->iTlayerWeight * kiGopBits, INT_MULTIPLY * 10 * 2);
 
       int32_t iMaxTh = iBufferTh / 2;
@@ -1445,9 +1445,10 @@ void WelsRcFrameDelayJudgeTimeStamp (sWelsEncCtx* pEncCtx, long long uiTimeStamp
   iSentBits = WELS_MAX (iSentBits, 0);
 
   //When bitrate is changed, pBuffer size should be updated
-  pWelsSvcRc->iBufferSizeSkip = WELS_DIV_ROUND (pDLayerConfig->iSpatialBitrate * pWelsSvcRc->iSkipBufferRatio,
+  pWelsSvcRc->iBufferSizeSkip = WELS_DIV_ROUND (static_cast<int64_t> (pDLayerConfig->iSpatialBitrate) * pWelsSvcRc->iSkipBufferRatio,
                                 INT_MULTIPLY);
-  pWelsSvcRc->iBufferSizePadding = WELS_DIV_ROUND (pDLayerConfig->iSpatialBitrate * PADDING_BUFFER_RATIO, INT_MULTIPLY);
+  pWelsSvcRc->iBufferSizePadding = WELS_DIV_ROUND (static_cast<int64_t> (pDLayerConfig->iSpatialBitrate) * PADDING_BUFFER_RATIO,
+                                   INT_MULTIPLY);
 
   pWelsSvcRc->iBufferFullnessSkip -= iSentBits;
   pWelsSvcRc->iBufferFullnessSkip = WELS_MAX ((-1) * (pDLayerConfig->iSpatialBitrate / 4),
