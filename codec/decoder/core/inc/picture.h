@@ -70,6 +70,9 @@ struct SPicture {
   bool            bUsedAsRef;                                                     //for ref pic management
   bool            bIsLongRef;     // long term reference frame flag       //for ref pic management
   int8_t          iRefCount;
+  //Held by a frame that is still decoding against this picture. Separate from iRefCount,
+  //which the output path uses to decide when to call pSetUnRef().
+  int32_t         iPinCount;
   void            (*pSetUnRef)(WelsDec::SPicture*);
 
   bool            bIsComplete;    // indicate whether current picture is complete, not from EC
@@ -79,7 +82,6 @@ struct SPicture {
   uint8_t         uiQualityId;
 
   int32_t         iFrameNum;              // frame number                 //for ref pic management
-  int32_t         iFrameWrapNum;          // frame wrap number            //for ref pic management
   int32_t         iLongTermFrameIdx;                                      //id for long term ref pic
   uint32_t        uiLongTermPicNum;       //long_term_pic_num
 
@@ -102,6 +104,7 @@ struct SPicture {
   int8_t (*pRefIndex[LIST_A])[MB_BLOCK4x4_NUM]; //used for direct mode
   struct SPicture* pRefPic[LIST_A][17];  //ref pictures used for direct mode
   SWelsDecEvent* pReadyEvent;  //MB line ready event
+  int32_t* pRowMbDone;         //macroblocks padded so far in each MB row
 
 };// "Picture" declaration is comflict with Mac system
 

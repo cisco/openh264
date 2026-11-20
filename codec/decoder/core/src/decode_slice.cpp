@@ -1617,6 +1617,131 @@ int32_t WelsDecodeSlice (PWelsDecoderContext pCtx, bool bFirstSliceInLayer, PNal
   return ERR_NONE;
 }
 
+namespace {
+
+//Macroblocks reconstructed but not yet filtered, oldest first.
+struct SDbkDelayQ {
+  int32_t iIdx[MAX_MB_WIDTH_FOR_PAD_QUEUE + 2];
+  int32_t iHead;
+  int32_t iCount;
+  int32_t iCap;
+};
+
+static void DbkQInit (SDbkDelayQ& sQ, int32_t iMbWidth) {
+  sQ.iHead = 0;
+  sQ.iCount = 0;
+  sQ.iCap = WELS_MIN (iMbWidth + 1, MAX_MB_WIDTH_FOR_PAD_QUEUE + 1);
+}
+
+//Pad one macroblock's borders and, once its row can no longer change, announce the row.
+static void DbkPadOne (PWelsDecoderContext pCtx, PDqLayer pCurDqLayer, int32_t iIdx) {
+  const int32_t iSaveX = pCurDqLayer->iMbX;
+  const int32_t iSaveY = pCurDqLayer->iMbY;
+  const int32_t iSaveXy = pCurDqLayer->iMbXyIndex;
+  pCurDqLayer->iMbX = iIdx % pCurDqLayer->iMbWidth;
+  pCurDqLayer->iMbY = iIdx / pCurDqLayer->iMbWidth;
+  pCurDqLayer->iMbXyIndex = iIdx;
+  if (pCtx->uiNalRefIdc > 0) {
+    if (pCurDqLayer->iMbX == 0 || pCurDqLayer->iMbX == pCurDqLayer->iMbWidth - 1 || pCurDqLayer->iMbY == 0
+        || pCurDqLayer->iMbY == pCurDqLayer->iMbHeight - 1) {
+      PadMBLuma_c (pCurDqLayer->pDec->pData[0], pCurDqLayer->pDec->iLinesize[0], pCurDqLayer->pDec->iWidthInPixel,
+                   pCurDqLayer->pDec->iHeightInPixel, pCurDqLayer->iMbX, pCurDqLayer->iMbY, pCurDqLayer->iMbWidth,
+                   pCurDqLayer->iMbHeight);
+      PadMBChroma_c (pCurDqLayer->pDec->pData[1], pCurDqLayer->pDec->iLinesize[1], pCurDqLayer->pDec->iWidthInPixel / 2,
+                     pCurDqLayer->pDec->iHeightInPixel / 2, pCurDqLayer->iMbX, pCurDqLayer->iMbY, pCurDqLayer->iMbWidth,
+                     pCurDqLayer->iMbHeight);
+      PadMBChroma_c (pCurDqLayer->pDec->pData[2], pCurDqLayer->pDec->iLinesize[2], pCurDqLayer->pDec->iWidthInPixel / 2,
+                     pCurDqLayer->pDec->iHeightInPixel / 2, pCurDqLayer->iMbX, pCurDqLayer->iMbY, pCurDqLayer->iMbWidth,
+                     pCurDqLayer->iMbHeight);
+    }
+  }
+  if (GetThreadCount (pCtx) > 1 && pCtx->pDec->pRowMbDone != NULL) {
+    //Announce the row once every macroblock in it has been padded. Reaching the last column
+    //is not the same thing: with more than one slice group FmoNextMb() can visit it while
+    //another group still owns undecoded macroblocks in the row, and a slice can end mid-row.
+    if (++pCtx->pDec->pRowMbDone[pCurDqLayer->iMbY] >= pCurDqLayer->iMbWidth)
+      SET_EVENT (&pCtx->pDec->pReadyEvent[pCurDqLayer->iMbY]);
+  }
+  pCurDqLayer->iMbX = iSaveX;
+  pCurDqLayer->iMbY = iSaveY;
+  pCurDqLayer->iMbXyIndex = iSaveXy;
+}
+
+static void DbkPadPush (PWelsDecoderContext pCtx, PDqLayer pCurDqLayer, int32_t iIdx) {
+  if (pCtx->iPadQCount == pCtx->iPadQCap) {
+    const int32_t iOld = pCtx->iPadQIdx[pCtx->iPadQHead];
+    pCtx->iPadQHead = (pCtx->iPadQHead + 1) % (pCtx->iPadQCap + 1);
+    --pCtx->iPadQCount;
+    DbkPadOne (pCtx, pCurDqLayer, iOld);
+  }
+  pCtx->iPadQIdx[(pCtx->iPadQHead + pCtx->iPadQCount) % (pCtx->iPadQCap + 1)] = iIdx;
+  ++pCtx->iPadQCount;
+}
+
+//Filter one macroblock, then hand it to the padding stage.
+static void DbkFilterOne (PWelsDecoderContext pCtx, PDqLayer pCurDqLayer, int32_t iIdx,
+                          SDeblockingFilter& pFilter, int32_t& iFilterIdc,
+                          PDeblockingFilterMbFunc pDeblockMb) {
+  const int32_t iSaveX = pCurDqLayer->iMbX;
+  const int32_t iSaveY = pCurDqLayer->iMbY;
+  const int32_t iSaveXy = pCurDqLayer->iMbXyIndex;
+  pCurDqLayer->iMbX = iIdx % pCurDqLayer->iMbWidth;
+  pCurDqLayer->iMbY = iIdx / pCurDqLayer->iMbWidth;
+  pCurDqLayer->iMbXyIndex = iIdx;
+  WelsDeblockingFilterMB (pCurDqLayer, pFilter, iFilterIdc, pDeblockMb);
+  pCurDqLayer->iMbX = iSaveX;
+  pCurDqLayer->iMbY = iSaveY;
+  pCurDqLayer->iMbXyIndex = iSaveXy;
+  DbkPadPush (pCtx, pCurDqLayer, iIdx);
+}
+
+static void DbkFilterPush (PWelsDecoderContext pCtx, PDqLayer pCurDqLayer, int32_t iIdx, SDbkDelayQ& sQ,
+                           SDeblockingFilter& pFilter, int32_t& iFilterIdc, PDeblockingFilterMbFunc pDeblockMb) {
+  if (sQ.iCount == sQ.iCap) {
+    const int32_t iOld = sQ.iIdx[sQ.iHead];
+    sQ.iHead = (sQ.iHead + 1) % (sQ.iCap + 1);
+    --sQ.iCount;
+    DbkFilterOne (pCtx, pCurDqLayer, iOld, pFilter, iFilterIdc, pDeblockMb);
+  }
+  sQ.iIdx[(sQ.iHead + sQ.iCount) % (sQ.iCap + 1)] = iIdx;
+  ++sQ.iCount;
+}
+
+//Drain the filter stage. Called when a slice ends: every macroblock of a slice is filtered
+//with that slice's own filter parameters, as the whole-slice pass does.
+static void DbkFilterFlush (PWelsDecoderContext pCtx, PDqLayer pCurDqLayer, SDbkDelayQ& sQ,
+                            SDeblockingFilter& pFilter, int32_t& iFilterIdc, PDeblockingFilterMbFunc pDeblockMb) {
+  while (sQ.iCount > 0) {
+    const int32_t iOld = sQ.iIdx[sQ.iHead];
+    sQ.iHead = (sQ.iHead + 1) % (sQ.iCap + 1);
+    --sQ.iCount;
+    DbkFilterOne (pCtx, pCurDqLayer, iOld, pFilter, iFilterIdc, pDeblockMb);
+  }
+}
+
+} // anonymous namespace
+
+void WelsDbkPadQInit (PWelsDecoderContext pCtx, int32_t iMbWidth) {
+  pCtx->iPadQHead = 0;
+  pCtx->iPadQCount = 0;
+  pCtx->iPadQCap = WELS_MIN (iMbWidth + 1, MAX_MB_WIDTH_FOR_PAD_QUEUE + 1);
+}
+
+//Pad and announce everything still held back. Called once the frame is complete.
+void WelsDbkPadQFlush (PWelsDecoderContext pCtx) {
+  PDqLayer pCurDqLayer = pCtx->pCurDqLayer;
+  if (pCurDqLayer == NULL || pCtx->pDec == NULL) {
+    pCtx->iPadQCount = 0;
+    return;
+  }
+  while (pCtx->iPadQCount > 0) {
+    const int32_t iIdx = pCtx->iPadQIdx[pCtx->iPadQHead];
+    pCtx->iPadQHead = (pCtx->iPadQHead + 1) % (pCtx->iPadQCap + 1);
+    --pCtx->iPadQCount;
+    DbkPadOne (pCtx, pCurDqLayer, iIdx);
+  }
+}
+
 int32_t WelsDecodeAndConstructSlice (PWelsDecoderContext pCtx) {
   PNalUnit pNalCur = pCtx->pNalCur;
   PDqLayer pCurDqLayer = pCtx->pCurDqLayer;
@@ -1700,6 +1825,8 @@ int32_t WelsDecodeAndConstructSlice (PWelsDecoderContext pCtx) {
     WelsDeblockingInitFilter (pCtx, pFilter, iFilterIdc);
   }
 
+  SDbkDelayQ sDbkQ;
+  DbkQInit (sDbkQ, pCurDqLayer->iMbWidth);
   do {
     if ((-1 == iNextMbXyIndex) || (iNextMbXyIndex >= kiCountNumMb)) { // slice group boundary or end of a frame
       break;
@@ -1710,6 +1837,7 @@ int32_t WelsDecodeAndConstructSlice (PWelsDecoderContext pCtx) {
     iRet = pDecMbFunc (pCtx, pNalCur, uiEosFlag);
     pCurDqLayer->pMbRefConcealedFlag[iNextMbXyIndex] = pCtx->bMbRefConcealed;
     if (iRet != ERR_NONE) {
+      DbkFilterFlush (pCtx, pCurDqLayer, sDbkQ, pFilter, iFilterIdc, pDeblockMb);
       return iRet;
     }
     if (WelsTargetMbConstruction (pCtx)) {
@@ -1717,6 +1845,7 @@ int32_t WelsDecodeAndConstructSlice (PWelsDecoderContext pCtx) {
                "WelsTargetSliceConstruction():::MB(%d, %d) construction error. pCurSlice_type:%d",
                pCurDqLayer->iMbX, pCurDqLayer->iMbY, pSlice->eSliceType);
 
+      DbkFilterFlush (pCtx, pCurDqLayer, sDbkQ, pFilter, iFilterIdc, pDeblockMb);
       return ERR_INFO_MB_RECON_FAIL;
     }
     memcpy (pCtx->pDec->pNzc[pCurDqLayer->iMbXyIndex], pCurDqLayer->pNzc[pCurDqLayer->iMbXyIndex], 24);
@@ -1724,20 +1853,7 @@ int32_t WelsDecodeAndConstructSlice (PWelsDecoderContext pCtx) {
       pCtx->sBlockFunc.pWelsSetNonZeroCountFunc (
         pCtx->pDec->pNzc[pCurDqLayer->iMbXyIndex]); // set all none-zero nzc to 1; dbk can be opti!
     }
-    WelsDeblockingFilterMB (pCurDqLayer, pFilter, iFilterIdc, pDeblockMb);
-    if (pCtx->uiNalRefIdc > 0) {
-      if (pCurDqLayer->iMbX == 0 || pCurDqLayer->iMbX == pCurDqLayer->iMbWidth - 1 || pCurDqLayer->iMbY == 0
-          || pCurDqLayer->iMbY == pCurDqLayer->iMbHeight - 1) {
-        PadMBLuma_c (pCurDqLayer->pDec->pData[0], pCurDqLayer->pDec->iLinesize[0], pCurDqLayer->pDec->iWidthInPixel,
-                     pCurDqLayer->pDec->iHeightInPixel, pCurDqLayer->iMbX, pCurDqLayer->iMbY, pCurDqLayer->iMbWidth, pCurDqLayer->iMbHeight);
-        PadMBChroma_c (pCurDqLayer->pDec->pData[1], pCurDqLayer->pDec->iLinesize[1], pCurDqLayer->pDec->iWidthInPixel / 2,
-                       pCurDqLayer->pDec->iHeightInPixel / 2, pCurDqLayer->iMbX, pCurDqLayer->iMbY, pCurDqLayer->iMbWidth,
-                       pCurDqLayer->iMbHeight);
-        PadMBChroma_c (pCurDqLayer->pDec->pData[2], pCurDqLayer->pDec->iLinesize[2], pCurDqLayer->pDec->iWidthInPixel / 2,
-                       pCurDqLayer->pDec->iHeightInPixel / 2, pCurDqLayer->iMbX, pCurDqLayer->iMbY, pCurDqLayer->iMbWidth,
-                       pCurDqLayer->iMbHeight);
-      }
-    }
+    DbkFilterPush (pCtx, pCurDqLayer, pCurDqLayer->iMbXyIndex, sDbkQ, pFilter, iFilterIdc, pDeblockMb);
     if (!pCurDqLayer->pMbCorrectlyDecodedFlag[iNextMbXyIndex]) { //already con-ed, overwrite
       pCurDqLayer->pMbCorrectlyDecodedFlag[iNextMbXyIndex] = true;
       pCtx->pDec->iMbEcedPropNum += (pCurDqLayer->pMbRefConcealedFlag[iNextMbXyIndex] ? 1 : 0);
@@ -1749,12 +1865,12 @@ int32_t WelsDecodeAndConstructSlice (PWelsDecoderContext pCtx) {
                "WelsTargetSliceConstruction():::pCtx->iTotalNumMbRec:%d, iTotalMbTargetLayer:%d",
                pCtx->iTotalNumMbRec, iTotalMbTargetLayer);
 
+      DbkFilterFlush (pCtx, pCurDqLayer, sDbkQ, pFilter, iFilterIdc, pDeblockMb);
       return ERR_INFO_MB_NUM_EXCEED_FAIL;
     }
 
     ++pSlice->iTotalMbInCurSlice;
     if (uiEosFlag) { //end of slice
-      SET_EVENT (&pCtx->pDec->pReadyEvent[pCurDqLayer->iMbY]);
       break;
     }
     if (pSliceHeader->pPps->uiNumSliceGroups > 1) {
@@ -1762,22 +1878,14 @@ int32_t WelsDecodeAndConstructSlice (PWelsDecoderContext pCtx) {
     } else {
       ++iNextMbXyIndex;
     }
-    int32_t iLastMby = iMbY;
-    int32_t iLastMbx = iMbX;
     iMbX = iNextMbXyIndex % pCurDqLayer->iMbWidth;
     iMbY = iNextMbXyIndex / pCurDqLayer->iMbWidth;
     pCurDqLayer->iMbX = iMbX;
     pCurDqLayer->iMbY = iMbY;
     pCurDqLayer->iMbXyIndex = iNextMbXyIndex;
-    if (GetThreadCount (pCtx) > 1) {
-      if ((iMbY > iLastMby) && (iLastMbx == pCurDqLayer->iMbWidth - 1)) {
-        SET_EVENT (&pCtx->pDec->pReadyEvent[iLastMby]);
-      }
-    }
   } while (1);
-  if (GetThreadCount (pCtx) > 1) {
-    SET_EVENT (&pCtx->pDec->pReadyEvent[pCurDqLayer->iMbY]);
-  }
+  //Rows are announced by the padding stage, which is what makes them final.
+  DbkFilterFlush (pCtx, pCurDqLayer, sDbkQ, pFilter, iFilterIdc, pDeblockMb);
   return ERR_NONE;
 }
 

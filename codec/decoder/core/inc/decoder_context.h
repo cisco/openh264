@@ -59,6 +59,10 @@
 #include "wels_decoder_thread.h"
 
 namespace WelsDec {
+
+//Widest picture the padding queue can hold a macroblock row for (16384 pixels).
+#define MAX_MB_WIDTH_FOR_PAD_QUEUE 1024
+
 #define MAX_PRED_MODE_ID_I16x16  3
 #define MAX_PRED_MODE_ID_CHROMA  3
 #define MAX_PRED_MODE_ID_I4x4    8
@@ -276,7 +280,6 @@ typedef struct tagSWelsLastDecPicInfo {
   int32_t           iPrevPicOrderCntLsb;
   PPicture          pPreviousDecodedPictureInDpb; //pointer to previously decoded picture in DPB for error concealment
   int32_t           iPrevFrameNum;// frame number of previous frame well decoded for non-truncated mode yet
-  bool              bLastHasMmco5;
   uint32_t          uiDecodingTimeStamp; //represent relative decoding time stamps
 } SWelsLastDecPicInfo, *PWelsLastDecPicInfo;
 
@@ -515,6 +518,19 @@ typedef struct TagWelsDecoderContext {
   void* pLastThreadCtx;
   WELS_MUTEX* pCsDecoder;
   int16_t lastReadyHeightOffset[LIST_A][MAX_REF_PIC_COUNT]; //last ready reference MB offset
+
+  //Macroblocks that have been filtered but not yet border-padded, oldest first. A
+  //macroblock's samples are only final once the macroblock below it has been filtered,
+  //which can be in the next slice, so this queue spans the frame rather than a slice.
+  int32_t                       iPadQIdx[MAX_MB_WIDTH_FOR_PAD_QUEUE + 2];
+  int32_t                       iPadQHead;
+  int32_t                       iPadQCount;
+  int32_t                       iPadQCap;
+
+  //Pictures this frame is decoding against, held through SPicture::iPinCount so that
+  //another worker's PrefetchPic() cannot hand the buffer out from under it.
+  PPicture                      pPinnedRef[LIST_A * MAX_DPB_COUNT * 3];
+  int32_t                       iPinnedRefCount;
   PPictInfo               pPictInfoList;
   PPictReoderingStatus    pPictReoderingStatus;
 } SWelsDecoderContext, *PWelsDecoderContext;
@@ -531,6 +547,23 @@ typedef struct tagSWelsDecThread {
   DECLARE_PROCTHREAD_PTR (pThrProcMain);
 } SWelsDecThreadInfo, *PWelsDecThreadInfo;
 
+//Everything WelsMarkAsRef() needs to know about the access unit that produced a picture.
+//Reference marking for a picture runs on the *next* frame's worker, which cannot read these
+//out of the decoding worker's context: by then that context's slice headers and access unit
+//list may already have been overwritten with a later access unit, and marking then applies
+//another frame's dec_ref_pic_marking() to this one.
+typedef struct tagSWelsDecRefMarkInfo {
+  SRefPicMarking sRefMarking;
+  bool           bValid;
+  bool           bIsIdrAu;
+  int32_t        iNumRefFrames;
+  uint32_t       uiLog2MaxFrameNum;
+  uint8_t        uiQualityId;
+  uint8_t        uiTemporalId;
+  int32_t        iSpsId;
+  int32_t        iPpsId;
+} SWelsDecRefMarkInfo, *PWelsDecRefMarkInfo;
+
 typedef struct tagSWelsDecThreadCtx {
   SWelsDecThreadInfo sThreadInfo;
   PWelsDecoderContext pCtx;
@@ -538,6 +571,10 @@ typedef struct tagSWelsDecThreadCtx {
   uint8_t* kpSrc;
   int32_t kiSrcLen;
   uint8_t** ppDst;
+  //The worker writes the decoded picture's plane pointers through ppDst. That must not be
+  //the caller's array: the caller's lives on its stack for one call, while the worker keeps
+  //running past it.
+  uint8_t* pDstOwn[3];
   SBufferInfo sDstInfo;
   PPicture pDec;
   SWelsDecEvent sImageReady;
@@ -548,6 +585,9 @@ typedef struct tagSWelsDecThreadCtx {
   // is signaled. Prevents concurrent workers from overwriting the shared pLastDecPicInfo
   // field before BufferingReadyPicture() reads it.
   PPicture      pPreviousDecodedPictureInDpb;
+  //Filled by this worker for its own picture before it lets the next worker start, and read
+  //by that next worker when it marks this picture as a reference.
+  SWelsDecRefMarkInfo sRefMarkInfo;
 } SWelsDecoderThreadCTX, *PWelsDecoderThreadCTX;
 
 static inline void ResetActiveSPSForEachLayer (PWelsDecoderContext pCtx) {
@@ -564,6 +604,19 @@ static inline int32_t GetThreadCount (PWelsDecoderContext pCtx) {
     iThreadCount = pThreadCtx->sThreadInfo.uiThrMaxNum;
   }
   return iThreadCount;
+}
+//Pin acquisition, pin release, and the decision in SetUnRef() that resets a picture when
+//iRefCount and iPinCount are both zero have to be serialized against each other and against
+//the release on the output path, which makes the iRefCount half of that same decision.
+//m_csDecoder is the lock that path already holds to do it, and pCsDecoder points at it. It is
+//NULL for a context driven without the plus layer, which has no worker threads either.
+static inline void DpbRefLock (PWelsDecoderContext pCtx) {
+  if (pCtx->pCsDecoder != NULL && GetThreadCount (pCtx) > 1)
+    WelsMutexLock (pCtx->pCsDecoder);
+}
+static inline void DpbRefUnlock (PWelsDecoderContext pCtx) {
+  if (pCtx->pCsDecoder != NULL && GetThreadCount (pCtx) > 1)
+    WelsMutexUnlock (pCtx->pCsDecoder);
 }
 //GetPrevFrameNum only applies when thread count >= 2
 static inline int32_t GetPrevFrameNum (PWelsDecoderContext pCtx) {
