@@ -219,10 +219,7 @@ static int32_t WelsCheckAndRecoverForFutureDecoding (PWelsDecoderContext pCtx) {
                               || (ERROR_CON_SLICE_COPY_CROSS_IDR_FREEZE_RES_CHANGE == pCtx->pParam->eEcActiveIdc)
                               || (ERROR_CON_SLICE_MV_COPY_CROSS_IDR == pCtx->pParam->eEcActiveIdc)
                               || (ERROR_CON_SLICE_MV_COPY_CROSS_IDR_FREEZE_RES_CHANGE == pCtx->pParam->eEcActiveIdc))
-                             && (NULL != pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb);
-        bCopyPrevious = bCopyPrevious
-                        && (pRef->iWidthInPixel == pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb->iWidthInPixel)
-                        && (pRef->iHeightInPixel == pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb->iHeightInPixel);
+                             && IsEcRefPicCompatible (pCtx, pRef, pCtx->pLastDecPicInfo->pPreviousDecodedPictureInDpb);
 
         if (!bCopyPrevious) {
           memset (pRef->pData[0], 128, pRef->iLinesize[0] * pRef->iHeightInPixel);
