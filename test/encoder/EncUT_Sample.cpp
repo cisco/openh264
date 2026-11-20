@@ -669,6 +669,27 @@ GENERATE_Sad8x16_UT (WelsSampleSad8x16_AArch64_neon, WelsSampleSad8x16_c, WELS_C
 GENERATE_Sad16x8_UT (WelsSampleSad16x8_AArch64_neon, WelsSampleSad16x8_c, WELS_CPU_NEON)
 GENERATE_Sad16x16_UT (WelsSampleSad16x16_AArch64_neon, WelsSampleSad16x16_c, WELS_CPU_NEON)
 
+// Use signed row offsets without advancing beyond the final row.
+static int32_t Sad16Reference (const uint8_t* pA, int32_t iStrideA, const uint8_t* pB, int32_t iStrideB,
+                             int32_t iHeight) {
+  int32_t iSad = 0;
+  for (int32_t iY = 0; iY < iHeight; ++iY) {
+    const uint8_t* pRowA = pA + (ptrdiff_t)iY * iStrideA;
+    const uint8_t* pRowB = pB + (ptrdiff_t)iY * iStrideB;
+    for (int32_t iX = 0; iX < 16; ++iX)
+      iSad += abs (pRowA[iX] - pRowB[iX]);
+  }
+  return iSad;
+}
+
+static void SadFour16Reference (const uint8_t* pA, int32_t iStrideA, const uint8_t* pB, int32_t iStrideB,
+                               int32_t iHeight, int32_t* pSad) {
+  pSad[0] = Sad16Reference (pA, iStrideA, pB - iStrideB, iStrideB, iHeight);
+  pSad[1] = Sad16Reference (pA, iStrideA, pB + iStrideB, iStrideB, iHeight);
+  pSad[2] = Sad16Reference (pA, iStrideA, pB - 1, iStrideB, iHeight);
+  pSad[3] = Sad16Reference (pA, iStrideA, pB + 1, iStrideB, iHeight);
+}
+
 TEST_F (SadSatdAssemblyFuncTest, Sad16_AArch64_neon_StridesAndExtremes) {
   if (0 == (m_uiCpuFeatureFlag & WELS_CPU_NEON))
     return;
@@ -684,10 +705,54 @@ TEST_F (SadSatdAssemblyFuncTest, Sad16_AArch64_neon_StridesAndExtremes) {
         for (int iOffset = 0; iOffset < 16; ++iOffset) {
           uint8_t* pA = m_pPixSrcA + iOffset + (iStrideA < 0 ? -15 * iStrideA : 0);
           uint8_t* pB = m_pPixSrcB + 15 - iOffset + (iStrideB < 0 ? -15 * iStrideB : 0);
-          EXPECT_EQ (WelsSampleSad16x8_c (pA, iStrideA, pB, iStrideB),
+          EXPECT_EQ (Sad16Reference (pA, iStrideA, pB, iStrideB, 8),
                      WelsSampleSad16x8_AArch64_neon (pA, iStrideA, pB, iStrideB));
-          EXPECT_EQ (WelsSampleSad16x16_c (pA, iStrideA, pB, iStrideB),
+          EXPECT_EQ (Sad16Reference (pA, iStrideA, pB, iStrideB, 16),
                      WelsSampleSad16x16_AArch64_neon (pA, iStrideA, pB, iStrideB));
+        }
+      }
+    }
+  }
+}
+
+TEST_F (SadSatdAssemblyFuncTest, SadFour16_AArch64_neon_StridesAndExtremes) {
+  if (0 == (m_uiCpuFeatureFlag & WELS_CPU_NEON))
+    return;
+  const int32_t kiStrides[] = {16, 23, 32, -16, -23, -32};
+  for (int iPattern = 0; iPattern < 4; ++iPattern) {
+    for (int i = 0; i < (PIXEL_STRIDE << 5); ++i) {
+      if (iPattern == 0) {
+        m_pPixSrcA[i] = 0;
+        m_pPixSrcB[i] = 255;
+      } else if (iPattern == 1) {
+        m_pPixSrcA[i] = 255;
+        m_pPixSrcB[i] = 0;
+      } else if (iPattern == 2) {
+        m_pPixSrcA[i] = 127;
+        m_pPixSrcB[i] = 127;
+      } else {
+        m_pPixSrcA[i] = rand() % 256;
+        m_pPixSrcB[i] = rand() % 256;
+      }
+    }
+    for (int32_t iStrideA : kiStrides) {
+      for (int32_t iStrideB : kiStrides) {
+        for (int iOffset = 0; iOffset < 16; ++iOffset) {
+          uint8_t* pA = m_pPixSrcA + iOffset + (iStrideA < 0 ? -15 * iStrideA : 0);
+          uint8_t* pB = m_pPixSrcB + iOffset + (iStrideB < 0 ? 16 * -iStrideB : 32);
+          int32_t sadReference[4];
+          int32_t sadNeon[4];
+          SadFour16Reference (pA, iStrideA, pB, iStrideB, 8, sadReference);
+          WelsSampleSadFour16x8_AArch64_neon (pA, iStrideA, pB, iStrideB, sadNeon);
+          for (int iSad = 0; iSad < 4; ++iSad)
+            EXPECT_EQ (sadReference[iSad], sadNeon[iSad]) << "pattern=" << iPattern << " strideA=" << iStrideA
+                                                          << " strideB=" << iStrideB << " offset=" << iOffset;
+
+          SadFour16Reference (pA, iStrideA, pB, iStrideB, 16, sadReference);
+          WelsSampleSadFour16x16_AArch64_neon (pA, iStrideA, pB, iStrideB, sadNeon);
+          for (int iSad = 0; iSad < 4; ++iSad)
+            EXPECT_EQ (sadReference[iSad], sadNeon[iSad]) << "pattern=" << iPattern << " strideA=" << iStrideA
+                                                          << " strideB=" << iStrideB << " offset=" << iOffset;
         }
       }
     }
