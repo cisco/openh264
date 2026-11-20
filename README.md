@@ -81,6 +81,8 @@ ABIs, add `ARCH=arm64`, `ARCH=x86`, `ARCH=x86_64`, `ARCH=mips` or `ARCH=mips64`.
 To build for the older `armeabi` ABI (which has armv5te as baseline), add `APP_ABI=armeabi` (`ARCH=arm` is implicit).
 To build for 64-bit ABI, such as `arm64`, explicitly set `NDKLEVEL` to 21 or higher.
 
+For `x86` specific builds additionally set make flag: `ENABLEPIC=Yes`.
+
 For iOS Builds
 --------------
 You can build the libraries and demo applications using xcode project files
