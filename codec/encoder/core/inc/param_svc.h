@@ -204,7 +204,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
       for (int32_t idx = 0; idx < kiLesserSliceNum; idx++)
         param.sSpatialLayers[iLayer].sSliceArgument.uiSliceMbNum[idx] = 0; //default, using one row a slice if uiSliceMode is SM_RASTER_MODE
 
-      // See codec_app_def.h for more info about members bVideoSignalTypePresent through uiColorMatrix.  The default values
+      // See codec_app_def.h for more info about members bVideoSignalTypePresent through bFixedFrameRateFlag.  The default values
       // used below preserve the previous behavior; i.e., no additional information will be written to the output file.
       param.sSpatialLayers[iLayer].bVideoSignalTypePresent = false;			// do not write any of the following information to the header
       param.sSpatialLayers[iLayer].uiVideoFormat = VF_UNDEF;				// undefined
@@ -213,6 +213,10 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
       param.sSpatialLayers[iLayer].uiColorPrimaries = CP_UNDEF;				// undefined
       param.sSpatialLayers[iLayer].uiTransferCharacteristics = TRC_UNDEF;	// undefined
       param.sSpatialLayers[iLayer].uiColorMatrix = CM_UNDEF;				// undefined
+      param.sSpatialLayers[iLayer].bTimingInfoPresentFlag = false;	    	// do not write any of the following three items to the header
+      param.sSpatialLayers[iLayer].uiNumUnitsInTick = 1;				    // not set
+      param.sSpatialLayers[iLayer].uiTimeScale = 0;	                        // not set
+      param.sSpatialLayers[iLayer].bFixedFrameRateFlag = false;				// not set
     }
   }
 
@@ -450,7 +454,7 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
 
       pSpatialLayer->iDLayerQp = pCodingParam.sSpatialLayers[iIdxSpatial].iDLayerQp;
 
-      // See codec_app_def.h and parameter_sets.h for more info about members bVideoSignalTypePresent through uiColorMatrix.
+      // See codec_app_def.h and parameter_sets.h for more info about members bVideoSignalTypePresent through bFixedFrameRateFlag.
       pSpatialLayer->bVideoSignalTypePresent =   pCodingParam.sSpatialLayers[iIdxSpatial].bVideoSignalTypePresent;
       pSpatialLayer->uiVideoFormat =             pCodingParam.sSpatialLayers[iIdxSpatial].uiVideoFormat;
       pSpatialLayer->bFullRange =                pCodingParam.sSpatialLayers[iIdxSpatial].bFullRange;
@@ -458,6 +462,10 @@ typedef struct TagWelsSvcCodingParam: SEncParamExt {
       pSpatialLayer->uiColorPrimaries =          pCodingParam.sSpatialLayers[iIdxSpatial].uiColorPrimaries;
       pSpatialLayer->uiTransferCharacteristics = pCodingParam.sSpatialLayers[iIdxSpatial].uiTransferCharacteristics;
       pSpatialLayer->uiColorMatrix =             pCodingParam.sSpatialLayers[iIdxSpatial].uiColorMatrix;
+      pSpatialLayer->bTimingInfoPresentFlag =    pCodingParam.sSpatialLayers[iIdxSpatial].bTimingInfoPresentFlag;
+      pSpatialLayer->uiNumUnitsInTick =          pCodingParam.sSpatialLayers[iIdxSpatial].uiNumUnitsInTick;
+      pSpatialLayer->uiTimeScale =               pCodingParam.sSpatialLayers[iIdxSpatial].uiTimeScale;
+      pSpatialLayer->bFixedFrameRateFlag =       pCodingParam.sSpatialLayers[iIdxSpatial].bFixedFrameRateFlag;
 
       pSpatialLayer->bAspectRatioPresent = pCodingParam.sSpatialLayers[iIdxSpatial].bAspectRatioPresent;
       pSpatialLayer->eAspectRatio = pCodingParam.sSpatialLayers[iIdxSpatial].eAspectRatio;
