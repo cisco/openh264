@@ -57,7 +57,7 @@ cpp_lib = '-lstdc++'
 libm_dep = cpp.find_library('m', required : false)
 deps += [libm_dep]
 
-if ['linux', 'freebsd', 'android', 'ios', 'darwin'].contains(system)
+if ['linux', 'freebsd', 'openbsd', 'android', 'ios', 'darwin'].contains(system)
   asm_format32 = 'elf'
   asm_format64 = 'elf64'
   if ['ios', 'darwin'].contains(system)
