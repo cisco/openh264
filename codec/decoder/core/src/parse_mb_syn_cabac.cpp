@@ -1514,10 +1514,6 @@ int32_t ParseIPCMInfoCabac (PWelsDecoderContext pCtx) {
   int32_t iMbOffsetLuma = (iMbX + iMbY * iDstStrideLuma) << 4;
   int32_t iMbOffsetChroma = (iMbX + iMbY * iDstStrideChroma) << 3;
 
-  uint8_t* pMbDstY = pCtx->pDec->pData[0] + iMbOffsetLuma;
-  uint8_t* pMbDstU = pCtx->pDec->pData[1] + iMbOffsetChroma;
-  uint8_t* pMbDstV = pCtx->pDec->pData[2] + iMbOffsetChroma;
-
   uint8_t* pPtrSrc;
 
   pCurDqLayer->pDec->pMbType[iMbXy] = MB_TYPE_INTRA_PCM;
@@ -1528,6 +1524,11 @@ int32_t ParseIPCMInfoCabac (PWelsDecoderContext pCtx) {
   }
   pPtrSrc = pBsAux->pCurBuf;
   if (!pCtx->pParam->bParseOnly) {
+    //pDec->pData is only valid when reconstructing; in parse-only mode it is
+    //NULL, so forming these pointers outside this branch is undefined behavior.
+    uint8_t* pMbDstY = pCtx->pDec->pData[0] + iMbOffsetLuma;
+    uint8_t* pMbDstU = pCtx->pDec->pData[1] + iMbOffsetChroma;
+    uint8_t* pMbDstV = pCtx->pDec->pData[2] + iMbOffsetChroma;
     for (i = 0; i < 16; i++) {   //luma
       memcpy (pMbDstY, pPtrSrc, 16);
       pMbDstY += iDstStrideLuma;

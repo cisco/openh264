@@ -1827,10 +1827,6 @@ int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
     int32_t iOffsetL = (iMbX + iMbY * iDecStrideL) << 4;
     int32_t iOffsetC = (iMbX + iMbY * iDecStrideC) << 3;
 
-    uint8_t* pDecY = pCurDqLayer->pDec->pData[0] + iOffsetL;
-    uint8_t* pDecU = pCurDqLayer->pDec->pData[1] + iOffsetC;
-    uint8_t* pDecV = pCurDqLayer->pDec->pData[2] + iOffsetC;
-
     uint8_t* pTmpBsBuf;
 
 
@@ -1855,6 +1851,11 @@ int32_t WelsActualDecodeMbCavlcISlice (PWelsDecoderContext pCtx) {
     //step 2: copy pixel from bit-stream into fdec [reconstruction]
     pTmpBsBuf = pBs->pCurBuf;
     if (!pCtx->pParam->bParseOnly) {
+      //pDec->pData is only valid when reconstructing; in parse-only mode it is
+      //NULL, so forming these pointers outside this branch is undefined behavior.
+      uint8_t* pDecY = pCurDqLayer->pDec->pData[0] + iOffsetL;
+      uint8_t* pDecU = pCurDqLayer->pDec->pData[1] + iOffsetC;
+      uint8_t* pDecV = pCurDqLayer->pDec->pData[2] + iOffsetC;
       for (i = 0; i < 16; i++) { //luma
         memcpy (pDecY, pTmpBsBuf, iCopySizeY);
         pDecY += iDecStrideL;
@@ -2176,10 +2177,6 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
       int32_t iOffsetL = (iMbX + iMbY * iDecStrideL) << 4;
       int32_t iOffsetC = (iMbX + iMbY * iDecStrideC) << 3;
 
-      uint8_t* pDecY = pCurDqLayer->pDec->pData[0] + iOffsetL;
-      uint8_t* pDecU = pCurDqLayer->pDec->pData[1] + iOffsetC;
-      uint8_t* pDecV = pCurDqLayer->pDec->pData[2] + iOffsetC;
-
       uint8_t* pTmpBsBuf;
 
       int32_t i;
@@ -2203,6 +2200,11 @@ int32_t WelsActualDecodeMbCavlcPSlice (PWelsDecoderContext pCtx) {
       //step 2: copy pixel from bit-stream into fdec [reconstruction]
       pTmpBsBuf = pBs->pCurBuf;
       if (!pCtx->pParam->bParseOnly) {
+        //pDec->pData is only valid when reconstructing; in parse-only mode it is
+        //NULL, so forming these pointers outside this branch is undefined behavior.
+        uint8_t* pDecY = pCurDqLayer->pDec->pData[0] + iOffsetL;
+        uint8_t* pDecU = pCurDqLayer->pDec->pData[1] + iOffsetC;
+        uint8_t* pDecV = pCurDqLayer->pDec->pData[2] + iOffsetC;
         for (i = 0; i < 16; i++) { //luma
           memcpy (pDecY, pTmpBsBuf, iCopySizeY);
           pDecY += iDecStrideL;
@@ -2730,10 +2732,6 @@ int32_t WelsActualDecodeMbCavlcBSlice (PWelsDecoderContext pCtx) {
       int32_t iOffsetL = (iMbX + iMbY * iDecStrideL) << 4;
       int32_t iOffsetC = (iMbX + iMbY * iDecStrideC) << 3;
 
-      uint8_t* pDecY = pCurDqLayer->pDec->pData[0] + iOffsetL;
-      uint8_t* pDecU = pCurDqLayer->pDec->pData[1] + iOffsetC;
-      uint8_t* pDecV = pCurDqLayer->pDec->pData[2] + iOffsetC;
-
       uint8_t* pTmpBsBuf;
 
       int32_t i;
@@ -2757,6 +2755,11 @@ int32_t WelsActualDecodeMbCavlcBSlice (PWelsDecoderContext pCtx) {
       //step 2: copy pixel from bit-stream into fdec [reconstruction]
       pTmpBsBuf = pBs->pCurBuf;
       if (!pCtx->pParam->bParseOnly) {
+        //pDec->pData is only valid when reconstructing; in parse-only mode it is
+        //NULL, so forming these pointers outside this branch is undefined behavior.
+        uint8_t* pDecY = pCurDqLayer->pDec->pData[0] + iOffsetL;
+        uint8_t* pDecU = pCurDqLayer->pDec->pData[1] + iOffsetC;
+        uint8_t* pDecV = pCurDqLayer->pDec->pData[2] + iOffsetC;
         for (i = 0; i < 16; i++) { //luma
           memcpy (pDecY, pTmpBsBuf, iCopySizeY);
           pDecY += iDecStrideL;
