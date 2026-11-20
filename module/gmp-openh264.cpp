@@ -91,6 +91,7 @@
 #endif
 
 #include "task_utils.h"
+#include <vector>
 
 static int g_log_level = 0;
 
