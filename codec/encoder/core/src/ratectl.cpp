@@ -639,8 +639,12 @@ void RcDecideTargetBitsTimestamp (sWelsEncCtx* pEncCtx) {
       SSpatialLayerInternal* pDLayerParamInternal = &pEncCtx->pSvcParam->sDependencyLayers[pEncCtx->uiDependencyId];
       const int32_t kiGopSize   = (1 << pDLayerParamInternal->iDecompositionStages);
       int32_t iAverageFrameSize = (int32_t) ((double) (pDLayerParam->iSpatialBitrate) / (double) (pDLayerParam->fFrameRate));
-      const int32_t kiGopBits   = iAverageFrameSize * kiGopSize;
-      pWelsSvcRc->iTargetBits = WELS_DIV_ROUND (pTOverRc->iTlayerWeight * kiGopBits, INT_MULTIPLY * 10 * 2);
+      // Widen to 64-bit: iTlayerWeight (up to 2000) times the GOP bit budget
+      // overflows int32 at ordinary high bitrates (e.g. 30 Mbps at 25 fps),
+      // the same class of signed overflow fixed in RcDecideTargetBits (#3982).
+      const int64_t kiGopBits   = static_cast<int64_t> (iAverageFrameSize) * kiGopSize;
+      pWelsSvcRc->iTargetBits = static_cast<int32_t> (WELS_DIV_ROUND64 (static_cast<int64_t> (pTOverRc->iTlayerWeight) * kiGopBits,
+                                                                       INT_MULTIPLY * 10 * 2));
 
       int32_t iMaxTh = iBufferTh / 2;
       int32_t iMinTh = static_cast<int32_t>((pDLayerParam->fFrameRate < 8) ? iBufferTh * 1.0 / 4 : iBufferTh * 2 / pDLayerParam->fFrameRate);
