@@ -2317,6 +2317,16 @@ int32_t WelsDecodeInitAccessUnitStart (PWelsDecoderContext pCtx, SBufferInfo* pD
   pCtx->pSps = pCurAu->pNalUnitsList[pCurAu->uiStartPos]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pSps;
   pCtx->pPps = pCurAu->pNalUnitsList[pCurAu->uiStartPos]->sNalData.sVclNal.sSliceHeaderExt.sSliceHeader.pPps;
 
+  // A resolution increase that was not flagged as a new sequence (e.g. an
+  // in-place SPS overwrite reusing the same id, so CheckNewSeqBegin sees an
+  // unchanged active-sps pointer) would otherwise decode the larger picture
+  // into Dq-layer buffers still sized for the previous, smaller resolution.
+  // Force the new-sequence reallocation path so the buffers match pSps.
+  if (pCtx->pSps != NULL && pCtx->bInitialDqLayersMem
+      && (pCtx->pSps->iMbWidth > pCtx->sMb.iMbWidth
+          || pCtx->pSps->iMbHeight > pCtx->sMb.iMbHeight))
+    pCtx->bNewSeqBegin = true;
+
   return iErr;
 }
 
