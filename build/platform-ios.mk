@@ -10,6 +10,6 @@ endif
 SDK_MIN = 5.1
 
 SDKROOT := $(shell xcrun --sdk $(shell echo $(SDKTYPE) | tr A-Z a-z) --show-sdk-path)
-CFLAGS += -arch $(ARCH) -isysroot $(SDKROOT) -miphoneos-version-min=$(SDK_MIN) -DAPPLE_IOS -fembed-bitcode
-LDFLAGS += -arch $(ARCH) -isysroot $(SDKROOT) -miphoneos-version-min=$(SDK_MIN)
+CFLAGS += -arch $(ARCH) -isysroot "$(SDKROOT)" -miphoneos-version-min=$(SDK_MIN) -DAPPLE_IOS -fembed-bitcode
+LDFLAGS += -arch $(ARCH) -isysroot "$(SDKROOT)" -miphoneos-version-min=$(SDK_MIN)
 
